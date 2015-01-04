@@ -58,7 +58,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo and bar', $c->toSentence('key'));
 
 		$c = new Collection([['key' => 'foo'], ['key' => 'bar'], ['key' => 'bat']]);
-		$this->assertEquals('foo, bar and bat', $c->toSentence('key'));
+		$this->assertEquals('foo, bar, and bat', $c->toSentence('key'));
 	}
 
 

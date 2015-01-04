@@ -739,10 +739,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  string  $key
 	 * @param  string  $wordsConnector
+	 * @param  string  $twoWordsConnector
 	 * @param  string  $lastWordConnector
 	 * @return string
 	 */
-	public function toSentence($key, $wordsConnector = ', ', $lastWordConnector = ' and ')
+	public function toSentence($key, $wordsConnector = ', ', $twoWordsConnector = ' and ', $lastWordConnector = ', and ')
 	{
 		switch ($this->count()) 
 		{
@@ -753,7 +754,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 				return array_get($this->first(), $key);
 
 			case 2:
-				return $this->implode($key, $lastWordConnector);
+				return $this->implode($key, $twoWordsConnector);
 
 			default:
 				$lastWord = $this->pop();
