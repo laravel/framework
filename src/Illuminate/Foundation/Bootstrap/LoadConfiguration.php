@@ -74,7 +74,7 @@ class LoadConfiguration {
 	}
 
 	/**
-	 * Pull in any set environment variables that overwirtes the config values
+	 * Pull in any set environment variables that overwrites the config values
 	 *
 	 * @param  string $key
 	 * @param  array  $config
