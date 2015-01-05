@@ -290,9 +290,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$url->forceRootUrl('https://www.bar.com');
 		$this->assertEquals('http://www.bar.com/foo/bar', $url->to('foo/bar'));
 
-		/**
-		 * Ensure trailing / is trimmed from root URL as UrlGenerator already handles this
-		 */
+		// Ensure trailing slash is trimmed from root URL as UrlGenerator already handles this
 		$url->forceRootUrl('http://www.foo.com/');
 		$this->assertEquals('http://www.foo.com/bar', $url->to('/bar'));
 
