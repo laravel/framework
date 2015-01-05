@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 
 class ConfigCacheCommand extends Command {
 
@@ -19,6 +20,26 @@ class ConfigCacheCommand extends Command {
 	protected $description = 'Create a cache file for faster configuration loading';
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
+	 * Create a new config cache command instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @return void
+	 */
+	public function __construct(Filesystem $files)
+	{
+		parent::__construct();
+
+		$this->files = $files;
+	}
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
@@ -30,8 +51,8 @@ class ConfigCacheCommand extends Command {
 		$config = $this->setRealSessionDriver(
 			$this->getFreshConfiguration()
 		);
-
-		file_put_contents(
+                
+		$this->files->put(
 			$this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
 		);
 
