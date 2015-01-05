@@ -25,7 +25,7 @@ class FoundationDispatchesCommandsTest {
 	}
 	public function testMarshalFromRequest()
 	{
-		$request = Illuminate\Http\Request::create('/', 'GET', ['first_name' => 'taylor']);
+		$request = Illuminate\Http\Request::create('/', 'GET', ['firstName' => 'taylor']);
 		return $this->marshal('FoundationDispatchesCommandsTestCommand', $request);
 	}
 }
