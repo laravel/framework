@@ -151,7 +151,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		file_put_contents(__DIR__.'/file.php', '<?php return "Howdy?"; ?>');
 		$files = new Filesystem;
-		$this->assertEquals('Howdy?',$files->getRequire(__DIR__.'/file.php'));
+		$this->assertEquals('Howdy?', $files->getRequire(__DIR__.'/file.php'));
 		@unlink(__DIR__.'/file.php');
 	}
 
@@ -170,10 +170,10 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		file_put_contents(__DIR__.'/file.txt', 'foo');
 		$files = new Filesystem;
-		$bytesWritten = $files->append(__DIR__.'/file.txt','bar');
-		$this->assertEquals(mb_strlen('bar','8bit'),$bytesWritten);
+		$bytesWritten = $files->append(__DIR__.'/file.txt', 'bar');
+		$this->assertEquals(mb_strlen('bar', '8bit'), $bytesWritten);
 		$this->assertFileExists(__DIR__.'/file.txt');
-		$this->assertStringEqualsFile(__DIR__.'/file.txt','foobar');
+		$this->assertStringEqualsFile(__DIR__.'/file.txt', 'foobar');
 		@unlink(__DIR__.'/file.txt');
 	}
 
@@ -182,7 +182,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$files->move(__DIR__.'/foo.txt',__DIR__.'/bar.txt');
+		$files->move(__DIR__.'/foo.txt', __DIR__.'/bar.txt');
 		$this->assertFileExists(__DIR__.'/bar.txt');
 		$this->assertFileNotExists(__DIR__.'/foo.txt');
 		@unlink(__DIR__.'/bar.txt');
@@ -193,7 +193,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals('txt',$files->extension(__DIR__.'/foo.txt'));
+		$this->assertEquals('txt', $files->extension(__DIR__.'/foo.txt'));
 		@unlink(__DIR__.'/foo.txt');
 	}
 
@@ -202,7 +202,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals('file',$files->type(__DIR__.'/foo.txt'));
+		$this->assertEquals('file', $files->type(__DIR__.'/foo.txt'));
 		@unlink(__DIR__.'/foo.txt');
 	}
 
@@ -211,7 +211,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		mkdir(__DIR__.'/foo');
 		$files = new Filesystem;
-		$this->assertEquals('dir',$files->type(__DIR__.'/foo'));
+		$this->assertEquals('dir', $files->type(__DIR__.'/foo'));
 		@rmdir(__DIR__.'/foo');
 	}
 
@@ -220,7 +220,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	{
 		$size = file_put_contents(__DIR__.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals($size,$files->size(__DIR__.'/foo.txt'));
+		$this->assertEquals($size, $files->size(__DIR__.'/foo.txt'));
 		@unlink(__DIR__.'/foo.txt');
 	}
 
@@ -230,7 +230,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		$time = time();
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
 		$files = new Filesystem;
-		$this->assertEquals($time,$files->lastModified(__DIR__.'/foo.txt'));
+		$this->assertEquals($time, $files->lastModified(__DIR__.'/foo.txt'));
 		@unlink(__DIR__.'/foo.txt');
 	}
 
@@ -253,8 +253,8 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(__DIR__.'/bar.txt', 'bar');
 		$files = new Filesystem;
 		$glob = $files->glob(__DIR__.'/*.txt');
-		$this->assertContains(__DIR__.'/foo.txt',$glob);
-		$this->assertContains(__DIR__.'/bar.txt',$glob);
+		$this->assertContains(__DIR__.'/foo.txt', $glob);
+		$this->assertContains(__DIR__.'/bar.txt', $glob);
 		@unlink(__DIR__.'/foo.txt');
 		@unlink(__DIR__.'/bar.txt');
 	}
@@ -266,10 +266,12 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(__DIR__.'/bar.txt', 'bar');
 		$files = new Filesystem;
 		$allFiles = [];
-		foreach($files->allFiles(__DIR__) as $file)
+		foreach ($files->allFiles(__DIR__) as $file)
+		{
 			$allFiles[] = $file->getFilename();
-		$this->assertContains('foo.txt',$allFiles);
-		$this->assertContains('bar.txt',$allFiles);
+		}
+		$this->assertContains('foo.txt', $allFiles);
+		$this->assertContains('bar.txt', $allFiles);
 		@unlink(__DIR__.'/foo.txt');
 		@unlink(__DIR__.'/bar.txt');
 	}
@@ -281,8 +283,8 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 		mkdir(__DIR__.'/bar');
 		$files = new Filesystem;
 		$directories = $files->directories(__DIR__);
-		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'foo',$directories);
-		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'bar',$directories);
+		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'foo', $directories);
+		$this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'bar', $directories);
 		@rmdir(__DIR__.'/foo');
 		@rmdir(__DIR__.'/bar');
 	}
