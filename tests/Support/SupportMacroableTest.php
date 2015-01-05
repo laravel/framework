@@ -1,6 +1,6 @@
 <?php
 
-class SupportMacroableTest extends \PHPUnit_Framework_TestCase {
+class SupportMacroableTest extends PHPUnit_Framework_TestCase {
 
 	private $macroable;
 
