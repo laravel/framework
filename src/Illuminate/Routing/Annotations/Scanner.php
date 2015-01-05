@@ -133,7 +133,7 @@ class Scanner {
 			{
 				$classes[] = new ReflectionClass($scan);
 			}
-			catch (\Exception $e)
+			catch (Exception $e)
 			{
 				//
 			}
