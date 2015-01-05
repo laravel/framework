@@ -128,10 +128,7 @@ trait DispatchesCommands {
 	 */
 	protected function extractValueFromSource(ArrayAccess $source, ReflectionParameter $parameter)
 	{
-		if (isset($source[$parameter->name]))
-		{
-			return $source[$parameter->name];
-		}
+		return array_get($source, $parameter->name);
 	}
 
 }
