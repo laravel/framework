@@ -1,5 +1,7 @@
 <?php namespace Illuminate\View\Engines;
 
+use Exception;
+
 class PhpEngine implements EngineInterface {
 
 	/**
@@ -36,7 +38,7 @@ class PhpEngine implements EngineInterface {
 		{
 			include $__path;
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			$this->handleViewException($e, $obLevel);
 		}

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Events\Annotations;
 
+use Exception;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -94,7 +95,7 @@ class Scanner {
 			{
 				$classes[] = new ReflectionClass($class);
 			}
-			catch (\Exception $e)
+			catch (Exception $e)
 			{
 				//
 			}

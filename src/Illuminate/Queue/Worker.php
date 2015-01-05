@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
@@ -111,7 +112,7 @@ class Worker {
 		{
 			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			if ($this->exceptions) $this->exceptions->report($e);
 		}
@@ -208,7 +209,7 @@ class Worker {
 			return ['job' => $job, 'failed' => false];
 		}
 
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
