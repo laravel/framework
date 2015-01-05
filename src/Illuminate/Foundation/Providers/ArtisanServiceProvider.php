@@ -126,9 +126,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerConfigCacheCommand()
 	{
-		$this->app->singleton('command.config.cache', function()
+		$this->app->singleton('command.config.cache', function($app)
 		{
-			return new ConfigCacheCommand;
+			return new ConfigCacheCommand($app['files']);
 		});
 	}
 
@@ -139,9 +139,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerConfigClearCommand()
 	{
-		$this->app->singleton('command.config.clear', function()
+		$this->app->singleton('command.config.clear', function($app)
 		{
-			return new ConfigClearCommand;
+			return new ConfigClearCommand($app['files']);
 		});
 	}
 
@@ -204,9 +204,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerEventScanCommand()
 	{
-		$this->app->singleton('command.event.scan', function()
+		$this->app->singleton('command.event.scan', function($app)
 		{
-			return new EventScanCommand;
+			return new EventScanCommand($app['files']);
 		});
 	}
 
@@ -334,9 +334,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRouteScanCommand()
 	{
-		$this->app->singleton('command.route.scan', function()
+		$this->app->singleton('command.route.scan', function($app)
 		{
-			return new RouteScanCommand;
+			return new RouteScanCommand($app['files']);
 		});
 	}
 
