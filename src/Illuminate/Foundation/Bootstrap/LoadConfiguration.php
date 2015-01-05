@@ -51,7 +51,7 @@ class LoadConfiguration {
 	{
 		foreach ($this->getConfigurationFiles($app) as $key => $path)
 		{
-			$config->set($key, require $path);
+			$config->set($key, $this->pullInEnvVariables($key, require $path));
 		}
 	}
 
@@ -71,6 +71,22 @@ class LoadConfiguration {
 		}
 
 		return $files;
+	}
+
+	/**
+	 * Pull in any set environment variables that overwirtes the config values
+	 *
+	 * @param  string $key
+	 * @param  array  $config
+	 * @return array
+	 */
+	protected function pullInEnvVariables($key, Array $config)
+	{
+		foreach (array_dot($config) as $dot_notation_index => $default_value) {
+			array_set($config, $dot_notation_index, env("$key.$dot_notation_index", $default_value));
+		}
+
+		return $config;
 	}
 
 }
