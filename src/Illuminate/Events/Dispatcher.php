@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Events;
 
+use Exception;
 use ReflectionClass;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -375,7 +376,7 @@ class Dispatcher implements DispatcherContract {
 				'Illuminate\Contracts\Queue\ShouldBeQueued'
 			);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return false;
 		}

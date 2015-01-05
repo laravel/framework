@@ -3,6 +3,7 @@
 use Closure;
 use DateTime;
 use Countable;
+use Exception;
 use DateTimeZone;
 use RuntimeException;
 use BadMethodCallException;
@@ -1437,7 +1438,7 @@ class Validator implements ValidatorContract {
 		{
 			return new DateTime($value);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return;
 		}
@@ -1456,7 +1457,7 @@ class Validator implements ValidatorContract {
 		{
 			new DateTimeZone($value);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return false;
 		}

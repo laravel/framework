@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Console;
 
+use Exception;
 use RuntimeException;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Console\Command;
@@ -75,7 +76,7 @@ class SubscribeCommand extends Command {
 		{
 			return $this->getQueue()->push_type;
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return 'multicast';
 		}
@@ -106,7 +107,7 @@ class SubscribeCommand extends Command {
 		{
 			return $this->getQueue()->subscribers;
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return array();
 		}

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Cache;
 
+use Exception;
 use LogicException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -104,7 +105,7 @@ class DatabaseStore implements StoreInterface {
 		{
 			$this->table()->insert(compact('key', 'value', 'expiration'));
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			$this->table()->where('key', '=', $key)->update(compact('value', 'expiration'));
 		}
