@@ -236,18 +236,19 @@ class Validator implements ValidatorContract {
 	/**
 	 * Add conditions to a given field based on a Closure.
 	 *
-	 * @param  string  $attribute
+	 * @param  string|array  $attribute
 	 * @param  string|array  $rules
 	 * @param  callable  $callback
 	 * @return void
 	 */
 	public function sometimes($attribute, $rules, callable $callback)
 	{
+		$attribute = (array) $attribute;
 		$payload = new Fluent(array_merge($this->data, $this->files));
 
 		if (call_user_func($callback, $payload))
 		{
-			foreach ((array) $attribute as $key)
+			foreach ($attribute as $key)
 			{
 				$this->mergeRules($key, $rules);
 			}

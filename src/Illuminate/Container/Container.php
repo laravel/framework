@@ -379,13 +379,14 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function tag($abstracts, $tags)
 	{
+		$abstracts = (array) $abstracts;
 		$tags = is_array($tags) ? $tags : array_slice(func_get_args(), 1);
 
 		foreach ($tags as $tag)
 		{
 			if ( ! isset($this->tags[$tag])) $this->tags[$tag] = [];
 
-			foreach ((array) $abstracts as $abstract)
+			foreach ($abstracts as $abstract)
 			{
 				$this->tags[$tag][] = $abstract;
 			}

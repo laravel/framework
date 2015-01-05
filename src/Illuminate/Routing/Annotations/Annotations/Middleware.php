@@ -35,7 +35,8 @@ class Middleware extends Annotation {
 	{
 		foreach ($endpoints as $endpoint)
 		{
-			foreach ((array) $this->value as $middleware)
+			$value = (array) $this->value;
+			foreach ($value as $middleware)
 			{
 				$endpoint->classMiddleware[] = [
 					'name' => $middleware, 'only' => (array) $this->only, 'except' => (array) $this->except

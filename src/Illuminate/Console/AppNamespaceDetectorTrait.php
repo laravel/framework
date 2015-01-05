@@ -15,9 +15,12 @@ trait AppNamespaceDetectorTrait {
 	{
 		$composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
 
-		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path)
+		$namespaces = (array) data_get($composer, 'autoload.psr-4');
+
+		foreach ($namespaces as $namespace => $path)
 		{
-			foreach ((array) $path as $pathChoice)
+			$paths = (array) $path;
+			foreach ($paths as $pathChoice)
 			{
 				if (realpath(app_path()) == realpath(base_path().'/'.$pathChoice)) return $namespace;
 			}
