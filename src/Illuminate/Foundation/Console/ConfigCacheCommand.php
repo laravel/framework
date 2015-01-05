@@ -51,7 +51,7 @@ class ConfigCacheCommand extends Command {
 		$config = $this->setRealSessionDriver(
 			$this->getFreshConfiguration()
 		);
-                
+
 		$this->files->put(
 			$this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
 		);
