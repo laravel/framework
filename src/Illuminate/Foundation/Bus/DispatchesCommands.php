@@ -116,10 +116,7 @@ trait DispatchesCommands {
 	 */
 	protected function extractValueFromExtras(ReflectionParameter $parameter, array $extras)
 	{
-		return array_get($extras, $parameter->name, function() use ($parameter, $extras)
-		{
-			return array_get($extras, snake_case($parameter->name));
-		});
+		return array_get($extras, $parameter->name);
 	}
 
 	/**
@@ -134,10 +131,6 @@ trait DispatchesCommands {
 		if (isset($source[$parameter->name]))
 		{
 			return $source[$parameter->name];
-		}
-		elseif (isset($source[snake_case($parameter->name)]))
-		{
-			return $source[snake_case($parameter->name)];
 		}
 	}
 
