@@ -2,7 +2,6 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Filesystem\Filesystem;
 
 class ClearCommand extends Command {
 
@@ -28,25 +27,16 @@ class ClearCommand extends Command {
 	protected $cache;
 
 	/**
-	 * The file system instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
-
-	/**
 	 * Create a new cache clear command instance.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CacheManager $cache, Filesystem $files)
+	public function __construct(CacheManager $cache)
 	{
 		parent::__construct();
 
 		$this->cache = $cache;
-		$this->files = $files;
 	}
 
 	/**
