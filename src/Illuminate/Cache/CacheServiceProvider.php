@@ -45,7 +45,7 @@ class CacheServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.cache.clear', function($app)
 		{
-			return new Console\ClearCommand($app['cache'], $app['files']);
+			return new Console\ClearCommand($app['cache']);
 		});
 
 		$this->app->singleton('command.cache.table', function($app)

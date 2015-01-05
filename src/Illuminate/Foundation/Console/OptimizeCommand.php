@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Illuminate\View\Engines\CompilerEngine;
@@ -140,7 +141,7 @@ class OptimizeCommand extends Command {
 				{
 					$engine = $this->laravel['view']->getEngineFromPath($file);
 				}
-				catch (\InvalidArgumentException $e)
+				catch (InvalidArgumentException $e)
 				{
 					continue;
 				}

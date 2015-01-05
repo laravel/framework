@@ -235,7 +235,7 @@ abstract class AbstractPaginator {
 	 */
 	public function lastItem()
 	{
-		return $this->firstItem() + count($this->items) - 1;
+		return $this->firstItem() + $this->count() - 1;
 	}
 
 	/**
@@ -396,7 +396,7 @@ abstract class AbstractPaginator {
 	 */
 	public function offsetExists($key)
 	{
-		return array_key_exists($key, $this->items->all());
+		return $this->items->has($key);
 	}
 
 	/**
@@ -407,7 +407,7 @@ abstract class AbstractPaginator {
 	 */
 	public function offsetGet($key)
 	{
-		return $this->items[$key];
+		return $this->items->get($key);
 	}
 
 	/**
@@ -419,7 +419,7 @@ abstract class AbstractPaginator {
 	 */
 	public function offsetSet($key, $value)
 	{
-		$this->items[$key] = $value;
+		$this->items->put($key, $value);
 	}
 
 	/**
@@ -430,7 +430,7 @@ abstract class AbstractPaginator {
 	 */
 	public function offsetUnset($key)
 	{
-		unset($this->items[$key]);
+		$this->items->forget($key);
 	}
 
 	/**

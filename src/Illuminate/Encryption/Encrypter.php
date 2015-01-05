@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Encryption;
 
+use Exception;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
@@ -115,7 +116,7 @@ class Encrypter implements EncrypterContract {
 		{
 			return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			throw new DecryptException($e->getMessage());
 		}
