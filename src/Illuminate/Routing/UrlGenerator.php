@@ -560,7 +560,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function forceRootUrl($root)
 	{
-		$this->forcedRoot = $root;
+		$this->forcedRoot = rtrim($root, '/');
 	}
 
 	/**
