@@ -421,6 +421,21 @@ empty
 		$this->assertEquals('bar', $compiler->compileString('foo'));
 	}
 
+	public function testCustomBladeFunctionIsUsable()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$pattern = $compiler->createMatcher('foo');
+
+		$this->assertEquals('biz(bar)', preg_replace($pattern, "biz$2", $compiler->compileString('@foo(bar)')));
+	}
+
+	public function testCustomBladeFunctionIsUsableMultipleTimes()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$pattern = $compiler->createMatcher('foo');
+
+		$this->assertEquals('biz(bar)biz(bar)', preg_replace($pattern, "biz$2", $compiler->compileString('@foo(bar)@foo(bar)')));
+	}
 
 	public function testConfiguringContentTags()
 	{

@@ -639,7 +639,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return '/(?<!\w)(\s*)@'.$function.'(\s*\([^)]*\))/';
 	}
 
 	/**
