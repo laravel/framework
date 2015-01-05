@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\Annotations\Scanner;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Console\AppNamespaceDetectorTrait;
@@ -22,6 +23,26 @@ class RouteScanCommand extends Command {
 	 * @var string
 	 */
 	protected $description = 'Scan a directory for controller annotations';
+        
+	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
+	 * Create a new event scan command instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @return void
+	 */
+	public function __construct(Filesystem $files)
+	{
+		parent::__construct();
+
+		$this->files = $files;
+	}
 
 	/**
 	 * Execute the console command.
@@ -30,7 +51,7 @@ class RouteScanCommand extends Command {
 	 */
 	public function fire()
 	{
-		file_put_contents($this->getOutputPath(), $this->getRouteDefinitions());
+		$this->files->put($this->getOutputPath(), $this->getRouteDefinitions());
 
 		$this->info('Routes scanned!');
 	}

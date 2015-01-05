@@ -1,13 +1,11 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Events\Annotations\Scanner;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Console\AppNamespaceDetectorTrait;
 
 class EventScanCommand extends Command {
-
-	use AppNamespaceDetectorTrait;
 
 	/**
 	 * The console command name.
@@ -24,13 +22,33 @@ class EventScanCommand extends Command {
 	protected $description = 'Scan a directory for event annotations';
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
+	 * Create a new event scan command instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @return void
+	 */
+	public function __construct(Filesystem $files)
+	{
+		parent::__construct();
+
+		$this->files = $files;
+	}
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		file_put_contents($this->getOutputPath(), $this->getEventDefinitions());
+		$this->files->put($this->getOutputPath(), $this->getEventDefinitions());
 
 		$this->info('Events scanned!');
 	}
