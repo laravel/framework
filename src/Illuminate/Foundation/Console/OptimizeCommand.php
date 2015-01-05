@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use InvalidParamException;
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Illuminate\View\Engines\CompilerEngine;
