@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Connectors\ConnectionFactory;
@@ -9,13 +10,15 @@ class DatabaseServiceProvider extends ServiceProvider {
 	/**
 	 * Bootstrap the application events.
 	 *
+	 * @param  \Illuminate\Database\DatabaseManager  $resolver
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
-	public function boot()
+	public function boot(DatabaseManager $resolver, Dispatcher $dispatcher)
 	{
-		Model::setConnectionResolver($this->app['db']);
+		Model::setConnectionResolver($resolver);
 
-		Model::setEventDispatcher($this->app['events']);
+		Model::setEventDispatcher($dispatcher);
 	}
 
 	/**
