@@ -108,9 +108,7 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.migrate', function($app)
 		{
-			$packagePath = $app['path.base'].'/vendor';
-
-			return new MigrateCommand($app['migrator'], $packagePath);
+			return new MigrateCommand($app['migrator']);
 		});
 	}
 
@@ -190,11 +188,9 @@ class MigrationServiceProvider extends ServiceProvider {
 			// creation of the migrations, and may be extended by these developers.
 			$creator = $app['migration.creator'];
 
-			$packagePath = $app['path.base'].'/vendor';
-
 			$composer = $app['composer'];
 
-			return new MigrateMakeCommand($creator, $composer, $packagePath);
+			return new MigrateMakeCommand($creator, $composer);
 		});
 	}
 
