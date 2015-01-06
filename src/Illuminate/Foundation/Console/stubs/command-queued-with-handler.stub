@@ -4,10 +4,9 @@ use {{rootNamespace}}Commands\Command;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class {{class}} extends Command implements SelfHandling, ShouldBeQueued {
+class {{class}} extends Command implements ShouldBeQueued {
 
 	use InteractsWithQueue, SerializesModels;
 
@@ -17,16 +16,6 @@ class {{class}} extends Command implements SelfHandling, ShouldBeQueued {
 	 * @return void
 	 */
 	public function __construct()
-	{
-		//
-	}
-
-	/**
-	 * Execute the command.
-	 *
-	 * @return void
-	 */
-	public function handle()
 	{
 		//
 	}

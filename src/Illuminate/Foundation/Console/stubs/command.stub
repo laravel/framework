@@ -2,12 +2,9 @@
 
 use {{rootNamespace}}Commands\Command;
 
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class {{class}} extends Command {
+class {{class}} extends Command implements SelfHandling {
 
 	/**
 	 * Create a new command instance.
@@ -15,6 +12,16 @@ class {{class}} extends Command {
 	 * @return void
 	 */
 	public function __construct()
+	{
+		//
+	}
+
+	/**
+	 * Execute the command.
+	 *
+	 * @return void
+	 */
+	public function handle()
 	{
 		//
 	}
