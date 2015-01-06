@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Foundation\Bus;
+<?php namespace Illuminate\Bus;
 
 use RuntimeException;
 use ReflectionParameter;
