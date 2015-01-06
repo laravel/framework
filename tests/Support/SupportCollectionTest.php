@@ -586,7 +586,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testKeys()
 	{
 		$c = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));
-		$this->assertEquals(array('name', 'framework'), $c->keys());
+		$this->assertEquals(array('name', 'framework'), $c->keys()->all());
 	}
 
 
