@@ -630,46 +630,6 @@ class Application extends Container implements ApplicationContract {
 	}
 
 	/**
-	 * Determine if the application routes have been scanned.
-	 *
-	 * @return bool
-	 */
-	public function routesAreScanned()
-	{
-		return $this['files']->exists($this->getScannedRoutesPath());
-	}
-
-	/**
-	 * Get the path to the scanned routes file.
-	 *
-	 * @return string
-	 */
-	public function getScannedRoutesPath()
-	{
-		return $this['path.storage'].'/framework/routes.scanned.php';
-	}
-
-	/**
-	 * Determine if the application events have been scanned.
-	 *
-	 * @return bool
-	 */
-	public function eventsAreScanned()
-	{
-		return $this['files']->exists($this->getScannedEventsPath());
-	}
-
-	/**
-	 * Get the path to the scanned events file.
-	 *
-	 * @return string
-	 */
-	public function getScannedEventsPath()
-	{
-		return $this['path.storage'].'/framework/events.scanned.php';
-	}
-
-	/**
 	 * Call the booting callbacks for the application.
 	 *
 	 * @param  array  $callbacks
