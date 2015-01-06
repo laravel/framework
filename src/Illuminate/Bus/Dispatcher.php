@@ -1,7 +1,10 @@
 <?php namespace Illuminate\Bus;
 
 use Closure;
+use ArrayAccess;
 use ReflectionClass;
+use ReflectionParameter;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Container\Container;

@@ -79,10 +79,31 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$dispatcher->dispatch(new BusDispatcherTestBasicCommand, function($handler) { $handler->after(); });
 	}
 
+
+	public function testDispatchingFromArray()
+	{
+		$instance = new Dispatcher(new Container);
+		$result = $instance->dispatchFromArray('BusDispatcherTestSelfHandlingCommand', ['firstName' => 'taylor', 'lastName' => 'otwell']);
+		$this->assertEquals('taylor otwell', $result);
+	}
+
 }
 
 class BusDispatcherTestBasicCommand {
 
+}
+
+class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling {
+	public $firstName, $lastName;
+	public function __construct($firstName, $lastName)
+	{
+		$this->firstName = $firstName;
+		$this->lastName = $lastName;
+	}
+	public function handle()
+	{
+		return $this->firstName.' '.$this->lastName;
+	}
 }
 
 class BusDispatcherTestBasicHandler {
