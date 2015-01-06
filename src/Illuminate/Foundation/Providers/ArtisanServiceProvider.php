@@ -7,9 +7,7 @@ use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
-use Illuminate\Foundation\Console\RouteScanCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
-use Illuminate\Foundation\Console\EventScanCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\CommandMakeCommand;
@@ -48,7 +46,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'EventMake' => 'command.event.make',
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
-		'EventScan' => 'command.event.scan',
 		'HandlerCommand' => 'command.handler.command',
 		'HandlerEvent' => 'command.handler.event',
 		'KeyGenerate' => 'command.key.generate',
@@ -58,7 +55,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteCache' => 'command.route.cache',
 		'RouteClear' => 'command.route.clear',
 		'RouteList' => 'command.route.list',
-		'RouteScan' => 'command.route.scan',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
 	];
@@ -202,19 +198,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerEventScanCommand()
-	{
-		$this->app->singleton('command.event.scan', function($app)
-		{
-			return new EventScanCommand($app['files']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
 	protected function registerHandlerCommandCommand()
 	{
 		$this->app->singleton('command.handler.command', function($app)
@@ -324,19 +307,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.route.list', function($app)
 		{
 			return new RouteListCommand($app['router']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerRouteScanCommand()
-	{
-		$this->app->singleton('command.route.scan', function($app)
-		{
-			return new RouteScanCommand($app['files']);
 		});
 	}
 
