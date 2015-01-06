@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,11 +20,12 @@ class FormRequestServiceProvider extends ServiceProvider {
 	/**
 	 * Bootstrap the application events.
 	 *
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
-	public function boot()
+	public function boot(Dispatcher $events)
 	{
-		$this->app['events']->listen('router.matched', function()
+		$events->listen('router.matched', function()
 		{
 			$this->app->resolvingAny(function($resolved, $app)
 			{
