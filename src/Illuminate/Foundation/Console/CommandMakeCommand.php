@@ -35,22 +35,13 @@ class CommandMakeCommand extends GeneratorCommand {
 	{
 		parent::fire();
 
-		if ($this->doesntHaveHandler()) return;
-
-		$this->call('handler:command', [
-			'name' => $this->argument('name').'Handler',
-			'--command' => $this->parseName($this->argument('name'))
-		]);
-	}
-
-	/**
-	 * Determine if the command doesn't need a handler.
-	 *
-	 * @return bool
-	 */
-	protected function doesntHaveHandler()
-	{
-		return $this->option('self-handling') || $this->option('no-handler');
+		if ($this->option('handler'))
+		{
+			$this->call('handler:command', [
+				'name' => $this->argument('name').'Handler',
+				'--command' => $this->parseName($this->argument('name'))
+			]);
+		}
 	}
 
 	/**
@@ -60,17 +51,17 @@ class CommandMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		if ($this->option('queued') && $this->option('self-handling'))
+		if ($this->option('queued') && $this->option('handler'))
 		{
-			return __DIR__.'/stubs/command-self-queued.stub';
+			return __DIR__.'/stubs/command-queued-with-handler.stub';
 		}
 		elseif ($this->option('queued'))
 		{
 			return __DIR__.'/stubs/command-queued.stub';
 		}
-		elseif ($this->option('self-handling'))
+		elseif ($this->option('handler'))
 		{
-			return __DIR__.'/stubs/command-self.stub';
+			return __DIR__.'/stubs/command-with-handler.stub';
 		}
 		else
 		{
@@ -97,11 +88,9 @@ class CommandMakeCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('no-handler', null, InputOption::VALUE_NONE, 'Indicates that handler class should not be generated.'),
+			array('handler', null, InputOption::VALUE_NONE, 'Indicates that handler class should be generated.'),
 
 			array('queued', null, InputOption::VALUE_NONE, 'Indicates that command should be queued.'),
-
-			array('self-handling', null, InputOption::VALUE_NONE, 'Indicates that command handles itself.'),
 		);
 	}
 
