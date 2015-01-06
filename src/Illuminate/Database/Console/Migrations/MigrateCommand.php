@@ -30,23 +30,16 @@ class MigrateCommand extends BaseCommand {
 	protected $migrator;
 
 	/**
-	 * The path to the packages directory (vendor).
-	 */
-	protected $packagePath;
-
-	/**
 	 * Create a new migration command instance.
 	 *
 	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-	 * @param  string  $packagePath
 	 * @return void
 	 */
-	public function __construct(Migrator $migrator, $packagePath)
+	public function __construct(Migrator $migrator)
 	{
 		parent::__construct();
 
 		$this->migrator = $migrator;
-		$this->packagePath = $packagePath;
 	}
 
 	/**
@@ -114,8 +107,6 @@ class MigrateCommand extends BaseCommand {
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
-
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 
