@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Connectors\ConnectionFactory;
@@ -14,7 +14,7 @@ class DatabaseServiceProvider extends ServiceProvider {
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
-	public function boot(DatabaseManager $resolver, Dispatcher $dispatcher)
+	public function boot(DatabaseManager $resolver, DispatcherContract $dispatcher)
 	{
 		Model::setConnectionResolver($resolver);
 
