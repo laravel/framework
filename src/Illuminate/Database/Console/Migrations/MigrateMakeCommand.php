@@ -29,13 +29,6 @@ class MigrateMakeCommand extends BaseCommand {
 	protected $creator;
 
 	/**
-	 * The path to the packages directory (vendor).
-	 *
-	 * @var string
-	 */
-	protected $packagePath;
-
-	/**
 	 * @var \Illuminate\Foundation\Composer
 	 */
 	protected $composer;
@@ -45,16 +38,14 @@ class MigrateMakeCommand extends BaseCommand {
 	 *
 	 * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
 	 * @param  \Illuminate\Foundation\Composer  $composer
-	 * @param  string  $packagePath
 	 * @return void
 	 */
-	public function __construct(MigrationCreator $creator, Composer $composer, $packagePath)
+	public function __construct(MigrationCreator $creator, Composer $composer)
 	{
 		parent::__construct();
 
 		$this->creator = $creator;
 		$this->composer = $composer;
-		$this->packagePath = $packagePath;
 	}
 
 	/**
@@ -121,8 +112,6 @@ class MigrateMakeCommand extends BaseCommand {
 	{
 		return array(
 			array('create', null, InputOption::VALUE_OPTIONAL, 'The table to be created.'),
-
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Where to store the migration.', null),
 
 			array('table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'),
 		);
