@@ -2,21 +2,19 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class CookieServiceProvider extends ServiceProvider {
+class CookieServiceProvider extends ServiceProvider
+{
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->singleton('cookie', function ($app) {
+            $config = $app['config']['session'];
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->app->singleton('cookie', function($app)
-		{
-			$config = $app['config']['session'];
-
-			return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain']);
-		});
-	}
-
+            return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain']);
+        });
+    }
 }

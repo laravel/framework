@@ -2,7 +2,7 @@
 
 $basePath = $app['path.base'];
 
-return array_map('realpath', array(
+return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/Container.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/ContextualBindingBuilder.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Foundation/Application.php',
@@ -205,4 +205,4 @@ return array_map('realpath', array(
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Adapter/BsdFindAdapter.php',
     $basePath.'/vendor/symfony/finder/Symfony/Component/Finder/Finder.php',
     $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
-));
+]);

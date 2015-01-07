@@ -1,21 +1,21 @@
 <?php namespace Illuminate\Contracts\Console;
 
-interface Application {
+interface Application
+{
+    /**
+     * Call a console application command.
+     *
+     * @param string $command
+     * @param array  $parameters
+     *
+     * @return int
+     */
+    public function call($command, array $parameters = []);
 
-	/**
-	 * Call a console application command.
-	 *
-	 * @param  string  $command
-	 * @param  array  $parameters
-	 * @return int
-	 */
-	public function call($command, array $parameters = array());
-
-	/**
-	 * Get the output from the last command.
-	 *
-	 * @return string
-	 */
-	public function output();
-
+    /**
+     * Get the output from the last command.
+     *
+     * @return string
+     */
+    public function output();
 }
