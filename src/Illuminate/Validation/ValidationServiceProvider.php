@@ -26,12 +26,9 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerValidationResolverHook()
 	{
-		$this->app->afterResolvingAny(function($resolved)
+		$this->app->afterResolving(function(ValidatesWhenResolved $resolved)
 		{
-			if ($resolved instanceof ValidatesWhenResolved)
-			{
-				$resolved->validate();
-			}
+			$resolved->validate();
 		});
 	}
 
