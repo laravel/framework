@@ -129,14 +129,6 @@ interface Container {
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function resolving($abstract, Closure $callback);
-
-	/**
-	 * Register a new resolving callback for all types.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function resolvingAny(Closure $callback);
+	public function resolving($abstract, Closure $callback = null);
 
 }
