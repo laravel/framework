@@ -2,78 +2,72 @@
 
 use Mockery as m;
 
-class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
+class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
+{
+    public function tearDown()
+    {
+        m::close();
+    }
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    public function testFireProperlyCallsTheJobHandler()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
+        $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
+        $job->fire();
+    }
 
-	public function testFireProperlyCallsTheJobHandler()
-	{
-		$job = $this->getJob();
-		$job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
-		$job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
-		$handler->shouldReceive('fire')->once()->with($job, array('data'));
+    public function testFailedProperlyCallsTheJobHandler()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('BeanstalkdJobTestFailedTest'));
+        $handler->shouldReceive('failed')->once()->with(['data']);
 
-		$job->fire();
-	}
+        $job->failed();
+    }
 
+    public function testDeleteRemovesTheJobFromBeanstalkd()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob());
 
-	public function testFailedProperlyCallsTheJobHandler()
-	{
-		$job = $this->getJob();
-		$job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
-		$job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('BeanstalkdJobTestFailedTest'));
-		$handler->shouldReceive('failed')->once()->with(array('data'));
+        $job->delete();
+    }
 
-		$job->failed();
-	}
+    public function testReleaseProperlyReleasesJobOntoBeanstalkd()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
 
+        $job->release();
+    }
 
-	public function testDeleteRemovesTheJobFromBeanstalkd()
-	{
-		$job = $this->getJob();
-		$job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob());
+    public function testBuryProperlyBuryTheJobFromBeanstalkd()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalk()->shouldReceive('bury')->once()->with($job->getPheanstalkJob());
 
-		$job->delete();
-	}
+        $job->bury();
+    }
 
-
-	public function testReleaseProperlyReleasesJobOntoBeanstalkd()
-	{
-		$job = $this->getJob();
-		$job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
-
-		$job->release();
-	}
-
-
-	public function testBuryProperlyBuryTheJobFromBeanstalkd()
-	{
-		$job = $this->getJob();
-		$job->getPheanstalk()->shouldReceive('bury')->once()->with($job->getPheanstalkJob());
-
-		$job->bury();
-	}
-
-
-	protected function getJob()
-	{
-		return new Illuminate\Queue\Jobs\BeanstalkdJob(
-			m::mock('Illuminate\Container\Container'),
-			m::mock('Pheanstalk\Pheanstalk'),
-			m::mock('Pheanstalk\Job'),
-			'default'
-		);
-	}
-
+    protected function getJob()
+    {
+        return new Illuminate\Queue\Jobs\BeanstalkdJob(
+            m::mock('Illuminate\Container\Container'),
+            m::mock('Pheanstalk\Pheanstalk'),
+            m::mock('Pheanstalk\Job'),
+            'default'
+        );
+    }
 }
 
-class BeanstalkdJobTestFailedTest {
-	public function failed(array $data)
-	{
-		//
-	}
+class BeanstalkdJobTestFailedTest
+{
+    public function failed(array $data)
+    {
+        //
+    }
 }

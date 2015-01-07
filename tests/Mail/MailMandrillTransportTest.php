@@ -1,7 +1,7 @@
 <?php
 
-class MailMandrillTransportTest extends PHPUnit_Framework_TestCase {
-
+class MailMandrillTransportTest extends PHPUnit_Framework_TestCase
+{
     public function testSend()
     {
         $message = new Swift_Message('Foo subject', 'Bar body');
@@ -9,7 +9,7 @@ class MailMandrillTransportTest extends PHPUnit_Framework_TestCase {
         $message->setBcc('you@example.com');
 
         $transport = new MandrillTransportStub('testkey');
-        $client = $this->getMock('GuzzleHttp\Client', array('post'));
+        $client = $this->getMock('GuzzleHttp\Client', ['post']);
         $transport->setHttpClient($client);
 
         $client->expects($this->once())
@@ -20,8 +20,8 @@ class MailMandrillTransportTest extends PHPUnit_Framework_TestCase {
                         'key' => 'testkey',
                         'raw_message' => $message->toString(),
                         'async' => false,
-                        'to' => ['me@example.com', 'you@example.com']
-                    ]
+                        'to' => ['me@example.com', 'you@example.com'],
+                    ],
                 ])
             );
 

@@ -9,218 +9,224 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends BaseRedirectResponse {
+class RedirectResponse extends BaseRedirectResponse
+{
+    /**
+     * The request instance.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    protected $request;
 
-	/**
-	 * The request instance.
-	 *
-	 * @var \Illuminate\Http\Request
-	 */
-	protected $request;
+    /**
+     * The session store implementation.
+     *
+     * @var \Illuminate\Session\Store
+     */
+    protected $session;
 
-	/**
-	 * The session store implementation.
-	 *
-	 * @var \Illuminate\Session\Store
-	 */
-	protected $session;
+    /**
+     * Set a header on the Response.
+     *
+     * @param string $key
+     * @param string $value
+     * @param bool   $replace
+     *
+     * @return $this
+     */
+    public function header($key, $value, $replace = true)
+    {
+        $this->headers->set($key, $value, $replace);
 
-	/**
-	 * Set a header on the Response.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  bool  $replace
-	 * @return $this
-	 */
-	public function header($key, $value, $replace = true)
-	{
-		$this->headers->set($key, $value, $replace);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Flash a piece of data to the session.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function with($key, $value = null)
+    {
+        $key = is_array($key) ? $key : [$key => $value];
 
-	/**
-	 * Flash a piece of data to the session.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return \Illuminate\Http\RedirectResponse
-	 */
-	public function with($key, $value = null)
-	{
-		$key = is_array($key) ? $key : [$key => $value];
+        foreach ($key as $k => $v) {
+            $this->session->flash($k, $v);
+        }
 
-		foreach ($key as $k => $v)
-		{
-			$this->session->flash($k, $v);
-		}
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Add a cookie to the response.
+     *
+     * @param \Symfony\Component\HttpFoundation\Cookie $cookie
+     *
+     * @return $this
+     */
+    public function withCookie(Cookie $cookie)
+    {
+        $this->headers->setCookie($cookie);
 
-	/**
-	 * Add a cookie to the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return $this
-	 */
-	public function withCookie(Cookie $cookie)
-	{
-		$this->headers->setCookie($cookie);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Add multiple cookies to the response.
+     *
+     * @param array $cookie
+     *
+     * @return $this
+     */
+    public function withCookies(array $cookies)
+    {
+        foreach ($cookies as $cookie) {
+            $this->headers->setCookie($cookie);
+        }
 
-	/**
-	 * Add multiple cookies to the response.
-	 *
-	 * @param  array  $cookie
-	 * @return $this
-	 */
-	public function withCookies(array $cookies)
-	{
-		foreach ($cookies as $cookie)
-		{
-			$this->headers->setCookie($cookie);
-		}
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Flash an array of input to the session.
+     *
+     * @param array $input
+     *
+     * @return $this
+     */
+    public function withInput(array $input = null)
+    {
+        $input = $input ?: $this->request->input();
 
-	/**
-	 * Flash an array of input to the session.
-	 *
-	 * @param  array  $input
-	 * @return $this
-	 */
-	public function withInput(array $input = null)
-	{
-		$input = $input ?: $this->request->input();
+        $this->session->flashInput(array_filter($input, function ($value) {
+            return ! $value instanceof UploadedFile;
+        }));
 
-		$this->session->flashInput(array_filter($input, function ($value)
-		{
-			return ! $value instanceof UploadedFile;
-		}));
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Flash an array of input to the session.
+     *
+     * @param  mixed  string
+     *
+     * @return $this
+     */
+    public function onlyInput()
+    {
+        return $this->withInput($this->request->only(func_get_args()));
+    }
 
-	/**
-	 * Flash an array of input to the session.
-	 *
-	 * @param  mixed  string
-	 * @return $this
-	 */
-	public function onlyInput()
-	{
-		return $this->withInput($this->request->only(func_get_args()));
-	}
+    /**
+     * Flash an array of input to the session.
+     *
+     * @param  mixed  string
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function exceptInput()
+    {
+        return $this->withInput($this->request->except(func_get_args()));
+    }
 
-	/**
-	 * Flash an array of input to the session.
-	 *
-	 * @param  mixed  string
-	 * @return \Illuminate\Http\RedirectResponse
-	 */
-	public function exceptInput()
-	{
-		return $this->withInput($this->request->except(func_get_args()));
-	}
+    /**
+     * Flash a container of errors to the session.
+     *
+     * @param \Illuminate\Contracts\Support\MessageProvider|array $provider
+     * @param string                                              $key
+     *
+     * @return $this
+     */
+    public function withErrors($provider, $key = 'default')
+    {
+        $value = $this->parseErrors($provider);
 
-	/**
-	 * Flash a container of errors to the session.
-	 *
-	 * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
-	 * @param  string  $key
-	 * @return $this
-	 */
-	public function withErrors($provider, $key = 'default')
-	{
-		$value = $this->parseErrors($provider);
+        $this->session->flash(
+            'errors', $this->session->get('errors', new ViewErrorBag)->put($key, $value)
+        );
 
-		$this->session->flash(
-			'errors', $this->session->get('errors', new ViewErrorBag)->put($key, $value)
-		);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Parse the given errors into an appropriate value.
+     *
+     * @param \Illuminate\Contracts\Support\MessageProvider|array $provider
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    protected function parseErrors($provider)
+    {
+        if ($provider instanceof MessageProvider) {
+            return $provider->getMessageBag();
+        }
 
-	/**
-	 * Parse the given errors into an appropriate value.
-	 *
-	 * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
-	 * @return \Illuminate\Support\MessageBag
-	 */
-	protected function parseErrors($provider)
-	{
-		if ($provider instanceof MessageProvider)
-		{
-			return $provider->getMessageBag();
-		}
+        return new MessageBag((array) $provider);
+    }
 
-		return new MessageBag((array) $provider);
-	}
+    /**
+     * Get the request instance.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
 
-	/**
-	 * Get the request instance.
-	 *
-	 * @return \Illuminate\Http\Request
-	 */
-	public function getRequest()
-	{
-		return $this->request;
-	}
+    /**
+     * Set the request instance.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return void
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+    }
 
-	/**
-	 * Set the request instance.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
-	 */
-	public function setRequest(Request $request)
-	{
-		$this->request = $request;
-	}
+    /**
+     * Get the session store implementation.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
 
-	/**
-	 * Get the session store implementation.
-	 *
-	 * @return \Illuminate\Session\Store
-	 */
-	public function getSession()
-	{
-		return $this->session;
-	}
+    /**
+     * Set the session store implementation.
+     *
+     * @param \Illuminate\Session\Store $session
+     *
+     * @return void
+     */
+    public function setSession(SessionStore $session)
+    {
+        $this->session = $session;
+    }
 
-	/**
-	 * Set the session store implementation.
-	 *
-	 * @param  \Illuminate\Session\Store  $session
-	 * @return void
-	 */
-	public function setSession(SessionStore $session)
-	{
-		$this->session = $session;
-	}
+    /**
+     * Dynamically bind flash data in the session.
+     *
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @throws \BadMethodCallException
+     *
+     * @return void
+     */
+    public function __call($method, $parameters)
+    {
+        if (starts_with($method, 'with')) {
+            return $this->with(snake_case(substr($method, 4)), $parameters[0]);
+        }
 
-	/**
-	 * Dynamically bind flash data in the session.
-	 *
-	 * @param  string  $method
-	 * @param  array  $parameters
-	 * @return void
-	 *
-	 * @throws \BadMethodCallException
-	 */
-	public function __call($method, $parameters)
-	{
-		if (starts_with($method, 'with'))
-		{
-			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
-		}
-
-		throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
-	}
-
+        throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
+    }
 }

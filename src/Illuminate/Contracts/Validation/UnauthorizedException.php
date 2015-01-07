@@ -2,4 +2,6 @@
 
 use RuntimeException;
 
-class UnauthorizedException extends RuntimeException {}
+class UnauthorizedException extends RuntimeException
+{
+}
