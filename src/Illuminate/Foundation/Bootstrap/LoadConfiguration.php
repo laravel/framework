@@ -65,7 +65,7 @@ class LoadConfiguration {
 	{
 		$files = [];
 
-		foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
+		foreach (Finder::create()->files()->name('*.php')->in($app->configPath())->depth('== 0') as $file)
 		{
 			$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
 		}
