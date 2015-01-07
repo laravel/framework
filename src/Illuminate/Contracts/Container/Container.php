@@ -131,4 +131,13 @@ interface Container {
 	 */
 	public function resolving($abstract, Closure $callback = null);
 
+	/**
+	 * Register a new after resolving callback.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterResolving($abstract, Closure $callback = null);
+
 }
