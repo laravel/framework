@@ -139,4 +139,30 @@ interface Container {
 	 */
 	public function resolvingAny(Closure $callback);
 
+	/**
+	 * Register a new resolving callback for a given type or one of its subtypes.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function resolvingType($abstract, Closure $callback);
+
+	/**
+	 * Register a new after resolving callback for all types.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterResolvingAny(Closure $callback);
+
+	/**
+	 * Register a new after resolving callback for a given type or one of its subtypes.
+	 *
+	 * @param  string    $abstract
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterResolvingType($abstract, Closure $callback);
+
 }
