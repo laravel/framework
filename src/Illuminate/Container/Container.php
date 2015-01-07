@@ -676,7 +676,7 @@ class Container implements ArrayAccess, ContainerContract {
 			$this->instances[$abstract] = $object;
 		}
 
-		$this->fireResolvingCallbacks($object);
+		$this->fireResolvingCallbacks($abstract, $object);
 
 		$this->resolved[$abstract] = true;
 
@@ -1029,16 +1029,17 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Fire all of the resolving callbacks.
 	 *
+	 * @param  string  $abstract
 	 * @param  mixed   $object
 	 * @return void
 	 */
-	protected function fireResolvingCallbacks($object)
+	protected function fireResolvingCallbacks($abstract, $object)
 	{
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
 
 		$this->fireCallbackArray(
 			$object, $this->getCallbacksForType(
-				$object, $this->resolvingCallbacks
+				$abstract, $object, $this->resolvingCallbacks
 			)
 		);
 
@@ -1046,7 +1047,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 		$this->fireCallbackArray(
 			$object, $this->getCallbacksForType(
-				$object, $this->afterResolvingCallbacks
+				$abstract, $object, $this->afterResolvingCallbacks
 			)
 		);
 	}
@@ -1054,18 +1055,19 @@ class Container implements ArrayAccess, ContainerContract {
 	/**
 	 * Get all callbacks for a given type.
 	 *
+	 * @param  string  $abstract
 	 * @param  object  $object
 	 * @param  array   $callbacksPerType
 	 *
 	 * @return array
 	 */
-	protected function getCallbacksForType($object, array $callbacksPerType)
+	protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
 	{
 		$results = [];
 
 		foreach ($callbacksPerType as $type => $callbacks)
 		{
-			if ($object instanceof $type)
+			if ($type === $abstract || $object instanceof $type)
 			{
 				$results = array_merge($results, $callbacks);
 			}
