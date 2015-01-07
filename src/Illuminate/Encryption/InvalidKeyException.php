@@ -2,4 +2,6 @@
 
 use InvalidArgumentException;
 
-class InvalidKeyException extends InvalidArgumentException {}
+class InvalidKeyException extends InvalidArgumentException
+{
+}

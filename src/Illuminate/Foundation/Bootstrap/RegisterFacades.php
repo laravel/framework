@@ -4,21 +4,21 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Contracts\Foundation\Application;
 
-class RegisterFacades {
+class RegisterFacades
+{
+    /**
+     * Bootstrap the given application.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
+     * @return void
+     */
+    public function bootstrap(Application $app)
+    {
+        Facade::clearResolvedInstances();
 
-	/**
-	 * Bootstrap the given application.
-	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @return void
-	 */
-	public function bootstrap(Application $app)
-	{
-		Facade::clearResolvedInstances();
+        Facade::setFacadeApplication($app);
 
-		Facade::setFacadeApplication($app);
-
-		AliasLoader::getInstance($app['config']['app.aliases'])->register();
-	}
-
+        AliasLoader::getInstance($app['config']['app.aliases'])->register();
+    }
 }
