@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use IronMQ;
 use Illuminate\Http\Request;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Http;
+<?php
+
+namespace Illuminate\Foundation\Http;
 
 use Exception;
 use Illuminate\Routing\Router;

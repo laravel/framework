@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php
+
+namespace Illuminate\Database\Migrations;
 
 use Closure;
 use Illuminate\Filesystem\Filesystem;

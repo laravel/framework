@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Illuminate\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 interface ScopeInterface
 {

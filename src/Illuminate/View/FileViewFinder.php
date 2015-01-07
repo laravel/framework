@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;

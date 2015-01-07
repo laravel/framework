@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cookie;
+<?php
+
+namespace Illuminate\Cookie;
 
 use Illuminate\Support\ServiceProvider;
 

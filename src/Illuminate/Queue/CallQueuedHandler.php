@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\View;
+<?php
+
+namespace Illuminate\Contracts\View;
 
 interface Factory
 {

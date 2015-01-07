@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation;
+<?php
+
+namespace Illuminate\Foundation;
 
 use Closure;
 use Illuminate\Container\Container;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema;
+<?php
+
+namespace Illuminate\Database\Schema;
 
 class MySqlBuilder extends Builder
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation;
+<?php
+
+namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;

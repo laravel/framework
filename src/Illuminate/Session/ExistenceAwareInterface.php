@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session;
+<?php
+
+namespace Illuminate\Session;
 
 interface ExistenceAwareInterface
 {

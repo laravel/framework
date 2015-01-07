@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema\Grammars;
+<?php
+
+namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Fluent;

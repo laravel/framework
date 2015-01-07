@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session\Middleware;
+<?php
+
+namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Carbon\Carbon;

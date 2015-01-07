@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Encryption;
+<?php
+
+namespace Illuminate\Encryption;
 
 use InvalidArgumentException;
 

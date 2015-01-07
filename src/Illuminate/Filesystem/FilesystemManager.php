@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Filesystem;
+<?php
+
+namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;

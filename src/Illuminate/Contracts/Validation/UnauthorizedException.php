@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Validation;
+<?php
+
+namespace Illuminate\Contracts\Validation;
 
 use RuntimeException;
 

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Boris\Boris;
 use Illuminate\Console\Command;

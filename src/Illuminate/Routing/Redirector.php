@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View\Middleware;
+<?php
+
+namespace Illuminate\View\Middleware;
 
 use Closure;
 use Illuminate\Support\ViewErrorBag;

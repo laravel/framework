@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 class ResourceRegistrar
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console\Scheduling;
+<?php
+
+namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Carbon\Carbon;

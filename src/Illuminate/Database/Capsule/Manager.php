@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Capsule;
+<?php
+
+namespace Illuminate\Database\Capsule;
 
 use PDO;
 use Illuminate\Container\Container;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Auth;
+<?php
+
+namespace Illuminate\Contracts\Auth;
 
 interface Authenticatable
 {

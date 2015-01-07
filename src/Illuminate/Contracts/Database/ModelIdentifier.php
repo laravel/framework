@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Database;
+<?php
+
+namespace Illuminate\Contracts\Database;
 
 class ModelIdentifier
 {

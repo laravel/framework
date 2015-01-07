@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View\Engines;
+<?php
+
+namespace Illuminate\View\Engines;
 
 use ErrorException;
 use Illuminate\View\Compilers\CompilerInterface;

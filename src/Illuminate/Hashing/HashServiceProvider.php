@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Hashing;
+<?php
+
+namespace Illuminate\Hashing;
 
 use Illuminate\Support\ServiceProvider;
 

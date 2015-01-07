@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Hashing;
+<?php
+
+namespace Illuminate\Hashing;
 
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Console;
+<?php
+
+namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;

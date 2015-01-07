@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;

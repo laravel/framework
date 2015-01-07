@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php
+
+namespace Illuminate\Auth;
 
 use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;

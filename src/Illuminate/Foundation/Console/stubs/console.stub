@@ -1,4 +1,6 @@
-<?php namespace {{namespace}};
+<?php
+
+namespace {{namespace}};
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;

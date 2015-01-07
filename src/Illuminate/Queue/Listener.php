@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Closure;
 use Symfony\Component\Process\Process;

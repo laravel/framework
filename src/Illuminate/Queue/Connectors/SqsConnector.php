@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php
+
+namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;

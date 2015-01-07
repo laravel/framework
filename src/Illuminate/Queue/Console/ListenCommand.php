@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;

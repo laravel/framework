@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema;
+<?php
+
+namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;

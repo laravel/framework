@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;

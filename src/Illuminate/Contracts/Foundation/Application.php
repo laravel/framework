@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Foundation;
+<?php
+
+namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
 

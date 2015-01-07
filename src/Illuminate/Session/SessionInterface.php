@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session;
+<?php
+
+namespace Illuminate\Session;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface as BaseSessionInterface;

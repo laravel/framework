@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 class ApcStore extends TaggableStore implements StoreInterface
 {

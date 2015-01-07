@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;

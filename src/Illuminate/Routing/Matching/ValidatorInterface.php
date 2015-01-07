@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing\Matching;
+<?php
+
+namespace Illuminate\Routing\Matching;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;

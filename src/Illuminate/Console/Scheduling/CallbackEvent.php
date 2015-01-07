@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console\Scheduling;
+<?php
+
+namespace Illuminate\Console\Scheduling;
 
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;

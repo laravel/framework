@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;

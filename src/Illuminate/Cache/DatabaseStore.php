@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 use Exception;
 use LogicException;

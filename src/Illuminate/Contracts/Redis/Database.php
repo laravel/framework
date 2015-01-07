@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Redis;
+<?php
+
+namespace Illuminate\Contracts\Redis;
 
 interface Database
 {

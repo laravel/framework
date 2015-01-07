@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cookie;
+<?php
+
+namespace Illuminate\Cookie;
 
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;

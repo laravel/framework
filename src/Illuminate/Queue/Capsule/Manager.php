@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Capsule;
+<?php
+
+namespace Illuminate\Queue\Capsule;
 
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;

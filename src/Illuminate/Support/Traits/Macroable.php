@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support\Traits;
+<?php
+
+namespace Illuminate\Support\Traits;
 
 use Closure;
 use BadMethodCallException;

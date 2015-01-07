@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Mail;
+<?php
+
+namespace Illuminate\Mail;
 
 use Closure;
 use Swift_Mailer;

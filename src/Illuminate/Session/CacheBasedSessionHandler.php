@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session;
+<?php
+
+namespace Illuminate\Session;
 
 use SessionHandlerInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;

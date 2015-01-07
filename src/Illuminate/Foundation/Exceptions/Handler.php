@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Exceptions;
+<?php
+
+namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Psr\Log\LoggerInterface;

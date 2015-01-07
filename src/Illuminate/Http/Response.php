@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http;
+<?php
+
+namespace Illuminate\Http;
 
 use ArrayObject;
 use Illuminate\Contracts\Support\Jsonable;

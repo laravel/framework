@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Redis;
+<?php
+
+namespace Illuminate\Redis;
 
 use Illuminate\Support\ServiceProvider;
 

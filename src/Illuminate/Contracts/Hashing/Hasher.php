@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Hashing;
+<?php
+
+namespace Illuminate\Contracts\Hashing;
 
 interface Hasher
 {

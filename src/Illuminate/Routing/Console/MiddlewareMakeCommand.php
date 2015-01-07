@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing\Console;
+<?php
+
+namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
 

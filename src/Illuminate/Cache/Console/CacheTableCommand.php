@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache\Console;
+<?php
+
+namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;

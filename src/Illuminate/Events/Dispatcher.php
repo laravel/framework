@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Events;
+<?php
+
+namespace Illuminate\Events;
 
 use Exception;
 use ReflectionClass;

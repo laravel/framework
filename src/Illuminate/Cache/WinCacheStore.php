@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 class WinCacheStore extends TaggableStore implements StoreInterface
 {

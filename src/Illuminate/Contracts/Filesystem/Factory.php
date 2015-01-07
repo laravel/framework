@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Filesystem;
+<?php
+
+namespace Illuminate\Contracts\Filesystem;
 
 interface Factory
 {

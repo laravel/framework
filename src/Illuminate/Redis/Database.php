@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Redis;
+<?php
+
+namespace Illuminate\Redis;
 
 use Predis\Client;
 use Illuminate\Contracts\Redis\Database as DatabaseContract;

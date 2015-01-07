@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;

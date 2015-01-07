@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View\Engines;
+<?php
+
+namespace Illuminate\View\Engines;
 
 abstract class Engine
 {

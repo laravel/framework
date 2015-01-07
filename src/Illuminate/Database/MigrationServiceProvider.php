@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Migrations\Migrator;

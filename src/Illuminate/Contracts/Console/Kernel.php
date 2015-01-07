@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Console;
+<?php
+
+namespace Illuminate\Contracts\Console;
 
 interface Kernel
 {

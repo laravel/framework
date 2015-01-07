@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;

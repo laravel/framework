@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Filesystem;
+<?php
+
+namespace Illuminate\Filesystem;
 
 use Symfony\Component\Finder\Finder;
 

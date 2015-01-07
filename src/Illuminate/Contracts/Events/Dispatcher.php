@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Events;
+<?php
+
+namespace Illuminate\Contracts\Events;
 
 interface Dispatcher
 {

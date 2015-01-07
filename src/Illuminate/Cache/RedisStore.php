@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 use Illuminate\Redis\Database as Redis;
 

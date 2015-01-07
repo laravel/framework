@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php
+
+namespace Illuminate\Queue\Connectors;
 
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\PheanstalkInterface;

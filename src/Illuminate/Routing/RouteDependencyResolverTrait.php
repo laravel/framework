@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use ReflectionMethod;
 use ReflectionFunctionAbstract;

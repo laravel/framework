@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation;
+<?php
+
+namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;

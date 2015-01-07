@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Validation;
+<?php
+
+namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

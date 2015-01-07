@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Container;
+<?php
+
+namespace Illuminate\Contracts\Container;
 
 interface ContextualBindingBuilder
 {

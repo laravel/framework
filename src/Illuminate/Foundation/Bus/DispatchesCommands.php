@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bus;
+<?php
+
+namespace Illuminate\Foundation\Bus;
 
 use ArrayAccess;
 

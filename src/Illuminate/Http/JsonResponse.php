@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http;
+<?php
+
+namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;

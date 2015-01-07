@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support\Facades;
+<?php
+
+namespace Illuminate\Support\Facades;
 
 use Mockery;
 use RuntimeException;

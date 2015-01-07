@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php
+
+namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;

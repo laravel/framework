@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 interface ConnectionResolverInterface
 {

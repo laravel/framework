@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;

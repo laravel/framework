@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Mail;
+<?php
+
+namespace Illuminate\Mail;
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;

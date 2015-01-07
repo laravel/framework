@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Illuminate\Support\ServiceProvider;
 

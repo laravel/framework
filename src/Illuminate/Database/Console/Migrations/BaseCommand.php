@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Console\Migrations;
+<?php
+
+namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 

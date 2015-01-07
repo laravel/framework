@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http\Middleware;
+<?php
+
+namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;

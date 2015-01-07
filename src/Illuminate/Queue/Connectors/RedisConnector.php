@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php
+
+namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;

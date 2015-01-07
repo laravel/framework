@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
