@@ -1,16 +1,19 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements ApplicationContract {
+class Application extends Container implements ApplicationContract, HttpKernelInterface {
 
 	/**
 	 * The Laravel framework version.
@@ -618,6 +621,14 @@ class Application extends Container implements ApplicationContract {
 
 		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+    public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
+    {
+    	return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
+    }
 
 	/**
 	 * Determine if the application configuration is cached.
