@@ -82,13 +82,6 @@ class Container implements ArrayAccess, ContainerContract {
 	protected $reboundCallbacks = [];
 
 	/**
-	 * All of the registered resolving callbacks.
-	 *
-	 * @var array
-	 */
-	protected $resolvingCallbacks = [];
-
-	/**
 	 * All of the global resolving callbacks.
 	 *
 	 * @var array
@@ -107,14 +100,14 @@ class Container implements ArrayAccess, ContainerContract {
 	 *
 	 * @var array
 	 */
-	protected $resolvingCallbacksByType = [];
+	protected $resolvingCallbacks = [];
 
 	/**
 	 * All of the after resolving callbacks by class type.
 	 *
 	 * @var array
 	 */
-	protected $afterResolvingCallbacksByType = [];
+	protected $afterResolvingCallbacks = [];
 
 	/**
 	 * Define a contextual binding.
@@ -937,49 +930,100 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function resolving($abstract, Closure $callback)
+	public function resolving($abstract, Closure $callback = null)
 	{
-		$this->resolvingCallbacks[$abstract][] = $callback;
-	}
-
-	/**
-	 * Register a new resolving callback for all types.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function resolvingAny(Closure $callback)
-	{
-		$this->globalResolvingCallbacks[] = $callback;
+		if ($callback === null && $abstract instanceof Closure)
+		{
+			$this->resolvingCallback($abstract);
+		}
+		else
+		{
+			$this->resolvingCallbacks[$abstract][] = $callback;
+		}
 	}
 
 	/**
 	 * Register a new after resolving callback for all types.
 	 *
+	 * @param  string   $abstract
+	 * @param  \Closure $callback
+	 * @return void
+	 */
+	public function afterResolving($abstract, Closure $callback = null)
+	{
+		if ($abstract instanceof Closure && $callback === null)
+		{
+			$this->afterResolvingCallback($abstract);
+		}
+		else
+		{
+			$this->afterResolvingCallbacks[$abstract][] = $callback;
+		}
+	}
+
+	/**
+	 * Register a new resolving callback by type of its first argument.
+	 *
 	 * @param  \Closure  $callback
 	 * @return void
 	 */
-	public function afterResolvingAny(Closure $callback)
+	protected function resolvingCallback(Closure $callback)
 	{
-		$this->globalAfterResolvingCallbacks[] = $callback;
+		$abstract = $this->getFunctionHint($callback);
+
+		if ($abstract)
+		{
+			$this->resolvingCallbacks[$abstract][] = $callback;
+		}
+		else
+		{
+			$this->globalResolvingCallbacks[] = $callback;
+		}
 	}
 
 	/**
-	 * @param  $type
-	 * @param  callable  $callback
+	 * Register a new after resolving callback by type of its first argument.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
 	 */
-	public function resolvingType($type, Closure $callback)
+	protected function afterResolvingCallback(Closure $callback)
 	{
-		$this->resolvingCallbacksByType[$type][] = $callback;
+		$abstract = $this->getFunctionHint($callback);
+
+		if ($abstract)
+		{
+			$this->afterResolvingCallbacks[$abstract][] = $callback;
+		}
+		else
+		{
+			$this->globalAfterResolvingCallbacks[] = $callback;
+		}
 	}
 
 	/**
-	 * @param  $type
-	 * @param  callable  $callback
+	 * Get the type hint for this closure's first argument.
+	 *
+	 * @param  \Closure  $callback
+	 * @return mixed
 	 */
-	public function afterResolvingType($type, Closure $callback)
+	protected function getFunctionHint(Closure $callback)
 	{
-		$this->afterResolvingCallbacksByType[$type][] = $callback;
+		$function = new ReflectionFunction($callback);
+
+		if ($function->getNumberOfParameters() == 0)
+		{
+			return null;
+		}
+
+		$expected = $function->getParameters()[0];
+
+		if ( ! $expected->getClass())
+		{
+			return null;
+		}
+
+		return $expected->getClass()->name;
 	}
 
 	/**
@@ -991,16 +1035,11 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function fireResolvingCallbacks($abstract, $object)
 	{
-		if (isset($this->resolvingCallbacks[$abstract]))
-		{
-			$this->fireCallbackArray($object, $this->resolvingCallbacks[$abstract]);
-		}
-
 		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
 
 		$this->fireCallbackArray(
 			$object, $this->getCallbacksForType(
-				$object, $this->resolvingCallbacksByType
+				$abstract, $object, $this->resolvingCallbacks
 			)
 		);
 
@@ -1008,26 +1047,27 @@ class Container implements ArrayAccess, ContainerContract {
 
 		$this->fireCallbackArray(
 			$object, $this->getCallbacksForType(
-				$object, $this->afterResolvingCallbacksByType
+				$abstract, $object, $this->afterResolvingCallbacks
 			)
 		);
 	}
 
 	/**
-	 * Get all callbacks for a givne type.
+	 * Get all callbacks for a given type.
 	 *
+	 * @param  string  $abstract
 	 * @param  object  $object
-	 * @param  array  $callbacksPerType
+	 * @param  array   $callbacksPerType
 	 *
 	 * @return array
 	 */
-	protected function getCallbacksForType($object, array $callbacksPerType)
+	protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
 	{
 		$results = [];
 
 		foreach ($callbacksPerType as $type => $callbacks)
 		{
-			if ($object instanceof $type)
+			if ($type === $abstract || $object instanceof $type)
 			{
 				$results = array_merge($results, $callbacks);
 			}
