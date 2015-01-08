@@ -76,6 +76,13 @@ class Application extends Container implements ApplicationContract {
 	protected $deferredServices = array();
 
 	/**
+	 * The environment file to load during bootstrapping.
+	 *
+	 * @var string
+	 */
+	protected $environmentFile = '.env';
+
+	/**
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  string|null  $basePath
@@ -252,6 +259,29 @@ class Application extends Container implements ApplicationContract {
 	public function storagePath()
 	{
 		return $this->basePath.'/storage';
+	}
+
+	/**
+	 * Set the environment file to be loaded during bootstrapping.
+	 *
+	 * @param  string  $file
+	 * @return $this
+	 */
+	public function loadEnvironmentFrom($file)
+	{
+		$this->environmentFile = $file;
+
+		return $this;
+	}
+
+	/**
+	 * Get the environment file the application is using.
+	 *
+	 * @return string
+	 */
+	public function environmentFile()
+	{
+		return $this->environmentFile ?: '.env';
 	}
 
 	/**
