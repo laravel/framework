@@ -225,16 +225,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testLastModified()
-	{
-		$time = time();
-		file_put_contents(__DIR__.'/foo.txt', 'foo');
-		$files = new Filesystem;
-		$this->assertEquals($time, $files->lastModified(__DIR__.'/foo.txt'));
-		@unlink(__DIR__.'/foo.txt');
-	}
-
-
 	public function testIsWritable()
 	{
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
