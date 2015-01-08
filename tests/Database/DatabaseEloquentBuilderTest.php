@@ -106,7 +106,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetMethodLoadsModelsAndHydratesEagerRelations()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
-		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(array('bar'));
+		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(new Collection(array('bar')));
 		$builder->shouldReceive('eagerLoadRelations')->with(array('bar'))->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('newCollection')->with(array('bar', 'baz'))->andReturn(new Collection(array('bar', 'baz')));
@@ -119,7 +119,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
-		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(array());
+		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(new Collection);
 		$builder->shouldReceive('eagerLoadRelations')->never();
 		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('newCollection')->with(array())->andReturn(new Collection(array()));
@@ -221,13 +221,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
 		$records[] = array('name' => 'taylor', 'age' => 26);
 		$records[] = array('name' => 'dayle', 'age' => 28);
-		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
+		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn(new Collection($records));
 		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,newInstance]');
 		$model->shouldReceive('getTable')->once()->andReturn('foo_table');
 		$builder->setModel($model);
 		$model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
 		$model->shouldReceive('newInstance')->andReturnUsing(function() { return new EloquentBuilderTestModelStub; });
-		$models = $builder->getModels(array('foo'));
+		$models = $builder->getModels(['foo']);
 
 		$this->assertEquals('taylor', $models[0]->name);
 		$this->assertEquals($models[0]->getAttributes(), $models[0]->getOriginal());

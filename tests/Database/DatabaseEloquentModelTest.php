@@ -1283,7 +1283,7 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 }
 
 class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
-	public static function hydrate(array $items, $connection = null) { return 'hydrated'; }
+	public static function hydrate($items, $connection = null) { return 'hydrated'; }
 	public function getConnection()
 	{
 		$mock = m::mock('Illuminate\Database\Connection');
