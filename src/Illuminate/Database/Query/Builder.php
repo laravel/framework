@@ -888,7 +888,21 @@ class Builder {
 	{
 		return $this->whereNotNull($column, 'or');
 	}
-
+	
+	/**
+	 * Add a "where date" statement to the query.
+	 *
+	 * @param  string  $column
+	 * @param  string   $operator
+	 * @param  int   $value
+	 * @param  string   $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 */
+	public function whereDate($column, $operator, $value, $boolean = 'and')
+	{
+		return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
+	}
+	
 	/**
 	 * Add a "where day" statement to the query.
 	 *
