@@ -625,10 +625,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	/**
 	 * {@inheritdoc}
 	 */
-    public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
-    	return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
-    }
+	public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
+	{
+		return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
+	}
 
 	/**
 	 * Determine if the application configuration is cached.
