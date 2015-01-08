@@ -27,8 +27,6 @@ class FormRequestServiceProvider extends ServiceProvider {
 		{
 			$this->app->resolving(function(FormRequest $request, $app)
 			{
-				// We will go ahead and initialize the request as well as set a few dependencies
-				// on this request instance. The "ValidatesWhenResolved" hook will fire "validate".
 				$this->initializeRequest($request, $app['request']);
 
 				$request->setContainer($app)
