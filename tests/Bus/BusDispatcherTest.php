@@ -39,6 +39,19 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomHandler()
+	{
+		$container = new Container;
+		$dispatcher = new Dispatcher($container, function() {
+			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock->shouldReceive('push')->once();
+			return $mock;
+		});
+
+		$dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
+	}
+
+
 	public function testHandlersThatShouldBeQueuedAreQueued()
 	{
 		$container = new Container;
@@ -115,4 +128,12 @@ class BusDispatcherTestBasicHandler {
 
 class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
 
+}
+
+
+class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldBeQueued {
+	public function queue($queue, $command)
+	{
+		$queue->push($command);
+	}
 }

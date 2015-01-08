@@ -242,7 +242,14 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 			throw new \RuntimeException("Queue resolver did not return a Queue implementation.");
 		}
 
-		$queue->push($command);
+		if (method_exists($command, 'queue'))
+		{
+			$command->queue($queue, $command);
+		}
+		else
+		{
+			$queue->push($command);
+		}
 	}
 
 	/**
