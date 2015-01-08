@@ -376,7 +376,19 @@ class Grammar extends BaseGrammar {
 	{
 		return $this->wrap($where['column']).' is not null';
 	}
-
+	
+	/**
+	 * Compile a "where date" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereDate(Builder $query, $where)
+	{
+		return $this->dateBasedWhere('date', $query, $where);
+	}
+	
 	/**
 	 * Compile a "where day" clause.
 	 *
