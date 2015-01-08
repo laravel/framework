@@ -370,7 +370,7 @@ class Builder {
 	{
 		$connection = $this->model->getConnectionName();
 
-		// We will first get the raw results from the query builder. We'll then
+		// First, We will get the raw results from the query builder. We'll then
 		// transform the raw results into Eloquent models, while also setting
 		// the proper database connection on every Eloquent model instance.
 		return $this->query->get($columns)->map(function($result) use ($connection)
