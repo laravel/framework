@@ -42,6 +42,12 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 		$this->schema()->create('users', function($table) {
 			$table->increments('id');
 			$table->string('email')->unique();
+			$table->timestamps();
+		});
+
+		$this->schema()->create('friends', function($table) {
+			$table->integer('user_id');
+			$table->integer('friend_id');
 		});
 	}
 
@@ -54,6 +60,7 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 	public function tearDown()
 	{
 		$this->schema()->drop('users');
+		$this->schema()->drop('friends');
 	}
 
 	/**
@@ -61,9 +68,21 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 	 */
 	public function testBasicModelRetrieval()
 	{
-		$this->connection()->table('users')->insert(['email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
 		$model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
 		$this->assertEquals('taylorotwell@gmail.com', $model->email);
+	}
+
+
+	public function testHasOnSelfReferencingBelongsToManyRelationship()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+		$results = EloquentTestUser::has('friends')->get();
+
+		$this->assertEquals(1, count($results));
+		$this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
 	}
 
 	/**
@@ -98,6 +117,10 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 
 class EloquentTestUser extends Eloquent {
 	protected $table = 'users';
+	protected $guarded = [];
+	public function friends() {
+		return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
+	}
 }
 
 /**
