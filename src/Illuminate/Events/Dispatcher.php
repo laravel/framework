@@ -393,10 +393,34 @@ class Dispatcher implements DispatcherContract {
 	{
 		return function() use ($class, $method)
 		{
-			$this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
-				'class' => $class, 'method' => $method, 'data' => serialize(func_get_args()),
-			]);
+			if (method_exists($class, 'queue'))
+			{
+				$this->callQueueMethodOnHandler($class, $method, func_get_args());
+			}
+			else
+			{
+				$this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
+					'class' => $class, 'method' => $method, 'data' => serialize(func_get_args()),
+				]);
+			}
 		};
+	}
+
+	/**
+	 * Call the queue method on the handler class.
+	 *
+	 * @param  string  $class
+	 * @param  string  $method
+	 * @param  array  $arguments
+	 * @return void
+	 */
+	protected function callQueueMethodOnHandler($class, $method, $arguments)
+	{
+		$handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+
+		$handler->queue($this->resolveQueue(), 'Illuminate\Events\CallQueuedHandler@call', [
+			'class' => $class, 'method' => $method, 'data' => serialize($arguments),
+		]);
 	}
 
 	/**
