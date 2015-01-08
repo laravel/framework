@@ -262,7 +262,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testResolvingCallbacksAreCalled()
 	{
 		$container = new Container;
-		$container->resolvingAny(function($object) { return $object->name = 'taylor'; });
+		$container->resolving(function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
@@ -273,7 +273,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testResolvingCallbacksAreCalledForType()
 	{
 		$container = new Container;
-		$container->resolvingType('StdClass', function($object) { return $object->name = 'taylor'; });
+		$container->resolving('StdClass', function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
