@@ -118,15 +118,37 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 			'class' => 'TestDispatcherQueuedHandler',
 			'method' => 'someMethod',
 			'data' => serialize(['foo', 'bar']),
-		]);
+		],
+			null);
 		$d->setQueueResolver(function() use ($queue) { return $queue; });
 
 		$d->listen('some.event', 'TestDispatcherQueuedHandler@someMethod');
 		$d->fire('some.event', ['foo', 'bar']);
 	}
 
+	public function testQueuedEventHandlersAreQueuedToANamedQueue()
+	{
+		$d = new Dispatcher;
+		$queue = m::mock('Illuminate\Contracts\Queue\Queue');
+		$queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+			'class' => 'TestDispatcherToNamedQueue',
+			'method' => 'someMethod',
+			'data' => serialize(['foo', 'bar']),
+		],
+			'test');
+		$d->setQueueResolver(function() use ($queue) { return $queue; });
+
+		$d->listen('some.event', 'TestDispatcherToNamedQueue@someMethod');
+		$d->fire('some.event', ['foo', 'bar']);
+	}
+
 }
 
 class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
+	public function handle() {}
+}
+
+class TestDispatcherToNamedQueue implements  Illuminate\Contracts\Queue\ShouldBeQueued {
+	const QUEUE = 'test';
 	public function handle() {}
 }

@@ -395,8 +395,22 @@ class Dispatcher implements DispatcherContract {
 		{
 			$this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
 				'class' => $class, 'method' => $method, 'data' => serialize(func_get_args()),
-			]);
+			], $this->getQueueName($class));
 		};
+	}
+
+	/**
+	 * Gets the queue name from a given class, if available.
+	 *
+	 * @param  string|object  $class
+	 *
+	 * @return null|string
+	 */
+	protected function getQueueName($class)
+	{
+		if ( ! is_string($class)) $class = get_class($class);
+
+		return defined($class.'::QUEUE') ? $class::QUEUE : null;
 	}
 
 	/**
