@@ -46,10 +46,9 @@ abstract class Queue {
 	 *
 	 * @param  string  $job
 	 * @param  mixed   $data
-	 * @param  string  $queue
 	 * @return string
 	 */
-	protected function createPayload($job, $data = '', $queue = null)
+	protected function createPayload($job, $data = '')
 	{
 		if ($job instanceof Closure)
 		{
@@ -63,10 +62,9 @@ abstract class Queue {
 	 * Create a payload string for the given Closure job.
 	 *
 	 * @param  \Closure  $job
-	 * @param  mixed     $data
 	 * @return string
 	 */
-	protected function createClosurePayload($job, $data)
+	protected function createClosurePayload($job)
 	{
 		$closure = $this->crypt->encrypt(serialize(new SerializableClosure($job)));
 

@@ -93,10 +93,9 @@ class MySqlGrammar extends Grammar {
 	 * Compile an add column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileAdd(Blueprint $blueprint, Fluent $command)
+	public function compileAdd(Blueprint $blueprint)
 	{
 		$table = $this->wrapTable($blueprint);
 
@@ -164,10 +163,9 @@ class MySqlGrammar extends Grammar {
 	 * Compile a drop table command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDrop(Blueprint $blueprint, Fluent $command)
+	public function compileDrop(Blueprint $blueprint)
 	{
 		return 'drop table '.$this->wrapTable($blueprint);
 	}
@@ -176,10 +174,9 @@ class MySqlGrammar extends Grammar {
 	 * Compile a drop table (if exists) command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
+	public function compileDropIfExists(Blueprint $blueprint)
 	{
 		return 'drop table if exists '.$this->wrapTable($blueprint);
 	}
@@ -204,10 +201,9 @@ class MySqlGrammar extends Grammar {
 	 * Compile a drop primary key command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
+	public function compileDropPrimary(Blueprint $blueprint)
 	{
 		return 'alter table '.$this->wrapTable($blueprint).' drop primary key';
 	}
@@ -293,10 +289,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeText(Fluent $column)
+	protected function typeText()
 	{
 		return 'text';
 	}
@@ -304,10 +299,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a medium text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeMediumText(Fluent $column)
+	protected function typeMediumText()
 	{
 		return 'mediumtext';
 	}
@@ -315,10 +309,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a long text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeLongText(Fluent $column)
+	protected function typeLongText()
 	{
 		return 'longtext';
 	}
@@ -326,10 +319,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a big integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeBigInteger(Fluent $column)
+	protected function typeBigInteger()
 	{
 		return 'bigint';
 	}
@@ -337,10 +329,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeInteger(Fluent $column)
+	protected function typeInteger()
 	{
 		return 'int';
 	}
@@ -348,10 +339,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a medium integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeMediumInteger(Fluent $column)
+	protected function typeMediumInteger()
 	{
 		return 'mediumint';
 	}
@@ -359,10 +349,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a tiny integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeTinyInteger(Fluent $column)
+	protected function typeTinyInteger()
 	{
 		return 'tinyint';
 	}
@@ -370,10 +359,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a small integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeSmallInteger(Fluent $column)
+	protected function typeSmallInteger()
 	{
 		return 'smallint';
 	}
@@ -419,10 +407,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a boolean type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeBoolean(Fluent $column)
+	protected function typeBoolean()
 	{
 		return 'tinyint(1)';
 	}
@@ -441,10 +428,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a date type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeDate(Fluent $column)
+	protected function typeDate()
 	{
 		return 'date';
 	}
@@ -452,10 +438,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a date-time type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeDateTime(Fluent $column)
+	protected function typeDateTime()
 	{
 		return 'datetime';
 	}
@@ -463,10 +448,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a time type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeTime(Fluent $column)
+	protected function typeTime()
 	{
 		return 'time';
 	}
@@ -487,10 +471,9 @@ class MySqlGrammar extends Grammar {
 	/**
 	 * Create the column definition for a binary type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeBinary(Fluent $column)
+	protected function typeBinary()
 	{
 		return 'blob';
 	}

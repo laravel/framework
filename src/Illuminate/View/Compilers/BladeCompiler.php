@@ -297,10 +297,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the show statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileShow($expression)
+	protected function compileShow()
 	{
 		return "<?php echo \$__env->yieldSection(); ?>";
 	}
@@ -319,10 +318,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the append statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileAppend($expression)
+	protected function compileAppend()
 	{
 		return "<?php \$__env->appendSection(); ?>";
 	}
@@ -330,10 +328,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-section statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndsection($expression)
+	protected function compileEndsection()
 	{
 		return "<?php \$__env->stopSection(); ?>";
 	}
@@ -341,10 +338,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the stop statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileStop($expression)
+	protected function compileStop()
 	{
 		return "<?php \$__env->stopSection(); ?>";
 	}
@@ -352,10 +348,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the overwrite statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileOverwrite($expression)
+	protected function compileOverwrite()
 	{
 		return "<?php \$__env->stopSection(true); ?>";
 	}
@@ -374,10 +369,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end unless statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndunless($expression)
+	protected function compileEndunless()
 	{
 		return "<?php endif; ?>";
 	}
@@ -407,10 +401,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the else statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileElse($expression)
+	protected function compileElse()
 	{
 		return "<?php else: ?>";
 	}
@@ -475,10 +468,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the forelse statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEmpty($expression)
+	protected function compileEmpty()
 	{
 		$empty = '$__empty_' . $this->forelseCounter--;
 
@@ -499,10 +491,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-while statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndwhile($expression)
+	protected function compileEndwhile()
 	{
 		return "<?php endwhile; ?>";
 	}
@@ -510,10 +501,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-for statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndfor($expression)
+	protected function compileEndfor()
 	{
 		return "<?php endfor; ?>";
 	}
@@ -521,10 +511,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-for-each statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndforeach($expression)
+	protected function compileEndforeach()
 	{
 		return "<?php endforeach; ?>";
 	}
@@ -532,10 +521,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-if statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndif($expression)
+	protected function compileEndif()
 	{
 		return "<?php endif; ?>";
 	}
@@ -543,10 +531,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the end-for-else statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndforelse($expression)
+	protected function compileEndforelse()
 	{
 		return "<?php endif; ?>";
 	}
@@ -612,10 +599,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Compile the endpush statements into valid PHP.
 	 *
-	 * @param  string  $expression
 	 * @return string
 	 */
-	protected function compileEndpush($expression)
+	protected function compileEndpush()
 	{
 		return "<?php \$__env->appendSection(); ?>";
 	}

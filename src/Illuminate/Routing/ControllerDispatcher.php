@@ -208,10 +208,9 @@ class ControllerDispatcher {
 	 *
 	 * @param  array  $filter
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  string  $method
 	 * @return bool
 	 */
-	protected function filterFailsOn($filter, $request, $method)
+	protected function filterFailsOn($filter, $request)
 	{
 		$on = array_get($filter, 'options.on');
 

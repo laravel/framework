@@ -44,10 +44,9 @@ class PostgresGrammar extends Grammar {
 	 * Compile a create table command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileCreate(Blueprint $blueprint, Fluent $command)
+	public function compileCreate(Blueprint $blueprint)
 	{
 		$columns = implode(', ', $this->getColumns($blueprint));
 
@@ -58,10 +57,9 @@ class PostgresGrammar extends Grammar {
 	 * Compile a create table command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileAdd(Blueprint $blueprint, Fluent $command)
+	public function compileAdd(Blueprint $blueprint)
 	{
 		$table = $this->wrapTable($blueprint);
 
@@ -118,10 +116,9 @@ class PostgresGrammar extends Grammar {
 	 * Compile a drop table command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDrop(Blueprint $blueprint, Fluent $command)
+	public function compileDrop(Blueprint $blueprint)
 	{
 		return 'drop table '.$this->wrapTable($blueprint);
 	}
@@ -130,10 +127,9 @@ class PostgresGrammar extends Grammar {
 	 * Compile a drop table (if exists) command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
+	public function compileDropIfExists(Blueprint $blueprint)
 	{
 		return 'drop table if exists '.$this->wrapTable($blueprint);
 	}
@@ -158,10 +154,9 @@ class PostgresGrammar extends Grammar {
 	 * Compile a drop primary key command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-	 * @param  \Illuminate\Support\Fluent  $command
 	 * @return string
 	 */
-	public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
+	public function compileDropPrimary(Blueprint $blueprint)
 	{
 		$table = $blueprint->getTable();
 
@@ -247,10 +242,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeText(Fluent $column)
+	protected function typeText()
 	{
 		return 'text';
 	}
@@ -258,10 +252,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a medium text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeMediumText(Fluent $column)
+	protected function typeMediumText()
 	{
 		return 'text';
 	}
@@ -269,10 +262,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a long text type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeLongText(Fluent $column)
+	protected function typeLongText()
 	{
 		return 'text';
 	}
@@ -302,10 +294,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a medium integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeMediumInteger(Fluent $column)
+	protected function typeMediumInteger()
 	{
 		return 'integer';
 	}
@@ -313,10 +304,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a tiny integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeTinyInteger(Fluent $column)
+	protected function typeTinyInteger()
 	{
 		return 'smallint';
 	}
@@ -324,10 +314,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a small integer type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeSmallInteger(Fluent $column)
+	protected function typeSmallInteger()
 	{
 		return 'smallint';
 	}
@@ -335,10 +324,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a float type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeFloat(Fluent $column)
+	protected function typeFloat()
 	{
 		return 'real';
 	}
@@ -346,10 +334,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a double type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeDouble(Fluent $column)
+	protected function typeDouble()
 	{
 		return 'double precision';
 	}
@@ -368,10 +355,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a boolean type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeBoolean(Fluent $column)
+	protected function typeBoolean()
 	{
 		return 'boolean';
 	}
@@ -392,10 +378,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a date type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeDate(Fluent $column)
+	protected function typeDate()
 	{
 		return 'date';
 	}
@@ -403,10 +388,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a date-time type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeDateTime(Fluent $column)
+	protected function typeDateTime()
 	{
 		return 'timestamp';
 	}
@@ -414,10 +398,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a time type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeTime(Fluent $column)
+	protected function typeTime()
 	{
 		return 'time';
 	}
@@ -425,10 +408,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a timestamp type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeTimestamp(Fluent $column)
+	protected function typeTimestamp()
 	{
 		return 'timestamp';
 	}
@@ -436,10 +418,9 @@ class PostgresGrammar extends Grammar {
 	/**
 	 * Create the column definition for a binary type.
 	 *
-	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
-	protected function typeBinary(Fluent $column)
+	protected function typeBinary()
 	{
 		return 'bytea';
 	}

@@ -171,10 +171,9 @@ class PackageCreator {
 	 *
 	 * @param  \Illuminate\Workbench\Package  $package
 	 * @param  string  $directory
-	 * @param  bool    $plain
 	 * @return void
 	 */
-	public function writeIgnoreFile(Package $package, $directory, $plain)
+	public function writeIgnoreFile(Package $package, $directory)
 	{
 		$this->files->copy(__DIR__.'/stubs/gitignore.txt', $directory.'/.gitignore');
 	}
