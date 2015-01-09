@@ -101,6 +101,9 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 		$user = EloquentTestUser::with('posts')->where('email', 'taylorotwell@gmail.com')->first();
 
 		$this->assertEquals('First Post', $user->posts->first()->name);
+
+		$post = EloquentTestPost::with('user')->where('name', 'First Post')->get();
+		$this->assertEquals('taylorotwell@gmail.com', $post->first()->user->email);
 	}
 
 	/**
