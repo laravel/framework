@@ -150,7 +150,7 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
-		$models = $this->getModels($columns)->all();
+		$models = $this->getModels($columns);
 
 		// If we actually found models we will also eager load any relationships that
 		// have been specified as needing to be eager loaded, which will solve the
@@ -364,19 +364,30 @@ class Builder {
 	 * Get the hydrated models without eager loading.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Support\Collection
+	 * @return \Illuminate\Database\Eloquent\Model[]
 	 */
 	public function getModels($columns = array('*'))
 	{
+		// First, we will simply get the raw results from the query builders which we
+		// can use to populate an array with Eloquent models. We will pass columns
+		// that should be selected as well, which are typically just everything.
+		$results = $this->query->get($columns);
+
 		$connection = $this->model->getConnectionName();
 
-		// First, we will get the raw results from the query builder. We'll then
-		// transform the raw results into Eloquent models, while also setting
-		// the proper database connection on every Eloquent model instance.
-		return $this->query->get($columns)->map(function($result) use ($connection)
+		$models = array();
+
+		// Once we have the results, we can spin through them and instantiate a fresh
+		// model instance for each records we retrieved from the database. We will
+		// also set the proper connection name for the model after we create it.
+		foreach ($results as $result)
 		{
-			return $this->model->newFromBuilder($result)->setConnection($connection);
-		});
+			$models[] = $model = $this->model->newFromBuilder($result);
+
+			$model->setConnection($connection);
+		}
+
+		return $models;
 	}
 
 	/**
