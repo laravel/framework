@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\Console\ClearRemindersCommand;
+use Illuminate\Auth\Console\ClearResetsCommand;
 
 class GeneratorServiceProvider extends ServiceProvider {
 
@@ -18,7 +18,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $commands = [
-		'ClearReminders',
+		'ClearResets',
 	];
 
 	/**
@@ -34,7 +34,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 		}
 
 		$this->commands(
-			'command.auth.reminders.clear'
+			'command.auth.resets.clear'
 		);
 	}
 
@@ -43,11 +43,11 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerClearRemindersCommand()
+	protected function registerClearResetsCommand()
 	{
-		$this->app->singleton('command.auth.reminders.clear', function()
+		$this->app->singleton('command.auth.resets.clear', function()
 		{
-			return new ClearRemindersCommand;
+			return new ClearResetsCommand;
 		});
 	}
 
@@ -59,7 +59,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'command.auth.reminders.clear'
+			'command.auth.resets.clear'
 		];
 	}
 
