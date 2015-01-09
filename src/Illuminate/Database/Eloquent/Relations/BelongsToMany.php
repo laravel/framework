@@ -153,7 +153,7 @@ class BelongsToMany extends Relation {
 
 		$select = $this->getSelectColumns($columns);
 
-		$models = $this->query->addSelect($select)->getModels()->all();
+		$models = $this->query->addSelect($select)->getModels();
 
 		$this->hydratePivotRelation($models);
 
