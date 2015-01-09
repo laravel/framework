@@ -765,7 +765,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$sum = $builder->sum('id');
 		$this->assertEquals(2, $sum);
 		$result = $builder->get();
-		$this->assertEquals(array(array('column1' => 'foo', 'column2' => 'bar')), $result->all());
+		$this->assertEquals(array(array('column1' => 'foo', 'column2' => 'bar')), $result);
 	}
 
 
@@ -779,7 +779,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$count = $builder->count('column1');
 		$this->assertEquals(1, $count);
 		$result = $builder->select('column2', 'column3')->get();
-		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result->all());
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
 	}
 
 
@@ -793,7 +793,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$count = $builder->count('column1');
 		$this->assertEquals(1, $count);
 		$result = $builder->get(array('column2', 'column3'));
-		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result->all());
+		$this->assertEquals(array(array('column2' => 'foo', 'column3' => 'bar')), $result);
 	}
 
 
