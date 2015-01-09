@@ -146,7 +146,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSmtpTransport($config)
 	{
-		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
+		$this->app['swift.transport'] = $this->app->share(function() use ($config)
 		{
 			extract($config);
 
@@ -182,7 +182,7 @@ class MailServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSendmailTransport($config)
 	{
-		$this->app['swift.transport'] = $this->app->share(function($app) use ($config)
+		$this->app['swift.transport'] = $this->app->share(function() use ($config)
 		{
 			return SendmailTransport::newInstance($config['sendmail']);
 		});
@@ -191,10 +191,9 @@ class MailServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Mail Swift Transport instance.
 	 *
-	 * @param  array  $config
 	 * @return void
 	 */
-	protected function registerMailTransport($config)
+	protected function registerMailTransport()
 	{
 		$this->app['swift.transport'] = $this->app->share(function()
 		{
@@ -205,10 +204,9 @@ class MailServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Mailgun Swift Transport instance.
 	 *
-	 * @param  array  $config
 	 * @return void
 	 */
-	protected function registerMailgunTransport($config)
+	protected function registerMailgunTransport()
 	{
 		$mailgun = $this->app['config']->get('services.mailgun', array());
 
@@ -221,10 +219,9 @@ class MailServiceProvider extends ServiceProvider {
 	/**
 	 * Register the Mandrill Swift Transport instance.
 	 *
-	 * @param  array  $config
 	 * @return void
 	 */
-	protected function registerMandrillTransport($config)
+	protected function registerMandrillTransport()
 	{
 		$mandrill = $this->app['config']->get('services.mandrill', array());
 
@@ -237,10 +234,9 @@ class MailServiceProvider extends ServiceProvider {
 	/**
 	 * Register the "Log" Swift Transport instance.
 	 *
-	 * @param  array  $config
 	 * @return void
 	 */
-	protected function registerLogTransport($config)
+	protected function registerLogTransport()
 	{
 		$this->app->bindShared('swift.transport', function($app)
 		{

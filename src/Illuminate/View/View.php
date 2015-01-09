@@ -118,7 +118,7 @@ class View implements ArrayAccess, Renderable {
 	{
 		$env = $this->factory;
 
-		return $this->render(function($view) use ($env)
+		return $this->render(function() use ($env)
 		{
 			return $env->getSections();
 		});

@@ -367,10 +367,9 @@ class UrlGenerator {
 	 * Format the domain and port for the route and request.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
-	 * @param  array  $parameters
 	 * @return string
 	 */
-	protected function formatDomain($route, &$parameters)
+	protected function formatDomain($route)
 	{
 		return $this->addPortToDomain($this->getDomainAndScheme($route));
 	}

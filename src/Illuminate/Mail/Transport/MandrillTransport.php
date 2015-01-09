@@ -52,7 +52,7 @@ class MandrillTransport implements Swift_Transport {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+	public function send(Swift_Mime_Message $message)
 	{
 		$client = $this->getHttpClient();
 
