@@ -1330,18 +1330,20 @@ class Builder {
 	 * Execute the query and get the first result.
 	 *
 	 * @param  array   $columns
-	 * @return mixed
+	 * @return mixed|static
 	 */
 	public function first($columns = array('*'))
 	{
-		return $this->take(1)->get($columns)->first();
+		$results = $this->take(1)->get($columns);
+
+		return count($results) > 0 ? reset($results) : null;
 	}
 
 	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Support\Collection
+	 * @return array|static[]
 	 */
 	public function get($columns = array('*'))
 	{
@@ -1352,15 +1354,13 @@ class Builder {
 	 * Execute the query as a fresh "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return \Illuminate\Support\Collection
+	 * @return array|static[]
 	 */
 	public function getFresh($columns = array('*'))
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
-		$results = $this->processor->processSelect($this, $this->runSelect());
-
-		return new Collection($results);
+		return $this->processor->processSelect($this, $this->runSelect());
 	}
 
 	/**
@@ -1505,7 +1505,7 @@ class Builder {
 		// First we will just get all of the column values for the record result set
 		// then we can associate those values with the column if it was specified
 		// otherwise we can just give these values back without a specific key.
-		$results = $this->get($columns);
+		$results = new Collection($this->get($columns));
 
 		$values = $results->fetch($columns[0])->all();
 
@@ -1649,7 +1649,7 @@ class Builder {
 
 		$previousColumns = $this->columns;
 
-		$results = $this->get($columns)->all();
+		$results = $this->get($columns);
 
 		// Once we have executed the query, we will reset the aggregate property so
 		// that more select queries can be executed against the database without
