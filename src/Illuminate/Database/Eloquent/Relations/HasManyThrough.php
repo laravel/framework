@@ -205,7 +205,7 @@ class HasManyThrough extends Relation {
 		// models with the result of those columns as a separate model relation.
 		$select = $this->getSelectColumns($columns);
 
-		$models = $this->query->addSelect($select)->getModels()->all();
+		$models = $this->query->addSelect($select)->getModels();
 
 		// If we actually found models we will also eager load any relationships that
 		// have been specified as needing to be eager loaded. This will solve the
