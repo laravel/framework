@@ -322,6 +322,18 @@ class FormBuilder {
 	}
 
 	/**
+	 * Create a telephone input field.
+	 *
+	 * @param  string  $name
+	 * @param  array   $options
+	 * @return string
+	 */
+	public function tel($name, $options = array())
+	{
+		return $this->input('tel', $name, null, $options);
+	}
+
+	/**
 	 * Create a textarea input field.
 	 *
 	 * @param  string  $name
