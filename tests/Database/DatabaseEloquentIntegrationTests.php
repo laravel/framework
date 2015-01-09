@@ -49,6 +49,13 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 			$table->integer('user_id');
 			$table->integer('friend_id');
 		});
+
+		$this->schema()->create('posts', function($table) {
+			$table->increments('id');
+			$table->integer('user_id');
+			$table->string('name');
+			$table->timestamps();
+		});
 	}
 
 
@@ -61,6 +68,7 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 	{
 		$this->schema()->drop('users');
 		$this->schema()->drop('friends');
+		$this->schema()->drop('posts');
 	}
 
 	/**
@@ -83,6 +91,16 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($results));
 		$this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+	}
+
+
+	public function testBasicHasManyEagerLoading()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$user->posts()->create(['name' => 'First Post']);
+		$user = EloquentTestUser::with('posts')->where('email', 'taylorotwell@gmail.com')->first();
+
+		$this->assertEquals('First Post', $user->posts->first()->name);
 	}
 
 	/**
@@ -120,6 +138,17 @@ class EloquentTestUser extends Eloquent {
 	protected $guarded = [];
 	public function friends() {
 		return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
+	}
+	public function posts() {
+		return $this->hasMany('EloquentTestPost', 'user_id');
+	}
+}
+
+class EloquentTestPost extends Eloquent {
+	protected $table = 'posts';
+	protected $guarded = [];
+	public function user() {
+		return $this->belongsTo('EloquentTestUser', 'user_id');
 	}
 }
 
