@@ -2,6 +2,7 @@
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionParameter;
 use Illuminate\Support\Collection;
@@ -166,7 +167,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	protected function extractValueFromSource(ArrayAccess $source, ReflectionParameter $parameter)
 	{
-		return array_get($source, $parameter->name);
+		$name = $parameter->name;
+
+		return array_get($source, $name, array_get($source, Str::snake($name)));
 	}
 
 	/**

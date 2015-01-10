@@ -100,6 +100,26 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor otwell', $result);
 	}
 
+
+	public function testDispatchingFromArrayAccess()
+	{
+		$instance = new Dispatcher(new Container);
+		$source = new Container();
+		$source->firstName = 'taylor';
+		$result = $instance->dispatchFrom('BusDispatcherTestSelfHandlingCommand', $source, ['lastName' => 'otwell']);
+		$this->assertEquals('taylor otwell', $result);
+	}
+
+
+	public function testDispatchingFromArrayAccessChecksSnakeCase()
+	{
+		$instance = new Dispatcher(new Container);
+		$source = new Container();
+		$source->first_name = 'taylor';
+		$result = $instance->dispatchFrom('BusDispatcherTestSelfHandlingCommand', $source, ['lastName' => 'otwell']);
+		$this->assertEquals('taylor otwell', $result);
+	}
+
 }
 
 class BusDispatcherTestBasicCommand {
