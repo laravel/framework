@@ -73,6 +73,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 *
 	 * @param  mixed  $command
 	 * @param  \ArrayAccess  $array
+	 * @param  mixed $extras
 	 * @return mixed
 	 */
 	public function dispatchFrom($command, ArrayAccess $source, $extras = [])
