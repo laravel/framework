@@ -8,13 +8,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Command extends \Symfony\Component\Console\Command\Command {
 
 	/**
-	 * The Laravel application instance.
+	 * The Laravel container instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $laravel;
 
@@ -365,7 +366,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Get the Laravel application instance.
 	 *
-	 * @return \Illuminate\Foundation\Application
+	 * @return \Illuminate\Contracts\Container\Container
 	 */
 	public function getLaravel()
 	{
@@ -375,10 +376,10 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * Set the Laravel application instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $laravel
+	 * @param  \Illuminate\Contracts\Container\Container  $laravel
 	 * @return void
 	 */
-	public function setLaravel($laravel)
+	public function setLaravel(ContainerContract $laravel)
 	{
 		$this->laravel = $laravel;
 	}
