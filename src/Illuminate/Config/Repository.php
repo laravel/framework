@@ -31,9 +31,7 @@ class Repository implements ArrayAccess, ConfigContract {
 	 */
 	public function has($key)
 	{
-		$default = microtime(true);
-
-		return $this->get($key, $default) !== $default;
+		return array_has($this->items, $key);
 	}
 
 	/**
