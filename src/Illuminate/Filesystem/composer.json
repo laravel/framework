@@ -15,6 +15,9 @@
         "symfony/finder": "2.6.*",
         "league/flysystem": "~1.0"
     },
+    "require-dev": {
+        "ext-mbstring": "*",
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Filesystem\\": ""
