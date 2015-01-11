@@ -169,6 +169,17 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testShortRawEchosAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setRawTags('{{', '}}');
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
+	}
+
+
 	public function testExtendsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
