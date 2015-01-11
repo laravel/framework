@@ -65,4 +65,12 @@ interface PasswordBroker {
 	 */
 	public function validator(Closure $callback);
 
+	/**
+	 * Determine if the passwords match for the request.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function validateNewPassword(array $credentials);
+
 }
