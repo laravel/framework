@@ -10,6 +10,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "ext-mbstring": "*",
         "illuminate/container": "5.0.*",
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
