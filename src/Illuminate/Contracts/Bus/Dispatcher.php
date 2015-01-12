@@ -18,15 +18,17 @@ interface Dispatcher {
 	 * Marshal a command and dispatch it to its appropriate handler.
 	 *
 	 * @param  mixed  $command
-	 * @param  array  $array
+	 * @param  \ArrayAccess  $source
+	 * @param  array  $extras
 	 * @return mixed
 	 */
-	public function dispatchFrom($command, ArrayAccess $source, $extras = []);
+	public function dispatchFrom($command, ArrayAccess $source, array $extras = []);
 
 	/**
 	 * Dispatch a command to its appropriate handler.
 	 *
 	 * @param  mixed  $command
+	 * @param  \Closure|null  $afterResolving
 	 * @return mixed
 	 */
 	public function dispatch($command, Closure $afterResolving = null);
@@ -35,6 +37,7 @@ interface Dispatcher {
 	 * Dispatch a command to its appropriate handler in the current process.
 	 *
 	 * @param  mixed  $command
+	 * @param  \Closure|null  $afterResolving
 	 * @return mixed
 	 */
 	public function dispatchNow($command, Closure $afterResolving = null);
