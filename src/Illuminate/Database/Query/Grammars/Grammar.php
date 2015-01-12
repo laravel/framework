@@ -306,7 +306,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereIn(Builder $query, $where)
 	{
-		if (empty($where['values'])) return '0=1';
+		if (empty($where['values'])) return '0 = 1';
 
 		$values = $this->parameterize($where['values']);
 
@@ -322,7 +322,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereNotIn(Builder $query, $where)
 	{
-		if (empty($where['values'])) return '1=1';
+		if (empty($where['values'])) return '1 = 1';
 
 		$values = $this->parameterize($where['values']);
 

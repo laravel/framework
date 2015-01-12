@@ -347,12 +347,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereIn('id', array());
-		$this->assertEquals('select * from "users" where 0=1', $builder->toSql());
+		$this->assertEquals('select * from "users" where 0 = 1', $builder->toSql());
 		$this->assertEquals(array(), $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', array());
-		$this->assertEquals('select * from "users" where "id" = ? or 0=1', $builder->toSql());
+		$this->assertEquals('select * from "users" where "id" = ? or 0 = 1', $builder->toSql());
 		$this->assertEquals(array(0 => 1), $builder->getBindings());
 	}
 
@@ -361,12 +361,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->whereNotIn('id', array());
-		$this->assertEquals('select * from "users" where 1=1', $builder->toSql());
+		$this->assertEquals('select * from "users" where 1 = 1', $builder->toSql());
 		$this->assertEquals(array(), $builder->getBindings());
 
 		$builder = $this->getBuilder();
 		$builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotIn('id', array());
-		$this->assertEquals('select * from "users" where "id" = ? or 1=1', $builder->toSql());
+		$this->assertEquals('select * from "users" where "id" = ? or 1 = 1', $builder->toSql());
 		$this->assertEquals(array(0 => 1), $builder->getBindings());
 	}
 
