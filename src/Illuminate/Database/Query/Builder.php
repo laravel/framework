@@ -40,6 +40,7 @@ class Builder {
 	 */
 	protected $bindings = array(
 		'select' => [],
+		'from'   => [],
 		'join'   => [],
 		'where'  => [],
 		'having' => [],
@@ -301,8 +302,15 @@ class Builder {
 	 * @param  string  $table
 	 * @return $this
 	 */
-	public function from($table)
+	public function from($table, $as = null)
 	{
+		if ($table instanceof Builder)
+		{
+			$this->setBindings($table->getBindings(), 'from');
+
+			$table = new Expression('('.$table->toSql().') as '.$this->grammar->wrap($as ?: 'sub'));
+		}
+
 		$this->from = $table;
 
 		return $this;
@@ -888,7 +896,7 @@ class Builder {
 	{
 		return $this->whereNotNull($column, 'or');
 	}
-	
+
 	/**
 	 * Add a "where date" statement to the query.
 	 *
@@ -902,7 +910,7 @@ class Builder {
 	{
 		return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
 	}
-	
+
 	/**
 	 * Add a "where day" statement to the query.
 	 *
@@ -1645,18 +1653,7 @@ class Builder {
 	 */
 	public function aggregate($function, $columns = array('*'))
 	{
-		$this->aggregate = compact('function', 'columns');
-
-		$previousColumns = $this->columns;
-
-		$results = $this->get($columns);
-
-		// Once we have executed the query, we will reset the aggregate property so
-		// that more select queries can be executed against the database without
-		// the aggregate value getting in the way when the grammar builds it.
-		$this->aggregate = null;
-
-		$this->columns = $previousColumns;
+		$results = $this->aggregateQuery($function, $columns)->get();
 
 		if (isset($results[0]))
 		{
@@ -1664,6 +1661,36 @@ class Builder {
 
 			return $result['aggregate'];
 		}
+	}
+
+	/**
+	 * Create a query to compute an aggregate value.
+	 *
+	 * @param  string  $function
+	 * @param  array   $columns
+	 * @return mixed
+	 */
+	protected function aggregateQuery($function, $columns = array('*'))
+	{
+		$previousColumns = $this->columns;
+
+		// If the developer specified a column to calculate the aggregate for, we will
+		// make sure it is also selected from within the subquery otherwise the data
+		// would not be available when the aggregate is actually being calculated.
+		if ($columns != array('*'))
+		{
+			$this->addSelect($columns);
+
+			$this->columns = array_unique($this->columns);
+		}
+
+		$query = $this->newQuery()->from($this);
+
+		$query->aggregate = compact('function', 'columns');
+
+		$this->columns = $previousColumns;
+
+		return $query;
 	}
 
 	/**
