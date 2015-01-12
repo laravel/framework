@@ -37,6 +37,35 @@ abstract class ServiceProvider {
 	abstract public function register();
 
 	/**
+	 * Register a view file namespace.
+	 *
+	 * @param  string  $namespace
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function loadViewsFrom($namespace, $path)
+	{
+		if (is_dir($appPath = $this->app->basePath().'/resources/views/packages/'.$namespace))
+		{
+			$this->app['view']->addNamespace($namespace, $appPath);
+		}
+
+		$this->app['view']->addNamespace($namespace, $path);
+	}
+
+	/**
+	 * Register a translation file namespace.
+	 *
+	 * @param  string  $namespace
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function loadTranslationsFrom($namespace, $path)
+	{
+		$this->app['translator']->addNamespace($namespace, $path);
+	}
+
+	/**
 	 * Register the package's custom Artisan commands.
 	 *
 	 * @param  array  $commands
