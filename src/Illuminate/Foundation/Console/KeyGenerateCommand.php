@@ -30,9 +30,12 @@ class KeyGenerateCommand extends Command {
 
 		foreach ([base_path('.env'), base_path('.env.example')] as $path)
 		{
-			file_put_contents($path, str_replace(
-				$this->laravel['config']['app.key'], $key, file_get_contents($path)
-			));
+			if (file_exists($path))
+			{
+				file_put_contents($path, str_replace(
+					$this->laravel['config']['app.key'], $key, file_get_contents($path)
+				));
+			}
 		}
 
 		$this->laravel['config']['app.key'] = $key;
