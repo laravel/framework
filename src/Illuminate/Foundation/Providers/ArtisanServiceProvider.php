@@ -228,7 +228,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.key.generate', function($app)
 		{
-			return new KeyGenerateCommand($app['files']);
+			return new KeyGenerateCommand;
 		});
 	}
 
