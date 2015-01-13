@@ -182,7 +182,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	/**
 	 * Bind all of the application paths in the container.
 	 *
-	 * @return $this
+	 * @return void
 	 */
 	protected function bindPathsInContainer()
 	{
