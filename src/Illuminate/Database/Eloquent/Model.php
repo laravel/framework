@@ -1694,7 +1694,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// We will append the names of the class to the event to distinguish it from
 		// other model events that are fired, allowing us to listen on each model
 		// event set individually instead of catching event for all the models.
-		$event = "eloquent.{$event}: ".get_class($this);
+		$event = "eloquent.{$event}.".get_class($this);
 
 		$method = $halt ? 'until' : 'fire';
 
