@@ -392,7 +392,8 @@ class FormBuilder {
 	 * Create a number input field.
 	 *
 	 * @param  string  $name
-	 * @param  array   $options
+	 * @param  string|null  $value
+	 * @param  array  $options
 	 * @return string
 	 */
 	public function number($name, $value = null, $options = array())
