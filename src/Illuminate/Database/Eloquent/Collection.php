@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection {
@@ -23,6 +24,26 @@ class Collection extends BaseCollection {
 			return $model->getKey() == $key;
 
 		}, $default);
+	}
+
+	/**
+	 * Get the first item from the collection.
+	 *
+	 * @param  \Closure   $callback
+	 * @param  mixed      $default
+	 * @return mixed|null
+	 */
+	public function first(Closure $callback = null, $default = null)
+	{
+		if (is_null($callback))
+		{
+			return count($this->items) > 0 ? reset($this->items) : null;
+		}
+
+		foreach ($this->items as $item)
+		{
+			if (call_user_func($callback, $item)) return $item;
+		}
 	}
 
 	/**

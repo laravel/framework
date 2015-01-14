@@ -217,4 +217,21 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
 	}
 
+	public function testFirstWithCallback()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('getAttribute')->andReturn('foo');
+
+		$two = m::mock('Illuminate\Database\Eloquent\Model');
+		$two->shouldReceive('getAttribute')->andReturn('bar');
+
+		$c = new Collection([$one, $two]);
+
+		$result = $c->first(function ($item) {
+			return $item->getAttribute('baz') == 'bar';
+		});
+
+		$this->assertEquals($two, $result);
+	}
+
 }
