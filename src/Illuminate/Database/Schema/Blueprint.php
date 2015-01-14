@@ -661,6 +661,7 @@ class Blueprint {
 	 * Add the proper columns for a polymorphic table.
 	 *
 	 * @param  string  $name
+	 * @param  string|null  $indexName
 	 * @return void
 	 */
 	public function morphs($name, $indexName = null)
