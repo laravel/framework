@@ -36,7 +36,6 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 		$charset = $config['charset'];
 
 		$connection->prepare("set names '$charset'")->execute();
-		$connection->prepare("set timezone='" . \Config::get('app.timezone') . "'")->execute();
 
 		$timezone = $config['timezone'];
 
