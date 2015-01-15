@@ -37,7 +37,8 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 
 		$connection->prepare("set names '$charset'")->execute();
 
-		if(isset($config['timezone'])) {
+		if (isset($config['timezone']))
+		{
 			$timezone = $config['timezone'];
 
 			$connection->prepare("set timezone='$timezone'")->execute();
