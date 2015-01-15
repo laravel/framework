@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Container\Container;
 
-class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
+class FoundationFormRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
@@ -15,33 +15,37 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	public function testValidateFunctionRunsValidatorOnSpecifiedRules()
 	{
 		$request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
-		$request->setContainer(new Container);
+		$container = new Container();
 		$factory = m::mock('Illuminate\Validation\Factory');
-		$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
-		);
-		$validator->shouldReceive('fails')->once()->andReturn(false);
+		$validator = m::mock('Illuminate\Validation\Validator');
+		$validator->shouldReceive('passes')->once()->andReturn(true);
+		$container->bind('Illuminate\Validation\Factory', function() use ($factory, $validator)
+		{
+			$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'], [])->andReturn($validator);
+			return $factory;
+		});
+		$request->setContainer($container);
 
 		$request->validate($factory);
-
-		$this->assertTrue($_SERVER['__request.validated']);
 	}
 
 
 	public function testValidateFunctionRunsValidatorOnExtendedRules()
 	{
 		$request = FoundationTestFormRequestStubExtended::create('/', 'GET', ['name' => 'abigail']);
-		$request->setContainer(new Container);
+		$container = new Container();
 		$factory = m::mock('Illuminate\Validation\Factory');
-		$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'foo'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
-		);
-		$factory->shouldReceive('extend')->once()->with('foo', function() { return true; });
-		$validator->shouldReceive('fails')->once()->andReturn(false);
+		$validator = m::mock('Illuminate\Validation\Validator');
+		$validator->shouldReceive('passes')->once()->andReturn(true);
+		$container->bind('Illuminate\Validation\Factory', function() use ($factory, $validator)
+		{
+			$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'foo'], [])->andReturn($validator);
+			$factory->shouldReceive('extend')->once()->with('foo', true);
+			return $factory;
+		});
+		$request->setContainer($container);
 
 		$request->validate($factory);
-
-		$this->assertTrue($_SERVER['__request.validated']);
 	}
 
 
@@ -52,16 +56,19 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	{
 		$request = m::mock('FoundationTestFormRequestStub[response]');
 		$request->initialize(['name' => null]);
-		$request->setContainer(new Container);
+		$container = new Container();
 		$factory = m::mock('Illuminate\Validation\Factory');
-		$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
-		);
-		$validator->shouldReceive('fails')->once()->andReturn(true);
+		$validator = m::mock('Illuminate\Validation\Validator');
+		$validator->shouldReceive('passes')->once()->andReturn(false);
 		$validator->shouldReceive('errors')->once()->andReturn($messages = m::mock('StdClass'));
-		$messages->shouldReceive('all')->once()->andReturn([]);
+		$messages->shouldReceive('getMessages')->once()->andReturn([]);
+		$container->bind('Illuminate\Validation\Factory', function() use ($factory, $validator)
+		{
+			$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [])->andReturn($validator);
+			return $factory;
+		});
 		$request->shouldReceive('response')->once()->andReturn(new Illuminate\Http\Response);
-
+		$request->setContainer($container);
 
 		$request->validate($factory);
 	}
@@ -74,12 +81,15 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	{
 		$request = m::mock('FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
 		$request->initialize(['name' => null]);
-		$request->setContainer(new Container);
+		$container = new Container();
 		$factory = m::mock('Illuminate\Validation\Factory');
-		$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
-		);
-		$validator->shouldReceive('fails')->once()->andReturn(false);
+		$validator = m::mock('Illuminate\Validation\Validator');
+		$container->bind('Illuminate\Validation\Factory', function() use ($factory, $validator)
+		{
+			$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'], [])->andReturn($validator);
+			return $factory;
+		});
+		$request->setContainer($container);
 		$request->shouldReceive('forbiddenResponse')->once()->andReturn(new Illuminate\Http\Response);
 
 		$request->validate($factory);
@@ -94,12 +104,10 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 		$redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
 		$url->shouldReceive('previous')->once()->andReturn('previous');
 		$response->shouldReceive('withInput')->andReturn($response);
-		$response->shouldReceive('withErrors')->with(['errors'])->andReturn($response);
+		$response->shouldReceive('withErrors')->with(['errors'], 'default')->andReturn($response);
 
 		$request->response(['errors']);
 	}
-
-
 
 }
 
@@ -109,9 +117,6 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
 	}
 	public function authorize(StdClass $dep) {
 		return true;
-	}
-	public function validated(StdClass $dep) {
-		$_SERVER['__request.validated'] = true;
 	}
 }
 
@@ -131,12 +136,7 @@ class FoundationTestFormRequestStubExtended extends Illuminate\Foundation\Http\F
 	public function authorize(StdClass $dep) {
 		return true;
 	}
-	public function validated(StdClass $dep) {
-		$_SERVER['__request.validated'] = true;
-	}
 	public function extend(Illuminate\Validation\Factory $factory) {
-		$factory->extend('foo', function() {
-			return true;
-		});
+		$factory->extend('foo', true);
 	}
 }
