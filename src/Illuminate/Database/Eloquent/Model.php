@@ -481,11 +481,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Create a new model instance that is existing.
 	 *
 	 * @param  array  $attributes
+	 * @param  bool $exists
 	 * @return static
 	 */
-	public function newFromBuilder($attributes = array())
+	public function newFromBuilder($attributes = array(), $exists = true)
 	{
-		$instance = $this->newInstance(array(), true);
+		$instance = $this->newInstance(array(), $exists);
 
 		$instance->setRawAttributes((array) $attributes, true);
 
@@ -497,15 +498,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @param  array  $items
 	 * @param  string  $connection
+	 * @param  bool $exists
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public static function hydrate(array $items, $connection = null)
+	public static function hydrate(array $items, $connection = null, $exists = true)
 	{
 		$collection = with($instance = new static)->newCollection();
 
 		foreach ($items as $item)
 		{
-			$model = $instance->newFromBuilder($item);
+			$model = $instance->newFromBuilder($item, $exists);
 
 			if ( ! is_null($connection))
 			{
