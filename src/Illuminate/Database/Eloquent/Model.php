@@ -454,7 +454,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Create a new model instance that is existing.
 	 *
 	 * @param  array  $attributes
-	 * @param string $exists
+	 * @param  string $exists
 	 * @return static
 	 */
 	public function newFromBuilder($attributes = array(), $exists = true)
@@ -471,7 +471,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $items
 	 * @param  string  $connection
-	 * @param string $exists
+	 * @param  string $exists
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
 	public static function hydrate(array $items, $connection = null, $exists = true)
