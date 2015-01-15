@@ -265,6 +265,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	}
 
 	/**
+	 * Get the Flysystem driver.
+	 *
+	 * @return \League\Flysystem\FilesystemInterface
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	/**
 	 * Filter directory contents by type.
 	 *
 	 * @param  array  $contents
@@ -300,16 +310,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 		}
 
 		throw new InvalidArgumentException('Unknown visibility: '.$visibility);
-	}
-
-	/**
-	 * Get the Flysystem driver.
-	 *
-	 * @return \League\Flysystem\FilesystemInterface
-	 */
-	protected function getDriver()
-	{
-		return $this->driver;
 	}
 
 }
