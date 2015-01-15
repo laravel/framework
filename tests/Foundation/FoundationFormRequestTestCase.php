@@ -28,6 +28,23 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testValidateFunctionRunsValidatorOnExtendedRules()
+	{
+		$request = FoundationTestFormRequestStubExtended::create('/', 'GET', ['name' => 'abigail']);
+		$request->setContainer(new Container);
+		$factory = m::mock('Illuminate\Validation\Factory');
+		$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'foo'])->andReturn(
+			$validator = m::mock('Illuminate\Validation\Validator')
+		);
+		$factory->shouldReceive('extend')->once()->with('foo', function() { return true; });
+		$validator->shouldReceive('fails')->once()->andReturn(false);
+
+		$request->validate($factory);
+
+		$this->assertTrue($_SERVER['__request.validated']);
+	}
+
+
 	/**
 	 * @expectedException \Illuminate\Http\Exception\HttpResponseException
 	 */
@@ -104,5 +121,22 @@ class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\
 	}
 	public function authorize() {
 		return false;
+	}
+}
+
+class FoundationTestFormRequestStubExtended extends Illuminate\Foundation\Http\FormRequest {
+	public function rules(StdClass $dep) {
+		return ['name' => 'foo'];
+	}
+	public function authorize(StdClass $dep) {
+		return true;
+	}
+	public function validated(StdClass $dep) {
+		$_SERVER['__request.validated'] = true;
+	}
+	public function extend(Illuminate\Validation\Factory $factory) {
+		$factory->extend('foo', function() {
+			return true;
+		});
 	}
 }
