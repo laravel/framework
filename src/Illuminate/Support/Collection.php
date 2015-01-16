@@ -768,6 +768,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Ensure two collections are the same.
+	 *
+	 * @param  \Illuminate\Support\Collection $collection
+	 * @return bool
+	 */
+	public function same(Collection $collection)
+	{
+		return md5($this) === md5($collection);
+	}
+
+	/**
 	 * Get an iterator for the items.
 	 *
 	 * @return \ArrayIterator
