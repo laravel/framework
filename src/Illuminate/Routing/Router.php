@@ -11,6 +11,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Router implements RegistrarContract {
 
@@ -26,7 +27,7 @@ class Router implements RegistrarContract {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -104,10 +105,10 @@ class Router implements RegistrarContract {
 	 * Create a new Router instance.
 	 *
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public function __construct(Dispatcher $events, Container $container = null)
+	public function __construct(Dispatcher $events, ContainerContract $container = null)
 	{
 		$this->events = $events;
 		$this->routes = new RouteCollection;

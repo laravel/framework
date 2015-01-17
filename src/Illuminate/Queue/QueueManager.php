@@ -10,7 +10,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	/**
 	 * The application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $app;
 
@@ -24,7 +24,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	/**
 	 * Create a new queue manager instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)

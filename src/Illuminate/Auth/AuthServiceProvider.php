@@ -25,19 +25,19 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAuthenticator()
 	{
-		$this->app->singleton('auth', function($app)
+		$this->app->singleton('auth', function()
 		{
 			// Once the authentication service has actually been requested by the developer
 			// we will set a variable in the application indicating such. This helps us
 			// know that we need to set any queued cookies in the after event later.
-			$app['auth.loaded'] = true;
+			$this->app['auth.loaded'] = true;
 
-			return new AuthManager($app);
+			return new AuthManager($this->app);
 		});
 
-		$this->app->singleton('auth.driver', function($app)
+		$this->app->singleton('auth.driver', function()
 		{
-			return $app['auth']->driver();
+			return $this->app['auth']->driver();
 		});
 	}
 
@@ -48,9 +48,9 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUserResolver()
 	{
-		$this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function($app)
+		$this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function()
 		{
-			return $app['auth']->user();
+			return $this->app['auth']->user();
 		});
 	}
 
@@ -61,11 +61,11 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRequestRebindHandler()
 	{
-		$this->app->rebinding('request', function($app, $request)
+		$this->app->rebinding('request', function($request)
 		{
-			$request->setUserResolver(function() use ($app)
+			$request->setUserResolver(function()
 			{
-				return $app['auth']->user();
+				return $this->app['auth']->user();
 			});
 		});
 	}

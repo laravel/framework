@@ -62,7 +62,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	{
 		$app = new Application;
 		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
-		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
+		$app->extend('foo', function($instance) { return $instance.'bar'; });
 		$this->assertEquals('foobar', $app->make('foo'));
 	}
 
@@ -85,7 +85,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
-		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
+		$app->extend('foo', function($instance) { return $instance.'bar'; });
 		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$this->assertEquals('foobar', $app->make('foo'));
 		$this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
@@ -208,6 +208,6 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
 	public function register()
 	{
 		$this->app->singleton('foo', function() { return 'foo'; });
-		$this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
+		$this->app->singleton('bar', function() { return $this->app['foo'].'bar'; });
 	}
 }

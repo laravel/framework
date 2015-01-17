@@ -3,7 +3,7 @@
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class ControllerDispatcher {
 
@@ -19,7 +19,7 @@ class ControllerDispatcher {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -27,11 +27,10 @@ class ControllerDispatcher {
 	 * Create a new controller dispatcher instance.
 	 *
 	 * @param  \Illuminate\Routing\Router  $router
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public function __construct(Router $router,
-								Container $container = null)
+	public function __construct(Router $router, ContainerContract $container = null)
 	{
 		$this->router = $router;
 		$this->container = $container;

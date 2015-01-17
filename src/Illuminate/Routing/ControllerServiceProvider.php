@@ -11,9 +11,9 @@ class ControllerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('illuminate.route.dispatcher', function($app)
+		$this->app->singleton('illuminate.route.dispatcher', function()
 		{
-			return new ControllerDispatcher($app['router'], $app);
+			return new ControllerDispatcher($this->app['router'], $this->app);
 		});
 	}
 

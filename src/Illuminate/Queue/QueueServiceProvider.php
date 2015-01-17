@@ -51,21 +51,21 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerManager()
 	{
-		$this->app->singleton('queue', function($app)
+		$this->app->singleton('queue', function()
 		{
 			// Once we have an instance of the queue manager, we will register the various
 			// resolvers for the queue connectors. These connectors are responsible for
 			// creating the classes that accept queue configs and instantiate queues.
-			$manager = new QueueManager($app);
+			$manager = new QueueManager($this->app);
 
 			$this->registerConnectors($manager);
 
 			return $manager;
 		});
 
-		$this->app->singleton('queue.connection', function($app)
+		$this->app->singleton('queue.connection', function()
 		{
-			return $app['queue']->connection();
+			return $this->app['queue']->connection();
 		});
 	}
 
@@ -80,9 +80,9 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->registerRestartCommand();
 
-		$this->app->singleton('queue.worker', function($app)
+		$this->app->singleton('queue.worker', function()
 		{
-			return new Worker($app['queue'], $app['queue.failer'], $app['events']);
+			return new Worker($this->app['queue'], $this->app['queue.failer'], $this->app['events']);
 		});
 	}
 
@@ -93,9 +93,9 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerWorkCommand()
 	{
-		$this->app->singleton('command.queue.work', function($app)
+		$this->app->singleton('command.queue.work', function()
 		{
-			return new WorkCommand($app['queue.worker']);
+			return new WorkCommand($this->app['queue.worker']);
 		});
 
 		$this->commands('command.queue.work');
@@ -110,9 +110,9 @@ class QueueServiceProvider extends ServiceProvider {
 	{
 		$this->registerListenCommand();
 
-		$this->app->singleton('queue.listener', function($app)
+		$this->app->singleton('queue.listener', function()
 		{
-			return new Listener($app['path.base']);
+			return new Listener($this->app['path.base']);
 		});
 	}
 
@@ -123,9 +123,9 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerListenCommand()
 	{
-		$this->app->singleton('command.queue.listen', function($app)
+		$this->app->singleton('command.queue.listen', function()
 		{
-			return new ListenCommand($app['queue.listener']);
+			return new ListenCommand($this->app['queue.listener']);
 		});
 
 		$this->commands('command.queue.listen');
@@ -239,11 +239,9 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRedisConnector($manager)
 	{
-		$app = $this->app;
-
-		$manager->addConnector('redis', function() use ($app)
+		$manager->addConnector('redis', function()
 		{
-			return new RedisConnector($app['redis']);
+			return new RedisConnector($this->app['redis']);
 		});
 	}
 
@@ -269,11 +267,9 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerIronConnector($manager)
 	{
-		$app = $this->app;
-
-		$manager->addConnector('iron', function() use ($app)
+		$manager->addConnector('iron', function()
 		{
-			return new IronConnector($app['encrypter'], $app['request']);
+			return new IronConnector($this->app['encrypter'], $this->app['request']);
 		});
 
 		$this->registerIronRequestBinder();
@@ -286,11 +282,11 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerIronRequestBinder()
 	{
-		$this->app->rebinding('request', function($app, $request)
+		$this->app->rebinding('request', function($request)
 		{
-			if ($app['queue']->connected('iron'))
+			if ($this->app['queue']->connected('iron'))
 			{
-				$app['queue']->connection('iron')->setRequest($request);
+				$this->app['queue']->connection('iron')->setRequest($request);
 			}
 		});
 	}
@@ -302,11 +298,11 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerFailedJobServices()
 	{
-		$this->app->singleton('queue.failer', function($app)
+		$this->app->singleton('queue.failer', function()
 		{
-			$config = $app['config']['queue.failed'];
+			$config = $this->app['config']['queue.failed'];
 
-			return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+			return new DatabaseFailedJobProvider($this->app['db'], $config['database'], $config['table']);
 		});
 	}
 
@@ -317,9 +313,9 @@ class QueueServiceProvider extends ServiceProvider {
 	 */
 	protected function registerQueueClosure()
 	{
-		$this->app->singleton('IlluminateQueueClosure', function($app)
+		$this->app->singleton('IlluminateQueueClosure', function()
 		{
-			return new IlluminateQueueClosure($app['encrypter']);
+			return new IlluminateQueueClosure($this->app['encrypter']);
 		});
 	}
 

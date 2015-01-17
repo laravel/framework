@@ -45,11 +45,11 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRepository()
 	{
-		$this->app->singleton('migration.repository', function($app)
+		$this->app->singleton('migration.repository', function()
 		{
-			$table = $app['config']['database.migrations'];
+			$table = $this->app['config']['database.migrations'];
 
-			return new DatabaseMigrationRepository($app['db'], $table);
+			return new DatabaseMigrationRepository($this->app['db'], $table);
 		});
 	}
 
@@ -63,11 +63,11 @@ class MigrationServiceProvider extends ServiceProvider {
 		// The migrator is responsible for actually running and rollback the migration
 		// files in the application. We'll pass in our database connection resolver
 		// so the migrator can resolve any of these connections when it needs to.
-		$this->app->singleton('migrator', function($app)
+		$this->app->singleton('migrator', function()
 		{
-			$repository = $app['migration.repository'];
+			$repository = $this->app['migration.repository'];
 
-			return new Migrator($repository, $app['db'], $app['files']);
+			return new Migrator($repository, $this->app['db'], $this->app['files']);
 		});
 	}
 
@@ -106,9 +106,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerMigrateCommand()
 	{
-		$this->app->singleton('command.migrate', function($app)
+		$this->app->singleton('command.migrate', function()
 		{
-			return new MigrateCommand($app['migrator']);
+			return new MigrateCommand($this->app['migrator']);
 		});
 	}
 
@@ -119,9 +119,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRollbackCommand()
 	{
-		$this->app->singleton('command.migrate.rollback', function($app)
+		$this->app->singleton('command.migrate.rollback', function()
 		{
-			return new RollbackCommand($app['migrator']);
+			return new RollbackCommand($this->app['migrator']);
 		});
 	}
 
@@ -132,9 +132,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerResetCommand()
 	{
-		$this->app->singleton('command.migrate.reset', function($app)
+		$this->app->singleton('command.migrate.reset', function()
 		{
-			return new ResetCommand($app['migrator']);
+			return new ResetCommand($this->app['migrator']);
 		});
 	}
 
@@ -153,9 +153,9 @@ class MigrationServiceProvider extends ServiceProvider {
 
 	protected function registerStatusCommand()
 	{
-		$this->app->singleton('command.migrate.status', function($app)
+		$this->app->singleton('command.migrate.status', function()
 		{
-			return new StatusCommand($app['migrator']);
+			return new StatusCommand($this->app['migrator']);
 		});
 	}
 
@@ -166,9 +166,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerInstallCommand()
 	{
-		$this->app->singleton('command.migrate.install', function($app)
+		$this->app->singleton('command.migrate.install', function()
 		{
-			return new InstallCommand($app['migration.repository']);
+			return new InstallCommand($this->app['migration.repository']);
 		});
 	}
 
@@ -181,14 +181,14 @@ class MigrationServiceProvider extends ServiceProvider {
 	{
 		$this->registerCreator();
 
-		$this->app->singleton('command.migrate.make', function($app)
+		$this->app->singleton('command.migrate.make', function()
 		{
 			// Once we have the migration creator registered, we will create the command
 			// and inject the creator. The creator is responsible for the actual file
 			// creation of the migrations, and may be extended by these developers.
-			$creator = $app['migration.creator'];
+			$creator = $this->app['migration.creator'];
 
-			$composer = $app['composer'];
+			$composer = $this->app['composer'];
 
 			return new MigrateMakeCommand($creator, $composer);
 		});
@@ -201,9 +201,9 @@ class MigrationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerCreator()
 	{
-		$this->app->singleton('migration.creator', function($app)
+		$this->app->singleton('migration.creator', function()
 		{
-			return new MigrationCreator($app['files']);
+			return new MigrationCreator($this->app['files']);
 		});
 	}
 

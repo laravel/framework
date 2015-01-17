@@ -87,15 +87,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testContainerIsPassedToResolvers()
-	{
-		$container = new Container;
-		$container->bind('something', function($c) { return $c; });
-		$c = $container->make('something');
-		$this->assertSame($c, $container);
-	}
-
-
 	public function testArrayAccess()
 	{
 		$container = new Container;
@@ -147,7 +138,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$container['foo'] = 'foo';
-		$container->extend('foo', function($old, $container)
+		$container->extend('foo', function($old)
 		{
 			return $old.'bar';
 		});
@@ -160,7 +151,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		{
 			return (object) array('name' => 'taylor');
 		});
-		$container->extend('foo', function($old, $container)
+		$container->extend('foo', function($old)
 		{
 			$old->age = 26;
 			return $old;
@@ -178,11 +169,11 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$container['foo'] = 'foo';
-		$container->extend('foo', function($old, $container)
+		$container->extend('foo', function($old)
 		{
 			return $old.'bar';
 		});
-		$container->extend('foo', function($old, $container)
+		$container->extend('foo', function($old)
 		{
 			return $old.'baz';
 		});
@@ -197,8 +188,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->bind('foo', function() { $obj = new StdClass; $obj->foo = 'bar'; return $obj; });
 		$obj = new StdClass; $obj->foo = 'foo';
 		$container->instance('foo', $obj);
-		$container->extend('foo', function($obj, $container) { $obj->bar = 'baz'; return $obj; });
-		$container->extend('foo', function($obj, $container) { $obj->baz = 'foo'; return $obj; });
+		$container->extend('foo', function($obj) { $obj->bar = 'baz'; return $obj; });
+		$container->extend('foo', function($obj) { $obj->baz = 'foo'; return $obj; });
 		$this->assertEquals('foo', $container->make('foo')->foo);
 	}
 
@@ -207,7 +198,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$container->bind('ContainerLazyExtendStub');
-		$container->extend('ContainerLazyExtendStub', function($obj, $container) { $obj->init(); return $obj; });
+		$container->extend('ContainerLazyExtendStub', function($obj) { $obj->init(); return $obj; });
 		$this->assertFalse(ContainerLazyExtendStub::$initialized);
 		$container->make('ContainerLazyExtendStub');
 		$this->assertTrue(ContainerLazyExtendStub::$initialized);
@@ -217,7 +208,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testExtendCanBeCalledBeforeBind()
 	{
 		$container = new Container;
-		$container->extend('foo', function($old, $container)
+		$container->extend('foo', function($old)
 		{
 			return $old.'bar';
 		});
@@ -230,9 +221,9 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
-		$container->bind('foo', function($c, $parameters)
+		$container->bind('foo', function($param1, $param2, $param3)
 		{
-			return $parameters;
+			return [$param1, $param2, $param3];
 		});
 
 		$this->assertEquals(array(1, 2, 3), $container->make('foo', array(1, 2, 3)));
@@ -468,7 +459,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->bind('IContainerContractStub', 'ContainerImplementationStub');
 
 		$container->when('ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStub');
-		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give(function($container) {
+		$container->when('ContainerTestContextInjectTwo')->needs('IContainerContractStub')->give(function() use ($container) {
 			return $container->make('ContainerImplementationStubTwo');
 		});
 
