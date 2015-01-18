@@ -13,6 +13,13 @@ class Repository implements ArrayAccess, ConfigContract {
 	protected $items = [];
 
 	/**
+	 * The cache of configuration items.
+	 *
+	 * @var array
+	 */
+	protected $cache = [];
+
+	/**
 	 * Create a new configuration repository.
 	 *
 	 * @param  array  $items
@@ -43,7 +50,12 @@ class Repository implements ArrayAccess, ConfigContract {
 	 */
 	public function get($key, $default = null)
 	{
-		return array_get($this->items, $key, $default);
+		if (isset($this->cache[$key]) && is_null($default))
+		{
+			return $this->cache[$key];
+		}
+
+		return $this->cache[$key] = array_get($this->items, $key, $default);
 	}
 
 	/**
@@ -60,11 +72,15 @@ class Repository implements ArrayAccess, ConfigContract {
 			foreach ($key as $innerKey => $innerValue)
 			{
 				array_set($this->items, $innerKey, $innerValue);
+
+				unset($this->cache[$innerKey]);
 			}
 		}
 		else
 		{
 			array_set($this->items, $key, $value);
+
+			unset($this->cache[$key]);
 		}
 	}
 
