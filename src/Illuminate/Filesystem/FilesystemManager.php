@@ -37,7 +37,7 @@ class FilesystemManager implements FactoryContract {
 	}
 
 	/**
-	 * Get an OAuth provider implementation.
+	 * Get a filesystem instance.
 	 *
 	 * @param  string  $name
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
