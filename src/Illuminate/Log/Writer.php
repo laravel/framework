@@ -241,7 +241,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	public function useSyslog($name = 'laravel', $level = 'debug')
 	{
-		return $this->monolog->pushHandler(new SyslogHandler('laravel', LOG_USER, $level));
+		return $this->monolog->pushHandler(new SyslogHandler($name, LOG_USER, $level));
 	}
 
 	/**
