@@ -359,7 +359,7 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function getDoctrineColumnChangeOptions(Fluent $fluent)
 	{
-		$options = ['type' => Type::getType($fluent['type'])];
+		$options = ['type' => Type::getType($this->getType($fluent))];
 
 		if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
 		{
