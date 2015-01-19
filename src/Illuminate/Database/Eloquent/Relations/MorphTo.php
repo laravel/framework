@@ -195,6 +195,16 @@ class MorphTo extends BelongsTo {
 	}
 
 	/**
+	 * Get the foreign key "type" name.
+	 *
+	 * @return string
+	 */
+	public function getMorphType()
+	{
+		return $this->morphType;
+	}
+
+	/**
 	 * Get the dictionary used by the relationship.
 	 *
 	 * @return array
