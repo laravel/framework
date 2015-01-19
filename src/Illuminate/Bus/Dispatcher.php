@@ -72,10 +72,11 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Marshal a command and dispatch it to its appropriate handler.
 	 *
 	 * @param  mixed  $command
-	 * @param  \ArrayAccess  $array
+	 * @param  \ArrayAccess  $source
+	 * @param  array  $extras
 	 * @return mixed
 	 */
-	public function dispatchFrom($command, ArrayAccess $source, $extras = [])
+	public function dispatchFrom($command, ArrayAccess $source, array $extras = [])
 	{
 		return $this->dispatch($this->marshal($command, $source, $extras));
 	}
@@ -100,7 +101,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * @param  array  $extras
 	 * @return mixed
 	 */
-	protected function marshal($command, ArrayAccess $source, $extras = [])
+	protected function marshal($command, ArrayAccess $source, array $extras = [])
 	{
 		$injected = [];
 
@@ -119,7 +120,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Get a parameter value for a marshalled command.
+	 * Get a parameter value for a marshaled command.
 	 *
 	 * @param  string  $command
 	 * @param  \ArrayAccess  $source
