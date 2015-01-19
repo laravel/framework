@@ -28,14 +28,13 @@ class KeyGenerateCommand extends Command {
 	{
 		$key = $this->getRandomKey();
 
-		foreach ([base_path('.env'), base_path('.env.example')] as $path)
+		$environmentFile = base_path($this->laravel->environmentFile());
+
+		if (file_exists($environmentFile))
 		{
-			if (file_exists($path))
-			{
-				file_put_contents($path, str_replace(
-					$this->laravel['config']['app.key'], $key, file_get_contents($path)
-				));
-			}
+			file_put_contents($environmentFile, str_replace(
+				$this->laravel['config']['app.key'], $key, file_get_contents($environmentFile)
+			));
 		}
 
 		$this->laravel['config']['app.key'] = $key;
