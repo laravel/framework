@@ -29,7 +29,7 @@
         }
     },
     "suggest": {
-        "jeremeamia/superclosure": "Required to be able to serialize closures (~1.0.1)."
+        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0)."
     },
     "minimum-stability": "dev"
 }
