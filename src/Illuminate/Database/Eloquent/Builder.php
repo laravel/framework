@@ -105,13 +105,22 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
 	 *
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function findOrFail($id, $columns = array('*'))
 	{
-		if ( ! is_null($model = $this->find($id, $columns))) return $model;
+		$result = $this->find($id, $columns);
+
+		if (is_array($id))
+		{
+			if (count($result) == count(array_unique($id))) return $result;
+		}
+		elseif ( ! is_null($result))
+		{
+			return $result;
+		}
 
 		throw (new ModelNotFoundException)->setModel(get_class($this->model));
 	}
