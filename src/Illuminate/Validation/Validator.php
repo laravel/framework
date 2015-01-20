@@ -143,7 +143,7 @@ class Validator implements ValidatorContract {
 	 * @var array
 	 */
 	protected $implicitRules = array(
-		'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted'
+		'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted'
 	);
 
 	/**
@@ -699,6 +699,30 @@ class Validator implements ValidatorContract {
 		$values = array_slice($parameters, 1);
 
 		if (in_array($data, $values))
+		{
+			return $this->validateRequired($attribute, $value);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate that an attribute exists when another attribute is not a given value.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @param  mixed   $parameters
+	 * @return bool
+	 */
+	protected function validateRequiredUnless($attribute, $value, $parameters)
+	{
+		$this->requireParameterCount(2, $parameters, 'required_unless');
+
+		$data = array_get($this->data, $parameters[0]);
+
+		$values = array_slice($parameters, 1);
+
+		if (!in_array($data, $values))
 		{
 			return $this->validateRequired($attribute, $value);
 		}
@@ -1899,6 +1923,32 @@ class Validator implements ValidatorContract {
 		$parameters[0] = $this->getAttribute($parameters[0]);
 
 		return str_replace(array(':other', ':value'), $parameters, $message);
+	}
+
+	/**
+	 * Replace all place-holders for the required_unless rule.
+	 *
+	 * @param  string  $message
+	 * @param  string  $attribute
+	 * @param  string  $rule
+	 * @param  array   $parameters
+	 * @return string
+	 */
+	protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
+	{
+		$parameters[0] = $this->getAttribute($parameters[0]);
+
+		foreach ($parameters as $index => $parameter) {
+			if ($index == 0) continue;
+
+			$exceptions[] = $this->getDisplayableValue($parameters[0], $parameter);
+		}
+
+		$last = count($exceptions) > 1 ? ' or '.array_pop($exceptions) : '';
+
+		$parameters[1] = implode(', ', $exceptions).$last;
+
+		return str_replace(array(':other', ':parameters'), $parameters, $message);
 	}
 
 	/**
