@@ -3,6 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
@@ -55,6 +56,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteCache' => 'command.route.cache',
 		'RouteClear' => 'command.route.clear',
 		'RouteList' => 'command.route.list',
+		'Serve' => 'command.serve',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
 	];
@@ -307,6 +309,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.route.list', function($app)
 		{
 			return new RouteListCommand($app['router']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerServeCommand()
+	{
+		$this->app->singleton('command.serve', function($app)
+		{
+			return new ServeCommand;
 		});
 	}
 
