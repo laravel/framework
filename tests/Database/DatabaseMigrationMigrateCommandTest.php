@@ -70,7 +70,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function runCommand($command, $input = array())
+	protected function runCommand($command, $input = [])
 	{
 		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
 	}
@@ -78,7 +78,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 }
 
 class ApplicationDatabaseMigrationStub extends Application {
-	public function __construct(array $data = array()) {
+	public function __construct(array $data = []) {
 		foreach ($data as $abstract => $instance) {
 			$this->instance($abstract, $instance);
 		}

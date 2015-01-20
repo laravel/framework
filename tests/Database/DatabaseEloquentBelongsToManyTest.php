@@ -110,7 +110,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	public function testRelationIsProperlyInitialized()
 	{
 		$relation = $this->getRelation();
-		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
+		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = []) { return new Collection($array); });
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
 		$model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
 		$models = $relation->initRelation(array($model), 'foo');
@@ -530,7 +530,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 }
 
 class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model {
-	protected $guarded = array();
+	protected $guarded = [];
 }
 
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model {

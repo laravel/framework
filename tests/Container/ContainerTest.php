@@ -349,7 +349,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
 		$container = new Container;
-		$parameters = array();
+		$parameters = [];
 		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
@@ -357,14 +357,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testCallWithDependencies()
 	{
 		$container = new Container;
-		$result = $container->call(function(StdClass $foo, $bar = array()) {
+		$result = $container->call(function(StdClass $foo, $bar = []) {
 			return func_get_args();
 		});
 
 		$this->assertInstanceOf('stdClass', $result[0]);
 		$this->assertEquals([], $result[1]);
 
-		$result = $container->call(function(StdClass $foo, $bar = array()) {
+		$result = $container->call(function(StdClass $foo, $bar = []) {
 			return func_get_args();
 		}, ['bar' => 'taylor']);
 
@@ -374,7 +374,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * Wrap a function...
 		 */
-		$result = $container->wrap(function(StdClass $foo, $bar = array()) {
+		$result = $container->wrap(function(StdClass $foo, $bar = []) {
 			return func_get_args();
 		}, ['bar' => 'taylor']);
 

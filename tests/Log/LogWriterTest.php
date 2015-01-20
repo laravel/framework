@@ -49,7 +49,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
 		$monolog->shouldReceive('error')->once()->with('foo', array());
 
-		$events->listen('illuminate.log', function($level, $message, array $context = array())
+		$events->listen('illuminate.log', function($level, $message, array $context = [])
 		{
 			$_SERVER['__log.level']   = $level;
 			$_SERVER['__log.message'] = $message;
