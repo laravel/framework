@@ -9,6 +9,7 @@ use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
+use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\CommandMakeCommand;
@@ -50,6 +51,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'HandlerCommand' => 'command.handler.command',
 		'HandlerEvent' => 'command.handler.event',
 		'KeyGenerate' => 'command.key.generate',
+		'ModelMake' => 'command.model.make',
 		'Optimize' => 'command.optimize',
 		'ProviderMake' => 'command.provider.make',
 		'RequestMake' => 'command.request.make',
@@ -231,6 +233,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.key.generate', function($app)
 		{
 			return new KeyGenerateCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerModelMakeCommand()
+	{
+		$this->app->singleton('command.model.make', function($app)
+		{
+			return new ModelMakeCommand($app['files']);
 		});
 	}
 
