@@ -64,4 +64,19 @@ class CallQueuedHandler {
 		return $instance;
 	}
 
+	/**
+	 * Call the failed method on the job instance.
+	 *
+	 * @return void
+	 */
+	public function failed(array $data)
+	{
+		$handler = $this->dispatcher->resolveHandler($command = unserialize($data['command']));
+
+		if (method_exists($handler, 'failed'))
+		{
+			call_user_func([$handler, 'failed'], $command);
+		}
+	}
+
 }

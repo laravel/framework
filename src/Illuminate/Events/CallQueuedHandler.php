@@ -63,4 +63,19 @@ class CallQueuedHandler {
 		return $instance;
 	}
 
+	/**
+	 * Call the failed method on the job instance.
+	 *
+	 * @return void
+	 */
+	public function failed(array $data)
+	{
+		$handler = $this->container->make($data['class']);
+
+		if (method_exists($handler, 'failed'))
+		{
+			call_user_func_array([$handler, 'failed'], unserialize($data));
+		}
+	}
+
 }
