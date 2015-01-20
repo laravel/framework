@@ -888,7 +888,7 @@ class Builder {
 	{
 		return $this->whereNotNull($column, 'or');
 	}
-	
+
 	/**
 	 * Add a "where date" statement to the query.
 	 *
@@ -902,7 +902,7 @@ class Builder {
 	{
 		return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
 	}
-	
+
 	/**
 	 * Add a "where day" statement to the query.
 	 *
