@@ -75,7 +75,7 @@ class Event {
 	protected $output = '/dev/null';
 
 	/**
-	 * The e-mail addressses the command output should be sent to.
+	 * The e-mail addresses the command output should be sent to.
 	 *
 	 * @var array
 	 */
@@ -507,7 +507,7 @@ class Event {
 	}
 
 	/**
-	 * Schedule the event to run every ten minutes.
+	 * Schedule the event to run every thirty minutes.
 	 *
 	 * @return $this
 	 */
