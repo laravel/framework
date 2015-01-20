@@ -71,6 +71,18 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
+	public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder->setModel($this->getMockModel());
+		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+		$builder->shouldReceive('get')->with(array('column'))->andReturn(new Collection([1]));
+		$result = $builder->findOrFail([1, 2], array('column'));
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
 	public function testFirstOrFailMethodThrowsModelNotFoundException()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
@@ -437,7 +449,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($builder, $result);
 	}
 
-	
+
 	public function testHasNested()
 	{
 		$model = new EloquentBuilderTestModelParentStub;
