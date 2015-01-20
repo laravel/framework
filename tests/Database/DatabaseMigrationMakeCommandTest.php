@@ -12,12 +12,12 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicCreateDumpsAutoload()
 	{
-		$command = new DatabaseMigrationMakeCommandTestStub(
+		$command = new MigrateMakeCommand(
 			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
 			$composer = m::mock('Illuminate\Foundation\Composer'),
 			__DIR__.'/vendor'
 		);
-		$app = new Illuminate\Container\Container;
+		$app = new Illuminate\Foundation\Application;
 		$app['path.database'] = __DIR__;
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
@@ -28,12 +28,12 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicCreateGivesCreatorProperArguments()
 	{
-		$command = new DatabaseMigrationMakeCommandTestStub(
+		$command = new MigrateMakeCommand(
 			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
 			m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
 			__DIR__.'/vendor'
 		);
-		$app = new Illuminate\Container\Container;
+		$app = new Illuminate\Foundation\Application;
 		$app['path.database'] = __DIR__;
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
@@ -44,12 +44,12 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
 	{
-		$command = new DatabaseMigrationMakeCommandTestStub(
+		$command = new MigrateMakeCommand(
 			$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
 			m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
 			__DIR__.'/vendor'
 		);
-		$app = new Illuminate\Container\Container;
+		$app = new Illuminate\Foundation\Application;
 		$app['path.database'] = __DIR__;
 		$command->setLaravel($app);
 		$creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', 'users', true);
@@ -63,14 +63,4 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
 		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
 	}
 
-}
-
-
-
-class DatabaseMigrationMakeCommandTestStub extends MigrateMakeCommand
-{
-	public function call($command, array $arguments = array())
-	{
-		//
-	}
 }

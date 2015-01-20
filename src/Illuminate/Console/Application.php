@@ -14,7 +14,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	/**
 	 * The Laravel application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $laravel;
 
