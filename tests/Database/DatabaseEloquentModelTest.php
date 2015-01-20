@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
@@ -1263,10 +1264,10 @@ class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Mod
 }
 
 class EloquentModelFindNotFoundStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
+	public static function query()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn(null);
+		$mock->shouldReceive('findOrFail')->once()->with(1, array('*'))->andThrow(new ModelNotFoundException);
 		return $mock;
 	}
 }
