@@ -7,7 +7,7 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
+use League\Flysystem\AwsS3v2\AwsS3Adapter as S3Adapter;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
 class FilesystemManager implements FactoryContract {
@@ -15,7 +15,7 @@ class FilesystemManager implements FactoryContract {
 	/**
 	 * The application instance.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected $app;
 
@@ -36,7 +36,7 @@ class FilesystemManager implements FactoryContract {
 	/**
 	 * Create a new filesystem manager instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	public function __construct($app)
@@ -80,12 +80,10 @@ class FilesystemManager implements FactoryContract {
 
 		if (isset($this->customCreators[$config['driver']]))
 		{
-		    return $this->callCustomCreator($config);
+			return $this->callCustomCreator($config);
 		}
-		else
-		{
-		    return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
-		}
+
+		return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
 	}
 
 	/**
@@ -96,16 +94,14 @@ class FilesystemManager implements FactoryContract {
 	 */
 	protected function callCustomCreator(array $config)
 	{
-	    $driver = $this->customCreators[$config['driver']]($this->app, $config);
+		$driver = $this->customCreators[$config['driver']]($this->app, $config);
 
-	    if ($driver instanceof FilesystemInterface)
-	    {
-	        return $this->adapt($driver);
-	    }
-	    else
-	    {
-	        return $driver;
-	    }
+		if ($driver instanceof FilesystemInterface)
+		{
+			return $this->adapt($driver);
+		}
+
+		return $driver;
 	}
 
 	/**
@@ -206,9 +202,9 @@ class FilesystemManager implements FactoryContract {
 	 */
 	public function extend($driver, Closure $callback)
 	{
-	    $this->customCreators[$driver] = $callback;
+		$this->customCreators[$driver] = $callback;
 
-	    return $this;
+		return $this;
 	}
 
 }
