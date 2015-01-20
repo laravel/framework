@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 
 class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
@@ -20,7 +20,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
 		);
 		$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 
-		$app = new Container();
+		$app = new Application();
 		$app['path.database'] = __DIR__;
 		$app['migration.creator'] = $creator;
 		$command->setLaravel($app);
