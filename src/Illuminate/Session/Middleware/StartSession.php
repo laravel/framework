@@ -21,6 +21,12 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	protected $manager;
 
 	/**
+	 * True if handle method called
+	 * @var bool
+	 */
+	protected $sessionHandled = false;
+
+	/**
 	 * Create a new session middleware.
 	 *
 	 * @param  \Illuminate\Session\SessionManager  $manager
@@ -40,6 +46,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	public function handle($request, Closure $next)
 	{
+		$this->sessionHandled = true;
 		// If a session driver has been configured, we will need to start the session here
 		// so that the data is ready for an application. Note that the Laravel sessions
 		// do not make use of PHP "native" sessions in any way since they are crappy.
@@ -76,7 +83,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 */
 	public function terminate($request, $response)
 	{
-		if ($this->sessionConfigured() && ! $this->usingCookieSessions())
+		if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions())
 		{
 			$this->manager->driver()->save();
 		}
