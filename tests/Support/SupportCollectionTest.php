@@ -92,6 +92,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSame()
+	{
+		$items = ['foo' => 'bar', 'int' => 1];
+		$c1 = new Collection($items);
+		$c2 = new Collection($items);
+		$this->assertTrue($c1->same($c2));
+
+		$c2->put('int', '2');
+		$this->assertFalse($c1->same($c2));
+
+		$c2->put('int', '1');
+		$this->assertFalse($c1->same($c2));
+
+		$c2->put('int', 1);
+		$this->assertTrue($c1->same($c2));
+	}
+
+
 	public function testCountable()
 	{
 		$c = new Collection(array('foo', 'bar'));
