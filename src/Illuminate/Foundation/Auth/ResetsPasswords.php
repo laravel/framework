@@ -22,21 +22,6 @@ trait ResetsPasswords {
 	protected $passwords;
 
 	/**
-	 * Create a new password controller instance.
-	 *
-	 * @param  Guard  $auth
-	 * @param  PasswordBroker  $passwords
-	 * @return void
-	 */
-	public function __construct(Guard $auth, PasswordBroker $passwords)
-	{
-		$this->auth = $auth;
-		$this->passwords = $passwords;
-
-		$this->middleware('guest');
-	}
-
-	/**
 	 * Display the form to request a password reset link.
 	 *
 	 * @return Response
