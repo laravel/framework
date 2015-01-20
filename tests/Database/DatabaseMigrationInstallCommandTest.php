@@ -13,7 +13,7 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
 	public function testFireCallsRepositoryToInstall()
 	{
 		$command = new Illuminate\Database\Console\Migrations\InstallCommand($repo = m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'));
-		$command->setLaravel(new Illuminate\Container\Container);
+		$command->setLaravel(new Illuminate\Foundation\Application);
 		$repo->shouldReceive('setSource')->once()->with('foo');
 		$repo->shouldReceive('createRepository')->once();
 

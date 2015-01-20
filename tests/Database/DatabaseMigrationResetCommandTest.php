@@ -41,8 +41,6 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
-class AppDatabaseMigrationStub {
-	public $env = 'development';
-	public function environment() { return $this->env; }
-	public function call($method) { return call_user_func($method); }
+class AppDatabaseMigrationStub extends \Illuminate\Foundation\Application {
+	public function environment() { return 'development'; }
 }
