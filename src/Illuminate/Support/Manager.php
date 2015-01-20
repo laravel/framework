@@ -17,14 +17,14 @@ abstract class Manager {
 	 *
 	 * @var array
 	 */
-	protected $customCreators = array();
+	protected $customCreators = [];
 
 	/**
 	 * The array of created "drivers".
 	 *
 	 * @var array
 	 */
-	protected $drivers = array();
+	protected $drivers = [];
 
 	/**
 	 * Create a new manager instance.

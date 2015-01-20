@@ -284,7 +284,7 @@ class Filesystem {
 	 */
 	public function directories($directory)
 	{
-		$directories = array();
+		$directories = [];
 
 		foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir)
 		{

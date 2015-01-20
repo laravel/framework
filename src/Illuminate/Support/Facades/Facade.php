@@ -166,7 +166,7 @@ abstract class Facade {
 	 */
 	public static function clearResolvedInstances()
 	{
-		static::$resolvedInstance = array();
+		static::$resolvedInstance = [];
 	}
 
 	/**

@@ -43,14 +43,14 @@ class Route {
 	 *
 	 * @var array
 	 */
-	protected $defaults = array();
+	protected $defaults = [];
 
 	/**
 	 * The regular expression requirements.
 	 *
 	 * @var array
 	 */
-	protected $wheres = array();
+	protected $wheres = [];
 
 	/**
 	 * The array of matched parameters.
@@ -318,7 +318,7 @@ class Route {
 	 */
 	protected static function explodeArrayFilters(array $filters)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter)
 		{

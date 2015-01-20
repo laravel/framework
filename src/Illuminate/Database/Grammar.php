@@ -56,7 +56,7 @@ abstract class Grammar {
 			return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
 		}
 
-		$wrapped = array();
+		$wrapped = [];
 
 		$segments = explode('.', $value);
 

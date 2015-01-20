@@ -9,6 +9,6 @@ interface Database {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function command($method, array $parameters = array());
+	public function command($method, array $parameters = []);
 
 }

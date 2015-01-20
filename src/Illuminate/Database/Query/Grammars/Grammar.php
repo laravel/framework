@@ -46,7 +46,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileComponents(Builder $query)
 	{
-		$sql = array();
+		$sql = [];
 
 		foreach ($this->selectComponents as $component)
 		{
@@ -126,7 +126,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileJoins(Builder $query, $joins)
 	{
-		$sql = array();
+		$sql = [];
 
 		foreach ($joins as $join)
 		{
@@ -135,7 +135,7 @@ class Grammar extends BaseGrammar {
 			// First we need to build all of the "on" clauses for the join. There may be many
 			// of these clauses so we will need to iterate through each one and build them
 			// separately, then we'll join them up into a single string when we're done.
-			$clauses = array();
+			$clauses = [];
 
 			foreach ($join->clauses as $clause)
 			{
@@ -190,7 +190,7 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function compileWheres(Builder $query)
 	{
-		$sql = array();
+		$sql = [];
 
 		if (is_null($query->wheres)) return '';
 
@@ -664,7 +664,7 @@ class Grammar extends BaseGrammar {
 		// Each one of the columns in the update statements needs to be wrapped in the
 		// keyword identifiers, also a place-holder needs to be created for each of
 		// the values in the list of bindings so we can make the sets statements.
-		$columns = array();
+		$columns = [];
 
 		foreach ($values as $key => $value)
 		{

@@ -117,7 +117,7 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function getColumns(Blueprint $blueprint, $change = false)
 	{
-		$columns = array();
+		$columns = [];
 
 		foreach ($change ? $blueprint->getChangedColumns() : $blueprint->getAddedColumns() as $column)
 		{

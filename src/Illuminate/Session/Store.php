@@ -27,14 +27,14 @@ class Store implements SessionInterface {
 	 *
 	 * @var array
 	 */
-	protected $attributes = array();
+	protected $attributes = [];
 
 	/**
 	 * The session bags.
 	 *
 	 * @var array
 	 */
-	protected $bags = array();
+	protected $bags = [];
 
 	/**
 	 * The meta-data bag instance.
@@ -48,7 +48,7 @@ class Store implements SessionInterface {
 	 *
 	 * @var array
 	 */
-	protected $bagData = array();
+	protected $bagData = [];
 
 	/**
 	 * The session handler implementation.
@@ -213,7 +213,7 @@ class Store implements SessionInterface {
 	 */
 	public function invalidate($lifetime = null)
 	{
-		$this->attributes = array();
+		$this->attributes = [];
 
 		return $this->migrate();
 	}
@@ -512,7 +512,7 @@ class Store implements SessionInterface {
 	 */
 	public function clear()
 	{
-		$this->attributes = array();
+		$this->attributes = [];
 
 		foreach ($this->bags as $bag)
 		{

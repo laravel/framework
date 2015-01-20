@@ -222,7 +222,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function selectRaw($expression, array $bindings = array())
+	public function selectRaw($expression, array $bindings = [])
 	{
 		$this->addSelect(new Expression($expression));
 
@@ -538,7 +538,7 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return $this
 	 */
-	public function whereRaw($sql, array $bindings = array(), $boolean = 'and')
+	public function whereRaw($sql, array $bindings = [], $boolean = 'and')
 	{
 		$type = 'raw';
 
@@ -556,7 +556,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orWhereRaw($sql, array $bindings = array())
+	public function orWhereRaw($sql, array $bindings = [])
 	{
 		return $this->whereRaw($sql, $bindings, 'or');
 	}
@@ -1084,7 +1084,7 @@ class Builder {
 	 * @param  string  $boolean
 	 * @return $this
 	 */
-	public function havingRaw($sql, array $bindings = array(), $boolean = 'and')
+	public function havingRaw($sql, array $bindings = [], $boolean = 'and')
 	{
 		$type = 'raw';
 
@@ -1102,7 +1102,7 @@ class Builder {
 	 * @param  array   $bindings
 	 * @return \Illuminate\Database\Query\Builder|static
 	 */
-	public function orHavingRaw($sql, array $bindings = array())
+	public function orHavingRaw($sql, array $bindings = [])
 	{
 		return $this->havingRaw($sql, $bindings, 'or');
 	}
@@ -1153,7 +1153,7 @@ class Builder {
 	 * @param  array  $bindings
 	 * @return $this
 	 */
-	public function orderByRaw($sql, $bindings = array())
+	public function orderByRaw($sql, $bindings = [])
 	{
 		$type = 'raw';
 
@@ -1696,7 +1696,7 @@ class Builder {
 		// We'll treat every insert like a batch insert so we can easily insert each
 		// of the records into the database consistently. This will make it much
 		// easier on the grammars to just handle one type of record insertion.
-		$bindings = array();
+		$bindings = [];
 
 		foreach ($values as $record)
 		{
@@ -1755,7 +1755,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function increment($column, $amount = 1, array $extra = array())
+	public function increment($column, $amount = 1, array $extra = [])
 	{
 		$wrapped = $this->grammar->wrap($column);
 
@@ -1772,7 +1772,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function decrement($column, $amount = 1, array $extra = array())
+	public function decrement($column, $amount = 1, array $extra = [])
 	{
 		$wrapped = $this->grammar->wrap($column);
 

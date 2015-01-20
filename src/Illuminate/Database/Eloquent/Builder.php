@@ -28,14 +28,14 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	protected $eagerLoad = array();
+	protected $eagerLoad = [];
 
 	/**
 	 * All of the registered builder macros.
 	 *
 	 * @var array
 	 */
-	protected $macros = array();
+	protected $macros = [];
 
 	/**
 	 * A replacement for the typical delete function.
@@ -296,7 +296,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function increment($column, $amount = 1, array $extra = array())
+	public function increment($column, $amount = 1, array $extra = [])
 	{
 		$extra = $this->addUpdatedAtColumn($extra);
 
@@ -311,7 +311,7 @@ class Builder {
 	 * @param  array   $extra
 	 * @return int
 	 */
-	public function decrement($column, $amount = 1, array $extra = array())
+	public function decrement($column, $amount = 1, array $extra = [])
 	{
 		$extra = $this->addUpdatedAtColumn($extra);
 
@@ -384,7 +384,7 @@ class Builder {
 
 		$connection = $this->model->getConnectionName();
 
-		$models = array();
+		$models = [];
 
 		// Once we have the results, we can spin through them and instantiate a fresh
 		// model instance for each records we retrieved from the database. We will
@@ -487,7 +487,7 @@ class Builder {
 	 */
 	protected function nestedRelations($relation)
 	{
-		$nested = array();
+		$nested = [];
 
 		// We are basically looking for any relationships that are nested deeper than
 		// the given top-level relationship. We will just check for any relations
@@ -765,7 +765,7 @@ class Builder {
 	 */
 	protected function parseRelations(array $relations)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($relations as $name => $constraints)
 		{
@@ -799,7 +799,7 @@ class Builder {
 	 */
 	protected function parseNested($name, $results)
 	{
-		$progress = array();
+		$progress = [];
 
 		// If the relation has already been set on the result array, we will not set it
 		// again, since that would override any constraints that were already placed
