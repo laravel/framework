@@ -5,9 +5,9 @@ use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
-use League\Flysystem\Adapter\AwsS3 as S3Adapter;
+use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\Adapter\Rackspace as RackspaceAdapter;
+use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
 class FilesystemManager implements FactoryContract {
@@ -25,7 +25,7 @@ class FilesystemManager implements FactoryContract {
 	 * @var array
 	 */
 	protected $disks = [];
-	
+
 	/**
 	 * The registered custom driver creators.
 	 *
@@ -77,7 +77,7 @@ class FilesystemManager implements FactoryContract {
 	protected function resolve($name)
 	{
 		$config = $this->getConfig($name);
-		
+
 		if (isset($this->customCreators[$config['driver']]))
 		{
 		    return $this->callCustomCreator($config);
@@ -85,9 +85,9 @@ class FilesystemManager implements FactoryContract {
 		else
 		{
 		    return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
-		}	
+		}
 	}
-	
+
 	/**
 	 * Call a custom driver creator.
 	 *
@@ -97,7 +97,7 @@ class FilesystemManager implements FactoryContract {
 	protected function callCustomCreator(array $config)
 	{
 	    $driver = $this->customCreators[$config['driver']]($this->app, $config);
-	    
+
 	    if ($driver instanceof FilesystemInterface)
 	    {
 	        return $this->adapt($driver);
@@ -196,7 +196,7 @@ class FilesystemManager implements FactoryContract {
 	{
 		return $this->app['config']['filesystems.default'];
 	}
-	
+
 	/**
 	 * Register a custom driver creator Closure.
 	 *
@@ -207,7 +207,7 @@ class FilesystemManager implements FactoryContract {
 	public function extend($driver, Closure $callback)
 	{
 	    $this->customCreators[$driver] = $callback;
-	    
+
 	    return $this;
 	}
 
