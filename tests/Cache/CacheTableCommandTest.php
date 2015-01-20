@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheTableCommandTest extends PHPUnit_Framework_TestCase {
@@ -20,7 +20,7 @@ class CacheTableCommandTest extends PHPUnit_Framework_TestCase {
 		);
 		$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 
-		$app = new Container();
+		$app = new Application();
 		$app['path.database'] = __DIR__;
 		$app['migration.creator'] = $creator;
 		$command->setLaravel($app);
