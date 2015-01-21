@@ -76,7 +76,7 @@ class StatusCommand extends BaseCommand {
 	 */
 	protected function getAllMigrationFiles()
 	{
-		return $this->migrator->getMigrationFiles($this->laravel['path.database'].'/migrations');
+		return $this->migrator->getMigrationFiles($this->getMigrationPath());
 	}
 
 }
