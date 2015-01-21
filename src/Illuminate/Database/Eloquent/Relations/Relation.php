@@ -266,7 +266,7 @@ abstract class Relation {
 	 */
 	public function wrap($value)
 	{
-		return $this->parent->getQuery()->getGrammar()->wrap($value);
+		return $this->parent->newQueryWithoutScopes()->getQuery()->getGrammar()->wrap($value);
 	}
 
 	/**
