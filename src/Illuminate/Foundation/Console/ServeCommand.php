@@ -47,9 +47,9 @@ class ServeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', 'localhost'),
+			array('host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', env('SERVE_HOST', 'localhost')),
 
-			array('port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000),
+			array('port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', env('SERVE_PORT', 8000)),
 		);
 	}
 
