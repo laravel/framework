@@ -132,12 +132,12 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
                                                    ReflectionParameter $parameter, array $extras = array())
 	{
 		$value = $this->extractValueFromExtras($parameter, $extras);
+		
 		if (is_null($value))
 		{
 			$value = $this->extractValueFromSource($source, $parameter);
 		}
-
-		if (is_null($value) && $parameter->isDefaultValueAvailable())
+		elseif (is_null($value) && $parameter->isDefaultValueAvailable())
 		{
 			$value = $parameter->getDefaultValue();
 		}
