@@ -18,7 +18,7 @@ class Database implements DatabaseContract {
 	 * @param  array  $servers
 	 * @return void
 	 */
-	public function __construct(array $servers = array())
+	public function __construct(array $servers = [])
 	{
 		if (isset($servers['cluster']) && $servers['cluster'])
 		{
@@ -51,7 +51,7 @@ class Database implements DatabaseContract {
 	 */
 	protected function createSingleClients(array $servers)
 	{
-		$clients = array();
+		$clients = [];
 
 		foreach ($servers as $key => $server)
 		{
@@ -79,7 +79,7 @@ class Database implements DatabaseContract {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function command($method, array $parameters = array())
+	public function command($method, array $parameters = [])
 	{
 		return call_user_func_array(array($this->clients['default'], $method), $parameters);
 	}

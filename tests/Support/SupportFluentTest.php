@@ -107,9 +107,9 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
 
 class FluentArrayIteratorStub implements \IteratorAggregate {
-	protected $items = array();
+	protected $items = [];
 
-	public function __construct(array $items = array())
+	public function __construct(array $items = [])
 	{
 		$this->items = (array) $items;
 	}

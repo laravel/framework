@@ -449,7 +449,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * @param  array   $keys
 	 * @return void
 	 */
-	public function flash($filter = null, $keys = array())
+	public function flash($filter = null, $keys = [])
 	{
 		$flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
 

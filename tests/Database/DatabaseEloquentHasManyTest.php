@@ -128,7 +128,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	{
 		$relation = $this->getRelation();
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
-		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
+		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = []) { return new Collection($array); });
 		$model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
 		$models = $relation->initRelation(array($model), 'foo');
 

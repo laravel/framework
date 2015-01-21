@@ -70,7 +70,7 @@ class FacadeStub extends Illuminate\Support\Facades\Facade {
 
 class ApplicationStub implements ArrayAccess {
 
-	protected $attributes = array();
+	protected $attributes = [];
 
 	public function setAttributes($attributes) { $this->attributes = $attributes; }
 	public function instance($key, $instance) { $this->attributes[$key] = $instance; }

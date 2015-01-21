@@ -15,28 +15,28 @@ class RouteCollection implements Countable, IteratorAggregate {
 	 *
 	 * @var array
 	 */
-	protected $routes = array();
+	protected $routes = [];
 
 	/**
 	 * An flattened array of all of the routes.
 	 *
 	 * @var array
 	 */
-	protected $allRoutes = array();
+	protected $allRoutes = [];
 
 	/**
 	 * A look-up table of routes by their names.
 	 *
 	 * @var array
 	 */
-	protected $nameList = array();
+	protected $nameList = [];
 
 	/**
 	 * A look-up table of routes by controller action.
 	 *
 	 * @var array
 	 */
-	protected $actionList = array();
+	protected $actionList = [];
 
 	/**
 	 * Add a Route instance to the collection.
@@ -158,7 +158,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 		// Here we will spin through all verbs except for the current request verb and
 		// check to see if any routes respond to them. If they do, we will return a
 		// proper error response with the correct headers on the response string.
-		$others = array();
+		$others = [];
 
 		foreach ($methods as $method)
 		{

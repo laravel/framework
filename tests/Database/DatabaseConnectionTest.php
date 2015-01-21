@@ -260,7 +260,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 
 
 
-	protected function getMockConnection($methods = array(), $pdo = null)
+	protected function getMockConnection($methods = [], $pdo = null)
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
 		$defaults = array('getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar');

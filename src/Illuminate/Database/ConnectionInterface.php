@@ -27,7 +27,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return mixed
 	 */
-	public function selectOne($query, $bindings = array());
+	public function selectOne($query, $bindings = []);
 
 	/**
 	 * Run a select statement against the database.
@@ -36,7 +36,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return array
 	 */
-	public function select($query, $bindings = array());
+	public function select($query, $bindings = []);
 
 	/**
 	 * Run an insert statement against the database.
@@ -45,7 +45,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return bool
 	 */
-	public function insert($query, $bindings = array());
+	public function insert($query, $bindings = []);
 
 	/**
 	 * Run an update statement against the database.
@@ -54,7 +54,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function update($query, $bindings = array());
+	public function update($query, $bindings = []);
 
 	/**
 	 * Run a delete statement against the database.
@@ -63,7 +63,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function delete($query, $bindings = array());
+	public function delete($query, $bindings = []);
 
 	/**
 	 * Execute an SQL statement and return the boolean result.
@@ -72,7 +72,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return bool
 	 */
-	public function statement($query, $bindings = array());
+	public function statement($query, $bindings = []);
 
 	/**
 	 * Run an SQL statement and get the number of rows affected.
@@ -81,7 +81,7 @@ interface ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return int
 	 */
-	public function affectingStatement($query, $bindings = array());
+	public function affectingStatement($query, $bindings = []);
 
 	/**
 	 * Run a raw, unprepared query against the PDO connection.

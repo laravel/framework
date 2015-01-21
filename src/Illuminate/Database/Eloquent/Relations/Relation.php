@@ -121,7 +121,7 @@ abstract class Relation {
 	 * @param  array  $attributes
 	 * @return int
 	 */
-	public function rawUpdate(array $attributes = array())
+	public function rawUpdate(array $attributes = [])
 	{
 		return $this->query->update($attributes);
 	}

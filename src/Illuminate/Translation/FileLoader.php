@@ -23,7 +23,7 @@ class FileLoader implements LoaderInterface {
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * Create a new file loader instance.

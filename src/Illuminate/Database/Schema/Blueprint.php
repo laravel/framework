@@ -19,14 +19,14 @@ class Blueprint {
 	 *
 	 * @var array
 	 */
-	protected $columns = array();
+	protected $columns = [];
 
 	/**
 	 * The commands that should be run for the table.
 	 *
 	 * @var array
 	 */
-	protected $commands = array();
+	protected $commands = [];
 
 	/**
 	 * The storage engine that should be used for the table.
@@ -75,7 +75,7 @@ class Blueprint {
 	{
 		$this->addImpliedCommands();
 
-		$statements = array();
+		$statements = [];
 
 		// Each type of command has a corresponding compiler function on the schema
 		// grammar which is used to build the necessary SQL statements to build
@@ -709,7 +709,7 @@ class Blueprint {
 	 */
 	protected function dropIndexCommand($command, $type, $index)
 	{
-		$columns = array();
+		$columns = [];
 
 		// If the given "index" is actually an array of columns, the developer means
 		// to drop an index merely by specifying the columns involved without the
@@ -769,7 +769,7 @@ class Blueprint {
 	 * @param  array   $parameters
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function addColumn($type, $name, array $parameters = array())
+	protected function addColumn($type, $name, array $parameters = [])
 	{
 		$attributes = array_merge(compact('type', 'name'), $parameters);
 
@@ -801,7 +801,7 @@ class Blueprint {
 	 * @param  array  $parameters
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function addCommand($name, array $parameters = array())
+	protected function addCommand($name, array $parameters = [])
 	{
 		$this->commands[] = $command = $this->createCommand($name, $parameters);
 
@@ -815,7 +815,7 @@ class Blueprint {
 	 * @param  array   $parameters
 	 * @return \Illuminate\Support\Fluent
 	 */
-	protected function createCommand($name, array $parameters = array())
+	protected function createCommand($name, array $parameters = [])
 	{
 		return new Fluent(array_merge(compact('name'), $parameters));
 	}

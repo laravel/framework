@@ -41,7 +41,7 @@ interface Application extends Container {
 	 * @param  bool   $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function register($provider, $options = array(), $force = false);
+	public function register($provider, $options = [], $force = false);
 
 	/**
 	 * Register a deferred provider and service.

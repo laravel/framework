@@ -48,35 +48,35 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var array
 	 */
-	protected $bootingCallbacks = array();
+	protected $bootingCallbacks = [];
 
 	/**
 	 * The array of booted callbacks.
 	 *
 	 * @var array
 	 */
-	protected $bootedCallbacks = array();
+	protected $bootedCallbacks = [];
 
 	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
 	 */
-	protected $serviceProviders = array();
+	protected $serviceProviders = [];
 
 	/**
 	 * The names of the loaded service providers.
 	 *
 	 * @var array
 	 */
-	protected $loadedProviders = array();
+	protected $loadedProviders = [];
 
 	/**
 	 * The deferred services and their providers.
 	 *
 	 * @var array
 	 */
-	protected $deferredServices = array();
+	protected $deferredServices = [];
 
 	/**
 	 * The environment file to load during bootstrapping.
@@ -377,7 +377,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  bool   $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function register($provider, $options = array(), $force = false)
+	public function register($provider, $options = [], $force = false)
 	{
 		if ($registered = $this->getProvider($provider) && ! $force)
                                      return $registered;
@@ -470,7 +470,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 			$this->loadDeferredProvider($service);
 		}
 
-		$this->deferredServices = array();
+		$this->deferredServices = [];
 	}
 
 	/**
@@ -526,7 +526,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, $parameters = [])
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -715,7 +715,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
 	 */
-	public function abort($code, $message = '', array $headers = array())
+	public function abort($code, $message = '', array $headers = [])
 	{
 		if ($code == 404)
 		{

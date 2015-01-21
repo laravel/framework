@@ -148,7 +148,7 @@ class SQLiteGrammar extends Grammar {
 
 		$columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-		$statements = array();
+		$statements = [];
 
 		foreach ($columns as $column)
 		{

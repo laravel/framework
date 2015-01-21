@@ -38,7 +38,7 @@ class Migrator {
 	 *
 	 * @var array
 	 */
-	protected $notes = array();
+	protected $notes = [];
 
 	/**
 	 * Create a new migrator instance.
@@ -66,7 +66,7 @@ class Migrator {
 	 */
 	public function run($path, $pretend = false)
 	{
-		$this->notes = array();
+		$this->notes = [];
 
 		$files = $this->getMigrationFiles($path);
 
@@ -150,7 +150,7 @@ class Migrator {
 	 */
 	public function rollback($pretend = false)
 	{
-		$this->notes = array();
+		$this->notes = [];
 
 		// We want to pull in the last batch of migrations that ran on the previous
 		// migration operation. We'll then reverse those migrations and run each

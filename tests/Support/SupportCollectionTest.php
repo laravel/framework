@@ -602,7 +602,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 class TestAccessorEloquentTestStub
 {
-	protected $attributes = array();
+	protected $attributes = [];
 
 	public function __construct($attributes)
 	{
