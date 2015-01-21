@@ -204,30 +204,42 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
+		foreach ($this->getEchoMethods() as $method => $length)
+		{
+			$value = $this->$method($value);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Get the echo methdos in the proper order for compilation.
+	 *
+	 * @return array
+	 */
+	protected function getEchoMethods()
+	{
 		$methods = [
-			"compileRawEchos"     => strlen(stripcslashes($this->rawTags[0])),
+			"compileRawEchos" => strlen(stripcslashes($this->rawTags[0])),
 			"compileEscapedEchos" => strlen(stripcslashes($this->escapedTags[0])),
 			"compileRegularEchos" => strlen(stripcslashes($this->contentTags[0])),
 		];
+
 		uksort($methods, function($method1, $method2) use ($methods)
 		{
-			# Ensure the longest tags are processed first
+			// Ensure the longest tags are processed first
 			if ($methods[$method1] > $methods[$method2]) return -1;
 			if ($methods[$method1] < $methods[$method2]) return 1;
 
-			# Otherwise give preference to raw tags (assuming they've overridden)
+			// Otherwise give preference to raw tags (assuming they've overridden)
 			if ($method1 === "compileRawEchos") return -1;
 			if ($method2 === "compileRawEchos") return 1;
 
 			if ($method1 === "compileEscapedEchos") return -1;
 			if ($method2 === "compileEscapedEchos") return 1;
 		});
-		foreach ($methods as $method => $length)
-		{
-			$value = $this->$method($value);
-		}
 
-		return $value;
+		return $methods;
 	}
 
 	/**
