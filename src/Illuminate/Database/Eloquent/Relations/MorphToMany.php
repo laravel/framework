@@ -29,7 +29,7 @@ class MorphToMany extends BelongsToMany {
 	protected $inverse;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new morph to many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -38,7 +38,7 @@ class MorphToMany extends BelongsToMany {
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
 	 * @param  string  $relationName
-	 * @param  bool   $inverse
+	 * @param  bool  $inverse
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $parent, $name, $table, $foreignKey, $otherKey, $relationName = null, $inverse = false)
