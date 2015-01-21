@@ -234,19 +234,14 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$records[] = array('name' => 'taylor', 'age' => 26);
 		$records[] = array('name' => 'dayle', 'age' => 28);
 		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
-		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,newInstance]');
+		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,hydrate]');
 		$model->shouldReceive('getTable')->once()->andReturn('foo_table');
 		$builder->setModel($model);
 		$model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-		$model->shouldReceive('newInstance')->andReturnUsing(function() { return new EloquentBuilderTestModelStub; });
+		$model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection(['hydrated']));
 		$models = $builder->getModels(array('foo'));
 
-		$this->assertEquals('taylor', $models[0]->name);
-		$this->assertEquals($models[0]->getAttributes(), $models[0]->getOriginal());
-		$this->assertEquals('dayle', $models[1]->name);
-		$this->assertEquals($models[1]->getAttributes(), $models[1]->getOriginal());
-		$this->assertEquals('foo_connection', $models[0]->getConnectionName());
-		$this->assertEquals('foo_connection', $models[1]->getConnectionName());
+		$this->assertEquals($models, ['hydrated']);
 	}
 
 
