@@ -100,10 +100,30 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('taylor otwell', $result);
 	}
 
+
+	public function testMarshallArguments()
+	{
+		$instance = new Dispatcher(new Container);
+		$result = $instance->dispatchFromArray('BusDispatcherTestArgumentMapping', ['flag' => false, 'emptyString' => '']);
+		$this->assertTrue($result);
+	}
 }
 
 class BusDispatcherTestBasicCommand {
 
+}
+
+class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfHandling {
+	public $flag, $emptyString;
+	public function __construct($flag, $emptyString)
+	{
+		$this->flag = $flag;
+		$this->emptyString = $emptyString;
+	}
+	public function handle()
+	{
+		return true;
+	}
 }
 
 class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling {
