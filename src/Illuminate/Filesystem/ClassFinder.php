@@ -140,7 +140,7 @@ class ClassFinder {
 	 */
 	protected function isPartOfClass($token)
 	{
- 		return is_array($token) && $token[0] == T_STRING;
+		return is_array($token) && $token[0] == T_STRING;
 	}
 
 	/**
