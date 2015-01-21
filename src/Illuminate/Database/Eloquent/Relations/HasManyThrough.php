@@ -251,16 +251,6 @@ class HasManyThrough extends Relation {
 	}
 
 	/**
-	 * Get the key name of the parent model.
-	 *
-	 * @return string
-	 */
-	protected function getQualifiedParentKeyName()
-	{
-		return $this->parent->getQualifiedKeyName();
-	}
-
-	/**
 	 * Get the key for comparing against the parent key in "has" query.
 	 *
 	 * @return string
