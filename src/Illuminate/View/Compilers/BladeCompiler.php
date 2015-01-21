@@ -204,16 +204,30 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$value = $this->compileRawEchos($value);
-
-		$difference = strlen($this->contentTags[0]) - strlen($this->escapedTags[0]);
-
-		if ($difference > 0)
+		$methods = [
+			"compileRawEchos"     => strlen(stripcslashes($this->rawTags[0])),
+			"compileEscapedEchos" => strlen(stripcslashes($this->escapedTags[0])),
+			"compileRegularEchos" => strlen(stripcslashes($this->contentTags[0])),
+		];
+		uksort($methods, function($method1, $method2) use ($methods)
 		{
-			return $this->compileEscapedEchos($this->compileRegularEchos($value));
+			# Ensure the longest tags are processed first
+			if ($methods[$method1] > $methods[$method2]) return -1;
+			if ($methods[$method1] < $methods[$method2]) return 1;
+
+			# Otherwise give preference to raw tags (assuming they've overridden)
+			if ($method1 === "compileRawEchos") return -1;
+			if ($method2 === "compileRawEchos") return 1;
+
+			if ($method1 === "compileEscapedEchos") return -1;
+			if ($method2 === "compileEscapedEchos") return 1;
+		});
+		foreach ($methods as $method => $length)
+		{
+			$value = $this->$method($value);
 		}
 
-		return $this->compileRegularEchos($this->compileEscapedEchos($value));
+		return $value;
 	}
 
 	/**
