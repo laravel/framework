@@ -131,8 +131,11 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	protected function getParameterValueForCommand($command, ArrayAccess $source,
                                                    ReflectionParameter $parameter, array $extras = array())
 	{
-		$value = $this->extractValueFromExtras($parameter, $extras)
-								?: $this->extractValueFromSource($source, $parameter);
+		$value = $this->extractValueFromExtras($parameter, $extras);
+		if (is_null($value))
+		{
+			$value = $this->extractValueFromSource($source, $parameter);
+		}
 
 		if (is_null($value) && $parameter->isDefaultValueAvailable())
 		{
