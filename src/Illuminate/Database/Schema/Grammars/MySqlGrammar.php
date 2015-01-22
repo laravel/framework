@@ -575,7 +575,7 @@ class MySqlGrammar extends Grammar {
 	{
 		if ( ! is_null($column->first))
 		{
-			return ' first '.$this->wrap($column->after);
+			return ' first '.$this->wrap($column->first);
 		}
 	}
 
