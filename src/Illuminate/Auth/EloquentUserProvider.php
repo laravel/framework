@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class EloquentUserProvider implements UserProviderInterface {
+class EloquentUserProvider implements UserProvider {
 
 	/**
 	 * The hasher implementation.

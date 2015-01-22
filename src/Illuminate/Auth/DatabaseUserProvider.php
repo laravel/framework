@@ -1,10 +1,11 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class DatabaseUserProvider implements UserProviderInterface {
+class DatabaseUserProvider implements UserProvider {
 
 	/**
 	 * The active database connection.

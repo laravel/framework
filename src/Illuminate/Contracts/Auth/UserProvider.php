@@ -1,8 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Contracts\Auth;
 
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
-
-interface UserProviderInterface {
+interface UserProvider {
 
 	/**
 	 * Retrieve a user by their unique identifier.
@@ -28,7 +26,7 @@ interface UserProviderInterface {
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function updateRememberToken(UserContract $user, $token);
+	public function updateRememberToken(Authenticatable $user, $token);
 
 	/**
 	 * Retrieve a user by the given credentials.
@@ -45,6 +43,6 @@ interface UserProviderInterface {
 	 * @param  array  $credentials
 	 * @return bool
 	 */
-	public function validateCredentials(UserContract $user, array $credentials);
+	public function validateCredentials(Authenticatable $user, array $credentials);
 
 }
