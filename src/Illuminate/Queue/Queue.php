@@ -18,6 +18,33 @@ abstract class Queue {
 	protected $container;
 
 	/**
+	 * Push a new job onto the queue.
+	 *
+	 * @param  stirng  $queue
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function pushOn($queue, $job, $data = '')
+	{
+		return $this->push($job, $data, $queue);
+	}
+
+	/**
+	 * Push a new job onto the queue after a delay.
+	 *
+	 * @param  string  $queue
+	 * @param  \DateTime|int  $delay
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function laterOn($queue, $delay, $job, $data = '')
+	{
+		return $this->later($delay, $job, $data, $queue);
+	}
+
+	/**
 	 * Marshal a push queue request and fire the job.
 	 *
 	 * @throws \RuntimeException
