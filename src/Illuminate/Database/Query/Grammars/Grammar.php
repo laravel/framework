@@ -144,7 +144,7 @@ class Grammar extends BaseGrammar {
 				$clauses[] = $this->compileJoinConstraint($clause);
 			}
 
-			foreach ($join->bindings as $index => $binding)
+			foreach ($join->bindings as $binding)
 			{
 				$query->addBinding($binding, 'join');
 			}
