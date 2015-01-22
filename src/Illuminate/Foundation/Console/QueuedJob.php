@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Contracts\Console\Kernel as KernelContract;
 
 class QueuedJob {
 
@@ -17,7 +17,7 @@ class QueuedJob {
 	 * @param  \Illuminate\Contracts\Console\Kernel  $kernel
 	 * @return void
 	 */
-	public function __construct(Kernel $kernel)
+	public function __construct(KernelContract $kernel)
 	{
 		$this->kernel = $kernel;
 	}
