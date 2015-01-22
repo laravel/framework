@@ -56,6 +56,13 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 			$table->string('name');
 			$table->timestamps();
 		});
+
+		$this->schema()->create('photos', function($table) {
+			$table->increments('id');
+			$table->morphs('imageable');
+			$table->string('name');
+			$table->timestamps();
+		});
 	}
 
 
@@ -69,6 +76,7 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 		$this->schema()->drop('users');
 		$this->schema()->drop('friends');
 		$this->schema()->drop('posts');
+		$this->schema()->drop('photos');
 	}
 
 	/**
@@ -79,6 +87,22 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 		EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
 		$model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
 		$this->assertEquals('taylorotwell@gmail.com', $model->email);
+	}
+
+
+	public function testBasicModelCollectionRetrieval()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+		$models = EloquentTestUser::oldest('id');
+
+		$this->assertEquals(2, $models->count());
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
+		$this->assertInstanceOf('EloquentTestUser', $models[0]);
+		$this->assertInstanceOf('EloquentTestUser', $models[1]);
+		$this->assertInstanceOf('taylorotwell@gmail.com', $models[0]->email);
+		$this->assertInstanceOf('abigailotwell@gmail.com', $models[1]->email);
 	}
 
 
@@ -104,6 +128,37 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 
 		$post = EloquentTestPost::with('user')->where('name', 'First Post')->get();
 		$this->assertEquals('taylorotwell@gmail.com', $post->first()->user->email);
+	}
+
+
+	public function testBasicMorphManyRelationship()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$user->photos()->create(['name' => 'Avatar 1']);
+		$user->photos()->create(['name' => 'Avatar 2']);
+		$post = $user->posts()->create(['name' => 'First Post']);
+		$post->photos()->create(['name' => 'Hero 1']);
+		$post->photos()->create(['name' => 'Hero 2']);
+
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $user->photos);
+		$this->assertInstanceOf('EloquentTestPhoto', $user->photos[0]);
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
+		$this->assertInstanceOf('EloquentTestPhoto', $post->photos[0]);
+		$this->assertEquals(2, $user->photos->count());
+		$this->assertEquals(2, $post->photos->count());
+		$this->assertEquals('Avatar 1', $user->photos[0]->name);
+		$this->assertEquals('Avatar 2', $user->photos[1]->name);
+		$this->assertEquals('Hero 1', $post->photos[0]->name);
+		$this->assertEquals('Hero 2', $post->photos[1]->name);
+
+		$photos = EloquentTestPhoto::orderBy('name')->get();
+
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $photos);
+		$this->assertEquals(4, $photos->count());
+		$this->assertInstanceOf('EloquentTestUser', $photos[0]->imageable);
+		$this->assertInstanceOf('EloquentTestPost', $photos[2]->imageable);
+		$this->assertEquals('taylorotwell@gmail.com', $photos[1]->imageable->email);
+		$this->assertEquals('First Post', $photos[3]->imageable->name);
 	}
 
 	/**
@@ -142,8 +197,14 @@ class EloquentTestUser extends Eloquent {
 	public function friends() {
 		return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
 	}
+	public function friend() {
+		return $this->hasOne('EloquentTestUser', 'user_id', 'friend_id');
+	}
 	public function posts() {
 		return $this->hasMany('EloquentTestPost', 'user_id');
+	}
+	public function photos() {
+		return $this->morphMany('EloquentTestPhoto', 'imageable');
 	}
 }
 
@@ -152,6 +213,17 @@ class EloquentTestPost extends Eloquent {
 	protected $guarded = [];
 	public function user() {
 		return $this->belongsTo('EloquentTestUser', 'user_id');
+	}
+	public function photos() {
+		return $this->morphMany('EloquentTestPhoto', 'imageable');
+	}
+}
+
+class EloquentTestPhoto extends Eloquent {
+	protected $table = 'photos';
+	protected $guarded = [];
+	public function imageable(){
+		return $this->morphTo();
 	}
 }
 
