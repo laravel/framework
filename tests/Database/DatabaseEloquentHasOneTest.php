@@ -120,7 +120,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $parent->shouldReceive('newQueryWithoutScopes')->andReturn($builder);
+		$parent->shouldReceive('newQueryWithoutScopes')->andReturn($builder);
 		return new HasOne($builder, $parent, 'table.foreign_key', 'id');
 	}
 
