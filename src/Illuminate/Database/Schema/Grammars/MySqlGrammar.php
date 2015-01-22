@@ -571,7 +571,7 @@ class MySqlGrammar extends Grammar {
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string|null
 	 */
-	protected function modifyAfter(Blueprint $blueprint, Fluent $column)
+	protected function modifyFirst(Blueprint $blueprint, Fluent $column)
 	{
 		if ( ! is_null($column->first))
 		{
