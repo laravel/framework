@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-class MemcachedStore extends TaggableStore implements StoreInterface {
+use Illuminate\Contracts\Cache\Store;
+
+class MemcachedStore extends TaggableStore implements Store {
 
 	/**
 	 * The Memcached instance.

@@ -2,10 +2,11 @@
 
 use Exception;
 use LogicException;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class DatabaseStore implements StoreInterface {
+class DatabaseStore implements Store {
 
 	/**
 	 * The database connection instance.

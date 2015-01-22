@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php namespace Illuminate\Contracts\Cache;
 
-interface StoreInterface {
+interface Store {
 
 	/**
 	 * Retrieve an item from the cache by key.

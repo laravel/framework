@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-class XCacheStore extends TaggableStore implements StoreInterface {
+use Illuminate\Contracts\Cache\Store;
+
+class XCacheStore extends TaggableStore implements Store {
 
 	/**
 	 * A string that should be prepended to keys.
