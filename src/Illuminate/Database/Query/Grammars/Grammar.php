@@ -128,6 +128,8 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = array();
 
+		$query->setBindings(array(), 'join');
+
 		foreach ($joins as $join)
 		{
 			$table = $this->wrapTable($join->table);
@@ -144,8 +146,6 @@ class Grammar extends BaseGrammar {
 
 			foreach ($join->bindings as $index => $binding)
 			{
-				unset($join->bindings[$index]);
-
 				$query->addBinding($binding, 'join');
 			}
 
