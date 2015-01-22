@@ -20,7 +20,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	protected $morphClass;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new morph one or many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent

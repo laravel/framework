@@ -29,7 +29,7 @@ class HasManyThrough extends Relation {
 	protected $secondKey;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new has many through relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $farParent
