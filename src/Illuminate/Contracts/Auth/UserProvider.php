@@ -1,8 +1,8 @@
-<?php namespace Illuminate\Auth;
+<?php namespace Illuminate\Contracts\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-interface UserProviderInterface {
+interface UserProvider {
 
 	/**
 	 * Retrieve a user by their unique identifier.

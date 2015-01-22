@@ -1,8 +1,8 @@
-<?php namespace Illuminate\Auth\Passwords;
+<?php namespace Illuminate\Contracts\Auth;
 
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-interface TokenRepositoryInterface {
+interface TokenRepository {
 
 	/**
 	 * Create a new token.

@@ -33,9 +33,10 @@ class ViewServiceProvider extends ServiceProvider {
 		{
 			$resolver = new EngineResolver;
 
-			// Next we will register the various engines with the resolver so that the
-			// environment can resolve the engines it needs for various views based
-			// on the extension of view files. We call a method for each engines.
+			// Next we will register the various engines with the resolver
+			// so that the environment can resolve the engines it needs
+			// for various views based on the extension of view files.
+			// We call a method for each engines.
 			foreach (array('php', 'blade') as $engine)
 			{
 				$this->{'register'.ucfirst($engine).'Engine'}($resolver);
@@ -66,9 +67,10 @@ class ViewServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		// The Compiler engine requires an instance of the CompilerInterface, which in
-		// this case will be the Blade compiler, so we'll first create the compiler
-		// instance to pass into the engine so it can compile the views properly.
+		// The Compiler engine requires an object that implements the Compiler
+		// contract, which in this case will be the Blade compiler, so we'll
+		// first create the compiler instance to pass into the engine so it
+		// can compile the views properly.
 		$app->singleton('blade.compiler', function($app)
 		{
 			$cache = $app['config']['view.compiled'];

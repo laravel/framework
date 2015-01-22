@@ -3,8 +3,8 @@
 use Closure;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Session\StoreInterface;
 use Illuminate\Session\SessionManager;
-use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
@@ -95,7 +95,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 * Start the session for the given request.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Session\SessionInterface
+	 * @return \Illuminate\Session\StoreInterface
 	 */
 	protected function startSession(Request $request)
 	{
@@ -110,7 +110,7 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 * Get the session implementation from the manager.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Session\SessionInterface
+	 * @return \Illuminate\Session\StoreInterface
 	 */
 	public function getSession(Request $request)
 	{
@@ -125,10 +125,10 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 * Store the current URL for the request if necessary.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Session\SessionInterface  $session
+	 * @param  \Illuminate\Session\StoreInterface  $session
 	 * @return void
 	 */
-	protected function storeCurrentUrl(Request $request, $session)
+	protected function storeCurrentUrl(Request $request, StoreInterface $session)
 	{
 		if ($request->method() === 'GET' && $request->route() && ! $request->ajax())
 		{
@@ -139,10 +139,10 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	/**
 	 * Remove the garbage from the session if necessary.
 	 *
-	 * @param  \Illuminate\Session\SessionInterface  $session
+	 * @param  \Illuminate\Session\StoreInterface  $session
 	 * @return void
 	 */
-	protected function collectGarbage(SessionInterface $session)
+	protected function collectGarbage(StoreInterface $session)
 	{
 		$config = $this->manager->getSessionConfig();
 
@@ -170,10 +170,10 @@ class StartSession implements MiddlewareContract, TerminableMiddleware {
 	 * Add the session cookie to the application response.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @param  \Illuminate\Session\SessionInterface  $session
+	 * @param  \Illuminate\Session\StoreInterface  $session
 	 * @return void
 	 */
-	protected function addCookieToResponse(Response $response, SessionInterface $session)
+	protected function addCookieToResponse(Response $response, StoreInterface $session)
 	{
 		if ($this->usingCookieSessions())
 		{

@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Queue\Failed;
+<?php namespace Illuminate\Contracts\Queue\Failed;
 
-interface FailedJobProviderInterface {
+interface FailedJobProvider {
 
 	/**
 	 * Log a failed job into storage.

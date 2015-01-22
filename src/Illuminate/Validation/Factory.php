@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Validation\PresenceVerifier;
 use Symfony\Component\Translation\TranslatorInterface;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
 
@@ -17,7 +18,7 @@ class Factory implements FactoryContract {
 	/**
 	 * The Presence Verifier implementation.
 	 *
-	 * @var \Illuminate\Validation\PresenceVerifierInterface
+	 * @var \Illuminate\Contracts\Validation\PresenceVerifier
 	 */
 	protected $verifier;
 
@@ -217,7 +218,7 @@ class Factory implements FactoryContract {
 	/**
 	 * Get the Presence Verifier implementation.
 	 *
-	 * @return \Illuminate\Validation\PresenceVerifierInterface
+	 * @return \Illuminate\Contracts\Validation\PresenceVerifier
 	 */
 	public function getPresenceVerifier()
 	{
@@ -227,10 +228,10 @@ class Factory implements FactoryContract {
 	/**
 	 * Set the Presence Verifier implementation.
 	 *
-	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+	 * @param  \Illuminate\Contracts\Validation\PresenceVerifier  $presenceVerifier
 	 * @return void
 	 */
-	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
+	public function setPresenceVerifier(PresenceVerifier $presenceVerifier)
 	{
 		$this->verifier = $presenceVerifier;
 	}

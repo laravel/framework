@@ -7,7 +7,7 @@ interface Mailer {
 	 *
 	 * @param  string  $text
 	 * @param  \Closure|string  $callback
-	 * @return int
+	 * @return int|null
 	 */
 	public function raw($text, $callback);
 
@@ -17,7 +17,7 @@ interface Mailer {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  \Closure|string  $callback
-	 * @return void
+	 * @return int|null
 	 */
 	public function send($view, array $data, $callback);
 

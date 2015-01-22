@@ -100,7 +100,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 	 * @param  string  $queue
 	 * @param  \StdClass  $job
 	 * @param  int  $delay
-	 * @return void
+	 * @return int
 	 */
 	public function release($queue, $job, $delay)
 	{

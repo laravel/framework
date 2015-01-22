@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Validation;
+<?php namespace Illuminate\Contracts\Validation;
 
-interface PresenceVerifierInterface {
+interface PresenceVerifier {
 
 	/**
 	 * Count the number of objects in a collection having the given value.

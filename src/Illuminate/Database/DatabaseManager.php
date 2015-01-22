@@ -3,8 +3,9 @@
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
 
-class DatabaseManager implements ConnectionResolverInterface {
+class DatabaseManager implements ConnectionResolverContract {
 
 	/**
 	 * The application instance.

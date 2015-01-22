@@ -2,7 +2,7 @@
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Database\Migrations\MigrationRepositoryInterface;
+use Illuminate\Contracts\Database\Migrations\MigrationRepository as MigrationRepositoryContract;
 
 class InstallCommand extends Command {
 
@@ -23,17 +23,17 @@ class InstallCommand extends Command {
 	/**
 	 * The repository instance.
 	 *
-	 * @var \Illuminate\Database\Migrations\MigrationRepositoryInterface
+	 * @var \Illuminate\Contracts\Database\Migrations\MigrationRepository
 	 */
 	protected $repository;
 
 	/**
 	 * Create a new migration install command instance.
 	 *
-	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
+	 * @param  \Illuminate\Contracts\Database\Migrations\MigrationRepository  $repository
 	 * @return void
 	 */
-	public function __construct(MigrationRepositoryInterface $repository)
+	public function __construct(MigrationRepositoryContract $repository)
 	{
 		parent::__construct();
 

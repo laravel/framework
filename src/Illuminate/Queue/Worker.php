@@ -2,10 +2,10 @@
 
 use Exception;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
+use Illuminate\Contracts\Queue\Failed\FailedJobProvider as FailedJobProviderContract;
 
 class Worker {
 
@@ -19,7 +19,7 @@ class Worker {
 	/**
 	 * The failed job provider implementation.
 	 *
-	 * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
+	 * @var \Illuminate\Contracts\Queue\Failed\FailedJobProvider
 	 */
 	protected $failer;
 
@@ -40,7 +40,7 @@ class Worker {
 	/**
 	 * The exception handler instance.
 	 *
-	 * @var \Illuminate\Exception\Handler
+	 * @var \Illuminate\Contracts\Debug\ExceptionHandler
 	 */
 	protected $exceptions;
 
@@ -48,13 +48,13 @@ class Worker {
 	 * Create a new queue worker.
 	 *
 	 * @param  \Illuminate\Queue\QueueManager  $manager
-	 * @param  \Illuminate\Queue\Failed\FailedJobProviderInterface  $failer
+	 * @param  \Illuminate\Contracts\Queue\Failed\FailedJobProvider  $failer
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function __construct(QueueManager $manager,
-                                FailedJobProviderInterface $failer = null,
-                                Dispatcher $events = null)
+                                FailedJobProviderContract $failer = null,
+                                DispatcherContract $events = null)
 	{
 		$this->failer = $failer;
 		$this->events = $events;
@@ -167,7 +167,7 @@ class Worker {
 	/**
 	 * Get the next job from the queue connection.
 	 *
-	 * @param  \Illuminate\Queue\Queue  $connection
+	 * @param  \Illuminate\Contracts\Queue\Queue  $connection
 	 * @param  string  $queue
 	 * @return \Illuminate\Contracts\Queue\Job|null
 	 */
@@ -188,7 +188,7 @@ class Worker {
 	 * @param  \Illuminate\Contracts\Queue\Job  $job
 	 * @param  int  $maxTries
 	 * @param  int  $delay
-	 * @return void
+	 * @return array
 	 *
 	 * @throws \Exception
 	 */
@@ -324,7 +324,7 @@ class Worker {
 	 * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
 	 * @return void
 	 */
-	public function setDaemonExceptionHandler(ExceptionHandler $handler)
+	public function setDaemonExceptionHandler(ExceptionHandlerContract $handler)
 	{
 		$this->exceptions = $handler;
 	}

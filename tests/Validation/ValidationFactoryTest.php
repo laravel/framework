@@ -20,7 +20,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $validator->getData());
 		$this->assertEquals(array('baz' => array('boom')), $validator->getRules());
 
-		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$presence = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$noop1 = function() {};
 		$noop2 = function() {};
 		$noop3 = function() {};
@@ -33,7 +33,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('replacer' => $noop3), $validator->getReplacers());
 		$this->assertEquals($presence, $validator->getPresenceVerifier());
 
-		$presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$presence = m::mock('Illuminate\Contracts\Validation\PresenceVerifier');
 		$factory->extend('foo', $noop1, 'foo!');
 		$factory->extendImplicit('implicit', $noop2, 'implicit!');
 		$factory->setPresenceVerifier($presence);

@@ -1,8 +1,9 @@
 <?php namespace Illuminate\View\Compilers;
 
 use Closure;
+use Illuminate\Contracts\View\Compiler as CompilerContract;
 
-class BladeCompiler extends Compiler implements CompilerInterface {
+class BladeCompiler extends Compiler implements CompilerContract {
 
 	/**
 	 * All of the registered extensions.

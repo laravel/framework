@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
-class Store implements SessionInterface {
+class Store implements StoreInterface {
 
 	/**
 	 * The session ID.
@@ -624,7 +624,7 @@ class Store implements SessionInterface {
 	 */
 	public function setPreviousUrl($url)
 	{
-		return $this->put('_previous.url', $url);
+		$this->put('_previous.url', $url);
 	}
 
 	/**

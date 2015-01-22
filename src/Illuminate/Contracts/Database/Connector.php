@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Database\Connectors;
+<?php namespace Illuminate\Contracts\Database;
 
-interface ConnectorInterface {
+interface Connector {
 
 	/**
 	 * Establish a database connection.

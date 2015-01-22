@@ -1,6 +1,6 @@
-<?php namespace Illuminate\View\Compilers;
+<?php namespace Illuminate\Contracts\View;
 
-interface CompilerInterface {
+interface Compiler {
 
 	/**
 	 * Get the path to the compiled version of a view.

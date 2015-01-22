@@ -14,13 +14,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testDataCanBeSetOnView()
 	{
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\Contracts\View\Engine'), 'view', 'path', array());
 		$view->with('foo', 'bar');
 		$view->with(array('baz' => 'boom'));
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 
 
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\Contracts\View\Engine'), 'view', 'path', array());
 		$view->withFoo('bar')->withBaz('boom');
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 	}
@@ -51,7 +51,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	{
 		$view = m::mock('Illuminate\View\View[render]', array(
 			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+			m::mock('Illuminate\Contracts\View\Engine'),
 			'view',
 			'path',
 			array(),
@@ -95,7 +95,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 		$view = new View(
 			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+			m::mock('Illuminate\Contracts\View\Engine'),
 			'view',
 			'path',
 			$arrayable
@@ -207,7 +207,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	{
 		return new View(
 			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+			m::mock('Illuminate\Contracts\View\Engine'),
 			'view',
 			'path',
 			array('foo' => 'bar')

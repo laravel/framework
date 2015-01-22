@@ -1,14 +1,15 @@
 <?php namespace Illuminate\Queue\Failed;
 
 use Carbon\Carbon;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
+use Illuminate\Contracts\Queue\Failed\FailedJobProvider as FailedJobProviderContract;
 
-class DatabaseFailedJobProvider implements FailedJobProviderInterface {
+class DatabaseFailedJobProvider implements FailedJobProviderContract {
 
 	/**
 	 * The connection resolver implementation.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected $resolver;
 
@@ -29,12 +30,12 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
 	/**
 	 * Create a new database failed job provider.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
 	 * @param  string  $database
 	 * @param  string  $table
 	 * @return void
 	 */
-	public function __construct(ConnectionResolverInterface $resolver, $database, $table)
+	public function __construct(ConnectionResolverContract $resolver, $database, $table)
 	{
 		$this->table = $table;
 		$this->resolver = $resolver;

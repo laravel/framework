@@ -3,19 +3,26 @@
 use Closure;
 use DateTime;
 use RuntimeException;
-use Illuminate\Container\Container;
 use Illuminate\Support\SerializableClosure;
-use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Queue\QueueableEntity as QueueableEntityContract;
 
 abstract class Queue {
 
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
+
+	/**
+	 * The encrypter instance.
+	 *
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
+	 */
+	protected $crypt;
 
 	/**
 	 * Marshal a push queue request and fire the job.
@@ -88,7 +95,7 @@ abstract class Queue {
 	 */
 	protected function prepareQueueableEntities($data)
 	{
-		if ($data instanceof QueueableEntity)
+		if ($data instanceof QueueableEntityContract)
 		{
 			return $this->prepareQueueableEntity($data);
 		}
@@ -109,7 +116,7 @@ abstract class Queue {
 	 */
 	protected function prepareQueueableEntity($value)
 	{
-		if ($value instanceof QueueableEntity)
+		if ($value instanceof QueueableEntityContract)
 		{
 			return '::entity::|'.get_class($value).'|'.$value->getQueueableId();
 		}
@@ -175,10 +182,10 @@ abstract class Queue {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public function setContainer(Container $container)
+	public function setContainer(ContainerContract $container)
 	{
 		$this->container = $container;
 	}

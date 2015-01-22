@@ -5,13 +5,13 @@ use Swift_Mailer;
 use Swift_Message;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\SerializableClosure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Mailer implements MailerContract, MailQueueContract {
 
@@ -93,7 +93,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
-	public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
+	public function __construct(FactoryContract $views, Swift_Mailer $swift, DispatcherContract $events = null)
 	{
 		$this->views = $views;
 		$this->swift = $swift;
@@ -117,7 +117,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 *
 	 * @param  string  $text
 	 * @param  mixed   $callback
-	 * @return int
+	 * @return int|null
 	 */
 	public function raw($text, $callback)
 	{
@@ -130,7 +130,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  string  $view
 	 * @param  array   $data
 	 * @param  mixed   $callback
-	 * @return int
+	 * @return int|null
 	 */
 	public function plain($view, array $data, $callback)
 	{
@@ -143,7 +143,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  string|array  $view
 	 * @param  array  $data
 	 * @param  \Closure|string  $callback
-	 * @return mixed
+	 * @return int|null
 	 */
 	public function send($view, array $data, $callback)
 	{
@@ -338,7 +338,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * Send a Swift Message instance.
 	 *
 	 * @param  \Swift_Message  $message
-	 * @return void
+	 * @return int|null
 	 */
 	protected function sendSwiftMessage($message)
 	{
@@ -519,7 +519,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
-	public function setContainer(Container $container)
+	public function setContainer(ContainerContract $container)
 	{
 		$this->container = $container;
 	}

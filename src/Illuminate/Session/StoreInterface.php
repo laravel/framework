@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Session;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface as BaseSessionInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-interface SessionInterface extends BaseSessionInterface {
+interface StoreInterface extends SessionInterface {
 
 	/**
 	 * Get the session handler instance.
@@ -26,5 +26,13 @@ interface SessionInterface extends BaseSessionInterface {
 	 * @return void
 	 */
 	public function setRequestOnHandler(Request $request);
+
+	/**
+	 * Set the "previous" URL in the session.
+	 *
+	 * @param  string  $url
+	 * @return void
+	 */
+	public function setPreviousUrl($url);
 
 }

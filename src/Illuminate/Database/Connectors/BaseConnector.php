@@ -2,7 +2,7 @@
 
 use PDO;
 
-class Connector {
+class BaseConnector {
 
 	/**
 	 * The default PDO connection options.

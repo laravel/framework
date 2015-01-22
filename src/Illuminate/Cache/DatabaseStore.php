@@ -2,15 +2,16 @@
 
 use Exception;
 use LogicException;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Cache\Store as StoreContract;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class DatabaseStore implements StoreInterface {
+class DatabaseStore implements StoreContract {
 
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionInterface
+	 * @var \Illuminate\Contracts\Database\Connection
 	 */
 	protected $connection;
 
@@ -38,13 +39,13 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Create a new database store.
 	 *
-	 * @param  \Illuminate\Database\ConnectionInterface  $connection
+	 * @param  \Illuminate\Contracts\Database\Connection  $connection
 	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
 	 * @param  string  $table
 	 * @param  string  $prefix
 	 * @return void
 	 */
-	public function __construct(ConnectionInterface $connection, EncrypterContract $encrypter, $table, $prefix = '')
+	public function __construct(ConnectionContract $connection, EncrypterContract $encrypter, $table, $prefix = '')
 	{
 		$this->table = $table;
 		$this->prefix = $prefix;
@@ -158,7 +159,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
-		return $this->put($key, $value, 5256000);
+		$this->put($key, $value, 5256000);
 	}
 
 	/**
@@ -197,7 +198,7 @@ class DatabaseStore implements StoreInterface {
 	/**
 	 * Get the underlying database connection.
 	 *
-	 * @return \Illuminate\Database\ConnectionInterface
+	 * @return \Illuminate\Contracts\Database\Connection
 	 */
 	public function getConnection()
 	{

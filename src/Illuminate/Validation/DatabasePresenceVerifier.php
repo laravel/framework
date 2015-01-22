@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Validation;
 
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Contracts\Validation\PresenceVerifier as PresenceVerifierContract;
+use Illuminate\Contracts\Database\ConnectionResolver as ConnectionResolverContract;
 
-class DatabasePresenceVerifier implements PresenceVerifierInterface {
+class DatabasePresenceVerifier implements PresenceVerifierContract {
 
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Contracts\Database\ConnectionResolver
 	 */
 	protected $db;
 
@@ -21,10 +22,10 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	/**
 	 * Create a new database presence verifier.
 	 *
-	 * @param  \Illuminate\Database\ConnectionResolverInterface  $db
+	 * @param  \Illuminate\Contracts\Database\ConnectionResolver  $db
 	 * @return void
 	 */
-	public function __construct(ConnectionResolverInterface $db)
+	public function __construct(ConnectionResolverContract $db)
 	{
 		$this->db = $db;
 	}

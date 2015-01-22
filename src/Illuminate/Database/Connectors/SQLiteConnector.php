@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Database\Connectors;
 
 use InvalidArgumentException;
+use Illuminate\Contracts\Database\Connector as ConnectorContract;
 
-class SQLiteConnector extends Connector implements ConnectorInterface {
+class SQLiteConnector extends BaseConnector implements ConnectorContract {
 
 	/**
 	 * Establish a database connection.

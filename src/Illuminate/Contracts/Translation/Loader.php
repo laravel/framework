@@ -1,6 +1,6 @@
-<?php namespace Illuminate\Translation;
+<?php namespace Illuminate\Contracts\Translation;
 
-interface LoaderInterface {
+interface Loader {
 
 	/**
 	 * Load the messages for the given locale.

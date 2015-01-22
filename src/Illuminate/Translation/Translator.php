@@ -4,13 +4,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Loader as LoaderContract;
 
 class Translator extends NamespacedItemResolver implements TranslatorInterface {
 
 	/**
 	 * The loader implementation.
 	 *
-	 * @var \Illuminate\Translation\LoaderInterface
+	 * @var \Illuminate\Contracts\Translation\Loader
 	 */
 	protected $loader;
 
@@ -36,13 +37,20 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	protected $loaded = array();
 
 	/**
+	 * The message selector instance.
+	 *
+	 * @var \Symfony\Component\Translation\MessageSelector
+	 */
+	protected $selector;
+
+	/**
 	 * Create a new translator instance.
 	 *
-	 * @param  \Illuminate\Translation\LoaderInterface  $loader
+	 * @param  \Illuminate\Contracts\Translation\Loader  $loader
 	 * @param  string  $locale
 	 * @return void
 	 */
-	public function __construct(LoaderInterface $loader, $locale)
+	public function __construct(LoaderContract $loader, $locale)
 	{
 		$this->loader = $loader;
 		$this->locale = $locale;
@@ -303,7 +311,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	/**
 	 * Get the language line loader implementation.
 	 *
-	 * @return \Illuminate\Translation\LoaderInterface
+	 * @return \Illuminate\Contracts\Translation\Loader
 	 */
 	public function getLoader()
 	{

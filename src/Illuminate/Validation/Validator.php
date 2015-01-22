@@ -12,6 +12,7 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Validation\PresenceVerifier;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
@@ -28,7 +29,7 @@ class Validator implements ValidatorContract {
 	/**
 	 * The Presence Verifier implementation.
 	 *
-	 * @var \Illuminate\Validation\PresenceVerifierInterface
+	 * @var \Illuminate\Contracts\Validation\PresenceVerifier
 	 */
 	protected $presenceVerifier;
 
@@ -2282,7 +2283,7 @@ class Validator implements ValidatorContract {
 	/**
 	 * Get the Presence Verifier implementation.
 	 *
-	 * @return \Illuminate\Validation\PresenceVerifierInterface
+	 * @return \Illuminate\Contracts\Validation\PresenceVerifier
 	 *
 	 * @throws \RuntimeException
 	 */
@@ -2299,10 +2300,10 @@ class Validator implements ValidatorContract {
 	/**
 	 * Set the Presence Verifier implementation.
 	 *
-	 * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
+	 * @param  \Illuminate\Contracts\Validation\PresenceVerifier  $presenceVerifier
 	 * @return void
 	 */
-	public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
+	public function setPresenceVerifier(PresenceVerifier $presenceVerifier)
 	{
 		$this->presenceVerifier = $presenceVerifier;
 	}

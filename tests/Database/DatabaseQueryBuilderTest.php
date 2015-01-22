@@ -1077,7 +1077,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function setupCacheTestQuery($cache, $driver)
 	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$connection = m::mock('Illuminate\Contracts\Database\Connection');
 		$connection->shouldReceive('getName')->andReturn('connection_name');
 		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
 		$cache->shouldReceive('driver')->once()->andReturn($driver);
@@ -1216,7 +1216,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 
@@ -1224,7 +1224,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\PostgresGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 
@@ -1232,7 +1232,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 
@@ -1240,7 +1240,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 
@@ -1248,7 +1248,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar;
 		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 
@@ -1256,7 +1256,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
 		$processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		return new Builder(m::mock('Illuminate\Contracts\Database\Connection'), $grammar, $processor);
 	}
 
 }

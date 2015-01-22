@@ -2,8 +2,9 @@
 
 use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Contracts\Queue\Connector as ConnectorContract;
 
-class RedisConnector implements ConnectorInterface {
+class RedisConnector implements ConnectorContract {
 
 	/**
 	* The Redis database instance.
