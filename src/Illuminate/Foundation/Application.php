@@ -481,6 +481,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function loadDeferredProvider($service)
 	{
+		if ( ! isset($this->deferredServices[$service]))
+		{
+			return;
+		}
+
 		$provider = $this->deferredServices[$service];
 
 		// If the service provider has not already been loaded and registered we can
