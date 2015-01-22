@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Redis\Database as Redis;
 
-class RedisStore extends TaggableStore implements StoreInterface {
+class RedisStore extends TaggableStore implements Store {
 
 	/**
 	 * The Redis database connection.

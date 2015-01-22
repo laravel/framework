@@ -4,6 +4,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
@@ -17,7 +18,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * The cache store implementation.
 	 *
-	 * @var \Illuminate\Cache\StoreInterface
+	 * @var \Illuminate\Contracts\Cache\Store
 	 */
 	protected $store;
 
@@ -38,9 +39,9 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Create a new cache repository instance.
 	 *
-	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Contracts\Cache\Store  $store
 	 */
-	public function __construct(StoreInterface $store)
+	public function __construct(Store $store)
 	{
 		$this->store = $store;
 	}
@@ -271,7 +272,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Get the cache store implementation.
 	 *
-	 * @return \Illuminate\Cache\StoreInterface
+	 * @return \Illuminate\Contracts\Cache\Store
 	 */
 	public function getStore()
 	{

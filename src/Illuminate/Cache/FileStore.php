@@ -2,8 +2,9 @@
 
 use Exception;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Cache\Store;
 
-class FileStore implements StoreInterface {
+class FileStore implements Store {
 
 	/**
 	 * The Illuminate Filesystem instance.

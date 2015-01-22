@@ -2,6 +2,7 @@
 
 use Closure;
 use InvalidArgumentException;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 
 class CacheManager implements FactoryContract {
@@ -225,10 +226,10 @@ class CacheManager implements FactoryContract {
 	/**
 	 * Create a new cache repository with the given implementation.
 	 *
-	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Contracts\Cache\Store  $store
 	 * @return \Illuminate\Cache\Repository
 	 */
-	public function repository(StoreInterface $store)
+	public function repository(Store $store)
 	{
 		$repository = new Repository($store);
 
