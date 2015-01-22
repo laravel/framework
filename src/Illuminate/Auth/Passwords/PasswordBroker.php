@@ -2,7 +2,7 @@
 
 use Closure;
 use UnexpectedValueException;
-use Illuminate\Auth\UserProviderInterface;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -48,13 +48,13 @@ class PasswordBroker implements PasswordBrokerContract {
 	 * Create a new password broker instance.
 	 *
 	 * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
-	 * @param  \Illuminate\Auth\UserProviderInterface  $users
+	 * @param  \Illuminate\Contracts\Auth\UserProvider  $users
 	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
 	 * @param  string  $emailView
 	 * @return void
 	 */
 	public function __construct(TokenRepositoryInterface $tokens,
-                                UserProviderInterface $users,
+                                UserProvider $users,
                                 MailerContract $mailer,
                                 $emailView)
 	{

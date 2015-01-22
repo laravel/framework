@@ -39,7 +39,7 @@ return array_map('realpath', array(
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Hashing/Hasher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthManager.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/Guard.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/UserProviderInterface.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Auth/UserProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/EloquentUserProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Container/Container.php',
     $basePath.'/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpKernelInterface.php',
