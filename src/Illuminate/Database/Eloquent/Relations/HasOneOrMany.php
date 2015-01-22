@@ -21,7 +21,7 @@ abstract class HasOneOrMany extends Relation {
 	protected $localKey;
 
 	/**
-	 * Create a new has many relationship instance.
+	 * Create a new has one or many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
