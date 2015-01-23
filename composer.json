@@ -18,7 +18,7 @@
         "jeremeamia/superclosure": "~1.0.1",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
-        "patchwork/utf8": "1.1.*",
+        "patchwork/utf8": "~1.1",
         "phpseclib/phpseclib": "0.3.*",
         "predis/predis": "0.8.*",
         "stack/builder": "~1.0",
