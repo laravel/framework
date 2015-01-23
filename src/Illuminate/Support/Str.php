@@ -157,9 +157,9 @@ class Str {
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function lower($value)
+	public static function lower($value, $encoding = 'UTF-8')
 	{
-		return mb_strtolower($value);
+		return mb_strtolower($value, $encoding);
 	}
 
 	/**
@@ -249,9 +249,9 @@ class Str {
 	 * @param  string  $value
 	 * @return string
 	 */
-	public static function upper($value)
+	public static function upper($value, $encoding = 'UTF-8')
 	{
-		return mb_strtoupper($value);
+		return mb_strtoupper($value, $encoding);
 	}
 
 	/**
