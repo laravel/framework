@@ -113,15 +113,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
-	 */
-	public function testFindOrFailMethodThrowsModelNotFoundException()
-	{
-		$result = EloquentModelFindNotFoundStub::findOrFail(1);
-	}
-
-
 	public function testFindMethodWithArrayCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelFindManyStub::find(array(1, 2));
@@ -1259,15 +1250,6 @@ class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Mod
 		$mock->shouldReceive('useWritePdo')->once()->andReturnSelf();
 		$mock->shouldReceive('find')->once()->with(1)->andReturn('foo');
 
-		return $mock;
-	}
-}
-
-class EloquentModelFindNotFoundStub extends Illuminate\Database\Eloquent\Model {
-	public static function query()
-	{
-		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('findOrFail')->once()->with(1, array('*'))->andThrow(new ModelNotFoundException);
 		return $mock;
 	}
 }

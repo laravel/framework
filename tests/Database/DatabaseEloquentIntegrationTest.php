@@ -106,6 +106,39 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFindOrFail()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+		$single = EloquentTestUser::findOrFail(1);
+		$multiple = EloquentTestUser::findOrFail([1, 2]);
+
+		$this->assertInstanceOf('EloquentTestUser', $single);
+		$this->assertEquals('taylorotwell@gmail.com', $single->email);
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $multiple);
+		$this->assertInstanceOf('EloquentTestUser', $multiple[0]);
+		$this->assertInstanceOf('EloquentTestUser', $multiple[1]);
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
+	{
+		EloquentTestUser::findOrFail(1);
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::findOrFail([1, 2]);
+	}
+
+
 	public function testHasOnSelfReferencingBelongsToManyRelationship()
 	{
 		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
