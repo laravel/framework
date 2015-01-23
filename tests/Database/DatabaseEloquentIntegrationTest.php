@@ -3,7 +3,7 @@
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
+class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Bootstrap Eloquent.
@@ -95,14 +95,14 @@ class DatabaseEloquentIntegrationTests extends PHPUnit_Framework_TestCase {
 		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
-		$models = EloquentTestUser::oldest('id');
+		$models = EloquentTestUser::oldest('id')->get();
 
 		$this->assertEquals(2, $models->count());
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
 		$this->assertInstanceOf('EloquentTestUser', $models[0]);
 		$this->assertInstanceOf('EloquentTestUser', $models[1]);
-		$this->assertInstanceOf('taylorotwell@gmail.com', $models[0]->email);
-		$this->assertInstanceOf('abigailotwell@gmail.com', $models[1]->email);
+		$this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
+		$this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
 	}
 
 
