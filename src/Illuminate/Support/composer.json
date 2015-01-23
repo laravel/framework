@@ -12,7 +12,7 @@
     },
     "require-dev": {
         "jeremeamia/superclosure": "~1.0.1",
-        "patchwork/utf8": "1.1.*"
+        "patchwork/utf8": "~1.1"
     },
     "autoload": {
         "psr-0": {
