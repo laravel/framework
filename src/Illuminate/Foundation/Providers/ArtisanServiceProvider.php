@@ -230,7 +230,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerKeyGenerateCommand()
 	{
-		$this->app->singleton('command.key.generate', function($app)
+		$this->app->singleton('command.key.generate', function()
 		{
 			return new KeyGenerateCommand;
 		});
@@ -334,7 +334,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 */
 	protected function registerServeCommand()
 	{
-		$this->app->singleton('command.serve', function($app)
+		$this->app->singleton('command.serve', function()
 		{
 			return new ServeCommand;
 		});
