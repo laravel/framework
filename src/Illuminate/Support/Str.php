@@ -155,10 +155,16 @@ class Str {
 	 * Convert the given string to lower-case.
 	 *
 	 * @param  string  $value
+	 * @param  string|null  $encoding
 	 * @return string
 	 */
-	public static function lower($value)
+	public static function lower($value, $encoding = null)
 	{
+		if ( ! is_null($encoding))
+		{
+			return mb_strtolower($value, $encoding);
+		}
+
 		return mb_strtolower($value);
 	}
 
@@ -247,10 +253,16 @@ class Str {
 	 * Convert the given string to upper-case.
 	 *
 	 * @param  string  $value
+	 * @param  string|null  $encoding
 	 * @return string
 	 */
-	public static function upper($value)
+	public static function upper($value, $encoding = null)
 	{
+		if ( ! is_null($encoding))
+		{
+			return mb_strtoupper($value, $encoding);
+		}
+
 		return mb_strtoupper($value);
 	}
 
