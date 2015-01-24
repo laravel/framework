@@ -80,16 +80,8 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testReleaseProperlyReleasesTheJobOntoSqs()
 	{
-		$this->mockedSqsClient = $this->getMock(
-			'Aws\Sqs\SqsClient',
-			array('changeMessageVisibility'),
-			array($this->credentials, $this->signature, $this->config)
-		);
-		$queue = $this->getMock(
-			'Illuminate\Queue\SqsQueue',
-			array('getQueue'),
-			array($this->mockedSqsClient, $this->queueName, $this->account)
-		);
+		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('changeMessageVisibility'), array($this->credentials, $this->signature, $this->config));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 
 		$job = $this->getJob();
