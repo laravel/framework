@@ -83,18 +83,8 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('changeMessageVisibility'), array($this->credentials, $this->signature, $this->config));
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
-
 		$job = $this->getJob();
-		$job->getSqs()
-			->expects($this->once())
-			->method('changeMessageVisibility')
-			->with(
-				array(
-					'QueueUrl' => $this->queueUrl,
-					'ReceiptHandle' => $this->mockedReceiptHandle,
-					'VisibilityTimeout' => $this->releaseDelay
-				)
-			);
+		$job->getSqs()->expects($this->once())->method('changeMessageVisibility')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay));
 		$job->release($this->releaseDelay);
 	}
 
