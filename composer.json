@@ -15,7 +15,7 @@
         "ext-mcrypt": "*",
         "ext-mbstring": "*",
         "classpreloader/classpreloader": "~1.0.2",
-        "danielstjules/stringy": "~1.5",
+        "danielstjules/stringy": "~1.8",
         "d11wtq/boris": "~1.0",
         "doctrine/inflector": "~1.0",
         "ircmaxell/password-compat": "~1.0",
@@ -24,7 +24,6 @@
         "monolog/monolog": "~1.11",
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.0",
-        "predis/predis": "~1.0",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "2.6.*",
         "symfony/debug": "2.6.*",
@@ -69,11 +68,10 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "~2.7",
+        "aws/aws-sdk-php": "~2.4",
         "iron-io/iron_mq": "~1.5",
-        "league/flysystem-aws-s3-v2": "~1.0",
-        "league/flysystem-rackspace": "~1.0",
         "pda/pheanstalk": "~3.0",
+        "predis/predis": "~1.0",
         "mockery/mockery": "~0.9",
         "phpunit/phpunit": "~4.0"
     },
@@ -95,8 +93,14 @@
         }
     },
     "suggest": {
-        "doctrine/dbal": "Allow renaming columns and dropping SQLite columns.",
-        "guzzlehttp/guzzle": "Required for Mailgun and Mandrill mail drivers."
+        "aws/aws-sdk-php": "Required to use the SQS queue driver (~2.4).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.0).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~1.5).",
+        "league/flysystem-aws-s3-v2": "Required to use the Flysystem S3 driver (~1.0).",
+        "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
+        "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
+        "predis/predis": "Required to use the redis cache and queue drivers (~1.0)."
     },
     "minimum-stability": "dev"
 }

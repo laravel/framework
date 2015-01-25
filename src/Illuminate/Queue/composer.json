@@ -18,11 +18,6 @@
         "symfony/process": "2.6.*",
         "nesbot/carbon": "~1.0"
     },
-    "require-dev": {
-        "aws/aws-sdk-php": "~2.6",
-        "iron-io/iron_mq": "~1.5",
-        "pda/pheanstalk": "~2.1"
-    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Queue\\": ""
@@ -37,7 +32,10 @@
         }
     },
     "suggest": {
-        "illuminate/redis": "Allows use of the Redis queue driver."
+        "aws/aws-sdk-php": "Required to use the SQS queue driver (~2.4).",
+        "illuminate/redis": "Required to use the redis queue driver (5.0.*).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~1.5).",
+        "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0)."
     },
     "minimum-stability": "dev"
 }
