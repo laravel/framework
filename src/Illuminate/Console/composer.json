@@ -13,11 +13,6 @@
         "illuminate/contracts": "5.0.*",
         "symfony/console": "2.6.*"
     },
-    "require-dev": {
-        "mtdowling/cron-expression": "~1.0",
-        "symfony/process": "2.6.*",
-        "nesbot/carbon": "~1.0"
-    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Console\\": ""
@@ -27,6 +22,11 @@
         "branch-alias": {
             "dev-master": "5.0-dev"
         }
+    },
+    "suggest": {
+        "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
+        "symfony/process": "Required to use scheduling component (2.6.*).",
+        "nesbot/carbon": "Required to use scheduling component (~1.0)."
     },
     "minimum-stability": "dev"
 }

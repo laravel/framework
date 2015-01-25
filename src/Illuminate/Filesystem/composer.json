@@ -25,5 +25,9 @@
             "dev-master": "5.0-dev"
         }
     },
+    "suggest": {
+        "league/flysystem-aws-s3-v2": "Required to use the Flysystem S3 driver (~1.0).",
+        "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0)."
+    },
     "minimum-stability": "dev"
 }
