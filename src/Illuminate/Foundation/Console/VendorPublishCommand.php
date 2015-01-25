@@ -58,6 +58,8 @@ class VendorPublishCommand extends Command {
 				$this->publishDirectory($from, $to);
 			}
 		}
+
+		$this->info('Publishing Complete!');
 	}
 
 	/**
@@ -69,6 +71,11 @@ class VendorPublishCommand extends Command {
 	 */
 	protected function publishFile($from, $to)
 	{
+		if ($this->files->exists($to))
+		{
+			return;
+		}
+
 		$this->createParentDirectory(dirname($to));
 
 		$this->files->copy($from, $to);
@@ -85,6 +92,11 @@ class VendorPublishCommand extends Command {
 	 */
 	protected function publishDirectory($from, $to)
 	{
+		if ($this->files->isDirectory($to))
+		{
+			return;
+		}
+
 		$this->createParentDirectory($to);
 
 		$this->files->copyDirectory($from, $to);
