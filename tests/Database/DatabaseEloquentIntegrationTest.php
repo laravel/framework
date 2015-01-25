@@ -106,6 +106,19 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testListsRetrieval()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+		$simple = EloquentTestUser::oldest('id')->lists('users.email');
+		$keyed = EloquentTestUser::oldest('id')->lists('users.email', 'users.id');
+
+		$this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
+		$this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+	}
+
+
 	public function testFindOrFail()
 	{
 		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

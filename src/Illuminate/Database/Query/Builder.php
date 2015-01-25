@@ -888,7 +888,7 @@ class Builder {
 	{
 		return $this->whereNotNull($column, 'or');
 	}
-	
+
 	/**
 	 * Add a "where date" statement to the query.
 	 *
@@ -902,7 +902,7 @@ class Builder {
 	{
 		return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
 	}
-	
+
 	/**
 	 * Add a "where day" statement to the query.
 	 *
@@ -1502,24 +1502,9 @@ class Builder {
 	{
 		$columns = $this->getListSelect($column, $key);
 
-		// First we will just get all of the column values for the record result set
-		// then we can associate those values with the column if it was specified
-		// otherwise we can just give these values back without a specific key.
 		$results = new Collection($this->get($columns));
 
-		$values = $results->fetch($columns[0])->all();
-
-		// If a key was specified and we have results, we will go ahead and combine
-		// the values with the keys of all of the records so that the values can
-		// be accessed by the key of the rows instead of simply being numeric.
-		if ( ! is_null($key) && count($results) > 0)
-		{
-			$keys = $results->fetch($key)->all();
-
-			return array_combine($keys, $values);
-		}
-
-		return $values;
+		return $results->lists($columns[0], array_get($columns, 1));
 	}
 
 	/**
@@ -1536,12 +1521,12 @@ class Builder {
 		// If the selected column contains a "dot", we will remove it so that the list
 		// operation can run normally. Specifying the table is not needed, since we
 		// really want the names of the columns as it is in this resulting array.
-		if (($dot = strpos($select[0], '.')) !== false)
+		return array_map(function($column)
 		{
-			$select[0] = substr($select[0], $dot + 1);
-		}
+			$dot = strpos($column, '.');
 
-		return $select;
+			return $dot === false ? $column : substr($column, $dot + 1);
+		}, $select);
 	}
 
 	/**
