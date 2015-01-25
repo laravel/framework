@@ -19,6 +19,13 @@ abstract class ServiceProvider {
 	protected $defer = false;
 
 	/**
+	 * The paths that should be published.
+	 *
+	 * @var array
+	 */
+	protected static $publishes = [];
+
+	/**
 	 * Create a new service provider instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -45,7 +52,7 @@ abstract class ServiceProvider {
 	 */
 	protected function loadViewsFrom($namespace, $path)
 	{
-		if (is_dir($appPath = $this->app->basePath().'/resources/views/packages/'.$namespace))
+		if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace))
 		{
 			$this->app['view']->addNamespace($namespace, $appPath);
 		}
@@ -63,6 +70,27 @@ abstract class ServiceProvider {
 	protected function loadTranslationsFrom($namespace, $path)
 	{
 		$this->app['translator']->addNamespace($namespace, $path);
+	}
+
+	/**
+	 * Register paths to be published by the publish command.
+	 *
+	 * @param  array  $paths
+	 * @return void
+	 */
+	protected function publishes(array $paths)
+	{
+		static::$publishes = array_merge(static::$publishes, $paths);
+	}
+
+	/**
+	 * Get the paths to publish.
+	 *
+	 * @return array
+	 */
+	public static function pathsToPublish()
+	{
+		return static::$publishes;
 	}
 
 	/**
