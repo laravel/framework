@@ -85,8 +85,8 @@
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
-        "psr-0": {
-            "Illuminate": "src/"
+        "psr-4": {
+            "Illuminate\\": "src/Illuminate/"
         }
     },
     "extra": {
