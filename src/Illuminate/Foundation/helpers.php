@@ -164,6 +164,20 @@ if ( ! function_exists('config'))
 	}
 }
 
+if ( ! function_exists('config_path'))
+{
+	/**
+	 * Get the configuration path.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	function config_path($path = '')
+	{
+		return app()->make('path.config').($path ? '/'.$path : $path);
+	}
+}
+
 if ( ! function_exists('cookie'))
 {
 	/**
