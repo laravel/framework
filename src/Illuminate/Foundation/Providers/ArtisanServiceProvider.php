@@ -22,6 +22,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
+use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\HandlerCommandCommand;
 
@@ -46,6 +47,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'ConfigCache' => 'command.config.cache',
 		'ConfigClear' => 'command.config.clear',
 		'ConsoleMake' => 'command.console.make',
+		'EventGenerate' => 'command.event.generate',
 		'EventMake' => 'command.event.make',
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
@@ -157,6 +159,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.console.make', function($app)
 		{
 			return new ConsoleMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerEventGenerateCommand()
+	{
+		$this->app->singleton('command.event.generate', function()
+		{
+			return new EventGenerateCommand;
 		});
 	}
 
