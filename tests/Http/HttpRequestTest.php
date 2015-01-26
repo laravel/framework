@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
@@ -417,6 +417,25 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
 		$request->setUserResolver(function() { return 'user'; });
 		$this->assertEquals('user', $request->user());
+	}
+
+
+	public function testCreateFromBase()
+	{
+		$body = [
+			'foo' => 'bar',
+			'baz' => ['qux'],
+		];
+
+		$server = array(
+			'CONTENT_TYPE' => 'application/json',
+		);
+
+		$base = SymfonyRequest::create('/', 'GET', array(), array(), array(), $server, json_encode($body));
+
+		$request = Request::createFromBase($base);
+
+		$this->assertEquals($request->request->all(), $body);
 	}
 
 }
