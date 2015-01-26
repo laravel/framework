@@ -44,17 +44,17 @@ abstract class ServiceProvider {
 	abstract public function register();
 
 	/**
-	 * Register the package defaults.
+	 * Merge the given configuration with the existing configuration.
 	 *
 	 * @param  string  $key
 	 * @param  string  $path
 	 * @return void
 	 */
-	protected function loadConfigFrom($key, $path)
+	protected function mergeConfigFrom($key, $path)
 	{
-		$defaults = $this->app['files']->getRequire($path);
 		$config = $this->app['config']->get($key, []);
-		$this->app['config']->set($key, config_merge($defaults, $config));
+
+		$this->app['config']->set($key, config_merge(require $path, $config));
 	}
 
 	/**
