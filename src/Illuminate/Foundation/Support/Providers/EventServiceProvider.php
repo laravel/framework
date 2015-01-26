@@ -42,4 +42,14 @@ class EventServiceProvider extends ServiceProvider {
 		//
 	}
 
+	/**
+	 * Get the events and handlers.
+	 *
+	 * @return array
+	 */
+	public function listens()
+	{
+		return $this->listen;
+	}
+
 }
