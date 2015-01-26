@@ -148,6 +148,16 @@ trait SoftDeletes {
 	}
 
 	/**
+	 * Get the attributes that should be converted to dates.
+	 *
+	 * @return array
+	 */
+	public function getDates()
+	{
+	    return array_merge(parent::getDates(), [static::DELETED_AT]);
+	}
+
+	/**
 	 * Get the name of the "deleted at" column.
 	 *
 	 * @return string
