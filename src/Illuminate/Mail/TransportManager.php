@@ -7,6 +7,7 @@ use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager {
