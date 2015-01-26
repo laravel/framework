@@ -19,7 +19,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	/**
 	 * The user provider implementation.
 	 *
-	 * @var \Illuminate\Auth\UserProviderInterface
+	 * @var \Illuminate\Contracts\Auth\UserProvider
 	 */
 	protected $users;
 
