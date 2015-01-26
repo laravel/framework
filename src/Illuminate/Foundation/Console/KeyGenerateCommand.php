@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command {
 
@@ -28,6 +29,11 @@ class KeyGenerateCommand extends Command {
 	{
 		$key = $this->getRandomKey();
 
+		if ($this->option('show'))
+		{
+			return $this->line('<comment>'.$key.'</comment>');
+		}
+
 		foreach ([base_path('.env'), base_path('.env.example')] as $path)
 		{
 			if (file_exists($path))
@@ -51,6 +57,18 @@ class KeyGenerateCommand extends Command {
 	protected function getRandomKey()
 	{
 		return Str::random(32);
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'),
+		);
 	}
 
 }
