@@ -3,7 +3,9 @@
 use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 
-class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface {
+class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface, ExpirationAwareInterface {
+
+	use ExpirationAwareTrait;
 
 	/**
 	 * The database connection instance.
@@ -60,14 +62,29 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 	 */
 	public function read($sessionId)
 	{
-		$session = (object) $this->getQuery()->find($sessionId);
+		// Unless we identify otherwise, this is a new session
+		$this->exists = false;
 
-		if (isset($session->payload))
+		// Get the session from the database
+		$session = $this->getQuery()->find($sessionId);
+
+		// If the session is null, no data
+		if (is_null($session))
 		{
-			$this->exists = true;
-
-			return base64_decode($session->payload);
+			return;
 		}
+
+		// Delete the session if it's still in the database but it has expired
+		if ($session->last_activity <= time() - ($this->lifetime * 60))
+		{
+			$this->destroy($sessionId);
+			return;
+		}
+
+		// This is a new session
+		$this->exists = true;
+
+		return base64_decode($session->payload);
 	}
 
 	/**
