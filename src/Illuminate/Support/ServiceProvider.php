@@ -44,6 +44,20 @@ abstract class ServiceProvider {
 	abstract public function register();
 
 	/**
+	 * Register the package defaults.
+	 *
+	 * @param  string  $key
+	 * @param  string  $path
+	 * @return void
+	 */
+	protected function loadConfigFrom($key, $path)
+	{
+		$defaults = $this->app['files']->getRequire($path);
+		$config = $this->app['config']->get($key, []);
+		$this->app['config']->set($key, array_merge($defaults, $config));
+	}
+
+	/**
 	 * Register a view file namespace.
 	 *
 	 * @param  string  $namespace
