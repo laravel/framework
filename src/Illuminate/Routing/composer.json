@@ -20,10 +20,6 @@
         "symfony/http-kernel": "2.6.*",
         "symfony/routing": "2.6.*"
     },
-    "require-dev": {
-        "illuminate/console": "5.0.*",
-        "illuminate/filesystem": "5.0.*"
-    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Routing\\": ""
@@ -33,6 +29,9 @@
         "branch-alias": {
             "dev-master": "5.0-dev"
         }
+    },
+    "suggest": {
+        "illuminate/console": "Required to use the make commands (5.0.*)."
     },
     "minimum-stability": "dev"
 }
