@@ -790,6 +790,18 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
+	 * Validate that an attribute is an array.
+	 *
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateArray($attribute, $value)
+	{
+		return is_array($value);
+	}
+
+	/**
 	 * Validate that an attribute is a boolean.
 	 *
 	 * @param  string  $attribute
@@ -804,15 +816,15 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
-	 * Validate that an attribute is an array.
+	 * Validate that an attribute is an integer.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
 	 * @return bool
 	 */
-	protected function validateArray($attribute, $value)
+	protected function validateInteger($attribute, $value)
 	{
-		return is_array($value);
+		return filter_var($value, FILTER_VALIDATE_INT) !== false;
 	}
 
 	/**
@@ -828,15 +840,15 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
-	 * Validate that an attribute is an integer.
+	 * Validate that an attribute is a string.
 	 *
 	 * @param  string  $attribute
 	 * @param  mixed   $value
 	 * @return bool
 	 */
-	protected function validateInteger($attribute, $value)
+	protected function validateString($attribute, $value)
 	{
-		return filter_var($value, FILTER_VALIDATE_INT) !== false;
+		return is_string($value);
 	}
 
 	/**
