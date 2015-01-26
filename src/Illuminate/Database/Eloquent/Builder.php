@@ -845,11 +845,13 @@ class Builder {
 	 * Set the underlying query builder instance.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @return void
+	 * @return $this
 	 */
 	public function setQuery($query)
 	{
 		$this->query = $query;
+
+		return $this;
 	}
 
 	/**
@@ -866,11 +868,13 @@ class Builder {
 	 * Set the relationships being eagerly loaded.
 	 *
 	 * @param  array  $eagerLoad
-	 * @return void
+	 * @return $this
 	 */
 	public function setEagerLoads(array $eagerLoad)
 	{
 		$this->eagerLoad = $eagerLoad;
+
+		return $this;
 	}
 
 	/**
