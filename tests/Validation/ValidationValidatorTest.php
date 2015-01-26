@@ -537,6 +537,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testValidateString()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => 'string'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => array('blah' => 'test')), array('x' => 'string'));
+		$this->assertFalse($v->passes());
+	}
+
+
 	public function testValidateBoolean()
 	{
 		$trans = $this->getRealTranslator();
