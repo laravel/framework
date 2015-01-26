@@ -4,11 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
-use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class FormRequest extends Request implements ValidatesWhenResolved {
 
@@ -17,7 +17,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * The container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -200,10 +200,10 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Set the container implementation.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return $this
 	 */
-	public function setContainer(Container $container)
+	public function setContainer(ContainerContract $container)
 	{
 		$this->container = $container;
 

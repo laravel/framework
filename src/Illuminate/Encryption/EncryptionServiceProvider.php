@@ -11,13 +11,13 @@ class EncryptionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('encrypter', function($app)
+		$this->app->singleton('encrypter', function()
 		{
-			$encrypter =  new Encrypter($app['config']['app.key']);
+			$encrypter =  new Encrypter($this->app['config']['app.key']);
 
-			if ($app['config']->has('app.cipher'))
+			if ($this->app['config']->has('app.cipher'))
 			{
-				$encrypter->setCipher($app['config']['app.cipher']);
+				$encrypter->setCipher($this->app['config']['app.cipher']);
 			}
 
 			return $encrypter;

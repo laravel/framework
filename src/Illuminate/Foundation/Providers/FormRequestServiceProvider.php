@@ -25,12 +25,12 @@ class FormRequestServiceProvider extends ServiceProvider {
 	{
 		$this->app['events']->listen('router.matched', function()
 		{
-			$this->app->resolving(function(FormRequest $request, $app)
+			$this->app->resolving(function(FormRequest $request)
 			{
-				$this->initializeRequest($request, $app['request']);
+				$this->initializeRequest($request, $this->app['request']);
 
-				$request->setContainer($app)
-                        ->setRedirector($app['Illuminate\Routing\Redirector']);
+				$request->setContainer($this->app)
+                        ->setRedirector($this->app['Illuminate\Routing\Redirector']);
 			});
 		});
 	}

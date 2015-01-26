@@ -18,11 +18,11 @@ class BusServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('Illuminate\Bus\Dispatcher', function($app)
+		$this->app->singleton('Illuminate\Bus\Dispatcher', function()
 		{
-			return new Dispatcher($app, function() use ($app)
+			return new Dispatcher($this->app, function()
 			{
-				return $app['Illuminate\Contracts\Queue\Queue'];
+				return $this->app['queue.connection'];
 			});
 		});
 

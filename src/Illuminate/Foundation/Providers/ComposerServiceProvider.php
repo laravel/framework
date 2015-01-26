@@ -19,9 +19,9 @@ class ComposerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('composer', function($app)
+		$this->app->singleton('composer', function()
 		{
-			return new Composer($app['files'], $app['path.base']);
+			return new Composer($this->app['files'], $this->app['path.base']);
 		});
 	}
 

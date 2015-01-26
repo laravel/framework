@@ -36,9 +36,9 @@ class SeedServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSeedCommand()
 	{
-		$this->app->singleton('command.seed', function($app)
+		$this->app->singleton('command.seed', function()
 		{
-			return new SeedCommand($app['db']);
+			return new SeedCommand($this->app['db']);
 		});
 	}
 

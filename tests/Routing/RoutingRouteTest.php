@@ -806,7 +806,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		{
 			$_SERVER['route.test.controller.after.filter'] = true;
 		});
-		$container->singleton('illuminate.route.dispatcher', function($container) use ($router)
+		$container->singleton('illuminate.route.dispatcher', function() use ($container, $router)
 		{
 			return new Illuminate\Routing\ControllerDispatcher($router, $container);
 		});

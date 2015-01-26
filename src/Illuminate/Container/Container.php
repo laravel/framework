@@ -222,11 +222,11 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function getClosure($abstract, $concrete)
 	{
-		return function($c, $parameters = []) use ($abstract, $concrete)
+		return function() use ($abstract, $concrete)
 		{
 			$method = ($abstract == $concrete) ? 'build' : 'make';
 
-			return $c->$method($concrete, $parameters);
+			return $this->$method($concrete, func_get_args());
 		};
 	}
 
@@ -278,7 +278,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function share(Closure $closure)
 	{
-		return function($container) use ($closure)
+		return function() use ($closure)
 		{
 			// We'll simply declare a static variable within the Closures and if it has
 			// not been set we will execute the given Closures to resolve this value
@@ -287,7 +287,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 			if (is_null($object))
 			{
-				$object = $closure($container);
+				$object = $this->call($closure);
 			}
 
 			return $object;
@@ -319,7 +319,7 @@ class Container implements ArrayAccess, ContainerContract {
 	{
 		if (isset($this->instances[$abstract]))
 		{
-			$this->instances[$abstract] = $closure($this->instances[$abstract], $this);
+			$this->instances[$abstract] = $closure($this->instances[$abstract]);
 
 			$this->rebound($abstract);
 		}
@@ -450,7 +450,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	public function refresh($abstract, $target, $method)
 	{
-		return $this->rebinding($abstract, function($app, $instance) use ($target, $method)
+		return $this->rebinding($abstract, function($instance) use ($target, $method)
 		{
 			$target->{$method}($instance);
 		});
@@ -468,7 +468,7 @@ class Container implements ArrayAccess, ContainerContract {
 
 		foreach ($this->getReboundCallbacks($abstract) as $callback)
 		{
-			call_user_func($callback, $this, $instance);
+			call_user_func($callback, $instance);
 		}
 	}
 
@@ -665,7 +665,7 @@ class Container implements ArrayAccess, ContainerContract {
 		// of services, such as changing configuration or decorating the object.
 		foreach ($this->getExtenders($abstract) as $extender)
 		{
-			$object = $extender($object, $this);
+			$object = $extender($object);
 		}
 
 		// If the requested type is registered as a singleton we'll want to cache off
@@ -770,7 +770,7 @@ class Container implements ArrayAccess, ContainerContract {
 		// used as resolvers for more fine-tuned resolution of these objects.
 		if ($concrete instanceof Closure)
 		{
-			return $concrete($this, $parameters);
+			return $this->call($concrete, $parameters);
 		}
 
 		$reflector = new ReflectionClass($concrete);
@@ -1086,7 +1086,7 @@ class Container implements ArrayAccess, ContainerContract {
 	{
 		foreach ($callbacks as $callback)
 		{
-			$callback($object, $this);
+			$callback($object);
 		}
 	}
 

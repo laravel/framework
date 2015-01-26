@@ -24,9 +24,9 @@ class ConsoleServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('command.queue.table', function($app)
+		$this->app->singleton('command.queue.table', function()
 		{
-			return new TableCommand($app['files']);
+			return new TableCommand($this->app['files']);
 		});
 
 		$this->app->singleton('command.queue.failed', function()
@@ -49,9 +49,9 @@ class ConsoleServiceProvider extends ServiceProvider {
 			return new FlushFailedCommand;
 		});
 
-		$this->app->singleton('command.queue.failed-table', function($app)
+		$this->app->singleton('command.queue.failed-table', function()
 		{
-			return new FailedTableCommand($app['files']);
+			return new FailedTableCommand($this->app['files']);
 		});
 
 		$this->commands(

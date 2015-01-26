@@ -27,9 +27,9 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRouter()
 	{
-		$this->app['router'] = $this->app->share(function($app)
+		$this->app->singleton('router', function()
 		{
-			return new Router($app['events'], $app);
+			return new Router($this->app['events'], $this->app);
 		});
 	}
 
@@ -40,17 +40,17 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUrlGenerator()
 	{
-		$this->app['url'] = $this->app->share(function($app)
+		$this->app->singleton('url', function()
 		{
-			$routes = $app['router']->getRoutes();
+			$routes = $this->app['router']->getRoutes();
 
 			// The URL generator needs the route collection that exists on the router.
 			// Keep in mind this is an object, so we're passing by references here
 			// and all the registered routes will be available to the generator.
-			$app->instance('routes', $routes);
+			$this->app->instance('routes', $routes);
 
 			$url = new UrlGenerator(
-				$routes, $app->rebinding(
+				$routes, $this->app->rebinding(
 					'request', $this->requestRebinder()
 				)
 			);
@@ -63,9 +63,9 @@ class RoutingServiceProvider extends ServiceProvider {
 			// If the route collection is "rebound", for example, when the routes stay
 			// cached for the application, we will need to rebind the routes on the
 			// URL generator instance so it has the latest version of the routes.
-			$app->rebinding('routes', function($app, $routes)
+			$this->app->rebinding('routes', function($routes)
 			{
-				$app['url']->setRoutes($routes);
+				$this->app['url']->setRoutes($routes);
 			});
 
 			return $url;
@@ -79,9 +79,9 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function requestRebinder()
 	{
-		return function($app, $request)
+		return function($request)
 		{
-			$app['url']->setRequest($request);
+			$this->app['url']->setRequest($request);
 		};
 	}
 
@@ -92,16 +92,16 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerRedirector()
 	{
-		$this->app['redirect'] = $this->app->share(function($app)
+		$this->app->singleton('redirect', function()
 		{
-			$redirector = new Redirector($app['url']);
+			$redirector = new Redirector($this->app['url']);
 
 			// If the session is set on the application instance, we'll inject it into
 			// the redirector instance. This allows the redirect responses to allow
 			// for the quite convenient "with" methods that flash to the session.
-			if (isset($app['session.store']))
+			if (isset($this->app['session.store']))
 			{
-				$redirector->setSession($app['session.store']);
+				$redirector->setSession($this->app['session.store']);
 			}
 
 			return $redirector;
@@ -115,9 +115,9 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerResponseFactory()
 	{
-		$this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function($app)
+		$this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function()
 		{
-			return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
+			return new ResponseFactory($this->app['view'], $this->app['redirect']);
 		});
 	}
 

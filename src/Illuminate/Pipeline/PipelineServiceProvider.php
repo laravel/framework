@@ -18,9 +18,9 @@ class PipelineServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton(
-			'Illuminate\Contracts\Pipeline\Hub', 'Illuminate\Pipeline\Hub'
-		);
+		$this->app->singleton('Illuminate\Contracts\Pipeline\Hub', function () {
+			return new Hub($this->app);
+		});
 	}
 
 	/**
