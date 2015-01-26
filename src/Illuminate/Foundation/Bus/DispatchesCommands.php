@@ -34,7 +34,8 @@ trait DispatchesCommands {
 	 * Marshal a command and dispatch it to its appropriate handler.
 	 *
 	 * @param  mixed  $command
-	 * @param  \ArrayAccess  $array
+	 * @param  \ArrayAccess  $source
+	 * @param  array  $extras
 	 * @return mixed
 	 */
 	protected function dispatchFrom($command, ArrayAccess $source, $extras = [])
