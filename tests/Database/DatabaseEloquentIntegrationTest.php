@@ -152,6 +152,41 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testOneToOneRelationship()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$user->post()->create(['name' => 'First Post']);
+
+		$post = $user->post;
+		$user = $post->user;
+
+		$this->assertInstanceOf('EloquentTestUser', $user);
+		$this->assertInstanceOf('EloquentTestPost', $post);
+		$this->assertEquals('taylorotwell@gmail.com', $user->email);
+		$this->assertEquals('First Post', $post->name);
+	}
+
+
+	public function testOneToManyRelationship()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$user->posts()->create(['name' => 'First Post']);
+		$user->posts()->create(['name' => 'Second Post']);
+
+		$posts = $user->posts;
+		$post2 = $user->posts()->where('name', 'Second Post')->first();
+
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $posts);
+		$this->assertEquals(2, $posts->count());
+		$this->assertInstanceOf('EloquentTestPost', $posts[0]);
+		$this->assertInstanceOf('EloquentTestPost', $posts[1]);
+		$this->assertInstanceOf('EloquentTestPost', $post2);
+		$this->assertEquals('Second Post', $post2->name);
+		$this->assertInstanceOf('EloquentTestUser', $post2->user);
+		$this->assertEquals('taylorotwell@gmail.com', $post2->user->email);
+	}
+
+
 	public function testHasOnSelfReferencingBelongsToManyRelationship()
 	{
 		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -243,11 +278,11 @@ class EloquentTestUser extends Eloquent {
 	public function friends() {
 		return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
 	}
-	public function friend() {
-		return $this->hasOne('EloquentTestUser', 'user_id', 'friend_id');
-	}
 	public function posts() {
 		return $this->hasMany('EloquentTestPost', 'user_id');
+	}
+	public function post() {
+		return $this->hasOne('EloquentTestPost', 'user_id');
 	}
 	public function photos() {
 		return $this->morphMany('EloquentTestPhoto', 'imageable');
