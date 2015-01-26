@@ -13,10 +13,7 @@
         "ext-mbstring": "*",
         "illuminate/contracts": "5.0.*",
         "doctrine/inflector": "~1.0",
-        "danielstjules/stringy": "~1.5"
-    },
-    "require-dev": {
-        "jeremeamia/superclosure": "~1.0.1"
+        "danielstjules/stringy": "~1.8"
     },
     "autoload": {
         "psr-4": {
@@ -30,6 +27,9 @@
         "branch-alias": {
             "dev-master": "5.0-dev"
         }
+    },
+    "suggest": {
+        "jeremeamia/superclosure": "Required to be able to serialize closures (~1.0.1)."
     },
     "minimum-stability": "dev"
 }
