@@ -42,9 +42,7 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 		// database. Setting this DB timezone is an optional configuration item.
 		if (isset($config['timezone']))
 		{
-			$timezone = $config['timezone'];
-
-			$connection->prepare("set time zone '$timezone'")->execute();
+			$connection->prepare("set time zone '{$config['timezone']}'")->execute();
 		}
 
 		// Unlike MySQL, Postgres allows the concept of "schema" and a default schema
