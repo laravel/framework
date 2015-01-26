@@ -454,6 +454,37 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRequiredIfNot()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_if_not:first,taylor'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'shady', 'last' => 'otwell'), array('last' => 'required_if_not:first,taylor'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_if_not:first,taylor,dayle'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'dayle'), array('last' => 'required_if_not:first,taylor,dayle'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'shady'), array('last' => 'required_if_not:first,taylor,dayle'));
+		$this->assertTrue($v->fails());
+
+		// error message when passed multiple values (required_if_not:foo,bar,baz)
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required_if_not' => 'The :attribute field is required when :other is not :value.'), 'en', 'messages');
+		$v = new Validator($trans, array('first' => 'shady', 'last' => ''), array('last' => 'RequiredIfNot:first,taylor,dayle'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals('The last field is required when first is not shady.', $v->messages()->first('last'));
+	}
+
+
 	public function testValidateConfirmed()
 	{
 		$trans = $this->getRealTranslator();
