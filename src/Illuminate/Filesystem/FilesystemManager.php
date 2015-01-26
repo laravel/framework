@@ -50,6 +50,17 @@ class FilesystemManager implements FactoryContract {
 	 * @param  string  $name
 	 * @return \Illuminate\Contracts\Filesystem\Filesystem
 	 */
+	public function drive($name = null)
+	{
+		return $this->disk($name);
+	}
+
+	/**
+	 * Get a filesystem instance.
+	 *
+	 * @param  string  $name
+	 * @return \Illuminate\Contracts\Filesystem\Filesystem
+	 */
 	public function disk($name = null)
 	{
 		$name = $name ?: $this->getDefaultDriver();
