@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use SuperClosure\Serializer;
 
 class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
@@ -38,8 +39,8 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
 		$queue->setEncrypter($crypt);
 		$name = 'Foo';
-		$closure = new Illuminate\Support\SerializableClosure($innerClosure = function() use ($name) { return $name; });
-		$crypt->shouldReceive('encrypt')->once()->with(serialize($closure))->andReturn('serial_closure');
+		$closure = (new Serializer)->serialize($innerClosure = function() use ($name) { return $name; });
+		$crypt->shouldReceive('encrypt')->once()->with($closure)->andReturn('serial_closure');
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array(
 			'job' => 'IlluminateQueueClosure', 'data' => array('closure' => 'serial_closure'), 'attempts' => 1, 'queue' => 'default',
 		)))->andReturn('encrypted');

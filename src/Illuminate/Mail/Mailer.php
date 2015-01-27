@@ -3,11 +3,11 @@
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
+use SuperClosure\Serializer;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\SerializableClosure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -238,7 +238,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	{
 		if ( ! $callback instanceof Closure) return $callback;
 
-		return serialize(new SerializableClosure($callback));
+		return (new Serializer)->serialize($callback);
 	}
 
 	/**
@@ -265,7 +265,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	{
 		if (str_contains($data['callback'], 'SerializableClosure'))
 		{
-			return with(unserialize($data['callback']))->getClosure();
+			return unserialize($data['callback']);
 		}
 
 		return $data['callback'];
