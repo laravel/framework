@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use SuperClosure\Serializer;
 
 class MailMailerTest extends PHPUnit_Framework_TestCase {
 
@@ -98,7 +99,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
 		list($view, $swift) = $this->getMocks();
 		$mailer = new Illuminate\Mail\Mailer($view, $swift);
 		$mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-		$serialized = serialize(new Illuminate\Support\SerializableClosure($closure = function() {}));
+		$serialized = (new Serializer)->serialize($closure = function() {});
 		$queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => $serialized), null);
 
 		$mailer->queue('foo', array(1), $closure);
