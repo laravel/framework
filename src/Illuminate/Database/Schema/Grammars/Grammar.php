@@ -112,14 +112,13 @@ abstract class Grammar extends BaseGrammar {
 	 * Compile the blueprint's column definitions.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-	 * @param  bool $change
 	 * @return array
 	 */
-	protected function getColumns(Blueprint $blueprint, $change = false)
+	protected function getColumns(Blueprint $blueprint)
 	{
 		$columns = array();
 
-		foreach ($change ? $blueprint->getChangedColumns() : $blueprint->getAddedColumns() as $column)
+		foreach ($blueprint->getAddedColumns() as $column)
 		{
 			// Each of the column types have their own compiler functions which are tasked
 			// with turning the column definition into its SQL format for this platform
