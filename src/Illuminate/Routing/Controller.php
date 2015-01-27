@@ -3,6 +3,7 @@
 use Closure;
 use BadMethodCallException;
 use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Controller {
 
@@ -243,6 +244,19 @@ abstract class Controller {
 	public function callAction($method, $parameters)
 	{
 		return call_user_func_array(array($this, $method), $parameters);
+	}
+
+	/**
+	 * Handle calls to missing methods on the controller.
+	 *
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+	 */
+	public function missingMethod($parameters = array())
+	{
+		throw new NotFoundHttpException("Controller method not found.");
 	}
 
 	/**
