@@ -130,7 +130,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @param  \DateTime|int  $minutes
-	 * @return void
+	 * @return mixed
 	 */
 	public function put($key, $value, $minutes)
 	{
@@ -142,6 +142,8 @@ class Repository implements CacheContract, ArrayAccess {
 
 			$this->fireCacheEvent('write', [$key, $value, $minutes]);
 		}
+
+		return $value;
 	}
 
 	/**
