@@ -75,7 +75,7 @@ class RedirectResponse extends BaseRedirectResponse {
 	/**
 	 * Add multiple cookies to the response.
 	 *
-	 * @param  array  $cookie
+	 * @param  array  $cookies
 	 * @return $this
 	 */
 	public function withCookies(array $cookies)
