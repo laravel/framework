@@ -22,14 +22,14 @@ class Listener {
 	/**
 	 * The amount of seconds to wait before polling the queue.
 	 *
-	 * @var  int
+	 * @var int
 	 */
 	protected $sleep = 3;
 
 	/**
 	 * The amount of times to try a job before logging it failed.
 	 *
-	 * @var  int
+	 * @var int
 	 */
 	protected $maxTries = 0;
 

@@ -14,7 +14,7 @@ class Artisan {
 	/**
 	 * The Artisan console instance.
 	 *
-	 * @var  \Illuminate\Console\Application
+	 * @var \Illuminate\Console\Application
 	 */
 	protected $artisan;
 
