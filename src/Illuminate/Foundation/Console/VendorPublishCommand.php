@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use FilesystemIterator;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
@@ -92,16 +93,14 @@ class VendorPublishCommand extends Command {
 	 */
 	protected function publishDirectory($from, $to)
 	{
-		if ($this->files->isDirectory($to))
+		$items = new FilesystemIterator($from);
+
+		foreach ($items as $item)
 		{
-			return;
+			$method = $item->isDir() ? 'publishDirectory' : 'publishFile';
+
+			$this->{$method}($item->getPathname(), $to.'/'.$item->getBasename());
 		}
-
-		$this->createParentDirectory($to);
-
-		$this->files->copyDirectory($from, $to);
-
-		$this->status($from, $to, 'Directory');
 	}
 
 	/**
