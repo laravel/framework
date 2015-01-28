@@ -23,6 +23,7 @@ use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
+use Illuminate\Foundation\Console\VendorAssetsCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\HandlerCommandCommand;
 
@@ -64,6 +65,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'Serve' => 'command.serve',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
+		'VendorAssets' => 'command.vendor.assets',
 		'VendorPublish' => 'command.vendor.publish',
 	];
 
@@ -380,6 +382,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.up', function()
 		{
 			return new UpCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerVendorAssetsCommand()
+	{
+		$this->app->singleton('command.vendor.assets', function($app)
+		{
+			return new VendorAssetsCommand($app['Symfony\Component\Filesystem\Filesystem']);
 		});
 	}
 

@@ -31,6 +31,13 @@ abstract class ServiceProvider {
 	 * @var array
 	 */
 	protected static $publishGroups = [];
+    
+	/**
+	 * The assets that should be published.
+	 *
+	 * @var array
+	 */
+	protected static $assets = [];
 
 	/**
 	 * Create a new service provider instance.
@@ -144,6 +151,27 @@ abstract class ServiceProvider {
 		}
 
 		return $paths;
+	}
+
+	/**
+	 * Register paths to be published by the publish command.
+	 *
+	 * @param  array  $paths
+	 * @return void
+	 */
+	protected function assets(array $paths)
+	{
+		static::$assets = array_merge(static::$assets, $paths);
+	}
+
+	/**
+	 * Get the paths to publish.
+	 *
+	 * @return array
+	 */
+	public static function assetsToPublish()
+	{
+		return static::$assets;
 	}
 
 	/**
