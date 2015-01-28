@@ -79,6 +79,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $deferredServices = array();
 
 	/**
+	 * The custom storage path defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $storagePath;
+
+	/**
 	 * The environment file to load during bootstrapping.
 	 *
 	 * @var string
@@ -261,7 +268,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function storagePath()
 	{
-		return $this->basePath.'/storage';
+		return $this->storagePath ?: $this->basePath.'/storage';
+	}
+
+	/**
+	 * Set the storage directory.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function useStoragePath($path)
+	{
+		$this->storagePath = $path;
+
+		$this->instance('path.storage', $path);
+
+		return $this;
 	}
 
 	/**
