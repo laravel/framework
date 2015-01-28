@@ -550,7 +550,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testGetForeignKey()
 	{
 		$model = new EloquentModelStub;
-		$this->assertEquals('stub', $model->getForeignKey());
+		$this->assertEquals('stub_id', $model->getForeignKey());
 	}
 
 
@@ -761,7 +761,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
 		$relation = $model->hasOne('EloquentModelSaveStub');
-		$this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getForeignKey());
+		$this->assertEquals('save_stub.stub_id', $relation->getForeignKey());
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
@@ -788,7 +788,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
 		$relation = $model->hasMany('EloquentModelSaveStub');
-		$this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getForeignKey());
+		$this->assertEquals('save_stub.stub_id', $relation->getForeignKey());
 
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
@@ -842,8 +842,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$this->addMockConnection($model);
 		$relation = $model->belongsToMany('EloquentModelSaveStub');
-		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getForeignKey());
-		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getOtherKey());
+		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.stub_id', $relation->getForeignKey());
+		$this->assertEquals('eloquent_model_save_stub_eloquent_model_stub.save_stub_id', $relation->getOtherKey());
 		$this->assertSame($model, $relation->getParent());
 		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
 		$this->assertEquals(__FUNCTION__, $relation->getRelationName());
