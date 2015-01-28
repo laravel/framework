@@ -489,6 +489,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testKeyByClosure()
+	{
+		$data   = new Collection([
+			['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+			['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR']
+		]);
+		$result = $data->keyBy(function ($item)
+		{
+			return strtolower($item['firstname'].$item['lastname']);
+		});
+		$this->assertEquals([
+			'taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+			'lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR']
+		], $result->all());
+	}
+
+
 	public function testContains()
 	{
 		$c = new Collection([1, 3, 5]);
