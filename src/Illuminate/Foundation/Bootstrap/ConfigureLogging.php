@@ -97,7 +97,7 @@ class ConfigureLogging {
 	 * @param  \Illuminate\Log\Writer  $log
 	 * @return void
 	 */
-	protected function configureStdoutHandler(Application $app, Writer $log)
+	protected function configureErrorlogHandler(Application $app, Writer $log)
 	{
 		$log->useErrorLog();
 	}
