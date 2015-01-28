@@ -547,6 +547,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $model->getTable());
 	}
 
+	public function testGetForeignKey()
+	{
+		$model = new EloquentModelStub;
+		$this->assertEquals('stub', $model->getForeignKey());
+	}
+
 
 	public function testGetKeyReturnsValueOfPrimaryKey()
 	{
