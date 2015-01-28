@@ -1370,12 +1370,7 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
-		if ($this->useWritePdo)
-		{
-			return $this->connection->select($this->toSql(), $this->getBindings(), false);
-		}
-
-		return $this->connection->select($this->toSql(), $this->getBindings());
+		return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
 	}
 
 	/**
