@@ -28,9 +28,7 @@ class TinkerCommand extends Command {
 	{
 		$this->getApplication()->setCatchExceptions(false);
 
-		$shell = new Shell();
-
-		$shell->run();
+		(new Shell)->run();
 	}
 
 }
