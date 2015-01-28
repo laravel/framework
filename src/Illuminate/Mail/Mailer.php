@@ -265,7 +265,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	{
 		if (str_contains($data['callback'], 'SerializableClosure'))
 		{
-			return unserialize($data['callback']);
+			return unserialize($data['callback'])->getClosure();
 		}
 
 		return $data['callback'];
