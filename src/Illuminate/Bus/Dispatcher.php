@@ -2,10 +2,9 @@
 
 use Closure;
 use ArrayAccess;
-use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
-use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
 use ReflectionParameter;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -14,6 +13,7 @@ use Illuminate\Contracts\Bus\HandlerResolver;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver {
 
@@ -46,14 +46,14 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	protected $mapper;
 
 	/**
-	 * The pipeline
+	 * The pipeline implementation.
 	 *
 	 * @var Pipeline
 	 */
 	protected $pipeline;
 
 	/**
-	 * The pipes which the pipeline will send commands through
+	 * The pipes which the pipeline will send commands through.
 	 *
 	 * @var array
 	 */
@@ -63,15 +63,15 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Create a new command dispatcher instance.
 	 *
 	 * @param  \Illuminate\Contracts\Container\Container  $container
-	 * @param  \Closure|null $queueResolver
 	 * @param  \Illuminate\Contracts\Pipeline\Pipeline|null  $pipeline
+	 * @param  \Closure|null $queueResolver
 	 * @return void
 	 */
-	public function __construct(Container $container, Closure $queueResolver = null, PipelineContract $pipeline = null)
+	public function __construct(Container $container, PipelineContract $pipeline, Closure $queueResolver = null)
 	{
 		$this->container = $container;
 		$this->queueResolver = $queueResolver;
-		$this->pipeline = $pipeline ?: new Pipeline($container);
+		$this->pipeline = $pipeline;
 	}
 
 	/**
@@ -383,9 +383,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Set the pipes which the pipeline will use when dispatching commands
+	 * Set the pipes which the pipeline will use when dispatching commands.
 	 *
-	 * @param array $pipes
+	 * @param  array  $pipes
 	 * @return void
 	 */
 	public function setPipes(array $pipes)
