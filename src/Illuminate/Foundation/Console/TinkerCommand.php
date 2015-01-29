@@ -9,6 +9,10 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class TinkerCommand extends Command {
 
+	private static $commandWhitelist = [
+		'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'optimize', 'up',
+	];
+
 	/**
 	 * The console command name.
 	 *
@@ -38,6 +42,7 @@ class TinkerCommand extends Command {
 		$pm->addPresenters($this->getPresenters());
 
 		$shell = new Shell($config);
+		$shell->addCommands($this->getCommands());
 		$shell->setIncludes($this->argument('include'));
 
 		$shell->run();
@@ -55,6 +60,24 @@ class TinkerCommand extends Command {
 		];
 	}
 
+	/**
+	 * Get artisan commands to pass through to PsySH.
+	 *
+	 * @return array
+	 */
+	protected function getCommands()
+	{
+		$app = $this->getApplication();
+		$commands = [];
+
+		foreach ($app->all() as $name => $command) {
+			if (in_array($name, self::$commandWhitelist)) {
+				$commands[] = $command;
+			}
+		}
+
+		return $commands;
+	}
 
 	/**
 	 * Get an array of Laravel-specific Presenters.
