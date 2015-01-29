@@ -148,13 +148,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  string  $key
 	 * @param  mixed  $value
+	 * @param  bool  $strict
 	 * @return static
 	 */
-	public function where($key, $value)
+	public function where($key, $value, $strict = false)
 	{
-		return $this->filter(function($item) use ($key, $value)
+		return $this->filter(function($item) use ($key, $value, $strict)
 		{
-			return data_get($item, $key) == $value;
+			$data = data_get($item, $key);
+
+			return $strict ? $data === $value : $data == $value;
 		});
 	}
 
