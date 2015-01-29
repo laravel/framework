@@ -63,15 +63,15 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Create a new command dispatcher instance.
 	 *
 	 * @param  \Illuminate\Contracts\Container\Container  $container
-	 * @param  \Illuminate\Contracts\Pipeline\Pipeline|null  $pipeline
+	 * @param  \Illuminate\Contracts\Pipeline\Pipeline  $pipeline
 	 * @param  \Closure|null $queueResolver
 	 * @return void
 	 */
 	public function __construct(Container $container, PipelineContract $pipeline, Closure $queueResolver = null)
 	{
 		$this->container = $container;
-		$this->queueResolver = $queueResolver;
 		$this->pipeline = $pipeline;
+		$this->queueResolver = $queueResolver;
 	}
 
 	/**
