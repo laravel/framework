@@ -35,7 +35,8 @@ class TinkerCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->getApplication()->setCatchExceptions(false);
+		$app = $this->getApplication();
+		$app->setCatchExceptions(false);
 
 		$config = new Configuration();
 
@@ -45,6 +46,9 @@ class TinkerCommand extends Command {
 		$shell = new Shell($config);
 		$shell->addCommands($this->getCommands());
 		$shell->setIncludes($this->argument('include'));
+		$shell->setScopeVariables([
+			'app' => $app->getLaravel(),
+		]);
 
 		$shell->run();
 	}
