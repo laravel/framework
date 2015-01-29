@@ -46,11 +46,11 @@ abstract class ServiceProvider {
 	/**
 	 * Merge the given configuration with the existing configuration.
 	 *
-	 * @param  string  $key
 	 * @param  string  $path
+	 * @param  string  $key
 	 * @return void
 	 */
-	protected function mergeConfigFrom($key, $path)
+	protected function mergeConfigFrom($path, $key)
 	{
 		$config = $this->app['config']->get($key, []);
 
@@ -60,11 +60,11 @@ abstract class ServiceProvider {
 	/**
 	 * Register a view file namespace.
 	 *
-	 * @param  string  $namespace
 	 * @param  string  $path
+	 * @param  string  $namespace
 	 * @return void
 	 */
-	protected function loadViewsFrom($namespace, $path)
+	protected function loadViewsFrom($path, $namespace)
 	{
 		if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace))
 		{
@@ -77,11 +77,11 @@ abstract class ServiceProvider {
 	/**
 	 * Register a translation file namespace.
 	 *
-	 * @param  string  $namespace
 	 * @param  string  $path
+	 * @param  string  $namespace
 	 * @return void
 	 */
-	protected function loadTranslationsFrom($namespace, $path)
+	protected function loadTranslationsFrom($path, $namespace)
 	{
 		$this->app['translator']->addNamespace($namespace, $path);
 	}
