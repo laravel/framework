@@ -91,5 +91,4 @@ interface Application extends Container {
         public function bootstrapWith($bootstrappers);
      
         
-
 }
