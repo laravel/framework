@@ -2,8 +2,11 @@
 
 use FilesystemIterator;
 use Illuminate\Console\Command;
+use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\Filesystem as Flysystem;
+use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class VendorPublishCommand extends Command {
 
@@ -93,13 +96,17 @@ class VendorPublishCommand extends Command {
 	 */
 	protected function publishDirectory($from, $to)
 	{
-		$items = new FilesystemIterator($from);
+		$manager = new MountManager([
+			'from' => new Flysystem(new LocalAdapter($from)),
+			'to' => new Flysystem(new LocalAdapter($to)),
+		]);
 
-		foreach ($items as $item)
+		foreach ($manager->listContents('from://') as $file)
 		{
-			$method = $item->isDir() ? 'publishDirectory' : 'publishFile';
-
-			$this->{$method}($item->getPathname(), $to.'/'.$item->getBasename());
+			if ($file['type'] === 'file' && ! $manager->has('to://'.$file['path']))
+			{
+				$manager->copy('from://'.$file['path'], 'to://'.$file['path']);
+			}
 		}
 	}
 
