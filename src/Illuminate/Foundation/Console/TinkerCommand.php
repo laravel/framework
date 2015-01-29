@@ -1,16 +1,21 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Foundation\Console\Tinker\Presenters\EloquentCollectionPresenter;
-use Illuminate\Foundation\Console\Tinker\Presenters\EloquentModelPresenter;
-use Illuminate\Foundation\Console\Tinker\Presenters\IlluminateApplicationPresenter;
-use Psy\Configuration;
 use Psy\Shell;
+use Psy\Configuration;
+use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Console\Tinker\Presenters\EloquentModelPresenter;
+use Illuminate\Foundation\Console\Tinker\Presenters\EloquentCollectionPresenter;
+use Illuminate\Foundation\Console\Tinker\Presenters\IlluminateApplicationPresenter;
 
 class TinkerCommand extends Command {
 
-	private static $commandWhitelist = [
+	/**
+	 * artisan commands to include in the tinker shell.
+	 *
+	 * @var array
+	 */
+	protected static $commandWhitelist = [
 		'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'optimize', 'up',
 	];
 
@@ -72,13 +77,11 @@ class TinkerCommand extends Command {
 	 */
 	protected function getCommands()
 	{
-		$app = $this->getApplication();
 		$commands = [];
 
-		foreach ($app->all() as $name => $command) {
-			if (in_array($name, self::$commandWhitelist)) {
-				$commands[] = $command;
-			}
+		foreach ($this->getApplication()->all() as $name => $command)
+		{
+			if (in_array($name, self::$commandWhitelist)) $commands[] = $command;
 		}
 
 		return $commands;
