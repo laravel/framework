@@ -12,7 +12,7 @@
         "php": ">=5.4.0",
         "illuminate/contracts": "5.1.*",
         "illuminate/support": "5.1.*",
-        "symfony/finder": "2.6.*",
+        "symfony/finder": "2.7.*",
         "league/flysystem": "~1.0"
     },
     "autoload": {

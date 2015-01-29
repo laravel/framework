@@ -15,7 +15,7 @@
         "illuminate/container": "5.1.*",
         "illuminate/http": "5.1.*",
         "illuminate/support": "5.1.*",
-        "symfony/process": "2.6.*",
+        "symfony/process": "2.7.*",
         "nesbot/carbon": "~1.0"
     },
     "autoload": {
