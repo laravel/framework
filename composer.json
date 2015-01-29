@@ -25,16 +25,16 @@
         "nesbot/carbon": "~1.0",
         "psy/psysh": "0.3.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "2.6.*",
-        "symfony/debug": "2.6.*",
-        "symfony/finder": "2.6.*",
-        "symfony/http-foundation": "2.6.*",
-        "symfony/http-kernel": "2.6.*",
-        "symfony/process": "2.6.*",
-        "symfony/routing": "2.6.*",
-        "symfony/security-core": "2.6.*",
-        "symfony/translation": "2.6.*",
-        "symfony/var-dumper": "2.6.*",
+        "symfony/console": "2.7.*",
+        "symfony/debug": "2.7.*",
+        "symfony/finder": "2.7.*",
+        "symfony/http-foundation": "2.7.*",
+        "symfony/http-kernel": "2.7.*",
+        "symfony/process": "2.7.*",
+        "symfony/routing": "2.7.*",
+        "symfony/security-core": "2.7.*",
+        "symfony/translation": "2.7.*",
+        "symfony/var-dumper": "2.7.*",
         "vlucas/phpdotenv": "~1.0"
     },
     "replace": {
@@ -89,7 +89,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {

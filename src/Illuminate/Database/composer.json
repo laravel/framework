@@ -11,9 +11,9 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/container": "5.0.*",
-        "illuminate/contracts": "5.0.*",
-        "illuminate/support": "5.0.*",
+        "illuminate/container": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/support": "5.1.*",
         "nesbot/carbon": "~1.0"
     },
     "autoload": {
@@ -23,13 +23,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
-        "illuminate/console": "Required to use the database commands (5.0.*).",
-        "illuminate/filesystem": "Required to use the migrations (5.0.*)."
+        "illuminate/console": "Required to use the database commands (5.1.*).",
+        "illuminate/filesystem": "Required to use the migrations (5.1.*)."
     },
     "minimum-stability": "dev"
 }
