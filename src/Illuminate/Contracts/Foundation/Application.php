@@ -88,7 +88,7 @@ interface Application extends Container {
          * @param  array  $bootstrappers
 	 * @return void
          */
-        public function bootstrapWith();
+        public function bootstrapWith($bootstrappers);
      
         
 
