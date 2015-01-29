@@ -36,7 +36,7 @@ interface Queue {
 	/**
 	 * Push a new job onto the queue.
 	 *
-	 * @param  stirng  $queue
+	 * @param  string  $queue
 	 * @param  string  $job
 	 * @param  mixed   $data
 	 * @return mixed
