@@ -329,6 +329,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->make('ContainerMixedPrimitiveStub', $parameters);
 	}
 
+
+	public function testUnsetAffectsResolved()
+	{
+		$container = new Container;
+		$container->make('ContainerConcreteStub');
+
+		unset($container['ContainerConcreteStub']);
+		$this->assertFalse($container->resolved('ContainerConcreteStub'));
+	}
+
 }
 
 class ContainerConcreteStub {}
