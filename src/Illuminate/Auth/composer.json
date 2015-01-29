@@ -10,10 +10,10 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/contracts": "5.0.*",
-        "illuminate/http": "5.0.*",
-        "illuminate/session": "5.0.*",
-        "illuminate/support": "5.0.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/http": "5.1.*",
+        "illuminate/session": "5.1.*",
+        "illuminate/support": "5.1.*",
         "nesbot/carbon": "~1.0"
     },
     "autoload": {
@@ -23,11 +23,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the auth:clear-resets command (5.0.*)."
+        "illuminate/console": "Required to use the auth:clear-resets command (5.1.*)."
     },
     "minimum-stability": "dev"
 }

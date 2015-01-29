@@ -10,11 +10,11 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/console": "5.0.*",
-        "illuminate/contracts": "5.0.*",
-        "illuminate/container": "5.0.*",
-        "illuminate/http": "5.0.*",
-        "illuminate/support": "5.0.*",
+        "illuminate/console": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/container": "5.1.*",
+        "illuminate/http": "5.1.*",
+        "illuminate/support": "5.1.*",
         "symfony/process": "2.6.*",
         "nesbot/carbon": "~1.0"
     },
@@ -28,12 +28,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver (~2.4).",
-        "illuminate/redis": "Required to use the redis queue driver (5.0.*).",
+        "illuminate/redis": "Required to use the redis queue driver (5.1.*).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~1.5).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0)."
     },
