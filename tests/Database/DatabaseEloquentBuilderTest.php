@@ -504,7 +504,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($builder, $result);
 	}
 
-	
+
 	public function testHasNested()
 	{
 		$model = new EloquentBuilderTestModelParentStub;
