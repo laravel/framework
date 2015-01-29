@@ -107,6 +107,25 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$result = $instance->dispatchFromArray('BusDispatcherTestArgumentMapping', ['flag' => false, 'emptyString' => '']);
 		$this->assertTrue($result);
 	}
+
+
+	public function testDispatchingSentThroughPipes()
+	{
+		$container = new Container;
+
+		$pipeDispatcher = m::mock('BusDispatcherPipelineDispatcher');
+		$pipeDispatcher->shouldReceive('dispatch')->once();
+		$container->instance('BusDispatcherPipelineDispatcher', $pipeDispatcher);
+
+		$handler = m::mock('StdClass')->shouldIgnoreMissing();
+		$container->instance('Handler', $handler);
+
+		$dispatcher = new Dispatcher($container);
+		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
+		$dispatcher->setPipes(['BusDispatcherPipelineDispatcher']);
+		$dispatcher->dispatch(new BusDispatcherTestBasicCommand);
+	}
+
 }
 
 class BusDispatcherTestBasicCommand {
@@ -157,3 +176,9 @@ class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\
 		$queue->push($command);
 	}
 }
+
+
+class BusDispatcherPipelineDispatcher {
+	public function dispatch($command) {}
+}
+
