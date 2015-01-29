@@ -4,6 +4,7 @@ use Closure;
 use ArrayAccess;
 use ReflectionClass;
 use ReflectionParameter;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Bus\HandlerResolver;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver {
 
@@ -44,15 +46,31 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	protected $mapper;
 
 	/**
+	 * The pipeline implementation.
+	 *
+	 * @var Pipeline
+	 */
+	protected $pipeline;
+
+	/**
+	 * The pipes which the pipeline will send commands through.
+	 *
+	 * @var array
+	 */
+	protected $pipes = [];
+
+	/**
 	 * Create a new command dispatcher instance.
 	 *
 	 * @param  \Illuminate\Contracts\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Pipeline\Pipeline  $pipeline
 	 * @param  \Closure|null $queueResolver
 	 * @return void
 	 */
-	public function __construct(Container $container, Closure $queueResolver = null)
+	public function __construct(Container $container, PipelineContract $pipeline, Closure $queueResolver = null)
 	{
 		$this->container = $container;
+		$this->pipeline = $pipeline;
 		$this->queueResolver = $queueResolver;
 	}
 
@@ -160,6 +178,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	{
 		if ($this->queueResolver && $this->commandShouldBeQueued($command))
 		{
+			$this->dispatchThroughPipeline($command);
 			return $this->dispatchToQueue($command);
 		}
 		else
@@ -178,16 +197,24 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	public function dispatchNow($command, Closure $afterResolving = null)
 	{
 		if ($command instanceof SelfHandling)
-			return $this->container->call([$command, 'handle']);
-
-		$handler = $this->resolveHandler($command);
+		{
+			$handler = $command;
+		}
+		else
+		{
+			$handler = $this->resolveHandler($command);
+		}
 
 		if ($afterResolving)
 			call_user_func($afterResolving, $handler);
 
-		return call_user_func(
-			[$handler, $this->getHandlerMethod($command)], $command
-		);
+		$handle = function ($command) use ($handler) {
+			return call_user_func(
+				[$handler, $this->getHandlerMethod($command)], $command
+			);
+		};
+
+		return $this->dispatchThroughPipeline($command, $handle);
 	}
 
 	/**
@@ -353,6 +380,33 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		$command = str_replace($commandNamespace, '', get_class($command));
 
 		return $handlerNamespace.'\\'.trim($command, '\\').'Handler@handle';
+	}
+
+	/**
+	 * Set the pipes which the pipeline will use when dispatching commands.
+	 *
+	 * @param  array  $pipes
+	 * @return void
+	 */
+	public function setPipes(array $pipes)
+	{
+		$this->pipes = $pipes;
+	}
+
+	/**
+	 * Dispatch the command through the pipeline
+	 *
+	 * @param  mixed  $command
+	 * @param  Closure|null  $after
+	 * @return mixed
+	 */
+	protected function dispatchThroughPipeline($command, \Closure $after = null)
+	{
+		$result = $this->pipeline->send($command)
+			->through($this->pipes)
+			->via('dispatch');
+
+		return $after ? $result->then($after) : $result;
 	}
 
 }

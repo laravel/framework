@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Pipeline\Pipeline;
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
@@ -15,10 +16,11 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testBasicDispatchingOfCommandsToHandlers()
 	{
 		$container = new Container;
+		$pipeline = new Pipeline($container);
 		$handler = m::mock('StdClass');
 		$handler->shouldReceive('handle')->once()->andReturn('foo');
 		$container->instance('Handler', $handler);
-		$dispatcher = new Dispatcher($container);
+		$dispatcher = new Dispatcher($container, $pipeline);
 		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
 
 		$result = $dispatcher->dispatch(new BusDispatcherTestBasicCommand);
@@ -29,7 +31,8 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testCommandsThatShouldBeQueuedAreQueued()
 	{
 		$container = new Container;
-		$dispatcher = new Dispatcher($container, function() {
+		$pipeline = new Pipeline($container);
+		$dispatcher = new Dispatcher($container, $pipeline, function() {
 			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
 			$mock->shouldReceive('push')->once();
 			return $mock;
@@ -42,7 +45,8 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomHandler()
 	{
 		$container = new Container;
-		$dispatcher = new Dispatcher($container, function() {
+		$pipeline = new Pipeline($container);
+		$dispatcher = new Dispatcher($container, $pipeline, function() {
 			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
 			$mock->shouldReceive('push')->once();
 			return $mock;
@@ -55,7 +59,8 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testHandlersThatShouldBeQueuedAreQueued()
 	{
 		$container = new Container;
-		$dispatcher = new Dispatcher($container, function() {
+		$pipeline = new Pipeline($container);
+		$dispatcher = new Dispatcher($container, $pipeline, function() {
 			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
 			$mock->shouldReceive('push')->once();
 			return $mock;
@@ -69,10 +74,11 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testDispatchNowShouldNeverQueue()
 	{
 		$container = new Container;
+		$pipeline = new Pipeline($container);
 		$handler = m::mock('StdClass');
 		$handler->shouldReceive('handle')->once()->andReturn('foo');
 		$container->instance('Handler', $handler);
-		$dispatcher = new Dispatcher($container);
+		$dispatcher = new Dispatcher($container, $pipeline);
 		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
 
 		$result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
@@ -83,10 +89,11 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testDispatchShouldCallAfterResolvingIfCommandNotQueued()
 	{
 		$container = new Container;
+		$pipeline = new Pipeline($container);
 		$handler = m::mock('StdClass')->shouldIgnoreMissing();
 		$handler->shouldReceive('after')->once();
 		$container->instance('Handler', $handler);
-		$dispatcher = new Dispatcher($container);
+		$dispatcher = new Dispatcher($container, $pipeline);
 		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
 
 		$dispatcher->dispatch(new BusDispatcherTestBasicCommand, function($handler) { $handler->after(); });
@@ -95,7 +102,9 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testDispatchingFromArray()
 	{
-		$instance = new Dispatcher(new Container);
+		$container = new Container();
+		$pipeline = new Pipeline($container);
+		$instance = new Dispatcher($container, $pipeline);
 		$result = $instance->dispatchFromArray('BusDispatcherTestSelfHandlingCommand', ['firstName' => 'taylor', 'lastName' => 'otwell']);
 		$this->assertEquals('taylor otwell', $result);
 	}
@@ -103,10 +112,32 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testMarshallArguments()
 	{
-		$instance = new Dispatcher(new Container);
+		$container = new Container();
+		$pipeline = new Pipeline($container);
+		$instance = new Dispatcher($container, $pipeline);
 		$result = $instance->dispatchFromArray('BusDispatcherTestArgumentMapping', ['flag' => false, 'emptyString' => '']);
 		$this->assertTrue($result);
 	}
+
+
+	public function testDispatchingSentThroughPipes()
+	{
+		$container = new Container();
+		$pipeline = new Pipeline($container);
+
+		$pipeDispatcher = m::mock('BusDispatcherPipelineDispatcher');
+		$pipeDispatcher->shouldReceive('dispatch')->once();
+		$container->instance('BusDispatcherPipelineDispatcher', $pipeDispatcher);
+
+		$handler = m::mock('StdClass')->shouldIgnoreMissing();
+		$container->instance('Handler', $handler);
+
+		$dispatcher = new Dispatcher($container, $pipeline);
+		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
+		$dispatcher->setPipes(['BusDispatcherPipelineDispatcher']);
+		$dispatcher->dispatch(new BusDispatcherTestBasicCommand);
+	}
+
 }
 
 class BusDispatcherTestBasicCommand {
@@ -157,3 +188,9 @@ class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\
 		$queue->push($command);
 	}
 }
+
+
+class BusDispatcherPipelineDispatcher {
+	public function dispatch($command) {}
+}
+
