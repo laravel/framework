@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
 
 if ( ! function_exists('append_config'))
@@ -355,6 +356,20 @@ if ( ! function_exists('class_uses_recursive'))
 		}
 
 		return array_unique($results);
+	}
+}
+
+if ( ! function_exists('collect'))
+{
+	/**
+	 * Create a collection from the given value.
+	 *
+	 * @param  mixed  $value
+	 * @return \Illuminate\Support\Collection
+	 */
+	function collect($value = null)
+	{
+		return new Collection($value);
 	}
 }
 
