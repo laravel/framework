@@ -3,6 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Console\Tinker\Presenters\EloquentCollectionPresenter;
 use Illuminate\Foundation\Console\Tinker\Presenters\EloquentModelPresenter;
+use Illuminate\Foundation\Console\Tinker\Presenters\IlluminateApplicationPresenter;
 use Psy\Configuration;
 use Psy\Shell;
 use Symfony\Component\Console\Input\InputArgument;
@@ -89,6 +90,7 @@ class TinkerCommand extends Command {
 		return [
 			new EloquentModelPresenter(),
 			new EloquentCollectionPresenter(),
+			new IlluminateApplicationPresenter(),
 		];
 	}
 }
