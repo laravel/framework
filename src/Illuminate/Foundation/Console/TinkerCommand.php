@@ -1,7 +1,10 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Psy\Shell;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Console\Tinker\Presenters\EloquentCollectionPresenter;
+use Illuminate\Foundation\Console\Tinker\Presenters\EloquentModelPresenter;
+use Psy\Configuration;
+use Psy\Shell;
 use Symfony\Component\Console\Input\InputArgument;
 
 class TinkerCommand extends Command {
@@ -29,7 +32,12 @@ class TinkerCommand extends Command {
 	{
 		$this->getApplication()->setCatchExceptions(false);
 
-		$shell = new Shell();
+		$config = new Configuration();
+
+		$pm = $config->getPresenterManager();
+		$pm->addPresenters($this->getPresenters());
+
+		$shell = new Shell($config);
 		$shell->setIncludes($this->argument('include'));
 
 		$shell->run();
@@ -47,4 +55,17 @@ class TinkerCommand extends Command {
 		];
 	}
 
+
+	/**
+	 * Get an array of Laravel-specific Presenters.
+	 *
+	 * @return array
+	 */
+	protected function getPresenters()
+	{
+		return [
+			new EloquentModelPresenter(),
+			new EloquentCollectionPresenter(),
+		];
+	}
 }
