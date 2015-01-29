@@ -11,6 +11,7 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/contracts": "5.1.*",
+        "illuminate/pipeline": "5.1.*",
         "illuminate/support": "5.1.*"
     },
     "autoload": {
