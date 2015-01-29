@@ -588,7 +588,7 @@ class Builder {
 	 *
 	 * @param  string  $relations
 	 * @param  string  $operator
-	 * @param  integer $count
+	 * @param  int     $count
 	 * @param  string  $boolean
 	 * @param  \Closure  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static

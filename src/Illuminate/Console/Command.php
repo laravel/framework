@@ -90,7 +90,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
 	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return integer
+	 * @return int
 	 */
 	public function run(InputInterface $input, OutputInterface $output)
 	{
@@ -120,7 +120,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  string  $command
 	 * @param  array   $arguments
-	 * @return integer
+	 * @return int
 	 */
 	public function call($command, array $arguments = array())
 	{
@@ -136,7 +136,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 *
 	 * @param  string  $command
 	 * @param  array   $arguments
-	 * @return integer
+	 * @return int
 	 */
 	public function callSilent($command, array $arguments = array())
 	{
