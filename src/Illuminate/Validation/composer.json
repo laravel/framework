@@ -13,8 +13,8 @@
         "illuminate/container": "5.1.*",
         "illuminate/contracts": "5.1.*",
         "illuminate/support": "5.1.*",
-        "symfony/http-foundation": "2.6.*",
-        "symfony/translation": "2.6.*"
+        "symfony/http-foundation": "2.7.*",
+        "symfony/translation": "2.7.*"
     },
     "autoload": {
         "psr-4": {
