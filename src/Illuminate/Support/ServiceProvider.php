@@ -26,6 +26,13 @@ abstract class ServiceProvider {
 	protected static $publishes = [];
 
 	/**
+	 * The paths that should be published by group.
+	 *
+	 * @var array
+	 */
+	protected static $publishGroups = [];
+
+	/**
 	 * Create a new service provider instance.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -90,9 +97,10 @@ abstract class ServiceProvider {
 	 * Register paths to be published by the publish command.
 	 *
 	 * @param  array  $paths
+	 * @param  string  $group
 	 * @return void
 	 */
-	protected function publishes(array $paths)
+	protected function publishes(array $paths, $group = null)
 	{
 		$class = get_class($this);
 
@@ -102,30 +110,40 @@ abstract class ServiceProvider {
 		}
 
 		static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
+
+		if ($group)
+		{
+			static::$publishGroups[$group] = $paths;
+		}
 	}
 
 	/**
 	 * Get the paths to publish.
 	 *
 	 * @param  string  $provider
+	 * @param  string  $group
 	 * @return array
 	 */
-	public static function pathsToPublish($provider = null)
+	public static function pathsToPublish($provider = null, $group = null)
 	{
-		if (is_null($provider))
+		if ($group && array_key_exists($group, static::$publishGroups))
 		{
-			$paths = [];
-
-			foreach (static::$publishes as $class => $publish)
-			{
-				$paths = array_merge($paths, $publish);
-			}
-
-			return $paths;
+			return static::$publishGroups[$group];
 		}
 
-		return array_key_exists($provider, static::$publishes)
-							? static::$publishes[$provider] : [];
+		if ($provider && array_key_exists($provider, static::$publishes))
+		{
+			return static::$publishes[$provider];
+		}
+
+		$paths = [];
+
+		foreach (static::$publishes as $class => $publish)
+		{
+			$paths = array_merge($paths, $publish);
+		}
+
+		return $paths;
 	}
 
 	/**
