@@ -94,17 +94,38 @@ abstract class ServiceProvider {
 	 */
 	protected function publishes(array $paths)
 	{
-		static::$publishes = array_merge(static::$publishes, $paths);
+		$class = get_class($this);
+
+		if ( ! array_key_exists($class, static::$publishes))
+		{
+			static::$publishes[$class] = [];
+		}
+
+		static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 	}
 
 	/**
 	 * Get the paths to publish.
 	 *
+	 * @param  string  $provider
 	 * @return array
 	 */
-	public static function pathsToPublish()
+	public static function pathsToPublish($provider = null)
 	{
-		return static::$publishes;
+		if (is_null($provider))
+		{
+			$paths = [];
+
+			foreach (static::$publishes as $class => $publish)
+			{
+				$paths = array_merge($paths, $publish);
+			}
+
+			return $paths;
+		}
+
+		return array_key_exists($provider, static::$publishes)
+							? static::$publishes[$provider] : [];
 	}
 
 	/**
