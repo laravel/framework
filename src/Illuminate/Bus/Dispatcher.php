@@ -131,46 +131,22 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	protected function getParameterValueForCommand($command, ArrayAccess $source,
                                                    ReflectionParameter $parameter, array $extras = array())
 	{
-		$value = $this->extractValueFromExtras($parameter, $extras);
-		
-		if (is_null($value))
+		if (array_key_exists($parameter->name, $extras))
 		{
-			$value = $this->extractValueFromSource($source, $parameter);
-		}
-		elseif (is_null($value) && $parameter->isDefaultValueAvailable())
-		{
-			$value = $parameter->getDefaultValue();
-		}
-		elseif (is_null($value))
-		{
-			MarshalException::whileMapping($command, $parameter);
+			return $extras[$parameter->name];
 		}
 
-		return $value;
-	}
+		if (isset($source[$parameter->name]))
+		{
+			return $source[$parameter->name];
+		}
 
-	/**
-	 * Attempt to extract the given parameter out of the given array.
-	 *
-	 * @param  \ReflectionParameter  $parameter
-	 * @param  array  $extras
-	 * @return mixed
-	 */
-	protected function extractValueFromExtras(ReflectionParameter $parameter, array $extras)
-	{
-		return array_get($extras, $parameter->name);
-	}
+		if ($parameter->isDefaultValueAvailable())
+		{
+			return $parameter->getDefaultValue();
+		}
 
-	/**
-	 * Attempt to extract the given parameter out of the source.
-	 *
-	 * @param  \ArrayAccess  $source
-	 * @param  \ReflectionParameter  $parameter
-	 * @return mixed
-	 */
-	protected function extractValueFromSource(ArrayAccess $source, ReflectionParameter $parameter)
-	{
-		return array_get($source, $parameter->name);
+		MarshalException::whileMapping($command, $parameter);
 	}
 
 	/**
