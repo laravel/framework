@@ -2,6 +2,7 @@
 
 use Psy\Shell;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
 class TinkerCommand extends Command {
 
@@ -29,8 +30,21 @@ class TinkerCommand extends Command {
 		$this->getApplication()->setCatchExceptions(false);
 
 		$shell = new Shell();
+		$shell->setIncludes($this->argument('include'));
 
 		$shell->run();
+	}
+
+	/**
+	 * Get the console command arguments.
+	 *
+	 * @return array
+	 */
+	protected function getArguments()
+	{
+		return [
+			['include', InputArgument::IS_ARRAY, 'Include file(s) before starting tinker'],
+		];
 	}
 
 }
