@@ -58,7 +58,17 @@ class MigrateCommand extends BaseCommand {
 		// a database for real, which is helpful for double checking migrations.
 		$pretend = $this->input->getOption('pretend');
 
-		$path = $this->getMigrationPath();
+		// Next, we will check to see if a path option has been defined. If it has
+		// we will use the path relative to the root of this installation folder
+		// so that migrations may be run for any path within the applications.
+		if( ! is_null($path = $this->input->getOption('path')))
+		{
+			$path = $this->laravel['path.base'].'/'.$path;
+		}
+		else
+		{
+			$path = $this->getMigrationPath();
+		}
 
 		$this->migrator->run($path, $pretend);
 
@@ -105,6 +115,8 @@ class MigrateCommand extends BaseCommand {
 	{
 		return array(
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed. If not provided, it will use the default migrations path.'),
 
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
