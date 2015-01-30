@@ -29,7 +29,12 @@ class EloquentModelPresenter extends ObjectPresenter {
 	 */
 	public function getProperties($value, \ReflectionClass $class, $propertyFilter)
 	{
-		return $value->toArray();
+		$attributes = $value->getAttributes();
+		$visible = $value->getVisible();
+
+		if (count($visible) > 0) return array_intersect_key($attributes, array_flip($visible));
+
+		return array_diff_key($attributes, array_flip($value->getHidden()));
 	}
 
 }
