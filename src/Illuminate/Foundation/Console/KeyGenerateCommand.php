@@ -34,14 +34,13 @@ class KeyGenerateCommand extends Command {
 			return $this->line('<comment>'.$key.'</comment>');
 		}
 
-		foreach ([base_path('.env'), base_path('.env.example')] as $path)
+		$path = base_path('.env');
+
+		if (file_exists($path))
 		{
-			if (file_exists($path))
-			{
-				file_put_contents($path, str_replace(
-					$this->laravel['config']['app.key'], $key, file_get_contents($path)
-				));
-			}
+			file_put_contents($path, str_replace(
+				$this->laravel['config']['app.key'], $key, file_get_contents($path)
+			));
 		}
 
 		$this->laravel['config']['app.key'] = $key;
