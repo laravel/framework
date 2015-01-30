@@ -51,6 +51,15 @@ interface Repository {
 	public function add($key, $value, $minutes);
 
 	/**
+	 * Store an item in the cache indefinitely.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public function forever($key, $value);
+
+	/**
 	 * Get an item from the cache, or store the default value.
 	 *
 	 * @param  string  $key
