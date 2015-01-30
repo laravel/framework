@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Foundation\Console\Tinker\Presenters;
 
-use Psy\Presenter\ObjectPresenter;
+use Psy\Presenter\ArrayPresenter;
 use Illuminate\Database\Eloquent\Collection;
 
-class EloquentCollectionPresenter extends ObjectPresenter {
+class EloquentCollectionPresenter extends ArrayPresenter {
 
 	/**
 	 * EloquentCollectionPresenter can present Collections.
@@ -16,20 +16,26 @@ class EloquentCollectionPresenter extends ObjectPresenter {
 		return $value instanceof Collection;
 	}
 
-	/**
-	 * Get an array of Collection object properties.
-	 *
-	 * ReflectionProperty constants may be passed as $propertyFilter, and should
-	 * be used to toggle visibility of private and protected properties.
-	 *
+    /**
+     * Collections should be treated as ArrayObjects.
+     *
 	 * @param  object  $value
-	 * @param  \ReflectionClass  $class
-	 * @param  int  $propertyFilter
-	 * @return array
-	 */
-	public function getProperties($value, \ReflectionClass $class, $propertyFilter)
-	{
-		return $value->toArray();
-	}
+     * @return boolean
+     */
+    protected function isArrayObject($value)
+    {
+        return $value instanceof Collection;
+    }
+
+    /**
+     * Get an array of Collection values.
+     *
+	 * @param  object  $value
+     * @return array
+     */
+    protected function getArrayObjectValue($value)
+    {
+        return $value->all();
+    }
 
 }
