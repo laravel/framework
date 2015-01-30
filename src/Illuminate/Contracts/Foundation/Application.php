@@ -89,4 +89,5 @@ interface Application extends Container {
          * @return void
          */
         public function bootstrapWith($bootstrappers);
+        
 }
