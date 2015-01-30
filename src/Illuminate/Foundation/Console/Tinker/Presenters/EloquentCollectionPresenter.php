@@ -16,26 +16,26 @@ class EloquentCollectionPresenter extends ArrayPresenter {
 		return $value instanceof Collection;
 	}
 
-    /**
-     * Collections should be treated as ArrayObjects.
-     *
+	/**
+	 * Collections should be treated as ArrayObjects.
+	 *
 	 * @param  object  $value
-     * @return boolean
-     */
-    protected function isArrayObject($value)
-    {
-        return $value instanceof Collection;
-    }
+	 * @return boolean
+	 */
+	protected function isArrayObject($value)
+	{
+		return $value instanceof Collection;
+	}
 
-    /**
-     * Get an array of Collection values.
-     *
+	/**
+	 * Get an array of Collection values.
+	 *
 	 * @param  object  $value
-     * @return array
-     */
-    protected function getArrayObjectValue($value)
-    {
-        return $value->all();
-    }
+	 * @return array
+	 */
+	protected function getArrayObjectValue($value)
+	{
+		return $value->all();
+	}
 
 }
