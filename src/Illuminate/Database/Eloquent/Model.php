@@ -1720,6 +1720,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function touch()
 	{
+		if ( ! $this->timestamps) return false;
+
 		$this->updateTimestamps();
 
 		return $this->save();
