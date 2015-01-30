@@ -32,9 +32,35 @@ class EloquentModelPresenter extends ObjectPresenter {
 		$attributes = $value->getAttributes();
 		$visible = $value->getVisible();
 
-		if (count($visible) > 0) return array_intersect_key($attributes, array_flip($visible));
+		if (count($visible) === 0)
+		{
+			$visible = array_diff(array_keys($attributes), $value->getHidden());
+		}
 
-		return array_diff_key($attributes, array_flip($value->getHidden()));
+		if (!$this->showHidden($propertyFilter))
+		{
+			return array_intersect_key($attributes, array_flip($visible));
+		}
+
+		$properties = [];
+		foreach ($attributes as $key => $value)
+		{
+			if (!in_array($key, $visible)) $key = sprintf('<protected>%s</protected>', $key);
+			$properties[$key] = $value;
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Decide whether to show hidden properties, based on a ReflectionProperty filter.
+	 *
+	 * @param  int  $propertyFilter
+	 * @return bool
+	 */
+	protected function showHidden($propertyFilter)
+	{
+		return $propertyFilter & (\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
 	}
 
 }
