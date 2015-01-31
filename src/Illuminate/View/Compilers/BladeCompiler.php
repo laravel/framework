@@ -648,6 +648,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
+		if (starts_with($expression, "'."))
+		{
+			$view_name = substr($this->path, strrpos($this->path, '/'));
+
+			$view_path = str_replace($view_name, '',$this->path);
+			$view_path = substr($view_path, strpos($view_path, '/views/')+7);
+
+			$expression = "'" . str_replace('/', '.', $view_path) . substr($expression, 1);
+		}
+
 		return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 	}
 
