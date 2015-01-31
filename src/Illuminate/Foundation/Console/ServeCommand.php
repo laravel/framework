@@ -26,17 +26,17 @@ class ServeCommand extends Command {
 	 */
 	public function fire()
 	{
-		chdir($this->laravel->basePath());
+		chdir($this->laravel->publicPath());
 
 		$host = $this->input->getOption('host');
 
 		$port = $this->input->getOption('port');
 
-		$public = $this->laravel->publicPath();
+		$base = $this->laravel->basePath();
 
 		$this->info("Laravel development server started on http://{$host}:{$port}");
 
-		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
+		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} \"{$base}\"/server.php");
 	}
 
 	/**
