@@ -355,6 +355,15 @@ empty
 	}
 
 
+	public function testSamePathIncludesAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->setPath('/project/resources/views/pages/home.blade.php');
+		$this->assertEquals('<?php echo $__env->make(\'pages.partial\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(\'.partial\')'));
+		$this->assertEquals('<?php echo $__env->make(name(pages.partial), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(name(.partial))'));
+	}
+
+
 	public function testShowEachAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);

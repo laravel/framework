@@ -648,6 +648,20 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
+		preg_match("/(name)?[(|'](.*)[)|']/", $expression, $partial_name);
+
+		if (starts_with($partial_name[2], '.'))
+		{
+			$view_name = substr($this->path, strrpos($this->path, '/'));
+
+			$view_path = str_replace($view_name, '',$this->path);
+			$view_path = substr($view_path, strpos($view_path, '/views')+7);
+
+			$partial_path = str_replace('/', '.', $view_path) . $partial_name[2];
+
+			$expression = str_replace($partial_name[2], $partial_path, $partial_name[0]);
+		}
+
 		return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 	}
 
