@@ -274,20 +274,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
-	 * Key an associative array by a field.
+	 * Key an associative array by a field or using a closure.
 	 *
-	 * @param  string  $keyBy
+	 * @param  string|\Closure  $keyBy
 	 * @return static
 	 */
 	public function keyBy($keyBy)
 	{
+		if ( ! $keyBy instanceof Closure)
+		{
+			return $this->keyBy($this->valueRetriever($keyBy));
+		}
+
 		$results = [];
 
 		foreach ($this->items as $item)
 		{
-			$key = data_get($item, $keyBy);
-
-			$results[$key] = $item;
+			$results[$keyBy($item)] = $item;
 		}
 
 		return new static($results);
