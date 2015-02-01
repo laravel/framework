@@ -58,10 +58,12 @@ class VendorAssetsCommand extends Command {
 			$to = $targetDir . '/' . basename($package);
 			$this->files->remove($to);
 
+			$relativeFrom = $this->files->makePathRelative(realpath($from), $targetDir);
+
 			try
 			{
 				// Try to symlink, otherwise mirror
-				$this->files->symlink($from, $to, true);
+				$this->files->symlink($relativeFrom, $to, true);
 				if ( ! file_exists($to))
 				{
 					throw new IOException('Symbolic link is broken');
