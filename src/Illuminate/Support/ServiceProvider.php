@@ -136,6 +136,11 @@ abstract class ServiceProvider {
 			return static::$publishes[$provider];
 		}
 
+		if ($group || $provider)
+		{
+			return [];	
+		}
+
 		$paths = [];
 
 		foreach (static::$publishes as $class => $publish)
