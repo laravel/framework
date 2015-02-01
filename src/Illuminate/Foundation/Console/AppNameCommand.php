@@ -111,13 +111,11 @@ class AppNameCommand extends Command {
 	{
 		$search = [
 			'namespace '.$this->currentRoot.';',
-			'namespace '.$this->currentRoot.'\\',
 			$this->currentRoot.'\\',
 		];
 
 		$replace = [
 			'namespace '.$this->argument('name').';',
-			'namespace '.$this->argument('name').'\\',
 			$this->argument('name').'\\',
 		];
 
