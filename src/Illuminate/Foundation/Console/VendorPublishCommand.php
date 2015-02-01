@@ -8,6 +8,8 @@ use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
 use Symfony\Component\Console\Input\InputOption;
 use League\Flysystem\Adapter\Local as LocalAdapter;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class VendorPublishCommand extends Command {
 
@@ -64,7 +66,10 @@ class VendorPublishCommand extends Command {
 			}
 			elseif ($this->files->isDirectory($from))
 			{
-				$this->publishDirectory($from, $to);
+				if ( ! $this->option('symlink') || ! $this->symlinkDirectory($from, $to))
+				{
+					$this->publishDirectory($from, $to);
+				}
 			}
 		}
 
@@ -116,6 +121,43 @@ class VendorPublishCommand extends Command {
 	}
 
 	/**
+	 * Symlink the directory to the given directory.
+	 *
+	 * @param  string  $from
+	 * @param  string  $to
+	 * @return bool
+	 */
+	protected function symlinkDirectory($from, $to)
+	{
+		$filesystem = new SymfonyFilesystem();
+
+		$targetDir = realpath(dirname($to));
+		$relativeFrom = $filesystem->makePathRelative(realpath($from), $targetDir);
+
+		$filesystem->remove($to);
+
+		try
+		{
+			$filesystem->symlink($relativeFrom, $to);
+
+			if ( ! file_exists($to))
+			{
+				throw new IOException('Symbolic link is broken');
+			}
+
+			$to = str_replace(base_path(), '', $to);
+			$this->line('<info>Created symlink</info> <comment>['.$to.']</comment> <info>to</info> <comment>['.$relativeFrom.']</comment>');
+
+			return true;
+		}
+		catch (IOException $e)
+		{
+			$this->error("Cannot create symlink to '$to', copying directory instead.");
+			return false;
+		}
+	}
+
+	/**
 	 * Create the directory to house the published files if needed.
 	 *
 	 * @param  string  $directory
@@ -157,6 +199,8 @@ class VendorPublishCommand extends Command {
 			array('force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'),
 
 			array('provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'),
+
+			array('symlink', null, InputOption::VALUE_NONE, 'Symlink directories instead of copying.'),
 
 			array('tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'),
 		);
