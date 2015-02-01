@@ -56,6 +56,12 @@ class VendorPublishCommand extends Command {
 			$this->option('provider'), $this->option('tag')
 		);
 
+		if (empty($paths))
+		{
+			$this->error("There are no paths to publish");
+			return;
+		}
+
 		foreach ($paths as $from => $to)
 		{
 			if ($this->files->isFile($from))
