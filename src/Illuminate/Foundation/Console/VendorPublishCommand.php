@@ -66,6 +66,10 @@ class VendorPublishCommand extends Command {
 			{
 				$this->publishDirectory($from, $to);
 			}
+			else
+			{
+				$this->error("Cannot find path '$from'");
+			}
 		}
 
 		$this->info('Publishing Complete!');
@@ -113,6 +117,8 @@ class VendorPublishCommand extends Command {
 				$manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
 			}
 		}
+
+		$this->status($from, $to, 'Directory');
 	}
 
 	/**
