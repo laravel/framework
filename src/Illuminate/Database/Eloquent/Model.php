@@ -2571,6 +2571,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			return $this->getRelationshipFromMethod($key);
 		}
+
+		if( property_exists($this, $key))
+		{
+			return $this->$key;
+		}
 	}
 
 	/**
