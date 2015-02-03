@@ -20,7 +20,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '5.0-dev';
+	const VERSION = '5.0';
 
 	/**
 	 * The base path for the Laravel installation.
@@ -56,6 +56,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @var array
 	 */
 	protected $bootedCallbacks = array();
+
+	/**
+	 * The array of terminating callbacks.
+	 *
+	 * @var array
+	 */
+	protected $terminatingCallbacks = array();
 
 	/**
 	 * All of the registered service providers.
@@ -750,6 +757,32 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		}
 
 		throw new HttpException($code, $message, null, $headers);
+	}
+
+	/**
+	 * Register a terminating callback with the application.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function terminating(Closure $callback)
+	{
+		$this->terminatingCallbacks[] = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Terminate the application.
+	 *
+	 * @return void
+	 */
+	public function terminate()
+	{
+		foreach ($this->terminatingCallbacks as $terminating)
+		{
+			$this->call($terminating);
+		}
 	}
 
 	/**
