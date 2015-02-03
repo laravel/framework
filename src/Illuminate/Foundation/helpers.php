@@ -391,6 +391,25 @@ if ( ! function_exists('response'))
 	}
 }
 
+if ( ! function_exists('json'))
+{
+	/**
+	 * Return a new JSON response from the application.
+	 *
+	 * @param  string|array  $data
+	 * @param  int    $status
+	 * @param  array  $headers
+	 * @param  int    $options
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	function json($data = array(), $status = 200, array $headers = array(), $options = 0)
+	{
+		$factory = app('Illuminate\Contracts\Routing\ResponseFactory');
+
+		return $factory->json($data, $status, $headers, $options);
+	}
+}
+
 if ( ! function_exists('route'))
 {
 	/**
