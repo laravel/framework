@@ -485,8 +485,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testKeyByAttribute()
 	{
 		$data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
+
 		$result = $data->keyBy('rating');
 		$this->assertEquals([1 => ['rating' => 1, 'name' => '1'], 2 => ['rating' => 2, 'name' => '2'], 3 => ['rating' => 3, 'name' => '3']], $result->all());
+
+		$result = $data->keyBy(function($item){ return $item['rating'] * 2; });
+		$this->assertEquals([2 => ['rating' => 1, 'name' => '1'], 4 => ['rating' => 2, 'name' => '2'], 6 => ['rating' => 3, 'name' => '3']], $result->all());
 	}
 
 
