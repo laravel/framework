@@ -631,7 +631,7 @@ class Event {
 	 */
 	public function emailOutputTo($addresses)
 	{
-		if (is_null($this->output))
+		if (is_null($this->output) || $this->output == '/dev/null')
 		{
 			throw new LogicException("Must direct output to a file in order to e-mail results.");
 		}
