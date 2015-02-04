@@ -128,7 +128,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 */
 	public function response(array $errors)
 	{
-		if ($this->ajax())
+		if ($this->ajax() || $this->wantsJson())
 		{
 			return new JsonResponse($errors, 422);
 		}
