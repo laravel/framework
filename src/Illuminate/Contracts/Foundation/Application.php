@@ -16,7 +16,7 @@ interface Application extends Container {
 	 *
 	 * @return string
 	 */
-	public function basePath()
+	public function basePath();
 
 	/**
 	 * Get or check the current application environment.
