@@ -83,10 +83,8 @@ class AppNameCommand extends Command {
 		$this->info('Application namespace set!');
 
 		$this->composer->dumpAutoloads();
-		
-		$this->call('clear-compiled');
 
-		$this->call('optimize');
+		$this->call('clear-compiled');
 	}
 
 	/**
