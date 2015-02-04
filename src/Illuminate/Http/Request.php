@@ -271,6 +271,22 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	}
 
 	/**
+	 * Determine if the request contains a non-empty value for an input item matching a given pattern.
+	 *
+	 * @param  string  $pattern
+	 * @return bool
+	 */
+	public function hasRegex($pattern)
+	{
+		foreach ($this->all() as $key => $value)
+		{
+			if (! $this->isEmptyString($key) && preg_match($pattern, $key)) return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine if the given input key is an empty string for "has".
 	 *
 	 * @param  string  $key

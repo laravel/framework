@@ -171,6 +171,20 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasRegexMethod()
+	{
+		$request = Request::create('/', 'GET', array('name' => 'Taylor', 'foo' => 'bar'));
+		$this->assertFalse($request->hasRegex('/^utm_/'));
+		$this->assertTrue($request->hasRegex('/name/'));
+		$this->assertTrue($request->hasRegex('/^foo$/'));
+
+		$request = Request::create('/', 'GET', array('name' => '', 'utm_source' => 'laravel', 'foo' => null));
+		$this->assertTrue($request->hasRegex('/^utm_/'));
+		$this->assertFalse($request->hasRegex('/foo/'));
+		$this->assertFalse($request->hasRegex('/name/'));
+	}
+
+
 	public function testInputMethod()
 	{
 		$request = Request::create('/', 'GET', array('name' => 'Taylor'));
