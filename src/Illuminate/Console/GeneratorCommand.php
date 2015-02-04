@@ -83,6 +83,8 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function parseName($name)
 	{
+		$name = strtok($name, '@');
+		
 		$rootNamespace = $this->getAppNamespace();
 
 		if (starts_with($name, $rootNamespace))
