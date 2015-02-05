@@ -21,31 +21,65 @@ class KeyGenerateCommand extends Command {
 	protected $description = "Set the application key";
 
 	/**
+	 * The generated key
+	 *
+	 * @var string
+	 */
+	protected $newKey = '';
+
+	/**
+	 * The old application key
+	 *
+	 * @var string
+	 */
+	protected $oldKey = '';
+
+	/**
+	 * Files that will be replaced
+	 *
+	 * @var array
+	 */
+	protected $paths = [];
+
+	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		$key = $this->getRandomKey();
+		$this->paths = [
+			base_path('.env'),
+			base_path('config/app.php'),
+		];
+		$this->oldKey = $this->laravel['config']['app.key'];
+		$this->newKey = $this->getRandomKey();
 
 		if ($this->option('show'))
 		{
-			return $this->line('<comment>'.$key.'</comment>');
+			return $this->line('<comment>'.$this->newKey.'</comment>');
 		}
 
-		$path = base_path('.env');
+		$this->replaceKeyInPaths();
 
-		if (file_exists($path))
-		{
-			file_put_contents($path, str_replace(
-				$this->laravel['config']['app.key'], $key, file_get_contents($path)
-			));
+		$this->info("Application key [$this->newKey] set successfully.");
+	}
+
+	/**
+	 * Replace the key in given paths
+	 *
+	 * @return void
+	 */
+	protected function replaceKeyInPaths()
+	{
+		foreach($this->paths as $path) {
+			if (file_exists($path))
+			{
+				file_put_contents($path, str_replace(
+					$this->oldKey, $this->newKey, file_get_contents($path)
+				));
+			}
 		}
-
-		$this->laravel['config']['app.key'] = $key;
-
-		$this->info("Application key [$key] set successfully.");
 	}
 
 	/**
