@@ -150,6 +150,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCopy()
+	{
+		$c = new Collection(['foo' => 'bar', 'bar' => 'baz']);
+		$this->assertEquals(['foo' => 'baz', 'bar' => 'baz'], $c->copy('bar', 'foo')->all());
+	}
+
+
+	public function testMove()
+	{
+		$c = new Collection(['foo' => 'bar', 'bar' => 'baz']);
+		$this->assertEquals(['foo' => 'baz'], $c->move('bar', 'foo')->all());
+	}
+
+
 	public function testMergeArray()
 	{
 		$c = new Collection(array('name' => 'Hello'));
