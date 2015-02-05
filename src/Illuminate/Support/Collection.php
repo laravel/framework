@@ -161,6 +161,43 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Copy an item of the collection.
+	 *
+	 * @param  mixed  $from
+	 * @param  mixed  $to
+	 * @param  bool  $remove
+	 * @return static
+	 */
+	public function copy($from, $to, $remove = false)
+	{
+		$to = is_array($to) ? $to : [$to];
+
+		foreach ($to as $dest)
+		{
+			$this->items[$dest] = $this->items[$from];
+		}
+
+		if ($remove)
+		{
+			unset($this->items[$from]);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Move an item of the collection.
+	 *
+	 * @param  mixed  $from
+	 * @param  mixed  $to
+	 * @return static
+	 */
+	public function move($from, $to)
+	{
+		return $this->copy($from, $to, true);
+	}
+
+	/**
 	 * Filter items by the given key value pair using loose comparison.
 	 *
 	 * @param  string  $key
