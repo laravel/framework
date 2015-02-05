@@ -107,7 +107,7 @@ class AppNameCommand extends Command {
 	}
 
 	/**
-	 * Set the namespace on the files in the app directory.
+	 * Set the namespace on the files in the views directory.
 	 *
 	 * @return void
 	 */
