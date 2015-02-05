@@ -165,15 +165,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  mixed  $from
 	 * @param  mixed  $to
+	 * @param  bool  $remove
 	 * @return static
 	 */
-	public function copy($from, $to)
+	public function copy($from, $to, $remove = false)
 	{
 		$to = is_array($to) ? $to : [$to];
 
 		foreach ($to as $dest)
 		{
 			$this->items[$dest] = $this->items[$from];
+		}
+
+		if ($remove)
+		{
+			unset($this->items[$from]);
 		}
 
 		return $this;
@@ -188,16 +194,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function move($from, $to)
 	{
-		$to = is_array($to) ? $to : [$to];
-
-		foreach ($to as $dest)
-		{
-			$this->items[$dest] = $this->items[$from];
-		}
-
-		unset($this->items[$from]);
-
-		return $this;
+		return $this->copy($from, $to, true);
 	}
 
 	/**
