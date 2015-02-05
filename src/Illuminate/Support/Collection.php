@@ -169,7 +169,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function copy($from, $to)
 	{
-		$this->items[$to] = $this->items[$from];
+		$to = is_array($to) ? $to : [$to];
+
+		foreach ($to as $dest)
+		{
+			$this->items[$dest] = $this->items[$from];
+		}
 
 		return $this;
 	}
@@ -183,7 +188,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function move($from, $to)
 	{
-		$this->items[$to] = $this->items[$from];
+		$to = is_array($to) ? $to : [$to];
+
+		foreach ($to as $dest)
+		{
+			$this->items[$dest] = $this->items[$from];
+		}
+
 		unset($this->items[$from]);
 
 		return $this;
