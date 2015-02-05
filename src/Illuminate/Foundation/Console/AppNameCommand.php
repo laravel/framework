@@ -74,6 +74,8 @@ class AppNameCommand extends Command {
 
 		$this->setAppDirectoryNamespace();
 
+		$this->setViewsDirectoryNamespace();
+
 		$this->setConfigNamespaces();
 
 		$this->setComposerNamespace();
@@ -96,6 +98,23 @@ class AppNameCommand extends Command {
 	{
 		$files = Finder::create()
                             ->in($this->laravel['path'])
+                            ->name('*.php');
+
+		foreach ($files as $file)
+		{
+			$this->replaceNamespace($file->getRealPath());
+		}
+	}
+
+	/**
+	 * Set the namespace on the files in the app directory.
+	 *
+	 * @return void
+	 */
+	protected function setViewsDirectoryNamespace()
+	{
+		$files = Finder::create()
+                            ->in($this->getViewsPath())
                             ->name('*.php');
 
 		foreach ($files as $file)
@@ -238,6 +257,16 @@ class AppNameCommand extends Command {
 	protected function getUserClassPath()
 	{
 		return $this->laravel['path'].'/Core/User.php';
+	}
+
+	/**
+	 * Get the path to the resources/views directory.
+	 *
+	 * @return string
+	 */
+	protected function getViewsPath()
+	{
+		return $this->laravel['path.base'].'/resources/views';
 	}
 
 	/**
