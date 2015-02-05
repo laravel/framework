@@ -64,6 +64,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $dontFlash = ['password', 'password_confirmation'];
 
 	/**
+	 * The attribute names
+	 *
+	 * @var array
+	 */
+	protected $attributeNames = [];
+	
+	/**
 	 * Get the validator instance for the request.
 	 *
 	 * @return \Illuminate\Validation\Validator
@@ -78,7 +85,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		}
 
 		return $factory->make(
-			$this->all(), $this->container->call([$this, 'rules']), $this->messages()
+			$this->all(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributeNames
 		);
 	}
 
