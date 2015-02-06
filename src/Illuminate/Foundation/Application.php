@@ -905,6 +905,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		parent::flush();
 
 		$this->loadedProviders = [];
+        restore_exception_handler();
+        restore_error_handler();
 	}
 
 }
