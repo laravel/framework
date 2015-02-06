@@ -264,7 +264,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		foreach ($this->all() as $key => $value)
 		{
-			if (preg_match($pattern, $key) && ! $this->isEmptyString($key)) return true;
+			if (! $this->isEmptyString($key) && preg_match($pattern, $key)) return true;
 		}
 
 		return false;
