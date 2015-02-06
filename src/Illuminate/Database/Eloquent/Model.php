@@ -596,7 +596,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function firstOrNew(array $attributes)
 	{
-		if ( ! is_null($instance = static::firstByAttributes($attributes))
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
 		{
 			return $instance;
 		}
