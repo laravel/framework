@@ -59,7 +59,7 @@ class VerifyCsrfToken implements Middleware {
 		$header = $request->header('X-XSRF-TOKEN');
 
 		return StringUtils::equals($token, $request->input('_token')) ||
-		       ($header && StringUtils::equals($token, $this->encrypter->decrypt($header)));
+		       ($header && StringUtils::equals($token, $header));
 	}
 
 	/**
