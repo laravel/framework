@@ -521,7 +521,10 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function action($action, $parameters = array(), $absolute = true)
 	{
-		if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
+		if ($this->rootNamespace && 
+			! (strpos($action, $this->rootNamespace) === 0) && 
+			! (strpos($action, '\\') === 0)
+		)
 		{
 			$action = $this->rootNamespace.'\\'.$action;
 		}
