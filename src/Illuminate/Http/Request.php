@@ -262,9 +262,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function hasRegex($pattern)
 	{
-		$input = $this->all();
-
-		foreach ($input as $key => $value)
+		foreach ($this->all() as $key => $value)
 		{
 			if (preg_match($pattern, $key) && ! $this->isEmptyString($key)) return true;
 		}
