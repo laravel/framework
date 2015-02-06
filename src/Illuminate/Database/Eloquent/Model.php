@@ -621,17 +621,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Get the first model for the given attributes.
-	 *
-	 * @param  array  $attributes
-	 * @return static|null
-	 */
-	protected static function firstByAttributes($attributes)
-	{
-		return static::where($attributes)->first();
-	}
-
-	/**
 	 * Begin querying the model.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
