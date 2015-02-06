@@ -173,6 +173,35 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Filter items that do not match the given key value pair.
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @param  bool  $strict
+	 * @return static
+	 */
+	public function whereNot($key, $value, $strict = true)
+	{
+		return $this->filter(function($item) use ($key, $value, $strict)
+		{
+			return $strict ? data_get($item, $key) !== $value
+                           : data_get($item, $key) != $value;
+		});
+	}
+
+	/**
+	 * Filter items that do not match the given key value pair using loose comparison.
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @return static
+	 */
+	public function whereNotLoose($key, $value)
+	{
+		return $this->whereNot($key, $value, false);
+	}
+
+	/**
 	 * Get the first item from the collection.
 	 *
 	 * @param  \Closure   $callback
