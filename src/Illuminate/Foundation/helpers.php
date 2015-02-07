@@ -616,6 +616,12 @@ if ( ! function_exists('elixir'))
 
 		if (is_null($manifest))
 		{
+
+			if(!file_exists(public_path().'/build/rev-manifest.json'))
+			{
+				return $file;
+			}
+
 			$manifest = json_decode(file_get_contents(public_path().'/build/rev-manifest.json'), true);
 		}
 
