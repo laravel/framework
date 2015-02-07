@@ -128,6 +128,11 @@ trait ResetsPasswords {
 	 */
 	public function redirectPath()
 	{
+		if (property_exists($this, 'redirectPath'))
+		{
+			return $this->redirectPath;
+		}
+
 		return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
 	}
 
