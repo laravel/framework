@@ -195,9 +195,7 @@ class Router implements RegistrarContract {
 	 */
 	public function any($uri, $action)
 	{
-		$verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE');
-
-		return $this->addRoute($verbs, $uri, $action);
+		return $this->addRoute(self::$verbs, $uri, $action);
 	}
 
 	/**
