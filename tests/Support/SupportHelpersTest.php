@@ -314,7 +314,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
 		$this->assertEquals(['b' => 2, 'd' => 4, 'f' => 6, 'h' => 8], array_where(
 			$array,
-			function ($key, $value) {
+			function($key, $value)
+			{
 				return $value % 2 === 0;
 			}
 		));
