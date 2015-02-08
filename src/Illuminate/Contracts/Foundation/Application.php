@@ -12,6 +12,13 @@ interface Application extends Container {
 	public function version();
 
 	/**
+	 * Get the base path of the Laravel installation.
+	 *
+	 * @return string
+	 */
+	public function basePath();
+
+	/**
 	 * Get or check the current application environment.
 	 *
 	 * @param  mixed
