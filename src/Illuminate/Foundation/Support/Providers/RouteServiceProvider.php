@@ -76,12 +76,19 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function loadRoutesFrom($path)
 	{
-		$router = $this->app['Illuminate\Routing\Router'];
-
-		$router->group(['namespace' => $this->namespace], function($router) use ($path)
+		if (empty($this->namespace))
 		{
 			require $path;
-		});
+		}
+		else
+		{
+			$router = $this->app['Illuminate\Routing\Router'];
+
+			$router->group(['namespace' => $this->namespace], function($router) use ($path)
+			{
+				require $path;
+			});
+		}
 	}
 
 	/**
