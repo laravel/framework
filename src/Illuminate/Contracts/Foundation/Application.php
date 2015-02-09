@@ -75,4 +75,19 @@ interface Application extends Container {
 	 */
 	public function booted($callback);
 
+        /**
+         * Determine if the Application has been booted.
+         *
+         * @return bool
+         */
+        public function hasBeenBootstrapped();
+
+        /**
+         * Run the given array of bootstrap classes.
+         *
+         * @param  array  $bootstrappers
+         * @return void
+         */
+        public function bootstrapWith($bootstrappers);
+        
 }
