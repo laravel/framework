@@ -126,6 +126,30 @@ if ( ! function_exists('bcrypt'))
 	}
 }
 
+if ( ! function_exists('closure'))
+{
+	/**
+	 * Create a closure from the given callback.
+	 *
+	 * @param  callable|string  $callback
+	 * @return \Closure
+	 */
+	function closure($callback)
+	{
+		return function() use ($callback)
+		{
+			if (is_string($callback) && str_contains($callback, '@'))
+			{
+				$fragments = explode('@', $callback);
+
+				$callback = [app($fragments[0]), $fragments[1]];
+			}
+
+			return call_user_func_array($callback, func_get_args());
+		};
+	}
+}
+
 if ( ! function_exists('config'))
 {
 	/**
