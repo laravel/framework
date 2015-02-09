@@ -3,13 +3,14 @@
 use Mockery;
 use RuntimeException;
 use Mockery\MockInterface;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 abstract class Facade {
 
 	/**
 	 * The application instance being facaded.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var ApplicationContract
 	 */
 	protected static $app;
 
@@ -172,7 +173,7 @@ abstract class Facade {
 	/**
 	 * Get the application instance behind the facade.
 	 *
-	 * @return \Illuminate\Foundation\Application
+	 * @return ApplicationContract
 	 */
 	public static function getFacadeApplication()
 	{
@@ -182,7 +183,7 @@ abstract class Facade {
 	/**
 	 * Set the application instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  ApplicationContract  $app
 	 * @return void
 	 */
 	public static function setFacadeApplication($app)
