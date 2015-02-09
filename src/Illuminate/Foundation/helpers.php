@@ -243,6 +243,20 @@ if ( ! function_exists('get'))
 	}
 }
 
+if ( ! function_exists('controllers'))
+{
+	/**
+	 * Register an array of controllers with wildcard routing.
+	 *
+	 * @param  array  $controllers
+	 * @return \Illuminate\Routing\Route
+	 */
+	function controllers($controllers)
+	{
+		return app('router')->controllers($controllers);
+	}
+}
+
 if ( ! function_exists('info'))
 {
 	/**
