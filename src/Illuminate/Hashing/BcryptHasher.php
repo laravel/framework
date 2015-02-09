@@ -63,7 +63,7 @@ class BcryptHasher implements HasherContract {
 	}
 
 	/**
-	 * Set the default passwork work factor.
+	 * Set the default password work factor.
 	 *
 	 * @param  int  $rounds
 	 * @return $this
