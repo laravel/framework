@@ -38,29 +38,17 @@ class KeyGenerateCommand extends Command {
 
 		if ( ! file_exists($path))
 		{
-			copy(base_path('.env.example'), $path);
+			$this->error("A .env file needs to be created first.");
+			exit(1);
 		}
 
-		$success = false;
-
-		if (file_exists($path))
-		{
-			$success = file_put_contents($path, str_replace(
-				$this->laravel['config']['app.key'], $key, file_get_contents($path)
-			));
-		}
+		file_put_contents($path, str_replace(
+			$this->laravel['config']['app.key'], $key, file_get_contents($path)
+		));
 
 		$this->laravel['config']['app.key'] = $key;
 
-		if ($success)
-		{
-			$this->info("Application key [$key] set successfully.");
-		}
-		else
-		{
-			$this->error("Application key was not set. Try creating a .env file.");
-		}
-
+		$this->info("Application key [$key] set successfully.");
 	}
 
 	/**
