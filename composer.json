@@ -7,10 +7,6 @@
         {
             "name": "Taylor Otwell",
             "email": "taylorotwell@gmail.com"
-        },
-        {
-            "name": "Tom de Goede",
-            "email": "tom@allesonline.eu"
         }
     ],
     "require": {
