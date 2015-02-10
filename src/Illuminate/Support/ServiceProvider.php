@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use BadMethodCallException;
+use Symfony\Component\Finder\Finder;
 
 abstract class ServiceProvider {
 
