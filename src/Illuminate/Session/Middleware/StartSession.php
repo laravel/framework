@@ -46,31 +46,27 @@ class StartSession implements TerminableMiddleware {
 	 */
 	public function handle($request, Closure $next)
 	{
+		if ( ! $this->sessionConfigured()) return $next($request);
+
 		$this->sessionHandled = true;
 
-		// If a session driver has been configured, we will need to start the session here
-		// so that the data is ready for an application. Note that the Laravel sessions
-		// do not make use of PHP "native" sessions in any way since they are crappy.
-		if ($this->sessionConfigured())
-		{
-			$session = $this->startSession($request);
+		// We start the session here so that the data is ready for use in
+		// the application. Note that the Laravel sessions do not make
+		// use of native sessions in any way since they are crappy.
+		$session = $this->startSession($request);
 
-			$request->setSession($session);
-		}
+		$request->setSession($session);
 
 		$response = $next($request);
 
-		// Again, if the session has been configured we will need to close out the session
-		// so that the attributes may be persisted to some storage medium. We will also
-		// add the session identifier cookie to the application response headers now.
-		if ($this->sessionConfigured())
-		{
-			$this->storeCurrentUrl($request, $session);
+		// We need to close out the session so that the attributes may
+		// be persisted to the storage medium. We will also add the
+		// session identifier cookie to the response headers now.
+		$this->storeCurrentUrl($request, $session);
 
-			$this->collectGarbage($session);
+		$this->collectGarbage($session);
 
-			$this->addCookieToResponse($response, $session);
-		}
+		$this->addCookieToResponse($response, $session);
 
 		return $response;
 	}
@@ -84,7 +80,7 @@ class StartSession implements TerminableMiddleware {
 	 */
 	public function terminate($request, $response)
 	{
-		if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions())
+		if ($this->sessionHandled && ! $this->usingCookieSessions())
 		{
 			$this->manager->driver()->save();
 		}
@@ -240,8 +236,6 @@ class StartSession implements TerminableMiddleware {
 	 */
 	protected function usingCookieSessions()
 	{
-		if ( ! $this->sessionConfigured()) return false;
-
 		return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
 	}
 
