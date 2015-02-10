@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use BadMethodCallException;
+use Symfony\Component\Finder\Finder;
 
 abstract class ServiceProvider {
 
@@ -58,6 +59,23 @@ abstract class ServiceProvider {
 	 * @return void
 	 */
 	protected function mergeConfigFrom($path, $key)
+	{
+		if(is_dir($path))
+			$this->mergeConfigFromDir($path,$key);
+		else
+			$this->mergeConfigFromFile($path,$key);
+	}
+
+	protected function mergeConfigFromDir($path, $key)
+	{
+		foreach (Finder::create()->files()->name('*.php')->in(realpath($path)) as $file)
+		{
+			$subKey = str_replace('\\','/',substr($file->getRealPath(), strlen(realpath($path)) + 1, -4));
+			$this->mergeConfigFromFile($file->getRealPath(), $key.'/'.$subKey);
+		}
+	}
+
+	protected function mergeConfigFromFile($path, $key)
 	{
 		$config = $this->app['config']->get($key, []);
 
