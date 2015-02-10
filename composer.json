@@ -1,5 +1,5 @@
 {
-    "name": "laravel/framework",
+    "name": "ao/framework",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
@@ -7,6 +7,10 @@
         {
             "name": "Taylor Otwell",
             "email": "taylorotwell@gmail.com"
+        },
+        {
+            "name": "Tom de Goede",
+            "email": "tom@allesonline.eu"
         }
     ],
     "require": {
