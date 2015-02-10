@@ -1125,7 +1125,7 @@ class Router implements RegistrarContract {
 	}
 
 	/**
-	 * Call the given route's before filters.
+	 * Call the given route's after filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
