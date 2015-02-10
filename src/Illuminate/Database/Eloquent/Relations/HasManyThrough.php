@@ -226,9 +226,9 @@ class HasManyThrough extends Relation {
 	 */
 	protected function getSelectColumns(array $columns = array('*'))
 	{
-		if ($columns == array('*'))
+		foreach (array_keys($columns, '*') as $asteriskKey)
 		{
-			$columns = array($this->related->getTable().'.*');
+			$columns[$asteriskKey] = $this->related->getTable().'.*';
 		}
 
 		return array_merge($columns, array($this->parent->getTable().'.'.$this->firstKey));
