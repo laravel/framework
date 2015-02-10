@@ -280,7 +280,7 @@ class Builder {
 
 		if (is_null($this->columns))
 		{
-			$this->columns = [ '*' ];
+			$this->columns = ['*'];
 		}
 
 		$this->columns = array_merge((array) $this->columns, $column);
