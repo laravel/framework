@@ -690,6 +690,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get the mean of the given key.
+	 *
+	 * @param  string  $key
+	 * @return float
+	 */
+	public function avg($key)
+	{
+		if ($this->isEmpty()) return 0;
+
+		$total = $this->sum($key);
+
+		return $total / count($this->items);
+	}
+
+	/**
 	 * Take the first or last {$limit} items.
 	 *
 	 * @param  int  $limit

@@ -534,6 +534,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGettingAvgFromCollection()
+	{
+		$c = new Collection(array((object) array('foo' => 40), (object) array('foo' => 50), (object) array('foo' => 60)));
+		$this->assertEquals(50, $c->avg('foo'));
+	}
+
+
+	public function testGettingAvgFromEmptyCollection()
+	{
+		$c = new Collection();
+		$this->assertEquals(0, $c->avg('foo'));
+	}
+
+
 	public function testValueRetrieverAcceptsDotNotation()
 	{
 		$c = new Collection(array(
