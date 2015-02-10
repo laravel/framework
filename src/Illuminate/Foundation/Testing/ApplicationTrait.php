@@ -52,7 +52,7 @@ trait ApplicationTrait {
 
 		// Clear the resolved request instance, otherwise subsequent invocations of call()
 		// in the same test will reuse the first request instance
-		Facade::clearResolvedInstance('request');
+		Facade::clearResolvedInstances();
 
 		return $this->response;
 	}
