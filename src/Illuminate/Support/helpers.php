@@ -436,6 +436,11 @@ if ( ! function_exists('dd'))
 	 */
 	function dd()
 	{
+		$dbt = debug_backtrace();
+		$lb  = PHP_SAPI === 'cli' ? PHP_EOL : "<br>";
+
+		echo "File: {$dbt[0]['file']}:{$dbt[0]['line']}{$lb}";
+
 		array_map(function($x) { (new Dumper)->dump($x); }, func_get_args());
 
 		die;
