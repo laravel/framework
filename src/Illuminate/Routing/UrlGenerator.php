@@ -246,9 +246,13 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		if ( ! is_null($route = $this->routes->getByName($name)))
 		{
-			return $this->toRoute($route, $parameters, $absolute);
+			if (count($parameters)) {
+				return $this->toRoute($route, $parameters, $absolute);
+			} else {
+				$parameters = $route->bind($this->getRequest())->parameters();
+				return $this->toRoute($route, $parameters, $absolute);
+			}
 		}
-
 		throw new InvalidArgumentException("Route [{$name}] not defined.");
 	}
 
