@@ -242,6 +242,32 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('First Post', $photos[3]->imageable->name);
 	}
 
+
+	public function testMultiInsertsWithDifferentValues()
+	{
+		$date = '1970-01-01';
+		$result = EloquentTestPost::insert([
+			['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
+			['user_id' => 2, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
+		]);
+
+		$this->assertTrue($result);
+		$this->assertEquals(2, EloquentTestPost::count());
+	}
+
+
+	public function testMultiInsertsWithSameValues()
+	{
+		$date = '1970-01-01';
+		$result = EloquentTestPost::insert([
+			['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
+			['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
+		]);
+
+		$this->assertTrue($result);
+		$this->assertEquals(2, EloquentTestPost::count());
+	}
+
 	/**
 	 * Helpers...
 	 */

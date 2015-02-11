@@ -837,7 +837,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSQLiteMultipleInserts()
 	{
 		$builder = $this->getSQLiteBuilder();
-		$builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union select ? as "email", ? as "name"', array('foo', 'taylor', 'bar', 'dayle'))->andReturn(true);
+		$builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', array('foo', 'taylor', 'bar', 'dayle'))->andReturn(true);
 		$result = $builder->from('users')->insert(array(array('email' => 'foo', 'name' => 'taylor'), array('email' => 'bar', 'name' => 'dayle')));
 		$this->assertTrue($result);
 	}

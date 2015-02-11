@@ -56,7 +56,7 @@ class SQLiteGrammar extends Grammar {
 
 		$columns = array_fill(0, count($values), implode(', ', $columns));
 
-		return "insert into $table ($names) select ".implode(' union select ', $columns);
+		return "insert into $table ($names) select ".implode(' union all select ', $columns);
 	}
 
 	/**
