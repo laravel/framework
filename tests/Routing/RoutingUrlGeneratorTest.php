@@ -248,6 +248,20 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', array('taylor', 'otwell')));
 	}
 
+	public function testRoutesWithDomainWildcard()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://sub.foo.com')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), '/', array('as' => 'bar', 'domain' => '{subdomain}.foo.com'));
+		$routes->add($route);
+
+		//Parameters filled by current request
+		$this->assertEquals('http://sub.foo.com', $url->route('bar'));
+	}
+
 
 	public function testHttpsRoutesWithDomains()
 	{
