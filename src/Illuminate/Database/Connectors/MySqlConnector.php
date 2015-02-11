@@ -21,7 +21,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 
 		if (isset($config['unix_socket']))
 		{
-			$connection->exec("use {$config['database']};");
+			$connection->exec("use `{$config['database']}`;");
 		}
 
 		$collation = $config['collation'];
