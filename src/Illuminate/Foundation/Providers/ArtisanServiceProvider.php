@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
+use Illuminate\Foundation\Console\SeedMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\CommandMakeCommand;
@@ -263,6 +264,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.model.make', function($app)
 		{
 			return new ModelMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerSeedMakeCommand()
+	{
+		$this->app->singleton('command.seed.make', function($app)
+		{
+			return new SeedMakeCommand($app['files']);
 		});
 	}
 

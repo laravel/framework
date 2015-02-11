@@ -1,0 +1,12 @@
+<?php namespace {{namespace}};
+
+class {{class}}TableSeeder extends Seeder {
+
+    public function run()
+    {
+        {{class}}::truncate();
+
+        {{class}}::create([]);
+    }
+
+}
