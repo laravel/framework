@@ -3,6 +3,7 @@
 use Exception;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
@@ -99,6 +100,8 @@ class Kernel implements KernelContract {
 	protected function sendRequestThroughRouter($request)
 	{
 		$this->app->instance('request', $request);
+
+		Facade::clearResolvedInstance('request');
 
 		$this->bootstrap();
 
