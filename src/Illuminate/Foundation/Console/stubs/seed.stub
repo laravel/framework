@@ -11,7 +11,7 @@ class {{class}}TableSeeder extends Seeder {
 	{
 		{{class}}::truncate();
 
-		foreach(range(1, 10) as $index)
+		foreach (range(1, 10) as $index)
 		{
 			{{class}}::create([
 
