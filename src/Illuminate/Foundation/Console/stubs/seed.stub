@@ -2,11 +2,21 @@
 
 class {{class}}TableSeeder extends Seeder {
 
-    public function run()
-    {
-        {{class}}::truncate();
+	/**
+	 * Create a seed for {{class}}.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		{{class}}::truncate();
 
-        {{class}}::create([]);
-    }
+		foreach(range(1, 10) as $index)
+		{
+			{{class}}::create([
+
+			]);
+		}
+	}
 
 }
