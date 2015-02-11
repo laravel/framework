@@ -503,6 +503,11 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		$group = str_replace('/', '.', $this->getLastGroupPrefix());
 
+		if (empty($group))
+		{
+			return trim("{$prefix}{$resource}.{$method}", '.');
+		}
+
 		return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
 	}
 
