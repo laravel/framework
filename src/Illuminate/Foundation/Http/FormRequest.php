@@ -15,6 +15,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	use ValidatesWhenResolvedTrait;
 
 	/**
+	 * Set this to overwrite the default database connection on the validator
+	 *
+	 * @var string
+	 */
+	protected $connection = null;
+
+	/**
 	 * The container instance.
 	 *
 	 * @var \Illuminate\Container\Container
@@ -77,9 +84,15 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 			return $this->container->call([$this, 'validator'], compact('factory'));
 		}
 
-		return $factory->make(
+		$validator = $factory->make(
 			$this->all(), $this->container->call([$this, 'rules']), $this->messages()
 		);
+
+		if ($this->connection != null) {
+			$validator->getPresenceVerifier()->setConnection($this->connection);
+		}
+
+		return $validator;
 	}
 
 	/**
