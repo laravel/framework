@@ -3,7 +3,6 @@
 use DateTime;
 use Exception;
 use ArrayAccess;
-use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -131,6 +130,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var array
 	 */
 	protected $dates = array();
+
+	/**
+	 * Class for DateTime (Carbon or extension based on it such as jenssegers/laravel-date).
+	 *
+	 * @var string
+	 */
+	protected $dateTimeClass = 'Carbon\Carbon';
 
 	/**
 	 * The attributes that should be casted to native types.
@@ -1796,7 +1802,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function freshTimestamp()
 	{
-		return new Carbon;
+		return new $this->dateTimeClass;
 	}
 
 	/**
@@ -2836,7 +2842,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// format it according to the proper format for the database connection.
 		elseif (is_numeric($value))
 		{
-			$value = Carbon::createFromTimestamp($value);
+			$value = (new $this->dateTimeClass)->createFromTimestamp($value);
 		}
 
 		// If the value is in simple year, month, day format, we will format it using
@@ -2844,7 +2850,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// the field. This conveniently picks up those dates and format correct.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
-			$value = Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+			$value = (new $this->dateTimeClass)->createFromFormat('Y-m-d', $value)->startOfDay();
 		}
 
 		// If this value is some other type of string, we'll create the DateTime with
@@ -2852,7 +2858,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// can return back the finally formatted DateTime instances to the devs.
 		else
 		{
-			$value = Carbon::createFromFormat($format, $value);
+			$value = (new $this->dateTimeClass)->createFromFormat($format, $value);
 		}
 
 		return $value->format($format);
@@ -2871,7 +2877,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// when defining your date fields as they might be UNIX timestamps here.
 		if (is_numeric($value))
 		{
-			return Carbon::createFromTimestamp($value);
+			return (new $this->dateTimeClass)->createFromTimestamp($value);
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
@@ -2879,7 +2885,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
-			return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+			return (new $this->dateTimeClass)->createFromFormat('Y-m-d', $value)->startOfDay();
 		}
 
 		// Finally, we will just assume this date is in the format used by default on
@@ -2889,10 +2895,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			$format = $this->getDateFormat();
 
-			return Carbon::createFromFormat($format, $value);
+			return (new $this->dateTimeClass)->createFromFormat($format, $value);
 		}
 
-		return Carbon::instance($value);
+		return (new $this->dateTimeClass)->instance($value);
 	}
 
 	/**
