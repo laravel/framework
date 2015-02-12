@@ -31,7 +31,7 @@ abstract class AbstractPaginator {
 	 *
 	 * @var string
 	 */
-	protected $path = '/';
+	protected $path = null;
 
 	/**
 	 * The query parameters to add to all URLs.

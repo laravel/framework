@@ -36,7 +36,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 
 		$this->perPage = $perPage;
 		$this->currentPage = $this->setCurrentPage($currentPage);
-		$this->path = $this->path != '/' ? rtrim($this->path, '/').'/' : $this->path;
+		$this->path = $this->path != '/' ? rtrim($this->path, '/') : $this->path;
 		$this->items = $items instanceof Collection ? $items : Collection::make($items);
 
 		$this->checkForMorePages();
@@ -64,7 +64,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	{
 		$this->hasMore = count($this->items) > ($this->perPage);
 
-		$this->items = $this->items->slice(0, $this->perPage);
+		$this->items = $this->items->slice(($this->currentPage - 1) * $this->perPage, $this->perPage);
 	}
 
 	/**
