@@ -725,9 +725,9 @@ class Validator implements MessageProviderInterface {
 	{
 		$this->requireParameterCount(1, $parameters, 'different');
 
-		$other = $parameters[0];
+		$other = array_get($this->data, $parameters[0]);
 
-		return isset($this->data[$other]) && $value != $this->data[$other];
+		return (isset($other) && $value != $other);
 	}
 
 	/**
