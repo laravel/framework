@@ -291,7 +291,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = sprintf('/(@)?%s\s*(.+?)[\s;]*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
 
 		$callback = function($matches)
 		{
