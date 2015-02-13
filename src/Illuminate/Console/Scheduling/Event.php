@@ -76,18 +76,11 @@ class Event {
 	protected $output = '/dev/null';
 
 	/**
-	 * The e-mail addresses the command output should be sent to.
-	 *
-	 * @var array
-	 */
-	protected $emailAddresses = [];
-
-	/**
 	 * The array of callbacks to be run after the event is finished.
 	 *
 	 * @var array
 	 */
-	protected $afterCallbacks;
+	protected $afterCallbacks = [];
 
 	/**
 	 * The human readable description of the event.
@@ -115,7 +108,7 @@ class Event {
 	 */
 	public function run(Container $container)
 	{
-		if ($this->afterCallbacks || ! empty($this->emailAddresses))
+		if (count($this->afterCallbacks) > 0)
 		{
 			$this->runCommandInForeground($container);
 		}
@@ -150,11 +143,6 @@ class Event {
 		))->run();
 
 		$this->callAfterCallbacks($container);
-
-		if ($this->emailAddresses && $container->bound('Illuminate\Contracts\Mail\Mailer'))
-		{
-			$this->emailOutput($container->make('Illuminate\Contracts\Mail\Mailer'));
-		}
 	}
 
 	/**
@@ -171,40 +159,6 @@ class Event {
 		{
 			$container->call($callback);
 		}
-	}
-
-	/**
-	 * E-mail the output of the event to the recipients.
-	 *
-	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-	 * @return void
-	 */
-	protected function emailOutput(Mailer $mailer)
-	{
-		$mailer->raw(file_get_contents($this->output), function($m)
-		{
-			$m->subject($this->getEmailSubject());
-
-			foreach ($this->emailAddresses as $address)
-			{
-				$m->to($address);
-			}
-		});
-	}
-
-	/**
-	 * Get the e-mail subject line for output results.
-	 *
-	 * @return string
-	 */
-	protected function getEmailSubject()
-	{
-		if ($this->description)
-		{
-			return 'Scheduled Job Output ('.$this->description.')';
-		}
-
-		return 'Scheduled Job Output';
 	}
 
 	/**
@@ -650,9 +604,45 @@ class Event {
 			throw new LogicException("Must direct output to a file in order to e-mail results.");
 		}
 
-		$this->emailAddresses = is_array($addresses) ? $addresses : func_get_args();
+		return $this->then(function(Mailer $mailer) use ($addresses)
+		{
+			$this->emailOutput($mailer, is_array($addresses) ? $addresses : func_get_args());
+		});
+	}
 
-		return $this;
+	/**
+	 * E-mail the output of the event to the recipients.
+	 *
+	 * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+	 * @param  array  $addresses
+	 * @return void
+	 */
+	protected function emailOutput(Mailer $mailer, $addresses)
+	{
+		$mailer->raw(file_get_contents($this->output), function($m) use ($addresses)
+		{
+			$m->subject($this->getEmailSubject());
+
+			foreach ($addresses as $address)
+			{
+				$m->to($address);
+			}
+		});
+	}
+
+	/**
+	 * Get the e-mail subject line for output results.
+	 *
+	 * @return string
+	 */
+	protected function getEmailSubject()
+	{
+		if ($this->description)
+		{
+			return 'Scheduled Job Output ('.$this->description.')';
+		}
+
+		return 'Scheduled Job Output';
 	}
 
 	/**
