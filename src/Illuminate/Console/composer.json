@@ -24,6 +24,7 @@
         }
     },
     "suggest": {
+        "guzzlehttp/guzzle": "Required to use the thenPing method on schedules (~5.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
         "symfony/process": "Required to use scheduling component (2.6.*).",
         "nesbot/carbon": "Required to use scheduling component (~1.0)."
