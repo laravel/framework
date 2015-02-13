@@ -4,6 +4,7 @@ use Closure;
 use Carbon\Carbon;
 use LogicException;
 use Cron\CronExpression;
+use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Container\Container;
@@ -82,11 +83,11 @@ class Event {
 	protected $emailAddresses = [];
 
 	/**
-	 * The callback to be run after the event is finished.
+	 * The array of callbacks to be run after the event is finished.
 	 *
-	 * @var \Closure
+	 * @var array
 	 */
-	protected $afterCallback;
+	protected $afterCallbacks;
 
 	/**
 	 * The human readable description of the event.
@@ -114,7 +115,7 @@ class Event {
 	 */
 	public function run(Container $container)
 	{
-		if ($this->afterCallback || ! empty($this->emailAddresses))
+		if ($this->afterCallbacks || ! empty($this->emailAddresses))
 		{
 			$this->runCommandInForeground($container);
 		}
@@ -148,14 +149,27 @@ class Event {
 			trim($this->buildCommand(), '& '), base_path(), null, null, null
 		))->run();
 
-		if ($this->afterCallback)
-		{
-			$container->call($this->afterCallback);
-		}
+		$this->callAfterCallbacks($container);
 
 		if ($this->emailAddresses && $container->bound('Illuminate\Contracts\Mail\Mailer'))
 		{
 			$this->emailOutput($container->make('Illuminate\Contracts\Mail\Mailer'));
+		}
+	}
+
+	/**
+	 * Call all of the "after" callbacks for the event.
+	 *
+	 * @param  \Illuminate\Contracts\Container\Container  $container
+	 * @return void
+	 */
+	protected function callAfterCallbacks(Container $container)
+	{
+		if (empty($this->afterCallbacks)) return;
+
+		foreach ($this->afterCallbacks as $callback)
+		{
+			$container->call($callback);
 		}
 	}
 
@@ -642,6 +656,17 @@ class Event {
 	}
 
 	/**
+	 * Register a callback to the ping a given URL after the job runs.
+	 *
+	 * @param  string  $url
+	 * @return $this
+	 */
+	public function thenPing($url)
+	{
+		return $this->then(function() use ($url) { (new HttpClient)->get($url); });
+	}
+
+	/**
 	 * Register a callback to be called after the operation.
 	 *
 	 * @param  \Closure  $callback
@@ -649,7 +674,7 @@ class Event {
 	 */
 	public function then(Closure $callback)
 	{
-		$this->afterCallback = $callback;
+		$this->afterCallbacks[] = $callback;
 
 		return $this;
 	}
