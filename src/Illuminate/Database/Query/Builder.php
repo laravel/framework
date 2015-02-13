@@ -3,7 +3,6 @@
 use Closure;
 use BadMethodCallException;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
@@ -1334,16 +1333,14 @@ class Builder {
 	 */
 	public function first($columns = array('*'))
 	{
-		$results = $this->take(1)->get($columns);
-
-		return count($results) > 0 ? reset($results) : null;
+		return $this->take(1)->get($columns)->first();
 	}
 
 	/**
 	 * Execute the query as a "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return array|static[]
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function get($columns = array('*'))
 	{
@@ -1354,13 +1351,15 @@ class Builder {
 	 * Execute the query as a fresh "select" statement.
 	 *
 	 * @param  array  $columns
-	 * @return array|static[]
+	 * @return \Illuminate\Support\Collection
 	 */
 	public function getFresh($columns = array('*'))
 	{
 		if (is_null($this->columns)) $this->columns = $columns;
 
-		return $this->processor->processSelect($this, $this->runSelect());
+		$results = $this->processor->processSelect($this, $this->runSelect());
+
+		return collect($results);
 	}
 
 	/**
@@ -1502,7 +1501,7 @@ class Builder {
 	{
 		$columns = $this->getListSelect($column, $key);
 
-		$results = new Collection($this->get($columns));
+		$results = $this->get($columns);
 
 		return $results->lists($columns[0], array_get($columns, 1));
 	}
@@ -1634,7 +1633,7 @@ class Builder {
 
 		$previousColumns = $this->columns;
 
-		$results = $this->get($columns);
+		$results = $this->get($columns)->all();
 
 		// Once we have executed the query, we will reset the aggregate property so
 		// that more select queries can be executed against the database without
