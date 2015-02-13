@@ -97,7 +97,7 @@ trait AuthenticatesAndRegistersUsers {
 	{
 		$this->auth->logout();
 
-		return redirect('/');
+		return redirect($this->logoutPath());
 	}
 
 	/**
@@ -123,6 +123,21 @@ trait AuthenticatesAndRegistersUsers {
 	public function loginPath()
 	{
 		return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+	}
+
+	/**
+	 * Get the post logout redirect path.
+	 *
+	 * @return string
+	 */
+	public function logoutPath()
+	{
+		if (property_exists($this, 'logoutPath'))
+		{
+			return $this->logoutPath;
+		}
+
+		return property_exists($this, 'logoutTo') ? $this->logoutTo : '/';
 	}
 
 }
