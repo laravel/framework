@@ -81,8 +81,8 @@ trait AuthenticatesAndRegistersUsers {
 			return redirect()->intended($this->redirectPath());
 		}
 
-		return redirect('/auth/login')
-					->withInput($request->only('email'))
+		return redirect($this->loginPath())
+					->withInput($request->only('email', 'remember'))
 					->withErrors([
 						'email' => 'These credentials do not match our records.',
 					]);
@@ -107,7 +107,22 @@ trait AuthenticatesAndRegistersUsers {
 	 */
 	public function redirectPath()
 	{
+		if (property_exists($this, 'redirectPath'))
+		{
+			return $this->redirectPath;
+		}
+
 		return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+	}
+
+	/**
+	 * Get the path to the login route.
+	 *
+	 * @return string
+	 */
+	public function loginPath()
+	{
+		return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
 	}
 
 }

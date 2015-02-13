@@ -41,13 +41,23 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function report(Exception $e)
 	{
-		foreach ($this->dontReport as $type)
-		{
-			if ($e instanceof $type)
-					return;
-		}
+		if ($this->shouldntReport($e)) return;
 
 		$this->log->error((string) $e);
+	}
+
+	/**
+	 * Determine if the exception is in the "do not report" list.
+	 *
+	 * @param  \Exception  $e
+	 * @return bool
+	 */
+	protected function shouldntReport(Exception $e)
+	{
+		foreach ($this->dontReport as $type)
+		{
+			if ($e instanceof $type) return true;
+		}
 	}
 
 	/**
@@ -59,7 +69,14 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function render($request, Exception $e)
 	{
-		return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+		if ($this->isHttpException($e))
+		{
+			return $this->renderHttpException($e);
+		}
+		else
+		{
+			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+		}
 	}
 
 	/**
@@ -82,9 +99,11 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	protected function renderHttpException(HttpException $e)
 	{
-		if (view()->exists('errors.'.$e->getStatusCode()))
+		$status = $e->getStatusCode();
+
+		if (view()->exists("errors.{$status}"))
 		{
-			return response()->view('errors.'.$e->getStatusCode(), [], $e->getStatusCode());
+			return response()->view("errors.{$status}", [], $status);
 		}
 		else
 		{

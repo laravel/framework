@@ -170,6 +170,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testStrRandom()
+	{
+		$result = str_random(20);
+		$this->assertTrue(is_string($result));
+		$this->assertEquals(20, strlen($result));
+	}
+
+
 	public function testStartsWith()
 	{
 		$this->assertTrue(starts_with('jason', 'jas'));
@@ -197,10 +205,27 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testStrFinish()
+	{
+		$this->assertEquals('test/string/', str_finish('test/string', '/'));
+		$this->assertEquals('test/string/', str_finish('test/string/', '/'));
+		$this->assertEquals('test/string/', str_finish('test/string//', '/'));
+	}
+
+
 	public function testSnakeCase()
 	{
 		$this->assertEquals('foo_bar', snake_case('fooBar'));
 		$this->assertEquals('foo_bar', snake_case('fooBar')); // test cache
+	}
+
+
+	public function testStrLimit()
+	{
+		$string = 'The PHP framework for web artisans.';
+		$this->assertEquals('The PHP...', str_limit($string, 7));
+		$this->assertEquals('The PHP', str_limit($string, 7, ''));
+		$this->assertEquals('The PHP framework for web artisans.', str_limit($string, 100));
 	}
 
 
@@ -221,6 +246,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('FooBar', studly_case('foo_bar')); // test cache
 		$this->assertEquals('FooBarBaz', studly_case('foo-barBaz'));
 		$this->assertEquals('FooBarBaz', studly_case('foo-bar_baz'));
+	}
+
+
+	public function testClassBasename()
+	{
+		$this->assertEquals('Baz', class_basename('Foo\Bar\Baz'));
+		$this->assertEquals('Baz', class_basename('Baz'));
 	}
 
 
@@ -274,6 +306,33 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 			array('name' => 'baz'),
 			array('name' => 'foo')),
 		array_values(array_sort($array, function($v) { return $v['name']; })));
+	}
+
+
+	public function testArrayWhere()
+	{
+		$array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
+		$this->assertEquals(['b' => 2, 'd' => 4, 'f' => 6, 'h' => 8], array_where(
+			$array,
+			function($key, $value)
+			{
+				return $value % 2 === 0;
+			}
+		));
+	}
+
+
+	public function testHead()
+	{
+		$array = ['a', 'b', 'c'];
+		$this->assertEquals('a', head($array));
+	}
+
+
+	public function testLast()
+	{
+		$array = ['a', 'b', 'c'];
+		$this->assertEquals('c', last($array));
 	}
 
 

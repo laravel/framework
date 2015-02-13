@@ -9,9 +9,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
-use Illuminate\Contracts\Routing\Middleware as MiddlewareContract;
 
-class StartSession implements MiddlewareContract, TerminableMiddleware {
+class StartSession implements TerminableMiddleware {
 
 	/**
 	 * The session manager.

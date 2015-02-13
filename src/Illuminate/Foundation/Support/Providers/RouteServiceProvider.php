@@ -8,9 +8,9 @@ class RouteServiceProvider extends ServiceProvider {
 	/**
 	 * The controller namespace for the application.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	protected $namespace = '';
+	protected $namespace;
 
 	/**
 	 * Bootstrap any application services.
@@ -77,6 +77,8 @@ class RouteServiceProvider extends ServiceProvider {
 	protected function loadRoutesFrom($path)
 	{
 		$router = $this->app['Illuminate\Routing\Router'];
+
+		if (is_null($this->namespace)) return require $path;
 
 		$router->group(['namespace' => $this->namespace], function($router) use ($path)
 		{
