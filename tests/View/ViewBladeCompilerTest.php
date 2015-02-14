@@ -134,6 +134,18 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<?php echo e(myfunc(\'foo or bar\')); ?>', $compiler->compileString('{{ myfunc(\'foo or bar\') }}'));
 		$this->assertEquals('<?php echo e(myfunc("foo or bar")); ?>', $compiler->compileString('{{ myfunc("foo or bar") }}'));
 		$this->assertEquals('<?php echo e(myfunc("$name or \'foo\'")); ?>', $compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
+
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name;}}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{ $name; }}'));
+		$this->assertEquals('<?php echo e("$name"); ?>', $compiler->compileString('{{"$name" ;}}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name ;; }}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{
+			$name ;;
+		}}'));
+		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{
+			$name
+		;}}'));
+
 	}
 
 
