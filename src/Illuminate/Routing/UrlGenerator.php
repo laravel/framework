@@ -532,12 +532,12 @@ class UrlGenerator implements UrlGeneratorContract {
 			$action = trim($action, '\\');
 		}
 	
-		if ( !is_null($route = $this->routes->getByAction($action)))
+		if ( ! is_null($route = $this->routes->getByAction($action)))
 		{
 			 return $this->toRoute($route, $parameters, $absolute);
 		}
+		
 		throw new InvalidArgumentException("Action {$action} not defined.");
-	
 	}
 
 	/**
