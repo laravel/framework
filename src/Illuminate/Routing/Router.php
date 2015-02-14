@@ -247,8 +247,7 @@ class Router implements RegistrarContract {
 			$prepended = $this->prependGroupUses($controller);
 		}
 
-		$routable = (new ControllerInspector)
-							->getRoutable($prepended, $uri);
+		$routable = (new ControllerInspector)->getRoutable($prepended, $uri);
 
 		// When a controller is routed using this method, we use Reflection to parse
 		// out all of the routable methods for the controller, then register each
