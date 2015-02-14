@@ -29,7 +29,7 @@ class RefreshCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ( ! $this->confirmToProceed()) return;
+		if ( ! $this->confirmToProceed("About to run ".$this->name)) return;
 
 		$database = $this->input->getOption('database');
 
