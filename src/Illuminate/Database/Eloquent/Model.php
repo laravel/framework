@@ -77,6 +77,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $attributes = array();
 
 	/**
+	 * The model database's columns.
+	 *
+	 * @var array
+	 */
+	protected $columnsCache = [];
+
+	/**
 	 * The model attribute's original state.
 	 *
 	 * @var array
@@ -2571,6 +2578,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			return $this->getRelationshipFromMethod($key);
 		}
+	}
+
+	/**
+	 * Get column's name of the related model.
+	 *
+	 * @return array
+	 */
+	public function getColumns()
+	{
+		if ( ! $this->columnsCache)
+		{
+			$this->columnsCache = $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+		}
+
+		return $this->columnsCache;
 	}
 
 	/**
