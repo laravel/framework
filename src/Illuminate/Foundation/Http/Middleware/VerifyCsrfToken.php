@@ -3,29 +3,10 @@
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class VerifyCsrfToken implements Middleware {
-
-	/**
-	 * The encrypter implementation.
-	 *
-	 * @var \Illuminate\Contracts\Encryption\Encrypter
-	 */
-	protected $encrypter;
-
-	/**
-	 * Create a new middleware instance.
-	 *
-	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-	 * @return void
-	 */
-	public function __construct(Encrypter $encrypter)
-	{
-		$this->encrypter = $encrypter;
-	}
 
 	/**
 	 * Handle an incoming request.
