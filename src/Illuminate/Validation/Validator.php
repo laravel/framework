@@ -263,7 +263,7 @@ class Validator implements ValidatorContract {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function each($attribute, $rules)
+	public function each($attribute, $rules, $customAttribute = null)
 	{
 		$data = array_get($this->data, $attribute);
 
@@ -278,6 +278,9 @@ class Validator implements ValidatorContract {
 		{
 			foreach ($rules as $ruleValue)
 			{
+				$this->customAttributes = array_merge($this->customAttributes,
+				 	[ "$attribute.$dataKey" => $customAttribute ]
+				 );
 				$this->mergeRules("$attribute.$dataKey", $ruleValue);
 			}
 		}
