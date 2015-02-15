@@ -56,10 +56,8 @@ class RouteCacheCommand extends Command {
 			return $this->error("Your application doesn't have any routes.");
 		}
 
-		foreach ($routes as $route)
-		{
-			$route->prepareForSerialization();
-		}
+
+		$routes->prepareForSerialization();
 
 		$this->files->put(
 			$this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
