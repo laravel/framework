@@ -170,6 +170,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPluralize()
+	{
+		$this->assertEquals('0 people', pluralize(0, 'person'));
+		$this->assertEquals('1 person', pluralize(1, 'person'));
+		$this->assertEquals('2 people', pluralize(2, 'person'));
+		$this->assertEquals('0 users', pluralize(0, 'user'));
+		$this->assertEquals('1 user', pluralize(1, 'user'));
+		$this->assertEquals('2 users', pluralize(2, 'user'));
+	}
+
+
 	public function testStrRandom()
 	{
 		$result = str_random(20);
