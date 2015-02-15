@@ -59,15 +59,22 @@ class CallQueuedHandler {
 	 */
 	protected function parameterizeJobDataDependencies($handler, $method, &$data)
 	{
-		foreach ((new ReflectionMethod($handler, $method))->getParameters() as $callbackKey => $callbackParameter) {
+		foreach ((new ReflectionMethod($handler, $method))->getParameters() as $callbackKey => $callbackParameter)
+		{
 			$callbackParameterClass = ($callbackParameter->getClass()) ? $callbackParameter->getClass()->name : null;
 			if (empty($callbackParameterClass))
+			{
 				continue;
+			}
 			$callbackParameterName = $callbackParameter->name;
-			foreach ($data as $dataKey => &$possibleParameter) {
+			foreach ($data as $dataKey => &$possibleParameter)
+			{
 				if (!is_object($possibleParameter) || !is_numeric($dataKey))
+				{
 					continue;
-				if (get_class($possibleParameter) == $callbackParameterClass) {
+				}
+				if (get_class($possibleParameter) == $callbackParameterClass)
+				{
 					$data[$callbackParameterName] = $possibleParameter;
 					unset($data[$dataKey]);
 				}
