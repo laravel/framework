@@ -279,7 +279,7 @@ class Validator implements ValidatorContract {
 			foreach ($rules as $ruleValue)
 			{
 				$this->customAttributes = array_merge($this->customAttributes,
-				 	[ "$attribute.$dataKey" => $customAttribute ]
+				 	[ "$attribute.$dataKey" => "$customAttribute.$dataKey" ]
 				 );
 				$this->mergeRules("$attribute.$dataKey", $ruleValue);
 			}
