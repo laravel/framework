@@ -56,7 +56,7 @@ class VerifyCsrfToken implements Middleware {
 	{
 		$token = $request->session()->token();
 
-		$header = $request->header('X-XSRF-TOKEN');
+		$header = $request->header('X-CSRF-TOKEN');
 
 		return StringUtils::equals($token, $request->input('_token')) ||
 		       ($header && StringUtils::equals($token, $this->encrypter->decrypt($header)));
@@ -72,7 +72,7 @@ class VerifyCsrfToken implements Middleware {
 	protected function addCookieToResponse($request, $response)
 	{
 		$response->headers->setCookie(
-			new Cookie('XSRF-TOKEN', $request->session()->token(), time() + 60 * 120, '/', null, false, false)
+			new Cookie('CSRF-TOKEN', $request->session()->token(), time() + 60 * 120, '/', null, false, false)
 		);
 
 		return $response;
