@@ -308,6 +308,32 @@ if ( ! function_exists('array_where'))
 	}
 }
 
+if ( ! function_exists('recursive_merge'))
+{
+	/**
+	 * Array merge recursive
+	 * 
+	 * @param array $arr1
+	 * @param array $arr2
+	 * @return array
+	 */
+	function recursive_merge($arr1, $arr2)
+	{
+		if ( ! is_array($arr1) || ! is_array($arr2)) return $arr2;
+	
+		foreach ($arr2 as $key => $val2)
+		{
+		
+			$val1 = isset($arr1[$key]) ? $arr1[$key] : [];
+			
+			$arr1[$key] = recursive_merge($val1, $val2);
+		
+		}
+		
+		return $arr1;
+	}
+}
+
 if ( ! function_exists('camel_case'))
 {
 	/**
