@@ -113,6 +113,18 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', array('foo' => 'bar'), false));
 		$this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', array('baz' => 'åαф'), false));
 	}
+	
+	public function testUndefinedActionException()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+		
+		$undefinedAction = 'foo@bar';
+		$this->setExpectedException('InvalidArgumentException', "Action {$undefinedAction} not defined.");
+		$url->action($undefinedAction);
+	}
 
 
 	public function testControllerRoutesWithADefaultNamespace()
