@@ -278,7 +278,8 @@ class Validator implements ValidatorContract {
 		{
 			foreach ($rules as $ruleValue)
 			{
-				if(is_null( ! $customAttribute )){
+				if( ! is_null($customAttribute) )
+				{
 					$this->customAttributes = array_merge($this->customAttributes,
 					 	[ "$attribute.$dataKey" => "$customAttribute.$dataKey" ]
 					 );
