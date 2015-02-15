@@ -653,6 +653,21 @@ if ( ! function_exists('str_plural'))
 	}
 }
 
+if ( ! function_exists('pluralize'))
+{
+	/**
+	 * Attempts to pluralize the singular word unless count is 1.
+	 *
+	 * @param  string  $word
+	 * @param  int     $count
+	 * @return string
+	 */
+	function pluralize($word, $count = 2)
+	{
+		return Str::plural($word, $count);
+	}
+}
+
 if ( ! function_exists('str_random'))
 {
 	/**
