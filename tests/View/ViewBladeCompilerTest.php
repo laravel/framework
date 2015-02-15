@@ -86,6 +86,9 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{!!$name!!}'));
 		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{!! $name !!}'));
+		$this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{!!
+			$name
+		!!}'));
 		$this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>', $compiler->compileString('{!! $name or \'foo\' !!}'));
 
 		$this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
@@ -296,6 +299,98 @@ breeze
 	}
 
 
+	public function testWhileStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@while ($foo)
+test
+@endwhile';
+		$expected = '<?php while($foo): ?>
+test
+<?php endwhile; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testNestedWhileStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@while ($foo)
+@while ($bar)
+test
+@endwhile
+@endwhile';
+		$expected = '<?php while($foo): ?>
+<?php while($bar): ?>
+test
+<?php endwhile; ?>
+<?php endwhile; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testForStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@for ($i = 0; $i < 10; $i++)
+test
+@endfor';
+		$expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php endfor; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testNestedForStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@for ($i = 0; $i < 10; $i++)
+@for ($j = 0; $j < 20; $j++)
+test
+@endfor
+@endfor';
+		$expected = '<?php for($i = 0; $i < 10; $i++): ?>
+<?php for($j = 0; $j < 20; $j++): ?>
+test
+<?php endfor; ?>
+<?php endfor; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testForeachStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@foreach ($this->getUsers() as $user)
+test
+@endforeach';
+		$expected = '<?php foreach($this->getUsers() as $user): ?>
+test
+<?php endforeach; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testNestedForeachStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@foreach ($this->getUsers() as $user)
+user info
+@foreach ($user->tags as $tag)
+tag info
+@endforeach
+@endforeach';
+		$expected = '<?php foreach($this->getUsers() as $user): ?>
+user info
+<?php foreach($user->tags as $tag): ?>
+tag info
+<?php endforeach; ?>
+<?php endforeach; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testForelseStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -402,6 +497,13 @@ empty
 	}
 
 
+	public function testOverwriteSectionsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php $__env->stopSection(true); ?>', $compiler->compileString('@overwrite'));
+	}
+
+
 	public function testEndSectionsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -435,6 +537,50 @@ empty
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$compiler->extend(function($value) { return str_replace('foo', 'bar', $value); });
 		$this->assertEquals('bar', $compiler->compileString('foo'));
+	}
+
+
+	public function testCreateMatcher()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->extend(
+			function($view, BladeCompiler $compiler)
+			{
+				$pattern = $compiler->createMatcher('customControl');
+				$replace = '<?php echo custom_control$2; ?>';
+				return preg_replace($pattern, '$1'.$replace, $view);
+			}
+		);
+
+		$string = '@if($foo)
+@customControl(10, $foo, \'bar\')
+@endif';
+		$expected = '<?php if($foo): ?>
+<?php echo custom_control(10, $foo, \'bar\'); ?>
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testCreatePlainMatcher()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->extend(
+			function($view, BladeCompiler $compiler)
+			{
+				$pattern = $compiler->createPlainMatcher('customControl');
+				$replace = '<?php echo custom_control; ?>';
+				return preg_replace($pattern, '$1'.$replace.'$2', $view);
+			}
+		);
+
+		$string = '@if($foo)
+@customControl
+@endif';
+		$expected = '<?php if($foo): ?>
+<?php echo custom_control; ?>
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
 
