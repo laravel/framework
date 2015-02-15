@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
+use ReflectionMethod;
 
 class CallQueuedHandler {
 
@@ -36,13 +37,49 @@ class CallQueuedHandler {
 			$job, $this->container->make($data['class'])
 		);
 
-		call_user_func_array(
-			[$handler, $data['method']], unserialize($data['data'])
+		$jobData = unserialize($data['data']);
+		$this->parameterizeJobDataDependencies($handler, $data['method'], $jobData);
+		$this->container->call(
+			[$handler, $data['method']], $jobData
 		);
 
 		if ( ! $job->isDeletedOrReleased())
 		{
 			$job->delete();
+		}
+	}
+
+	/**
+	 * Convert the job data into named parameters that the IoC container can use to resolve dependencies
+	 *
+	 * @param  object $handler
+	 * @param  string $method
+	 * @param  array  $data
+	 * @return void
+	 */
+	protected function parameterizeJobDataDependencies($handler, $method, &$data)
+	{
+		foreach ((new ReflectionMethod($handler, $method))->getParameters() as $callbackKey => $callbackParameter)
+		{
+			$callbackParameterClass = ($callbackParameter->getClass()) ? $callbackParameter->getClass()->name : null;
+			if (empty($callbackParameterClass))
+			{
+				continue;
+			}
+			$callbackParameterName = $callbackParameter->name;
+			foreach ($data as $dataKey => &$possibleParameter)
+			{
+				if (!is_object($possibleParameter) || !is_numeric($dataKey))
+				{
+					continue;
+				}
+				if (get_class($possibleParameter) == $callbackParameterClass)
+				{
+					$data[$callbackParameterName] = $possibleParameter;
+					unset($data[$dataKey]);
+				}
+			}
+			unset($possibleParameter);
 		}
 	}
 
