@@ -686,7 +686,10 @@ class Router implements RegistrarContract {
 		                ->through($middleware)
 		                ->then(function($request) use ($route)
 						{
-							return $route->run($request);
+							return $this->prepareResponse(
+								$request,
+								$route->run($request)
+							);
 						});
 	}
 
