@@ -73,14 +73,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	public function testHydrateCreatesCollectionOfModels()
 	{
 		$data = array(array('name' => 'Taylor'), array('name' => 'Otwell'));
-		$collection = EloquentModelStub::hydrate($data);
+		$collection = EloquentModelStub::hydrate($data, 'foo_connection');
 
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
 		$this->assertCount(2, $collection);
 		$this->assertInstanceOf('EloquentModelStub', $collection[0]);
 		$this->assertInstanceOf('EloquentModelStub', $collection[1]);
+		$this->assertEquals($collection[0]->getAttributes(), $collection[0]->getOriginal());
+		$this->assertEquals($collection[1]->getAttributes(), $collection[1]->getOriginal());
 		$this->assertEquals('Taylor', $collection[0]->name);
 		$this->assertEquals('Otwell', $collection[1]->name);
+		$this->assertEquals('foo_connection', $collection[0]->getConnectionName());
+		$this->assertEquals('foo_connection', $collection[1]->getConnectionName());
 	}
 
 
