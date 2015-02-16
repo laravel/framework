@@ -42,7 +42,7 @@ class RouteListCommand extends Command {
 	 * @var array
 	 */
 	protected $headers = array(
-		'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'
+		'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware', 'Tags'
 	);
 
 	/**
@@ -105,7 +105,8 @@ class RouteListCommand extends Command {
 			'uri'    => $route->uri(),
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
-			'middleware' => $this->getMiddleware($route)
+			'middleware' => $this->getMiddleware($route),
+			'tags' => $this->getTags($route)
 		));
 	}
 
@@ -133,6 +134,17 @@ class RouteListCommand extends Command {
 		$middleware = array_unique(array_merge($middleware, $this->getPatternFilters($route)));
 
 		return implode(', ', $middleware);
+	}
+
+	/**
+	 * Get tags
+	 *
+	 * @param  \Illuminate\Routing\Route  $route
+	 * @return string
+	 */
+	protected function getTags($route)
+	{
+		return implode(', ', $route->getTags());
 	}
 
 	/**
