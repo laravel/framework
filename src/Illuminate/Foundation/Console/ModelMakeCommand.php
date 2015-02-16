@@ -27,6 +27,20 @@ class ModelMakeCommand extends GeneratorCommand {
 	protected $type = 'Model';
 
 	/**
+	 * Execute the console command.
+	 *
+	 * @return void
+	 */
+	public function fire()
+	{
+		parent::fire();
+
+		$table = str_plural(strtolower(class_basename($this->argument('name'))));
+
+		$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+	}
+
+	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
