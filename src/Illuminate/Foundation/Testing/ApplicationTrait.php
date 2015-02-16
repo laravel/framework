@@ -27,7 +27,7 @@ trait ApplicationTrait {
 	 */
 	protected function refreshApplication()
 	{
-		Dotenv::setEnvironmentVariable('APP_ENV', 'testing');
+		putenv('APP_ENV=testing');
 
 		$this->app = $this->createApplication();
 	}
