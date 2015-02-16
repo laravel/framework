@@ -40,6 +40,37 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
 	}
 
+	public function testCharsetCollationCreateTable()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->create();
+		$blueprint->increments('id');
+		$blueprint->string('email');
+		$blueprint->charset = 'utf8mb4';
+		$blueprint->collation = 'utf8mb4_unicode_ci';
+
+		$conn = $this->getConnection();
+
+		$statements = $blueprint->toSql($conn, $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate utf8mb4_unicode_ci', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->create();
+		$blueprint->increments('id');
+		$blueprint->string('email')->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
+
+		$conn = $this->getConnection();
+		$conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+		$conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+
+		$statements = $blueprint->toSql($conn, $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
+
+	}
 
 	public function testBasicCreateTableWithPrefix()
 	{
