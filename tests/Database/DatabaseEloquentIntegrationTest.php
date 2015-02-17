@@ -187,6 +187,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicModelHydration()
+	{
+		EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+
+		$models = EloquentTestUser::hydrateRaw('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com'], 'foo_connection');
+
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
+		$this->assertInstanceOf('EloquentTestUser', $models[0]);
+		$this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
+		$this->assertEquals('foo_connection', $models[0]->getConnectionName());
+		$this->assertEquals(1, $models->count());
+	}
+
+
 	public function testHasOnSelfReferencingBelongsToManyRelationship()
 	{
 		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
