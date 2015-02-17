@@ -88,7 +88,7 @@ class Connection implements ConnectionInterface {
 	 * @var bool
 	 */
 	protected $loggingQueries = false;
-
+	
 	/**
 	 * Indicates if the connection is in a "dry run".
 	 *
@@ -532,17 +532,19 @@ class Connection implements ConnectionInterface {
 	 */
 	public function pretend(Closure $callback)
 	{
+		$this->enableQueryLog();
+		
 		$this->pretending = true;
-
+		
 		$this->queryLog = array();
-
+		
 		// Basically to make the database connection "pretend", we will just return
 		// the default values for all the query methods, then we will return an
 		// array of queries that were "executed" within the Closure callback.
 		$callback($this);
-
+		
 		$this->pretending = false;
-
+		
 		return $this->queryLog;
 	}
 
