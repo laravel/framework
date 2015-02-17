@@ -5,6 +5,7 @@ use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\ThreadSafeStore;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
@@ -18,7 +19,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * The cache store implementation.
 	 *
-	 * @var \Illuminate\Contracts\Cache\Store
+	 * @var \Illuminate\Contracts\Cache\Store|\Illuminate\Contracts\Cache\ThreadSafeStore
 	 */
 	protected $store;
 
@@ -37,6 +38,13 @@ class Repository implements CacheContract, ArrayAccess {
 	protected $default = 60;
 
 	/**
+	 * Whether or not the cache store implements the \Illuminate\Contracts\Cache\ThreadSafeStore interface
+	 *
+	 * @var bool
+	 */
+	protected $storeIsThreadSafe = false;
+
+	/**
 	 * Create a new cache repository instance.
 	 *
 	 * @param  \Illuminate\Contracts\Cache\Store  $store
@@ -44,6 +52,11 @@ class Repository implements CacheContract, ArrayAccess {
 	public function __construct(Store $store)
 	{
 		$this->store = $store;
+		if ($store instanceof ThreadSafeStore)
+		{
+			$this->storeIsThreadSafe = true;
+		}
+
 	}
 
 	/**
@@ -154,6 +167,11 @@ class Repository implements CacheContract, ArrayAccess {
 	 */
 	public function add($key, $value, $minutes)
 	{
+		if ($this->storeIsThreadSafe)
+		{
+			return $this->store->add($key, $value, $minutes);
+		}
+
 		if (is_null($this->get($key)))
 		{
 			$this->put($key, $value, $minutes); return true;

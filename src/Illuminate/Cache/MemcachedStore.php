@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\ThreadSafeStore;
 
-class MemcachedStore extends TaggableStore implements Store {
+class MemcachedStore extends TaggableStore implements ThreadSafeStore {
 
 	/**
 	 * The Memcached instance.
@@ -58,6 +59,19 @@ class MemcachedStore extends TaggableStore implements Store {
 	public function put($key, $value, $minutes)
 	{
 		$this->memcached->set($this->prefix.$key, $value, $minutes * 60);
+	}
+
+	/**
+	 * Store an item in the cache if the key does not exist for a given number of minutes.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @param  int     $minutes
+	 * @return bool
+	 */
+	public function add($key, $value, $minutes)
+	{
+		return $this->memcached->add($this->prefix.$key, $value, $minutes * 60);
 	}
 
 	/**
