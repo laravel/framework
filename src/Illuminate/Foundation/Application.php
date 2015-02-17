@@ -178,7 +178,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function afterLoadingEnvironment(Closure $callback)
 	{
-		$this->afterBootstrapping(
+		return $this->afterBootstrapping(
 			'Illuminate\Foundation\Bootstrap\DetectEnvironment', $callback
 		);
 	}
