@@ -35,9 +35,12 @@ class ModelMakeCommand extends GeneratorCommand {
 	{
 		parent::fire();
 
-		$table = str_plural(strtolower(class_basename($this->argument('name'))));
+		if ( ! $this->option('skip-migration'))
+		{
+			$table = str_plural(strtolower(class_basename($this->argument('name'))));
 
-		$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+			$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+		}
 	}
 
 	/**
@@ -59,6 +62,18 @@ class ModelMakeCommand extends GeneratorCommand {
 	protected function getDefaultNamespace($rootNamespace)
 	{
 		return $rootNamespace;
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('skip-migration', null, InputOption::VALUE_NONE, 'Do not create a new migration file.'),
+		);
 	}
 
 }
