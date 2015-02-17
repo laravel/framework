@@ -163,9 +163,36 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		foreach ($bootstrappers as $bootstrapper)
 		{
 			$this->make($bootstrapper)->bootstrap($this);
+
+			$this['events']->fire('bootstrapped: '.$bootstrapper, [$this]);
 		}
 
 		$this->hasBeenBootstrapped = true;
+	}
+
+	/**
+	 * Register a callback to run after loading the environment.
+	 *
+	 * @param  \Closure  $callback
+	 * @return void
+	 */
+	public function afterLoadingEnvironment(Closure $callback)
+	{
+		$this->afterBootstrapping(
+			'Illuminate\Foundation\Bootstrap\DetectEnvironment', $callback
+		);
+	}
+
+	/**
+	 * Register a callback to run after a bootstrapper.
+	 *
+	 * @param  string  $bootstrapper
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function afterBootstrapping($bootstrapper, Closure $callback)
+	{
+		$this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
 	}
 
 	/**
