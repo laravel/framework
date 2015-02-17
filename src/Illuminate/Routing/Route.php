@@ -53,6 +53,13 @@ class Route {
 	protected $wheres = array();
 
 	/**
+	 * The array of tags.
+	 *
+	 * @var array
+	 */
+	protected $tags = [];
+
+	/**
 	 * The array of matched parameters.
 	 *
 	 * @var array
@@ -109,6 +116,11 @@ class Route {
 		if (isset($this->action['prefix']))
 		{
 			$this->prefix($this->action['prefix']);
+		}
+
+		if (isset($this->action['tags']))
+		{
+			$this->tags($this->action['tags']);
 		}
 	}
 
@@ -754,6 +766,82 @@ class Route {
 
 		return $this;
 	}
+
+	/**
+	 * Add tags to the route.
+	 *
+	 * @param  mixed  $tags
+	 * @return $this
+	 */
+	public function tags($tags)
+	{
+		$tags = array_unique(is_array($tags) ? $tags : explode('|', $tags));
+
+		$this->tags = array_merge($this->tags, $tags);
+
+		sort($this->tags);
+
+		return $this;
+	}
+
+	/**
+	 * Get route tags.
+	 *
+	 * @return array
+	 */
+	public function getTags()
+	{
+		return $this->tags;
+	}
+
+	/**
+	 * Check if a route has a tag.
+	 *
+	 * @param  mixed  $tag
+	 * @return bool
+	 */
+	public function hasTag($tag)
+	{
+		$tags = is_array($tag) ? $tag : func_get_args();
+
+		foreach ($tags as $tag)
+		{
+			if (in_array($tag, $this->tags)) return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a route has a tag.
+	 *
+	 * @param  mixed  $tags
+	 * @return bool
+	 */
+	public function hasAllTags($tags)
+	{
+		$tags = is_array($tags) ? $tags : func_get_args();
+
+		foreach ($tags as $tag)
+		{
+			if ( ! in_array($tag, $this->tags)) return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Reset tags.
+	 *
+	 * @return bool
+	 */
+	public function resetTags()
+	{
+		$this->tags = [];
+
+		return $this;
+	}
+
 
 	/**
 	 * Get the URI associated with the route.

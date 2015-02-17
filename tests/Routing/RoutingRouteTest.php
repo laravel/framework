@@ -95,6 +95,54 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testTags()
+	{
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => 'tag1', function() {
+			return 'bar';
+		}]);
+		$this->assertEquals(['tag1'], $route->getTags());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => 'tag1', function() {
+			return 'bar';
+		}])->resetTags();
+		$this->assertEquals([], $route->getTags());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => 'tag1|tag2', function() {
+			return 'bar';
+		}]);
+		$this->assertEquals(['tag1', 'tag2'], $route->getTags());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => 'tag1|tag2|tag1', function() {
+			return 'bar';
+		}]);
+		$this->assertEquals(['tag1', 'tag2'], $route->getTags());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => 'tag1|tag2|tag1', function() {
+			return 'bar';
+		}])->tags(['tag4', 'tag3']);
+		$this->assertEquals(['tag1', 'tag2', 'tag3', 'tag4'], $route->getTags());
+
+		$router = $this->getRouter();
+		$route = $router->get('foo', ['tags' => ['tag3','tag4'], function() {
+			return 'bar';
+		}]);
+		$this->assertEquals(['tag3', 'tag4'], $route->getTags());
+
+		$this->assertTrue($route->hasTag('tag3'));
+		$this->assertTrue($route->hasTag('tag3', 'tag4'));
+		$this->assertTrue($route->hasTag('tag5', 'tag4'));
+		$this->assertFalse($route->hasTag('tag6', 'tag7'));
+
+		$this->assertTrue($route->hasAllTags('tag3', 'tag4'));
+		$this->assertFalse($route->hasAllTags('tag3', 'tag4', 'tag5'));
+	}
+
+
 	public function testClassesCanBeInjectedIntoRoutes()
 	{
 		unset($_SERVER['__test.route_inject']);
