@@ -42,7 +42,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 *
 	 * @var bool
 	 */
-	protected $storeIsThreadSafe = false;
+	protected $isStoreThreadSafe = false;
 
 	/**
 	 * Create a new cache repository instance.
@@ -54,7 +54,7 @@ class Repository implements CacheContract, ArrayAccess {
 		$this->store = $store;
 		if ($store instanceof ThreadSafeStore)
 		{
-			$this->storeIsThreadSafe = true;
+			$this->isStoreThreadSafe = true;
 		}
 
 	}
@@ -167,7 +167,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 */
 	public function add($key, $value, $minutes)
 	{
-		if ($this->storeIsThreadSafe)
+		if ($this->isStoreThreadSafe)
 		{
 			return $this->store->add($key, $value, $minutes);
 		}
