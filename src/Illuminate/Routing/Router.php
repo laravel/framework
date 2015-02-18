@@ -248,7 +248,7 @@ class Router implements RegistrarContract {
 		}
 
 		$routable = (new ControllerInspector)
-		                    ->getRoutable($prepended, $uri);
+							->getRoutable($prepended, $uri);
 
 		// When a controller is routed using this method, we use Reflection to parse
 		// out all of the routable methods for the controller, then register each
@@ -682,9 +682,9 @@ class Router implements RegistrarContract {
 		$middleware = $this->gatherRouteMiddlewares($route);
 
 		return (new Pipeline($this->container))
-		                ->send($request)
-		                ->through($middleware)
-		                ->then(function($request) use ($route)
+						->send($request)
+						->through($middleware)
+						->then(function($request) use ($route)
 						{
 							return $this->prepareResponse(
 								$request,
