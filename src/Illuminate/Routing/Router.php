@@ -703,9 +703,9 @@ class Router implements RegistrarContract {
 	{
 		return Collection::make($route->middleware())->map(function($m)
 		{
-			return array_get($this->middleware, $m, $m);
+			return Collection::make(array_get($this->middleware, $m, $m));
 
-		})->all();
+		})->collapse()->all();
 	}
 
 	/**
