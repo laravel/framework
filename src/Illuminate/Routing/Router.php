@@ -478,7 +478,7 @@ class Router implements RegistrarContract {
 		}
 
 		$route = $this->newRoute(
-			$methods, $uri = $this->prefix($uri), $action
+			$methods, $this->prefix($uri), $action
 		);
 
 		// If we have groups that need to be merged, we will merge them now after this
