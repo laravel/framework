@@ -355,6 +355,13 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table `users` add `foo` smallint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->smallInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` smallint not null auto_increment primary key', $statements[0]);
 	}
 
 
@@ -366,6 +373,13 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table `users` add `foo` tinyint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->tinyInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table `users` add `foo` tinyint not null auto_increment primary key', $statements[0]);
 	}
 
 
