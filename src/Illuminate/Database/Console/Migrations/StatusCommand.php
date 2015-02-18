@@ -56,7 +56,7 @@ class StatusCommand extends BaseCommand {
 
 		foreach ($this->getAllMigrationFiles() as $migration)
 		{
-			$migrations[] = in_array($migration, $ran) ? ['<info>✔</info>', $migration] : ['<fg=red>✗</fg=red>', $migration];
+			$migrations[] = in_array($migration, $ran) ? ['<info>Y</info>', $migration] : ['<fg=red>N</fg=red>', $migration];
 		}
 
 		if (count($migrations) > 0)
