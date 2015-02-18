@@ -114,7 +114,7 @@ class Handler implements ExceptionHandlerContract {
 
 		if (view()->exists("errors.{$status}"))
 		{
-			return response()->view("errors.{$status}", [], $status);
+			return response()->view("errors.{$status}", []);
 		}
 		else
 		{
