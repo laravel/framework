@@ -699,7 +699,7 @@ class Router implements RegistrarContract {
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return array
 	 */
-	protected function gatherRouteMiddlewares(Route $route)
+	public function gatherRouteMiddlewares(Route $route)
 	{
 		return Collection::make($route->middleware())->map(function($m)
 		{
