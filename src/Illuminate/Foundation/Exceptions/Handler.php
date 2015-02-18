@@ -47,6 +47,17 @@ class Handler implements ExceptionHandlerContract {
 	}
 
 	/**
+	 * Determine if the exception should be reported.
+	 *
+	 * @param  \Exception  $e
+	 * @return bool
+	 */
+	public function shouldReport(Exception $e)
+	{
+		return ! $this->shouldntReport($e);
+	}
+
+	/**
 	 * Determine if the exception is in the "do not report" list.
 	 *
 	 * @param  \Exception  $e
