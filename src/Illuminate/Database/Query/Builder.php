@@ -198,7 +198,7 @@ class Builder {
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'not like', 'between', 'ilike',
 		'&', '|', '^', '<<', '>>',
-		'rlike', 'regexp', 'not regexp',
+		'rlike', 'regexp', 'not regexp', '~',
 	);
 
 	/**
