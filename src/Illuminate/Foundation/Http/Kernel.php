@@ -120,7 +120,12 @@ class Kernel implements KernelContract {
 	 */
 	public function terminate($request, $response)
 	{
-		foreach ($this->middleware as $middleware)
+		$globalMiddlewares = $this->middleware;
+		$routeResolver = $request->getRouteResolver();
+		$routeMiddlewares = $this->router->gatherRouteMiddlewares($routeResolver());
+		$middlewares = array_merge($globalMiddlewares, $routeMiddlewares);
+
+		foreach ($middlewares as $middleware)
 		{
 			$instance = $this->app->make($middleware);
 
