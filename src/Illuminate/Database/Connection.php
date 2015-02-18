@@ -532,6 +532,8 @@ class Connection implements ConnectionInterface {
 	 */
 	public function pretend(Closure $callback)
 	{
+		$this->enableQueryLog();
+		
 		$this->pretending = true;
 
 		$this->queryLog = array();
