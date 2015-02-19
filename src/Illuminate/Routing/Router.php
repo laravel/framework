@@ -911,7 +911,7 @@ class Router implements RegistrarContract {
 			// developer a little greater flexibility to decide what will happen.
 			if ($callback instanceof Closure)
 			{
-				return call_user_func($callback);
+				return call_user_func($callback, $value);
 			}
 
 			throw new NotFoundHttpException;
