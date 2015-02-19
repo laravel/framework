@@ -16,7 +16,7 @@ class DetectEnvironment {
 	{
 		try
 		{
-			if( "mutable" == getenv('VAR_MUT') )
+			if (getenv('VAR_MUT') == "mutable")
 			{
 				Dotenv::makeMutable();
 			}
