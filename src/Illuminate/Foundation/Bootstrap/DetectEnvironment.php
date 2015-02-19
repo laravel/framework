@@ -17,7 +17,9 @@ class DetectEnvironment {
 		try
 		{
 			if( "mutable" == getenv('VAR_MUT') )
+			{
 				Dotenv::makeMutable();
+			}
 
 			Dotenv::load($app['path.base'], $app->environmentFile());
 		}
