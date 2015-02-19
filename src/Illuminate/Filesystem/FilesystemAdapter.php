@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Filesystem;
 
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\FileNotFoundException;
@@ -283,10 +282,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	protected function filterContentsByType($contents, $type)
 	{
-		return Collection::make($contents)
-			->where('type', $type)
-			->fetch('path')
-			->values()->all();
+		return collect($contents)->where('type', $type)->lists('path');
 	}
 
 	/**
