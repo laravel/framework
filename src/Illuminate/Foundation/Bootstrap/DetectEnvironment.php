@@ -16,6 +16,11 @@ class DetectEnvironment {
 	{
 		try
 		{
+			if (getenv('VAR_MUT') == "mutable")
+			{
+				Dotenv::makeMutable();
+			}
+
 			Dotenv::load($app['path.base'], $app->environmentFile());
 		}
 		catch (InvalidArgumentException $e)
