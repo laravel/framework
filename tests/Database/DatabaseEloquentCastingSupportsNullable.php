@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 
-class DatabaseEloquentCastingSupportsNulalble extends PHPUnit_Framework_TestCase {
+class DatabaseEloquentCastingSupportsNullable extends PHPUnit_Framework_TestCase {
 
 	public function tearDown()
 	{
