@@ -106,12 +106,20 @@ class VendorPublishCommand extends Command {
 			'to' => new Flysystem(new LocalAdapter($to)),
 		]);
 
+		$copied = 0;
+
 		foreach ($manager->listContents('from://', true) as $file)
 		{
 			if ($file['type'] === 'file' && ( ! $manager->has('to://'.$file['path']) || $this->option('force')))
 			{
 				$manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
+				$copied++;
 			}
+		}
+
+		if ($copied)
+		{
+			$this->status($from, $to, "$copied Files From");
 		}
 	}
 
