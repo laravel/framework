@@ -555,6 +555,14 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('missing', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
 	}
 
+	public function testModelBindingWithBindingClosure()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/{bar}', function($name) { return $name; });
+		$router->model('bar', 'RouteModelBindingNullStub', function($value) { return (new RouteModelBindingClosureStub())->findAlternate($value); });
+		$this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
+	}
+
 
 	public function testGroupMerging()
 	{
@@ -884,6 +892,10 @@ class RouteModelBindingStub {
 
 class RouteModelBindingNullStub {
 	public function find($value) {}
+}
+
+class RouteModelBindingClosureStub {
+	public function findAlternate($value) { return strtolower($value) . "alt"; }
 }
 
 class RouteTestFilterStub {
