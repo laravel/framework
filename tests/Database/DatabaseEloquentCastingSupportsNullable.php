@@ -1,14 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseEloquentCastingSupportsNullable extends PHPUnit_Framework_TestCase {
-
-	public function tearDown()
-	{
-		m::close();
-	}
 
 	public function testCastingStringToInteger()
 	{
@@ -18,12 +12,28 @@ class DatabaseEloquentCastingSupportsNullable extends PHPUnit_Framework_TestCase
         $this->assert(true, is_integer($model->getAttribute('string_to_integer_field')));
 	}
 
+    public function testFalseCastingStringToInteger()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->setAttribute('string_to_integer_field', '1');
+
+        $this->assert(false, is_string($model->getAttribute('string_to_integer_field')));
+    }
+
     public function testCastingStringToFloat()
     {
         $model = new EloquentModelCastingStub();
         $model->setAttribute('string_to_float_field', '1.0');
 
         $this->assert(true, is_float($model->getAttribute('string_to_float_field')));
+    }
+
+    public function testFalseCastingStringToFloat()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->setAttribute('string_to_float_field', '1.0');
+
+        $this->assert(false, is_string($model->getAttribute('string_to_float_field')));
     }
 
     public function testCastIntegerToString()
@@ -34,12 +44,28 @@ class DatabaseEloquentCastingSupportsNullable extends PHPUnit_Framework_TestCase
         $this->assert(true, is_string($model->getAttribute('integer_to_string_field')));
     }
 
+    public function testFalseCastIntegerToString()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->setAttribute('integer_to_string_field', 1);
+
+        $this->assert(false, is_integer($model->getAttribute('integer_to_string_field')));
+    }
+
     public function testCastFloatToString()
     {
         $model = new EloquentModelCastingStub();
         $model->setAttribute('integer_to_string_field', 1.0);
 
         $this->assert(true, is_string($model->getAttribute('float_to_string_field')));
+    }
+
+    public function testFalseCastFloatToString()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->setAttribute('integer_to_string_field', 1.0);
+
+        $this->assert(false, is_integer($model->getAttribute('float_to_string_field')));
     }
 
     public function testCastNullableToString()
@@ -65,7 +91,6 @@ class DatabaseEloquentCastingSupportsNullable extends PHPUnit_Framework_TestCase
 
         $this->assert(true, is_null($model->getAttribute('nullable_to_float')));
     }
-
 
 }
 
