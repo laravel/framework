@@ -36,6 +36,16 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 
 		$connection->prepare($names)->execute();
 
+		// Next, we will check to see if a timezone has been specified in this config
+		// and if it has we will issue a statement to modify the timezone with the
+		// database. Setting this DB timezone is an optional configuration item.
+		if (isset($config['timezone']))
+		{
+			$connection->prepare(
+				'set time_zone="'.$config['timezone'].'"'
+			)->execute();
+		}
+
 		// If the "strict" option has been configured for the connection we'll enable
 		// strict mode on all of these tables. This enforces some extra rules when
 		// using the MySQL database system and is a quicker way to enforce them.
