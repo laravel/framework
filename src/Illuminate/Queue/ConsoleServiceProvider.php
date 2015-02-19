@@ -51,7 +51,7 @@ class ConsoleServiceProvider extends ServiceProvider {
 
 		$this->app->singleton('command.queue.failed-table', function($app)
 		{
-			return new FailedTableCommand($app['files']);
+			return new FailedTableCommand($app['files'], $app['composer']);
 		});
 
 		$this->commands(
