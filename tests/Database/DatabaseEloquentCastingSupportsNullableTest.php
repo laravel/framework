@@ -1,14 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseEloquentCastingSupportsNullableTest extends PHPUnit_Framework_TestCase {
-
-	public function tearDown()
-	{
-		m::close();
-	}
 
 	public function testCastingStringToInteger()
 	{
