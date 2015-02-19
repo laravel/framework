@@ -253,4 +253,15 @@ class PasswordBroker implements PasswordBrokerContract {
 		return $this->tokens;
 	}
 
+	/**
+	 * Set the emailView in runtime.
+	 *
+	 * @param  string $view
+	 * @return  void
+	 */
+	public function setEmailView($view)
+	{
+		$this->emailView = $view;
+	}
+
 }
