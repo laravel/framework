@@ -555,6 +555,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('missing', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
 	}
 
+
 	public function testModelBindingWithBindingClosure()
 	{
 		$router = $this->getRouter();
