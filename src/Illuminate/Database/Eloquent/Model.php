@@ -2722,17 +2722,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function castAttribute($key, $value)
 	{
+        if ( is_null($value) ) {
+            return $value;
+        }
+
 		switch ($this->getCastType($key))
 		{
 			case 'int':
 			case 'integer':
-				return is_null($value) ? $value : (int) $value;
+				return (int) $value;
 			case 'real':
 			case 'float':
 			case 'double':
-				return is_null($value) ? $value : (float) $value;
+				return (float) $value;
 			case 'string':
-				return is_null($value) ? $value : (string) $value;
+				return (string) $value;
 			case 'bool':
 			case 'boolean':
 				return (bool) $value;
