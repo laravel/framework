@@ -27,7 +27,7 @@
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.0)."
+        "guzzlehttp/guzzle": "Required to use the Mailgun, Mandrill, and Postmark mail drivers (~5.0)."
     },
     "minimum-stability": "dev"
 }
