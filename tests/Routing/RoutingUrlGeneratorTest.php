@@ -73,13 +73,13 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * HTTPS...
 		 */
-		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'https'));
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/baz', array('as' => 'baz', 'https'));
 		$routes->add($route);
 
 		/**
 		 * Controller Route Route
 		 */
-		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'foo@bar'));
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bam', array('controller' => 'foo@bar'));
 		$routes->add($route);
 
 		/**
@@ -104,8 +104,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
 		$this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall'), false));
-		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
-		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+		$this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
+		$this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
