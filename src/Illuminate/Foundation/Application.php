@@ -756,17 +756,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
-	 * Register a maintenance mode event listener.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function down(Closure $callback)
-	{
-		$this['events']->listen('illuminate.app.down', $callback);
-	}
-
-	/**
 	 * Throw an HttpException with the given data.
 	 *
 	 * @param  int     $code
