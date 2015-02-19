@@ -112,15 +112,15 @@ class AppNameCommand extends Command {
 	protected function replaceNamespace($path)
 	{
 		$search = [
+			$this->currentRoot.'\\',
 			'namespace '.$this->currentRoot.';',
 			'namespace '.$this->currentRoot.'\\',
-			$this->currentRoot.'\\',
 		];
 
 		$replace = [
+			$this->argument('name').'\\',
 			'namespace '.$this->argument('name').';',
 			'namespace '.$this->argument('name').'\\',
-			$this->argument('name').'\\',
 		];
 
 		$this->replaceIn($path, $search, $replace);
