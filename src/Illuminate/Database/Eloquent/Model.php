@@ -2722,11 +2722,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function castAttribute($key, $value)
 	{
-		// If the attribute exists within the cast array, we will convert it to
-		// an appropriate native PHP type dependant upon the associated value
-		// given with the key in the pair. Dayle made this comment line up.
-		//
-		// To give the option of passing null back as an optional
+		// First we need to check if the cast type should allow NULL to
+		// pass back as a valid response rather than being cast into the
+		// equivalent empty value. Thanks Rafael for this suggestion.
 		$castType = $this->getCastType($key);
 		if (strpos($castType, '|null'))
 		{
