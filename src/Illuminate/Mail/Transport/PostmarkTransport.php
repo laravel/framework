@@ -84,6 +84,10 @@ class PostmarkTransport implements Swift_Transport {
 	}
 
 	/**
+	 * Gets MIME parts that match the message type.
+	 * Excludes parts of type \Swift_Mime_Attachment as those
+	 * are handled later.
+	 *
 	 * @param  Swift_Mime_Message $message
 	 * @param  string             $mimeType
 	 * @return Swift_Mime_MimePart
@@ -118,6 +122,13 @@ class PostmarkTransport implements Swift_Transport {
 		return $payload;
 	}
 
+	/**
+	 * Applies the recipients of the message into the API Payload.
+	 *
+	 * @param  array              $payload
+	 * @param  Swift_Mime_Message $message
+	 * @return object
+	 */
 	private function processRecipients(&$payload, $message)
 	{
 		$payload['From'] = join(',', $this->convertEmailsArray($message->getFrom()));
@@ -138,6 +149,14 @@ class PostmarkTransport implements Swift_Transport {
 		}
 	}
 
+	/**
+	 * Applies the message parts and attachments
+	 * into the API Payload.
+	 *
+	 * @param  array              $payload
+	 * @param  Swift_Mime_Message $message
+	 * @return object
+	 */
 	private function processMessageParts(&$payload, $message)
 	{
 		//Get the primary message.
@@ -178,6 +197,13 @@ class PostmarkTransport implements Swift_Transport {
 		}
 	}
 
+	/**
+	 * Applies the headers into the API Payload.
+	 *
+	 * @param  array              $payload
+	 * @param  Swift_Mime_Message $message
+	 * @return object
+	 */
 	private function processHeaders(&$payload, $message)
 	{
 		if ($message->getHeaders())
