@@ -2,8 +2,8 @@
 
 [![Build Status](https://img.shields.io/travis/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/vpre/unstable.svg)](https://packagist.org/packages/laravel/framework)
+[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework.svg?label=stable)](https://packagist.org/packages/laravel/framework)
+[![Latest Unstable Version](https://img.shields.io/packagist/vpre/laravel/framework.svg?label=unstable)](https://packagist.org/packages/laravel/framework)
 [![License](https://img.shields.io/packagist/l/laravel/framework.svg)](https://packagist.org/packages/laravel/framework)
 
 > **Note:** This repository contains the core code of the Laravel framework. If you want to build an application using Laravel 5, visit the main [Laravel repository](https://github.com/laravel/laravel).
