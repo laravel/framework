@@ -3,6 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 
 class RouteCacheCommand extends Command {
 
@@ -21,6 +22,20 @@ class RouteCacheCommand extends Command {
 	protected $description = 'Create a route cache file for faster route registration';
 
 	/**
+	 * The router instance.
+	 *
+	 * @var \Illuminate\Routing\Router
+	 */
+	protected $router;
+
+	/**
+	 * An array of all the registered routes.
+	 *
+	 * @var \Illuminate\Routing\RouteCollection
+	 */
+	protected $routes;
+
+	/**
 	 * The filesystem instance.
 	 *
 	 * @var \Illuminate\Filesystem\Filesystem
@@ -30,13 +45,15 @@ class RouteCacheCommand extends Command {
 	/**
 	 * Create a new route command instance.
 	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
+	 * @param  \Illuminate\Filesystem\Filesystem $files
+	 * @param  \Illuminate\Routing\Router  $router
 	 */
-	public function __construct(Filesystem $files)
+	public function __construct(Filesystem $files, Router $router)
 	{
 		parent::__construct();
 
+		$this->router = $router;
+		$this->routes = $router->getRoutes();
 		$this->files = $files;
 	}
 
@@ -49,41 +66,25 @@ class RouteCacheCommand extends Command {
 	{
 		$this->call('route:clear');
 
-		$routes = $this->getFreshApplicationRoutes();
-
-		if (count($routes) == 0)
+		if (count($this->routes) == 0)
 		{
 			return $this->error("Your application doesn't have any routes.");
 		}
 
-		foreach ($routes as $route)
+		foreach ($this->routes as $route)
 		{
 			$route->prepareForSerialization();
 		}
 
 		$this->files->put(
-			$this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
+			$this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($this->routes)
 		);
 
 		$this->info('Routes cached successfully!');
 	}
 
 	/**
-	 * Boot a fresh copy of the application and get the routes.
-	 *
-	 * @return \Illuminate\Routing\RouteCollection
-	 */
-	protected function getFreshApplicationRoutes()
-	{
-		$app = require $this->laravel['path.base'].'/bootstrap/app.php';
-
-		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-
-		return $app['router']->getRoutes();
-	}
-
-	/**
-	 * Build the route cache file.
+	 * Built the route cache file.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @return string
