@@ -73,11 +73,10 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testBootstrapPresenterCanGeneratorLinksForSlider()
 	{
-		return;
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new LengthAwarePaginator($array, count($array), 7, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 7);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
@@ -86,11 +85,10 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testBootstrapPresenterCanGeneratorLinksForTooCloseToBeginning()
 	{
-		return;
 		$array = [];
 		for ($i = 1; $i <= 13; $i++)
 			$array[$i] = 'item'.$i;
-		$p = new LengthAwarePaginator($array, count($array), 2, 1);
+		$p = new LengthAwarePaginator($array, count($array), 1, 2);
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning.html')), $presenter->render());
