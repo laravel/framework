@@ -280,6 +280,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->mediumInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" serial primary key not null', $statements[0]);
 	}
 
 
@@ -291,6 +298,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->tinyInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
 	}
 
 
@@ -302,6 +316,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->smallInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
 	}
 
 
