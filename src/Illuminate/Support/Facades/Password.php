@@ -10,7 +10,7 @@ class Password extends Facade {
 	 *
 	 * @var int
 	 */
-	const REMINDER_SENT = 'passwords.sent';
+	const RESET_LINK_SENT = 'passwords.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
