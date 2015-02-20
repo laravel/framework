@@ -68,7 +68,7 @@ class PostmarkTransport implements Swift_Transport {
 	 * Convert email dictionary with emails and names
 	 * to array of emails with names.
 	 *
-	 * @param  array $emails
+	 * @param  array  $emails
 	 * @return array
 	 */
 	private function convertEmailsArray(array $emails)
@@ -88,8 +88,8 @@ class PostmarkTransport implements Swift_Transport {
 	 * Excludes parts of type \Swift_Mime_Attachment as those
 	 * are handled later.
 	 *
-	 * @param  Swift_Mime_Message $message
-	 * @param  string             $mimeType
+	 * @param  Swift_Mime_Message  $message
+	 * @param  string              $mimeType
 	 * @return Swift_Mime_MimePart
 	 */
 	private function getMIMEPart(\Swift_Mime_Message $message, $mimeType)
@@ -106,7 +106,7 @@ class PostmarkTransport implements Swift_Transport {
 	/**
 	 * Convert a Swift Mime Message to a Postmark Payload.
 	 *
-	 * @param  Swift_Mime_Message $message
+	 * @param  Swift_Mime_Message  $message
 	 * @return object
 	 */
 	private function getMessagePayload(Swift_Mime_Message $message)
@@ -125,8 +125,8 @@ class PostmarkTransport implements Swift_Transport {
 	/**
 	 * Applies the recipients of the message into the API Payload.
 	 *
-	 * @param  array              $payload
-	 * @param  Swift_Mime_Message $message
+	 * @param  array               $payload
+	 * @param  Swift_Mime_Message  $message
 	 * @return object
 	 */
 	private function processRecipients(&$payload, $message)
@@ -153,8 +153,8 @@ class PostmarkTransport implements Swift_Transport {
 	 * Applies the message parts and attachments
 	 * into the API Payload.
 	 *
-	 * @param  array              $payload
-	 * @param  Swift_Mime_Message $message
+	 * @param  array               $payload
+	 * @param  Swift_Mime_Message  $message
 	 * @return object
 	 */
 	private function processMessageParts(&$payload, $message)
@@ -200,8 +200,8 @@ class PostmarkTransport implements Swift_Transport {
 	/**
 	 * Applies the headers into the API Payload.
 	 *
-	 * @param  array              $payload
-	 * @param  Swift_Mime_Message $message
+	 * @param  array               $payload
+	 * @param  Swift_Mime_Message  $message
 	 * @return object
 	 */
 	private function processHeaders(&$payload, $message)
