@@ -68,7 +68,7 @@ class PostmarkTransport implements Swift_Transport {
 	 * Convert email dictionary with emails and names
 	 * to array of emails with names.
 	 *
-	 * @param array $emails
+	 * @param  array $emails
 	 * @return array
 	 */
 	private function convertEmailsArray(array $emails)
@@ -84,8 +84,8 @@ class PostmarkTransport implements Swift_Transport {
 	}
 
 	/**
-	 * @param Swift_Mime_Message $message
-	 * @param string              $mimeType
+	 * @param  Swift_Mime_Message $message
+	 * @param  string             $mimeType
 	 * @return Swift_Mime_MimePart
 	 */
 	private function getMIMEPart(\Swift_Mime_Message $message, $mimeType)
@@ -107,55 +107,68 @@ class PostmarkTransport implements Swift_Transport {
 	 */
 	private function getMessagePayload(Swift_Mime_Message $message)
 	{
+		$payload = [];
 
-		$data = array(
-			'From'    => join(',', $this->convertEmailsArray($message->getFrom())),
-			'To'      => join(',', $this->convertEmailsArray($message->getTo())),
-			'Subject' => $message->getSubject(),
-		);
+		$this->processRecipients($payload, $message);
+
+		$this->processMessageParts($payload, $message);
+
+		$this->processHeaders($payload, $message);
+
+		return $payload;
+	}
+
+	private function processRecipients(&$payload, $message)
+	{
+		$payload['From'] = join(',', $this->convertEmailsArray($message->getFrom()));
+		$payload['To'] = join(',', $this->convertEmailsArray($message->getTo()));
+		$payload['Subject'] = $message->getSubject();
 
 		if ($cc = $message->getCc())
 		{
-			$data['Cc'] = join(',', $this->convertEmailsArray($cc));
+			$payload['Cc'] = join(',', $this->convertEmailsArray($cc));
 		}
 		if ($reply_to = $message->getReplyTo())
 		{
-			$data['ReplyTo'] = join(',', $this->convertEmailsArray($reply_to));
+			$payload['ReplyTo'] = join(',', $this->convertEmailsArray($reply_to));
 		}
 		if ($bcc = $message->getBcc())
 		{
-			$data['Bcc'] = join(',', $this->convertEmailsArray($bcc));
+			$payload['Bcc'] = join(',', $this->convertEmailsArray($bcc));
 		}
+	}
 
+	private function processMessageParts(&$payload, $message)
+	{
 		//Get the primary message.
 		switch ($message->getContentType())
 		{
 			case 'text/html':
 			case 'multipart/alternative':
-				$data['HtmlBody'] = $message->getBody();
+				$payload['HtmlBody'] = $message->getBody();
 				break;
 			default:
-				$data['TextBody'] = $message->getBody();
+				$payload['TextBody'] = $message->getBody();
 				break;
 		}
 
 		// Provide an alternate view from the secondary parts.
 		if ($plain = $this->getMIMEPart($message, 'text/plain'))
 		{
-			$data['TextBody'] = $plain->getBody();
+			$payload['TextBody'] = $plain->getBody();
 		}
 		if ($html = $this->getMIMEPart($message, 'text/html'))
 		{
-			$data['HtmlBody'] = $html->getBody();
+			$payload['HtmlBody'] = $html->getBody();
 		}
 		if ($message->getChildren())
 		{
-			$data['Attachments'] = array();
+			$payload['Attachments'] = array();
 			foreach ($message->getChildren() as $attachment)
 			{
 				if (is_object($attachment) and $attachment instanceof \Swift_Mime_Attachment)
 				{
-					$data['Attachments'][] = array(
+					$payload['Attachments'][] = array(
 						'Name'        => $attachment->getFilename(),
 						'Content'     => base64_encode($attachment->getBody()),
 						'ContentType' => $attachment->getContentType(),
@@ -163,10 +176,13 @@ class PostmarkTransport implements Swift_Transport {
 				}
 			}
 		}
+	}
+
+	private function processHeaders(&$payload, $message)
+	{
 		if ($message->getHeaders())
 		{
-			$data['Headers'] = [];
-
+			$headers = [];
 			foreach ($message->getHeaders()->getAll() as $key => $value)
 			{
 				$fieldName = $value->getFieldName();
@@ -181,7 +197,7 @@ class PostmarkTransport implements Swift_Transport {
 					if ($value instanceof \Swift_Mime_Headers_UnstructuredHeader ||
 						$value instanceof \Swift_Mime_Headers_OpenDKIMHeader)
 					{
-						array_push($data['Headers'], [
+						array_push($headers, [
 							"Name"  => $fieldName,
 							"Value" => $value->getValue(),
 						]);
@@ -193,14 +209,14 @@ class PostmarkTransport implements Swift_Transport {
 					{
 						if ($value->getFieldName() != 'Subject')
 						{
-							array_push($data['Headers'], [
+							array_push($headers, [
 								"Name"  => $fieldName,
 								"Value" => $value->getFieldBody(),
 							]);
 						}
 						if ($value->getFieldName() == 'Message-ID')
 						{
-							array_push($data['Headers'], [
+							array_push($headers, [
 								"Name"  => 'X-PM-KeepID',
 								"Value" => 'true',
 							]);
@@ -208,8 +224,8 @@ class PostmarkTransport implements Swift_Transport {
 					}
 				}
 			}
+			$payload['Headers'] = $headers;
 		}
-		return $data;
 	}
 
 	/**
