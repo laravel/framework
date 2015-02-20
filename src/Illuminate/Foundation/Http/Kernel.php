@@ -123,7 +123,7 @@ class Kernel implements KernelContract {
 		$routeResolver = $request->getRouteResolver();
 		$routeMiddlewares = $this->router->gatherRouteMiddlewares($routeResolver());
 
-		foreach (array_merge($this->middleware, $routeMiddlewares) as $middleware)
+		foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
 		{
 			$instance = $this->app->make($middleware);
 
