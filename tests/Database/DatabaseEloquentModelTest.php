@@ -1120,12 +1120,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->seventh = $obj;
 		$model->eighth = array('foo' => 'bar');
 
-        $model->intnullasnull = null;
-        $model->intnullasint = '87';
-        $model->floatnullasnull = null;
-        $model->floatnullasfloat = '12.4';
-        $model->stringnullasnull = null;
-        $model->stringnullasstring = 'bar';
+		$model->intnullasnull = null;
+		$model->intnullasint = '87';
+		$model->floatnullasnull = null;
+		$model->floatnullasfloat = '12.4';
+		$model->stringnullasnull = null;
+		$model->stringnullasstring = 'bar';
 
 		$this->assertInternalType('int', $model->first);
 		$this->assertInternalType('float', $model->second);
