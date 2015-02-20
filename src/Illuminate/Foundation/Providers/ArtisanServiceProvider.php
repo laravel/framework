@@ -314,7 +314,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.route.cache', function($app)
 		{
-			return new RouteCacheCommand($app['files']);
+			return new RouteCacheCommand($app['files'], $app['router']);
 		});
 	}
 
