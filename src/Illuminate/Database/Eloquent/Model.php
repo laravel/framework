@@ -2726,20 +2726,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			case 'int|null':
 			case 'integer|null':
-				if (is_null($value)) return null;
+				if (is_null($value)) return;
 			case 'int':
 			case 'integer':
 				return (int) $value;
 			case 'real|null':
 			case 'float|null':
 			case 'double|null':
-				if (is_null($value)) return null;
+				if (is_null($value)) return;
 			case 'real':
 			case 'float':
 			case 'double':
 				return (float) $value;
 			case 'string|null':
-				if (is_null($value)) return null;
+				if (is_null($value)) return;
 			case 'string':
 				return (string) $value;
 			case 'bool':
