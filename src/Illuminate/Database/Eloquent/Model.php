@@ -2722,25 +2722,41 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function castAttribute($key, $value)
 	{
-		switch ($this->getCastType($key))
+		// First we need to check if the cast type should allow NULL to
+		// pass back as a valid response rather than being cast into the
+		// equivalent empty value. Thanks Rafael for this suggestion.
+		$castType = $this->getCastType($key);
+		if (strpos($castType, '|null'))
 		{
+			if (is_null($value)) return;
+
+			$castType = str_replace('|null', '', $castType);
+		}
+
+		switch ($castType) {
 			case 'int':
 			case 'integer':
 				return (int) $value;
+
 			case 'real':
 			case 'float':
 			case 'double':
 				return (float) $value;
+
 			case 'string':
 				return (string) $value;
+
 			case 'bool':
 			case 'boolean':
 				return (bool) $value;
+
 			case 'object':
 				return json_decode($value);
+
 			case 'array':
 			case 'json':
 				return json_decode($value, true);
+
 			default:
 				return $value;
 		}

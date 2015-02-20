@@ -1120,6 +1120,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->seventh = $obj;
 		$model->eighth = array('foo' => 'bar');
 
+		$model->intnullasnull = null;
+		$model->intnullasint = '87';
+		$model->floatnullasnull = null;
+		$model->floatnullasfloat = '12.4';
+		$model->stringnullasnull = null;
+		$model->stringnullasstring = 'bar';
+
 		$this->assertInternalType('int', $model->first);
 		$this->assertInternalType('float', $model->second);
 		$this->assertInternalType('string', $model->third);
@@ -1135,6 +1142,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $model->eighth);
 		$this->assertEquals('{"foo":"bar"}', $model->eighthAttributeValue());
 
+		$this->assertNull($model->intnullasnull);
+		$this->assertInternalType('int', $model->intnullasint);
+		$this->assertNull($model->floatnullasnull);
+		$this->assertInternalType('float', $model->floatnullasfloat);
+		$this->assertNull($model->stringnullasnull);
+		$this->assertInternalType('string', $model->stringnullasstring);
+
 		$arr = $model->toArray();
 		$this->assertInternalType('int', $arr['first']);
 		$this->assertInternalType('float', $arr['second']);
@@ -1149,6 +1163,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($obj, $arr['sixth']);
 		$this->assertEquals(array('foo' => 'bar'), $arr['seventh']);
 		$this->assertEquals(array('foo' => 'bar'), $arr['eighth']);
+
+		$this->assertNull($arr['intnullasnull']);
+		$this->assertInternalType('int', $arr['intnullasint']);
+		$this->assertNull($arr['floatnullasnull']);
+		$this->assertInternalType('float', $arr['floatnullasfloat']);
+		$this->assertNull($arr['stringnullasnull']);
+		$this->assertInternalType('string', $arr['stringnullasstring']);
 	}
 
 
@@ -1335,7 +1356,13 @@ class EloquentModelCastingStub extends Illuminate\Database\Eloquent\Model {
 		'fifth' => 'boolean',
 		'sixth' => 'object',
 		'seventh' => 'array',
-		'eighth' => 'json'
+		'eighth' => 'json',
+		'intnullasnull' => 'int|null',
+		'intnullasint' => 'int|null',
+		'floatnullasnull' => 'float|null',
+		'floatnullasfloat' => 'float|null',
+		'stringnullasnull' => 'string|null',
+		'stringnullasstring' => 'string|null',
 	);
 	public function eighthAttributeValue()
 	{
