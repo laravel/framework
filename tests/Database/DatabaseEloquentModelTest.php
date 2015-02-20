@@ -1142,12 +1142,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $model->eighth);
 		$this->assertEquals('{"foo":"bar"}', $model->eighthAttributeValue());
 
-        $this->assertNull($model->intnullasnull);
+		$this->assertNull($model->intnullasnull);
 		$this->assertInternalType('int', $model->intnullasint);
-        $this->assertNull($model->floatnullasnull);
-        $this->assertInternalType('float', $model->floatnullasfloat);
-        $this->assertNull($model->stringnullasnull);
-        $this->assertInternalType('string', $model->stringnullasstring);
+		$this->assertNull($model->floatnullasnull);
+		$this->assertInternalType('float', $model->floatnullasfloat);
+		$this->assertNull($model->stringnullasnull);
+		$this->assertInternalType('string', $model->stringnullasstring);
 
 		$arr = $model->toArray();
 		$this->assertInternalType('int', $arr['first']);
@@ -1164,12 +1164,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $arr['seventh']);
 		$this->assertEquals(array('foo' => 'bar'), $arr['eighth']);
 
-        $this->assertNull($arr['intnullasnull']);
+		$this->assertNull($arr['intnullasnull']);
 		$this->assertInternalType('int', $arr['intnullasint']);
-        $this->assertNull($arr['floatnullasnull']);
-        $this->assertInternalType('float', $arr['floatnullasfloat']);
-        $this->assertNull($arr['stringnullasnull']);
-        $this->assertInternalType('string', $arr['stringnullasstring']);
+		$this->assertNull($arr['floatnullasnull']);
+		$this->assertInternalType('float', $arr['floatnullasfloat']);
+		$this->assertNull($arr['stringnullasnull']);
+		$this->assertInternalType('string', $arr['stringnullasstring']);
 	}
 
 
@@ -1357,12 +1357,12 @@ class EloquentModelCastingStub extends Illuminate\Database\Eloquent\Model {
 		'sixth' => 'object',
 		'seventh' => 'array',
 		'eighth' => 'json',
-        'intnullasnull' => 'int|null',
-        'intnullasint' => 'int|null',
-        'floatnullasnull' => 'float|null',
-        'floatnullasfloat' => 'float|null',
-        'stringnullasnull' => 'string|null',
-        'stringnullasstring' => 'string|null',
+		'intnullasnull' => 'int|null',
+		'intnullasint' => 'int|null',
+		'floatnullasnull' => 'float|null',
+		'floatnullasfloat' => 'float|null',
+		'stringnullasnull' => 'string|null',
+		'stringnullasstring' => 'string|null',
 	);
 	public function eighthAttributeValue()
 	{
