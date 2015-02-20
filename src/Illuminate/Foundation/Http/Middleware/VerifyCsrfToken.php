@@ -54,12 +54,14 @@ class VerifyCsrfToken implements Middleware {
 	 */
 	protected function tokensMatch($request)
 	{
-		$token = $request->session()->token();
+		$token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
-		$header = $request->header('X-XSRF-TOKEN');
+		if ( ! $token && $header = $request->header('X-XSRF-TOKEN'))
+		{
+			$token = $this->encrypter->decrypt($header);
+		}
 
-		return StringUtils::equals($token, $request->input('_token')) ||
-		       ($header && StringUtils::equals($token, $this->encrypter->decrypt($header)));
+		return StringUtils::equals($request->session()->token(), $token);
 	}
 
 	/**
