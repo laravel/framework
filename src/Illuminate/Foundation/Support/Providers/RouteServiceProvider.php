@@ -92,6 +92,13 @@ class RouteServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function register() {}
+	
+	/**
+	 * Define the routes for the application.
+	 *
+	 * @return void
+	 */
+	public function map() {}
 
 	/**
 	 * Pass dynamic methods onto the router instance.
