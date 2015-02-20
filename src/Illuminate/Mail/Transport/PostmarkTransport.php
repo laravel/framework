@@ -117,7 +117,10 @@ class PostmarkTransport implements Swift_Transport {
 
 		$this->processMessageParts($payload, $message);
 
-		$this->processHeaders($payload, $message);
+		if ($message->getHeaders())
+		{
+			$this->processHeaders($payload, $message);
+		}
 
 		return $payload;
 	}
@@ -206,52 +209,46 @@ class PostmarkTransport implements Swift_Transport {
 	 */
 	private function processHeaders(&$payload, $message)
 	{
-		if ($message->getHeaders())
+		$headers = [];
+
+		foreach ($message->getHeaders()->getAll() as $key => $value)
 		{
-			$headers = [];
-			foreach ($message->getHeaders()->getAll() as $key => $value)
+			$fieldName = $value->getFieldName();
+
+			$excludedHeaders = ['Subject', 'Content-Type', 'MIME-Version', 'Date'];
+
+			if ( ! in_array($fieldName, $excludedHeaders))
 			{
-				$fieldName = $value->getFieldName();
 
-				if ($fieldName != 'Subject' &&
-					$fieldName != 'Content-Type' &&
-					$fieldName != 'MIME-Version' &&
-					$fieldName != 'Date'
-				)
+				if ($value instanceof \Swift_Mime_Headers_UnstructuredHeader ||
+					$value instanceof \Swift_Mime_Headers_OpenDKIMHeader)
 				{
+					array_push($headers, [
+						"Name"  => $fieldName,
+						"Value" => $value->getValue(),
+					]);
+				}
+				else if ($value instanceof \Swift_Mime_Headers_DateHeader ||
+					$value instanceof \Swift_Mime_Headers_IdentificationHeader ||
+					$value instanceof \Swift_Mime_Headers_ParameterizedHeader ||
+					$value instanceof \Swift_Mime_Headers_PathHeader)
+				{
+					array_push($headers, [
+						"Name"  => $fieldName,
+						"Value" => $value->getFieldBody(),
+					]);
 
-					if ($value instanceof \Swift_Mime_Headers_UnstructuredHeader ||
-						$value instanceof \Swift_Mime_Headers_OpenDKIMHeader)
+					if ($value->getFieldName() == 'Message-ID')
 					{
 						array_push($headers, [
-							"Name"  => $fieldName,
-							"Value" => $value->getValue(),
+							"Name"  => 'X-PM-KeepID',
+							"Value" => 'true',
 						]);
-					}
-					else if ($value instanceof \Swift_Mime_Headers_DateHeader ||
-						$value instanceof \Swift_Mime_Headers_IdentificationHeader ||
-						$value instanceof \Swift_Mime_Headers_ParameterizedHeader ||
-						$value instanceof \Swift_Mime_Headers_PathHeader)
-					{
-						if ($value->getFieldName() != 'Subject')
-						{
-							array_push($headers, [
-								"Name"  => $fieldName,
-								"Value" => $value->getFieldBody(),
-							]);
-						}
-						if ($value->getFieldName() == 'Message-ID')
-						{
-							array_push($headers, [
-								"Name"  => 'X-PM-KeepID',
-								"Value" => 'true',
-							]);
-						}
 					}
 				}
 			}
-			$payload['Headers'] = $headers;
 		}
+		$payload['Headers'] = $headers;
 	}
 
 	/**
