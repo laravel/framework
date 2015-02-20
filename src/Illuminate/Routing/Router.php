@@ -731,11 +731,19 @@ class Router implements RegistrarContract {
 	 */
 	protected function substituteBindings($route)
 	{
+		$fullName = '';
+
 		foreach ($route->parameters() as $key => $value)
 		{
-			if (isset($this->binders[$key]))
+			if (strlen($fullName) === 0) {
+				$fullName .= $key;
+			} else {
+				$fullName .= '.' . $key;
+			}
+
+			if (isset($this->binders[$fullName]))
 			{
-				$route->setParameter($key, $this->performBinding($key, $value, $route));
+				$route->setParameter($key, $this->performBinding($fullName, $value, $route));
 			}
 		}
 

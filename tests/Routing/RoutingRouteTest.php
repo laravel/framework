@@ -508,6 +508,15 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testNestedRouteBinding()
+	{
+		$router = $this->getRouter();
+		$router->get('foo/{foo_bar}/name/{foo_name}', function($foo, $name) { return $name; });
+		$router->bind('foo-bar.foo-name', function($value) { return strtoupper($value); });
+		$this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/foo/name/taylor', 'GET'))->getContent());
+	}
+
+
 	public function testRouteClassBinding()
 	{
 		$router = $this->getRouter();
