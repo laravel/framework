@@ -248,7 +248,7 @@ class Router implements RegistrarContract {
 		}
 
 		$routable = (new ControllerInspector)
-		                    ->getRoutable($prepended, $uri);
+							->getRoutable($prepended, $uri);
 
 		// When a controller is routed using this method, we use Reflection to parse
 		// out all of the routable methods for the controller, then register each
@@ -478,7 +478,7 @@ class Router implements RegistrarContract {
 		}
 
 		$route = $this->newRoute(
-			$methods, $uri = $this->prefix($uri), $action
+			$methods, $this->prefix($uri), $action
 		);
 
 		// If we have groups that need to be merged, we will merge them now after this
@@ -682,9 +682,9 @@ class Router implements RegistrarContract {
 		$middleware = $this->gatherRouteMiddlewares($route);
 
 		return (new Pipeline($this->container))
-		                ->send($request)
-		                ->through($middleware)
-		                ->then(function($request) use ($route)
+						->send($request)
+						->through($middleware)
+						->then(function($request) use ($route)
 						{
 							return $this->prepareResponse(
 								$request,
@@ -911,7 +911,7 @@ class Router implements RegistrarContract {
 			// developer a little greater flexibility to decide what will happen.
 			if ($callback instanceof Closure)
 			{
-				return call_user_func($callback);
+				return call_user_func($callback, $value);
 			}
 
 			throw new NotFoundHttpException;

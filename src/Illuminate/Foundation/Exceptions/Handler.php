@@ -3,6 +3,7 @@
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
@@ -47,6 +48,17 @@ class Handler implements ExceptionHandlerContract {
 	}
 
 	/**
+	 * Determine if the exception should be reported.
+	 *
+	 * @param  \Exception  $e
+	 * @return bool
+	 */
+	public function shouldReport(Exception $e)
+	{
+		return ! $this->shouldntReport($e);
+	}
+
+	/**
 	 * Determine if the exception is in the "do not report" list.
 	 *
 	 * @param  \Exception  $e
@@ -88,7 +100,7 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function renderForConsole($output, Exception $e)
 	{
-		$output->writeln((string) $e);
+		(new ConsoleApplication)->renderException($e, $output);
 	}
 
 	/**
