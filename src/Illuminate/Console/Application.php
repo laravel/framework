@@ -46,7 +46,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 		$this->event = $events;
 		$this->laravel = $laravel;
 		$this->setAutoExit(false);
-		$this->setCatchExceptions(!$this->laravel->make('config')->get('app.debug');
+		$this->setCatchExceptions(!$this->laravel->make('config')->get('app.debug'));
 
 		$events->fire('artisan.start', [$this]);
 	}
