@@ -1152,6 +1152,40 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelAttributeCastingPreservesNull()
+	{
+		$model = new EloquentModelCastingStub;
+		$model->first = null;
+		$model->second = null;
+		$model->third = null;
+		$model->fourth = null;
+		$model->fifth = null;
+		$model->sixth = null;
+		$model->seventh = null;
+		$model->eighth = null;
+
+		$this->assertNull($model->first);
+		$this->assertNull($model->second);
+		$this->assertNull($model->third);
+		$this->assertNull($model->fourth);
+		$this->assertNull($model->fifth);
+		$this->assertNull($model->sixth);
+		$this->assertNull($model->seventh);
+		$this->assertNull($model->eighth);
+
+		$array = $model->toArray();
+
+		$this->assertNull($array['first']);
+		$this->assertNull($array['second']);
+		$this->assertNull($array['third']);
+		$this->assertNull($array['fourth']);
+		$this->assertNull($array['fifth']);
+		$this->assertNull($array['sixth']);
+		$this->assertNull($array['seventh']);
+		$this->assertNull($array['eighth']);
+	}
+
+
 	protected function addMockConnection($model)
 	{
 		$model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
