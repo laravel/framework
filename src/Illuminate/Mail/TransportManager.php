@@ -2,12 +2,13 @@
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
-use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
+use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
-use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Mail\Transport\PostmarkTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager {
@@ -102,6 +103,18 @@ class TransportManager extends Manager {
 		$config = $this->app['config']->get('services.mandrill', array());
 
 		return new MandrillTransport($config['secret']);
+	}
+
+	/**
+	 * Create an instance of the Postmark Swift Transport driver.
+	 *
+	 * @return \Illuminate\Mail\Transport\PostmarkTransport
+	 */
+	protected function createPostmarkDriver()
+	{
+		$config = $this->app['config']->get('services.postmark', array());
+
+		return new PostmarkTransport($config['serverToken']);
 	}
 
 	/**
