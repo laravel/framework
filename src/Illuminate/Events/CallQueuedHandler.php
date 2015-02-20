@@ -66,6 +66,7 @@ class CallQueuedHandler {
 	/**
 	 * Call the failed method on the job instance.
 	 *
+	 * @param  array  $data
 	 * @return void
 	 */
 	public function failed(array $data)
