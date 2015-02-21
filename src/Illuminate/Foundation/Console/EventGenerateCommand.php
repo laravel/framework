@@ -17,7 +17,7 @@ class EventGenerateCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Generate the missing events and handlers based on registration';
+	protected $description = 'Generate the missing events and listeners based on registration';
 
 	/**
 	 * Execute the console command.
@@ -30,20 +30,20 @@ class EventGenerateCommand extends Command {
 			'Illuminate\Foundation\Support\Providers\EventServiceProvider'
 		);
 
-		foreach ($provider->listens() as $event => $handlers)
+		foreach ($provider->listens() as $event => $listeners)
 		{
 			if ( ! str_contains($event, '\\'))
 				continue;
 
 			$this->callSilent('make:event', ['name' => $event]);
 
-			foreach ($handlers as $handler)
+			foreach ($listeners as $listener)
 			{
-				$this->callSilent('handler:event', ['name' => $handler, '--event' => $event]);
+				$this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
 			}
 		}
 
-		$this->info('Events and handlers generated successfully!');
+		$this->info('Events and listeners generated successfully!');
 	}
 
 }
