@@ -1,0 +1,31 @@
+<?php namespace {{namespace}};
+
+use {{fullEvent}};
+
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
+
+class {{class}} {
+
+	/**
+	 * Create the event listener.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		//
+	}
+
+	/**
+	 * Handle the event.
+	 *
+	 * @param  {{event}}  $event
+	 * @return void
+	 */
+	public function handle({{event}} $event)
+	{
+		//
+	}
+
+}
