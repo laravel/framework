@@ -684,13 +684,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		return "<?php \$__env->appendSection(); ?>";
 	}
 
-	/**
-	 * Register a custom Blade compiler.
-	 *
-	 * @param  \Closure  $compiler
-	 * @return void
-	 */
-	public function extend(Closure $compiler)
+    /**
+     * Register a custom Blade compiler.
+     *
+     * @param callable $compiler
+     * @return void
+     */
+	public function extend(callable $compiler)
 	{
 		$this->extensions[] = $compiler;
 	}
