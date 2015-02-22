@@ -282,7 +282,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function input($key = null, $default = null)
 	{
