@@ -22,6 +22,17 @@ trait ResetsPasswords {
 	protected $passwords;
 
 	/**
+	 * The password reset validation rules.
+	 *
+	 * @var array
+	 */
+	protected $rules = [
+		'token' => 'required',
+		'email' => 'required|email',
+		'password' => 'required|confirmed|min:6',
+	];
+
+	/**
 	 * Display the form to request a password reset link.
 	 *
 	 * @return Response
@@ -90,11 +101,7 @@ trait ResetsPasswords {
 	 */
 	public function postReset(Request $request)
 	{
-		$this->validate($request, [
-			'token' => 'required',
-			'email' => 'required|email',
-			'password' => 'required|confirmed',
-		]);
+		$this->validate($request, $this->rules);
 
 		$credentials = $request->only(
 			'email', 'password', 'password_confirmation', 'token'
