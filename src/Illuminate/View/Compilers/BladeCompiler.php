@@ -687,10 +687,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Register a custom Blade compiler.
 	 *
-	 * @param  \Closure  $compiler
+	 * @param  callable  $compiler
 	 * @return void
 	 */
-	public function extend(Closure $compiler)
+	public function extend(callable $compiler)
 	{
 		$this->extensions[] = $compiler;
 	}
