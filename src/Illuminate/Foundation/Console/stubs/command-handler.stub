@@ -1,10 +1,10 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace;
 
-use {{fullCommand}};
+use DummyFullCommand;
 
 use Illuminate\Queue\InteractsWithQueue;
 
-class {{class}} {
+class DummyClass {
 
 	/**
 	 * Create the command handler.
@@ -19,10 +19,10 @@ class {{class}} {
 	/**
 	 * Handle the command.
 	 *
-	 * @param  {{command}}  $command
+	 * @param  DummyCommand  $command
 	 * @return void
 	 */
-	public function handle({{command}} $command)
+	public function handle(DummyCommand $command)
 	{
 		//
 	}

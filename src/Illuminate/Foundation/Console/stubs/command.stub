@@ -1,10 +1,10 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
-use {{rootNamespace}}Commands\Command;
+use DummyRootNamespaceCommands\Command;
 
 use Illuminate\Contracts\Bus\SelfHandling;
 
-class {{class}} extends Command implements SelfHandling {
+class DummyClass extends Command implements SelfHandling {
 
 	/**
 	 * Create a new command instance.

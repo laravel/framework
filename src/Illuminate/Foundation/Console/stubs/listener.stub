@@ -1,11 +1,11 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
-use {{fullEvent}};
+use DummyFullEvent;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class {{class}} {
+class DummyClass {
 
 	/**
 	 * Create the event listener.
@@ -20,10 +20,10 @@ class {{class}} {
 	/**
 	 * Handle the event.
 	 *
-	 * @param  {{event}}  $event
+	 * @param  DummyEvent  $event
 	 * @return void
 	 */
-	public function handle({{event}} $event)
+	public function handle(DummyEvent $event)
 	{
 		//
 	}

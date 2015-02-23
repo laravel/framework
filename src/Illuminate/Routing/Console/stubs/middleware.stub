@@ -1,8 +1,8 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
 use Closure;
 
-class {{class}} {
+class DummyClass {
 
 	/**
 	 * Handle an incoming request.
