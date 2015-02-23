@@ -368,6 +368,22 @@ if ( ! function_exists('redirect'))
 	}
 }
 
+if ( ! function_exists('resource'))
+{
+	/**
+	 * Route a resource to a controller.
+	 *
+	 * @param  string  $name
+	 * @param  string  $controller
+	 * @param  array   $options
+	 * @return void
+	 */
+	function resource($name, $controller, array $options = [])
+	{
+		return app('router')->resource($name, $controller, $options);
+	}
+}
+
 if ( ! function_exists('response'))
 {
 	/**

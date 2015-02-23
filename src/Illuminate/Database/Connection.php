@@ -532,9 +532,13 @@ class Connection implements ConnectionInterface {
 	 */
 	public function pretend(Closure $callback)
 	{
+		$loggingQueries = $this->loggingQueries;
+
+		$this->enableQueryLog();
+
 		$this->pretending = true;
 
-		$this->queryLog = array();
+		$this->queryLog = [];
 
 		// Basically to make the database connection "pretend", we will just return
 		// the default values for all the query methods, then we will return an
@@ -542,6 +546,8 @@ class Connection implements ConnectionInterface {
 		$callback($this);
 
 		$this->pretending = false;
+
+		$this->loggingQueries = $loggingQueries;
 
 		return $this->queryLog;
 	}
