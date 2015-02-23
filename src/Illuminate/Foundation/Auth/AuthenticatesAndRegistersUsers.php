@@ -84,7 +84,7 @@ trait AuthenticatesAndRegistersUsers {
 		return redirect($this->loginPath())
 					->withInput($request->only('email', 'remember'))
 					->withErrors([
-						$this->getFailedLoginMesssage(),
+						'email' => $this->getFailedLoginMesssage(),
 					]);
 	}
 
