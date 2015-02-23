@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class EloquentModelPresenter extends ObjectPresenter {
 
 	/**
-	 * Can the presenter present the given value?
+	 * Determine if the presenter present the given value.
 	 *
 	 * @param  mixed  $value
 	 * @return bool
@@ -21,17 +21,15 @@ class EloquentModelPresenter extends ObjectPresenter {
 	/**
 	 * Get an array of Model object properties.
 	 *
-	 * ReflectionProperty constants may be passed as $propertyFilter, and should
-	 * be used to toggle visibility of private and protected properties.
-	 *
 	 * @param  object  $value
-	 * @param  ReflectionClass  $class
+	 * @param  \ReflectionClass  $class
 	 * @param  int  $propertyFilter
 	 * @return array
 	 */
 	public function getProperties($value, ReflectionClass $class, $propertyFilter)
 	{
-		$attributes = $value->getAttributes();
+		$attributes = array_merge($value->getAttributes(), $value->getRelations());
+
 		$visible = $value->getVisible();
 
 		if (count($visible) === 0)

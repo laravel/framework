@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 class IlluminateCollectionPresenter extends ArrayPresenter {
 
 	/**
-	 * Can the presenter present the given value?
+	 * Determine if the presenter present the given value.
 	 *
 	 * @param  mixed  $value
 	 * @return bool
@@ -17,7 +17,7 @@ class IlluminateCollectionPresenter extends ArrayPresenter {
 	}
 
 	/**
-	 * Collections should be treated as ArrayObjects.
+	 * Determine if the given value is a collection.
 	 *
 	 * @param  object  $value
 	 * @return boolean
@@ -28,7 +28,7 @@ class IlluminateCollectionPresenter extends ArrayPresenter {
 	}
 
 	/**
-	 * Get an array of Collection values.
+	 * Get an array of collection values.
 	 *
 	 * @param  object  $value
 	 * @return array

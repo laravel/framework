@@ -15,7 +15,7 @@ class TinkerCommand extends Command {
 	 *
 	 * @var array
 	 */
-	protected static $commandWhitelist = [
+	protected $commandWhitelist = [
 		'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'optimize', 'up',
 	];
 
@@ -42,16 +42,48 @@ class TinkerCommand extends Command {
 	{
 		$this->getApplication()->setCatchExceptions(false);
 
-		$config = new Configuration();
+		$config = new Configuration;
 
-		$pm = $config->getPresenterManager();
-		$pm->addPresenters($this->getPresenters());
+		$config->getPresenterManager()->addPresenters(
+			$this->getPresenters()
+		);
 
 		$shell = new Shell($config);
 		$shell->addCommands($this->getCommands());
 		$shell->setIncludes($this->argument('include'));
 
 		$shell->run();
+	}
+
+	/**
+	 * Get artisan commands to pass through to PsySH.
+	 *
+	 * @return array
+	 */
+	protected function getCommands()
+	{
+		$commands = [];
+
+		foreach ($this->getApplication()->all() as $name => $command)
+		{
+			if (in_array($name, $this->commandWhitelist)) $commands[] = $command;
+		}
+
+		return $commands;
+	}
+
+	/**
+	 * Get an array of Laravel tailored Presenters.
+	 *
+	 * @return array
+	 */
+	protected function getPresenters()
+	{
+		return [
+			new EloquentModelPresenter,
+			new IlluminateCollectionPresenter,
+			new IlluminateApplicationPresenter,
+		];
 	}
 
 	/**
@@ -66,34 +98,4 @@ class TinkerCommand extends Command {
 		];
 	}
 
-	/**
-	 * Get artisan commands to pass through to PsySH.
-	 *
-	 * @return array
-	 */
-	protected function getCommands()
-	{
-		$commands = [];
-
-		foreach ($this->getApplication()->all() as $name => $command)
-		{
-			if (in_array($name, self::$commandWhitelist)) $commands[] = $command;
-		}
-
-		return $commands;
-	}
-
-	/**
-	 * Get an array of Laravel-specific Presenters.
-	 *
-	 * @return array
-	 */
-	protected function getPresenters()
-	{
-		return [
-			new EloquentModelPresenter(),
-			new IlluminateCollectionPresenter(),
-			new IlluminateApplicationPresenter(),
-		];
-	}
 }
