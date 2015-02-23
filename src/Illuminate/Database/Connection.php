@@ -651,12 +651,15 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Determine if the given exception was caused by a lost connection.
 	 *
-	 * @param  \Illuminate\Database\QueryException
+	 * @param  \Illuminate\Database\QueryException  $e
 	 * @return bool
 	 */
 	protected function causedByLostConnection(QueryException $e)
 	{
-		return str_contains($e->getPrevious()->getMessage(), 'server has gone away');
+		$message = $e->getPrevious()->getMessage();
+
+		return str_contains($message, 'server has gone away')
+			|| str_contains($message, 'no connection to the server');
 	}
 
 	/**
