@@ -12,5 +12,5 @@
 */
 
 app('router')->setRoutes(
-	unserialize(base64_decode('{{routes}}'))
+    unserialize(base64_decode('{{routes}}'))
 );

@@ -1,33 +1,32 @@
 <?php namespace DummyNamespace;
 
 use DummyFullEvent;
-
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class DummyClass implements ShouldBeQueued {
+class DummyClass implements ShouldBeQueued
+{
 
-	use InteractsWithQueue;
+    use InteractsWithQueue;
 
-	/**
-	 * Create the event handler.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		//
-	}
+    /**
+     * Create the event handler.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
 
-	/**
-	 * Handle the event.
-	 *
-	 * @param  DummyEvent  $event
-	 * @return void
-	 */
-	public function handle(DummyEvent $event)
-	{
-		//
-	}
-
+    /**
+     * Handle the event.
+     *
+     * @param  DummyEvent  $event
+     * @return void
+     */
+    public function handle(DummyEvent $event)
+    {
+        //
+    }
 }
