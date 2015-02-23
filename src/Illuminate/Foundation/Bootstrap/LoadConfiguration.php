@@ -81,7 +81,7 @@ class LoadConfiguration {
 	/**
 	 * Get the configuration file nesting path.
 	 *
-	 * @param  \Symfony\Component\Finder\SplFileInfo $file
+	 * @param  \Symfony\Component\Finder\SplFileInfo  $file
 	 * @return string
 	 */
 	private function getConfigurationNesting(SplFileInfo $file)
