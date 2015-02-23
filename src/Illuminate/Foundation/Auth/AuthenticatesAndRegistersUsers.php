@@ -84,8 +84,18 @@ trait AuthenticatesAndRegistersUsers {
 		return redirect($this->loginPath())
 					->withInput($request->only('email', 'remember'))
 					->withErrors([
-						'email' => trans()->has('validation.credentials_not_match') ? trans('validation.credentials_not_match') : 'These credentials do not match our records.'
+						$this->getFailedLoginMesssage(),
 					]);
+	}
+
+	/**
+	 * Get the failed login message.
+	 *
+	 * @return string
+	 */
+	protected function getFailedLoginMesssage()
+	{
+		return 'These credentials do not match our records.';
 	}
 
 	/**
