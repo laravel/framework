@@ -1,115 +1,60 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Auth;
+
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\Registrar;
 
 trait AuthenticatesAndRegistersUsers {
 
-	/**
-	 * Show the application registration form.
-	 *
-	 * @return \Illuminate\Http\Response
-	 */
-	public function getRegister()
-	{
-		return view('auth.register');
-	}
+    use AuthenticatesUsers;
 
-	/**
-	 * Handle a registration request for the application.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
-	public function postRegister(Request $request)
-	{
-		$validator = $this->validator($request->all());
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getRegister()
+    {
+        return view('auth.register');
+    }
 
-		if ($validator->fails())
-		{
-			$this->throwValidationException(
-				$request, $validator
-			);
-		}
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postRegister(Request $request)
+    {
+        $validator = $this->validator($request->all());
 
-		Auth::login($this->create($request->all()));
+        if ($validator->fails())
+        {
+            $this->throwValidationException(
+                $request, $validator
+            );
+        }
 
-		return redirect($this->redirectPath());
-	}
+        Auth::login($this->create($request->all()));
 
-	/**
-	 * Show the application login form.
-	 *
-	 * @return \Illuminate\Http\Response
-	 */
-	public function getLogin()
-	{
-		return view('auth.login');
-	}
+        return redirect($this->redirectPath());
+    }
 
-	/**
-	 * Handle a login request to the application.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
-	public function postLogin(Request $request)
-	{
-		$this->validate($request, [
-			'email' => 'required|email', 'password' => 'required',
-		]);
+    /**
+     * Validates the submitted registration form
+     *
+     * @param array $data
+     *
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    abstract protected function validator(array $data);
 
-		$credentials = $request->only('email', 'password');
-
-		if (Auth::attempt($credentials, $request->has('remember')))
-		{
-			return redirect()->intended($this->redirectPath());
-		}
-
-		return redirect($this->loginPath())
-					->withInput($request->only('email', 'remember'))
-					->withErrors([
-						'email' => 'These credentials do not match our records.',
-					]);
-	}
-
-	/**
-	 * Log the user out of the application.
-	 *
-	 * @return \Illuminate\Http\Response
-	 */
-	public function getLogout()
-	{
-		Auth::logout();
-
-		return redirect('/');
-	}
-
-	/**
-	 * Get the post register / login redirect path.
-	 *
-	 * @return string
-	 */
-	public function redirectPath()
-	{
-		if (property_exists($this, 'redirectPath'))
-		{
-			return $this->redirectPath;
-		}
-
-		return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
-	}
-
-	/**
-	 * Get the path to the login route.
-	 *
-	 * @return string
-	 */
-	public function loginPath()
-	{
-		return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
-	}
-
+    /**
+     * Persist the registration form and returns it
+     *
+     * @param array $data
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     */
+    abstract protected function create(array $data);
 }
