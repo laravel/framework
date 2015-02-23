@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr {
@@ -28,13 +27,13 @@ class Arr {
 	/**
 	 * Build a new array using a callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	public static function build($array, Closure $callback)
+	public static function build($array, callable $callback)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -54,7 +53,7 @@ class Arr {
 	 */
 	public static function divide($array)
 	{
-		return array(array_keys($array), array_values($array));
+		return [array_keys($array), array_values($array)];
 	}
 
 	/**
@@ -66,7 +65,7 @@ class Arr {
 	 */
 	public static function dot($array, $prepend = '')
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $key => $value)
 		{
@@ -106,7 +105,7 @@ class Arr {
 	{
 		foreach (explode('.', $key) as $segment)
 		{
-			$results = array();
+			$results = [];
 
 			foreach ($array as $value)
 			{
@@ -125,12 +124,12 @@ class Arr {
 	/**
 	 * Return the first element in an array passing a given truth test.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
-	 * @param  mixed     $default
+	 * @param  array  $array
+	 * @param  callable  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public static function first($array, $callback, $default = null)
+	public static function first($array, callable $callback, $default = null)
 	{
 		foreach ($array as $key => $value)
 		{
@@ -143,12 +142,12 @@ class Arr {
 	/**
 	 * Return the last element in an array passing a given truth test.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
-	 * @param  mixed     $default
+	 * @param  array  $array
+	 * @param  callable  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public static function last($array, $callback, $default = null)
+	public static function last($array, callable $callback, $default = null)
 	{
 		return static::first(array_reverse($array), $callback, $default);
 	}
@@ -161,7 +160,7 @@ class Arr {
 	 */
 	public static function flatten($array)
 	{
-		$return = array();
+		$return = [];
 
 		array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
 
@@ -275,7 +274,7 @@ class Arr {
 	 */
 	public static function pluck($array, $value, $key = null)
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($array as $item)
 		{
@@ -341,7 +340,7 @@ class Arr {
 			// values at the correct depth. Then we'll keep digging into the array.
 			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
-				$array[$key] = array();
+				$array[$key] = [];
 			}
 
 			$array =& $array[$key];
@@ -353,27 +352,27 @@ class Arr {
 	}
 
 	/**
-	 * Sort the array using the given Closure.
+	 * Sort the array using the given callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	public static function sort($array, Closure $callback)
+	public static function sort($array, callable $callback)
 	{
 		return Collection::make($array)->sortBy($callback)->all();
 	}
 
 	/**
-	 * Filter the array using the given Closure.
+	 * Filter the array using the given callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	public static function where($array, Closure $callback)
+	public static function where($array, callable $callback)
 	{
-		$filtered = array();
+		$filtered = [];
 
 		foreach ($array as $key => $value)
 		{
