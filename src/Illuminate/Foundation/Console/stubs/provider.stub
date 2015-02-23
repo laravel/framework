@@ -1,4 +1,4 @@
-<?php namespace DummyNamespace};
+<?php namespace DummyNamespace;
 
 use Illuminate\Support\ServiceProvider;
 
