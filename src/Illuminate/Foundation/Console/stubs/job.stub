@@ -1,10 +1,10 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
-use {{rootNamespace}}Jobs\Job;
+use DummyRootNamespaceJobs\Job;
 
 use Illuminate\Contracts\Bus\SelfHandling;
 
-class {{class}} extends Job implements SelfHandling {
+class DummyClass extends Job implements SelfHandling {
 
 	/**
 	 * Create a new job instance.

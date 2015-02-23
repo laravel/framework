@@ -1,10 +1,10 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
-use {{rootNamespace}}Events\Event;
+use DummyRootNamespaceEvents\Event;
 
 use Illuminate\Queue\SerializesModels;
 
-class {{class}} extends Event {
+class DummyClass extends Event {
 
 	use SerializesModels;
 

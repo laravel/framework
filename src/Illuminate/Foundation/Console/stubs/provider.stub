@@ -1,8 +1,8 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
 use Illuminate\Support\ServiceProvider;
 
-class {{class}} extends ServiceProvider {
+class DummyClass extends ServiceProvider {
 
 	/**
 	 * Bootstrap the application services.

@@ -1,13 +1,13 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace};
 
-use {{rootNamespace}}Commands\Command;
+use DummyRootNamespaceCommands\Command;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class {{class}} extends Command implements SelfHandling, ShouldBeQueued {
+class DummyClass extends Command implements SelfHandling, ShouldBeQueued {
 
 	use InteractsWithQueue, SerializesModels;
 
