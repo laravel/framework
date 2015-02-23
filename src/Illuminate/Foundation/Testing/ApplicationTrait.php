@@ -171,19 +171,6 @@ trait ApplicationTrait {
 	}
 
 	/**
-	 * Call artisan command and return code
-	 *
-	 * @param string  $command
-	 * @param array   $parameters
-	 *
-	 * @return int
-	 */
-	public function callArtisan($command, $parameters = [])
-	{
-		return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
-	}
-
-	/**
 	 * Seed a given database connection.
 	 *
 	 * @param  string  $class
@@ -191,7 +178,19 @@ trait ApplicationTrait {
 	 */
 	public function seed($class = 'DatabaseSeeder')
 	{
-		$this->callArtisan('db:seed', ['--class' => $class]);
+		$this->artisan('db:seed', ['--class' => $class]);
+	}
+
+	/**
+	 * Call artisan command and return code
+	 *
+	 * @param string  $command
+	 * @param array   $parameters
+	 * @return int
+	 */
+	public function artisan($command, $parameters = [])
+	{
+		return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
 	}
 
 }
