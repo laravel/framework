@@ -30,7 +30,7 @@ class IlluminateApplicationPresenter extends ObjectPresenter {
 	];
 
 	/**
-	 * Determine if the presenter present the given value.
+	 * Determine if the presenter can present the given value.
 	 *
 	 * @param  mixed  $value
 	 * @return bool

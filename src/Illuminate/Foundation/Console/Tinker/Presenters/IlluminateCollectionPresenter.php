@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 class IlluminateCollectionPresenter extends ArrayPresenter {
 
 	/**
-	 * Determine if the presenter present the given value.
+	 * Determine if the presenter can present the given value.
 	 *
 	 * @param  mixed  $value
 	 * @return bool
