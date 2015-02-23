@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Database\Seeder;
+
+class {{class}} extends Seeder {
+
+	/**
+	 * Run the seeder.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		//
+	}
+
+}
