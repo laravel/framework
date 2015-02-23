@@ -2,6 +2,7 @@
 
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 
@@ -69,10 +70,26 @@ class LoadConfiguration {
 
 		foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
 		{
-			$files[basename($file->getRealPath(), '.php')] = $file->getRealPath();
+			$files[$this->getConfigurationSubtree($file).basename($file->getRealPath(), '.php')] = $file->getRealPath();
 		}
 
 		return $files;
+	}
+
+	/**
+	 * Get the configuration file subtree.
+	 *
+	 * @param  \Symfony\Component\Finder\SplFileInfo $file
+	 * @return string
+	 */
+	private function getConfigurationSubtree(SplFileInfo $file)
+	{
+		if ($tree = ltrim(dirname($file->getRealPath()), config_path()))
+		{
+			$tree = str_replace(DIRECTORY_SEPARATOR, '.', $tree) . '.';
+		}
+
+		return $tree;
 	}
 
 }
