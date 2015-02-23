@@ -1,21 +1,20 @@
 <?php namespace DummyNamespace;
 
 use DummyRootNamespaceEvents\Event;
-
 use Illuminate\Queue\SerializesModels;
 
-class DummyClass extends Event {
+class DummyClass extends Event
+{
 
-	use SerializesModels;
+    use SerializesModels;
 
-	/**
-	 * Create a new event instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		//
-	}
-
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
 }

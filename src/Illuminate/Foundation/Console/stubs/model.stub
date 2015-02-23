@@ -2,8 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class DummyClass extends Model {
-
-	//
-
+class DummyClass extends Model
+{
+    //
 }

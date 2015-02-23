@@ -8,5 +8,5 @@ $finder = Symfony\Component\Finder\Finder::create()
 	->ignoreVCS(true);
 
 return Symfony\CS\Config\Config::create()
-	->fixers(['-psr2'])
+	->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
 	->finder($finder);
