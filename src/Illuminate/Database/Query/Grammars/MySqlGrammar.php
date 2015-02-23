@@ -108,10 +108,24 @@ class MySqlGrammar extends Grammar {
 		{
 			$joins = ' '.$this->compileJoins($query, $query->joins);
 
-			return trim("delete $table from {$table}{$joins} $where");
+			$sql = trim("delete $table from {$table}{$joins} $where");
+		}
+		else
+		{
+			$sql = trim("delete from $table $where");
 		}
 
-		return trim("delete from $table $where");
+		if (isset($query->orders))
+		{
+			$sql .= ' '.$this->compileOrders($query, $query->orders);
+		}
+
+		if (isset($query->limit))
+		{
+			$sql .= ' '.$this->compileLimit($query, $query->limit);
+		}
+
+		return $sql;
 	}
 
 	/**
