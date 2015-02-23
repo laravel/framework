@@ -133,24 +133,31 @@ class OptimizeCommand extends Command {
 	 */
 	protected function compileViews()
 	{
-		foreach ($this->laravel['view']->getFinder()->getPaths() as $path)
+		try
 		{
-			foreach ($this->laravel['files']->allFiles($path) as $file)
+			foreach ($this->laravel['view']->getFinder()->getPaths() as $path)
 			{
-				try
+				foreach ($this->laravel['files']->allFiles($path) as $file)
 				{
-					$engine = $this->laravel['view']->getEngineFromPath($file);
-				}
-				catch (InvalidArgumentException $e)
-				{
-					continue;
-				}
+					try
+					{
+						$engine = $this->laravel['view']->getEngineFromPath($file);
+					}
+					catch (InvalidArgumentException $e)
+					{
+						continue;
+					}
 
-				if ($engine instanceof CompilerEngine)
-				{
-					$engine->getCompiler()->compile($file);
+					if ($engine instanceof CompilerEngine)
+					{
+						$engine->getCompiler()->compile($file);
+					}
 				}
 			}
+		}
+		catch (InvalidArgumentException $e)
+		{
+			//	Ignore missing directory error (The "" directory does not exist)
 		}
 	}
 
