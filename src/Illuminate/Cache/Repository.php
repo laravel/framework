@@ -154,6 +154,11 @@ class Repository implements CacheContract, ArrayAccess {
 	 */
 	public function add($key, $value, $minutes)
 	{
+		if (method_exists($this->store, 'add'))
+		{
+			return $this->store->add($key, $value, $minutes);
+		}
+
 		if (is_null($this->get($key)))
 		{
 			$this->put($key, $value, $minutes); return true;
