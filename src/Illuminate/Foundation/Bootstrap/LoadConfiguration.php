@@ -70,19 +70,21 @@ class LoadConfiguration {
 
 		foreach (Finder::create()->files()->name('*.php')->in($app->configPath()) as $file)
 		{
-			$files[$this->getConfigurationSubtree($file).basename($file->getRealPath(), '.php')] = $file->getRealPath();
+			$nesting = $this->getConfigurationNesting($file);
+
+			$files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
 		}
 
 		return $files;
 	}
 
 	/**
-	 * Get the configuration file subtree.
+	 * Get the configuration file nesting path.
 	 *
 	 * @param  \Symfony\Component\Finder\SplFileInfo $file
 	 * @return string
 	 */
-	private function getConfigurationSubtree(SplFileInfo $file)
+	private function getConfigurationNesting(SplFileInfo $file)
 	{
 		if ($tree = ltrim(dirname($file->getRealPath()), config_path()))
 		{
