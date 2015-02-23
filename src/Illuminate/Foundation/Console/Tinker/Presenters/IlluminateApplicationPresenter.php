@@ -30,7 +30,7 @@ class IlluminateApplicationPresenter extends ObjectPresenter {
 	];
 
 	/**
-	 * Can the presenter present the given value?
+	 * Determine if the presenter present the given value.
 	 *
 	 * @param  mixed  $value
 	 * @return bool
@@ -43,11 +43,8 @@ class IlluminateApplicationPresenter extends ObjectPresenter {
 	/**
 	 * Get an array of Application object properties.
 	 *
-	 * ReflectionProperty constants may be passed as $propertyFilter, and should
-	 * be used to toggle visibility of private and protected properties.
-	 *
 	 * @param  object  $value
-	 * @param  ReflectionClass  $class
+	 * @param  \ReflectionClass  $class
 	 * @param  int  $propertyFilter
 	 * @return array
 	 */
@@ -60,11 +57,12 @@ class IlluminateApplicationPresenter extends ObjectPresenter {
 			try
 			{
 				$val = $value->$property();
+
 				if ( ! is_null($val)) $properties[$property] = $val;
 			}
 			catch (Exception $e)
 			{
-				// Ignore exceptions
+				//
 			}
 		}
 
