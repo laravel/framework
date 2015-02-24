@@ -78,7 +78,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		}
 
 		return $factory->make(
-			$this->all(), $this->container->call([$this, 'rules']), $this->messages()
+			$this->all(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
 		);
 	}
 
@@ -211,11 +211,21 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	}
 
 	/**
-	* Set custom messages for validator errors.
-	*
-	* @return array
-	*/
+	 * Set custom messages for validator errors.
+	 *
+	 * @return array
+	 */
 	public function messages()
+	{
+		return [];
+	}
+	
+	/**
+	 * Set custom attributes for validator errors.
+	 *
+	 * @return array
+	 */
+	public function attributes()
 	{
 		return [];
 	}
