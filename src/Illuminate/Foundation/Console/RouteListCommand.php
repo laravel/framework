@@ -128,11 +128,59 @@ class RouteListCommand extends Command {
 	 */
 	protected function getMiddleware($route)
 	{
-		$middleware = array_values($route->middleware());
+		$middlewares = array_values($route->middleware());
 
-		$middleware = array_unique(array_merge($middleware, $this->getPatternFilters($route)));
+		$middlewares = array_unique(array_merge($middlewares, $this->getPatternFilters($route)));
 
-		return implode(', ', $middleware);
+		$actionName = $route->getActionName();
+
+		if($this->option('controllers') && !empty($actionName) && $actionName != 'Closure')
+		{
+			$actionName = explode('@', $actionName);
+
+			$controllerMiddlewares = $this->getControllerMiddleware(app()->make($actionName[0]), $actionName[1]);
+
+			$middlewares = array_merge($middlewares, $controllerMiddlewares);
+		}
+
+		return implode(',', $middlewares);
+	}
+
+	/**
+	 * Get the middlewares for the controller instance for method.
+	 *
+	 * @param  \Illuminate\Routing\Controller  $instance
+	 * @param  string  $method
+	 * @return array
+	 */
+	protected function getControllerMiddleware($instance, $method)
+	{
+		$middleware = $this->router->getMiddleware();
+
+		$results = [];
+
+		foreach ($instance->getMiddleware() as $name => $options)
+		{
+			if ( ! $this->methodExcludedByOptions($method, $options))
+			{
+				$results[] = array_get($middleware, $name, $name);
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Determine if the given options exclude a particular method.
+	 *
+	 * @param  string  $method
+	 * @param  array  $options
+	 * @return bool
+	 */
+	protected function methodExcludedByOptions($method, array $options)
+	{
+		return (( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+			( ! empty($options['except']) && in_array($method, (array) $options['except'])));
 	}
 
 	/**
@@ -198,6 +246,8 @@ class RouteListCommand extends Command {
 			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
+
+			array('controllers', null, InputOption::VALUE_NONE, 'Get the controllers middlewares.')
 		);
 	}
 
