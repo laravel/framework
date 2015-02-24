@@ -11,11 +11,10 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\HandlerResolver;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
-use Illuminate\Contracts\Bus\PipingDispatcher;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 
-class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver, PipingDispatcher {
+class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver {
 
 	/**
 	 * The container implementation.
