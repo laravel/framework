@@ -26,7 +26,7 @@ class CallbackEvent extends Event {
 	 * @param  array  $parameters
 	 * @return void
 	 */
-	public function __construct($callback, array $parameters = array())
+	public function __construct($callback, array $parameters = [])
 	{
 		$this->callback = $callback;
 		$this->parameters = $parameters;

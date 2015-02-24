@@ -87,11 +87,11 @@ class CommandMakeCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('handler', null, InputOption::VALUE_NONE, 'Indicates that handler class should be generated.'),
+		return [
+			['handler', null, InputOption::VALUE_NONE, 'Indicates that handler class should be generated.'],
 
-			array('queued', null, InputOption::VALUE_NONE, 'Indicates that command should be queued.'),
-		);
+			['queued', null, InputOption::VALUE_NONE, 'Indicates that command should be queued.'],
+		];
 	}
 
 }

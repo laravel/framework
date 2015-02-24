@@ -9,7 +9,7 @@ interface Application {
 	 * @param  array  $parameters
 	 * @return int
 	 */
-	public function call($command, array $parameters = array());
+	public function call($command, array $parameters = []);
 
 	/**
 	 * Get the output from the last command.
