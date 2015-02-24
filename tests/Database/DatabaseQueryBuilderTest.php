@@ -661,6 +661,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 			$j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
 		});
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('contacts', function($j)
+		{
+			$j->on('users.id', '=', 'contacts.id')->orWhereNull('contacts.deleted_at');
+		});
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is null', $builder->toSql());
 	}
 
 
@@ -672,6 +679,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 			$j->on('users.id', '=', 'contacts.id')->whereNotNull('contacts.deleted_at');
 		});
 		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is not null', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select('*')->from('users')->join('contacts', function($j)
+		{
+			$j->on('users.id', '=', 'contacts.id')->orWhereNotNull('contacts.deleted_at');
+		});
+		$this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is not null', $builder->toSql());
 	}
 
 
