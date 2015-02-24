@@ -58,8 +58,7 @@ class VendorPublishCommand extends Command {
 
 		if (empty($paths))
 		{
-			$this->error("There are no paths to publish");
-			return;
+			return $this->comment("Nothing to publish.");
 		}
 
 		foreach ($paths as $from => $to)
@@ -74,7 +73,7 @@ class VendorPublishCommand extends Command {
 			}
 			else
 			{
-				$this->error("Cannot find path '$from'");
+				$this->error("Can't locate path: <{$from}>");
 			}
 		}
 
