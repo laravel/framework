@@ -172,7 +172,7 @@ class Builder {
 	 */
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
-		'like', 'not like', 'between', 'ilike',
+		'like', 'like binary', 'not like', 'between', 'ilike',
 		'&', '|', '^', '<<', '>>',
 		'rlike', 'regexp', 'not regexp', 
 		'~', '~*', '!~', '!~*', 'similar to',
