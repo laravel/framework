@@ -471,6 +471,36 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRequiredUnless()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor'), array('last' => 'required_unless:first,dayle'));
+		$this->assertTrue($v->fails());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_unless:first,dayle'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'taylor', 'last' => 'otwell'), array('last' => 'required_unless:first,dayle,taylor'));
+		$this->assertTrue($v->passes());
+
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('first' => 'dayle', 'last' => 'rees'), array('last' => 'required_unless:first,dayle,taylor'));
+		$this->assertTrue($v->passes());
+
+		// error message when passed multiple values (required_unless:foo,bar,baz)
+		$trans = $this->getRealTranslator();
+		$trans->addResource('array', array('validation.required_unless' => 'The :attribute field is required when :other is not :parameters.'), 'en', 'messages');
+		$v = new Validator($trans, array('first' => 'dayle', 'last' => ''), array('last' => 'RequiredUnless:first,taylor'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals('The last field is required when first is not taylor.', $v->messages()->first('last'));
+		$v = new Validator($trans, array('first' => 'dayle', 'last' => ''), array('last' => 'RequiredUnless:first,taylor,jim,bob'));
+		$this->assertFalse($v->passes());
+		$this->assertEquals('The last field is required when first is not taylor, jim or bob.', $v->messages()->first('last'));
+	}
+
+
 	public function testValidateConfirmed()
 	{
 		$trans = $this->getRealTranslator();
