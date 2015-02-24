@@ -9,7 +9,7 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $selectComponents = array(
+	protected $selectComponents = [
 		'aggregate',
 		'columns',
 		'from',
@@ -21,7 +21,7 @@ class MySqlGrammar extends Grammar {
 		'limit',
 		'offset',
 		'lock',
-	);
+	];
 
 	/**
 	 * Compile a select query into SQL.

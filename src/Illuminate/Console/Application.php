@@ -58,7 +58,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	 * @param  array  $parameters
 	 * @return int
 	 */
-	public function call($command, array $parameters = array())
+	public function call($command, array $parameters = [])
 	{
 		$parameters['command'] = $command;
 

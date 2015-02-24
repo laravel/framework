@@ -14,7 +14,7 @@ class ResourceRegistrar {
 	 *
 	 * @var array
 	 */
-	protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+	protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
 	/**
 	 * Create a new resource registrar instance.
@@ -35,7 +35,7 @@ class ResourceRegistrar {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function register($name, $controller, array $options = array())
+	public function register($name, $controller, array $options = [])
 	{
 		// If the resource name contains a slash, we will assume the developer wishes to
 		// register these resource routes with a prefix so we will set that up out of
@@ -98,7 +98,7 @@ class ResourceRegistrar {
 		// last segment, which will be considered the final resources name we use.
 		$prefix = implode('/', array_slice($segments, 0, -1));
 
-		return array(end($segments), $prefix);
+		return [end($segments), $prefix];
 	}
 
 	/**
@@ -173,7 +173,7 @@ class ResourceRegistrar {
 	{
 		$name = $this->getResourceName($resource, $method, $options);
 
-		return array('as' => $name, 'uses' => $controller.'@'.$method);
+		return ['as' => $name, 'uses' => $controller.'@'.$method];
 	}
 
 	/**

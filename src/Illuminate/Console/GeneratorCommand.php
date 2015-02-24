@@ -198,9 +198,9 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the class'),
-		);
+		return [
+			['name', InputArgument::REQUIRED, 'The name of the class'],
+		];
 	}
 
 }
