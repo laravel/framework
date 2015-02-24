@@ -56,6 +56,12 @@ class VendorPublishCommand extends Command {
 			$this->option('provider'), $this->option('tag')
 		);
 
+		if (empty($paths))
+		{
+			$this->error("There are no paths to publish");
+			return;
+		}
+
 		foreach ($paths as $from => $to)
 		{
 			if ($this->files->isFile($from))
@@ -65,6 +71,10 @@ class VendorPublishCommand extends Command {
 			elseif ($this->files->isDirectory($from))
 			{
 				$this->publishDirectory($from, $to);
+			}
+			else
+			{
+				$this->error("Cannot find path '$from'");
 			}
 		}
 
@@ -113,6 +123,8 @@ class VendorPublishCommand extends Command {
 				$manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
 			}
 		}
+
+		$this->status($from, $to, 'Directory');
 	}
 
 	/**
