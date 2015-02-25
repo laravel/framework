@@ -227,7 +227,10 @@ class AppNameCommand extends Command {
 	 */
 	protected function replaceIn($path, $search, $replace)
 	{
-		$this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+        if ($this->files->isWritable($path))
+        {
+            $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
+        }
 	}
 
 	/**
