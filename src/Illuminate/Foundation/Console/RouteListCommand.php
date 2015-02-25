@@ -130,36 +130,49 @@ class RouteListCommand extends Command {
 	{
 		$middlewares = array_values($route->middleware());
 
-		$middlewares = array_unique(array_merge($middlewares, $this->getPatternFilters($route)));
+		$middlewares = array_unique(
+			array_merge($middlewares, $this->getPatternFilters($route))
+		);
 
 		$actionName = $route->getActionName();
 
-		if($this->option('controllers') && !empty($actionName) && $actionName != 'Closure')
+		if ( ! empty($actionName) && $actionName !== 'Closure')
 		{
-			$actionName = explode('@', $actionName);
-
-			$controllerMiddlewares = $this->getControllerMiddleware(app()->make($actionName[0]), $actionName[1]);
-
-			$middlewares = array_merge($middlewares, $controllerMiddlewares);
+			$middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
 		}
 
 		return implode(',', $middlewares);
 	}
 
 	/**
-	 * Get the middlewares for the controller instance for method.
+	 * Get the middleware for the given Controller@action name.
 	 *
-	 * @param  \Illuminate\Routing\Controller  $instance
+	 * @param  string  $actionName
+	 * @return array
+	 */
+	protected function getControllerMiddleware($actionName)
+	{
+		$segments = explode('@', $actionName);
+
+		return $this->getControllerMiddlewareFromInstance(
+			$this->laravel->make($segments[0]), $segments[1]
+		);
+	}
+
+	/**
+	 * Get the middlewares for the given controller instance and method.
+	 *
+	 * @param  \Illuminate\Routing\Controller  $controller
 	 * @param  string  $method
 	 * @return array
 	 */
-	protected function getControllerMiddleware($instance, $method)
+	protected function getControllerMiddlewareFromInstance($controller, $method)
 	{
 		$middleware = $this->router->getMiddleware();
 
 		$results = [];
 
-		foreach ($instance->getMiddleware() as $name => $options)
+		foreach ($controller->getMiddleware() as $name => $options)
 		{
 			if ( ! $this->methodExcludedByOptions($method, $options))
 			{
@@ -215,7 +228,9 @@ class RouteListCommand extends Command {
 	 */
 	protected function getMethodPatterns($uri, $method)
 	{
-		return $this->router->findPatternFilters(Request::create($uri, $method));
+		return $this->router->findPatternFilters(
+			Request::create($uri, $method)
+		);
 	}
 
 	/**
@@ -246,8 +261,6 @@ class RouteListCommand extends Command {
 			array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
 
 			array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
-
-			array('controllers', null, InputOption::VALUE_NONE, 'Get the controllers middlewares.')
 		);
 	}
 
