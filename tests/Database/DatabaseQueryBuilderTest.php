@@ -512,6 +512,35 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('email as foo_email')->from('users')->having('foo_email', '>', 1);
 		$this->assertEquals('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'));
+		$this->assertEquals('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3', $builder->toSql());
+
+		$builder = $this->getBuilder();
+		$builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3);
+		$this->assertEquals('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
+	}
+
+
+	public function testHavingFollowedBySelectGet()
+	{
+		$builder = $this->getBuilder();
+		$query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
+		$builder->getConnection()->shouldReceive('select')->once()->with($query, array("popular", 3), true)->andReturn(array(array('category' => 'rock', 'total' => 5)));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('item');
+		$result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3)->get();
+		$this->assertEquals(array(array('category' => 'rock', 'total' => 5)), $result);
+
+		// Using \Raw value
+		$builder = $this->getBuilder();
+		$query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
+		$builder->getConnection()->shouldReceive('select')->once()->with($query, array("popular"), true)->andReturn(array(array('category' => 'rock', 'total' => 5)));
+		$builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('item');
+		$result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'))->get();
+		$this->assertEquals(array(array('category' => 'rock', 'total' => 5)), $result);
 	}
 
 
