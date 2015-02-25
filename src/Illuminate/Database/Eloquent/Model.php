@@ -2005,7 +2005,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getRouteKey()
 	{
-	    return $this->getAttribute($this->getRouteKeyName());
+		return $this->getAttribute($this->getRouteKeyName());
 	}
 
 	/**
@@ -2015,7 +2015,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getRouteKeyName()
 	{
-	    return $this->getKeyName();
+		return $this->getKeyName();
 	}
 
 	/**
