@@ -172,7 +172,7 @@ class Builder {
 	 */
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
-		'like', 'not like', 'between', 'ilike',
+		'like', 'like binary', 'not like', 'between', 'ilike',
 		'&', '|', '^', '<<', '>>',
 		'rlike', 'regexp', 'not regexp', 
 		'~', '~*', '!~', '!~*', 'similar to',
@@ -1059,7 +1059,10 @@ class Builder {
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		$this->addBinding($value, 'having');
+		if ( ! $value instanceof Expression)
+		{
+			$this->addBinding($value, 'having');
+		}
 
 		return $this;
 	}

@@ -1994,7 +1994,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getRouteKey()
 	{
-	    return $this->getAttribute($this->getRouteKeyName());
+		return $this->getAttribute($this->getRouteKeyName());
 	}
 
 	/**
@@ -2004,7 +2004,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getRouteKeyName()
 	{
-	    return $this->getKeyName();
+		return $this->getKeyName();
 	}
 
 	/**
@@ -2584,7 +2584,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// date fields without having to create a mutator for each property.
 		elseif (in_array($key, $this->getDates()))
 		{
-			if ($value) return $this->asDateTime($value);
+			if ( ! is_null($value)) return $this->asDateTime($value);
 		}
 
 		return $value;

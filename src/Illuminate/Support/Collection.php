@@ -310,7 +310,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function implode($value, $glue = null)
 	{
-		return implode($glue, $this->lists($value));
+		$first = $this->first();
+
+		if (is_array($first) || is_object($first))
+		{
+			return implode($glue, $this->lists($value));
+		}
+
+		return implode($value, $this->items);
 	}
 
 	/**
@@ -582,14 +589,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function chunk($size, $preserveKeys = false)
 	{
-		$chunks = new static;
+		$chunks = [];
 
 		foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk)
 		{
-			$chunks->push(new static($chunk));
+			$chunks[] = new static($chunk);
 		}
 
-		return $chunks;
+		return new static($chunks);
 	}
 
 	/**

@@ -128,11 +128,72 @@ class RouteListCommand extends Command {
 	 */
 	protected function getMiddleware($route)
 	{
-		$middleware = array_values($route->middleware());
+		$middlewares = array_values($route->middleware());
 
-		$middleware = array_unique(array_merge($middleware, $this->getPatternFilters($route)));
+		$middlewares = array_unique(
+			array_merge($middlewares, $this->getPatternFilters($route))
+		);
 
-		return implode(', ', $middleware);
+		$actionName = $route->getActionName();
+
+		if ( ! empty($actionName) && $actionName !== 'Closure')
+		{
+			$middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
+		}
+
+		return implode(',', $middlewares);
+	}
+
+	/**
+	 * Get the middleware for the given Controller@action name.
+	 *
+	 * @param  string  $actionName
+	 * @return array
+	 */
+	protected function getControllerMiddleware($actionName)
+	{
+		$segments = explode('@', $actionName);
+
+		return $this->getControllerMiddlewareFromInstance(
+			$this->laravel->make($segments[0]), $segments[1]
+		);
+	}
+
+	/**
+	 * Get the middlewares for the given controller instance and method.
+	 *
+	 * @param  \Illuminate\Routing\Controller  $controller
+	 * @param  string  $method
+	 * @return array
+	 */
+	protected function getControllerMiddlewareFromInstance($controller, $method)
+	{
+		$middleware = $this->router->getMiddleware();
+
+		$results = [];
+
+		foreach ($controller->getMiddleware() as $name => $options)
+		{
+			if ( ! $this->methodExcludedByOptions($method, $options))
+			{
+				$results[] = array_get($middleware, $name, $name);
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Determine if the given options exclude a particular method.
+	 *
+	 * @param  string  $method
+	 * @param  array  $options
+	 * @return bool
+	 */
+	protected function methodExcludedByOptions($method, array $options)
+	{
+		return (( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+			( ! empty($options['except']) && in_array($method, (array) $options['except'])));
 	}
 
 	/**
@@ -167,7 +228,9 @@ class RouteListCommand extends Command {
 	 */
 	protected function getMethodPatterns($uri, $method)
 	{
-		return $this->router->findPatternFilters(Request::create($uri, $method));
+		return $this->router->findPatternFilters(
+			Request::create($uri, $method)
+		);
 	}
 
 	/**
