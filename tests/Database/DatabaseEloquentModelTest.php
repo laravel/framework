@@ -341,6 +341,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
 	}
 
+	public function testTimestampsAreCreatedFromStringsWithAlternativeFormat()
+	{
+		$model = $this->getMock('EloquentDateModelStub', array('getInputDateFormat'));
+		$model->expects($this->any())->method('getInputDateFormat')->will($this->returnValue('d.m.Y H:i'));
+
+		$model->created_at = '21.01.2015 12:10';
+		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+
+		$model->updated_at = Carbon\Carbon::now();
+		$this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
+	}
+
 
 	public function testInsertProcess()
 	{
