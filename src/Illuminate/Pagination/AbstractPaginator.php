@@ -69,6 +69,13 @@ abstract class AbstractPaginator {
 	protected static $currentPageResolver;
 
 	/**
+	 * The default presenter resolver.
+	 *
+	 * @var \Closure
+	 */
+	protected static $presenterResolver;
+
+	/**
 	 * Determine if the given value is a valid page number.
 	 *
 	 * @param  int  $page
@@ -320,6 +327,17 @@ abstract class AbstractPaginator {
 	public static function currentPageResolver(Closure $resolver)
 	{
 		static::$currentPageResolver = $resolver;
+	}
+
+	/**
+	 * Set the default Presenter resolver.
+	 *
+	 * @param  \Closure  $resolver
+	 * @return void
+	 */
+	public static function presenter(Closure $resolver)
+	{
+		static::$presenterResolver = $resolver;
 	}
 
 	/**
