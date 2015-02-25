@@ -202,6 +202,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(str_contains('taylor', array('ylo')));
 		$this->assertFalse(str_contains('taylor', 'xxx'));
 		$this->assertFalse(str_contains('taylor', array('xxx')));
+		$this->assertTrue(str_contains('taylor', array('xxx', 'taylor')));
 	}
 
 

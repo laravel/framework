@@ -162,7 +162,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function choice($key, $number, array $replace = array(), $locale = null)
 	{
-		$line = $this->get($key, $replace, $locale = $locale ?: $this->locale);
+		$line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
 
 		$replace['count'] = $number;
 
