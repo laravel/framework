@@ -248,7 +248,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Create a new Eloquent model instance.
      *
      * @param  array $attributes
-     *
      * @return \Illuminate\Database\Eloquent\Model
      */
 	public function __construct(array $attributes = [])
