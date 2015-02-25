@@ -98,6 +98,11 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	 */
 	public function render(Presenter $presenter = null)
 	{
+		if (is_null($presenter) && static::$presenterResolver)
+		{
+			$presenter = call_user_func(static::$presenterResolver, $this);
+		}
+
 		$presenter = $presenter ?: new SimpleBootstrapThreePresenter($this);
 
 		return $presenter->render();

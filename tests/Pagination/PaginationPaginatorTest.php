@@ -1,11 +1,18 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
 use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
 
 class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
+
+	public function tearDown()
+	{
+		m::close();
+	}
+
 
 	public function testPaginatorCanGiveMeRelevantPageInformation()
 	{
@@ -80,6 +87,23 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$presenter = new BootstrapPresenter($p);
 
 		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
+	}
+
+
+	public function testCustomPresenter()
+	{
+		$p = new LengthAwarePaginator([], 1, 1, 1);
+		$presenter = m::mock('StdClass');
+		\Illuminate\Pagination\AbstractPaginator::presenter(function() use ($presenter) {
+			return $presenter;
+		});
+		$presenter->shouldReceive('render')->andReturn('presenter');
+
+		$this->assertEquals('presenter', $p->render());
+
+		\Illuminate\Pagination\AbstractPaginator::presenter(function() {
+			return;
+		});
 	}
 
 
