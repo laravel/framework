@@ -528,7 +528,7 @@ class Builder {
 	{
 		$isOperator = in_array($operator, $this->operators);
 
-		return ($isOperator && $operator != '=' && is_null($value));
+		return $isOperator && $operator != '=' && is_null($value);
 	}
 
 	/**
