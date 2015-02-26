@@ -49,7 +49,7 @@ class SyncJob extends Job implements JobContract {
 	 */
 	public function getRawBody()
 	{
-		//
+		return $this->payload;
 	}
 
 	/**
