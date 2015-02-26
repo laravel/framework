@@ -67,7 +67,7 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key, $value = null)
 	{
-		if (func_num_args() == 1)
+		if (func_num_args() == 1 && ! is_callable($key))
 		{
 			return ! is_null($this->find($key));
 		}
