@@ -718,7 +718,7 @@ class Validator implements ValidatorContract {
 
 		foreach ($attributes as $key)
 		{
-			if (array_get($this->data, $key) || array_get($this->files, $key))
+			if (array_has($this->data, $key) || array_has($this->files, $key))
 			{
 				$count++;
 			}
