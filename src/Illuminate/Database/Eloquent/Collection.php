@@ -106,7 +106,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} > $result) ? $item->{$key} : $result;
+			return is_null($result) || $item->{$key} > $result ? $item->{$key} : $result;
 		});
 	}
 
@@ -120,7 +120,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} < $result) ? $item->{$key} : $result;
+			return is_null($result) || $item->{$key} < $result ? $item->{$key} : $result;
 		});
 	}
 

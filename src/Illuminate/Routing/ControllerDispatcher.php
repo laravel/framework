@@ -141,8 +141,8 @@ class ControllerDispatcher {
 	 */
 	public function methodExcludedByOptions($method, array $options)
 	{
-		return (( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-			( ! empty($options['except']) && in_array($method, (array) $options['except'])));
+		return ( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+			( ! empty($options['except']) && in_array($method, (array) $options['except']));
 	}
 
 	/**
