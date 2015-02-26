@@ -1393,7 +1393,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
     public function testValidateEachWithNonIndexedArray()
     {
         $trans = $this->getRealTranslator();
-        $data = ['foobar' => [['key' => 'foo', 'value' => 5], ['key' => 'foo', 'value' => 10]]];
+        $data = ['foobar' => [
+            ['key' => 'foo', 'value' => 5],
+            ['key' => 'foo', 'value' => 10],
+            ['key' => 'foo', 'value' => 16]
+        ]];
 
         $v = new Validator($trans, $data, ['foo' => 'Array']);
         $v->each('foobar', ['key' => 'required', 'value' => 'numeric|min:6|max:14']);
