@@ -118,7 +118,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 	{
 		$messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
 
-		return (count($messages) > 0) ? $messages[0] : '';
+		return count($messages) > 0 ? $messages[0] : '';
 	}
 
 	/**
@@ -196,7 +196,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 	 */
 	protected function checkFormat($format)
 	{
-		return ($format === null) ? $this->format : $format;
+		return $format ?: $this->format;
 	}
 
 	/**
