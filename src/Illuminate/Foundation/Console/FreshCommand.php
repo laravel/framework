@@ -28,7 +28,7 @@ class FreshCommand extends Command {
 	{
 		$files = new Filesystem;
 
-		if($files->exists($this->laravel->storagePath().'/framework/fresh'))
+		if ($files->exists($this->laravel->storagePath().'/framework/fresh'))
 		{
 			$this->error('You shouldn\'t run this twice, it\'s dangerous... Remove [/storage/framework/fresh] and try again if you\'re sure.');
 			return;
