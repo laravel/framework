@@ -278,14 +278,14 @@ class Validator implements ValidatorContract {
 		{
 			foreach ($rules as $ruleKey => $ruleValue)
 			{
-                if (!is_string($ruleKey))
-                {
-                    $this->mergeRules("$attribute.$dataKey", $ruleValue);
-                }
-                else
-                {
-                    $this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
-                }
+				if ( ! is_string($ruleKey))
+				{
+					$this->mergeRules("$attribute.$dataKey", $ruleValue);
+				}
+				else
+				{
+					$this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
+				}
 			}
 		}
 	}
