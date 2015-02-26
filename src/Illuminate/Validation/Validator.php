@@ -753,7 +753,7 @@ class Validator implements ValidatorContract {
 
 		$other = array_get($this->data, $parameters[0]);
 
-		return (isset($other) && $value == $other);
+		return isset($other) && $value == $other;
 	}
 
 	/**
@@ -770,7 +770,7 @@ class Validator implements ValidatorContract {
 
 		$other = array_get($this->data, $parameters[0]);
 
-		return (isset($other) && $value != $other);
+		return isset($other) && $value != $other;
 	}
 
 	/**
@@ -786,7 +786,7 @@ class Validator implements ValidatorContract {
 	{
 		$acceptable = array('yes', 'on', '1', 1, true, 'true');
 
-		return ($this->validateRequired($attribute, $value) && in_array($value, $acceptable, true));
+		return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
 	}
 
 	/**
