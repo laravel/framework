@@ -198,12 +198,7 @@ class Event {
 	 */
 	protected function expressionPasses()
 	{
-		$date = Carbon::now();
-
-		if ($this->timezone)
-		{
-			$date->setTimezone($this->timezone);
-		}
+		$date = Carbon::parse(Carbon::now()->toDateTimeString(), $this->timezone);
 
 		return CronExpression::factory($this->expression)->isDue($date);
 	}
