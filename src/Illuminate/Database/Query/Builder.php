@@ -1388,7 +1388,7 @@ class Builder {
 	{
 		$page = Paginator::resolveCurrentPage();
 
-		$total = $this->getCountForPagination();
+		$total = $this->getTotalForPagination();
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1415,6 +1415,16 @@ class Builder {
 		return new Paginator($this->get($columns), $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
+	}
+
+	/**
+	 * Get the correct count for pagination depending on if groups are set
+	 *
+	 * @return int
+	 */
+	public function getTotalForPagination()
+	{
+		return empty($this->groups) ? $this->getCountForPagination() : $this->getGroupCountForPagination();
 	}
 
 	/**
@@ -1456,6 +1466,78 @@ class Builder {
 	protected function restoreFieldsForCount()
 	{
 		foreach (['orders', 'limit', 'offset'] as $field)
+		{
+			$this->{$field} = $this->backups[$field];
+		}
+
+		$this->backups = [];
+	}
+
+	/**
+	 * Get the count of the total records for the paginator.
+	 *
+	 * @return int
+	 */
+	public function getGroupCountForPagination()
+	{
+		$sql = $this->toSql();
+		$this->backupGroupFieldsForCount();
+
+		$this->from = new Expression("($sql) aggregator_query");
+		$total = $this->count();
+
+		$this->restoreGroupFieldsForCount();
+
+		return $total;
+	}
+
+	/**
+	 * Backup some fields for the pagination count.
+	 *
+	 * @return void
+	 */
+	protected function backupGroupFieldsForCount()
+	{
+		$fields = [
+			'from',
+			'joins',
+			'wheres',
+			'groups',
+			'havings',
+			'orders',
+			'limit',
+			'offset',
+			'unions',
+		];
+
+		foreach ($fields as $field)
+		{
+			$this->backups[$field] = $this->{$field};
+
+			$this->{$field} = null;
+		}
+	}
+
+	/**
+	 * Restore some fields after the pagination count.
+	 *
+	 * @return void
+	 */
+	protected function restoreGroupFieldsForCount()
+	{
+		$fields = [
+			'from',
+			'joins',
+			'wheres',
+			'groups',
+			'havings',
+			'orders',
+			'limit',
+			'offset',
+			'unions',
+		];
+
+		foreach ($fields as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}

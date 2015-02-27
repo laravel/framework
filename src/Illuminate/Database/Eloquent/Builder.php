@@ -245,7 +245,7 @@ class Builder {
 	 */
 	public function paginate($perPage = null, $columns = ['*'])
 	{
-		$total = $this->query->getCountForPagination();
+		$total = $this->query->getTotalForPagination();
 
 		$this->query->forPage(
 			$page = Paginator::resolveCurrentPage(),
