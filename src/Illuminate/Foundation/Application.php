@@ -256,7 +256,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function path()
 	{
-		return $this->basePath.'/app';
+		return $this->basePath.DIRECTORY_SEPARATOR.'app';
 	}
 
 	/**
@@ -276,7 +276,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function configPath()
 	{
-		return $this->basePath.'/config';
+		return $this->basePath.DIRECTORY_SEPARATOR.'config';
 	}
 
 	/**
@@ -286,7 +286,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function databasePath()
 	{
-		return $this->basePath.'/database';
+		return $this->basePath.DIRECTORY_SEPARATOR.'database';
 	}
 
 	/**
@@ -296,7 +296,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function langPath()
 	{
-		return $this->basePath.'/resources/lang';
+		return $this->basePath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
 	}
 
 	/**
@@ -306,7 +306,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function publicPath()
 	{
-		return $this->basePath.'/public';
+		return $this->basePath.DIRECTORY_SEPARATOR.'public';
 	}
 
 	/**
@@ -316,7 +316,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function storagePath()
 	{
-		return $this->storagePath ?: $this->basePath.'/storage';
+		return $this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage';
 	}
 
 	/**
@@ -433,7 +433,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function registerConfiguredProviders()
 	{
-		$manifestPath = $this->storagePath().'/framework/services.json';
+		$manifestPath = $this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'services.json';
 
 		(new ProviderRepository($this, new Filesystem, $manifestPath))
 		            ->load($this->config['app.providers']);
@@ -722,7 +722,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedConfigPath()
 	{
-		return $this['path.storage'].'/framework/config.php';
+		return $this['path.storage'].DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'config.php';
 	}
 
 	/**
@@ -742,7 +742,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		return $this['path.storage'].'/framework/routes.php';
+		return $this['path.storage'].DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'routes.php';
 	}
 
 	/**
@@ -766,7 +766,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this->storagePath().'/framework/down');
+		return file_exists($this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'down');
 	}
 
 	/**
