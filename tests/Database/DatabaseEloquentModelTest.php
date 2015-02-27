@@ -934,6 +934,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelObserversCanBeAttachedToModelsWithString()
+	{
+		EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$events->shouldReceive('listen')->once()->with('eloquent.creating: EloquentModelStub', 'EloquentTestObserverStub@creating', 0);
+		$events->shouldReceive('listen')->once()->with('eloquent.saved: EloquentModelStub', 'EloquentTestObserverStub@saved', 0);
+		$events->shouldReceive('forget');
+		EloquentModelStub::observe('EloquentTestObserverStub');
+		EloquentModelStub::flushEventListeners();
+	}
 	public function testSetObservableEvents()
 	{
 		$class = new EloquentModelStub;
