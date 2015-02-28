@@ -47,21 +47,21 @@ class ResourceRegistrar {
 			return;
 		}
 
-        // We need to extract the base resource from the resource name.
-        $resource = last(explode('.', $name));
+		// We need to extract the base resource from the resource name.
+		$resource = last(explode('.', $name));
 
-        // Wildcards for a single or nested resource may be overridden using the wildcards option.
-        // Overrides are performed by matching the wildcards key with the resource name. If a key
-        // matches a resource name, the value of the wildcard is used instead of the resource name.
-        if(isset($options['wildcards'][$resource]))
-        {
-            $resource = $options['wildcards'][$resource];
-        }
+		// Wildcards for a single or nested resource may be overridden using the wildcards option.
+		// Overrides are performed by matching the wildcards key with the resource name. If a key
+		// matches a resource name, the value of the wildcard is used instead of the resource name.
+		if (isset($options['wildcards'][$resource]))
+		{
+			$resource = $options['wildcards'][$resource];
+		}
 
 		// Nested resources are supported in the framework, but we need to know what
-        // name to use for a place-holder on the route wildcards, which should be
+		// name to use for a place-holder on the route wildcards, which should be
 		// the base resources.
-        $base = $this->getResourceWildcard($resource);
+		$base = $this->getResourceWildcard($resource);
 
 		$defaults = $this->resourceDefaults;
 
@@ -137,7 +137,7 @@ class ResourceRegistrar {
 	 * Get the base resource URI for a given resource.
 	 *
 	 * @param  string  $resource
-     * @param  array   $options
+	 * @param  array   $options
 	 * @return string
 	 */
 	public function getResourceUri($resource, $options)
@@ -151,10 +151,10 @@ class ResourceRegistrar {
 
 		$uri = $this->getNestedResourceUri($segments, $options);
 
-        $resource = last($segments);
+		$resource = last($segments);
 
-        if(isset($options['wildcards'][$resource]))
-            return str_replace('/{'.$this->getResourceWildcard($options['wildcards'][$resource]).'}', '', $uri);
+		if (isset($options['wildcards'][$resource]))
+			return str_replace('/{'.$this->getResourceWildcard($options['wildcards'][$resource]).'}', '', $uri);
 
 		return str_replace('/{'.$this->getResourceWildcard($resource).'}', '', $uri);
 	}
@@ -162,7 +162,8 @@ class ResourceRegistrar {
 	/**
 	 * Get the URI for a nested resource segment array.
 	 *
-	 * @param  array   $segments
+	 * @param  array $segments
+	 * @param  array $options
 	 * @return string
 	 */
 	protected function getNestedResourceUri(array $segments, $options)
@@ -172,9 +173,9 @@ class ResourceRegistrar {
 		// entire string for the resource URI that contains all nested resources.
 		return implode('/', array_map(function($s) use ($options)
 		{
-            //If a wildcard for a resource has been set to be overridden
-            if(isset($options['wildcards'][$s]))
-                return $s.'/{'.$this->getResourceWildcard($options['wildcards'][$s]).'}';
+			//If a wildcard for a resource has been set to be overridden
+			if (isset($options['wildcards'][$s]))
+				return $s.'/{'.$this->getResourceWildcard($options['wildcards'][$s]).'}';
 
 			return $s.'/{'.$this->getResourceWildcard($s).'}';
 
@@ -377,15 +378,15 @@ class ResourceRegistrar {
 		return $this->router->put($uri, $action);
 	}
 
-    /**
-     * Add the update method for a resourceful route.
-     *
-     * @param  string $name
-     * @param  string $base
-     * @param  string $controller
-     * @param  array  $options
-     * @return void
-     */
+	/**
+	 * Add the update method for a resourceful route.
+	 *
+	 * @param  string $name
+	 * @param  string $base
+	 * @param  string $controller
+	 * @param  array  $options
+	 * @return void
+	 */
 	protected function addPatchResourceUpdate($name, $base, $controller, $options)
 	{
 		$uri = $this->getResourceUri($name, $options).'/{'.$base.'}';
