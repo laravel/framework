@@ -383,7 +383,7 @@ class Filesystem {
 			// If the item is a directory, we can just recurse into the function and
 			// delete that sub-directory otherwise we'll just delete the file and
 			// keep iterating through each file until the directory is cleaned.
-			if ($item->isDir())
+			if ($item->isDir() && ! $item->isLink())
 			{
 				$this->deleteDirectory($item->getPathname());
 			}
