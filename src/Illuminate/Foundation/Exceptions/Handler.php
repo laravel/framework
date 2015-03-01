@@ -2,6 +2,7 @@
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
@@ -83,7 +84,7 @@ class Handler implements ExceptionHandlerContract {
 	{
 		if ($this->isHttpException($e))
 		{
-			return $this->renderHttpException($e);
+			return $this->renderHttpException($e, $request);
 		}
 		else
 		{
@@ -106,12 +107,18 @@ class Handler implements ExceptionHandlerContract {
 	/**
 	 * Render the given HttpException.
 	 *
-	 * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+	 * @param  \Symfony\Component\HttpKernel\Exception\HttpException $e
+	 * @param Request $request
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	protected function renderHttpException(HttpException $e)
+	protected function renderHttpException(HttpException $e, Request $request = null)
 	{
 		$status = $e->getStatusCode();
+
+		if (null !== $request && $request->wantsJson())
+		{
+			return response()->json($e->getMessage(), $e->getStatusCode());
+		}
 
 		if (view()->exists("errors.{$status}"))
 		{
