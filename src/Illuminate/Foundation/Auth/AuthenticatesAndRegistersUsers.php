@@ -95,7 +95,7 @@ trait AuthenticatesAndRegistersUsers {
 	 */
 	protected function getFailedLoginMesssage()
 	{
-		return 'These credentials do not match our records.';
+		return trans('auth.failedLoginMessage');
 	}
 
 	/**
