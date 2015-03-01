@@ -2,6 +2,9 @@
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
@@ -81,6 +84,35 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function render($request, Exception $e)
 	{
+		if ($request->ajax() || $request->wantsJson())
+		{
+			if ( ! $e instanceof FlattenException)
+			{
+				$e = FlattenException::create($e);
+			}
+
+			$message = '';
+
+			if (config('app.debug'))
+			{
+				$message = $e->getMessage();
+			}
+
+			if (empty($message))
+			{
+				if (404 === $e->getStatusCode())
+				{
+					$message = 'Sorry, the page you are looking for could not be found.';
+				}
+				else
+				{
+					$message = 'Whoops, looks like something went wrong.';
+				}
+			}
+
+			return new JsonResponse(['code' => $e->getCode(), 'message' => $message], $e->getStatusCode());
+		}
+
 		if ($this->isHttpException($e))
 		{
 			return $this->renderHttpException($e);
