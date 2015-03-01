@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Testing;
 
-use Dotenv;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
