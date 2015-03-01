@@ -780,9 +780,14 @@ class Container implements ArrayAccess, ContainerContract {
 		// no binding registered for the abstractions so we need to bail out.
 		if ( ! $reflector->isInstantiable())
 		{
-			$message = "Target [$concrete] is not instantiable.";
+			throw new BindingResolutionException("Target [$concrete] is not instantiable.");
+		}
 
-			throw new BindingResolutionException($message);
+		if (in_array($concrete, $this->buildStack))
+		{
+			$this->buildStack[] = $concrete;
+
+			throw CircularReferenceException::in($concrete, $this->buildStack);
 		}
 
 		$this->buildStack[] = $concrete;
@@ -891,6 +896,15 @@ class Container implements ArrayAccess, ContainerContract {
 		// is optional, and if it is we will return the optional parameter value as
 		// the value of the dependency, similarly to how we do this with scalars.
 		catch (BindingResolutionException $e)
+		{
+			if ($parameter->isOptional())
+			{
+				return $parameter->getDefaultValue();
+			}
+
+			throw $e;
+		}
+		catch (CircularReferenceException $e)
 		{
 			if ($parameter->isOptional())
 			{
