@@ -354,6 +354,28 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCircularReferenceCheck()
+	{
+		// Since the dependency is ( D -> F -> E -> D ), the exception
+		// message should state that the issue starts in class D
+		$this->setExpectedException('Illuminate\Container\CircularReferenceException', "Circular reference found while resolving [ContainerCircularReferenceStubD].");
+		$container = new Container;
+		$parameters = [];
+		$container->make('ContainerCircularReferenceStubD', $parameters);
+	}
+
+
+	public function testCircularReferenceCheckDetectCycleStartLocation()
+	{
+		// Since the dependency is ( A -> B -> C -> B ), the exception
+		// message should state that the issue starts in class B
+		$this->setExpectedException('Illuminate\Container\CircularReferenceException', "Circular reference found while resolving [ContainerCircularReferenceStubB].");
+		$container = new Container;
+		$parameters = [];
+		$container->make('ContainerCircularReferenceStubA', $parameters);
+	}
+
+
 	public function testCallWithDependencies()
 	{
 		$container = new Container;
@@ -595,4 +617,34 @@ class ContainerStaticMethodStub
 function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
 {
 	return func_get_args();
+}
+
+class ContainerCircularReferenceStubA
+{
+	public function __construct(ContainerCircularReferenceStubB $b) {}
+}
+
+class ContainerCircularReferenceStubB
+{
+	public function __construct(ContainerCircularReferenceStubC $c) {}
+}
+
+class ContainerCircularReferenceStubC
+{
+	public function __construct(ContainerCircularReferenceStubB $b) {}
+}
+
+class ContainerCircularReferenceStubD
+{
+	public function __construct(ContainerCircularReferenceStubE $e) {}
+}
+
+class ContainerCircularReferenceStubE
+{
+	public function __construct(ContainerCircularReferenceStubF $f) {}
+}
+
+class ContainerCircularReferenceStubF
+{
+	public function __construct(ContainerCircularReferenceStubD $d) {}
 }
