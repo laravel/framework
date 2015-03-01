@@ -62,7 +62,7 @@ class ConfigCacheCommand extends Command {
 	/**
 	 * Boot a fresh copy of the application configuration.
 	 *
-	 * @return \Illuminate\Routing\RouteCollection
+	 * @return array
 	 */
 	protected function getFreshConfiguration()
 	{
