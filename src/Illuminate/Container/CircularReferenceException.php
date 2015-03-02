@@ -5,33 +5,30 @@ use Exception;
 class CircularReferenceException extends Exception {
 
 	/**
+	 * The build stack that caused the exception.
+	 *
 	 * @var array
 	 */
 	protected $buildStack;
 
 	/**
-	 * @param string $class
-	 * @param array $buildStack
+	 * Create a new circular reference exception instance.
 	 *
-	 * @return static
+	 * @param  string  $class
+	 * @param  array  $buildStack
+	 *
+	 * @return \Illuminate\Container\CircularReferenceException
 	 */
-	public static function in($class, $buildStack)
+	public function __construct($class, array $buildStack)
 	{
-		return with(new static("Circular reference found while resolving [$class]."))->setBuildStack($buildStack);
-	}
-
-	/**
-	 * @param $buildStack
-	 */
-	public function setBuildStack($buildStack)
-	{
+		$this->message = "Circular reference found while resolving [$class].";
 		$this->buildStack = $buildStack;
-
-		return $this;
 	}
 
 	/**
-	 * @return array
+	 * Get the build stack that caused the exception
+	 *
+	 * @return  array
 	 */
 	public function getBuildStack()
 	{

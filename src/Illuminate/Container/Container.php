@@ -787,7 +787,7 @@ class Container implements ArrayAccess, ContainerContract {
 		{
 			$this->buildStack[] = $concrete;
 
-			throw CircularReferenceException::in($concrete, $this->buildStack);
+			throw new CircularReferenceException($concrete, $this->buildStack);
 		}
 
 		$this->buildStack[] = $concrete;
