@@ -1,8 +1,9 @@
 <?php namespace {{namespace}};
 
 use Closure;
+use Illuminate\Contracts\Routing\Middleware;
 
-class {{class}} {
+class {{class}} implements Middleware {
 
 	/**
 	 * Handle an incoming request.
@@ -13,7 +14,11 @@ class {{class}} {
 	 */
 	public function handle($request, Closure $next)
 	{
-		return $next($request);
+		$response = $next($request);
+
+		//
+
+		return $response;
 	}
 
 }
