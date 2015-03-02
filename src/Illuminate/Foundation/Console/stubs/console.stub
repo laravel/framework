@@ -6,7 +6,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class DummyClass extends Command
 {
-
     /**
      * The console command name.
      *
@@ -64,5 +63,4 @@ class DummyClass extends Command
             ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
         ];
     }
-
 }

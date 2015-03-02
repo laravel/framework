@@ -6,7 +6,6 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 
 class DummyClass implements ShouldBeQueued
 {
-
     use InteractsWithQueue;
 
     /**
@@ -29,5 +28,4 @@ class DummyClass implements ShouldBeQueued
     {
         //
     }
-
 }

@@ -5,7 +5,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class DummyClass extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -29,5 +28,4 @@ class DummyClass extends Migration
             //
         });
     }
-
 }

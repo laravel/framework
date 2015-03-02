@@ -6,7 +6,6 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 
 class DummyClass
 {
-
     /**
      * Create the event handler.
      *
@@ -27,5 +26,4 @@ class DummyClass
     {
         //
     }
-
 }

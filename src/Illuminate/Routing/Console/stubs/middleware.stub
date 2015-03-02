@@ -4,7 +4,6 @@ use Closure;
 
 class DummyClass
 {
-
     /**
      * Handle an incoming request.
      *
@@ -16,5 +15,4 @@ class DummyClass
     {
         return $next($request);
     }
-
 }

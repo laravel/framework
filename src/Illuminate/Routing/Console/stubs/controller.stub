@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 class DummyClass extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -80,5 +79,4 @@ class DummyClass extends Controller
     {
         //
     }
-
 }
