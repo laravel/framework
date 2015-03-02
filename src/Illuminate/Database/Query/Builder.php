@@ -174,7 +174,7 @@ class Builder {
 		'=', '<', '>', '<=', '>=', '<>', '!=',
 		'like', 'like binary', 'not like', 'between', 'ilike',
 		'&', '|', '^', '<<', '>>',
-		'rlike', 'regexp', 'not regexp', 
+		'rlike', 'regexp', 'not regexp',
 		'~', '~*', '!~', '!~*', 'similar to',
                 'not similar to',
 	);
@@ -1658,6 +1658,8 @@ class Builder {
 	 */
 	public function insert(array $values)
 	{
+		if (empty($values)) return true;
+
 		// Since every insert gets treated like a batch insert, we will make sure the
 		// bindings are structured in a way that is convenient for building these
 		// inserts statements by verifying the elements are actually an array.
