@@ -84,7 +84,7 @@ trait AuthenticatesAndRegistersUsers {
 		return redirect($this->loginPath())
 					->withInput($request->only('email', 'remember'))
 					->withErrors([
-						'email' => $this->getFailedLoginMesssage(),
+						'email' => $this->getFailedLoginMessage(),
 					]);
 	}
 
@@ -93,7 +93,7 @@ trait AuthenticatesAndRegistersUsers {
 	 *
 	 * @return string
 	 */
-	protected function getFailedLoginMesssage()
+	protected function getFailedLoginMessage()
 	{
 		return 'These credentials do not match our records.';
 	}
