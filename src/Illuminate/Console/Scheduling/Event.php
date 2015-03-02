@@ -153,8 +153,6 @@ class Event {
 	 */
 	protected function callAfterCallbacks(Container $container)
 	{
-		if (empty($this->afterCallbacks)) return;
-
 		foreach ($this->afterCallbacks as $callback)
 		{
 			$container->call($callback);
