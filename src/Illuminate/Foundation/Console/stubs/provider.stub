@@ -24,4 +24,5 @@ class DummyClass extends ServiceProvider
     {
         //
     }
+
 }

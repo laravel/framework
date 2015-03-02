@@ -29,4 +29,5 @@ class CreateCacheTable extends Migration
     {
         Schema::drop('cache');
     }
+
 }

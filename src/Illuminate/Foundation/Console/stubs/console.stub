@@ -64,4 +64,5 @@ class DummyClass extends Command
             ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
         ];
     }
+
 }

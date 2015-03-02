@@ -16,4 +16,5 @@ class DummyClass
     {
         return $next($request);
     }
+
 }

@@ -17,4 +17,5 @@ class DummyClass extends Event
     {
         //
     }
+
 }
