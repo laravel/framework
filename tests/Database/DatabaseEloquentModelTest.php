@@ -686,6 +686,56 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHidden()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setHidden(['age', 'id']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testVisible()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setVisible(['name', 'id']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testHiddenAreIgnoringWhenVisibleExists()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setVisible(['name', 'id']);
+		$model->setHidden(['name', 'age']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayHasKey('id', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testDynamicHidden()
+	{
+		$model = new EloquentModelDynamicHiddenStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testDynamicVisible()
+	{
+		$model = new EloquentModelDynamicVisibleStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
 	public function testFillable()
 	{
 		$model = new EloquentModelStub;
@@ -1336,5 +1386,23 @@ class EloquentModelCastingStub extends Illuminate\Database\Eloquent\Model {
 	public function eighthAttributeValue()
 	{
 		return $this->attributes['eighth'];
+	}
+}
+
+class EloquentModelDynamicHiddenStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'stub';
+	protected $guarded = [];
+	public function getHidden()
+	{
+		return ['age', 'id'];
+	}
+}
+
+class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'stub';
+	protected $guarded = [];
+	public function getVisible()
+	{
+		return ['name', 'id'];
 	}
 }
