@@ -28,4 +28,5 @@ class DummyClass extends Migration
     {
         Schema::drop('DummyTable');
     }
+
 }

@@ -30,4 +30,5 @@ class DummyClass extends Command implements SelfHandling, ShouldBeQueued
     {
         //
     }
+
 }

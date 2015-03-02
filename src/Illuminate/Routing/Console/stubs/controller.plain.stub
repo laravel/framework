@@ -6,6 +6,5 @@ use Illuminate\Http\Request;
 
 class DummyClass extends Controller
 {
-
     //
 }

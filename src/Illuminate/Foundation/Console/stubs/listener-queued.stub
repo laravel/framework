@@ -29,4 +29,5 @@ class DummyClass implements ShouldBeQueued
     {
         //
     }
+
 }

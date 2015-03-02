@@ -30,4 +30,5 @@ class DummyClass extends Job implements SelfHandling, ShouldBeQueued
     {
         //
     }
+
 }

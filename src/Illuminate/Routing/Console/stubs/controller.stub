@@ -80,4 +80,5 @@ class DummyClass extends Controller
     {
         //
     }
+
 }
