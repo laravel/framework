@@ -2,7 +2,6 @@
 
 class WelcomeController extends Controller
 {
-
     /*
     |--------------------------------------------------------------------------
     | Default Home Controller
@@ -20,5 +19,4 @@ class WelcomeController extends Controller
     {
         return view('welcome');
     }
-
 }

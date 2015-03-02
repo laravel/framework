@@ -4,7 +4,6 @@ use Illuminate\Support\ServiceProvider;
 
 class DummyClass extends ServiceProvider
 {
-
     /**
      * Bootstrap the application services.
      *
@@ -24,5 +23,4 @@ class DummyClass extends ServiceProvider
     {
         //
     }
-
 }

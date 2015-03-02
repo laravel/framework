@@ -5,7 +5,6 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class DummyClass
 {
-
     /**
      * Create the command handler.
      *
@@ -26,5 +25,4 @@ class DummyClass
     {
         //
     }
-
 }

@@ -5,7 +5,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateFailedJobsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,5 +30,4 @@ class CreateFailedJobsTable extends Migration
     {
         Schema::drop('failed_jobs');
     }
-
 }

@@ -5,7 +5,6 @@ use Illuminate\Queue\SerializesModels;
 
 class DummyClass extends Event
 {
-
     use SerializesModels;
 
     /**
@@ -17,5 +16,4 @@ class DummyClass extends Event
     {
         //
     }
-
 }

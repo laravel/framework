@@ -4,7 +4,6 @@ use DummyRootNamespaceCommands\Command;
 
 class DummyClass extends Command
 {
-
     /**
      * Create a new command instance.
      *
@@ -14,5 +13,4 @@ class DummyClass extends Command
     {
         //
     }
-
 }

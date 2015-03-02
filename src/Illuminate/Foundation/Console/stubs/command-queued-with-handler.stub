@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 
 class DummyClass extends Command implements ShouldBeQueued
 {
-
     use InteractsWithQueue, SerializesModels;
 
     /**
@@ -19,5 +18,4 @@ class DummyClass extends Command implements ShouldBeQueued
     {
         //
     }
-
 }
