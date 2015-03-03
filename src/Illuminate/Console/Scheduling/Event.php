@@ -492,9 +492,9 @@ class Event {
 	 */
 	public function days($days)
 	{
-		$this->spliceIntoPosition(5, implode(',', is_array($days) ? $days : func_get_args()));
+		$days = is_array($days) ? $days : func_get_args();
 
-		return $this;
+		return $this->spliceIntoPosition(5, implode(',', $days));
 	}
 
 	/**
