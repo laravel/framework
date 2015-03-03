@@ -42,6 +42,7 @@ class FreshCommand extends Command {
 		$files->deleteDirectory(base_path('resources/assets/less/bootstrap'));
 
 		$files->put(app_path('Http/routes.php'), $files->get(__DIR__.'/stubs/fresh-routes.stub'));
+		$files->put(app_path('Providers/AppServiceProvider.php'), $files->get(__DIR__.'/stubs/fresh-app-provider.stub'));
 
 		$this->info('Scaffolding removed! Enjoy your fresh start.');
 	}
