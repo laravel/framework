@@ -15,7 +15,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector = $this->getMock('Illuminate\Cache\MemcachedConnector', array('getMemcached'));
 		$memcached = m::mock('stdClass');
 		$memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
-		$memcached->shouldReceive('getVersion')->once()->andReturn(true);
+		$memcached->shouldReceive('getVersion')->once()->andReturn([]);
 		$connector->expects($this->once())->method('getMemcached')->will($this->returnValue($memcached));
 		$result = $connector->connect(array(array('host' => 'localhost', 'port' => 11211, 'weight' => 100)));
 
@@ -31,7 +31,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector = $this->getMock('Illuminate\Cache\MemcachedConnector', array('getMemcached'));
 		$memcached = m::mock('stdClass');
 		$memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
-		$memcached->shouldReceive('getVersion')->once()->andReturn(false);
+		$memcached->shouldReceive('getVersion')->once()->andReturn(['255.255.255']);
 		$connector->expects($this->once())->method('getMemcached')->will($this->returnValue($memcached));
 		$result = $connector->connect(array(array('host' => 'localhost', 'port' => 11211, 'weight' => 100)));
 	}
