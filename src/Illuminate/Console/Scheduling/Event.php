@@ -601,7 +601,9 @@ class Event {
 		{
 			throw new LogicException("Must direct output to a file in order to e-mail results.");
 		}
+
 		$addresses = is_array($addresses) ? $addresses : func_get_args();
+
 		return $this->then(function(Mailer $mailer) use ($addresses)
 		{
 			$this->emailOutput($mailer, $addresses);
