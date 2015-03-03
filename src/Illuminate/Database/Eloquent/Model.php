@@ -2452,7 +2452,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		foreach ($this->getArrayableRelations() as $key => $value)
 		{
-			if (in_array($key, $this->hidden)) continue;
+			if (in_array($key, $this->getHidden())) continue;
 
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
@@ -2510,12 +2510,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function getArrayableItems(array $values)
 	{
-		if (count($this->visible) > 0)
+		if (count($this->getVisible()) > 0)
 		{
-			return array_intersect_key($values, array_flip($this->visible));
+			return array_intersect_key($values, array_flip($this->getVisible()));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));
+		return array_diff_key($values, array_flip($this->getHidden()));
 	}
 
 	/**
