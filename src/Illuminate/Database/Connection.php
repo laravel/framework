@@ -658,7 +658,11 @@ class Connection implements ConnectionInterface {
 	{
 		$message = $e->getPrevious()->getMessage();
 
-		return str_contains($message, ['server has gone away', 'no connection to the server']);
+		return str_contains($message, [
+			'server has gone away',
+			'no connection to the server',
+			'Lost connection',
+		]);
 	}
 
 	/**
