@@ -264,9 +264,7 @@ class Event {
 	 */
 	public function hourly()
 	{
-		$this->expression = '0 * * * * *';
-
-		return $this;
+		return $this->cron('0 * * * * *');
 	}
 
 	/**
@@ -276,9 +274,7 @@ class Event {
 	 */
 	public function daily()
 	{
-		$this->expression = '0 0 * * * *';
-
-		return $this;
+		return $this->cron('0 0 * * * *');
 	}
 
 	/**
@@ -313,9 +309,7 @@ class Event {
 	 */
 	public function twiceDaily()
 	{
-		$this->expression = '0 1,13 * * * *';
-
-		return $this;
+		return $this->cron('0 1,13 * * * *');
 	}
 
 	/**
@@ -405,9 +399,7 @@ class Event {
 	 */
 	public function weekly()
 	{
-		$this->expression = '0 0 * * 0 *';
-
-		return $this;
+		return $this->cron('0 0 * * 0 *');
 	}
 
 	/**
@@ -431,9 +423,7 @@ class Event {
 	 */
 	public function monthly()
 	{
-		$this->expression = '0 0 1 * * *';
-
-		return $this;
+		return $this->cron('0 0 1 * * *');
 	}
 
 	/**
@@ -443,9 +433,7 @@ class Event {
 	 */
 	public function yearly()
 	{
-		$this->expression = '0 0 1 1 * *';
-
-		return $this;
+		return $this->cron('0 0 1 1 * *');
 	}
 
 	/**
@@ -455,9 +443,7 @@ class Event {
 	 */
 	public function everyFiveMinutes()
 	{
-		$this->expression = '*/5 * * * * *';
-
-		return $this;
+		return $this->cron('*/5 * * * * *');
 	}
 
 	/**
@@ -467,9 +453,7 @@ class Event {
 	 */
 	public function everyTenMinutes()
 	{
-		$this->expression = '*/10 * * * * *';
-
-		return $this;
+		return $this->cron('*/10 * * * * *');
 	}
 
 	/**
@@ -479,9 +463,7 @@ class Event {
 	 */
 	public function everyThirtyMinutes()
 	{
-		$this->expression = '0,30 * * * * *';
-
-		return $this;
+		return $this->cron('0,30 * * * * *');
 	}
 
 	/**
@@ -695,9 +677,7 @@ class Event {
 
 		$segments[$position - 1] = $value;
 
-		$this->expression = implode(' ', $segments);
-
-		return $this;
+		return $this->cron(implode(' ', $segments));
 	}
 
 	/**
