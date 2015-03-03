@@ -243,7 +243,7 @@ class Builder {
 	 * @param  array  $columns
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = 15, $columns = ['*'])
+	public function paginate($perPage = null, $columns = ['*'])
 	{
 		$total = $this->query->getCountForPagination();
 
