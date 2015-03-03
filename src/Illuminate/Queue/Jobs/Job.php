@@ -179,7 +179,7 @@ abstract class Job {
 	 */
 	protected function resolveQueueableEntity($value)
 	{
-		if (is_string($value) and starts_with($value, '::entity::'))
+		if (is_string($value) && starts_with($value, '::entity::'))
 		{
 			list($marker, $type, $id) = explode('|', $value, 3);
 
