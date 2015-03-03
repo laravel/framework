@@ -179,7 +179,7 @@ class Event {
 	 */
 	public function isDue(Application $app)
 	{
-		if ($app->isDownForMaintenance() && ! $this->runsInMaintenanceMode())
+		if ( ! $this->runsInMaintenanceMode() && $app->isDownForMaintenance())
 		{
 			return false;
 		}
