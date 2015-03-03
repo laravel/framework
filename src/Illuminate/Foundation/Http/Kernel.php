@@ -152,6 +152,22 @@ class Kernel implements KernelContract {
 	}
 
 	/**
+	 * Add a new middleware to the stack if it does not already exist.
+	 *
+	 * @param  string  $middleware
+	 * @return $this
+	 */
+	public function addMiddleware($middleware)
+	{
+		if (array_search($middleware, $this->middleware) === false)
+		{
+			$this->middleware[] = $middleware;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Bootstrap the application for HTTP requests.
 	 *
 	 * @return void
