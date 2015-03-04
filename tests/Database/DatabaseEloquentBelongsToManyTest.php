@@ -71,6 +71,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('EloquentCustomCollectionStub', $results);
 		$this->assertSame('bar', $results->foo());
+		$this->assertCount(2, $results);
 	}
 
 

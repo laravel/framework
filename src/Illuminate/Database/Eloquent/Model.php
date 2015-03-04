@@ -1903,7 +1903,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function newCollection(array $models = array())
 	{
-		return is_null($collection = static::$collection) ? new Collection($models) : $collection($models);
+		return is_null($collection = static::$collection) ? new Collection($models) : new $collection($models);
 	}
 
 	/**
