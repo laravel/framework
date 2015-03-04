@@ -224,6 +224,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected static $mutatorCache = array();
 
 	/**
+	 * The collection to be used with this instance.
+	 *
+	 * @var string
+	 */
+	public static $collection = null;
+
+	/**
 	 * The many to many relationship methods.
 	 *
 	 * @var array
@@ -1892,11 +1899,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Create a new Eloquent Collection instance.
 	 *
 	 * @param  array  $models
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return mixed
 	 */
 	public function newCollection(array $models = array())
 	{
-		return new Collection($models);
+		return is_null($collection = static::$collection) ? new Collection($models) : $collection($models);
 	}
 
 	/**
