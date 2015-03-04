@@ -50,6 +50,31 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelHasCustomCollection()
+	{
+		$model1 = new EloquentHasCustomCollectionStub();
+		$model1->fill(['name' => 'taylor', 'pivot_user_id' => 1, 'pivot_role_id' => 2]);
+		$model2 = new EloquentHasCustomCollectionStub();
+		$model2->fill(['name' => 'dayle', 'pivot_user_id' => 3, 'pivot_role_id' => 4]);
+		$models = [$model1, $model2];
+
+		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+
+		$relation = $this->getRelation();
+		$relation->getParent()->shouldReceive('getConnectionName')->andReturn('foo.connection');
+		$relation->getQuery()->shouldReceive('addSelect')->once()->with(['roles.*', 'user_role.user_id as pivot_user_id', 'user_role.role_id as pivot_role_id'])->andReturn($relation->getQuery());
+		$relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
+		$relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
+		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new EloquentCustomCollectionStub($array); });
+		$relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
+		$results = $relation->get();
+
+		$this->assertInstanceOf('EloquentCustomCollectionStub', $results);
+		$this->assertSame('bar', $results->foo());
+		$this->assertCount(2, $results);
+	}
+
+
 	public function testTimestampsCanBeRetrievedProperly()
 	{
 		$model1 = new EloquentBelongsToManyModelStub;
@@ -543,4 +568,16 @@ class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\M
 
 class EloquentBelongsToManyPivotStub {
 	public $user_id;
+}
+
+class EloquentHasCustomCollectionStub extends Illuminate\Database\Eloquent\Model {
+	protected $guarded = [];
+	static $collection = 'EloquentCustomCollectionStub';
+}
+
+class EloquentCustomCollectionStub extends Illuminate\Database\Eloquent\Collection {
+	public function foo()
+	{
+		return 'bar';
+	}
 }
