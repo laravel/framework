@@ -184,8 +184,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 * Get the mime-type of a given file.
 	 *
 	 * @param  string  $path
-	 * @return string|false file mime-type or FALSE when fails
-	 *                      to fetch mime-type from existing file
+	 * @return string|false
 	 */
 	public function mimeType($path)
 	{
