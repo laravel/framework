@@ -181,6 +181,18 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	}
 
 	/**
+	 * Get the mime-type of a given file.
+	 *
+	 * @param  string  $path
+	 * @return string|false file mime-type or FALSE when fails
+	 *                      to fetch mime-type from existing file
+	 */
+	public function mimeType($path)
+	{
+		return $this->driver->getMimetype($path);
+	}
+
+	/**
 	 * Get the file's last modification time.
 	 *
 	 * @param  string  $path
