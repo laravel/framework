@@ -62,4 +62,12 @@ interface MigrationRepositoryInterface {
 	 */
 	public function setSource($name);
 
+    /**
+     * Get migration entries from the database by path
+     *
+     * @param array $path
+     * @return array
+     */
+    public function getByPath($path);
+
 }

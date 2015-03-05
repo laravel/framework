@@ -56,9 +56,11 @@ class ResetCommand extends Command {
 
 		$pretend = $this->input->getOption('pretend');
 
+        $path = $this->input->getOption('path');
+
 		while (true)
 		{
-			$count = $this->migrator->rollback($pretend);
+            $count = $this->migrator->rollback($pretend, $path);
 
 			// Once the migrator has run we will grab the note output and send it out to
 			// the console screen, since the migrator itself functions without having
@@ -85,6 +87,8 @@ class ResetCommand extends Command {
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+
+            array('path', null, InputOption::VALUE_OPTIONAL, 'The path of migration files to reset.'),
 		);
 	}
 

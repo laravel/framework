@@ -142,20 +142,29 @@ class Migrator {
 		$this->note("<info>Migrated:</info> $file");
 	}
 
-	/**
-	 * Rollback the last migration operation.
-	 *
-	 * @param  bool  $pretend
-	 * @return int
-	 */
-	public function rollback($pretend = false)
+    /**
+     * Rollback the last migration operation.
+     *
+     * @param  bool $pretend
+     * @param  string|null $path
+     * @return int
+     */
+	public function rollback($pretend = false, $path = null)
 	{
 		$this->notes = array();
 
 		// We want to pull in the last batch of migrations that ran on the previous
 		// migration operation. We'll then reverse those migrations and run each
 		// of them "down" to reverse the last migration "operation" which ran.
-		$migrations = $this->repository->getLast();
+        if (is_null($path))
+        {
+            $migrations = $this->repository->getLast();
+        }
+        else
+        {
+            // We grab the migrations that exist in the path specified
+            $migrations = $this->repository->getByPath($path);
+        }
 
 		if (count($migrations) == 0)
 		{
