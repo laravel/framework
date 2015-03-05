@@ -178,6 +178,17 @@ class Filesystem {
 	}
 
 	/**
+	 * Get the mime-type of a given file.
+	 *
+	 * @param  string  $path
+	 * @return string|false
+	 */
+	public function mimeType($path)
+	{
+		return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+	}
+
+	/**
 	 * Get the file size of a given file.
 	 *
 	 * @param  string  $path
