@@ -7,35 +7,35 @@ interface PasswordBroker {
 	/**
 	 * Constant representing a successfully sent reminder.
 	 *
-	 * @var int
+	 * @var string
 	 */
 	const RESET_LINK_SENT = 'passwords.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
 	 *
-	 * @var int
+	 * @var string
 	 */
 	const PASSWORD_RESET = 'passwords.reset';
 
 	/**
 	 * Constant representing the user not found response.
 	 *
-	 * @var int
+	 * @var string
 	 */
 	const INVALID_USER = 'passwords.user';
 
 	/**
 	 * Constant representing an invalid password.
 	 *
-	 * @var int
+	 * @var string
 	 */
 	const INVALID_PASSWORD = 'passwords.password';
 
 	/**
 	 * Constant representing an invalid token.
 	 *
-	 * @var int
+	 * @var string
 	 */
 	const INVALID_TOKEN = 'passwords.token';
 
