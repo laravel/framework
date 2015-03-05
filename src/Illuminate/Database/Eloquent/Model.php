@@ -2449,6 +2449,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function relationsToArray()
 	{
 		$attributes = array();
+
 		$hidden = $this->getHidden();
 
 		foreach ($this->getArrayableRelations() as $key => $value)
