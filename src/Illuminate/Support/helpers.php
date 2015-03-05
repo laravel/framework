@@ -541,7 +541,14 @@ if ( ! function_exists('preg_replace_sub'))
 	{
 		return preg_replace_callback($pattern, function($match) use (&$replacements)
 		{
-			return array_shift($replacements);
+			foreach ($replacements as $key => $value)
+			{
+				if (is_int($key))
+				{
+					unset($replacements[$key]);
+					return $value;
+				}
+			}
 
 		}, $subject);
 	}
