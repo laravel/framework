@@ -159,6 +159,21 @@ class Event {
 		}
 	}
 
+    /**
+     * Test if PHP is running on Windows.
+     * See http://stackoverflow.com/questions/5879043/php-script-detect-whether-running-under-linux-or-windows
+     *
+     * @return bool
+     */
+    public function isPhpOnWindowsServer()
+    {
+        if (strncasecmp(PHP_OS, 'WIN', 3) == 0) {
+            return true;
+        }
+
+        return false;
+    }
+
 	/**
 	 * Build the comand string.
 	 *
@@ -166,9 +181,24 @@ class Event {
 	 */
 	public function buildCommand()
 	{
-		$command = $this->command.' > '.$this->output.' 2>&1 &';
+        if($this->isPhpOnWindowsServer())
+        {
+            // in windows, default case would be e.g 'php artisan schedule:run > NUL 2>&1 &' tested on Windows 7
+            //using the wonderful IntelliAdmin Cron Service for windows @ http://www.intelliadmin.com/index.php/2012/05/free-utility-a-simple-task-scheduler-for-windows/
+            //See http://superuser.com/questions/777198/equivalent-of-foo-dev-null-in-windows-shell
+            $cmdOutput = $this->output;
+            if($cmdOutput === '/dev/null')
+            {
+                $cmdOutput = 'NUL';
+            }
+            return $this->command.' > '.$cmdOutput.' 2>&1 &';
+        }
+        else
+        {
+            $command = $this->command.' > '.$this->output.' 2>&1 &';
 
-		return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
+            return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
+        }
 	}
 
 	/**
