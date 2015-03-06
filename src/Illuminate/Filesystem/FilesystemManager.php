@@ -76,7 +76,7 @@ class FilesystemManager implements FactoryContract {
 	 */
 	protected function get($name)
 	{
-		return isset($this->disks[$name]) ? $this->disks[$name] : $this->resolve($name);
+		return array_get($this->disks, $name, $this->resolve($name));
 	}
 
 	/**

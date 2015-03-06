@@ -401,7 +401,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function detectEnvironment(Closure $callback)
 	{
-		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
+		$args = array_get($_SERVER, 'argv');
 
 		return $this['env'] = (new EnvironmentDetector())->detect($callback, $args);
 	}
