@@ -570,6 +570,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$old = array('prefix' => 'foo/bar/');
 		$this->assertEquals(array('prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []), Router::mergeGroup(array('prefix' => 'baz'), $old));
 
+		$old = array('prefix' => null);
+		$this->assertEquals(array('prefix' => 'baz', 'namespace' => null, 'where' => []), Router::mergeGroup(array('prefix' => 'baz'), $old));
+
 		$old = array('domain' => 'foo');
 		$this->assertEquals(array('domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []), Router::mergeGroup(array('domain' => 'baz'), $old));
 
