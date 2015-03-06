@@ -410,7 +410,7 @@ class Router implements RegistrarContract {
 			return trim($new['namespace'], '\\');
 		}
 
-		return array_get($old, 'namespace');
+		return isset($old['namespace']) ? $old['namespace'] : null;
 	}
 
 	/**
@@ -427,7 +427,7 @@ class Router implements RegistrarContract {
 			return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
 		}
 
-		return array_get($old, 'prefix');
+		return isset($old['prefix']) ? $old['prefix'] : null;
 	}
 
 	/**
