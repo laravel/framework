@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
@@ -79,9 +80,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->schema()->drop('photos');
 	}
 
+
 	/**
 	 * Tests...
 	 */
+
 	public function testBasicModelRetrieval()
 	{
 		EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -103,6 +106,32 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('EloquentTestUser', $models[1]);
 		$this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
 		$this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
+	}
+
+
+	public function testPaginatedModelCollectionRetrieval()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+		Paginator::currentPageResolver(function () { return 1; });
+		$models = EloquentTestUser::oldest('id')->paginate(2);
+
+		$this->assertEquals(2, $models->count());
+		$this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+		$this->assertInstanceOf('EloquentTestUser', $models[0]);
+		$this->assertInstanceOf('EloquentTestUser', $models[1]);
+		$this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
+		$this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
+
+		Paginator::currentPageResolver(function () { return 2; });
+		$models = EloquentTestUser::oldest('id')->paginate(2);
+
+		$this->assertEquals(1, $models->count());
+		$this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+		$this->assertInstanceOf('EloquentTestUser', $models[0]);
+		$this->assertEquals('foo@gmail.com', $models[0]->email);
 	}
 
 
@@ -134,6 +163,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('EloquentTestUser', $multiple[1]);
 	}
 
+
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
@@ -141,6 +171,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	{
 		EloquentTestUser::findOrFail(1);
 	}
+
 
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
@@ -283,9 +314,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(2, EloquentTestPost::count());
 	}
 
+
 	/**
 	 * Helpers...
 	 */
+
 
 	/**
 	 * Get a database connection instance.
@@ -296,6 +329,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	{
 		return Eloquent::getConnectionResolver()->connection();
 	}
+
 
 	/**
 	 * Get a schema builder instance.
