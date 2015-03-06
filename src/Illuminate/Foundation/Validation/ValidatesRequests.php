@@ -53,8 +53,8 @@ trait ValidatesRequests {
 		}
 
 		return redirect()->to($this->getRedirectUrl())
-                        ->withInput($request->input())
-                        ->withErrors($errors, $this->getErrorBag());
+						->withInput($request->input())
+						->withErrors($errors, $this->getErrorBag());
 	}
 
 	/**
@@ -88,14 +88,14 @@ trait ValidatesRequests {
 		return app('Illuminate\Contracts\Validation\Factory');
 	}
 
-    /**
-     * Get the key to be used for the view error bag.
-     *
-     * @return string
-     */
-    protected function getErrorBag()
-    {
-        return 'default';
-    }
+	/**
+	 * Get the key to be used for the view error bag.
+	 *
+	 * @return string
+	 */
+	protected function getErrorBag()
+	{
+		return 'default';
+	}
 
 }
