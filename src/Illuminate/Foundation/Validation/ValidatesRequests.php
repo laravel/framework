@@ -12,11 +12,12 @@ trait ValidatesRequests {
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  array  $rules
+	 * @param  array  $messages
 	 * @return void
 	 */
-	public function validate(Request $request, array $rules)
+	public function validate(Request $request, array $rules, array $messages = array())
 	{
-		$validator = $this->getValidationFactory()->make($request->all(), $rules);
+		$validator = $this->getValidationFactory()->make($request->all(), $rules, $messages);
 
 		if ($validator->fails())
 		{
