@@ -1,70 +1,32 @@
-## Illuminate Database
+## Illuminate Database package
 
-The Illuminate Database component is a full database toolkit for PHP, providing an expressive query builder, ActiveRecord style ORM, and schema builder. It currently supports MySQL, Postgres, SQL Server, and SQLite. It also serves as the database layer of the Laravel PHP framework.
+This package is part of the [Laravel framework](http://github.com/laravel/framework).
 
-### Usage Instructions
+[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
+[![Total Downloads](https://poser.pugx.org/laravel/framework/downloads.svg)](https://packagist.org/packages/laravel/framework)
+[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
+[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
+[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
 
-First, create a new "Capsule" manager instance. Capsule aims to make configuring the library for usage outside of the Laravel framework as easy as possible.
+> **Note:** If you want to build an application using Laravel 5, visit the main [Laravel repository](https://github.com/laravel/laravel).
 
-```PHP
-use Illuminate\Database\Capsule\Manager as Capsule;
+## Contributing
 
-$capsule = new Capsule;
+Issues for this package shall be posted on [Laravel framework issues](http://github.com/laravel/framework/issues).
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
 
-$capsule->addConnection([
-	'driver'    => 'mysql',
-	'host'      => 'localhost',
-	'database'  => 'database',
-	'username'  => 'root',
-	'password'  => 'password',
-	'charset'   => 'utf8',
-	'collation' => 'utf8_unicode_ci',
-	'prefix'    => '',
-]);
+## Installation
 
-// Set the event dispatcher used by Eloquent models... (optional)
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
-$capsule->setEventDispatcher(new Dispatcher(new Container));
+Use [Composer](https://getcomposer.org/) to install this package:
 
-// Make this Capsule instance available globally via static methods... (optional)
-$capsule->setAsGlobal();
-
-// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
-$capsule->bootEloquent();
+```sh
+composer require illuminate/database
 ```
 
-> `composer require "illuminate/events=5.0.*"` required when you need to use observers with Eloquent.
+## Official Documentation
 
-Once the Capsule instance has been registered. You may use it like so:
+Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
 
-**Using The Query Builder**
+### License
 
-```PHP
-$users = Capsule::table('users')->where('votes', '>', 100)->get();
-```
-Other core methods may be accessed directly from the Capsule in the same manner as from the DB facade:
-```PHP
-$results = Capsule::select('select * from users where id = ?', array(1));
-```
-
-**Using The Schema Builder**
-
-```PHP
-Capsule::schema()->create('users', function($table)
-{
-	$table->increments('id');
-	$table->string('email')->unique();
-	$table->timestamps();
-});
-```
-
-**Using The Eloquent ORM**
-
-```PHP
-class User extends Illuminate\Database\Eloquent\Model {}
-
-$users = User::where('votes', '>', 1)->get();
-```
-
-For further documentation on using the various database facilities this library provides, consult the [Laravel framework documentation](http://laravel.com/docs).
+The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
