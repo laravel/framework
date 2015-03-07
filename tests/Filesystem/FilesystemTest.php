@@ -225,6 +225,15 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMimeTypeOutputsMimeType()
+	{
+		file_put_contents(__DIR__.'/foo.txt', 'foo');
+		$files = new Filesystem;
+		$this->assertEquals('text/plain', $files->mimeType(__DIR__.'/foo.txt'));
+		@unlink(__DIR__.'/foo.txt');
+	}
+
+
 	public function testIsWritable()
 	{
 		file_put_contents(__DIR__.'/foo.txt', 'foo');
