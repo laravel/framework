@@ -54,7 +54,7 @@ trait ValidatesRequests {
 
 		return redirect()->to($this->getRedirectUrl())
 						->withInput($request->input())
-						->withErrors($errors, $this->getErrorBag());
+						->withErrors($errors, $this->errorBag());
 	}
 
 	/**
@@ -93,7 +93,7 @@ trait ValidatesRequests {
 	 *
 	 * @return string
 	 */
-	protected function getErrorBag()
+	protected function errorBag()
 	{
 		return 'default';
 	}
