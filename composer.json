@@ -3,6 +3,7 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "homepage": "http://laravel.com",
     "authors": [
         {
             "name": "Taylor Otwell",
