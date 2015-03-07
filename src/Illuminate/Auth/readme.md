@@ -1,4 +1,4 @@
-## Illuminate Queue package
+## Illuminate Auth package
 
 This package is part of the [Laravel framework](http://github.com/laravel/framework).
 
@@ -20,7 +20,7 @@ Thank you for considering contributing to the Laravel framework! The contributio
 Use [Composer](https://getcomposer.org/) to install this package:
 
 ```sh
-composer require illuminate/queue
+composer require illuminate/auth
 ```
 
 ## Official Documentation
