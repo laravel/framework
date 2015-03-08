@@ -3,6 +3,7 @@
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use ReflectionProperty;
 use ReflectionParameter;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
@@ -119,18 +120,24 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	protected function marshal($command, ArrayAccess $source, array $extras = [])
 	{
-		$injected = [];
-
 		$reflection = new ReflectionClass($command);
 
-		if ($constructor = $reflection->getConstructor())
+		if ( ! $constructor = $reflection->getConstructor())
 		{
-			$injected = array_map(function($parameter) use ($command, $source, $extras)
-			{
-				return $this->getParameterValueForCommand($command, $source, $parameter, $extras);
+			$instance = $reflection->newInstanceWithoutConstructor();
 
-			}, $constructor->getParameters());
+			foreach($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $parameter)
+			{
+				$instance->{$parameter->name} = $this->getParameterValueForCommand($command, $source, $parameter, $extras);
+			}
+
+			return $instance;
 		}
+
+		$injected = array_map(function($parameter) use ($command, $source, $extras)
+		{
+			return $this->getParameterValueForCommand($command, $source, $parameter, $extras);
+		}, $constructor->getParameters());
 
 		return $reflection->newInstanceArgs($injected);
 	}
@@ -145,7 +152,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * @return mixed
 	 */
 	protected function getParameterValueForCommand($command, ArrayAccess $source,
-                                                   ReflectionParameter $parameter, array $extras = array())
+                                                   $parameter, array $extras = array())
 	{
 		if (array_key_exists($parameter->name, $extras))
 		{
