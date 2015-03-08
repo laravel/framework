@@ -186,7 +186,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
-	 * Register a callback to run after a bootstrapper.
+	 * Register a callback to run before a bootstrapper.
 	 *
 	 * @param  string  $bootstrapper
 	 * @param  Closure  $callback
