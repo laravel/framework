@@ -676,22 +676,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Find a model by its primary key.
-	 *
-	 * @param  mixed  $id
-	 * @param  array  $columns
-	 * @return \Illuminate\Support\Collection|static|null
-	 */
-	public static function find($id, $columns = array('*'))
-	{
-		$instance = new static;
-
-		if (is_array($id) && empty($id)) return $instance->newCollection();
-
-		return $instance->newQuery()->find($id, $columns);
-	}
-
-	/**
 	 * Find a model by its primary key or return new static.
 	 *
 	 * @param  mixed  $id

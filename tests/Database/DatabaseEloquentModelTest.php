@@ -104,23 +104,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testFindMethodCallsQueryBuilderCorrectly()
-	{
-		$result = EloquentModelFindStub::find(1);
-		$this->assertEquals('foo', $result);
-	}
-
-
 	public function testFindMethodUseWritePdo()
 	{
 		$result =  EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
-	}
-
-
-	public function testFindMethodWithArrayCallsQueryBuilderCorrectly()
-	{
-		$result = EloquentModelFindManyStub::find(array(1, 2));
-		$this->assertEquals('foo', $result);
 	}
 
 
@@ -1285,15 +1271,6 @@ class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
-	{
-		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(1, array('*'))->andReturn('foo');
-		return $mock;
-	}
-}
-
 class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Model {
 	public function newQuery()
 	{
@@ -1322,15 +1299,6 @@ class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
 	{
 		$mock = m::mock('Illuminate\Database\Connection');
 		$mock->shouldReceive('select')->once()->with('SELECT ?', array('foo'))->andReturn(array());
-		return $mock;
-	}
-}
-
-class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
-	public function newQuery()
-	{
-		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
-		$mock->shouldReceive('find')->once()->with(array(1, 2), array('*'))->andReturn('foo');
 		return $mock;
 	}
 }
