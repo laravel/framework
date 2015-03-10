@@ -17,6 +17,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$this->account = '1234567891011';
 		$this->queueName = 'emails';
 		$this->baseUrl = 'https://sqs.someregion.amazonaws.com';
+		$this->releaseDelay = 0;
 
 		// The Aws\Common\AbstractClient needs these three constructor parameters
 		$this->credentials = new Credentials( $this->key, $this->secret );
@@ -70,6 +71,18 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$job = $this->getJob();
 		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));
 		$job->delete();
+	}
+
+
+	public function testReleaseProperlyReleasesTheJobOntoSqs()
+	{
+		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('changeMessageVisibility'), array($this->credentials, $this->signature, $this->config));
+		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
+		$queue->setContainer($this->mockedContainer);
+		$job = $this->getJob();
+		$job->getSqs()->expects($this->once())->method('changeMessageVisibility')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay));
+		$job->release($this->releaseDelay);
+		$this->assertTrue($job->isReleased());
 	}
 
 

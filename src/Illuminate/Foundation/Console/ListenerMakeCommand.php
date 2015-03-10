@@ -3,28 +3,28 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class HandlerCommandCommand extends GeneratorCommand {
+class ListenerMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'handler:command';
+	protected $name = 'make:listener';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new command handler class';
+	protected $description = 'Create a new event listener class';
 
 	/**
 	 * The type of class being generated.
 	 *
 	 * @var string
 	 */
-	protected $type = 'Handler';
+	protected $type = 'Listener';
 
 	/**
 	 * Build the class with the given name.
@@ -36,12 +36,19 @@ class HandlerCommandCommand extends GeneratorCommand {
 	{
 		$stub = parent::buildClass($name);
 
+		$event = $this->option('event');
+
+		if ( ! starts_with($event, $this->getAppNamespace()))
+		{
+			$event = $this->getAppNamespace().'Events\\'.$event;
+		}
+
 		$stub = str_replace(
-			'DummyCommand', class_basename($this->option('command')), $stub
+			'DummyEvent', class_basename($event), $stub
 		);
 
 		$stub = str_replace(
-			'DummyFullCommand', $this->option('command'), $stub
+			'DummyFullEvent', $event, $stub
 		);
 
 		return $stub;
@@ -54,7 +61,14 @@ class HandlerCommandCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/command-handler.stub';
+		if ($this->option('queued'))
+		{
+			return __DIR__.'/stubs/listener-queued.stub';
+		}
+		else
+		{
+			return __DIR__.'/stubs/listener.stub';
+		}
 	}
 
 	/**
@@ -65,7 +79,7 @@ class HandlerCommandCommand extends GeneratorCommand {
 	 */
 	protected function getDefaultNamespace($rootNamespace)
 	{
-		return $rootNamespace.'\Handlers\Commands';
+		return $rootNamespace.'\Listeners';
 	}
 
 	/**
@@ -76,7 +90,9 @@ class HandlerCommandCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('command', null, InputOption::VALUE_REQUIRED, 'The command class the handler handles.'),
+			array('event', null, InputOption::VALUE_REQUIRED, 'The event class the being listened for.'),
+
+			array('queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'),
 		);
 	}
 

@@ -1,17 +1,17 @@
 <?php namespace DummyNamespace;
 
-use DummyRootNamespaceCommands\Command;
+use DummyRootNamespaceJobs\Job;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class DummyClass extends Command implements SelfHandling, ShouldBeQueued
+class DummyClass extends Job implements SelfHandling, ShouldBeQueued
 {
     use InteractsWithQueue, SerializesModels;
 
     /**
-     * Create a new command instance.
+     * Create a new job instance.
      *
      * @return void
      */
@@ -21,7 +21,7 @@ class DummyClass extends Command implements SelfHandling, ShouldBeQueued
     }
 
     /**
-     * Execute the command.
+     * Execute the job.
      *
      * @return void
      */

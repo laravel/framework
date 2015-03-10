@@ -20,7 +20,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '5.0.14';
+	const VERSION = '5.1-dev';
 
 	/**
 	 * The base path for the Laravel installation.
@@ -601,7 +601,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, array $parameters = array())
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -767,17 +767,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	public function isDownForMaintenance()
 	{
 		return file_exists($this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'down');
-	}
-
-	/**
-	 * Register a maintenance mode event listener.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function down(Closure $callback)
-	{
-		$this['events']->listen('illuminate.app.down', $callback);
 	}
 
 	/**

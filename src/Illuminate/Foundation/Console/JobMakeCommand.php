@@ -3,49 +3,28 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class HandlerCommandCommand extends GeneratorCommand {
+class JobMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'handler:command';
+	protected $name = 'make:job';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new command handler class';
+	protected $description = 'Create a new job class';
 
 	/**
 	 * The type of class being generated.
 	 *
 	 * @var string
 	 */
-	protected $type = 'Handler';
-
-	/**
-	 * Build the class with the given name.
-	 *
-	 * @param  string  $name
-	 * @return string
-	 */
-	protected function buildClass($name)
-	{
-		$stub = parent::buildClass($name);
-
-		$stub = str_replace(
-			'DummyCommand', class_basename($this->option('command')), $stub
-		);
-
-		$stub = str_replace(
-			'DummyFullCommand', $this->option('command'), $stub
-		);
-
-		return $stub;
-	}
+	protected $type = 'Job';
 
 	/**
 	 * Get the stub file for the generator.
@@ -54,7 +33,14 @@ class HandlerCommandCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/command-handler.stub';
+		if ($this->option('queued'))
+		{
+			return __DIR__.'/stubs/job-queued.stub';
+		}
+		else
+		{
+			return __DIR__.'/stubs/job.stub';
+		}
 	}
 
 	/**
@@ -65,7 +51,7 @@ class HandlerCommandCommand extends GeneratorCommand {
 	 */
 	protected function getDefaultNamespace($rootNamespace)
 	{
-		return $rootNamespace.'\Handlers\Commands';
+		return $rootNamespace.'\Jobs';
 	}
 
 	/**
@@ -76,7 +62,7 @@ class HandlerCommandCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('command', null, InputOption::VALUE_REQUIRED, 'The command class the handler handles.'),
+			array('queued', null, InputOption::VALUE_NONE, 'Indicates that job should be queued.'),
 		);
 	}
 
