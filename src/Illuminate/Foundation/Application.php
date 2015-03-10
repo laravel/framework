@@ -433,7 +433,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function registerConfiguredProviders()
 	{
-		$manifestPath = $this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'services.json';
+		$manifestPath = $this->basePath().'/vendor/services.json';
 
 		(new ProviderRepository($this, new Filesystem, $manifestPath))
 		            ->load($this->config['app.providers']);
@@ -742,7 +742,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		return $this['path.storage'].DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'routes.php';
+		return $this->basePath().'/vendor/routes.php';
 	}
 
 	/**
