@@ -102,6 +102,8 @@ class StartSession implements TerminableMiddleware {
 
 		$session->start();
 
+		app('events')->fire('session.started');
+
 		return $session;
 	}
 
