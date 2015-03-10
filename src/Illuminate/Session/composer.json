@@ -17,6 +17,7 @@
         "php": ">=5.4.0",
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
+        "illuminate/events" : "5.0.*",
         "nesbot/carbon": "~1.0",
         "symfony/finder": "2.6.*",
         "symfony/http-foundation": "2.6.*"
