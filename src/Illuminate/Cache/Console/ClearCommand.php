@@ -2,6 +2,7 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Symfony\Component\Console\Input\InputArgument;
 
 class ClearCommand extends Command {
 
@@ -46,13 +47,27 @@ class ClearCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->laravel['events']->fire('cache:clearing');
+		$storeName = $this->argument('store');
 
-		$this->cache->flush();
+		$this->laravel['events']->fire('cache:clearing', [$storeName]);
 
-		$this->laravel['events']->fire('cache:cleared');
+		$this->cache->store($storeName)->flush();
+
+		$this->laravel['events']->fire('cache:cleared', [$storeName]);
 
 		$this->info('Application cache cleared!');
+	}
+
+	/**
+	 * Get the console command arguments.
+	 *
+	 * @return array
+	 */
+	protected function getArguments()
+	{
+		return [
+			['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
+		];
 	}
 
 }
