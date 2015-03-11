@@ -71,7 +71,7 @@ class Database implements DatabaseContract {
 	 * @param  array  $servers
 	 * @return array
 	 */
-	protected function getClientOptions($servers)
+	protected function getClientOptions(array $servers)
 	{
 		$options = array();
 
