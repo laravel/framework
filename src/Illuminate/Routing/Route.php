@@ -85,7 +85,7 @@ class Route {
 	 *
 	 * @var array
 	 */
-	protected static $validators;
+	public static $validators;
 
 	/**
 	 * Create a new Route instance.
@@ -635,19 +635,6 @@ class Route {
 			new HostValidator, new UriValidator,
 		);
 	}
-
-    /**
-     * Set the route validators.
-     *
-     * @param array  $validators
-     *
-     * @return void
-     */
-    public static function setValidators($validators)
-    {
-        // set validators to match the route.
-        static::$validators = $validators;
-    }
 
 	/**
 	 * Add before filters to the route.
