@@ -9,7 +9,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * The file currently being compiled.
@@ -23,33 +23,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $compilers = array(
+	protected $compilers = [
 		'Extensions',
 		'Statements',
 		'Comments',
 		'Echos'
-	);
+	];
 
 	/**
 	 * Array of opening and closing tags for raw echos.
 	 *
 	 * @var array
 	 */
-	protected $rawTags = array('{!!', '!!}');
+	protected $rawTags = ['{!!', '!!}'];
 
 	/**
 	 * Array of opening and closing tags for regular echos.
 	 *
 	 * @var array
 	 */
-	protected $contentTags = array('{{', '}}');
+	protected $contentTags = ['{{', '}}'];
 
 	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
 	 */
-	protected $escapedTags = array('{{{', '}}}');
+	protected $escapedTags = ['{{{', '}}}'];
 
 	/**
 	 * The "regular" / legacy echo string format.
@@ -63,7 +63,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $footer = array();
+	protected $footer = [];
 
 	/**
 	 * Counter to keep track of nested forelse statements.
@@ -80,7 +80,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path = null)
 	{
-		$this->footer = array();
+		$this->footer = [];
 
 		if ($path)
 		{
@@ -319,7 +319,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
 
-			return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
+			return '<?= e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -344,7 +344,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEach($expression)
 	{
-		return "<?php echo \$__env->renderEach{$expression}; ?>";
+		return "<?= \$__env->renderEach{$expression}; ?>";
 	}
 
 	/**
@@ -368,7 +368,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileYield($expression)
 	{
-		return "<?php echo \$__env->yieldContent{$expression}; ?>";
+		return "<?= \$__env->yieldContent{$expression}; ?>";
 	}
 
 	/**
@@ -379,7 +379,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileShow($expression)
 	{
-		return "<?php echo \$__env->yieldSection(); ?>";
+		return "<?= \$__env->yieldSection(); ?>";
 	}
 
 	/**
@@ -467,7 +467,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileLang($expression)
 	{
-		return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expression; ?>";
+		return "<?= \\Illuminate\\Support\\Facades\\Lang::get$expression; ?>";
 	}
 
 	/**
@@ -478,7 +478,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileChoice($expression)
 	{
-		return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expression; ?>";
+		return "<?= \\Illuminate\\Support\\Facades\\Lang::choice$expression; ?>";
 	}
 
 	/**
@@ -641,7 +641,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
-		$data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+		$data = "<?= \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 
 		$this->footer[] = $data;
 
@@ -661,7 +661,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
-		return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+		return "<?= \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 	}
 
 	/**
@@ -672,7 +672,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileStack($expression)
 	{
-		return "<?php echo \$__env->yieldContent{$expression}; ?>";
+		return "<?= \$__env->yieldContent{$expression}; ?>";
 	}
 
 	/**

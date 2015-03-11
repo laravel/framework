@@ -17,7 +17,7 @@ class CompilerEngine extends PhpEngine {
 	 *
 	 * @var array
 	 */
-	protected $lastCompiled = array();
+	protected $lastCompiled = [];
 
 	/**
 	 * Create a new Blade view engine instance.
