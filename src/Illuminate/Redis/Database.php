@@ -40,7 +40,9 @@ class Database implements DatabaseContract {
 	{
 		$servers = array_except($servers, array('cluster'));
 
-		return array('default' => new Client(array_values($servers)));
+		$options = $this->getClientOptions($servers);
+
+		return array('default' => new Client(array_values($servers), $options));
 	}
 
 	/**
@@ -53,12 +55,32 @@ class Database implements DatabaseContract {
 	{
 		$clients = array();
 
+		$options = $this->getClientOptions($servers);
+
 		foreach ($servers as $key => $server)
 		{
-			$clients[$key] = new Client($server);
+			$clients[$key] = new Client($server, $options);
 		}
 
 		return $clients;
+	}
+
+	/**
+	 * Get any client options from the config array
+	 * 
+	 * @param  array  $servers
+	 * @return array
+	 */
+	protected function getClientOptions($servers)
+	{
+		$options = array();
+
+		if (isset($servers['options']) && $servers['options'])
+		{
+			$options = $servers['options'];
+		}
+
+		return $options;
 	}
 
 	/**
