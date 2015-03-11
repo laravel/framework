@@ -191,7 +191,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileComments($value)
 	{
-		$pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = "/{$this->contentTags[0]}--((.|\s)*?)--{$this->contentTags[1]}/";
 
 		return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
 	}
@@ -271,7 +271,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRawEchos($value)
 	{
-		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->rawTags[0], $this->rawTags[1]);
+		$pattern = "/(@)?{$this->rawTags[0]}\s*(.+?)\s*{$this->rawTags[1]}(\r?\n)?/s";
 
 		$callback = function($matches)
 		{
@@ -291,7 +291,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileRegularEchos($value)
 	{
-		$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
+		$pattern = "/(@)?{$this->contentTags[0]}\s*(.+?)\s*{$this->contentTags[1]}(\r?\n)?/s";
 
 		$callback = function($matches)
 		{
@@ -313,7 +313,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEscapedEchos($value)
 	{
-		$pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
+		$pattern = "/{$this->escapedTags[0]}\s*(.+?)\s*{$this->escapedTags[1]}(\r?\n)?/s";
 
 		$callback = function($matches)
 		{
@@ -357,7 +357,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$segments = explode(',', preg_replace("/[\(\)\\\"\']/", '', $expression));
 
-		return "<?php $".trim($segments[0])." = app('".trim($segments[1])."'); ?>";
+		return '<?php $'.trim($segments[0])." = app('".trim($segments[1])."'); ?>";
 	}
 
 	/**
@@ -456,7 +456,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndunless($expression)
 	{
-		return "<?php endif; ?>";
+		return '<?php endif; ?>';
 	}
 
 	/**
@@ -489,7 +489,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileElse($expression)
 	{
-		return "<?php else: ?>";
+		return '<?php else: ?>';
 	}
 
 	/**
@@ -524,7 +524,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$empty = '$__empty_' . ++$this->forelseCounter;
 
-		return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
+		return "<?php $empty = true; foreach{$expression}: $empty = false; ?>";
 	}
 
 	/**
@@ -559,7 +559,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$empty = '$__empty_' . $this->forelseCounter--;
 
-		return "<?php endforeach; if ({$empty}): ?>";
+		return "<?php endforeach; if ($empty): ?>";
 	}
 
 	/**
@@ -581,7 +581,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndwhile($expression)
 	{
-		return "<?php endwhile; ?>";
+		return '<?php endwhile; ?>';
 	}
 
 	/**
@@ -592,7 +592,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndfor($expression)
 	{
-		return "<?php endfor; ?>";
+		return '<?php endfor; ?>';
 	}
 
 	/**
@@ -603,7 +603,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndforeach($expression)
 	{
-		return "<?php endforeach; ?>";
+		return '<?php endforeach; ?>';
 	}
 
 	/**
@@ -614,7 +614,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndif($expression)
 	{
-		return "<?php endif; ?>";
+		return '<?php endif; ?>';
 	}
 
 	/**
@@ -625,7 +625,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEndforelse($expression)
 	{
-		return "<?php endif; ?>";
+		return '<?php endif; ?>';
 	}
 
 	/**
@@ -716,7 +716,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
+		return "/(?<!\w)(\s*)@$function(\s*\(.*\))/";
 	}
 
 	/**
@@ -727,7 +727,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createOpenMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
+		return "/(?<!\w)(\s*)@$function(\s*\(.*)\)/";
 	}
 
 	/**
@@ -738,7 +738,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function createPlainMatcher($function)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+		return "/(?<!\w)(\s*)@$function(\s*)/";
 	}
 
 	/**
