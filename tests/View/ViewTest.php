@@ -203,6 +203,14 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testViewExceptionHandling()
+    {
+        $view = $this->getView();
+
+        $this->assertEquals('Method Mockery_0_Illuminate_View_Factory::incrementRender() does not exist on this mock object', (string) $view);
+    }
+
+
 	protected function getView()
 	{
 		return new View(
