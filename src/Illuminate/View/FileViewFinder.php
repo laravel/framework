@@ -24,21 +24,21 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @var array
 	 */
-	protected $views = array();
+	protected $views = [];
 
 	/**
 	 * The namespace to file path hints.
 	 *
 	 * @var array
 	 */
-	protected $hints = array();
+	protected $hints = [];
 
 	/**
 	 * Register a view extension with the finder.
 	 *
 	 * @var array
 	 */
-	protected $extensions = array('blade.php', 'php');
+	protected $extensions = ['blade.php', 'php'];
 
 	/**
 	 * Create a new file view loader instance.
@@ -67,7 +67,10 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function find($name)
 	{
-		if (isset($this->views[$name])) return $this->views[$name];
+		if (isset($this->views[$name]))
+		{
+			return $this->views[$name];
+		}
 
 		if ($this->hasHintInformation($name = trim($name)))
 		{
@@ -130,7 +133,7 @@ class FileViewFinder implements ViewFinderInterface {
 		{
 			foreach ($this->getPossibleViewFiles($name) as $file)
 			{
-				if ($this->files->exists($viewPath = $path.'/'.$file))
+				if ($this->files->exists($viewPath = "$path/$file"))
 				{
 					return $viewPath;
 				}
@@ -150,7 +153,7 @@ class FileViewFinder implements ViewFinderInterface {
 	{
 		return array_map(function($extension) use ($name)
 		{
-			return str_replace('.', '/', $name).'.'.$extension;
+			return str_replace('.', '/', $name).".$extension";
 
 		}, $this->extensions);
 	}
