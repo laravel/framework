@@ -9,6 +9,7 @@ use Illuminate\View\Engines\EngineInterface;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\View\View as ViewContract;
+use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
 
 class View implements ArrayAccess, ViewContract {
 
@@ -397,7 +398,15 @@ class View implements ArrayAccess, ViewContract {
 	 */
 	public function __toString()
 	{
-		return $this->render();
+		try
+		{
+			$contents = $this->render();
+		}
+		catch(\Exception $e) {
+			$exceptionHandler = (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+			die($exceptionHandler->getContent());
+		}
+		return $contents;
 	}
 
 }
