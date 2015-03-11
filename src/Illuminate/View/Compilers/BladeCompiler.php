@@ -277,7 +277,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		{
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
+			return $matches[1] ? substr($matches[0], 1) : '<?= '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
@@ -299,7 +299,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 
 			$wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
 
-			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$wrapped.'; ?>'.$whitespace;
+			return $matches[1] ? substr($matches[0], 1) : '<?= '.$wrapped.'; ?>'.$whitespace;
 		};
 
 		return preg_replace_callback($pattern, $callback, $value);
