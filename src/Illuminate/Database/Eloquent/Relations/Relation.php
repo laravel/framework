@@ -151,6 +151,7 @@ abstract class Relation {
 	public static function noConstraints(Closure $callback)
 	{
 		$previous = static::$constraints;
+
 		static::$constraints = false;
 
 		// When resetting the relation where clause, we want to shift the first element
