@@ -6,6 +6,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\FreshCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
+use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -20,6 +21,7 @@ use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -55,7 +57,9 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'Fresh' => 'command.fresh',
 		'HandlerCommand' => 'command.handler.command',
 		'HandlerEvent' => 'command.handler.event',
+		'JobMake' => 'command.job.make',
 		'KeyGenerate' => 'command.key.generate',
+		'ListenerMake' => 'command.listener.make',
 		'ModelMake' => 'command.model.make',
 		'Optimize' => 'command.optimize',
 		'ProviderMake' => 'command.provider.make',
@@ -260,11 +264,37 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
+	protected function registerJobMakeCommand()
+	{
+		$this->app->singleton('command.job.make', function($app)
+		{
+			return new JobMakeCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
 	protected function registerKeyGenerateCommand()
 	{
 		$this->app->singleton('command.key.generate', function()
 		{
 			return new KeyGenerateCommand;
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerListenerMakeCommand()
+	{
+		$this->app->singleton('command.listener.make', function($app)
+		{
+			return new ListenerMakeCommand($app['files']);
 		});
 	}
 

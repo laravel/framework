@@ -146,11 +146,11 @@ abstract class GeneratorCommand extends Command {
 	protected function replaceNamespace(&$stub, $name)
 	{
 		$stub = str_replace(
-			'{{namespace}}', $this->getNamespace($name), $stub
+			'DummyNamespace', $this->getNamespace($name), $stub
 		);
 
 		$stub = str_replace(
-			'{{rootNamespace}}', $this->getAppNamespace(), $stub
+			'DummyRootNamespace', $this->getAppNamespace(), $stub
 		);
 
 		return $this;
@@ -178,7 +178,7 @@ abstract class GeneratorCommand extends Command {
 	{
 		$class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-		return str_replace('{{class}}', $class, $stub);
+		return str_replace('DummyClass', $class, $stub);
 	}
 
 	/**
