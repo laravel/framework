@@ -636,6 +636,19 @@ class Route {
 		);
 	}
 
+    /**
+     * Set the route validators.
+     *
+     * @param array  $validators
+     *
+     * @return void
+     */
+    public static function setValidators($validators)
+    {
+        // set validators to match the route.
+        static::$validators = $validators;
+    }
+
 	/**
 	 * Add before filters to the route.
 	 *
