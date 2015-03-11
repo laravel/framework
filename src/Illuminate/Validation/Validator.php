@@ -786,6 +786,8 @@ class Validator implements ValidatorContract {
 	{
 		$acceptable = array('yes', 'on', '1', 1, true, 'true');
 
+		if (is_string($value)) $value = strtolower($value);
+
 		return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
 	}
 
