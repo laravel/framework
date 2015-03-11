@@ -34,7 +34,7 @@ class ServeCommand extends Command {
 
 		$base = $this->laravel->basePath();
 
-		$this->info("Laravel development server started on http://{$host}:{$port}");
+		$this->info("Laravel development server started on http://{$host}:{$port}/");
 
 		passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} \"{$base}\"/server.php");
 	}
