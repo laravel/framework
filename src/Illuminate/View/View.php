@@ -390,14 +390,14 @@ class View implements ArrayAccess, ViewContract {
 		throw new BadMethodCallException("Method [$method] does not exist on view.");
 	}
 
-	/**
-	 * Get the string contents of the view.
-	 *
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return $this->render();
-	}
+    /**
+     * Get the string contents of the view.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->render();
+    }
 
 }
