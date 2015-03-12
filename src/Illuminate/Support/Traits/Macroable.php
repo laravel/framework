@@ -2,6 +2,7 @@
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Contracts\Support\Renderable;
 
 trait Macroable {
 
@@ -44,22 +45,29 @@ trait Macroable {
 	 *
 	 * @throws \BadMethodCallException
 	 */
-	public static function __callStatic($method, $parameters)
-	{
-		if (static::hasMacro($method))
-		{
-			if (static::$macros[$method] instanceof Closure)
-			{
-				return call_user_func_array(Closure::bind(static::$macros[$method], null, get_called_class()), $parameters);
-			}
-			else
-			{
-				return call_user_func_array(static::$macros[$method], $parameters);
-			}
-		}
+    public static function __callStatic($method, $parameters)
+    {
+        if (static::hasMacro($method))
+        {
+            if (static::$macros[$method] instanceof Closure)
+            {
+                $macro = call_user_func_array(Closure::bind(static::$macros[$method], null, get_called_class()), $parameters);
+            }
+            else
+            {
+                $macro = call_user_func_array(static::$macros[$method], $parameters);
+            }
 
-		throw new BadMethodCallException("Method {$method} does not exist.");
-	}
+            if ($macro instanceof Renderable)
+            {
+                return $macro->render();
+            }
+
+            return $macro;
+        }
+
+        throw new BadMethodCallException("Method {$method} does not exist.");
+    }
 
 	/**
 	 * Dynamically handle calls to the class.

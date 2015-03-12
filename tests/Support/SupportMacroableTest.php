@@ -1,5 +1,7 @@
 <?php
 
+use Mockery as m;
+
 class SupportMacroableTest extends PHPUnit_Framework_TestCase {
 
 	private $macroable;
@@ -44,6 +46,19 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase {
 		$result = TestMacroable::tryStatic();
 		$this->assertEquals('static', $result);
 	}
+
+
+    public function testCallingRenderableMacro()
+    {
+        $renderable = m::mock('Illuminate\Contracts\Support\Renderable');
+        $renderable->shouldReceive('render')->once()->andReturn('output');
+
+        TestMacroable::macro('tryRenderable', function() use ($renderable) {
+            return $renderable;
+        });
+
+        $this->assertEquals('output', TestMacroable::tryRenderable());
+    }
 
 }
 
