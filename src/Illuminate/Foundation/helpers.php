@@ -215,6 +215,28 @@ if ( ! function_exists('csrf_token'))
 	}
 }
 
+if ( ! function_exists('csrf_form'))
+{
+	/**
+	 * Get the CSRF token value wrapped with hidden input.
+	 *
+	 * @return string
+	 *
+	 * @throws RuntimeException
+	 */
+	function csrf_form()
+	{
+		$session = app('session');
+
+		if (isset($session))
+		{
+			return '<input type="hidden" name="_token" value="'.$session->getToken().'">';
+		}
+
+		throw new RuntimeException("Application session store not set.");
+	}
+}
+
 if ( ! function_exists('delete'))
 {
 	/**
