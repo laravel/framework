@@ -66,21 +66,14 @@ class Database implements DatabaseContract {
 	}
 
 	/**
-	 * Get any client options from the config array
-	 * 
+	 * Get any client options from the configuration array.
+	 *
 	 * @param  array  $servers
 	 * @return array
 	 */
 	protected function getClientOptions(array $servers)
 	{
-		$options = array();
-
-		if (isset($servers['options']) && $servers['options'])
-		{
-			$options = $servers['options'];
-		}
-
-		return $options;
+		return isset($servers['options']) ? (array) $servers['options'] : [];
 	}
 
 	/**
