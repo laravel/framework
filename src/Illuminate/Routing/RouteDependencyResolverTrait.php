@@ -74,7 +74,7 @@ trait RouteDependencyResolverTrait {
 	{
 		return ! is_null(array_first($parameters, function($key, $value) use ($class)
 		{
-			return is_object($value) && get_class($value) === $class;
+			return $value instanceof $class;
 		}));
 	}
 
