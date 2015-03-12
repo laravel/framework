@@ -108,9 +108,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function path()
 	{
-		$pattern = trim($this->getPathInfo(), '/');
-
-		return $pattern == '' ? '/' : $pattern;
+		return trim($this->getPathInfo(), '/') ?: '/';
 	}
 
 	/**
