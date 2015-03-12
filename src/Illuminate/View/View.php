@@ -397,11 +397,7 @@ class View implements ArrayAccess, ViewContract {
      */
     public function __toString()
     {
-        try {
-            return $this->render();
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return $this->render();
     }
 
 }
