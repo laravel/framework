@@ -508,8 +508,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
-
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
@@ -519,12 +517,6 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return array();
 	}
-}
-
-class EloquentBuilderTestWithTrashedStub extends Illuminate\Database\Eloquent\Model {
-	use Illuminate\Database\Eloquent\SoftDeletes;
-	protected $table = 'table';
-	public function getKeyName() { return 'foo'; }
 }
 
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
