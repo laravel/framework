@@ -252,7 +252,7 @@ class Builder {
 			$perPage = $perPage ?: $this->model->getPerPage()
 		);
 
-		return new LengthAwarePaginator($this->get($columns)->all(), $total, $perPage, $page, [
+		return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
 	}
@@ -272,7 +272,7 @@ class Builder {
 
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-		return new Paginator($this->get($columns)->all(), $perPage, $page, [
+		return new Paginator($this->get($columns), $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
 	}
