@@ -1,7 +1,5 @@
 <?php namespace {{namespace}};
 
-use {{rootNamespace}}Http\Requests\Request;
-
 class {{class}} extends Request {
 
 	/**
