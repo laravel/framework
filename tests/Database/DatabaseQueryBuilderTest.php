@@ -1268,6 +1268,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGroupPagination()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from (select * from "users" group by "id") aggregator_query', array(), true)->andReturn(array(array('aggregate' => 1)));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+		$builder->from('users')->groupBy('id');
+		$results = $builder->getGroupCountForPagination();
+		$this->assertEquals(1, $results);
+	}
+
+
 	protected function getBuilder()
 	{
 		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
