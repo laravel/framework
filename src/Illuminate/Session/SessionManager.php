@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Manager;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
+use Illuminate\Cache\MemcachedStore;
+use RuntimeException;
 
 class SessionManager extends Manager {
 
@@ -103,7 +105,18 @@ class SessionManager extends Manager {
 	 */
 	protected function createMemcachedDriver()
 	{
-		return $this->createCacheBased('memcached');
+		$store = $this->app['config']['session.memcached_store'];
+
+		// Verify store uses the memcached driver
+		$repository = $this->app['cache']->store($store);
+		if (!($repository->getStore() instanceof MemcachedStore))
+		{
+			throw new RuntimeException("session.memcached_store [{$store}] is not a memcached store.");
+		}
+
+		$minutes = $this->app['config']['session.lifetime'];
+
+		return $this->buildSession(new CacheBasedSessionHandler($repository, $minutes));
 	}
 
 	/**
