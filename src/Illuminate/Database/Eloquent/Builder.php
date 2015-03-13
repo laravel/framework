@@ -70,7 +70,7 @@ class Builder {
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+	 * @return \Illuminate\Database\Eloquent\Model|static|null
 	 */
 	public function find($id, $columns = array('*'))
 	{
@@ -87,15 +87,15 @@ class Builder {
 	/**
 	 * Find a model by its primary key.
 	 *
-	 * @param  array  $ids
+	 * @param  array  $id
 	 * @param  array  $columns
-	 * @return \Illuminate\Database\Eloquent\Collection
+	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
 	 */
-	public function findMany($ids, $columns = array('*'))
+	public function findMany($id, $columns = array('*'))
 	{
-		if (empty($ids)) return $this->model->newCollection();
+		if (empty($id)) return $this->model->newCollection();
 
-		$this->query->whereIn($this->model->getQualifiedKeyName(), $ids);
+		$this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
 		return $this->get($columns);
 	}
