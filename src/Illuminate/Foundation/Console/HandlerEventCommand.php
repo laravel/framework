@@ -89,11 +89,11 @@ class HandlerEventCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('event', null, InputOption::VALUE_REQUIRED, 'The event class the handler handles.'),
+		return [
+			['event', null, InputOption::VALUE_REQUIRED, 'The event class the handler handles.'],
 
-			array('queued', null, InputOption::VALUE_NONE, 'Indicates the event handler should be queued.'),
-		);
+			['queued', null, InputOption::VALUE_NONE, 'Indicates the event handler should be queued.'],
+		];
 	}
 
 }

@@ -63,7 +63,7 @@ class FileStore implements Store {
 		}
 		catch (Exception $e)
 		{
-			return array('data' => null, 'time' => null);
+			return ['data' => null, 'time' => null];
 		}
 
 		// If the current time is greater than expiration timestamps we will delete
@@ -73,7 +73,7 @@ class FileStore implements Store {
 		{
 			$this->forget($key);
 
-			return array('data' => null, 'time' => null);
+			return ['data' => null, 'time' => null];
 		}
 
 		$data = unserialize(substr($contents, 10));

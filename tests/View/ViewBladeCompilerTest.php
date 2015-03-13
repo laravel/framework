@@ -188,13 +188,13 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@extends(\'foo\')
 test';
-		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 
 
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$string = '@extends(name(foo))'.PHP_EOL.'test';
-		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
@@ -445,8 +445,8 @@ empty
 	public function testIncludesAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$this->assertEquals('<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(\'foo\')'));
-		$this->assertEquals('<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(name(foo))'));
+		$this->assertEquals('<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $compiler->compileString('@include(\'foo\')'));
+		$this->assertEquals('<?php echo $__env->make(name(foo), array_except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $compiler->compileString('@include(name(foo))'));
 	}
 
 

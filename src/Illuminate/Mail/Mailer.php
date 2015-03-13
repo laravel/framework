@@ -76,14 +76,14 @@ class Mailer implements MailerContract, MailQueueContract {
 	 *
 	 * @var array
 	 */
-	protected $failedRecipients = array();
+	protected $failedRecipients = [];
 
 	/**
 	 * Array of parsed views containing html and text view name.
 	 *
 	 * @var array
 	 */
-	protected $parsedViews = array();
+	protected $parsedViews = [];
 
 	/**
 	 * Create a new Mailer instance.
@@ -121,7 +121,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	public function raw($text, $callback)
 	{
-		return $this->send(array('raw' => $text), [], $callback);
+		return $this->send(['raw' => $text], [], $callback);
 	}
 
 	/**
@@ -134,7 +134,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	public function plain($view, array $data, $callback)
 	{
-		return $this->send(array('text' => $view), $data, $callback);
+		return $this->send(['text' => $view], $data, $callback);
 	}
 
 	/**
@@ -344,7 +344,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	{
 		if ($this->events)
 		{
-			$this->events->fire('mailer.sending', array($message));
+			$this->events->fire('mailer.sending', [$message]);
 		}
 
 		if ( ! $this->pretending)

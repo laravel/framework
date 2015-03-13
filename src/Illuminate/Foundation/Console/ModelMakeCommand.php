@@ -71,9 +71,9 @@ class ModelMakeCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('no-migration', null, InputOption::VALUE_NONE, 'Do not create a new migration file.'),
-		);
+		return [
+			['no-migration', null, InputOption::VALUE_NONE, 'Do not create a new migration file.'],
+		];
 	}
 
 }

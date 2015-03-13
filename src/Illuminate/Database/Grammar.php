@@ -17,7 +17,7 @@ abstract class Grammar {
 	 */
 	public function wrapArray(array $values)
 	{
-		return array_map(array($this, 'wrap'), $values);
+		return array_map([$this, 'wrap'], $values);
 	}
 
 	/**
@@ -56,7 +56,7 @@ abstract class Grammar {
 			return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
 		}
 
-		$wrapped = array();
+		$wrapped = [];
 
 		$segments = explode('.', $value);
 
@@ -99,7 +99,7 @@ abstract class Grammar {
 	 */
 	public function columnize(array $columns)
 	{
-		return implode(', ', array_map(array($this, 'wrap'), $columns));
+		return implode(', ', array_map([$this, 'wrap'], $columns));
 	}
 
 	/**
@@ -110,7 +110,7 @@ abstract class Grammar {
 	 */
 	public function parameterize(array $values)
 	{
-		return implode(', ', array_map(array($this, 'parameter'), $values));
+		return implode(', ', array_map([$this, 'parameter'], $values));
 	}
 
 	/**

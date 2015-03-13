@@ -65,9 +65,9 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'),
-		);
+		return [
+			['show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'],
+		];
 	}
 
 }

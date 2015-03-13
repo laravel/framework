@@ -167,7 +167,7 @@ class HasManyThrough extends Relation {
 	 */
 	protected function buildDictionary(Collection $results)
 	{
-		$dictionary = array();
+		$dictionary = [];
 
 		$foreign = $this->firstKey;
 
@@ -198,7 +198,7 @@ class HasManyThrough extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
-	public function get($columns = array('*'))
+	public function get($columns = ['*'])
 	{
 		// First we'll add the proper select columns onto the query so it is run with
 		// the proper columns. Then, we will get the results and hydrate out pivot
@@ -224,14 +224,14 @@ class HasManyThrough extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	protected function getSelectColumns(array $columns = array('*'))
+	protected function getSelectColumns(array $columns = ['*'])
 	{
-		if ($columns == array('*'))
+		if ($columns == ['*'])
 		{
-			$columns = array($this->related->getTable().'.*');
+			$columns = [$this->related->getTable().'.*'];
 		}
 
-		return array_merge($columns, array($this->parent->getTable().'.'.$this->firstKey));
+		return array_merge($columns, [$this->parent->getTable().'.'.$this->firstKey]);
 	}
 
 	/*
@@ -241,7 +241,7 @@ class HasManyThrough extends Relation {
 	 * @param  array  $columns
 	 * @return \Illuminate\Pagination\Paginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = ['*'])
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
