@@ -620,7 +620,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 		// and grab the corresponding values for the sorted keys from this array.
 		foreach ($this->items as $key => $value)
 		{
-			$results[$key] = $callback($value);
+			$results[$key] = $callback($value, $key);
 		}
 
 		$descending ? arsort($results, $options)
