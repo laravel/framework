@@ -72,6 +72,14 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	protected $middlewares = array();
 
 	/**
+	 * List of middlewares that need to be removed before getting the HTTP
+	 * kernel
+	 *
+	 * @var array
+	 */
+	protected $forgetMiddlewares = array();
+
+	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
@@ -619,12 +627,14 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	{
 		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
 
-		$client = with(new \Stack\Builder)
-						->push('Illuminate\Cookie\Guard', $this['encrypter'])
-						->push('Illuminate\Cookie\Queue', $this['cookie'])
-						->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
+		$client = new \Stack\Builder();
 
-		$this->mergeCustomMiddlewares($client);
+		$this->middleware('Illuminate\Cookie\Guard', [$this['encrypter']])
+			->middleware('Illuminate\Cookie\Queue', [$this['cookie']])
+			->middleware('Illuminate\Session\Middleware', [$this['session'], $sessionReject]);
+
+		$this->removeMiddlewares($this->forgetMiddlewares)
+			->mergeCustomMiddlewares($client);
 
 		return $client->resolve($this);
 	}
@@ -645,6 +655,30 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
 			call_user_func_array(array($stack, 'push'), $parameters);
 		}
+	}
+
+	/**
+	 * Remove all the middlewares classes defined by the given parameter.
+	 * If the parameter is empty, `forgetMiddlewares` will be used.
+	 *
+	 * @param array $middlewares
+	 * @return $this
+	 */
+	protected function removeMiddlewares(array $middlewares = array())
+	{
+		if (empty($middlewares)) {
+			$middlewares = $this->forgetMiddlewares;
+		}
+
+		$middlewares = array_unique($middlewares);
+
+		foreach ($middlewares as $class) {
+			$this->middlewares = array_filter($this->middlewares, function($m) use ($class) {
+				return $m['class'] != $class;
+			});
+		}
+
+		return $this;
 	}
 
 	/**
@@ -672,17 +706,15 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	}
 
 	/**
-	 * Remove a custom middleware from the application.
+	 * Add a middleware class in the list of middlewares that will be removed
+	 * from the application.
 	 *
 	 * @param  string  $class
 	 * @return void
 	 */
 	public function forgetMiddleware($class)
 	{
-		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
-		{
-			return $m['class'] != $class;
-		});
+		$this->forgetMiddlewares[] = $class;
 	}
 
 	/**
