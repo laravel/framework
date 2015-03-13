@@ -61,6 +61,31 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	}
 
 	/**
+	 * Get migration entries from the database by path.
+	 *
+	 * @param  string  $path
+	 * @return array
+	 */
+	public function getByPath($path)
+	{
+		// List down all the PHP files in the given path.
+		$files = glob($path . '/*.php');
+
+		$migrationEntries = [];
+
+		foreach ($files as $file)
+		{
+			// Get the base file name, without the path and .php suffix.
+			$migrationEntries[] = basename($file, '.php');
+		}
+
+		return $this->table()->whereIn('migration', $migrationEntries)
+			->where('batch', $this->getLastBatchNumber())
+			->orderBy('migration', 'desc')
+			->get();
+	}
+
+	/**
 	 * Log that a migration was run.
 	 *
 	 * @param  string  $file

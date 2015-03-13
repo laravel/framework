@@ -17,6 +17,14 @@ interface MigrationRepositoryInterface {
 	public function getLast();
 
 	/**
+	 * Get migration entries from the database by path.
+	 *
+	 * @param  string  $path
+	 * @return array
+	 */
+	public function getByPath($path);
+
+	/**
 	 * Log that a migration was run.
 	 *
 	 * @param  string  $file
