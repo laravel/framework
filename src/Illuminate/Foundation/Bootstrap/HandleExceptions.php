@@ -113,7 +113,7 @@ class HandleExceptions {
 	{
 		if ( ! is_null($error = error_get_last()) && $this->isFatal($error['type']))
 		{
-			$this->handleException($this->fatalExceptionFromError($error));
+			$this->handleException($this->fatalExceptionFromError($error, 0));
 		}
 	}
 
@@ -121,12 +121,13 @@ class HandleExceptions {
 	 * Create a new fatal exception instance from an error array.
 	 *
 	 * @param  array  $error
+	 * @param  int|null  $traceOffset
 	 * @return \Symfony\Component\Debug\Exception\FatalErrorException
 	 */
-	protected function fatalExceptionFromError(array $error)
+	protected function fatalExceptionFromError(array $error, $traceOffset = null)
 	{
 		return new FatalErrorException(
-			$error['message'], $error['type'], 0, $error['file'], $error['line']
+			$error['message'], $error['type'], 0, $error['file'], $error['line'], $traceOffset
 		);
 	}
 
