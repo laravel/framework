@@ -813,7 +813,9 @@ class Builder {
 	{
 		array_unshift($parameters, $this);
 
-		return call_user_func_array(array($this->model, $scope), $parameters) ?: $this;
+		$scopeResult = call_user_func_array(array($this->model, $scope), $parameters);
+
+		return is_null($scopeResult) ? $this : $scopeResult;
 	}
 
 	/**
