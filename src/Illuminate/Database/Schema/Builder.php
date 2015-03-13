@@ -50,7 +50,7 @@ class Builder {
 
 		$table = $this->connection->getTablePrefix().$table;
 
-		return count($this->connection->select($sql, array($table))) > 0;
+		return count($this->connection->select($sql, [$table])) > 0;
 	}
 
 	/**

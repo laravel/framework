@@ -61,9 +61,9 @@ class JobMakeCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('queued', null, InputOption::VALUE_NONE, 'Indicates that job should be queued.'),
-		);
+		return [
+			['queued', null, InputOption::VALUE_NONE, 'Indicates that job should be queued.'],
+		];
 	}
 
 }

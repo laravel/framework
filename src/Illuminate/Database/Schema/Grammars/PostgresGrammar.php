@@ -10,14 +10,14 @@ class PostgresGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Increment', 'Nullable', 'Default');
+	protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
 	/**
 	 * The columns available as serials.
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
+	protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
 	/**
 	 * Compile the query to determine if a table exists.

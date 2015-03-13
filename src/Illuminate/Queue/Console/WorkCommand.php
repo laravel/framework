@@ -145,9 +145,9 @@ class WorkCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection', null),
-		);
+		return [
+			['connection', InputArgument::OPTIONAL, 'The name of connection', null],
+		];
 	}
 
 	/**
@@ -157,21 +157,21 @@ class WorkCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'),
+		return [
+			['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
 
-			array('daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'),
+			['daemon', null, InputOption::VALUE_NONE, 'Run the worker in daemon mode'],
 
-			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
+			['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'),
+			['force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'],
 
-			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
+			['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
-			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3),
+			['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
 
-			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
-		);
+			['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
+		];
 	}
 
 }

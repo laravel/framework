@@ -15,7 +15,7 @@ if ( ! function_exists('abort'))
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
 	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
-	function abort($code, $message = '', array $headers = array())
+	function abort($code, $message = '', array $headers = [])
 	{
 		return app()->abort($code, $message, $headers);
 	}
@@ -30,7 +30,7 @@ if ( ! function_exists('action'))
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	function action($name, $parameters = array())
+	function action($name, $parameters = [])
 	{
 		return app('url')->action($name, $parameters);
 	}
@@ -107,7 +107,7 @@ if ( ! function_exists('back'))
 	 * @param  array  $headers
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
-	function back($status = 302, $headers = array())
+	function back($status = 302, $headers = [])
 	{
 		return app('redirect')->back($status, $headers);
 	}
@@ -122,7 +122,7 @@ if ( ! function_exists('bcrypt'))
 	 * @param  array   $options
 	 * @return string
 	 */
-	function bcrypt($value, $options = array())
+	function bcrypt($value, $options = [])
 	{
 		return app('hash')->make($value, $options);
 	}
@@ -254,7 +254,7 @@ if ( ! function_exists('info'))
 	 * @param  array   $context
 	 * @return void
 	 */
-	function info($message, $context = array())
+	function info($message, $context = [])
 	{
 		return app('log')->info($message, $context);
 	}
@@ -269,7 +269,7 @@ if ( ! function_exists('logger'))
 	 * @param  array  $context
 	 * @return void
 	 */
-	function logger($message = null, array $context = array())
+	function logger($message = null, array $context = [])
 	{
 		if (is_null($message)) return app('log');
 
@@ -362,7 +362,7 @@ if ( ! function_exists('redirect'))
 	 * @param  bool    $secure
 	 * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
 	 */
-	function redirect($to = null, $status = 302, $headers = array(), $secure = null)
+	function redirect($to = null, $status = 302, $headers = [], $secure = null)
 	{
 		if (is_null($to)) return app('redirect');
 
@@ -396,7 +396,7 @@ if ( ! function_exists('response'))
 	 * @param  array   $headers
 	 * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
 	 */
-	function response($content = '', $status = 200, array $headers = array())
+	function response($content = '', $status = 200, array $headers = [])
 	{
 		$factory = app('Illuminate\Contracts\Routing\ResponseFactory');
 
@@ -420,7 +420,7 @@ if ( ! function_exists('route'))
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
-	function route($name, $parameters = array(), $absolute = true, $route = null)
+	function route($name, $parameters = [], $absolute = true, $route = null)
 	{
 		return app('url')->route($name, $parameters, $absolute, $route);
 	}
@@ -449,7 +449,7 @@ if ( ! function_exists('secure_url'))
 	 * @param  mixed   $parameters
 	 * @return string
 	 */
-	function secure_url($path, $parameters = array())
+	function secure_url($path, $parameters = [])
 	{
 		return url($path, $parameters, true);
 	}
@@ -501,7 +501,7 @@ if ( ! function_exists('trans'))
 	 * @param  string  $locale
 	 * @return string
 	 */
-	function trans($id = null, $parameters = array(), $domain = 'messages', $locale = null)
+	function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
 	{
 		if (is_null($id)) return app('translator');
 
@@ -521,7 +521,7 @@ if ( ! function_exists('trans_choice'))
 	 * @param  string  $locale
 	 * @return string
 	 */
-	function trans_choice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+	function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
 	{
 		return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
 	}
@@ -537,7 +537,7 @@ if ( ! function_exists('url'))
 	 * @param  bool    $secure
 	 * @return string
 	 */
-	function url($path = null, $parameters = array(), $secure = null)
+	function url($path = null, $parameters = [], $secure = null)
 	{
 		return app('Illuminate\Contracts\Routing\UrlGenerator')->to($path, $parameters, $secure);
 	}
@@ -553,7 +553,7 @@ if ( ! function_exists('view'))
 	 * @param  array   $mergeData
 	 * @return \Illuminate\View\View
 	 */
-	function view($view = null, $data = array(), $mergeData = array())
+	function view($view = null, $data = [], $mergeData = [])
 	{
 		$factory = app('Illuminate\Contracts\View\Factory');
 
@@ -599,7 +599,7 @@ if ( ! function_exists('env'))
 			case '(empty)':
 				return '';
 		}
-		
+
 		if (Str::startsWith($value, '"') && Str::endsWith($value, '"'))
 		{
 			return substr($value, 1, -1);
@@ -619,7 +619,7 @@ if ( ! function_exists('event'))
 	 * @param  bool    $halt
 	 * @return array|null
 	 */
-	function event($event, $payload = array(), $halt = false)
+	function event($event, $payload = [], $halt = false)
 	{
 		return app('events')->fire($event, $payload, $halt);
 	}

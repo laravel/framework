@@ -7,7 +7,7 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 *
 	 * @var array
 	 */
-	protected $connections = array();
+	protected $connections = [];
 
 	/**
 	 * The default connection name.
@@ -22,7 +22,7 @@ class ConnectionResolver implements ConnectionResolverInterface {
 	 * @param  array  $connections
 	 * @return void
 	 */
-	public function __construct(array $connections = array())
+	public function __construct(array $connections = [])
 	{
 		foreach ($connections as $name => $connection)
 		{

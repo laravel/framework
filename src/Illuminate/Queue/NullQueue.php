@@ -25,7 +25,7 @@ class NullQueue extends Queue implements QueueContract {
 	 * @param  array   $options
 	 * @return mixed
 	 */
-	public function pushRaw($payload, $queue = null, array $options = array())
+	public function pushRaw($payload, $queue = null, array $options = [])
 	{
 		//
 	}
