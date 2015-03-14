@@ -1494,10 +1494,7 @@ class Validator implements ValidatorContract {
 	 */
 	protected function validateEach($attribute, $values, $parameters)
 	{
-		if ( ! is_array($values))
-		{
-			return true;
-		}
+		if ( ! is_array($values)) return true;
 
 		$rules = $this->explodeRules($parameters);
 

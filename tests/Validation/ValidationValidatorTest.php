@@ -1428,6 +1428,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($v->passes());
 	}
 
+
 	public function testValidateEach()
 	{
 		$v = new Validator(
@@ -1437,6 +1438,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		);
 		$this->assertFalse($v->passes());
 	}
+
 
 	protected function getTranslator()
 	{
