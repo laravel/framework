@@ -1,9 +1,9 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\Support\Manager;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
-use Illuminate\Cache\MemcachedStore;
 use RuntimeException;
+use Illuminate\Support\Manager;
+use Illuminate\Cache\MemcachedStore;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 class SessionManager extends Manager {
 
