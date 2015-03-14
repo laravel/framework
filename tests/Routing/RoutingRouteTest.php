@@ -758,6 +758,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 	}
 
+	public function testControllerNaming()
+	{
+		$router = $this->getRouter();
+		$router->controller('home', 'RouteTestInspectedControllerStub', [
+			'getFoo' => 'foo',
+		]);
+
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
+
+		$router = $this->getRouter();
+		$router->controllers([
+			'home' => [
+				'uses' => 'RouteTestInspectedControllerStub',
+				'names' => ['getFoo' => 'bar']
+			],
+		]);
+		
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
+	}
 
 	public function testRouterFiresRoutedEvent()
 	{
