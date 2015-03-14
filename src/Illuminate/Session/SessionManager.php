@@ -109,7 +109,7 @@ class SessionManager extends Manager {
 
 		// Verify store uses the memcached driver
 		$repository = $this->app['cache']->store($store);
-		if (!($repository->getStore() instanceof MemcachedStore))
+		if ( ! $repository->getStore() instanceof MemcachedStore)
 		{
 			throw new RuntimeException("session.memcached_store [{$store}] is not a memcached store.");
 		}
