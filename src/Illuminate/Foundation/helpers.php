@@ -84,6 +84,19 @@ if ( ! function_exists('asset'))
 	}
 }
 
+if ( ! function_exists('auth'))
+{
+	/**
+	 * Get the Auth object of the system.
+	 * 
+	 * @return \Illuminate\Auth\AuthManager
+	 */
+	function auth()
+	{
+		return app('auth');
+	}
+}
+
 if ( ! function_exists('base_path'))
 {
 	/**
