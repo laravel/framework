@@ -74,7 +74,7 @@ class BeanstalkdQueue extends Queue implements QueueInterface {
 	 */
 	public function pop($queue = null)
 	{
-		$job = $this->pheanstalk->watchOnly($this->getQueue($queue))->reserve(0);
+		$job = $this->pheanstalk->watchOnly($this->getQueue($queue))->reserve(600);
 
 		if ($job instanceof Pheanstalk_Job)
 		{
