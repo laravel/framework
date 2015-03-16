@@ -42,13 +42,14 @@ if ( ! function_exists('app'))
 	 * Get the available container instance.
 	 *
 	 * @param  string  $make
-	 * @return mixed
+	 * @param  array   $parameters
+	 * @return mixed|\Illuminate\Foundation\Application
 	 */
-	function app($make = null)
+	function app($make = null, $parameters = array())
 	{
 		if ( ! is_null($make))
 		{
-			return app()->make($make);
+			return app()->make($make, $parameters);
 		}
 
 		return Illuminate\Container\Container::getInstance();
