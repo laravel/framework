@@ -87,9 +87,30 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicModelRetrieval()
 	{
-		EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
 		$model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
 		$this->assertEquals('taylorotwell@gmail.com', $model->email);
+
+		$model = EloquentTestUser::find(1);
+		$this->assertInstanceOf('EloquentTestUser', $model);
+		$this->assertEquals(1, $model->id);
+
+		$model = EloquentTestUser::find(2);
+		$this->assertInstanceOf('EloquentTestUser', $model);
+		$this->assertEquals(2, $model->id);
+
+		$missing = EloquentTestUser::find(3);
+		$this->assertNull($missing);
+
+		$collection = EloquentTestUser::find([]);
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
+		$this->assertEquals(0, $collection->count());
+
+		$collection = EloquentTestUser::find([1, 2, 3]);
+		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
+		$this->assertEquals(2, $collection->count());
 	}
 
 

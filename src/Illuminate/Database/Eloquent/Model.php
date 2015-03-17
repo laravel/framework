@@ -673,11 +673,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function find($id, $columns = array('*'))
 	{
-		$instance = new static;
-
-		if (is_array($id) && empty($id)) return $instance->newCollection();
-
-		return $instance->newQuery()->find($id, $columns);
+		return static::query()->find($id, $columns);
 	}
 
 	/**
@@ -2685,9 +2681,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		if ($this->hasCast($key))
 		{
-			$type = $this->getCastType($key);
-
-			return $type === 'array' || $type === 'json' || $type === 'object';
+			return in_array(
+				$this->getCastType($key), ['array', 'json', 'object', 'collection'], true
+			);
 		}
 
 		return false;
@@ -2734,6 +2730,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			case 'array':
 			case 'json':
 				return json_decode($value, true);
+			case 'collection':
+				return $this->newCollection(json_decode($value, true));
 			default:
 				return $value;
 		}
