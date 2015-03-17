@@ -38,6 +38,18 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	protected $routeResolver;
 
 	/**
+	 * The array containing all inputs of the request.
+	 * @var array
+	 */
+	protected $input;
+
+	/**
+	 * The array containing all inputs and files of the request.
+	 * @var array
+	 */
+	protected $all;
+
+	/**
 	 * Create a new Illuminate HTTP request from server variables.
 	 *
 	 * @return static
@@ -274,7 +286,12 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function all()
 	{
-		return array_replace_recursive($this->input(), $this->files->all());
+		if ($this->all === null)
+		{
+			$this->all = array_replace_recursive($this->input(), $this->files->all());
+		}
+
+		return $this->all;
 	}
 
 	/**
@@ -286,9 +303,12 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function input($key = null, $default = null)
 	{
-		$input = $this->getInputSource()->all() + $this->query->all();
+		if ($this->input === null) 
+		{
+			$this->input = $this->getInputSource()->all() + $this->query->all();
+		}
 
-		return array_get($input, $key, $default);
+		return array_get($this->input, $key, $default);
 	}
 
 	/**
