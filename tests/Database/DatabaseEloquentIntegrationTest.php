@@ -101,6 +101,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('EloquentTestUser', $model);
 		$this->assertEquals(2, $model->id);
 
+		$missing = EloquentTestUser::find(3);
+		$this->assertNull($missing);
+
 		$collection = EloquentTestUser::find([]);
 		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
 		$this->assertEquals(0, $collection->count());
