@@ -294,7 +294,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// Here we will extract all of the mutated attributes so that we can quickly
 		// spin through them after we export models to their array form, which we
 		// need to be fast. This will let us always know the attributes mutate.
-		foreach (get_class_methods($class) as $method)
+		foreach (array_diff(get_class_methods($class), get_class_methods(__CLASS__)) as $method)
 		{
 			if (preg_match('/^get(.+)Attribute$/', $method, $matches))
 			{
