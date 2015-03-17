@@ -173,6 +173,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	protected function getOneRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
 		$builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
@@ -187,6 +188,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 	protected function getManyRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
 		$builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
