@@ -173,7 +173,7 @@ class ResourceRegistrar {
 	{
 		$name = $this->getResourceName($resource, $method, $options);
 
-		return array('as' => $name, 'uses' => $controller.'@'.$method);
+		return array('as' => $name, 'uses' => $controller.'@'.$method) + $options;
 	}
 
 	/**

@@ -759,6 +759,22 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResourceRouteFilters()
+	{
+		$router = $this->getRouter();
+		$router->resource('foo', 'RouteResourceControllerStub', ['before' => 'foo']);
+		$router->filter('foo', function() { return 'foo!'; });
+		$this->assertEquals('foo!', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+		unset($_SERVER['__filter.after']);
+		$router = $this->getRouter();
+		$router->resource('foo', 'RouteResourceControllerStub', ['after' => 'foo']);
+		$router->filter('foo', function() { $_SERVER['__filter.after'] = true; return 'foo!'; });
+		$this->assertEquals('', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+		$this->assertTrue($_SERVER['__filter.after']);
+	}
+
+
 	public function testRouterFiresRoutedEvent()
 	{
 		$events = new Illuminate\Events\Dispatcher();
@@ -908,4 +924,13 @@ class RouteTestFilterStub {
 	{
 		return 'handling!';
 	}
+}
+
+class RouteResourceControllerStub {
+	public function index(){}
+	public function show(){}
+	public function create(){}
+	public function edit(){}
+	public function update(){}
+	public function delete(){}
 }
