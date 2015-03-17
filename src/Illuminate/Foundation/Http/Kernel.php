@@ -90,7 +90,7 @@ class Kernel implements KernelContract {
 			$response = $this->renderException($request, $e);
 		}
 
-		$this->app['events']->fire('kernel.response', array($request, $response));
+		$this->app['events']->fire('kernel.handled', [$request, $response]);
 
 		return $response;
 	}
