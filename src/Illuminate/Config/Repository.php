@@ -55,14 +55,9 @@ class Repository implements ArrayAccess, ConfigContract {
 	 */
 	public function set($key, $value = null)
 	{
-		if (is_array($key))
-		{
-			foreach ($key as $innerKey => $innerValue)
-			{
-				array_set($this->items, $innerKey, $innerValue);
-			}
-		}
-		else
+		$keys = is_array($key) ? $key : [$key => $value];
+
+		foreach ($keys as $key => $value)
 		{
 			array_set($this->items, $key, $value);
 		}
