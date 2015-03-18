@@ -702,4 +702,54 @@ class Event {
 		return $this->expression;
 	}
 
+	/**
+	 * Get the timezone for the event.
+	 *
+	 * @return \DateTimeZone|string
+	 */
+	public function getTimezone()
+	{
+		return $this->timezone;
+	}
+
+	/**
+	 * Get the user the event should run as.
+	 *
+	 * @return string
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
+	 * Get the environments the event should run in.
+	 *
+	 * @return array
+	 */
+	public function getEnvironments()
+	{
+		return $this->environments;
+	}
+
+	/**
+	 * Get whether the event should run in maintenance mode.
+	 *
+	 * @return boolean
+	 */
+	public function isEvenInMaintenanceMode()
+	{
+		return $this->evenInMaintenanceMode;
+	}
+
+	/**
+	 * Get the description of the event.
+	 *
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+
 }
