@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 class DummyClass
 {
     /**
-     * Create the event handler.
+     * Create the event listener.
      *
      * @return void
      */

@@ -254,7 +254,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
 		foreach ($this->items as $key => $value)
 		{
-			$results[$groupBy($value, $key)][] = $value;
+			$groupKey = $groupBy($value, $key);
+
+			if ( ! array_key_exists($groupKey, $results))
+			{
+				$results[$groupKey] = new static;
+			}
+
+			$results[$groupKey]->push($value);
 		}
 
 		return new static($results);

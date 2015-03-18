@@ -4,10 +4,12 @@ use DummyFullEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 
-class DummyClass
+class DummyClass implements ShouldBeQueued
 {
+    use InteractsWithQueue;
+
     /**
-     * Create the event handler.
+     * Create the event listener.
      *
      * @return void
      */

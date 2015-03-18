@@ -1,12 +1,12 @@
 <?php namespace DummyNamespace;
 
-use DummyRootNamespaceCommands\Command;
+use DummyRootNamespaceJobs\Job;
 use Illuminate\Contracts\Bus\SelfHandling;
 
-class DummyClass extends Command implements SelfHandling
+class DummyClass extends Job implements SelfHandling
 {
     /**
-     * Create a new command instance.
+     * Create a new job instance.
      *
      * @return void
      */
@@ -16,7 +16,7 @@ class DummyClass extends Command implements SelfHandling
     }
 
     /**
-     * Execute the command.
+     * Execute the job.
      *
      * @return void
      */

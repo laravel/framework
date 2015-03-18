@@ -294,7 +294,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// Here we will extract all of the mutated attributes so that we can quickly
 		// spin through them after we export models to their array form, which we
 		// need to be fast. This will let us always know the attributes mutate.
-		foreach (get_class_methods($class) as $method)
+		foreach (array_diff(get_class_methods($class), get_class_methods(__CLASS__)) as $method)
 		{
 			if (preg_match('/^get(.+)Attribute$/', $method, $matches))
 			{
@@ -609,17 +609,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		$instance->fill($values)->save();
 
 		return $instance;
-	}
-
-	/**
-	 * Get the first model for the given attributes.
-	 *
-	 * @param  array  $attributes
-	 * @return static|null
-	 */
-	protected static function firstByAttributes($attributes)
-	{
-		return static::where($attributes)->first();
 	}
 
 	/**
@@ -2457,9 +2446,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = array();
 
+		$hidden = $this->getHidden();
+
 		foreach ($this->getArrayableRelations() as $key => $value)
 		{
-			if (in_array($key, $this->hidden)) continue;
+			if (in_array($key, $hidden)) continue;
 
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
@@ -2517,12 +2508,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function getArrayableItems(array $values)
 	{
-		if (count($this->visible) > 0)
+		if (count($this->getVisible()) > 0)
 		{
-			return array_intersect_key($values, array_flip($this->visible));
+			return array_intersect_key($values, array_flip($this->getVisible()));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));
+		return array_diff_key($values, array_flip($this->getHidden()));
 	}
 
 	/**
