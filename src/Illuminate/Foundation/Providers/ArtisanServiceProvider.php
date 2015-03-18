@@ -3,7 +3,6 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
-use Illuminate\Foundation\Console\FreshCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
@@ -24,6 +23,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\HandlerEventCommand;
+use Illuminate\Foundation\Console\ScaffoldAuthCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -54,7 +54,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'EventMake' => 'command.event.make',
 		'Down' => 'command.down',
 		'Environment' => 'command.environment',
-		'Fresh' => 'command.fresh',
 		'HandlerCommand' => 'command.handler.command',
 		'HandlerEvent' => 'command.handler.event',
 		'JobMake' => 'command.job.make',
@@ -67,6 +66,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteCache' => 'command.route.cache',
 		'RouteClear' => 'command.route.clear',
 		'RouteList' => 'command.route.list',
+		'ScaffoldAuth' => 'command.scaffold.auth',
 		'Serve' => 'command.serve',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
@@ -225,19 +225,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerFreshCommand()
-	{
-		$this->app->singleton('command.fresh', function()
-		{
-			return new FreshCommand;
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
 	protected function registerHandlerCommandCommand()
 	{
 		$this->app->singleton('command.handler.command', function($app)
@@ -386,6 +373,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.route.list', function($app)
 		{
 			return new RouteListCommand($app['router']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerScaffoldAuthCommand()
+	{
+		$this->app->singleton('command.scaffold.auth', function()
+		{
+			return new ScaffoldAuthCommand;
 		});
 	}
 
