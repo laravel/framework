@@ -53,7 +53,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->select('foo')->addSelect('bar')->addSelect(array('baz', 'boom'))->from('users');
 		$this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
-	}
+
+        $builder = $this->getBuilder();
+        $builder->addSelect('bar')->addSelect(array('baz', 'boom'))->from('users');
+        $this->assertEquals('select *, "bar", "baz", "boom" from "users"', $builder->toSql());
+    }
 
 
 	public function testBasicSelectWithPrefix()
