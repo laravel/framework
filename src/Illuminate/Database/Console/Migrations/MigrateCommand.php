@@ -1,12 +1,13 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\DatabaseTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends BaseCommand {
 
-	use ConfirmableTrait;
+	use ConfirmableTrait, DatabaseTrait;
 
 	/**
 	 * The console command name.
@@ -23,16 +24,9 @@ class MigrateCommand extends BaseCommand {
 	protected $description = 'Run the database migrations';
 
 	/**
-	 * The migrator instance.
-	 *
-	 * @var \Illuminate\Database\Migrations\Migrator
-	 */
-	protected $migrator;
-
-	/**
 	 * Create a new migration command instance.
 	 *
-	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
+	 * @param  \Illuminate\Database\Migrations\Migrator $migrator
 	 * @return void
 	 */
 	public function __construct(Migrator $migrator)
@@ -51,6 +45,7 @@ class MigrateCommand extends BaseCommand {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
+		$this->selectDatabase();
 		$this->prepareDatabase();
 
 		// The pretend option can be used for "simulating" the migration and grabbing
@@ -96,8 +91,6 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected function prepareDatabase()
 	{
-		$this->migrator->setConnection($this->input->getOption('database'));
-
 		if ( ! $this->migrator->repositoryExists())
 		{
 			$options = array('--database' => $this->input->getOption('database'));
@@ -113,17 +106,17 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+		return [
+			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'),
+			['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
-			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+			['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
-			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
-		);
+			['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
+		];
 	}
 
 }

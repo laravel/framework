@@ -1,8 +1,12 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\DatabaseTrait;
 use Illuminate\Database\Migrations\Migrator;
+use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand {
+
+	use DatabaseTrait;
 
 	/**
 	 * The console command name.
@@ -17,13 +21,6 @@ class StatusCommand extends BaseCommand {
 	 * @var string
 	 */
 	protected $description = 'Show a list of migrations up/down';
-
-	/**
-	 * The migrator instance.
-	 *
-	 * @var \Illuminate\Database\Migrations\Migrator
-	 */
-	protected $migrator;
 
 	/**
 	 * Create a new migration rollback command instance.
@@ -45,6 +42,8 @@ class StatusCommand extends BaseCommand {
 	 */
 	public function fire()
 	{
+		$this->selectDatabase();
+
 		if ( ! $this->migrator->repositoryExists())
 		{
 			return $this->error('No migrations found.');
@@ -77,6 +76,18 @@ class StatusCommand extends BaseCommand {
 	protected function getAllMigrationFiles()
 	{
 		return $this->migrator->getMigrationFiles($this->getMigrationPath());
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return [
+			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
+		];
 	}
 
 }

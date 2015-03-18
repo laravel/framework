@@ -2,12 +2,13 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\DatabaseTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class ResetCommand extends Command {
 
-	use ConfirmableTrait;
+	use ConfirmableTrait, DatabaseTrait;
 
 	/**
 	 * The console command name.
@@ -22,13 +23,6 @@ class ResetCommand extends Command {
 	 * @var string
 	 */
 	protected $description = 'Rollback all database migrations';
-
-	/**
-	 * The migrator instance.
-	 *
-	 * @var \Illuminate\Database\Migrations\Migrator
-	 */
-	protected $migrator;
 
 	/**
 	 * Create a new migration rollback command instance.
@@ -52,7 +46,7 @@ class ResetCommand extends Command {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
-		$this->migrator->setConnection($this->input->getOption('database'));
+		$this->selectDatabase();
 
 		$pretend = $this->input->getOption('pretend');
 
