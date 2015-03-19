@@ -67,19 +67,16 @@ class Collection extends BaseCollection {
 	 */
 	public function contains($key, $value = null)
 	{
-		if (func_num_args() == 1 && ! $key instanceof Closure)
+		if (func_num_args() == 2) return parent::contains($key, $value);
+
+		if ( ! $this->useAsCallable($key))
 		{
 			$key = $key instanceof Model ? $key->getKey() : $key;
 
-			return $this->filter(function($m) use ($key)
+			return parent::contains(function($k, $m) use ($key)
 			{
-				return $m->getKey() === $key;
-
-			})->count() > 0;
-		}
-		elseif (func_num_args() == 2)
-		{
-			return $this->where($key, $value)->count() > 0;
+				return $m->getKey() == $key;
+			});
 		}
 
 		return parent::contains($key);
