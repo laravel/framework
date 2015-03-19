@@ -1351,7 +1351,8 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
-		if (is_string($columns)) {
+		if (is_string($columns)) 
+		{
 
 			$selects = func_get_args();
 
@@ -1362,7 +1363,7 @@ class Builder {
 				$columns[] = $select;
 
 			}
-			
+
 		}
 
 		return $this->getFresh($columns);
