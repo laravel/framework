@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Console;
 
-trait DatabaseTrait
+trait MigrateTrait
 {
 
 	/**

@@ -2,13 +2,13 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\DatabaseTrait;
+use Illuminate\Console\MigrateTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class ResetCommand extends Command {
 
-	use ConfirmableTrait, DatabaseTrait;
+	use ConfirmableTrait, MigrateTrait;
 
 	/**
 	 * The console command name.

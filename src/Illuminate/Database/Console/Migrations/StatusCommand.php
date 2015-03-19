@@ -1,12 +1,12 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\DatabaseTrait;
+use Illuminate\Console\MigrateTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand {
 
-	use DatabaseTrait;
+	use MigrateTrait;
 
 	/**
 	 * The console command name.
@@ -85,9 +85,9 @@ class StatusCommand extends BaseCommand {
 	 */
 	protected function getOptions()
 	{
-		return [
-			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
-		];
+		return array(
+			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+		);
 	}
 
 }

@@ -1,13 +1,13 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\DatabaseTrait;
+use Illuminate\Console\MigrateTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends BaseCommand {
 
-	use ConfirmableTrait, DatabaseTrait;
+	use ConfirmableTrait, MigrateTrait;
 
 	/**
 	 * The console command name.
@@ -26,7 +26,7 @@ class MigrateCommand extends BaseCommand {
 	/**
 	 * Create a new migration command instance.
 	 *
-	 * @param  \Illuminate\Database\Migrations\Migrator $migrator
+	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
 	 * @return void
 	 */
 	public function __construct(Migrator $migrator)
@@ -106,17 +106,17 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected function getOptions()
 	{
-		return [
-			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
+		return array(
+			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
-			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
-			['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'),
 
-			['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 
-			['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
-		];
+			array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
+		);
 	}
 
 }
