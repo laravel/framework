@@ -20,6 +20,7 @@ class Inspiring {
 			'Simplicity is the essence of happiness. - Cedric Bledsoe',
 			'Smile, breathe, and go slowly. - Thich Nhat Hanh',
 			'Simplicity is an acquired taste. - Katharine Gerould',
+			'There are two ways to be rich: One is by acquiring much, and the other is by desiring little. - Jackie French Koller',
 
 		])->random();
 	}
