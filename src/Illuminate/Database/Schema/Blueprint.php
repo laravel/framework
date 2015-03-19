@@ -511,6 +511,18 @@ class Blueprint {
 		return $this->bigInteger($column, $autoIncrement, true);
 	}
 
+    /**
+     * Create a money column on the table.
+     *
+     * @param string $column
+     * @param bool $big
+     * @return \Illuminate\Support\Fluent
+     */
+    public function money($column, $big = false)
+    {
+        return ($big) ? $this->unsignedBigInteger($column) : $this->unsignedInteger($column);
+    }
+
 	/**
 	 * Create a new float column on the table.
 	 *
