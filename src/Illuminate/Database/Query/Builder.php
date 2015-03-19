@@ -1356,7 +1356,8 @@ class Builder {
 			$selects = func_get_args();
 			$columns = [];
 
-			foreach ($selects as $select) {
+			foreach ($selects as $select) 
+			{
 				$columns[] = $select;
 			}
 		}
