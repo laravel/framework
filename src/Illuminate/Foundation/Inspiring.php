@@ -20,6 +20,7 @@ class Inspiring {
 			'Simplicity is the essence of happiness. - Cedric Bledsoe',
 			'Smile, breathe, and go slowly. - Thich Nhat Hanh',
 			'Simplicity is an acquired taste. - Katharine Gerould',
+			'Well begun is half done. - Aristotle',
 
 		])->random();
 	}
