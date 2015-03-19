@@ -1351,17 +1351,6 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
-		if (is_string($columns)) 
-		{
-			$selects = func_get_args();
-			$columns = [];
-
-			foreach ($selects as $select) 
-			{
-				$columns[] = $select;
-			}
-		}
-
 		return $this->getFresh($columns);
 	}
 
