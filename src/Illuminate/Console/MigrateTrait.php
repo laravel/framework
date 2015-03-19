@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Console;
 
-trait MigrateTrait
-{
+trait MigrateTrait {
 
 	/**
 	 * The migrator instance.

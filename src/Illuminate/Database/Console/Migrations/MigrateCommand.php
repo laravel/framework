@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\MigrateTrait;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
