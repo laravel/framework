@@ -1207,6 +1207,65 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
 	}
 
+
+    public function testMoneyAttributesReturnNullIfSetToNull()
+    {
+        $monies = [
+            'price' => new browner12\money\Money(0),
+        ];
+        $model = new EloquentMoneyModelStub;
+        Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
+        $instance = $model->newInstance($monies);
+
+        $instance->price = null;
+        $this->assertNull($instance->price);
+    }
+
+
+    public function testIntegerMoniesAreReturnedAsObjects()
+    {
+        $model = new EloquentMoneyModelStub;
+        $model->setRawAttributes([
+            'price'	=> 1234,
+        ]);
+
+        $this->assertInstanceOf('browner12\money\Money', $model->price);
+    }
+
+
+    public function testFloatMoniesAreReturnedAsObjects()
+    {
+        $model = new EloquentMoneyModelStub;
+        $model->setRawAttributes([
+            'price'	=> 1234.56,
+        ]);
+
+        $this->assertInstanceOf('browner12\money\Money', $model->price);
+    }
+
+
+    public function testStringMoniesAreReturnedAsObjects()
+    {
+        $model = new EloquentMoneyModelStub;
+        $model->setRawAttributes([
+            'price'	=> '1234',
+        ]);
+
+        $this->assertInstanceOf('browner12\money\Money', $model->price);
+    }
+
+
+    public function testMoneyCurrencyIsSetCorrectly(){
+        $model = new EloquentMoneyModelStub;
+        $model->setRawAttributes([
+            'price2' => 1234,
+        ]);
+
+        $this->assertSame('EUR', $model->price2->getCurrency()->currency());
+    }
+
 }
 
 class EloquentTestObserverStub {
@@ -1258,6 +1317,10 @@ class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
 	{
 		return array();
 	}
+    public function getMonies()
+    {
+        return [];
+    }
 	public function getAppendableAttribute()
 	{
 		return 'appended';
@@ -1273,6 +1336,16 @@ class EloquentDateModelStub extends EloquentModelStub {
 	{
 		return array('created_at', 'updated_at');
 	}
+}
+
+class EloquentMoneyModelStub extends EloquentModelStub {
+    public function getMonies()
+    {
+        return [
+            'price'  => 'usd',
+            'price2' => 'eur',
+        ];
+    }
 }
 
 class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {

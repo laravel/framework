@@ -19,6 +19,7 @@
         "ext-openssl": "*",
         "ext-mcrypt": "*",
         "ext-mbstring": "*",
+        "browner12/money": "~0.1",
         "classpreloader/classpreloader": "~1.2",
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",

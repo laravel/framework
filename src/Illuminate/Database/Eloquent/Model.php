@@ -3,6 +3,7 @@
 use DateTime;
 use Exception;
 use ArrayAccess;
+use browner12\money\Money;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
@@ -131,6 +132,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var array
 	 */
 	protected $dates = array();
+
+    /**
+     * The attributes that should be mutated to money.
+     *
+     * @var array
+     */
+    protected $monies = [];
 
 	/**
 	 * The attributes that should be casted to native types.
@@ -2594,6 +2602,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			if ( ! is_null($value)) return $this->asDateTime($value);
 		}
 
+        // If the attribute is listed as a money, we will convert it to a Money
+        // instance on retrieval, which makes it quite convenient to work with
+        // money fields without having to create a mutator for each property.
+        elseif (array_key_exists($key, $this->getMonies()))
+        {
+            if ( ! is_null($value)) return $this->asMoney($key, $value);
+        }
+
 		return $value;
 	}
 
@@ -2773,6 +2789,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			$value = $this->fromDateTime($value);
 		}
 
+        // If an attribute is listed as a "money", we'll convert it from a Money
+        // instance into a form proper for storage on the database tables.
+        elseif (array_key_exists($key, $this->getMonies()) && $value)
+        {
+            $value = $this->fromMoney($value);
+        }
+
 		if ($this->isJsonCastable($key))
 		{
 			$value = json_encode($value);
@@ -2803,6 +2826,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		return array_merge($this->dates, $defaults);
 	}
+
+    /**
+     * Get the attributes that should be converted to monies.
+     *
+     * @return array
+     */
+    public function getMonies()
+    {
+        return $this->monies;
+    }
 
 	/**
 	 * Convert a DateTime to a storable string.
@@ -2895,6 +2928,32 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		return $this->getConnection()->getQueryGrammar()->getDateFormat();
 	}
+
+    /**
+     * Convert a Money to a storable integer.
+     *
+     * @param \browner12\money\Money $value
+     * @return int
+     */
+    public function fromMoney($value)
+    {
+        return $value->subunits();
+    }
+
+    /**
+     * Return value as a Money object.
+     *
+     * @param string $key
+     * @param integer|float|string $value
+     * @return \browner12\money\Money
+     */
+    protected function asMoney($key, $value)
+    {
+        $monies = $this->getMonies();
+        $currency = $monies[$key];
+
+        return new Money($value, $currency);
+    }
 
 	/**
 	 * Clone the model into a new, non-existing instance.
