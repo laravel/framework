@@ -55,10 +55,10 @@ class Database implements DatabaseContract {
 	{
 		$clients = array();
 
-		$options = $this->getClientOptions($servers);
-
 		foreach ($servers as $key => $server)
 		{
+			$options = $this->getClientOptions($server);
+
 			$clients[$key] = new Client($server, $options);
 		}
 
@@ -68,12 +68,12 @@ class Database implements DatabaseContract {
 	/**
 	 * Get any client options from the configuration array.
 	 *
-	 * @param  array  $servers
+	 * @param  mixed  $server
 	 * @return array
 	 */
-	protected function getClientOptions(array $servers)
+	protected function getClientOptions($server)
 	{
-		return isset($servers['options']) ? (array) $servers['options'] : [];
+		return isset($server['options']) ? (array) $server['options'] : [];
 	}
 
 	/**
