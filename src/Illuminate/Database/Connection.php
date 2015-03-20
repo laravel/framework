@@ -104,7 +104,7 @@ class Connection implements ConnectionInterface {
 	protected $database;
 	
 	/**
-	 *  @var \Doctrine\DBAL\Connection
+	 * @var \Doctrine\DBAL\Connection
 	 */
 	protected $doctrineConnection;
 
@@ -800,7 +800,8 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getDoctrineConnection()
 	{
-		if (is_null($this->doctrineConnection)) {
+		if (is_null($this->doctrineConnection))
+		{
 			$driver = $this->getDoctrineDriver();
 			$data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
 			$this->doctrineConnection = new DoctrineConnection($data, $driver);
