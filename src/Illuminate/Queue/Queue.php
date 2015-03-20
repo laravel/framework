@@ -194,7 +194,7 @@ abstract class Queue {
 	 *
 	 * @return int
 	 */
-	public function getTime()
+	protected function getTime()
 	{
 		return time();
 	}
