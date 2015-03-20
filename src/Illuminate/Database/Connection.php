@@ -106,7 +106,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 *  @var \Doctrine\DBAL\Connection
 	 */
-	protected $doctrine_connection;
+	protected $doctrineConnection;
 
 	/**
 	 * The table prefix for the connection.
@@ -800,13 +800,13 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getDoctrineConnection()
 	{
-		if (null === $this->doctrine_connection) {
+		if (is_null($this->doctrineConnection)) {
 			$driver = $this->getDoctrineDriver();
-			$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
-			$this->doctrine_connection = new DoctrineConnection($data, $driver);
-		
+			$data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
+			$this->doctrineConnection = new DoctrineConnection($data, $driver);
 		}
-		return $this->doctrine_connection;
+		
+		return $this->doctrineConnection;
 	}
 
 	/**
