@@ -58,9 +58,7 @@ class ClassFinder {
 	{
 		$namespace = null;
 
-		$tokenCount = count($tokens);
-
-		for ($i = $key; $i < $tokenCount; $i++)
+		for ($i = $key, $j = count($tokens); $i < $j; $i++)
 		{
 			if ($this->isPartOfNamespace($tokens[$i]))
 			{
@@ -84,9 +82,7 @@ class ClassFinder {
 	{
 		$class = null;
 
-		$tokenCount = count($tokens);
-
-		for ($i = $key; $i < $tokenCount; $i++)
+		for ($i = $key, $j = count($tokens); $i < $j; $i++)
 		{
 			if ($this->isPartOfClass($tokens[$i]))
 			{
