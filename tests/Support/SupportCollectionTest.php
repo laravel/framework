@@ -528,6 +528,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($c->contains('v', 1));
 		$this->assertFalse($c->contains('v', 2));
+
+		$c = new Collection(['date', 'class', (object) ['foo' => 50]]);
+
+		$this->assertTrue($c->contains('date'));
+		$this->assertTrue($c->contains('class'));
+		$this->assertFalse($c->contains('foo'));
 	}
 
 
