@@ -26,6 +26,15 @@ class FreshCommand extends Command {
 	 */
 	public function fire()
 	{
+		$this->output->writeln('<bg=yellow;fg=black;>WARNING:</bg=yellow;fg=black;>');
+		$this->output->writeln('<bg=yellow;fg=black;>This is a destructive command. Please take a time to review what it does at:</bg=yellow;fg=black;>');
+		$this->output->writeln('<bg=yellow;fg=black;>Illuminate/Foundation/Console/FreshCommand.php</bg=yellow;fg=black;>');
+		$this->info('');
+		$answer = $this->ask('Are you sure you want to continue? [Y|n]', 'n');
+		if (in_array($answer, array('Y', 'y'), true) === false) {
+				return;
+		}
+		
 		$files = new Filesystem;
 
 		$files->deleteDirectory(app_path('Services'));
