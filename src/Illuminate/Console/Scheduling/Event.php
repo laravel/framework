@@ -17,42 +17,42 @@ class Event {
 	 *
 	 * @var string
 	 */
-	protected $command;
+	public $command;
 
 	/**
 	 * The cron expression representing the event's frequency.
 	 *
 	 * @var string
 	 */
-	protected $expression = '* * * * * *';
+	public $expression = '* * * * * *';
 
 	/**
 	 * The timezone the date should be evaluated on.
 	 *
 	 * @var \DateTimeZone|string
 	 */
-	protected $timezone;
+	public $timezone;
 
 	/**
 	 * The user the command should run as.
 	 *
 	 * @var string
 	 */
-	protected $user;
+	public $user;
 
 	/**
 	 * The list of environments the command should run under.
 	 *
 	 * @var array
 	 */
-	protected $environments = [];
+	public $environments = [];
 
 	/**
 	 * Indicates if the command should run in maintenance mode.
 	 *
 	 * @var bool
 	 */
-	protected $evenInMaintenanceMode = false;
+	public $evenInMaintenanceMode = false;
 
 	/**
 	 * The filter callback.
@@ -73,7 +73,7 @@ class Event {
 	 *
 	 * @var string
 	 */
-	protected $output = '/dev/null';
+	public $output = '/dev/null';
 
 	/**
 	 * The array of callbacks to be run after the event is finished.
@@ -87,7 +87,7 @@ class Event {
 	 *
 	 * @var string
 	 */
-	protected $description;
+	public $description;
 
 	/**
 	 * Create a new event instance.

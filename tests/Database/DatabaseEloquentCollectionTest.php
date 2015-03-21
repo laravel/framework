@@ -52,15 +52,43 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testContainsIndicatesIfKeyedModelInArray()
 	{
 		$mockModel = m::mock('Illuminate\Database\Eloquent\Model');
-		$mockModel->shouldReceive('getKey')->andReturn(1);
+		$mockModel->shouldReceive('getKey')->andReturn('1');
 		$c = new Collection(array($mockModel));
 		$mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
-		$mockModel2->shouldReceive('getKey')->andReturn(2);
+		$mockModel2->shouldReceive('getKey')->andReturn('2');
 		$c->add($mockModel2);
 
 		$this->assertTrue($c->contains(1));
 		$this->assertTrue($c->contains(2));
 		$this->assertFalse($c->contains(3));
+	}
+
+	public function testContainsKeyAndValueIndicatesIfModelInArray()
+	{
+		$mockModel1 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel1->shouldReceive('offsetExists')->with('name')->andReturn(true);
+		$mockModel1->shouldReceive('offsetGet')->with('name')->andReturn('Taylor');
+		$mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel2->shouldReceive('offsetExists')->andReturn(true);
+		$mockModel2->shouldReceive('offsetGet')->with('name')->andReturn('Abigail');
+		$c = new Collection([$mockModel1, $mockModel2]);
+
+		$this->assertTrue($c->contains('name', 'Taylor'));
+		$this->assertTrue($c->contains('name', 'Abigail'));
+		$this->assertFalse($c->contains('name', 'Dayle'));
+	}
+
+
+	public function testContainsClosureIndicatesIfModelInArray()
+	{
+		$mockModel1 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel1->shouldReceive('getKey')->andReturn(1);
+		$mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
+		$mockModel2->shouldReceive('getKey')->andReturn(2);
+		$c = new Collection([$mockModel1, $mockModel2]);
+
+		$this->assertTrue($c->contains(function($k, $m){ return $m->getKey() < 2; }));
+		$this->assertFalse($c->contains(function($k, $m){ return $m->getKey() > 2; }));
 	}
 
 

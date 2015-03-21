@@ -454,7 +454,7 @@ class Builder {
 		}
 		elseif ($this->invalidOperatorAndValue($operator, $value))
 		{
-			throw new InvalidArgumentException("Value must be provided.");
+			throw new InvalidArgumentException("Illegal operator and value combination.");
 		}
 
 		// If the columns is actually a Closure instance, we will assume the developer

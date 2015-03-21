@@ -89,7 +89,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 			});
 		}
 
-		if (is_callable($key))
+		if ($this->useAsCallable($key))
 		{
 			return ! is_null($this->first($key));
 		}
