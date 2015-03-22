@@ -334,7 +334,7 @@ if ( ! function_exists('class_basename'))
 	{
 		$class = is_object($class) ? get_class($class) : $class;
 
-		return basename(str_replace('\\', '/', $class));
+		return last(explode('\\', $class));
 	}
 }
 
