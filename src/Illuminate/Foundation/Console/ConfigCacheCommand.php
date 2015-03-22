@@ -74,7 +74,7 @@ class ConfigCacheCommand extends Command {
 	}
 
 	/**
-	 * Set the "real" session driver on the configuratoin array.
+	 * Set the "real" session driver on the configuration array.
 	 *
 	 * Typically the SessionManager forces the driver to "array" in CLI environment.
 	 *
