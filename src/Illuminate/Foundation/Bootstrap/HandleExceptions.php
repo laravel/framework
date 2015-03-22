@@ -70,7 +70,7 @@ class HandleExceptions {
 	 */
 	public function handleException($e)
 	{
-		$this->getExceptionHandler()->report($e);
+		$this->getExceptionHandler()->report($this->app['request'], $e);
 
 		if ($this->app->runningInConsole())
 		{

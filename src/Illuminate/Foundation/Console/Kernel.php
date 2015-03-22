@@ -228,7 +228,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function reportException(Exception $e)
 	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+		$this->getExceptionHandler()->report($this->app['request'], $e);
 	}
 
 	/**
@@ -240,7 +240,17 @@ class Kernel implements KernelContract {
 	 */
 	protected function renderException($output, Exception $e)
 	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+		$this->getExceptionHandler()->renderForConsole($output, $e);
+	}
+
+	/**
+	 * Get an instance of the exception handler.
+	 *
+	 * @return \Illuminate\Contracts\Debug\ExceptionHandler
+	 */
+	protected function getExceptionHandler()
+	{
+		return $this->app->make('Illuminate\Contracts\Debug\ExceptionHandler');
 	}
 
 }
