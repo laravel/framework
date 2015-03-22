@@ -372,7 +372,7 @@ abstract class Grammar extends BaseGrammar {
 	 * Get the doctrine column type.
 	 *
 	 * @param  string  $type
-	 * @return int
+	 * @return \Doctrine\DBAL\Types\Type
 	 */
 	protected function getDoctrineColumnType($type)
 	{
