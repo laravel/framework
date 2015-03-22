@@ -290,7 +290,9 @@ class Mailer implements MailerContract, MailQueueContract {
 
 		if (isset($plain))
 		{
-			$message->addPart($this->getView($plain, $data), 'text/plain');
+			$plainAction = (isset($view) ? 'addPart' : 'setBody');
+
+			$message->$plainAction($this->getView($plain, $data), 'text/plain');
 		}
 
 		if (isset($raw))
