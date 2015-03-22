@@ -11,10 +11,11 @@ trait AppNamespaceDetectorTrait {
 	 */
 	protected function getAppNamespace()
 	{
-		$kernelContract = app()->runningInConsole() ? 'Illuminate\Contracts\Console\Kernel' : 'Illuminate\Contracts\Http\Kernel';
-		$kernelFullClassName = get_class(app($kernelContract));	
+		$kernelContract = app()->runningInConsole()
+							? 'Illuminate\Contracts\Console\Kernel'
+							: 'Illuminate\Contracts\Http\Kernel';
 
-		return strtok($kernelFullClassName, '\\').'\\';
+		return strtok(get_class(app($kernelContract)), '\\').'\\';
 	}
 
 }
