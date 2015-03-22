@@ -1,21 +1,17 @@
 <?php namespace Illuminate\Console;
 
+use Illuminate\Container\Container;
+
 trait AppNamespaceDetectorTrait {
 
 	/**
-	 * Get the application namespace from the Kernel object.
+	 * Get the application namespace.
 	 *
 	 * @return string
-	 *
-	 * @throws \RuntimeException
 	 */
 	protected function getAppNamespace()
 	{
-		$kernelContract = app()->runningInConsole()
-							? 'Illuminate\Contracts\Console\Kernel'
-							: 'Illuminate\Contracts\Http\Kernel';
-
-		return strtok(get_class(app($kernelContract)), '\\').'\\';
+		return Container::getInstance()->getNamespace();
 	}
 
 }
