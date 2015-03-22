@@ -59,10 +59,43 @@ abstract class ServiceProvider {
 	 */
 	protected function mergeConfigFrom($path, $key)
 	{
+		$original = (array) require $path;
 		$config = $this->app['config']->get($key, []);
 
-		$this->app['config']->set($key, array_merge(require $path, $config));
+		$this->app['config']->set($key, $this->mergeValues($original, $config));
 	}
+
+
+	/**
+	 * Merge the values from the right array into the left side recursively.
+	 *
+	 * @param array $left Array with values which are overwritten if necessary
+	 * @param array $right Array values to overwrite with
+	 * @return array Recursively merged array
+	 */
+	protected function mergeValues(array $left, array $right)
+	{
+		foreach ($right as $k => $v)
+		{
+			if (!array_key_exists($k, $left))
+			{
+				$left[$k] = $v;
+				continue;
+			}
+
+			if (is_array($right[$k]))
+			{
+				$left[$k] = $this->mergeValues($left[$k], $right[$k]);
+			}
+			else
+			{
+				$left[$k] = $right[$k];
+			}
+		}
+
+		return $left;
+	}
+
 
 	/**
 	 * Register a view file namespace.
