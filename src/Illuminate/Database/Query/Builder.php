@@ -1642,12 +1642,10 @@ class Builder {
 
 		$this->columns = $previousColumns;
 
-		// Once we have used orderBy function,$result may have more than one record,
-		//and $results[0] is just the first group count,so we need to get the count
-		//of $results's  elements.
-		if (count($results) > 1) {
-			return count($results);
-		}
+		// Once we have used orderBy function, $result may have more than one
+		// record, and $results[0] is just the first group count, so
+		// we need to get the count of $results's elements.
+		if (count($results) > 1) return count($results);
 
 		if (isset($results[0]))
 		{
