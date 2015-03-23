@@ -43,7 +43,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	{
 		parent::__construct('Laravel Framework', $laravel->version());
 
-		$this->event = $events;
+		$this->events = $events;
 		$this->laravel = $laravel;
 		$this->setAutoExit(false);
 		$this->setCatchExceptions(false);
