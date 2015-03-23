@@ -260,10 +260,7 @@ class Route {
 
 		foreach ($middleware as $k => $v)
 		{
-			if (!is_numeric($k))
-			{
-				continue;
-			}
+			if ( ! is_numeric($k)) continue;
 
 			unset($middleware[$k]);
 			$middleware[$v] = [];

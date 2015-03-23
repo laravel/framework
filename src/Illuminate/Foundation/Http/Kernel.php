@@ -128,10 +128,7 @@ class Kernel implements KernelContract {
 
 		foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware => $v)
 		{
-			if (is_numeric($middleware))
-			{
-				list($v, $middleware) = [$middleware, $v];
-			}
+			if (is_numeric($middleware)) list($v, $middleware) = [$middleware, $v];
 
 			$instance = $this->app->make($middleware);
 

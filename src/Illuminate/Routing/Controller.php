@@ -43,11 +43,9 @@ abstract class Controller {
 	 * @param  array   $data
 	 * @return void
 	 */
-	public function middleware($middleware, array $options = array(), $data = array())
+	public function middleware($middleware, array $options = [], array $data = [])
 	{
-		$this->middleware[$middleware] = $options + [
-			'data' => $data
-		];
+		$this->middleware[$middleware] = array_merge($options, [ 'data' => $data ]);
 	}
 
 	/**

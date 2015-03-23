@@ -70,10 +70,7 @@ class Pipeline implements PipelineContract {
 
 		foreach ($pipes as $k => $v)
 		{
-			if (!is_numeric($k) || $v instanceof Closure)
-			{
-				continue;
-			}
+			if ( ! is_numeric($k) || $v instanceof Closure) continue;
 
 			unset($pipes[$k]);
 			$pipes[$v] = [];
