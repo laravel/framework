@@ -1428,6 +1428,11 @@ class Builder {
 
 		$total = $this->count();
 
+		if(isset($this->groups))
+		{
+			$total = count($total);
+		}
+
 		$this->restoreFieldsForCount();
 
 		return $total;
@@ -1562,7 +1567,7 @@ class Builder {
 	 * Retrieve the "count" result of the query.
 	 *
 	 * @param  string  $columns
-	 * @return int
+	 * @return mixed
 	 */
 	public function count($columns = '*')
 	{
@@ -1571,7 +1576,7 @@ class Builder {
 			$columns = array($columns);
 		}
 
-		return (int) $this->aggregate(__FUNCTION__, $columns);
+		return $this->aggregate(__FUNCTION__, $columns);
 	}
 
 	/**
@@ -1642,10 +1647,14 @@ class Builder {
 
 		$this->columns = $previousColumns;
 
-		// Once we have used orderBy function, $result may have more than one
-		// record, and $results[0] is just the first group count, so
-		// we need to get the count of $results's elements.
-		if (($count = count($results)) > 1) return $count;
+		// Once we have used groupBy function, $result may have more than one
+		// record, so we need to get all of $results elements in array.
+		if (count($results) > 1)
+		{
+			$results = array_change_key_case((array) $results);
+
+			return array_pluck($results, 'aggregate');
+		}
 
 		if (isset($results[0]))
 		{
