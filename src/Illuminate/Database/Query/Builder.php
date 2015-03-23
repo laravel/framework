@@ -1386,6 +1386,60 @@ class Builder {
 	 */
 	public function paginate($perPage = 15, $columns = ['*'])
 	{
+		if (isset($this->groups))
+		{
+			return $this->groupedPaginate($perPage, $columns);
+		}
+
+		return $this->ungroupedPaginate($perPage, $columns);
+	}
+
+	/**
+	 * Create a paginator for a grouped pagination statement.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	protected function groupedPaginate($perPage, $columns)
+	{
+		$results = $this->get($columns);
+
+		return $this->buildRawPaginator($results, $perPage);
+	}
+
+	/**
+	 * Build a paginator instance from a raw result array.
+	 *
+	 * @param  array  $results
+	 * @param  int  $perPage
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	public function buildRawPaginator($results, $perPage)
+	{
+		$page = Paginator::resolveCurrentPage();
+
+		$start = ($page - 1) * $perPage;
+
+		// For queries which have a group by, we will actually retrieve the entire set
+		// of rows from the table and "slice" them via PHP. This is inefficient and
+		// the developer must be aware of this behavior; however, it's an option.
+		$sliced = array_slice($results, $start, $perPage);
+
+		return new LengthAwarePaginator($sliced, count($results), $perPage, $page, [
+			'path' => Paginator::resolveCurrentPath()
+		]);
+	}
+
+	/**
+	 * Create a paginator for an un-grouped pagination statement.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	protected function ungroupedPaginate($perPage, $columns)
+	{
 		$page = Paginator::resolveCurrentPage();
 
 		$total = $this->getCountForPagination();
