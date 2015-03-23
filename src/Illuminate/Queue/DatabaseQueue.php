@@ -191,15 +191,13 @@ class DatabaseQueue extends Queue implements QueueContract {
 	{
 		$this->database->beginTransaction();
 
-		$job = $this->database->table($this->table)
+		return $this->database->table($this->table)
 					->lockForUpdate()
 					->where('queue', $this->getQueue($queue))
 					->where('reserved', 0)
 					->where('available_at', '<=', $this->getTime())
 					->orderBy('id', 'asc')
 					->first();
-
-		return $job ? (object) $job : null;
 	}
 
 	/**
