@@ -168,6 +168,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $morphClass;
 
 	/**
+	 * Indicates if the model is immutable
+	 *
+	 * @var bool
+	 */
+	protected $immutable = false;
+
+	/**
 	 * Indicates if the model exists.
 	 *
 	 * @var bool
@@ -1483,7 +1490,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the model already exists in the database we can just update our record
 		// that is already in this database using the current IDs in this "where"
 		// clause to only update this model. Otherwise, we'll just insert them.
-		if ($this->exists)
+		if ($this->exists && ! $this->isImmutable())
 		{
 			$saved = $this->performUpdate($query, $options);
 		}
@@ -1587,6 +1594,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if ($this->incrementing)
 		{
+			// Unset the primary key if model exists and it is immutable
+			if ($this->exists && $this->isImmutable() && !array_key_exists($this->getKeyName(), $this->getDirty()))
+			{
+				unset($attributes[$this->getKeyName()]);
+			}
 			$this->insertAndSetId($query, $attributes);
 		}
 
@@ -1941,6 +1953,27 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function setTable($table)
 	{
 		$this->table = $table;
+	}
+
+	/**
+	 * Get immutable flag.
+	 *
+	 * @return bool
+	 */
+	public function isImmutable()
+	{
+		return $this->immutable;
+	}
+
+	/**
+	 * Set immutable flag.
+	 *
+	 * @param  bool  $flag
+	 * @return void
+	 */
+	public function setImmutable($flag)
+	{
+		$this->immutable = ($flag == true);
 	}
 
 	/**

@@ -383,6 +383,33 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testImmutableModelSave()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+
+		$model->exists = true;
+		$model->setImmutable(true);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('id' => 2, 'foo' => 'bar'), 'id')->andReturn(2);
+		$query->shouldReceive('insertGetId')->once()->with(array('foo' => 'new'), 'id')->andReturn(3);
+
+		$model->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->method('updateTimestamps');
+
+		$model->setAttribute('id', 2);
+		$model->setAttribute('foo', 'bar');
+
+		$this->assertTrue($model->save());
+		$this->assertEquals(2, $model->id);
+
+		$model->setAttribute('foo', 'new');
+
+		$this->assertTrue($model->save());
+		$this->assertEquals(3, $model->id);
+	}
+
+
 	public function testInsertIsCancelledIfCreatingEventReturnsFalse()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes'));
