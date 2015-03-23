@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database\Capsule;
 
-use PDO;
 use Illuminate\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Events\Dispatcher;
