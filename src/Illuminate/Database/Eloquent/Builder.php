@@ -245,14 +245,46 @@ class Builder {
 	 */
 	public function paginate($perPage = null, $columns = ['*'])
 	{
+		$perPage = $perPage ?: $this->model->getPerPage();
+
+		if (isset($this->query->groups))
+		{
+			return $this->groupedPaginate($perPage, $columns);
+		}
+
+		return $this->ungroupedPaginate($perPage, $columns);
+	}
+
+	/**
+	 * Create a paginator for a grouped pagination statement.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	protected function groupedPaginate($perPage, $columns)
+	{
+		$results = $this->get($columns)->all();
+
+		return $this->query->buildRawPaginator($results, $perPage);
+	}
+
+	/**
+	 * Create a paginator for an un-grouped pagination statement.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+	 */
+	protected function ungroupedPaginate($perPage, $columns)
+	{
+		$page = Paginator::resolveCurrentPage();
+
 		$total = $this->query->getCountForPagination();
 
-		$this->query->forPage(
-			$page = Paginator::resolveCurrentPage(),
-			$perPage = $perPage ?: $this->model->getPerPage()
-		);
+		$results = $this->forPage($page, $perPage)->get($columns);
 
-		return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
+		return new LengthAwarePaginator($results, $total, $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath()
 		]);
 	}
