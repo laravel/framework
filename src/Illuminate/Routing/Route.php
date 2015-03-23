@@ -256,7 +256,20 @@ class Route {
 	 */
 	public function middleware()
 	{
-		return (array) array_get($this->action, 'middleware', []);
+		$middleware = (array) array_get($this->action, 'middleware', []);
+
+		foreach ($middleware as $k => $v)
+		{
+			if (!is_numeric($k))
+			{
+				continue;
+			}
+
+			unset($middleware[$k]);
+			$middleware[$v] = [];
+		}
+
+		return $middleware;
 	}
 
 	/**

@@ -701,10 +701,9 @@ class Router implements RegistrarContract {
 	 */
 	public function gatherRouteMiddlewares(Route $route)
 	{
-		return Collection::make($route->middleware())->map(function($m)
+		return Collection::make($route->middleware())->map(function($m, $k)
 		{
-			return Collection::make(array_get($this->middleware, $m, $m));
-
+			return Collection::make([array_get($this->middleware, $k, $k) => $m]);
 		})->collapse()->all();
 	}
 
