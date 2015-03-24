@@ -1398,11 +1398,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 			['key' => 'foo', 'value' => 10],
 			['key' => 'foo', 'value' => 16]
 		]];
-		
+
 		$v = new Validator($trans, $data, ['foo' => 'Array']);
 		$v->each('foobar', ['key' => 'required', 'value' => 'numeric|min:6|max:14']);
 		$this->assertFalse($v->passes());
-		
+
 		$v = new Validator($trans, $data, ['foo' => 'Array']);
 		$v->each('foobar', ['key' => 'required', 'value' => 'numeric|min:4|max:16']);
 		$this->assertTrue($v->passes());

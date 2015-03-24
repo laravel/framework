@@ -14,7 +14,7 @@ class FileStore implements Store {
 	protected $files;
 
 	/**
-	 * The file cache directory
+	 * The file cache directory.
 	 *
 	 * @var string
 	 */
@@ -207,7 +207,7 @@ class FileStore implements Store {
 	{
 		$parts = array_slice(str_split($hash = md5($key), 2), 0, 2);
 
-		return $this->directory.'/'.join('/', $parts).'/'.$hash;
+		return $this->directory.'/'.implode('/', $parts).'/'.$hash;
 	}
 
 	/**

@@ -14,7 +14,7 @@ class MySqlGrammar extends Grammar {
 	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'Comment', 'After');
 
 	/**
-	 * The possible column serials
+	 * The possible column serials.
 	 *
 	 * @var array
 	 */

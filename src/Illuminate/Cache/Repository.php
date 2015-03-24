@@ -161,7 +161,9 @@ class Repository implements CacheContract, ArrayAccess {
 
 		if (is_null($this->get($key)))
 		{
-			$this->put($key, $value, $minutes); return true;
+			$this->put($key, $value, $minutes);
+
+			return true;
 		}
 
 		return false;
