@@ -62,13 +62,6 @@ class Connection implements ConnectionInterface {
 	protected $events;
 
 	/**
-	 * The default fetch mode of the connection.
-	 *
-	 * @var int
-	 */
-	protected $fetchMode = PDO::FETCH_ASSOC;
-
-	/**
 	 * The number of active transactions.
 	 *
 	 * @var int
@@ -289,7 +282,7 @@ class Connection implements ConnectionInterface {
 
 			$statement->execute($me->prepareBindings($bindings));
 
-			return $statement->fetchAll($me->getFetchMode());
+			return $statement->fetchAll(PDO::FETCH_CLASS);
 		});
 	}
 
@@ -989,27 +982,6 @@ class Connection implements ConnectionInterface {
 	public function pretending()
 	{
 		return $this->pretending === true;
-	}
-
-	/**
-	 * Get the default fetch mode for the connection.
-	 *
-	 * @return int
-	 */
-	public function getFetchMode()
-	{
-		return $this->fetchMode;
-	}
-
-	/**
-	 * Set the default fetch mode for the connection.
-	 *
-	 * @param  int  $fetchMode
-	 * @return int
-	 */
-	public function setFetchMode($fetchMode)
-	{
-		$this->fetchMode = $fetchMode;
 	}
 
 	/**

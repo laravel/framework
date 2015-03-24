@@ -57,9 +57,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		list($name, $type) = $this->parseConnectionName($name);
 
-		// If we haven't created this connection, we'll create it based on the config
-		// provided in the application. Once we've created the connections we will
-		// set the "fetch mode" for PDO which determines the query return types.
+		// If necessary, create the connection based on the app config.
 		if ( ! isset($this->connections[$name]))
 		{
 			$connection = $this->makeConnection($name);
@@ -185,8 +183,6 @@ class DatabaseManager implements ConnectionResolverInterface {
 	 */
 	protected function prepare(Connection $connection)
 	{
-		$connection->setFetchMode($this->app['config']['database.fetch']);
-
 		if ($this->app->bound('events'))
 		{
 			$connection->setEventDispatcher($this->app['events']);

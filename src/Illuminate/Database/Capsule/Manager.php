@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database\Capsule;
 
-use PDO;
 use Illuminate\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -44,8 +43,6 @@ class Manager {
 	 */
 	protected function setupDefaultConfiguration()
 	{
-		$this->container['config']['database.fetch'] = PDO::FETCH_ASSOC;
-
 		$this->container['config']['database.default'] = 'default';
 	}
 
@@ -138,19 +135,6 @@ class Manager {
 		{
 			Eloquent::setEventDispatcher($dispatcher);
 		}
-	}
-
-	/**
-	 * Set the fetch mode for the database connections.
-	 *
-	 * @param  int  $fetchMode
-	 * @return $this
-	 */
-	public function setFetchMode($fetchMode)
-	{
-		$this->container['config']['database.fetch'] = $fetchMode;
-
-		return $this;
 	}
 
 	/**
