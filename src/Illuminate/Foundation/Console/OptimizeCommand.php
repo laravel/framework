@@ -82,11 +82,9 @@ class OptimizeCommand extends Command {
 	{
 		$this->registerClassPreloaderCommand();
 
-		$outputPath = $this->laravel['path.base'].'/vendor/compiled.php';
-
 		$this->callSilent('compile', array(
 			'--config' => implode(',', $this->getClassFiles()),
-			'--output' => $outputPath,
+			'--output' => $this->laravel->getCachedCompilePath(),
 			'--strip_comments' => 1,
 		));
 	}

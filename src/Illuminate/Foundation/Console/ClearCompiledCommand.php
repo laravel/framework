@@ -25,14 +25,17 @@ class ClearCompiledCommand extends Command {
 	 */
 	public function fire()
 	{
-		if (file_exists($path = $this->laravel->basePath().'/vendor/compiled.php'))
+		$compiledPath = $this->laravel->getCachedCompilePath();
+		$servicesPath = $this->laravel->getCachedServicesPath();
+
+		if (file_exists($compiledPath))
 		{
-			@unlink($path);
+			@unlink($compiledPath);
 		}
 
-		if (file_exists($path = $this->laravel->basePath().'/vendor/services.json'))
+		if (file_exists($servicesPath))
 		{
-			@unlink($path);
+			@unlink($servicesPath);
 		}
 	}
 
