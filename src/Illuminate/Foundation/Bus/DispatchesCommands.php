@@ -1,9 +1,6 @@
 <?php namespace Illuminate\Foundation\Bus;
 
 use ArrayAccess;
-use ReflectionClass;
-use ReflectionParameter;
-use Illuminate\Support\Collection;
 
 trait DispatchesCommands {
 
