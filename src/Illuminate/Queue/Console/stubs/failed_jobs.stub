@@ -16,7 +16,7 @@ class CreateFailedJobsTable extends Migration
             $table->increments('id');
             $table->text('connection');
             $table->text('queue');
-            $table->text('payload');
+            $table->longText('payload');
             $table->timestamp('failed_at');
         });
     }
