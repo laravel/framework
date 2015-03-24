@@ -1428,10 +1428,7 @@ class Builder {
 
 		$total = $this->count();
 
-		if(isset($this->groups))
-		{
-			$total = count($total);
-		}
+		if (is_array($total)) $total = count($total);
 
 		$this->restoreFieldsForCount();
 
@@ -1576,7 +1573,9 @@ class Builder {
 			$columns = array($columns);
 		}
 
-		return $this->aggregate(__FUNCTION__, $columns);
+		$count = $this->aggregate(__FUNCTION__, $columns);
+
+		return is_array($count) ? array_map('intval', $count) : (int) $count;
 	}
 
 	/**
@@ -1647,20 +1646,23 @@ class Builder {
 
 		$this->columns = $previousColumns;
 
-		// Once we have used groupBy function, $result may have more than one
-		// record, so we need to get all of $results elements in array.
-		if (count($results) > 1)
+		$results = array_map(function($result)
 		{
-			$results = array_change_key_case((array) $results);
-
-			return array_pluck($results, 'aggregate');
-		}
-
-		if (isset($results[0]))
-		{
-			$result = array_change_key_case((array) $results[0]);
+			$result = array_change_key_case((array) $result);
 
 			return $result['aggregate'];
+		}, (array) $results);
+
+		// If any groupings have been specified, we return the aggregate results as
+		// is such that we give information about all groups. Otherwise we check
+		// if the aggregate had any results and return the value as a scalar.
+		if (isset($this->groups))
+		{
+			return $results;
+		}
+		elseif (isset($results[0]))
+		{
+			return $results[0];
 		}
 	}
 
