@@ -100,6 +100,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $environmentFile = '.env';
 
 	/**
+	 * The application namespace.
+	 *
+	 * @var string
+	 */
+	protected $namespace = null;
+
+	/**
 	 * Create a new Illuminate application instance.
 	 *
 	 * @param  string|null  $basePath
@@ -935,6 +942,34 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		parent::flush();
 
 		$this->loadedProviders = [];
+	}
+
+	/**
+	 * Get the used kernel object.
+	 *
+	 * @return \Illuminate\Contracts\Console\Kernel|\Illuminate\Contracts\Http\Kernel
+	 */
+	protected function getKernel()
+	{
+		$kernelContract = $this->runningInConsole()
+					? 'Illuminate\Contracts\Console\Kernel'
+					: 'Illuminate\Contracts\Http\Kernel';
+
+		return $this->make($kernelContract);
+	}
+
+	/**
+	 * Get the application namespace.
+	 *
+	 * @return string
+	 */
+	public function getNamespace()
+	{
+		if ( ! is_null($this->namespace)) return $this->namespace;
+
+		$this->namespace = strtok(get_class($this->getKernel()), '\\').'\\';
+
+		return $this->namespace;
 	}
 
 }
