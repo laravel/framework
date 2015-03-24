@@ -167,7 +167,7 @@ class BelongsToMany extends Relation {
 
 		return $this->related->newCollection($models);
 	}
-	
+
 	/**
 	 * Get a paginator for the "select" statement.
 	 *

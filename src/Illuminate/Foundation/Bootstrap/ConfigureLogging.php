@@ -101,5 +101,5 @@ class ConfigureLogging {
 	{
 		$log->useErrorLog();
 	}
-	
+
 }
