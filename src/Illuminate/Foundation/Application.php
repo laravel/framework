@@ -20,7 +20,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '5.0.19';
+	const VERSION = '5.0.20';
 
 	/**
 	 * The base path for the Laravel installation.
@@ -91,6 +91,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @var string
 	 */
 	protected $storagePath;
+
+	/**
+	 * Indicates if the storage directory should be used for optimizations.
+	 *
+	 * @var bool
+	 */
+	protected $useStoragePathForOptimizations = false;
 
 	/**
 	 * The environment file to load during bootstrapping.
@@ -722,7 +729,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedConfigPath()
 	{
-		if ($this->vendorIsWritable())
+		if ($this->vendorIsWritableForOptimizations())
 		{
 			return $this->basePath().'/vendor/config.php';
 		}
@@ -749,7 +756,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		if ($this->vendorIsWritable())
+		if ($this->vendorIsWritableForOptimizations())
 		{
 			return $this->basePath().'/vendor/routes.php';
 		}
@@ -766,7 +773,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedCompilePath()
 	{
-		if ($this->vendorIsWritable())
+		if ($this->vendorIsWritableForOptimizations())
 		{
 			return $this->basePath().'/vendor/compiled.php';
 		}
@@ -783,7 +790,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedServicesPath()
 	{
-		if ($this->vendorIsWritable())
+		if ($this->vendorIsWritableForOptimizations())
 		{
 			return $this->basePath().'/vendor/services.json';
 		}
@@ -798,9 +805,24 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @return bool
 	 */
-	public function vendorIsWritable()
+	public function vendorIsWritableForOptimizations()
 	{
+		if ($this->useStoragePathForOptimizations) return false;
+
 		return is_writable($this->basePath().'/vendor');
+	}
+
+	/**
+	 * Determines if storage directory should be used for optimizations.
+	 *
+	 * @param  bool  $value
+	 * @return $this
+	 */
+	public function useStoragePathForOptimizations($value = true)
+	{
+		$this->useStoragePathForOptimizations = $value;
+
+		return $this;
 	}
 
 	/**
