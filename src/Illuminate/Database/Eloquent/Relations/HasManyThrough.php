@@ -29,6 +29,13 @@ class HasManyThrough extends Relation {
 	protected $secondKey;
 
 	/**
+	 * The local key on the relationship
+	 *
+	 * @var string
+	 */
+	protected $localKey;
+
+	/**
 	 * Create a new has many through relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -38,11 +45,12 @@ class HasManyThrough extends Relation {
 	 * @param  string  $secondKey
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey)
+	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey, $localKey)
 	{
 		$this->firstKey = $firstKey;
 		$this->secondKey = $secondKey;
 		$this->farParent = $farParent;
+		$this->localKey = $localKey;
 
 		parent::__construct($query, $parent);
 	}
@@ -56,11 +64,13 @@ class HasManyThrough extends Relation {
 	{
 		$parentTable = $this->parent->getTable();
 
+		$localValue = $this->farParent[$this->localKey];
+
 		$this->setJoin();
 
 		if (static::$constraints)
 		{
-			$this->query->where($parentTable.'.'.$this->firstKey, '=', $this->farParent->getKey());
+			$this->query->where($parentTable.'.'.$this->firstKey, '=', $localValue);
 		}
 	}
 
