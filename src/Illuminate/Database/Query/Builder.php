@@ -1564,7 +1564,7 @@ class Builder {
 	 * Retrieve the "count" result of the query.
 	 *
 	 * @param  string  $columns
-	 * @return mixed
+	 * @return array|int
 	 */
 	public function count($columns = '*')
 	{
