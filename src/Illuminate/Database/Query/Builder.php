@@ -1566,10 +1566,7 @@ class Builder {
 	 */
 	public function count($columns = '*')
 	{
-		if ( ! is_array($columns))
-		{
-			$columns = array($columns);
-		}
+		if ( ! is_array($columns)) $columns = array($columns);
 
 		$count = $this->aggregate(__FUNCTION__, $columns);
 
@@ -1625,10 +1622,7 @@ class Builder {
 	{
 		$result = $this->aggregate(__FUNCTION__, array($column));
 
-		if (is_array($result))
-		{
-			return $result ? array_sum($result) / count($result) : 0;
-		}
+		if (is_array($result)) return $result ? array_sum($result) / count($result) : 0;
 
 		return $result ?: 0;
 	}
@@ -1700,7 +1694,8 @@ class Builder {
 		{
 			foreach ($values as $key => $value)
 			{
-				ksort($value); $values[$key] = $value;
+				ksort($value);
+				$values[$key] = $value;
 			}
 		}
 
