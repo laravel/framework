@@ -1428,8 +1428,6 @@ class Builder {
 
 		$total = $this->count();
 
-		if (is_array($total)) $total = count($total);
-
 		$this->restoreFieldsForCount();
 
 		return $total;
@@ -1564,7 +1562,7 @@ class Builder {
 	 * Retrieve the "count" result of the query.
 	 *
 	 * @param  string  $columns
-	 * @return array|int
+	 * @return int
 	 */
 	public function count($columns = '*')
 	{
@@ -1575,7 +1573,7 @@ class Builder {
 
 		$count = $this->aggregate(__FUNCTION__, $columns);
 
-		return is_array($count) ? array_map('intval', $count) : (int) $count;
+		return is_array($count) ? count($count) : (int) $count;
 	}
 
 	/**
@@ -1586,7 +1584,9 @@ class Builder {
 	 */
 	public function min($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, array($column));
+
+		return is_array($result) ? min($result) : $result;
 	}
 
 	/**
@@ -1597,7 +1597,9 @@ class Builder {
 	 */
 	public function max($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, array($column));
+
+		return is_array($result) ? max($result) : $result;
 	}
 
 	/**
@@ -1610,7 +1612,7 @@ class Builder {
 	{
 		$result = $this->aggregate(__FUNCTION__, array($column));
 
-		return $result ?: 0;
+		return is_array($result) ? array_sum($result) : $result ?: 0;
 	}
 
 	/**
@@ -1621,7 +1623,14 @@ class Builder {
 	 */
 	public function avg($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, array($column));
+
+		if (is_array($result))
+		{
+			return $result ? array_sum($result) / count($result) : 0;
+		}
+
+		return $result ?: 0;
 	}
 
 	/**

@@ -845,28 +845,40 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testAggregateFunctionsWithGroups()
 	{
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => '3'), array('Aggregate' => '2')));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => '3'), array('Aggregate' => '4')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->groupBy('name')->count();
-		$this->assertSame(array(3, 2), $results);
+		$this->assertEquals(2, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 2)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 4)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->groupBy('name')->max('id');
-		$this->assertEquals(array(3, 2), $results);
+		$this->assertEquals(4, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 2)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 4)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->groupBy('name')->min('id');
-		$this->assertEquals(array(3, 2), $results);
+		$this->assertEquals(3, $results);
 
 		$builder = $this->getBuilder();
-		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 2)));
+		$builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 4)));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
 		$results = $builder->from('users')->groupBy('name')->sum('id');
-		$this->assertEquals(array(3, 2), $results);
+		$this->assertEquals(7, $results);
+
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array(array('aggregate' => 3), array('aggregate' => 4)));
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+		$results = $builder->from('users')->groupBy('name')->avg('id');
+		$this->assertEquals(3.5, $results);
+
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users" group by "name"', array(), true)->andReturn(array());
+		$builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+		$results = $builder->from('users')->groupBy('name')->avg('id');
+		$this->assertEquals(0, $results);
 	}
 
 
