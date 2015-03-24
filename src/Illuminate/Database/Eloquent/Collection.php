@@ -132,6 +132,16 @@ class Collection extends BaseCollection {
 	}
 
 	/**
+	 * Touch the models in the collection.
+	 *
+	 * @return void
+	 */
+	public function touchOwners()
+	{
+		$this->transform(function($m) { $m->touch(); });
+	}
+
+	/**
 	 * Merge the collection with the given items.
 	 *
 	 * @param  \ArrayAccess|array  $items

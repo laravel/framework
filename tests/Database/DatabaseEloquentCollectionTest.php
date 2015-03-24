@@ -245,4 +245,14 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
 	}
 
+	public function testTouchOwnersTouchesModelsInCollection()
+	{
+		$one = m::mock('Illuminate\Database\Eloquent\Model');
+		$one->shouldReceive('touch');
+
+		$c = new Collection(array($one));
+
+		$this->assertNull($c->touchOwners());
+	}
+
 }
