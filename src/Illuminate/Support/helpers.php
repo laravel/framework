@@ -341,7 +341,7 @@ if ( ! function_exists('class_basename'))
 if ( ! function_exists('class_uses_recursive'))
 {
 	/**
-	 * Returns all traits used by a class, it's subclasses and trait of their traits.
+	 * Returns all traits used by a class, its subclasses and trait of their traits.
 	 *
 	 * @param  string  $class
 	 * @return array
