@@ -44,7 +44,7 @@ class Manager {
 	 */
 	protected function setupDefaultConfiguration()
 	{
-		$this->container['config']['database.fetch'] = PDO::FETCH_ASSOC;
+		$this->container['config']['database.fetch'] = PDO::FETCH_OBJ;
 
 		$this->container['config']['database.default'] = 'default';
 	}
