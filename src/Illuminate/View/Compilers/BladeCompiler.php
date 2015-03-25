@@ -243,7 +243,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Compile Blade Statements that start with "@".
+	 * Compile Blade statements that start with "@".
 	 *
 	 * @param  string  $value
 	 * @return mixed
