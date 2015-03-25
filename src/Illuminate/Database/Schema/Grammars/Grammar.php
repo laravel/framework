@@ -358,7 +358,7 @@ abstract class Grammar extends BaseGrammar {
 	 */
 	protected function getDoctrineColumnChangeOptions(Fluent $fluent)
 	{
-		$options = ['type' => Type::getType($fluent['type'])];
+		$options = ['type' => $this->getDoctrineColumnType($fluent['type'])];
 
 		if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
 		{
@@ -366,6 +366,32 @@ abstract class Grammar extends BaseGrammar {
 		}
 
 		return $options;
+	}
+
+	/**
+	 * Get the doctrine column type.
+	 *
+	 * @param  string  $type
+	 * @return \Doctrine\DBAL\Types\Type
+	 */
+	protected function getDoctrineColumnType($type)
+	{
+		$type = strtolower($type);
+
+		switch ($type) {
+			case 'biginteger':
+				$type = 'bigint';
+				break;
+			case 'smallinteger':
+				$type = 'smallint';
+				break;
+			case 'mediumtext':
+			case 'longtext':
+				$type = 'text';
+				break;
+		}
+
+		return Type::getType($type);
 	}
 
 	/**
