@@ -355,7 +355,7 @@ class Route {
 	}
 
 	/**
-	 * Determine a given parameter exists from the route
+	 * Determine a given parameter exists from the route.
 	 *
 	 * @param  string $name
 	 * @return bool
