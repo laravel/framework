@@ -2362,7 +2362,7 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
-	 * Get the custom messages for the validator
+	 * Get the custom messages for the validator.
 	 *
 	 * @return array
 	 */
@@ -2372,7 +2372,7 @@ class Validator implements ValidatorContract {
 	}
 
 	/**
-	 * Set the custom messages for the validator
+	 * Set the custom messages for the validator.
 	 *
 	 * @param  array  $messages
 	 * @return void
