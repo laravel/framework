@@ -93,13 +93,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $storagePath;
 
 	/**
-	 * Indicates if the storage directory should be used for optimizations.
-	 *
-	 * @var bool
-	 */
-	protected $useStoragePathForOptimizations = false;
-
-	/**
 	 * The environment file to load during bootstrapping.
 	 *
 	 * @var string
@@ -736,14 +729,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedConfigPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/config.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/config.php';
-		}
+		return $this->basePath().'/bootstrap/cache/config.php';
 	}
 
 	/**
@@ -763,14 +749,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/routes.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/routes.php';
-		}
+		return $this->basePath().'/bootstrap/cache/routes.php';
 	}
 
 	/**
@@ -780,14 +759,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedCompilePath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/compiled.php';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/compiled.php';
-		}
+		return $this->basePath().'/bootstrap/cache/compiled.php';
 	}
 
 	/**
@@ -797,39 +769,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedServicesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/services.json';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/services.json';
-		}
-	}
-
-	/**
-	 * Determine if vendor path is writable.
-	 *
-	 * @return bool
-	 */
-	public function vendorIsWritableForOptimizations()
-	{
-		if ($this->useStoragePathForOptimizations) return false;
-
-		return is_writable($this->basePath().'/vendor');
-	}
-
-	/**
-	 * Determines if storage directory should be used for optimizations.
-	 *
-	 * @param  bool  $value
-	 * @return $this
-	 */
-	public function useStoragePathForOptimizations($value = true)
-	{
-		$this->useStoragePathForOptimizations = $value;
-
-		return $this;
+		return $this->basePath().'/bootstrap/cache/services.json';
 	}
 
 	/**
@@ -853,7 +793,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'down');
+		return file_exists($this->storagePath().'/framework/down');
 	}
 
 	/**
