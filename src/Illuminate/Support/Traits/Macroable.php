@@ -25,7 +25,7 @@ trait Macroable {
 	}
 
 	/**
-	 * Checks if macro is registered
+	 * Checks if macro is registered.
 	 *
 	 * @param  string  $name
 	 * @return bool
