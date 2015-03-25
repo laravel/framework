@@ -147,7 +147,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $touches = array();
 
 	/**
-	 * User exposed observable events
+	 * User exposed observable events.
 	 *
 	 * @var array
 	 */
@@ -1160,7 +1160,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function performDeleteOnModel()
 	{
-		$this->newQuery()->where($this->getKeyName(), $this->getKey())->delete();
+		$this->setKeysForSaveQuery($this->newQuery())->delete();
 	}
 
 	/**

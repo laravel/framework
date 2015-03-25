@@ -628,7 +628,7 @@ class Event {
 	}
 
 	/**
-	 * Register a callback to the ping a given URL after the job runs.
+	 * Register a callback to ping a given URL after the job runs.
 	 *
 	 * @param  string  $url
 	 * @return $this

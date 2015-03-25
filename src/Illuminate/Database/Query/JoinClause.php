@@ -103,7 +103,7 @@ class JoinClause {
 	}
 
 	/**
-	 * Add an "on where is null" clause to the join
+	 * Add an "on where is null" clause to the join.
 	 *
 	 * @param  string  $column
 	 * @param  string  $boolean
@@ -126,7 +126,7 @@ class JoinClause {
 	}
 
 	/**
-	 * Add an "on where is not null" clause to the join
+	 * Add an "on where is not null" clause to the join.
 	 *
 	 * @param  string  $column
 	 * @param  string  $boolean

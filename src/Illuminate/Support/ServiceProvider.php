@@ -138,7 +138,7 @@ abstract class ServiceProvider {
 
 		if ($group || $provider)
 		{
-			return [];	
+			return [];
 		}
 
 		$paths = [];
