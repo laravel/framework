@@ -959,7 +959,7 @@ class Router implements RegistrarContract {
 	}
 
 	/**
-	 * Set a global where pattern on all routes
+	 * Set a global where pattern on all routes.
 	 *
 	 * @param  string  $key
 	 * @param  string  $pattern
@@ -971,7 +971,7 @@ class Router implements RegistrarContract {
 	}
 
 	/**
-	 * Set a group of global where patterns on all routes
+	 * Set a group of global where patterns on all routes.
 	 *
 	 * @param  array  $patterns
 	 * @return void

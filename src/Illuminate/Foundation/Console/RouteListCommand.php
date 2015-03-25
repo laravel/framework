@@ -122,7 +122,7 @@ class RouteListCommand extends Command {
 	}
 
 	/**
-	 * Get before filters
+	 * Get before filters.
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string

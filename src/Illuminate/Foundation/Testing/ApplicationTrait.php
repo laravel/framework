@@ -20,7 +20,7 @@ trait ApplicationTrait {
 	protected $response;
 
 	/**
-	 * The last code returned by artisan cli
+	 * The last code returned by artisan cli.
 	 *
 	 * @var int
 	 */
@@ -181,7 +181,7 @@ trait ApplicationTrait {
 	}
 
 	/**
-	 * Call artisan command and return code
+	 * Call artisan command and return code.
 	 *
 	 * @param string  $command
 	 * @param array   $parameters

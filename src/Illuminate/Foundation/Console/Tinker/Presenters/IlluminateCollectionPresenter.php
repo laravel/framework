@@ -20,7 +20,7 @@ class IlluminateCollectionPresenter extends ArrayPresenter {
 	 * Determine if the given value is a collection.
 	 *
 	 * @param  object  $value
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function isArrayObject($value)
 	{

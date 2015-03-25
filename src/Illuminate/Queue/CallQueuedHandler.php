@@ -6,7 +6,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 class CallQueuedHandler {
 
 	/**
-	 * The bus dispatcher implementation
+	 * The bus dispatcher implementation.
 	 *
 	 * @var \Illuminate\Contracts\Bus\Dispatcher
 	 */
