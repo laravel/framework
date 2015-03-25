@@ -85,6 +85,10 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('hello-world', Str::slug('hello-world'));
 		$this->assertEquals('hello-world', Str::slug('hello_world'));
 		$this->assertEquals('hello_world', Str::slug('hello_world', '_'));
+		$this->assertEquals('hello-and-goodbye', Str::slug('hello & goodbye'));
+		$this->assertEquals('hello-or-goodbye', Str::slug('hello || goodbye', '-', array('||' => 'or')));
+		$this->assertEquals('hello-and-or-goodbye', Str::slug('hello & || goodbye', '-', array('||' => 'or')));
+		$this->assertEquals('hello-or-also-goodbye', Str::slug('hello || & goodbye', '-', array('||' => 'or', '&' => 'also')));
 	}
 
 

@@ -279,13 +279,18 @@ class Str {
 	/**
 	 * Generate a URL friendly "slug" from a given string.
 	 *
-	 * @param  string  $title
-	 * @param  string  $separator
+	 * @param  string $title
+	 * @param  string $separator
+	 * @param array $replacements
 	 * @return string
 	 */
-	public static function slug($title, $separator = '-')
+	public static function slug($title, $separator = '-', $replacements = array())
 	{
 		$title = static::ascii($title);
+
+		$replacements['&'] = isset($replacements['&']) ? $replacements['&'] : 'and';
+
+		$title = strtr($title, $replacements);
 
 		// Convert all dashes/underscores into separator
 		$flip = $separator == '-' ? '_' : '-';
