@@ -12,7 +12,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	/**
 	 * The password token repository.
 	 *
-	 * @var \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
+	 * @var \Illuminate\Auth\Passwords\TokenRepositoryInterface
 	 */
 	protected $tokens;
 
@@ -199,8 +199,7 @@ class PasswordBroker implements PasswordBrokerContract {
 		if (isset($this->passwordValidator))
 		{
 			return call_user_func(
-				$this->passwordValidator, $credentials) && $password === $confirm
-			;
+				$this->passwordValidator, $credentials) && $password === $confirm;
 		}
 
 		return $this->validatePasswordWithDefaults($credentials);

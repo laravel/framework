@@ -18,7 +18,7 @@ interface QueueingFactory extends Factory {
 	public function unqueue($name);
 
 	/**
-	 * Get the cookies which have been queued for the next request
+	 * Get the cookies which have been queued for the next request.
 	 *
 	 * @return array
 	 */
