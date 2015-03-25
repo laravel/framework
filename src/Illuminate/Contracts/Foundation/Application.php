@@ -10,7 +10,7 @@ interface Application extends Container {
 	 * @return string
 	 */
 	public function version();
-	
+
 	/**
 	 * Get the base path of the Laravel installation.
 	 *

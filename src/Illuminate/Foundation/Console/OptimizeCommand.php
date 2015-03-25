@@ -1,9 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
-use Illuminate\View\Engines\CompilerEngine;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -82,11 +80,9 @@ class OptimizeCommand extends Command {
 	{
 		$this->registerClassPreloaderCommand();
 
-		$outputPath = $this->laravel['path.base'].'/vendor/compiled.php';
-
 		$this->callSilent('compile', array(
 			'--config' => implode(',', $this->getClassFiles()),
-			'--output' => $outputPath,
+			'--output' => $this->laravel->getCachedCompilePath(),
 			'--strip_comments' => 1,
 		));
 	}

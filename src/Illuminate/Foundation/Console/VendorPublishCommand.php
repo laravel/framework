@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use FilesystemIterator;
 use Illuminate\Console\Command;
 use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;

@@ -73,7 +73,7 @@ class TagSet {
 	}
 
 	/**
-	 * Reset the tag and return the new tag identifier
+	 * Reset the tag and return the new tag identifier.
 	 *
 	 * @param  string  $name
 	 * @return string

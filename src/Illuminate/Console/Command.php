@@ -264,7 +264,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	}
 
 	/**
-	 * Format input to textual table
+	 * Format input to textual table.
 	 *
 	 * @param  array   $headers
 	 * @param  array   $rows

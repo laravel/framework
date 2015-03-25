@@ -165,6 +165,8 @@ class AppNameCommand extends Command {
 		$this->setAppConfigNamespaces();
 
 		$this->setAuthConfigNamespace();
+
+		$this->setServicesConfigNamespace();
 	}
 
 	/**
@@ -196,6 +198,18 @@ class AppNameCommand extends Command {
 	{
 		$this->replaceIn(
 			$this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+		);
+	}
+
+	/**
+	 * Set the services User namespace.
+	 *
+	 * @return void
+	 */
+	protected function setServicesConfigNamespace()
+	{
+		$this->replaceIn(
+			$this->getServicesConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
 		);
 	}
 
@@ -274,6 +288,16 @@ class AppNameCommand extends Command {
 	protected function getAuthConfigPath()
 	{
 		return $this->getConfigPath('auth');
+	}
+
+	/**
+	 * Get the path to the services configuration file.
+	 *
+	 * @return string
+	 */
+	protected function getServicesConfigPath()
+	{
+		return $this->getConfigPath('services');
 	}
 
 	/**
