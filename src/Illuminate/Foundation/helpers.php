@@ -590,13 +590,13 @@ if ( ! function_exists('env'))
 			case '(false)':
 				return false;
 
-			case 'null':
-			case '(null)':
-				return null;
-
 			case 'empty':
 			case '(empty)':
 				return '';
+
+			case 'null':
+			case '(null)':
+				return;
 		}
 
 		if (Str::startsWith($value, '"') && Str::endsWith($value, '"'))
