@@ -1,9 +1,7 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
-use Illuminate\View\Engines\CompilerEngine;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
 
