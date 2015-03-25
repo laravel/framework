@@ -122,7 +122,7 @@ class Collection extends BaseCollection {
 	}
 
 	/**
-	 * Get the array of primary keys
+	 * Get the array of primary keys.
 	 *
 	 * @return array
 	 */

@@ -136,7 +136,7 @@ class SQLiteGrammar extends Grammar {
 	}
 
 	/**
-	 * Compile alter table commands for adding columns
+	 * Compile alter table commands for adding columns.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @param  \Illuminate\Support\Fluent  $command

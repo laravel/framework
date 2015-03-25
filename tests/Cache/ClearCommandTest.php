@@ -22,10 +22,10 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 		$app = new Application();
 		$command->setLaravel($app);
-		
+
 		$cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
 		$cacheRepository->shouldReceive('flush')->once();
-		
+
 		$this->runCommand($command);
 	}
 
@@ -40,10 +40,10 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 		$app = new Application();
 		$command->setLaravel($app);
-		
+
 		$cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
 		$cacheRepository->shouldReceive('flush')->once();
-		
+
 		$this->runCommand($command, ['store' => 'foo']);
 	}
 
@@ -58,7 +58,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 		$app = new Application();
 		$command->setLaravel($app);
-		
+
 		$cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('\InvalidArgumentException');
 		$cacheRepository->shouldReceive('flush')->never();
 		$this->setExpectedException('InvalidArgumentException');
