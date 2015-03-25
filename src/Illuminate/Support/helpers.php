@@ -709,9 +709,9 @@ if ( ! function_exists('str_slug'))
 	/**
 	 * Generate a URL friendly "slug" from a given string.
 	 *
-	 * @param  string $title
-	 * @param  string $separator
-	 * @param  array $replacements
+	 * @param  string  $title
+	 * @param  string  $separator
+	 * @param  array   $replacements
 	 * @return string
 	 */
 	function str_slug($title, $separator = '-', $replacements = array())
