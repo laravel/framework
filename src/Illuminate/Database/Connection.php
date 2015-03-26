@@ -104,6 +104,8 @@ class Connection implements ConnectionInterface {
 	protected $database;
 	
 	/**
+	 * The instance of Doctrine connection.
+	 *
 	 * @var \Doctrine\DBAL\Connection
 	 */
 	protected $doctrineConnection;
