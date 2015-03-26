@@ -193,7 +193,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	public function validateNewPassword(array $credentials)
 	{
 		list($password, $confirm) = [
-			$credentials['password'], $credentials['password_confirmation']
+			$credentials['password'], $credentials['password_confirmation'],
 		];
 
 		if (isset($this->passwordValidator))
@@ -214,7 +214,7 @@ class PasswordBroker implements PasswordBrokerContract {
 	protected function validatePasswordWithDefaults(array $credentials)
 	{
 		list($password, $confirm) = [
-			$credentials['password'], $credentials['password_confirmation']
+			$credentials['password'], $credentials['password_confirmation'],
 		];
 
 		return $password === $confirm && mb_strlen($password) >= 6;

@@ -177,7 +177,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 					->update([
 						'reserved' => 0,
 						'reserved_at' => null,
-						'attempts' => new Expression('attempts + 1')
+						'attempts' => new Expression('attempts + 1'),
 					]);
 	}
 

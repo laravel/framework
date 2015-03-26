@@ -60,7 +60,7 @@ class UrlWindow {
 		return [
 			'first'  => $this->paginator->getUrlRange(1, $this->lastPage()),
 			'slider' => null,
-			'last'   => null
+			'last'   => null,
 		];
 	}
 
@@ -79,7 +79,7 @@ class UrlWindow {
 			return [
 				'first'  => null,
 				'slider' => null,
-				'last'   => null
+				'last'   => null,
 			];
 		}
 
@@ -116,7 +116,7 @@ class UrlWindow {
 		return [
 			'first'  => $this->paginator->getUrlRange(1, $window + 2),
 			'slider' => null,
-			'last'   => $this->getFinish()
+			'last'   => $this->getFinish(),
 		];
 	}
 
@@ -136,7 +136,7 @@ class UrlWindow {
 		return [
 			'first'  => $this->getStart(),
 			'slider' => null,
-			'last'   => $last
+			'last'   => $last,
 		];
 	}
 
@@ -151,7 +151,7 @@ class UrlWindow {
 		return [
 			'first'  => $this->getStart(),
 			'slider' => $this->getAdjacentUrlRange($onEachSide),
-			'last'   => $this->getFinish()
+			'last'   => $this->getFinish(),
 		];
 	}
 
