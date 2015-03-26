@@ -248,8 +248,9 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function forceSchema($schema)
 	{
-		$this->forceSchema = $schema.'://';
 		$this->cachedSchema = null;
+
+		$this->forceSchema = $schema.'://';
 	}
 
 	/**
@@ -641,6 +642,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
+
 		$this->cachedRoot = null;
 		$this->cachedSchema = null;
 	}
