@@ -153,6 +153,17 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
 		$this->assertEquals('laravel_php_framework', Str::snake('LaravelPhpFramework'));
+
+		// snake cased strings should not contain spaces
+		$this->assertEquals('laravel_php_framework', Str::snake('laravel php framework'));
+		$this->assertEquals('laravel_php_framework', Str::snake('Laravel Php Framework'));
+		$this->assertEquals('laravel_php_framework', Str::snake('Laravel  Php  Framework'));
+
+		// `Str::snake()` should not duplicate the delimeters
+		$this->assertEquals('laravel_php_framework', Str::snake('laravel_php_framework'));
+		$this->assertEquals('laravel_php_framework', Str::snake('Laravel_Php_Framework'));
+		$this->assertEquals('laravel_-php_-framework', Str::snake('Laravel_Php_Framework', '-'));
+		$this->assertEquals('laravel_php_framework', Str::snake('Laravel_ _Php_ _Framework'));
 	}
 
 }
