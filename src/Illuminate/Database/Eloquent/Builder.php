@@ -593,11 +593,11 @@ class Builder {
 			}
 			else
 			{
-				$q->has(array_shift($relations), $operator, $count, $boolean, $callback);
+				$q->has(array_shift($relations), $operator, $count, 'and', $callback);
 			}
 		};
 
-		return $this->whereHas(array_shift($relations), $closure);
+		return $this->has(array_shift($relations), '>=', 1, $boolean, $closure);
 	}
 
 	/**

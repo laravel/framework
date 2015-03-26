@@ -3294,7 +3294,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Handle dynamic method calls into the method.
+	 * Handle dynamic method calls into the model.
 	 *
 	 * @param  string  $method
 	 * @param  array   $parameters
