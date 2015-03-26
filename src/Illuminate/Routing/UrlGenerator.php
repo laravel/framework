@@ -299,7 +299,7 @@ class UrlGenerator implements UrlGeneratorContract {
 		if (count($parameters))
 		{
 			$path = preg_replace_sub(
-				'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
+				'/\{[^?]+?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
 			);
 		}
 
