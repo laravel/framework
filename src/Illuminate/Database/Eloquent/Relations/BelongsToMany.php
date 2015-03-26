@@ -663,6 +663,8 @@ class BelongsToMany extends Relation {
 		// if they exist in the array of current ones, and if not we will insert.
 		$current = $this->newPivotQuery()->lists($this->otherKey);
 
+		$ids = (is_array($ids))?$ids:array();
+
 		$records = $this->formatSyncList($ids);
 
 		$detach = array_diff($current, array_keys($records));
