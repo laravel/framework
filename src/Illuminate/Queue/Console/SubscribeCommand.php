@@ -59,7 +59,7 @@ class SubscribeCommand extends Command {
 	protected function getQueueOptions()
 	{
 		return array(
-			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList()
+			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList(),
 		);
 	}
 

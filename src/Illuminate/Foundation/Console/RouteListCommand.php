@@ -43,7 +43,7 @@ class RouteListCommand extends Command {
 	 * @var array
 	 */
 	protected $headers = array(
-		'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'
+		'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware',
 	);
 
 	/**
@@ -106,7 +106,7 @@ class RouteListCommand extends Command {
 			'uri'    => $route->uri(),
 			'name'   => $route->getName(),
 			'action' => $route->getActionName(),
-			'middleware' => $this->getMiddleware($route)
+			'middleware' => $this->getMiddleware($route),
 		));
 	}
 
