@@ -1,7 +1,5 @@
 <?php namespace Illuminate\View\Compilers;
 
-use Closure;
-
 class BladeCompiler extends Compiler implements CompilerInterface {
 
 	/**
