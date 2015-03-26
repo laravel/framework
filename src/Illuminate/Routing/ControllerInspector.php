@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing;
 
-use ReflectionClass, ReflectionMethod;
+use ReflectionClass;
+use ReflectionMethod;
 
 class ControllerInspector {
 

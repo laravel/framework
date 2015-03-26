@@ -73,7 +73,7 @@ class Listener {
 	{
 		$process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
 
-		while(true)
+		while (true)
 		{
 			$this->runProcess($process, $memory);
 		}
@@ -98,7 +98,7 @@ class Listener {
 		// process manager will restart this with a clean slate of memory.
 		if ($this->memoryExceeded($memory))
 		{
-			$this->stop(); return;
+			$this->stop();
 		}
 	}
 
@@ -153,7 +153,7 @@ class Listener {
 	/**
 	 * Determine if the memory limit has been exceeded.
 	 *
-	 * @param  int   $memoryLimit
+	 * @param  int  $memoryLimit
 	 * @return bool
 	 */
 	public function memoryExceeded($memoryLimit)
