@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Console\Scheduling;
 
+use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 
@@ -47,11 +48,48 @@ class CallbackEvent extends Event {
 	 */
 	public function run(Container $container)
 	{
+		if ($this->description)
+		{
+			touch($this->mutexPath());
+		}
+
 		$response = $container->call($this->callback, $this->parameters);
+
+		@unlink($this->mutexPath());
 
 		parent::callAfterCallbacks($container);
 
 		return $response;
+	}
+
+	/**
+	 * Do not allow the event to overlap each other.
+	 *
+	 * @return $this
+	 */
+	public function withoutOverlapping()
+	{
+		if ( ! isset($this->description))
+		{
+			throw new LogicException(
+				"A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
+			);
+		}
+
+		return $this->skip(function()
+		{
+			return file_exists($this->mutexPath());
+		});
+	}
+
+	/**
+	 * Get the mutex path for the scheduled command.
+	 *
+	 * @return string
+	 */
+	protected function mutexPath()
+	{
+		return storage_path().'/framework/schedule-'.md5($this->description);
 	}
 
 	/**
