@@ -164,6 +164,8 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('laravel_php_framework', Str::snake('Laravel_Php_Framework'));
 		$this->assertEquals('laravel_-php_-framework', Str::snake('Laravel_Php_Framework', '-'));
 		$this->assertEquals('laravel_php_framework', Str::snake('Laravel_ _Php_ _Framework'));
+		$this->assertEquals('laravel_php_framework', Str::snake('Laravel     Php    Framework'));
+		$this->assertEquals('laraaveeeel_phppp_framewoooork!!!', Str::snake('Laraaveeeel Phppp Framewoooork!!!'));
 	}
 
 }
