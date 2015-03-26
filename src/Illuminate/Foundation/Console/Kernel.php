@@ -57,7 +57,11 @@ class Kernel implements KernelContract {
 	{
 		$this->app = $app;
 		$this->events = $events;
-		$this->defineConsoleSchedule();
+
+		$this->app->booted(function()
+		{
+			$this->defineConsoleSchedule();
+		});
 	}
 
 	/**
