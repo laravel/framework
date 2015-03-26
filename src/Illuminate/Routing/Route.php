@@ -468,7 +468,12 @@ class Route {
 	{
 		preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
 
-		return array_map(function($m) { return trim($m, '?'); }, $matches[1]);
+		$mapping = function($m)
+		{
+			return trim($m, '?');
+		};
+
+		return array_map($mapping, $matches[1]);
 	}
 
 	/**
