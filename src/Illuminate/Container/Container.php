@@ -121,17 +121,6 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
-	 * Determine if a given string is resolvable.
-	 *
-	 * @param  string  $abstract
-	 * @return bool
-	 */
-	protected function resolvable($abstract)
-	{
-		return $this->bound($abstract);
-	}
-
-	/**
 	 * Determine if the given abstract type has been bound.
 	 *
 	 * @param  string  $abstract
