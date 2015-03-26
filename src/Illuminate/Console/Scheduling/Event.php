@@ -203,7 +203,7 @@ class Event {
 			$date->setTimezone($this->timezone);
 		}
 
-		return CronExpression::factory($this->expression)->isDue($date);
+		return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
 	}
 
 	/**
