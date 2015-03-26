@@ -1393,7 +1393,7 @@ class Builder {
 		$results = $this->forPage($page, $perPage)->get($columns);
 
 		return new LengthAwarePaginator($results, $total, $perPage, $page, [
-			'path' => Paginator::resolveCurrentPath()
+			'path' => Paginator::resolveCurrentPath(),
 		]);
 	}
 
@@ -1413,7 +1413,7 @@ class Builder {
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
 		return new Paginator($this->get($columns), $perPage, $page, [
-			'path' => Paginator::resolveCurrentPath()
+			'path' => Paginator::resolveCurrentPath(),
 		]);
 	}
 

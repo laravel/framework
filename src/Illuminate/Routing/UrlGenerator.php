@@ -22,7 +22,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	protected $request;
 
 	/**
-	 * The force URL root.
+	 * The forced URL root.
 	 *
 	 * @var string
 	 */
@@ -34,6 +34,20 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @var string
 	 */
 	protected $forceSchema;
+
+	/**
+	 * A cached copy of the URL root for the current request.
+	 *
+	 * @var string|null
+	 */
+	protected $cachedRoot;
+
+	/**
+	 * A cached copy of the URL schema for the current request.
+	 *
+	 * @var string|null
+	 */
+	protected $cachedSchema;
 
 	/**
 	 * The root namespace being applied to controller actions.
@@ -215,7 +229,12 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		if (is_null($secure))
 		{
-			return $this->forceSchema ?: $this->request->getScheme().'://';
+			if (is_null($this->cachedSchema))
+			{
+				$this->cachedSchema = $this->forceSchema ?: $this->request->getScheme().'://';
+			}
+
+			return $this->cachedSchema;
 		}
 
 		return $secure ? 'https://' : 'http://';
@@ -229,6 +248,8 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	public function forceSchema($schema)
 	{
+		$this->cachedSchema = null;
+
 		$this->forceSchema = $schema.'://';
 	}
 
@@ -299,7 +320,7 @@ class UrlGenerator implements UrlGeneratorContract {
 		if (count($parameters))
 		{
 			$path = preg_replace_sub(
-				'/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
+				'/\{[^?]+?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
 			);
 		}
 
@@ -551,7 +572,12 @@ class UrlGenerator implements UrlGeneratorContract {
 	{
 		if (is_null($root))
 		{
-			$root = $this->forcedRoot ?: $this->request->root();
+			if (is_null($this->cachedRoot))
+			{
+				$this->cachedRoot = $this->forcedRoot ?: $this->request->root();
+			}
+
+			$root = $this->cachedRoot;
 		}
 
 		$start = starts_with($root, 'http://') ? 'http://' : 'https://';
@@ -568,6 +594,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	public function forceRootUrl($root)
 	{
 		$this->forcedRoot = rtrim($root, '/');
+		$this->cachedRoot = null;
 	}
 
 	/**
@@ -615,6 +642,9 @@ class UrlGenerator implements UrlGeneratorContract {
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
+
+		$this->cachedRoot = null;
+		$this->cachedSchema = null;
 	}
 
 	/**

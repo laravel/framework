@@ -59,7 +59,7 @@ class GeneratorServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'command.auth.resets.clear'
+			'command.auth.resets.clear',
 		];
 	}
 

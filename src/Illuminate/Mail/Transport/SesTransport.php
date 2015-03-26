@@ -58,8 +58,8 @@ class SesTransport implements Swift_Transport {
 			'Source' => $message->getSender(),
 			'Destinations' => $this->getTo($message),
 			'RawMessage' => [
-				'Data' => base64_encode((string) $message)
-			]
+				'Data' => base64_encode((string) $message),
+			],
 		]);
 	}
 

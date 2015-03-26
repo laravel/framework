@@ -554,6 +554,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function forceCreate(array $attributes)
 	{
+		if (static::$unguarded)
+		{
+			return static::create($attributes);
+		}
+
 		static::unguard();
 
 		$model = static::create($attributes);
