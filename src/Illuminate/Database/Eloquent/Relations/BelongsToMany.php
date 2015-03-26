@@ -653,7 +653,7 @@ class BelongsToMany extends Relation {
 	public function sync($ids, $detaching = true)
 	{
 		$changes = array(
-			'attached' => array(), 'detached' => array(), 'updated' => array()
+			'attached' => array(), 'detached' => array(), 'updated' => array(),
 		);
 
 		if ($ids instanceof Collection) $ids = $ids->modelKeys();
