@@ -66,6 +66,43 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAllColumnsAreSelectedByDefault()
+	{
+		$select = array('posts.*', 'users.country_id');
+
+		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+
+		$relation = $this->getRelation();
+		$relation->getRelated()->shouldReceive('newCollection')->once();
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('getQuery')->andReturn($baseBuilder);
+		$builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
+		$builder->shouldReceive('getModels')->once()->andReturn(array());
+
+		$relation->get();
+	}
+
+
+	public function testOnlyProperColumnsAreSelectedIfProvided()
+	{
+		$select = array('users.country_id');
+
+		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+		$baseBuilder->columns = array('foo', 'bar');
+
+		$relation = $this->getRelation();
+		$relation->getRelated()->shouldReceive('newCollection')->once();
+
+		$builder = $relation->getQuery();
+		$builder->shouldReceive('getQuery')->andReturn($baseBuilder);
+		$builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
+		$builder->shouldReceive('getModels')->once()->andReturn(array());
+
+		$relation->get();
+	}
+
+
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
