@@ -5,6 +5,7 @@ use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
+use League\Flysystem\Adapter\Ftp as FtpAdapter;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v2\AwsS3Adapter as S3Adapter;
@@ -124,6 +125,19 @@ class FilesystemManager implements FactoryContract {
 	public function createLocalDriver(array $config)
 	{
 		return $this->adapt(new Flysystem(new LocalAdapter($config['root'])));
+	}
+
+	/**
+	 * Create an instance of the ftp driver.
+	 *
+	 * @param  array  $config
+	 * @return \Illuminate\Contracts\Filesystem\Filesystem
+	 */
+	public function createFtpDriver(array $config)
+	{
+		$ftpConfig = array_only($config, ['host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout']);
+
+		return $this->adapt(new Flysystem(new FtpAdapter($ftpConfig)));
 	}
 
 	/**
