@@ -576,9 +576,9 @@ if ( ! function_exists('env'))
 	 */
 	function env($key, $default = null)
 	{
-		$value = getenv($key);
+		$value = array_get($_ENV, $key);
 
-		if ($value === false) return value($default);
+		if ($value === null) return value($default);
 
 		switch (strtolower($value))
 		{
