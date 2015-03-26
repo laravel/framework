@@ -546,6 +546,7 @@ if ( ! function_exists('preg_replace_sub'))
 				if (is_int($key))
 				{
 					unset($replacements[$key]);
+
 					return $value;
 				}
 			}
