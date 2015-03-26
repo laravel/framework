@@ -1,7 +1,6 @@
 <?php namespace {{namespace}};
 
 use {{fullCommand}};
-
 use Illuminate\Queue\InteractsWithQueue;
 
 class {{class}} {
