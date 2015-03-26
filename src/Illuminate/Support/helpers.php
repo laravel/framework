@@ -711,11 +711,12 @@ if ( ! function_exists('str_slug'))
 	 *
 	 * @param  string  $title
 	 * @param  string  $separator
+	 * @param  array   $replacements
 	 * @return string
 	 */
-	function str_slug($title, $separator = '-')
+	function str_slug($title, $separator = '-', $replacements = array())
 	{
-		return Str::slug($title, $separator);
+		return Str::slug($title, $separator, $replacements);
 	}
 }
 
