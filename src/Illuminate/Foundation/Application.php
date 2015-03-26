@@ -78,7 +78,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var array
 	 */
-	protected $serviceProviderLookup = array();
+	protected $registeredProviders = array();
 
 	/**
 	 * The names of the loaded service providers.
@@ -509,7 +509,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
 
-		return array_get($this->serviceProviderLookup, $name);
+		return isset($this->registeredProviders[$name]) ? $this->registeredProviders[$name] : null;
 	}
 
 	/**
@@ -535,8 +535,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
 		$this->serviceProviders[] = $provider;
 
-		// We also add this to a lookup, which makes getProvider nice and fast.
-		$this->serviceProviderLookup = array_add($this->serviceProviderLookup, $class, $provider);
+		if ( ! isset($this->registeredProviders[$class]))
+		{
+			$this->registeredProviders[$class] = $provider;
+		}
 
 		$this->loadedProviders[$class] = true;
 	}
