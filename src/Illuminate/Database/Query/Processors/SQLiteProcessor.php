@@ -15,7 +15,7 @@ class SQLiteProcessor extends Processor {
 			$r = (object) $r;
 
 			return $r->name;
-		}
+		};
 
 		return array_map($mapping, $results);
 	}
