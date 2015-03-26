@@ -7,10 +7,11 @@ interface ExceptionHandler {
 	/**
 	 * Report or log an exception.
 	 *
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Exception  $e
 	 * @return void
 	 */
-	public function report(Exception $e);
+	public function report($request, Exception $e);
 
 	/**
 	 * Render an exception into an HTTP response.
