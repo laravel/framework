@@ -76,7 +76,7 @@ class BootstrapThreePresenter implements PresenterContract {
 	{
 		$rel = is_null($rel) ? '' : ' rel="'.$rel.'"';
 
-		return '<li><a href="'.$url.'"'.$rel.'>'.$page.'</a></li>';
+		return '<li><a href="'.htmlentities($url).'"'.$rel.'>'.$page.'</a></li>';
 	}
 
 	/**
