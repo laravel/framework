@@ -39,7 +39,7 @@ class PostgresProcessor extends Processor {
 			$r = (object) $r;
 
 			return $r->column_name;
-		}
+		};
 
 		return array_map($mapping, $results);
 	}
