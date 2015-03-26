@@ -164,9 +164,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	public function move($from, $to)
 	{
-		$this->driver->copy($from, $to);
-
-		$this->driver->delete($from);
+		$this->driver->rename($from, $to);
 	}
 
 	/**
