@@ -55,6 +55,13 @@ class Event {
 	public $evenInMaintenanceMode = false;
 
 	/**
+	 * Indicates if the command should not overlap itself.
+	 *
+	 * @var bool
+	 */
+	public $withoutOverlapping = false;
+
+	/**
 	 * The filter callback.
 	 *
 	 * @var \Closure
@@ -166,9 +173,27 @@ class Event {
 	 */
 	public function buildCommand()
 	{
-		$command = $this->command.' > '.$this->output.' 2>&1 &';
+		if ($this->withoutOverlapping)
+		{
+			$command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().') > '.$this->output.' 2>&1 &';
+		}
+		else
+		{
+			$command = $this->command.' > '.$this->output.' 2>&1 &';
+		}
+
 
 		return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
+	}
+
+	/**
+	 * Get the mutex path for the scheduled command.
+	 *
+	 * @return string
+	 */
+	protected function mutexPath()
+	{
+		return storage_path().'/framework/schedule-'.md5($this->expression.$this->command);
 	}
 
 	/**
@@ -531,6 +556,21 @@ class Event {
 	}
 
 	/**
+	 * Do not allow the event to overlap each other.
+	 *
+	 * @return $this
+	 */
+	public function withoutOverlapping()
+	{
+		$this->withoutOverlapping = true;
+
+		return $this->skip(function()
+		{
+			return file_exists($this->mutexPath());
+		});
+	}
+
+	/**
 	 * Register a callback to further filter the schedule.
 	 *
 	 * @param  \Closure  $callback
@@ -649,6 +689,17 @@ class Event {
 		$this->afterCallbacks[] = $callback;
 
 		return $this;
+	}
+
+	/**
+	 * Set the human-friendly description of the event.
+	 *
+	 * @param  string  $description
+	 * @return $this
+	 */
+	public function name($description)
+	{
+		return $this->description($description);
 	}
 
 	/**
