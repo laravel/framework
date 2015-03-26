@@ -25,7 +25,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Extensions',
 		'Statements',
 		'Comments',
-		'Echos'
+		'Echos',
 	);
 
 	/**
