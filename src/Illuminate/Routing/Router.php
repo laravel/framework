@@ -440,6 +440,7 @@ class Router implements RegistrarContract {
 		if ( ! empty($this->groupStack))
 		{
 			$last = end($this->groupStack);
+
 			return isset($last['prefix']) ? $last['prefix'] : '';
 		}
 
