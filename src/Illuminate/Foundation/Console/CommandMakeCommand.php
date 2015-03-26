@@ -39,7 +39,7 @@ class CommandMakeCommand extends GeneratorCommand {
 		{
 			$this->call('handler:command', [
 				'name' => $this->argument('name').'Handler',
-				'--command' => $this->parseName($this->argument('name'))
+				'--command' => $this->parseName($this->argument('name')),
 			]);
 		}
 	}

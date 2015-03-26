@@ -64,7 +64,7 @@ class CacheServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'cache', 'cache.store', 'memcached.connector', 'command.cache.clear', 'command.cache.table'
+			'cache', 'cache.store', 'memcached.connector', 'command.cache.clear', 'command.cache.table',
 		];
 	}
 
