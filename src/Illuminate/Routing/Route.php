@@ -370,7 +370,7 @@ class Route {
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|object
 	 */
 	public function getParameter($name, $default = null)
 	{
@@ -382,7 +382,7 @@ class Route {
 	 *
 	 * @param  string  $name
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|object
 	 */
 	public function parameter($name, $default = null)
 	{

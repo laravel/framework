@@ -71,12 +71,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$routes->add($route);
 
 		/**
-		 * Optional Parameter...
-		 */
-		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz?}', array('as' => 'foobaz'));
-		$routes->add($route);
-
-		/**
 		 * HTTPS...
 		 */
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/baz', array('as' => 'baz', 'https'));
@@ -109,8 +103,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', array('boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall')));
 		$this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
-		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', array('taylor')));
-		$this->assertEquals('http://www.foo.com/foo/bar/otwell?foo=taylor', $url->route('foobar', array('foo' => 'taylor', 'otwell')));
 		$this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall'), false));
 		$this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
 		$this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
@@ -120,11 +112,6 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/bar#derp', $url->route('fragment', array(), false));
 		$this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', array('foo' => 'bar'), false));
 		$this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', array('baz' => 'åαф'), false));
-		$this->assertEquals('http://www.foo.com/foo/bar/wall?taylor', $url->route('foobaz', array('taylor', 'baz' => 'wall')));
-		$this->assertEquals('http://www.foo.com/foo/bar/wall?taylor', $url->route('foobaz', array('baz' => 'wall', 'taylor')));
-		$this->assertEquals('http://www.foo.com/foo/bar?fly=wall&taylor', $url->route('foobaz', array('taylor', 'fly' => 'wall')));
-		$this->assertEquals('http://www.foo.com/foo/bar?fly=wall&taylor', $url->route('foobaz', array('fly' => 'wall', 'taylor')));
-		$this->assertEquals('http://www.foo.com/foo/bar?taylor', $url->route('foobaz', 'taylor'));
 	}
 
 

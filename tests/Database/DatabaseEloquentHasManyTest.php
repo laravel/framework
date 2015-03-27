@@ -57,7 +57,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getRelation();
 		$relation->getQuery()->shouldReceive('where')->once()->with(array('foo'))->andReturn($relation->getQuery());
 		$relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-		$relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('StdClass'));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('foo'))->andReturn($model = m::mock('StdClass'));
 		$model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
 		$this->assertTrue($relation->firstOrNew(array('foo')) instanceof StdClass);
@@ -104,7 +104,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getRelation();
 		$relation->getQuery()->shouldReceive('where')->once()->with(array('foo'))->andReturn($relation->getQuery());
 		$relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-		$relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('StdClass'));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('foo'))->andReturn($model = m::mock('StdClass'));
 		$model->shouldReceive('save')->once()->andReturn(true);
 		$model->shouldReceive('fill')->once()->with(array('bar'));
 		$model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
