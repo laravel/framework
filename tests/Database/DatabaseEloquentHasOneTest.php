@@ -98,15 +98,24 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testRelationCountQueryCanBeBuilt()
 	{
 		$relation = $this->getRelation();
-		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+
+		$baseQuery = m::mock('Illuminate\Database\Query\Builder');
+		$baseQuery->from = 'one';
+		$parentQuery = m::mock('Illuminate\Database\Query\Builder');
+		$parentQuery->from = 'two';
+
+		$builder->shouldReceive('getQuery')->once()->andReturn($baseQuery);
+		$builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
+
+		$builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
 		$relation->getParent()->shouldReceive('getTable')->andReturn('table');
-		$query->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
+		$builder->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
 		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
 		$grammar->shouldReceive('wrap')->once()->with('table.id');
 
-		$relation->getRelationCountQuery($query, $query);
+		$relation->getRelationCountQuery($builder, $builder);
 	}
 
 
