@@ -211,7 +211,7 @@ abstract class HasOneOrMany extends Relation {
 	{
 		if (is_null($instance = $this->where($attributes)->first()))
 		{
-			$instance = $this->related->newInstance();
+			$instance = $this->related->newInstance($attributes);
 
 			$instance->setAttribute($this->getPlainForeignKey(), $this->getParentKey());
 		}

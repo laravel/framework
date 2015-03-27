@@ -543,12 +543,7 @@ if ( ! function_exists('preg_replace_sub'))
 		{
 			foreach ($replacements as $key => $value)
 			{
-				if (is_int($key))
-				{
-					unset($replacements[$key]);
-
-					return $value;
-				}
+				return array_shift($replacements);
 			}
 
 		}, $subject);
