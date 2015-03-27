@@ -1442,7 +1442,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		if ( ! $this->exists)
 		{
-			return $this->newQuery()->update($attributes);
+			return $this->newQuery()->update($this->unaliasAttributes($attributes));
 		}
 
 		return $this->fill($attributes)->save();
@@ -1564,7 +1564,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 			if (count($dirty) > 0)
 			{
-				$this->setKeysForSaveQuery($query)->update($dirty);
+				$this->setKeysForSaveQuery($query)->update($this->unaliasAttributes($dirty));
 
 				$this->fireModelEvent('updated', false);
 			}
@@ -1595,7 +1595,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the model has an incrementing key, we can use the "insertGetId" method on
 		// the query builder, which will give us back the final inserted ID for this
 		// table from the database. Not all tables have to be incrementing though.
-		$attributes = $this->attributes;
+		$attributes = $this->unaliasAttributes($this->attributes);
 
 		if ($this->incrementing)
 		{
@@ -2106,13 +2106,77 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Get the column alias mappings for the model.
+	 * Apply aliases to any columns that have aliases defined.
 	 *
+	 * @param  array  $attributes
 	 * @return array
 	 */
-	public function getAliases()
+	public function aliasAttributes($attributes)
 	{
-		return $this->aliases;
+		forEach ( $attributes as $key => $value )
+		{
+			$aliased = $this->aliasColumn($key);
+			if ( $aliased !== $key )
+			{
+				$attributes[$aliased] = $value;
+				unset($attributes[$key]);
+			}
+		}
+		return $attributes;
+	}
+
+	/**
+	 * Replace any aliases in the array's keys with the actual column names.
+	 *
+	 * @param  array  $attributes
+	 * @return array
+	 */
+	public function unaliasAttributes($attributes)
+	{
+		forEach ( $attributes as $key => $value )
+		{
+			$unaliased = $this->unaliasColumn($key);
+			if ( $unaliased !== $key )
+			{
+				$attributes[$unaliased] = $value;
+				unset($attributes[$key]);
+			}
+		}
+		return $attributes;
+	}
+
+	/**
+	 * If the column has an alias defined, return the alias, otherwise return
+	 * the original column.
+	 *
+	 * @param  string  $column
+	 * @return string
+	 */
+	public function aliasColumn($column)
+	{
+		if ( array_key_exists($column, $this->aliases) )
+		{
+			return $this->aliases[$column];
+		}
+		return $column;
+	}
+
+	/**
+	 * If the provided key is defined as an alias, return the original column,
+	 * otherwise return the key unchanged.
+	 *
+	 * @param  string  $key
+	 * @return string
+	 */
+	public function unaliasColumn($key)
+	{
+		$unaliased = array_search($key, $this->aliases);
+		if ( $unaliased )
+		{
+			return $unaliased;
+		}
+		
+		return $key;
 	}
 
 	/**
@@ -2408,12 +2472,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function attributesToArray()
 	{
 		$attributes = $this->getArrayableAttributes();
-
-		foreach ($this->aliases as $original => $alias)
-		{
-			$attributes[$alias] = $attributes[$original];
-			unset($attributes[$original]);
-		}
 
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent
@@ -2975,7 +3033,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function setRawAttributes(array $attributes, $sync = false)
 	{
-		$this->attributes = $attributes;
+		$this->attributes = $this->aliasAttributes($attributes);
 
 		if ($sync) $this->syncOriginal();
 	}

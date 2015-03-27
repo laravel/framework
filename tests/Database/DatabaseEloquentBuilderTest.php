@@ -408,7 +408,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSimpleWhere()
 	{
 		$builder = $this->getBuilder();
-		$builder->getModel()->shouldReceive('getAliases')->andReturn(array());
+		$builder->getModel()->shouldReceive('unaliasColumn')->with('foo')->andReturn('foo');
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
 		$result = $builder->where('foo', '=', 'bar');
 		$this->assertEquals($result, $builder);
@@ -417,7 +417,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testWhereWithAlias()
 	{
 		$builder = $this->getBuilder();
-		$builder->getModel()->shouldReceive('getAliases')->andReturn(array('foo' => 'bar'));
+		$builder->getModel()->shouldReceive('unaliasColumn')->with('bar')->andReturn('foo');
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'baz');
 		$result = $builder->where('bar', '=', 'baz');
 		$this->assertEquals($result, $builder);

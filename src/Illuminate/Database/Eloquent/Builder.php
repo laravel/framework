@@ -524,13 +524,7 @@ class Builder {
 		else
 		{
 			$args = func_get_args();
-
-			// If the provided column is an alias, use the actual column name
-			if ( in_array($column, $this->model->getAliases()) )
-			{
-				$args[0] = array_search($column, $this->model->getAliases());
-			}
-
+			$args[0] = $this->model->unaliasColumn($column);
 			call_user_func_array(array($this->query, 'where'), $args);
 		}
 
