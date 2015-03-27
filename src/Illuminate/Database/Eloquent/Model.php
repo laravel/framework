@@ -2095,7 +2095,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Get the aliases for the model.
+	 * Set the column alias mappings.
+	 *
+	 * @param  array  $aliases
+	 * @return void
+	 */
+	public function setAliases(array $aliases)
+	{
+		$this->aliases = $aliases;
+	}
+
+	/**
+	 * Get the column alias mappings for the model.
 	 *
 	 * @return array
 	 */
@@ -2181,17 +2192,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function setAppends(array $appends)
 	{
 		$this->appends = $appends;
-	}
-
-	/**
-	 * Set the column alias mappings.
-	 *
-	 * @param  array  $aliases
-	 * @return void
-	 */
-	public function setAliases(array $aliases)
-	{
-		$this->aliases = $aliases;
 	}
 
 	/**
