@@ -84,6 +84,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $original = array();
 
 	/**
+	 * The model's column-to-alias mappings.
+	 *
+	 * @var array
+	 */
+	protected $aliases = array();
+
+	/**
 	 * The loaded relationships for the model.
 	 *
 	 * @var array
@@ -2167,6 +2174,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Set the column alias mappings.
+	 *
+	 * @param  array  $aliases
+	 * @return void
+	 */
+	public function setAliases(array $aliases)
+	{
+		$this->aliases = $aliases;
+	}
+
+	/**
 	 * Get the fillable attributes for the model.
 	 *
 	 * @return array
@@ -2380,6 +2398,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function attributesToArray()
 	{
 		$attributes = $this->getArrayableAttributes();
+
+		foreach ($this->aliases as $original => $alias)
+		{
+			$attributes[$alias] = $attributes[$original];
+			unset($attributes[$original]);
+		}
 
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent

@@ -581,6 +581,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentModelStub;
 		$model->name = 'foo';
 		$model->age = null;
+		$model->email = 'test@laravel.com';
+		$model->setAliases(array('email' => 'emailAddress'));
 		$model->password = 'password1';
 		$model->setHidden(array('password'));
 		$model->setRelation('names', new Illuminate\Database\Eloquent\Collection(array(
@@ -599,6 +601,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($array['group']);
 		$this->assertEquals(array(), $array['multi']);
 		$this->assertFalse(isset($array['password']));
+		$this->assertEquals('test@laravel.com',$array['emailAddress']);
+		$this->assertFalse(isset($array['email']));
 
 		$model->setAppends(array('appendable'));
 		$array = $model->toArray();
