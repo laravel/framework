@@ -744,6 +744,11 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function offsetGet($offset)
 	{
+		if ( ! $this->input($offset) && $this->hasFile($offset))
+		{
+			return $this->file($offset);
+		}
+
 		return $this->input($offset);
 	}
 
