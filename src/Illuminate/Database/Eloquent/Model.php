@@ -2095,6 +2095,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Get the aliases for the model.
+	 *
+	 * @return array
+	 */
+	public function getAliases()
+	{
+		return $this->aliases;
+	}
+
+	/**
 	 * Get the hidden attributes for the model.
 	 *
 	 * @return array

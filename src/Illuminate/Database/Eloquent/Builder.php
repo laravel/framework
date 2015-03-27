@@ -523,7 +523,15 @@ class Builder {
 		}
 		else
 		{
-			call_user_func_array(array($this->query, 'where'), func_get_args());
+			$args = func_get_args();
+
+			// If the provided column is an alias, use the actual column name
+			if ( in_array($column, $this->model->getAliases()) )
+			{
+				$args[0] = array_search($column, $this->model->getAliases());
+			}
+
+			call_user_func_array(array($this->query, 'where'), $args);
 		}
 
 		return $this;

@@ -279,7 +279,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetRelationProperlySetsNestedRelationships()
 	{
 		$builder = $this->getBuilder();
-		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
 		$relationQuery = m::mock('stdClass');
 		$relation->shouldReceive('getQuery')->andReturn($relationQuery);
@@ -293,7 +292,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
 	{
 		$builder = $this->getBuilder();
-		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
 		$builder->getModel()->shouldReceive('ordersGroups')->once()->andReturn($groupsRelation = m::mock('stdClass'));
 
@@ -410,8 +408,18 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testSimpleWhere()
 	{
 		$builder = $this->getBuilder();
+		$builder->getModel()->shouldReceive('getAliases')->andReturn(array());
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
 		$result = $builder->where('foo', '=', 'bar');
+		$this->assertEquals($result, $builder);
+	}
+
+	public function testWhereWithAlias()
+	{
+		$builder = $this->getBuilder();
+		$builder->getModel()->shouldReceive('getAliases')->andReturn(array('foo' => 'bar'));
+		$builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'baz');
+		$result = $builder->where('bar', '=', 'baz');
 		$this->assertEquals($result, $builder);
 	}
 
@@ -490,7 +498,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getBuilder()
 	{
-		return new Builder($this->getMockQueryBuilder());
+		$builder = new Builder($this->getMockQueryBuilder());
+		$builder->setModel($this->getMockModel());
+		return $builder;
 	}
 
 
