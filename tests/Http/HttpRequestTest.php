@@ -199,7 +199,11 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', array('name' => 'Taylor'));
 		$this->assertEquals('Taylor', $request->input('name'));
+		$this->assertEquals('Taylor', $request['name']);
 		$this->assertEquals('Bob', $request->input('foo', 'Bob'));
+
+		$request = Request::create('/', 'GET', [], [], ['file' => new Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
 	}
 
 
