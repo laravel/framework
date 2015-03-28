@@ -460,7 +460,17 @@ class Event {
 	{
 		return $this->cron('0 0 1 1 * *');
 	}
-
+	
+	/**
+	 * Schedule the event to run every minute.
+	 *
+	 * @return $this
+	 */
+	public function everyMinute()
+	{
+		return $this->cron('* * * * * *');
+	}
+	
 	/**
 	 * Schedule the event to run every five minutes.
 	 *
