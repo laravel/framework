@@ -30,19 +30,15 @@ class VerifyPostSize implements Middleware {
 	 *
 	 * @return int
 	 */
-	protected function getPostMaxSize()
-	{
-		$post_max_size = trim(ini_get('post_max_size'));
-		$last = strtolower($post_max_size[strlen($post_max_size)-1]);
-		switch($last) {
-			case 'g':
-				$post_max_size *= 1024;
-			case 'm':
-				$post_max_size *= 1024;
-			case 'k':
-				$post_max_size *= 1024;
+   	protected function getPostMaxSize()
+   	{
+		$postMaxSize = ini_get('post_max_size');
+		
+		switch (substr ($postMaxSize, -1)) {
+			case 'M': case 'm': return (int)$postMaxSize * 1048576;
+			case 'K': case 'k': return (int)$postMaxSize * 1024;
+			case 'G': case 'g': return (int)$postMaxSize * 1073741824;
+			default: return $postMaxSize;
 		}
-
-		return $post_max_size;
 	}
 }
