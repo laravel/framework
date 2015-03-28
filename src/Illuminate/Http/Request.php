@@ -246,6 +246,8 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		$keys = is_array($key) ? $key : func_get_args();
 
+		if ( ! $this->exists($keys)) return false;
+
 		foreach ($keys as $value)
 		{
 			if ($this->isEmptyString($value)) return false;
@@ -262,9 +264,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	protected function isEmptyString($key)
 	{
-		$boolOrArray = is_bool($this->input($key)) || is_array($this->input($key));
+		$value = $this->input($key);
 
-		return ! $boolOrArray && trim((string) $this->input($key)) === '';
+		return is_string($value) && trim($value) === '';
 	}
 
 	/**
