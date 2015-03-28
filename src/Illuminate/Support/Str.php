@@ -322,6 +322,8 @@ class Str {
 			$value = strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 		}
 
+		$value = preg_replace("/([ {$delimiter}]+)/", $delimiter, $value);
+
 		return static::$snakeCache[$key] = $value;
 	}
 
