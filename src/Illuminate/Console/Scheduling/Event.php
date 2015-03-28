@@ -460,7 +460,7 @@ class Event {
 	{
 		return $this->cron('0 0 1 1 * *');
 	}
-	
+
 	/**
 	 * Schedule the event to run every minute.
 	 *
@@ -470,7 +470,7 @@ class Event {
 	{
 		return $this->cron('* * * * * *');
 	}
-	
+
 	/**
 	 * Schedule the event to run every five minutes.
 	 *
