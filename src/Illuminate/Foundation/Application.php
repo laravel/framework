@@ -72,6 +72,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $serviceProviders = array();
 
 	/**
+	 * A lookup of service providers by class name.
+	 *
+	 * If the a provider is force-registered twice, only the first instance is included.
+	 *
+	 * @var array
+	 */
+	protected $registeredProviders = array();
+
+	/**
 	 * The names of the loaded service providers.
 	 *
 	 * @var array
@@ -522,10 +531,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
 
-		return array_first($this->serviceProviders, function($key, $value) use ($name)
-		{
-			return $value instanceof $name;
-		});
+		return isset($this->registeredProviders[$name]) ? $this->registeredProviders[$name] : null;
 	}
 
 	/**
@@ -552,6 +558,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[$class] = true;
+		
+		$aliases = class_parents($class) + class_implements($class) + array($class);
+		foreach ($aliases as $alias)
+		{
+			if ( ! isset($this->registeredProviders[$alias]))
+			{
+				$this->registeredProviders[$alias] = $provider;
+			}
+		}
 	}
 
 	/**

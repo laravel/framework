@@ -115,6 +115,15 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetProviderByParentClass()
+	{
+		$app = new Application;
+		$app->register('ApplicationChildProviderStub');
+		$this->assertEquals($app->getProvider('ApplicationChildProviderStub'), $app->getProvider('ApplicationParentProviderStub'));
+		$this->assertEquals($app->getProvider('ApplicationChildProviderStub'), $app->getProvider('ApplicationInterfaceProviderStub'));
+	}
+
+
 	public function testEnvironment()
 	{
 		$app = new Application;
@@ -209,5 +218,20 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
 	{
 		$this->app->singleton('foo', function() { return 'foo'; });
 		$this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
+	}
+}
+
+class ApplicationParentProviderStub extends Illuminate\Support\ServiceProvider {
+	public function register()
+	{
+	}
+}
+
+interface ApplicationInterfaceProviderStub {
+}
+
+class ApplicationChildProviderStub extends ApplicationParentProviderStub implements ApplicationInterfaceProviderStub {
+	public function register()
+	{
 	}
 }
