@@ -181,6 +181,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder->shouldReceive('whereNotNull')->with('table.foreign_key');
 		$builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
 		$related = m::mock('Illuminate\Database\Eloquent\Model');
 		$builder->shouldReceive('getModel')->andReturn($related);
