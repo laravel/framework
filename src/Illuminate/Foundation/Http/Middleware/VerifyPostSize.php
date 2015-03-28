@@ -12,8 +12,8 @@ class VerifyPostSize implements Middleware {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Closure  $next
 	 * @return mixed
-     *
-     * @throws \Illuminate\Http\Exception\PostTooLargeException
+	 * 
+	 * @throws \Illuminate\Http\Exception\PostTooLargeException
 	 */
 	public function handle($request, Closure $next)
 	{
