@@ -17,12 +17,32 @@ class VerifyPostSize implements Middleware {
 	 */
 	public function handle($request, Closure $next)
 	{
-		if (isset($_SERVER['CONTENT_LENGTH']) && ($_SERVER['CONTENT_LENGTH'] > ini_get('post_max_size')))
+		if ($request->server('CONTENT_LENGTH') > $this->getPostMaxSize())
 		{
 			throw new PostTooLargeException;
 		}
 
 		return $next($request);
 	}
+	
+	/**
+	 * Determine the server 'post_max_size' as bytes
+	 *
+	 * @return int
+	 */
+	protected function getPostMaxSize()
+	{
+		$post_max_size = trim(ini_get('post_max_size'));
+		$last = strtolower($post_max_size[strlen($post_max_size)-1]);
+		switch($last) {
+			case 'g':
+				$post_max_size *= 1024;
+			case 'm':
+				$post_max_size *= 1024;
+			case 'k':
+				$post_max_size *= 1024;
+		}
 
+		return $post_max_size;
+	}
 }
