@@ -26,7 +26,7 @@ class VerifyPostSize implements Middleware {
 	}
 	
 	/**
-	 * Determine the server 'post_max_size' as bytes
+	 * Determine the server 'post_max_size' as bytes.
 	 *
 	 * @return int
 	 */
@@ -34,11 +34,21 @@ class VerifyPostSize implements Middleware {
    	{
 		$postMaxSize = ini_get('post_max_size');
 		
-		switch (substr ($postMaxSize, -1)) {
-			case 'M': case 'm': return (int)$postMaxSize * 1048576;
-			case 'K': case 'k': return (int)$postMaxSize * 1024;
-			case 'G': case 'g': return (int)$postMaxSize * 1073741824;
-			default: return $postMaxSize;
+		switch (substr($postMaxSize, -1))
+		{
+			case 'M':
+			case 'm':
+				return (int)$postMaxSize * 1048576;
+				
+			case 'K':
+			case 'k':
+				return (int)$postMaxSize * 1024;
+				
+			case 'G':
+			case 'g':
+				return (int)$postMaxSize * 1073741824;
 		}
+		
+		return (int)$postMaxSize;
 	}
 }
