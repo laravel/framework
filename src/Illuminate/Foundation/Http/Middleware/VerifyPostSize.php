@@ -38,17 +38,18 @@ class VerifyPostSize implements Middleware {
 		{
 			case 'M':
 			case 'm':
-				return (int)$postMaxSize * 1048576;
+				return (int) $postMaxSize * 1048576;
 				
 			case 'K':
 			case 'k':
-				return (int)$postMaxSize * 1024;
+				return (int) $postMaxSize * 1024;
 				
 			case 'G':
 			case 'g':
-				return (int)$postMaxSize * 1073741824;
+				return (int) $postMaxSize * 1073741824;
 		}
 		
-		return (int)$postMaxSize;
+		return (int) $postMaxSize;
 	}
+	
 }
