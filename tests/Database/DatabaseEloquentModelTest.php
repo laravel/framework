@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
@@ -758,6 +759,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUnguaredRunsCallbackWhileBeingUnguarded()
+	{
+		$model = Model::unguarded(function() {
+			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+		});
+		$this->assertEquals('Taylor', $model->name);
+		$this->assertFalse(Model::getUnguardState());
+	}
+
+
+	public function testUnguaredCallDoesNotChangeUnguardedState()
+	{
+		Model::unguard();
+		$model = Model::unguarded(function() {
+			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+		});
+		$this->assertEquals('Taylor', $model->name);
+		$this->assertTrue(Model::getUnguardState());
+		Model::reguard();
+	}
+
+
 	public function testHasOneCreatesProperRelation()
 	{
 		$model = new EloquentModelStub;
@@ -1214,7 +1237,7 @@ class EloquentTestObserverStub {
 	public function saved() {}
 }
 
-class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelStub extends Model {
 	protected $table = 'stub';
 	protected $guarded = array();
 	protected $morph_to_stub_type = 'EloquentModelSaveStub';
@@ -1275,7 +1298,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 	}
 }
 
-class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelSaveStub extends Model {
 	protected $table = 'save_stub';
 	protected $guarded = array();
 	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
@@ -1285,7 +1308,7 @@ class EloquentModelSaveStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelFindStub extends Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1294,7 +1317,7 @@ class EloquentModelFindStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelFindWithWritePdoStub extends Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1305,7 +1328,7 @@ class EloquentModelFindWithWritePdoStub extends Illuminate\Database\Eloquent\Mod
 	}
 }
 
-class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelDestroyStub extends Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1316,7 +1339,7 @@ class EloquentModelDestroyStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelHydrateRawStub extends Model {
 	public static function hydrate(array $items, $connection = null) { return 'hydrated'; }
 	public function getConnection()
 	{
@@ -1326,7 +1349,7 @@ class EloquentModelHydrateRawStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelFindManyStub extends Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1335,7 +1358,7 @@ class EloquentModelFindManyStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelWithStub extends Model {
 	public function newQuery()
 	{
 		$mock = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1344,9 +1367,9 @@ class EloquentModelWithStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelWithoutTableStub extends Illuminate\Database\Eloquent\Model {}
+class EloquentModelWithoutTableStub extends Model {}
 
-class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelBootingTestStub extends Model {
 	public static function unboot()
 	{
 		unset(static::$booted[get_called_class()]);
@@ -1357,7 +1380,7 @@ class EloquentModelBootingTestStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelAppendsStub extends Model {
 	protected $appends = array('is_admin', 'camelCased', 'StudlyCased');
 	public function getIsAdminAttribute()
 	{
@@ -1373,7 +1396,7 @@ class EloquentModelAppendsStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentModelCastingStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelCastingStub extends Model {
 	protected $casts = array(
 		'first' => 'int',
 		'second' => 'float',
