@@ -343,9 +343,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	protected function resetSwiftTransport()
 	{
-		$transport = $this->getSwiftMailerTransport();
-
-		if ( ! isset($transport))
+		if ( !$transport = $this->getSwiftMailerTransport() )
 		{
 			return;
 		}
