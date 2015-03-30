@@ -1,12 +1,14 @@
 <?php namespace Illuminate\Mail;
 
 use Closure;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use SuperClosure\Serializer;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
+use Swift_Transport_AbstractSmtpTransport;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -335,6 +337,44 @@ class Mailer implements MailerContract, MailQueueContract {
 	}
 
 	/**
+	 * Reset Swift Mailer SMTP transport adapter
+	 *
+	 * @return void
+	 */
+	protected function resetSwiftTransport()
+	{
+		$transport = $this->getSwiftMailerTransport();
+
+		if ( ! isset($transport))
+		{
+			return;
+		}
+
+		try
+		{
+			// Send RESET to restart the SMTP status and check if it's ready for running
+			if ($transport instanceof Swift_Transport_AbstractSmtpTransport)
+			{
+				$transport->reset();
+			}
+		}
+		catch (Exception $e)
+		{
+			// In case of failure - let's try to restart it
+			try
+			{
+				$transport->stop();
+			}
+			catch (Exception $e)
+			{
+				// Just start it then...
+			}
+
+			$transport->start();
+		}
+	}
+
+	/**
 	 * Send a Swift Message instance.
 	 *
 	 * @param  \Swift_Message  $message
@@ -349,6 +389,10 @@ class Mailer implements MailerContract, MailQueueContract {
 
 		if ( ! $this->pretending)
 		{
+			// Fail-safe restart before email TXN
+			// Required for queued mail sending using daemon
+			$this->resetSwiftTransport();
+
 			return $this->swift->send($message, $this->failedRecipients);
 		}
 		elseif (isset($this->logger))
@@ -464,6 +508,19 @@ class Mailer implements MailerContract, MailQueueContract {
 	public function getSwiftMailer()
 	{
 		return $this->swift;
+	}
+
+	/**
+	 * Get the Swift Mailer Transport instance.
+	 *
+	 * @return \Swift_Transport|null
+	 */
+	protected function getSwiftMailerTransport()
+	{
+		if ($this->swift instanceof Swift_Mailer)
+		{
+			return $this->swift->getTransport();
+		}
 	}
 
 	/**
