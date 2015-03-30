@@ -1497,11 +1497,21 @@ class Validator implements ValidatorContract {
 		if ( ! is_array($values)) return true;
 
 		$rules = $this->explodeRules($parameters);
+		
+		// No grand children
+		if (isset($rules[0]) && !isset($rules[1])) {
+			foreach ($values as $index => $value) {
+				$this->passesEach("{$attribute}.{$index}", $rules[0]);
+			}
 
+			return true;
+		}
+	
+		// With grand children
 		foreach ($rules as $dataKey => $dataRules)
 		{
 			foreach ($values as $index => $value)
-			{
+			{    
 				$this->passesEach("{$attribute}.{$index}.{$dataKey}", $dataRules);
 			}
 		}

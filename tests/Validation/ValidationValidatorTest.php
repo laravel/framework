@@ -1433,6 +1433,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$v = new Validator(
 			$this->getRealTranslator(),
+			['children' => ['string', 'string1']],
+			['children' => ['array', ['each', 'required']]]
+		);
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testValidateEachMultDimensional()
+	{
+		$v = new Validator(
+			$this->getRealTranslator(),
 			['children' => [['name' => '']]],
 			['children' => ['array', ['each', 'name' => 'required']]]
 		);
