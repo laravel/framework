@@ -569,7 +569,7 @@ empty
 			function($view, BladeCompiler $compiler)
 			{
 				$pattern = $compiler->createOpenMatcher('datetime');
-				$replace = '<?php echo $2->format(\'m/d/Y H:i\')); ?>';
+				$replace = '<?php echo $2->format(\'m/d/Y H:i\'); ?>';
 				return preg_replace($pattern, '$1'.$replace, $view);
 			}
 		);
