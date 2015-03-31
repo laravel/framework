@@ -592,7 +592,13 @@ if ( ! function_exists('env'))
 	{
 		$value = getenv($key);
 
-		if ($value === false) return value($default);
+		if ($value === false) {
+			if (func_num_args() == 1) {
+				throw new \RuntimeException("Environment variable $key not found.");
+			} else {
+				return value($default);
+			}
+		}
 
 		switch (strtolower($value))
 		{
