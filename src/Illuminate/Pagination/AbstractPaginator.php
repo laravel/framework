@@ -31,7 +31,7 @@ abstract class AbstractPaginator {
 	 *
 	 * @var string
 	 */
-	protected $path = '/';
+	protected $path = '';
 
 	/**
 	 * The query parameters to add to all URLs.
@@ -281,7 +281,7 @@ abstract class AbstractPaginator {
 	 * @param  string  $default
 	 * @return string
 	 */
-	public static function resolveCurrentPath($default = '/')
+	public static function resolveCurrentPath($default = '')
 	{
 		if (isset(static::$currentPathResolver))
 		{
