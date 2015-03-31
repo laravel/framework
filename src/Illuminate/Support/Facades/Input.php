@@ -16,6 +16,10 @@ class Input extends Facade {
 	 */
 	public static function get($key = null, $default = null)
 	{
+		if (static::isMock()) {
+			return call_user_func_array(array(static::getFacadeRoot(), 'get'), array($key, $default));
+		}
+
 		return static::$app['request']->input($key, $default);
 	}
 
