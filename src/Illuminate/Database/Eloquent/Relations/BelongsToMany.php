@@ -531,6 +531,41 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Find a related model by its primary key.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+	 */
+	public function find($id, $columns = ['*'])
+	{
+		if (is_array($id))
+		{
+			return $this->findMany($id, $columns);
+		}
+
+		$this->where($this->getRelated()->getQualifiedKeyName(), '=', $id);
+
+		return $this->first($columns);
+	}
+
+	/**
+	 * Find multiple related models by their primary keys.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	public function findMany($ids, $columns = ['*'])
+	{
+		if (empty($ids)) return $this->getRelated()->newCollection();
+
+		$this->whereIn($this->getRelated()->getQualifiedKeyName(), $ids);
+
+		return $this->get($columns);
+	}
+
+	/**
 	 * Find a related model by its primary key or return new instance of the related model.
 	 *
 	 * @param  mixed  $id
