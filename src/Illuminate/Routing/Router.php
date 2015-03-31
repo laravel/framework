@@ -4,7 +4,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -702,11 +701,14 @@ class Router implements RegistrarContract {
 	 */
 	public function gatherRouteMiddlewares(Route $route)
 	{
-		return Collection::make($route->middleware())->map(function($m)
-		{
-			return Collection::make(array_get($this->middleware, $m, $m));
+		$result = [];
 
-		})->collapse()->all();
+		foreach ($route->middleware() as $tag)
+		{
+			$result[] = (isset($this->middleware[$tag]) === true ? $this->middleware[$tag] : $tag);
+		}
+
+		return $result;
 	}
 
 	/**
