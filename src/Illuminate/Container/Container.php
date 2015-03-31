@@ -1035,45 +1035,31 @@ class Container implements ArrayAccess, ContainerContract {
 	 */
 	protected function fireResolvingCallbacks($abstract, $object)
 	{
-		$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
+		if ( ! empty($this->globalResolvingCallbacks))
+		{
+			$this->fireCallbackArray($object, $this->globalResolvingCallbacks);
+		}
 
-		$this->fireCallbackArray(
-			$object, $this->getCallbacksForType(
-				$abstract, $object, $this->resolvingCallbacks
-			)
-		);
-
-		$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
-
-		$this->fireCallbackArray(
-			$object, $this->getCallbacksForType(
-				$abstract, $object, $this->afterResolvingCallbacks
-			)
-		);
-	}
-
-	/**
-	 * Get all callbacks for a given type.
-	 *
-	 * @param  string  $abstract
-	 * @param  object  $object
-	 * @param  array   $callbacksPerType
-	 *
-	 * @return array
-	 */
-	protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
-	{
-		$results = [];
-
-		foreach ($callbacksPerType as $type => $callbacks)
+		foreach ($this->resolvingCallbacks as $type => $callbacks)
 		{
 			if ($type === $abstract || $object instanceof $type)
 			{
-				$results = array_merge($results, $callbacks);
+				$this->fireCallbackArray($object, $callbacks);
 			}
 		}
 
-		return $results;
+		if ( ! empty($this->globalAfterResolvingCallbacks))
+		{
+			$this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
+		}
+
+		foreach ($this->afterResolvingCallbacks as $type => $callbacks)
+		{
+			if ($type === $abstract || $object instanceof $type)
+			{
+				$this->fireCallbackArray($object, $callbacks);
+			}
+		}
 	}
 
 	/**
