@@ -877,9 +877,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  string  $through
 	 * @param  string|null  $firstKey
 	 * @param  string|null  $secondKey
+	 * @param  string|null  $joinKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
 	 */
-	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $joinKey = null)
 	{
 		$through = new $through;
 
@@ -887,7 +888,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		$joinKey = $joinKey ?: $secondKey;
+
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $joinKey);
 	}
 
 	/**
