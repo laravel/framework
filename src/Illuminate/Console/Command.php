@@ -282,7 +282,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as information output.
 	 *
 	 * @param  string  $string
-	 * @param  bool  $newline
+	 * @param  bool  $newline 
 	 * @return void
 	 */
 	public function info($string, $newline = true) 
