@@ -287,7 +287,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function info($string, $newline = true) 
 	{
-		if ($newline) 
+		if ($newline)
 		{
 	    		$this->output->writeln("<info>$string</info>");
 		} 
@@ -296,7 +296,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	    		$this->output->write("<info>$string</info>");
 		}
 	}
-	
+
 	/**
 	 * Write a string as standard output.
 	 *
