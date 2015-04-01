@@ -3,6 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Database\SoftDeletes as SoftDeletesContract;
 
 class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
@@ -103,7 +105,26 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIgnoreSoftDeletedParent()
+	{
+		list($builder, $country,, $firstKey, $secondKey) = $this->getRelationArguments();
+		$user = new EloquentHasManyThroughSoftDeletingModelStub;
+
+		$builder->shouldReceive('whereNull')->with('users.deleted_at')->once()->andReturn($builder);
+		
+		$relation = new HasManyThrough($builder, $country, $user, $firstKey, $secondKey);
+	}
+
+
 	protected function getRelation()
+	{
+		list($builder, $country, $user, $firstKey, $secondKey) = $this->getRelationArguments();
+
+		return new HasManyThrough($builder, $country, $user, $firstKey, $secondKey);
+	}
+
+
+	protected function getRelationArguments()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
@@ -123,11 +144,17 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 		$user->shouldReceive('getKey')->andReturn(1);
 		$user->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$user->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasManyThrough($builder, $country, $user, 'country_id', 'user_id');
+
+		return [$builder, $country, $user, 'country_id', 'user_id'];
 	}
 
 }
 
 class EloquentHasManyThroughModelStub extends Illuminate\Database\Eloquent\Model {
 	public $country_id = 'foreign.value';
+}
+
+class EloquentHasManyThroughSoftDeletingModelStub extends Illuminate\Database\Eloquent\Model implements SoftDeletesContract {
+	use SoftDeletes;
+	public $table = 'users';
 }
