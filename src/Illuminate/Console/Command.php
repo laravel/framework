@@ -290,7 +290,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 		if ($newline)
 		{
 	    		$this->output->writeln("<info>$string</info>");
-		} 
+		}
 		else
 		{
 	    		$this->output->write("<info>$string</info>");
@@ -304,13 +304,13 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * @param  bool  $newline
 	 * @return void
 	 */
-	public function line($string, $newline = true) 
+	public function line($string, $newline = true)
 	{
-		if ($newline) 
+		if ($newline)
 		{
 	    		$this->output->writeln($string);
-		} 
-		else 
+		}
+		else
 		{
 	    		$this->output->write($string);
 		}
