@@ -713,7 +713,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->fill(array('name' => 'foo', 'age' => 'bar'));
 		$this->assertEquals('foo', $model->name);
 		$this->assertEquals('bar', $model->age);
-		EloquentModelStub::setUnguardState(false);
+		EloquentModelStub::unguard(false);
 	}
 
 
@@ -765,7 +765,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
 		});
 		$this->assertEquals('Taylor', $model->name);
-		$this->assertFalse(Model::getUnguardState());
+		$this->assertFalse(Model::isUnguarded());
 	}
 
 
@@ -776,7 +776,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
 		});
 		$this->assertEquals('Taylor', $model->name);
-		$this->assertTrue(Model::getUnguardState());
+		$this->assertTrue(Model::isUnguarded());
 		Model::reguard();
 	}
 

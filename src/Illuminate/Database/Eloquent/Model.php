@@ -2189,9 +2189,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @return void
 	 */
-	public static function unguard()
+	public static function unguard($state = true)
 	{
-		static::$unguarded = true;
+		static::$unguarded = $state;
 	}
 
 	/**
@@ -2205,22 +2205,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Set "unguard" to a given state.
-	 *
-	 * @param  bool  $state
-	 * @return void
-	 */
-	public static function setUnguardState($state)
-	{
-		static::$unguarded = $state;
-	}
-
-	/**
-	 * Get the current state of "unguard".
+	 * Determine if current state is "unguarded".
 	 *
 	 * @return bool
 	 */
-	public static function getUnguardState()
+	public static function isUnguarded()
 	{
 		return static::$unguarded;
 	}
