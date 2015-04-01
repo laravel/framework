@@ -103,7 +103,51 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFirstMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+		$relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
+
+		$this->assertEquals('first', $relation->first());
+	}
+
+
+	public function testFindMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[first]', $this->getRelationArguments());
+		$relation->shouldReceive('where')->with('posts.id', '=', 'foo')->once()->andReturn($relation);
+		$relation->shouldReceive('first')->once()->andReturn(new StdClass);
+
+		$related = $relation->getRelated();
+		$related->shouldReceive('getQualifiedKeyName')->once()->andReturn('posts.id');
+		
+		$relation->find('foo');
+	}
+
+
+	public function testFindManyMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+		$relation->shouldReceive('whereIn')->with('posts.id', ['foo', 'bar'])->once()->andReturn($relation);
+
+		$related = $relation->getRelated();
+		$related->shouldReceive('getQualifiedKeyName')->once()->andReturn('posts.id');
+
+		$relation->findMany(['foo', 'bar']);
+	}
+
+
 	protected function getRelation()
+	{
+		list($builder, $country, $user, $firstKey, $secondKey) = $this->getRelationArguments();
+
+		return new HasManyThrough($builder, $country, $user, $firstKey, $secondKey);
+	}
+
+
+	protected function getRelationArguments()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
 		$builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
@@ -123,7 +167,8 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 		$user->shouldReceive('getKey')->andReturn(1);
 		$user->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$user->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		return new HasManyThrough($builder, $country, $user, 'country_id', 'user_id');
+
+		return [$builder, $country, $user, 'country_id', 'user_id'];
 	}
 
 }
