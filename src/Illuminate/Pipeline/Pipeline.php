@@ -93,7 +93,7 @@ class Pipeline implements PipelineContract {
 	public function then(Closure $destination)
 	{
 		$linkNext = $this->getSlice();
-		$next     = $this->getInitialSlice($destination);
+		$next = $this->getInitialSlice($destination);
 		for ($i = count($this->pipes) - 1; $i >= 0; $i--) {
 			$next = $linkNext($next, $this->pipes[$i]);
 		}
