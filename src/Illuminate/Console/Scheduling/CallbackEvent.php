@@ -55,7 +55,10 @@ class CallbackEvent extends Event {
 
 		$response = $container->call($this->callback, $this->parameters);
 
-		@unlink($this->mutexPath());
+		if ($this->description)
+		{
+			@unlink($this->mutexPath());
+		}
 
 		parent::callAfterCallbacks($container);
 
