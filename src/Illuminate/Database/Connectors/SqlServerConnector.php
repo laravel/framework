@@ -44,10 +44,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 		{
 			return $this->getDblibDsn($config);
 		}
-		else
-		{
-			return $this->getSqlSrvDsn($config);
-		}
+
+		return $this->getSqlSrvDsn($config);
 	}
 
 	/**
@@ -58,9 +56,15 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDblibDsn(array $config)
 	{
-		$port = isset($config['port']) ? ':'.$config['port'] : '';
+		$arguments = array(
+			'host' => $this->buildHostString($config, ':'),
+			'dbname' => $config['database']
+		);
 
-		return "dblib:host={$config['host']}{$port};dbname={$config['database']}";
+		$arguments = $this->appendIfConfigKeyAvailable('appname', 'appname', $config, $arguments);
+		$arguments = $this->appendIfConfigKeyAvailable('charset', 'charset', $config, $arguments);
+
+		return $this->buildConnectString('dblib', $arguments);
 	}
 
 	/**
@@ -71,11 +75,44 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getSqlSrvDsn(array $config)
 	{
-		$port = isset($config['port']) ? ','.$config['port'] : '';
+		$arguments = array(
+			'Server' => $this->buildHostString($config, ',')
+		);
 
-		$dbName = $config['database'] != '' ? ";Database={$config['database']}" : '';
+		$arguments = $this->appendIfConfigKeyAvailable('database', 'Database', $config, $arguments);
+		$arguments = $this->appendIfConfigKeyAvailable('appname', 'APP', $config, $arguments);
+		
+		return $this->buildConnectString('sqlsrv', $arguments);
+	}
 
-		return "sqlsrv:Server={$config['host']}{$port}{$dbName}";
+	private function buildConnectString($driver, array $arguments)
+	{
+		$connectStringOptions = array_map(function($key) use ($arguments)
+		{
+			return sprintf("%s=%s", $key, $arguments[$key]);
+		}, array_keys($arguments));
+
+		return $driver.":".implode(';', $connectStringOptions);
+	}
+
+	private function buildHostString(array $config, $separator)
+	{
+		if(isset($config['port']))
+		{
+			return $config['host'].$separator.$config['port'];
+		}
+
+		return $config['host'];
+	}
+
+	private function appendIfConfigKeyAvailable($configKey, $targetKey, array $config, array $arguments)
+	{
+		if(isset($config[$configKey]))
+		{
+			$arguments[$targetKey] = $config[$configKey];
+		}
+
+		return $arguments;
 	}
 
 	/**
