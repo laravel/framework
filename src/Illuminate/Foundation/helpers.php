@@ -83,6 +83,19 @@ if ( ! function_exists('asset'))
 	}
 }
 
+if ( ! function_exists('auth'))
+{
+	/**
+	 * Get the available auth instance.
+	 *
+	 * @return \Illuminate\Contracts\Auth\Guard
+	 */
+	function auth()
+	{
+		return app('Illuminate\Contracts\Auth\Guard');
+	}
+}
+
 if ( ! function_exists('base_path'))
 {
 	/**

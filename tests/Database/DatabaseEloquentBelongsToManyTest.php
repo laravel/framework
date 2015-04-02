@@ -260,6 +260,45 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFirstMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([new StdClass]));
+		$relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
+
+		$this->assertTrue($relation->first() instanceof StdClass);
+	}
+
+
+	public function testFindMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[first]', $this->getRelationArguments());
+		$relation->shouldReceive('first')->once()->andReturn(new StdClass);
+		$relation->shouldReceive('where')->with('roles.id', '=', 'foo')->once()->andReturn($relation);
+
+		$related = $relation->getRelated();
+		$related->shouldReceive('getQualifiedKeyName')->once()->andReturn('roles.id');
+
+		$this->assertTrue($relation->find('foo') instanceof StdClass);
+	}
+
+
+	public function testFindManyMethod()
+	{
+		$relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([new StdClass, new StdClass]));
+		$relation->shouldReceive('whereIn')->with('roles.id', ['foo', 'bar'])->once()->andReturn($relation);
+
+		$related = $relation->getRelated();
+		$related->shouldReceive('getQualifiedKeyName')->once()->andReturn('roles.id');
+
+		$result = $relation->findMany(['foo', 'bar']);
+
+		$this->assertEquals(2, count($result));
+		$this->assertTrue($result->first() instanceof StdClass);
+	}
+
+
 	public function testCreateMethodCreatesNewModelAndInsertsAttachmentRecord()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('attach'), $this->getRelationArguments());
@@ -271,6 +310,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($model, $relation->create(array('attributes'), array('joining')));
 	}
 
+
 	public function testFindOrNewMethodFindsModel()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('find'), $this->getRelationArguments());
@@ -280,6 +320,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
 	}
 
+
 	public function testFindOrNewMethodReturnsNewModel()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('find'), $this->getRelationArguments());
@@ -288,6 +329,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
 	}
+
 
 	public function testFirstOrNewMethodFindsFirstModel()
 	{
@@ -299,6 +341,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->firstOrNew(array('foo')) instanceof StdClass);
 	}
 
+
 	public function testFirstOrNewMethodReturnsNewModel()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where'), $this->getRelationArguments());
@@ -308,6 +351,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($relation->firstOrNew(array('foo')) instanceof StdClass);
 	}
+
 
 	public function testFirstOrCreateMethodFindsFirstModel()
 	{
@@ -319,6 +363,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->firstOrCreate(array('foo')) instanceof StdClass);
 	}
 
+
 	public function testFirstOrCreateMethodReturnsNewModel()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('where','create'), $this->getRelationArguments());
@@ -328,6 +373,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($relation->firstOrCreate(array('foo')) instanceof StdClass);
 	}
+
 
 	public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
 	{
@@ -340,6 +386,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($relation->updateOrCreate(array('foo')) instanceof StdClass);
 	}
+
 
 	public function testUpdateOrCreateMethodReturnsNewModel()
 	{

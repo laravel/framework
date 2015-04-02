@@ -416,13 +416,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function forceFill(array $attributes)
 	{
-		static::unguard();
-
-		$this->fill($attributes);
-
-		static::reguard();
-
-		return $this;
+		return $this->unguarded(function() use ($attributes)
+		{
+			return $this->fill($attributes);
+		});
 	}
 
 	/**
@@ -537,18 +534,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function forceCreate(array $attributes)
 	{
-		if (static::$unguarded)
+		return static::unguarded(function() use ($attributes)
 		{
 			return static::create($attributes);
-		}
-
-		static::unguard();
-
-		$model = static::create($attributes);
-
-		static::reguard();
-
-		return $model;
+		});
 	}
 
 	/**
@@ -2189,9 +2178,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 *
 	 * @return void
 	 */
-	public static function unguard()
+	public static function unguard($state = true)
 	{
-		static::$unguarded = true;
+		static::$unguarded = $state;
 	}
 
 	/**
@@ -2205,14 +2194,32 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Set "unguard" to a given state.
+	 * Determine if current state is "unguarded".
 	 *
-	 * @param  bool  $state
-	 * @return void
+	 * @return bool
 	 */
-	public static function setUnguardState($state)
+	public static function isUnguarded()
 	{
-		static::$unguarded = $state;
+		return static::$unguarded;
+	}
+
+	/**
+	 * Run the given callable while being unguarded.
+	 *
+	 * @param  callable  $callback
+	 * @return mixed
+	 */
+	public static function unguarded(callable $callback)
+	{
+		if (static::$unguarded) return $callback();
+
+		static::unguard();
+
+		$result = $callback();
+
+		static::reguard();
+
+		return $result;
 	}
 
 	/**
