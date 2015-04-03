@@ -17,7 +17,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @var array
 	 */
-	protected $items = array();
+	protected $items = [];
 
 	/**
 	 * Create a new collection.
@@ -25,7 +25,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct($items = array())
+	public function __construct($items = [])
 	{
 		$items = is_null($items) ? [] : $this->getArrayableItems($items);
 

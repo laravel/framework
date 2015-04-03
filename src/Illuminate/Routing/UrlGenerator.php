@@ -68,7 +68,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 *
 	 * @var array
 	 */
-	protected $dontEncode = array(
+	protected $dontEncode = [
 		'%2F' => '/',
 		'%40' => '@',
 		'%3A' => ':',
@@ -83,7 +83,7 @@ class UrlGenerator implements UrlGeneratorContract {
 		'%26' => '&',
 		'%23' => '#',
 		'%25' => '%',
-	);
+	];
 
 	/**
 	 * Create a new URL Generator instance.
@@ -141,7 +141,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  bool|null  $secure
 	 * @return string
 	 */
-	public function to($path, $extra = array(), $secure = null)
+	public function to($path, $extra = [], $secure = null)
 	{
 		// First we will check if the URL is already a valid URL. If it is we will not
 		// try to generate a new one but will simply return the URL as is, which is
@@ -171,7 +171,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	public function secure($path, $parameters = array())
+	public function secure($path, $parameters = [])
 	{
 		return $this->to($path, $parameters, true);
 	}
@@ -263,7 +263,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true)
+	public function route($name, $parameters = [], $absolute = true)
 	{
 		if ( ! is_null($route = $this->routes->getByName($name)))
 		{
@@ -382,9 +382,9 @@ class UrlGenerator implements UrlGeneratorContract {
 	 * @param  array  $parameters
 	 * @return array
 	 */
-	protected function replaceRoutableParameters($parameters = array())
+	protected function replaceRoutableParameters($parameters = [])
 	{
-		$parameters = is_array($parameters) ? $parameters : array($parameters);
+		$parameters = is_array($parameters) ? $parameters : [$parameters];
 
 		foreach ($parameters as $key => $parameter)
 		{
@@ -492,7 +492,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 */
 	protected function addPortToDomain($domain)
 	{
-		if (in_array($this->request->getPort(), array('80', '443')))
+		if (in_array($this->request->getPort(), ['80', '443']))
 		{
 			return $domain;
 		}
@@ -542,7 +542,7 @@ class UrlGenerator implements UrlGeneratorContract {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function action($action, $parameters = array(), $absolute = true)
+	public function action($action, $parameters = [], $absolute = true)
 	{
 		if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
 		{

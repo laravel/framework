@@ -10,7 +10,7 @@ interface UrlGenerator {
 	 * @param  bool  $secure
 	 * @return string
 	 */
-	public function to($path, $extra = array(), $secure = null);
+	public function to($path, $extra = [], $secure = null);
 
 	/**
 	 * Generate a secure, absolute URL to the given path.
@@ -19,7 +19,7 @@ interface UrlGenerator {
 	 * @param  array   $parameters
 	 * @return string
 	 */
-	public function secure($path, $parameters = array());
+	public function secure($path, $parameters = []);
 
 	/**
 	 * Generate a URL to an application asset.
@@ -40,7 +40,7 @@ interface UrlGenerator {
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function route($name, $parameters = array(), $absolute = true);
+	public function route($name, $parameters = [], $absolute = true);
 
 	/**
 	 * Get the URL to a controller action.
@@ -50,7 +50,7 @@ interface UrlGenerator {
 	 * @param  bool $absolute
 	 * @return string
 	 */
-	public function action($action, $parameters = array(), $absolute = true);
+	public function action($action, $parameters = [], $absolute = true);
 
 	/**
 	 * Set the root controller namespace.

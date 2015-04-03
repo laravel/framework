@@ -60,9 +60,9 @@ class GeneratorServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array(
+		return [
 			'command.controller.make', 'command.middleware.make',
-		);
+		];
 	}
 
 }

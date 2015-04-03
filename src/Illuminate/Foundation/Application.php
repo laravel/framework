@@ -48,42 +48,42 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var array
 	 */
-	protected $bootingCallbacks = array();
+	protected $bootingCallbacks = [];
 
 	/**
 	 * The array of booted callbacks.
 	 *
 	 * @var array
 	 */
-	protected $bootedCallbacks = array();
+	protected $bootedCallbacks = [];
 
 	/**
 	 * The array of terminating callbacks.
 	 *
 	 * @var array
 	 */
-	protected $terminatingCallbacks = array();
+	protected $terminatingCallbacks = [];
 
 	/**
 	 * All of the registered service providers.
 	 *
 	 * @var array
 	 */
-	protected $serviceProviders = array();
+	protected $serviceProviders = [];
 
 	/**
 	 * The names of the loaded service providers.
 	 *
 	 * @var array
 	 */
-	protected $loadedProviders = array();
+	protected $loadedProviders = [];
 
 	/**
 	 * The deferred services and their providers.
 	 *
 	 * @var array
 	 */
-	protected $deferredServices = array();
+	protected $deferredServices = [];
 
 	/**
 	 * The custom storage path defined by the developer.
@@ -454,7 +454,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  bool   $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
-	public function register($provider, $options = array(), $force = false)
+	public function register($provider, $options = [], $force = false)
 	{
 		if ($registered = $this->getProvider($provider) && ! $force)
                                      return $registered;
@@ -525,7 +525,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	protected function markAsRegistered($provider)
 	{
-		$this['events']->fire($class = get_class($provider), array($provider));
+		$this['events']->fire($class = get_class($provider), [$provider]);
 
 		$this->serviceProviders[] = $provider;
 
@@ -547,7 +547,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 			$this->loadDeferredProvider($service);
 		}
 
-		$this->deferredServices = array();
+		$this->deferredServices = [];
 	}
 
 	/**
@@ -608,7 +608,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, $parameters = [])
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -701,7 +701,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$this->bootedCallbacks[] = $callback;
 
-		if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
+		if ($this->isBooted()) $this->fireAppCallbacks([$callback]);
 	}
 
 	/**
@@ -870,7 +870,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
 	 */
-	public function abort($code, $message = '', array $headers = array())
+	public function abort($code, $message = '', array $headers = [])
 	{
 		if ($code == 404)
 		{
@@ -960,7 +960,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
 		$this['translator']->setLocale($locale);
 
-		$this['events']->fire('locale.changed', array($locale));
+		$this['events']->fire('locale.changed', [$locale]);
 	}
 
 	/**
@@ -970,7 +970,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function registerCoreContainerAliases()
 	{
-		$aliases = array(
+		$aliases = [
 			'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
 			'artisan'              => ['Illuminate\Console\Application', 'Illuminate\Contracts\Console\Application'],
 			'auth'                 => 'Illuminate\Auth\AuthManager',
@@ -1005,7 +1005,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 			'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
 			'validator'            => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
 			'view'                 => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
-		);
+		];
 
 		foreach ($aliases as $key => $aliases)
 		{

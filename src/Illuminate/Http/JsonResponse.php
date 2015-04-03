@@ -22,7 +22,7 @@ class JsonResponse extends BaseJsonResponse {
 	 * @param  array  $headers
 	 * @param  int    $options
 	*/
-	public function __construct($data = null, $status = 200, $headers = array(), $options = 0)
+	public function __construct($data = null, $status = 200, $headers = [], $options = 0)
 	{
 		$this->jsonOptions = $options;
 
@@ -44,7 +44,7 @@ class JsonResponse extends BaseJsonResponse {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setData($data = array())
+	public function setData($data = [])
 	{
 		$this->data = $data instanceof Jsonable
 								   ? $data->toJson($this->jsonOptions)

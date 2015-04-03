@@ -18,7 +18,7 @@ interface Factory {
 	 * @param  array  $mergeData
 	 * @return \Illuminate\Contracts\View\View
 	 */
-	public function file($path, $data = array(), $mergeData = array());
+	public function file($path, $data = [], $mergeData = []);
 
 	/**
 	 * Get the evaluated view contents for the given view.
@@ -28,7 +28,7 @@ interface Factory {
 	 * @param  array  $mergeData
 	 * @return \Illuminate\Contracts\View\View
 	 */
-	public function make($view, $data = array(), $mergeData = array());
+	public function make($view, $data = [], $mergeData = []);
 
 	/**
 	 * Add a piece of shared data to the environment.

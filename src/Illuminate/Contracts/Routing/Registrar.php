@@ -76,7 +76,7 @@ interface Registrar {
 	 * @param  array   $options
 	 * @return void
 	 */
-	public function resource($name, $controller, array $options = array());
+	public function resource($name, $controller, array $options = []);
 
 	/**
 	 * Create a route group with shared attributes.

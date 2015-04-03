@@ -25,7 +25,7 @@ class Pipeline implements PipelineContract {
 	 *
 	 * @var array
 	 */
-	protected $pipes = array();
+	protected $pipes = [];
 
 	/**
 	 * The method to call on each pipe.

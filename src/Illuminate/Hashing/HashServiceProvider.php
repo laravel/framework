@@ -28,7 +28,7 @@ class HashServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('hash');
+		return ['hash'];
 	}
 
 }

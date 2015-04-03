@@ -14,7 +14,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 	 *
 	 * @var array
 	 */
-	protected $messages = array();
+	protected $messages = [];
 
 	/**
 	 * Default format for message output.
@@ -29,7 +29,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 	 * @param  array  $messages
 	 * @return void
 	 */
-	public function __construct(array $messages = array())
+	public function __construct(array $messages = [])
 	{
 		foreach ($messages as $key => $value)
 		{
@@ -140,7 +140,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 			return $this->transform($this->messages[$key], $format, $key);
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -153,7 +153,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 	{
 		$format = $this->checkFormat($format);
 
-		$all = array();
+		$all = [];
 
 		foreach ($this->messages as $key => $messages)
 		{
@@ -180,9 +180,9 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 		// the messages to be easily formatted to each developer's desires.
 		foreach ($messages as &$message)
 		{
-			$replace = array(':message', ':key');
+			$replace = [':message', ':key'];
 
-			$message = str_replace($replace, array($message, $messageKey), $format);
+			$message = str_replace($replace, [$message, $messageKey], $format);
 		}
 
 		return $messages;

@@ -32,7 +32,7 @@ class ComposerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('composer');
+		return ['composer'];
 	}
 
 }

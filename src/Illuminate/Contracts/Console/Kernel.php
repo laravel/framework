@@ -18,7 +18,7 @@ interface Kernel {
 	 * @param  array  $parameters
 	 * @return int
 	 */
-	public function call($command, array $parameters = array());
+	public function call($command, array $parameters = []);
 
 	/**
 	 * Queue an Artisan console command by name.
@@ -27,7 +27,7 @@ interface Kernel {
 	 * @param  array  $parameters
 	 * @return int
 	 */
-	public function queue($command, array $parameters = array());
+	public function queue($command, array $parameters = []);
 
 	/**
 	 * Get all of the commands registered with the console.

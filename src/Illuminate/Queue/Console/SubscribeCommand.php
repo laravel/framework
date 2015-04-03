@@ -58,9 +58,9 @@ class SubscribeCommand extends Command {
 	 */
 	protected function getQueueOptions()
 	{
-		return array(
+		return [
 			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList(),
-		);
+		];
 	}
 
 	/**
@@ -91,7 +91,7 @@ class SubscribeCommand extends Command {
 	{
 		$subscribers = $this->getCurrentSubscribers();
 
-		$subscribers[] = array('url' => $this->argument('url'));
+		$subscribers[] = ['url' => $this->argument('url')];
 
 		return $subscribers;
 	}
@@ -109,7 +109,7 @@ class SubscribeCommand extends Command {
 		}
 		catch (Exception $e)
 		{
-			return array();
+			return [];
 		}
 	}
 
@@ -132,11 +132,11 @@ class SubscribeCommand extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('queue', InputArgument::REQUIRED, 'The name of Iron.io queue.'),
+		return [
+			['queue', InputArgument::REQUIRED, 'The name of Iron.io queue.'],
 
-			array('url', InputArgument::REQUIRED, 'The URL to be subscribed.'),
-		);
+			['url', InputArgument::REQUIRED, 'The URL to be subscribed.'],
+		];
 	}
 
 	/**
@@ -146,9 +146,9 @@ class SubscribeCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'),
-		);
+		return [
+			['type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'],
+		];
 	}
 
 }

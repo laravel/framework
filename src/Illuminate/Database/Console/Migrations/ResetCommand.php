@@ -79,13 +79,13 @@ class ResetCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
+		return [
+			['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
-			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
-		);
+			['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+		];
 	}
 
 }

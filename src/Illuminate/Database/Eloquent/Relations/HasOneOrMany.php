@@ -143,7 +143,7 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	protected function buildDictionary(Collection $results)
 	{
-		$dictionary = array();
+		$dictionary = [];
 
 		$foreign = $this->getPlainForeignKey();
 
@@ -179,7 +179,7 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	public function saveMany(array $models)
 	{
-		array_walk($models, array($this, 'save'));
+		array_walk($models, [$this, 'save']);
 
 		return $models;
 	}
@@ -283,7 +283,7 @@ abstract class HasOneOrMany extends Relation {
 	 */
 	public function createMany(array $records)
 	{
-		$instances = array();
+		$instances = [];
 
 		foreach ($records as $record)
 		{

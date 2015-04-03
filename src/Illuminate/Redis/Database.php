@@ -18,7 +18,7 @@ class Database implements DatabaseContract {
 	 * @param  array  $servers
 	 * @return void
 	 */
-	public function __construct(array $servers = array())
+	public function __construct(array $servers = [])
 	{
 		if (isset($servers['cluster']) && $servers['cluster'])
 		{
@@ -38,11 +38,11 @@ class Database implements DatabaseContract {
 	 */
 	protected function createAggregateClient(array $servers)
 	{
-		$servers = array_except($servers, array('cluster'));
+		$servers = array_except($servers, ['cluster']);
 
 		$options = $this->getClientOptions($servers);
 
-		return array('default' => new Client(array_values($servers), $options));
+		return ['default' => new Client(array_values($servers), $options)];
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Database implements DatabaseContract {
 	 */
 	protected function createSingleClients(array $servers)
 	{
-		$clients = array();
+		$clients = [];
 
 		$options = $this->getClientOptions($servers);
 
@@ -94,9 +94,9 @@ class Database implements DatabaseContract {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function command($method, array $parameters = array())
+	public function command($method, array $parameters = [])
 	{
-		return call_user_func_array(array($this->clients['default'], $method), $parameters);
+		return call_user_func_array([$this->clients['default'], $method], $parameters);
 	}
 
 	/**
