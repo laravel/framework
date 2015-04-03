@@ -83,14 +83,14 @@ if ( ! function_exists('asset'))
 	}
 }
 
-if ( ! function_exists('auth'))
+if ( ! function_exists('Auth'))
 {
 	/**
 	 * Get the available auth instance.
 	 *
 	 * @return \Illuminate\Contracts\Auth\Guard
 	 */
-	function auth()
+	function Auth()
 	{
 		return app('Illuminate\Contracts\Auth\Guard');
 	}
