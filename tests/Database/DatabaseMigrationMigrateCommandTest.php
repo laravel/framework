@@ -16,6 +16,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
@@ -31,6 +32,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 		$params = array($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', array('call'), $params);
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
@@ -46,6 +48,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', true);
@@ -60,6 +63,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 	{
 		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
+		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
 		$migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false);
