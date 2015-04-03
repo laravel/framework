@@ -71,7 +71,7 @@ class TableCommand extends Command {
 	{
 		$name = 'create_jobs_table';
 
-		$path = $this->laravel['path.database'].'/migrations';
+		$path = $this->laravel->databasePath().'/migrations';
 
 		return $this->laravel['migration.creator']->create($name, $path);
 	}
