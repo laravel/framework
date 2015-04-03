@@ -34,16 +34,30 @@ class FreshCommand extends Command {
 
 		$files = new Filesystem;
 
-		$files->deleteDirectory(app_path('Services'));
+		$files->delete(app_path('Services/Registrar.php'));
+		@rmdir(app_path('Services'));
 		$files->delete(base_path('resources/views/app.blade.php'));
 		$files->delete(base_path('resources/views/home.blade.php'));
-		$files->deleteDirectory(app_path('Http/Controllers/Auth'));
-		$files->deleteDirectory(base_path('resources/views/auth'));
-		$files->deleteDirectory(base_path('resources/views/emails'));
+		$files->delete(app_path('Http/Controllers/Auth/AuthController.php'));
+		$files->delete(app_path('Http/Controllers/Auth/PasswordController.php'));
+		@rmdir(app_path('Http/Controllers/Auth'));
+		$files->delete(base_path('resources/views/auth/login.blade.php'));
+		$files->delete(base_path('resources/views/auth/password.blade.php'));
+		$files->delete(base_path('resources/views/auth/register.blade.php'));
+		$files->delete(base_path('resources/views/auth/reset.blade.php'));
+		@rmdir(base_path('resources/views/auth'));
+		$files->delete(base_path('resources/views/emails/password.blade.php'));
+		@rmdir(base_path('resources/views/emails'));
 		$files->delete(app_path('Http/Controllers/HomeController.php'));
 
-		$files->deleteDirectory(base_path('public/css'));
-		$files->deleteDirectory(base_path('public/fonts'));
+		$files->delete(base_path('public/css/app.css'));
+		@rmdir(base_path('public/css'));
+		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.eot'));
+		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.svg'));
+		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.ttf'));
+		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.woff'));
+		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.woff2'));
+		@rmdir(base_path('public/fonts'));
 		$files->put(base_path('resources/assets/less/app.less'), ''.PHP_EOL);
 		$files->deleteDirectory(base_path('resources/assets/less/bootstrap'));
 
