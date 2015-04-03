@@ -106,7 +106,7 @@ if ( ! function_exists('base_path'))
 	 */
 	function base_path($path = '')
 	{
-		return app()->make('path.base').($path ? '/'.$path : $path);
+		return app()->basePath().($path ? '/'.$path : $path);
 	}
 }
 

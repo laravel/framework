@@ -259,7 +259,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getBootstrapPath()
 	{
-		return $this->laravel['path.base'].'/bootstrap/app.php';
+		return $this->laravel->basePath().'/bootstrap/app.php';
 	}
 
 	/**
@@ -269,7 +269,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getComposerPath()
 	{
-		return $this->laravel['path.base'].'/composer.json';
+		return $this->laravel->basePath().'/composer.json';
 	}
 
 	/**
@@ -310,7 +310,7 @@ class AppNameCommand extends Command {
 	 */
 	protected function getPhpSpecConfigPath()
 	{
-		return $this->laravel['path.base'].'/phpspec.yml';
+		return $this->laravel->basePath().'/phpspec.yml';
 	}
 
 	/**
