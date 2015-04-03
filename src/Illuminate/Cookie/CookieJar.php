@@ -24,7 +24,7 @@ class CookieJar implements JarContract {
 	 *
 	 * @var array
 	 */
-	protected $queued = array();
+	protected $queued = [];
 
 	/**
 	 * Create a new cookie instance.
@@ -113,7 +113,7 @@ class CookieJar implements JarContract {
 		}
 		else
 		{
-			$cookie = call_user_func_array(array($this, 'make'), func_get_args());
+			$cookie = call_user_func_array([$this, 'make'], func_get_args());
 		}
 
 		$this->queued[$cookie->getName()] = $cookie;
@@ -138,7 +138,7 @@ class CookieJar implements JarContract {
 	 */
 	protected function getPathAndDomain($path, $domain)
 	{
-		return array($path ?: $this->path, $domain ?: $this->domain);
+		return [$path ?: $this->path, $domain ?: $this->domain];
 	}
 
 	/**
@@ -150,7 +150,7 @@ class CookieJar implements JarContract {
 	 */
 	public function setDefaultPathAndDomain($path, $domain)
 	{
-		list($this->path, $this->domain) = array($path, $domain);
+		list($this->path, $this->domain) = [$path, $domain];
 
 		return $this;
 	}

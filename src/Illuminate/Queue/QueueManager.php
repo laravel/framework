@@ -19,7 +19,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	 *
 	 * @var array
 	 */
-	protected $connections = array();
+	protected $connections = [];
 
 	/**
 	 * Create a new queue manager instance.
@@ -218,7 +218,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	 */
 	public function __call($method, $parameters)
 	{
-		$callable = array($this->connection(), $method);
+		$callable = [$this->connection(), $method];
 
 		return call_user_func_array($callable, $parameters);
 	}

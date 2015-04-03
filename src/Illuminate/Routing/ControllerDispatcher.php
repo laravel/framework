@@ -233,7 +233,7 @@ class ControllerDispatcher {
 	 */
 	protected function filterApplies($filter, $request, $method)
 	{
-		foreach (array('Method', 'On') as $type)
+		foreach (['Method', 'On'] as $type)
 		{
 			if ($this->{"filterFails{$type}"}($filter, $request, $method))
 			{

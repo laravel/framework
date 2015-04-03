@@ -7,7 +7,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * The file currently being compiled.
@@ -21,33 +21,33 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $compilers = array(
+	protected $compilers = [
 		'Extensions',
 		'Statements',
 		'Comments',
 		'Echos',
-	);
+	];
 
 	/**
 	 * Array of opening and closing tags for raw echos.
 	 *
 	 * @var array
 	 */
-	protected $rawTags = array('{!!', '!!}');
+	protected $rawTags = ['{!!', '!!}'];
 
 	/**
 	 * Array of opening and closing tags for regular echos.
 	 *
 	 * @var array
 	 */
-	protected $contentTags = array('{{', '}}');
+	protected $contentTags = ['{{', '}}'];
 
 	/**
 	 * Array of opening and closing tags for escaped echos.
 	 *
 	 * @var array
 	 */
-	protected $escapedTags = array('{{{', '}}}');
+	protected $escapedTags = ['{{{', '}}}'];
 
 	/**
 	 * The "regular" / legacy echo string format.
@@ -61,7 +61,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $footer = array();
+	protected $footer = [];
 
 	/**
 	 * Counter to keep track of nested forelse statements.
@@ -78,7 +78,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path = null)
 	{
-		$this->footer = array();
+		$this->footer = [];
 
 		if ($path)
 		{
@@ -626,7 +626,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
-		$data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+		$data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
 
 		$this->footer[] = $data;
 
@@ -646,7 +646,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			$expression = substr($expression, 1, -1);
 		}
 
-		return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+		return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
 	}
 
 	/**
@@ -735,7 +735,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function setRawTags($openTag, $closeTag)
 	{
-		$this->rawTags = array(preg_quote($openTag), preg_quote($closeTag));
+		$this->rawTags = [preg_quote($openTag), preg_quote($closeTag)];
 	}
 
 	/**
@@ -750,7 +750,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
-		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
+		$this->{$property} = [preg_quote($openTag), preg_quote($closeTag)];
 	}
 
 	/**

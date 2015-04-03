@@ -63,9 +63,9 @@ class FreshCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
-		);
+		return [
+			['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+		];
 	}
 
 }

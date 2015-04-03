@@ -163,13 +163,13 @@ class VendorPublishCommand extends Command {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'),
+		return [
+			['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'],
 
-			array('provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'),
+			['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'],
 
-			array('tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'),
-		);
+			['tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'],
+		];
 	}
 
 }

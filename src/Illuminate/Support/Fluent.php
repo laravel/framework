@@ -12,7 +12,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
 	 *
 	 * @var array
 	 */
-	protected $attributes = array();
+	protected $attributes = [];
 
 	/**
 	 * Create a new fluent container instance.
@@ -20,7 +20,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
 	 * @param  array|object	$attributes
 	 * @return void
 	 */
-	public function __construct($attributes = array())
+	public function __construct($attributes = [])
 	{
 		foreach ($attributes as $key => $value)
 		{

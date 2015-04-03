@@ -69,9 +69,9 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			array('name', InputArgument::REQUIRED, 'The name of the command.'),
-		);
+		return [
+			['name', InputArgument::REQUIRED, 'The name of the command.'],
+		];
 	}
 
 	/**
@@ -81,9 +81,9 @@ class ConsoleMakeCommand extends GeneratorCommand {
 	 */
 	protected function getOptions()
 	{
-		return array(
-			array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'),
-		);
+		return [
+			['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'],
+		];
 	}
 
 }

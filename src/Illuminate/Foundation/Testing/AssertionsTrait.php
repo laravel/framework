@@ -98,7 +98,7 @@ trait AssertionsTrait {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedTo($uri, $with = array())
+	public function assertRedirectedTo($uri, $with = [])
 	{
 		PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $this->response);
 
@@ -115,7 +115,7 @@ trait AssertionsTrait {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
+	public function assertRedirectedToRoute($name, $parameters = [], $with = [])
 	{
 		$this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
 	}
@@ -128,7 +128,7 @@ trait AssertionsTrait {
 	 * @param  array   $with
 	 * @return void
 	 */
-	public function assertRedirectedToAction($name, $parameters = array(), $with = array())
+	public function assertRedirectedToAction($name, $parameters = [], $with = [])
 	{
 		$this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
 	}
@@ -182,7 +182,7 @@ trait AssertionsTrait {
 	 * @param  mixed  $format
 	 * @return void
 	 */
-	public function assertSessionHasErrors($bindings = array(), $format = null)
+	public function assertSessionHasErrors($bindings = [], $format = null)
 	{
 		$this->assertSessionHas('errors');
 

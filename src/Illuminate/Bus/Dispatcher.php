@@ -145,7 +145,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * @return mixed
 	 */
 	protected function getParameterValueForCommand($command, ArrayAccess $source,
-                                                   ReflectionParameter $parameter, array $extras = array())
+                                                   ReflectionParameter $parameter, array $extras = [])
 	{
 		if (array_key_exists($parameter->name, $extras))
 		{

@@ -17,7 +17,7 @@ class MigrationCreator {
 	 *
 	 * @var array
 	 */
-	protected $postCreate = array();
+	protected $postCreate = [];
 
 	/**
 	 * Create a new migration creator instance.

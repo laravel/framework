@@ -243,7 +243,7 @@ class Collection extends BaseCollection {
 	{
 		$items = is_null($items) ? $this->items : $items;
 
-		$dictionary = array();
+		$dictionary = [];
 
 		foreach ($items as $value)
 		{

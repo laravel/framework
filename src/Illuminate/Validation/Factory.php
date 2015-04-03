@@ -33,28 +33,28 @@ class Factory implements FactoryContract {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
 	 * All of the custom implicit validator extensions.
 	 *
 	 * @var array
 	 */
-	protected $implicitExtensions = array();
+	protected $implicitExtensions = [];
 
 	/**
 	 * All of the custom validator message replacers.
 	 *
 	 * @var array
 	 */
-	protected $replacers = array();
+	protected $replacers = [];
 
 	/**
 	 * All of the fallback messages for custom rules.
 	 *
 	 * @var array
 	 */
-	protected $fallbackMessages = array();
+	protected $fallbackMessages = [];
 
 	/**
 	 * The Validator resolver instance.
@@ -85,7 +85,7 @@ class Factory implements FactoryContract {
 	 * @param  array  $customAttributes
 	 * @return \Illuminate\Validation\Validator
 	 */
-	public function make(array $data, array $rules, array $messages = array(), array $customAttributes = array())
+	public function make(array $data, array $rules, array $messages = [], array $customAttributes = [])
 	{
 		// The presence verifier is responsible for checking the unique and exists data
 		// for the validator. It is behind an interface so that multiple versions of

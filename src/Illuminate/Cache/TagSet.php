@@ -16,7 +16,7 @@ class TagSet {
 	 *
 	 * @var array
 	 */
-	protected $names = array();
+	protected $names = [];
 
 	/**
 	 * Create a new TagSet instance.
@@ -25,7 +25,7 @@ class TagSet {
 	 * @param  array  $names
 	 * @return void
 	 */
-	public function __construct(Store $store, array $names = array())
+	public function __construct(Store $store, array $names = [])
 	{
 		$this->store = $store;
 		$this->names = $names;
@@ -38,7 +38,7 @@ class TagSet {
 	 */
 	public function reset()
 	{
-		array_walk($this->names, array($this, 'resetTag'));
+		array_walk($this->names, [$this, 'resetTag']);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class TagSet {
 	 */
 	protected function tagIds()
 	{
-		return array_map(array($this, 'tagId'), $this->names);
+		return array_map([$this, 'tagId'], $this->names);
 	}
 
 	/**

@@ -11,14 +11,14 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'Comment', 'After');
+	protected $modifiers = ['Unsigned', 'Nullable', 'Default', 'Increment', 'Comment', 'After'];
 
 	/**
 	 * The possible column serials.
 	 *
 	 * @var array
 	 */
-	protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
+	protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
 	/**
 	 * Compile the query to determine the list of tables.
