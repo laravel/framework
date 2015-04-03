@@ -241,6 +241,19 @@ if ( ! function_exists('database_path'))
 	}
 }
 
+if ( ! function_exists('db'))
+{
+	/**
+	 * Get the available DB instance
+	 *
+	 * @return Illuminate\Database\DatabaseManager
+	 */
+	function db()
+	{
+		return app('db');
+	}
+}
+
 if ( ! function_exists('delete'))
 {
 	/**
