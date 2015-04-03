@@ -176,6 +176,33 @@ class Migrator {
 	}
 
 	/**
+	 * Rolls all of the currently applied migrations back.
+	 *
+	 * @param  bool  $pretend
+	 * @return int
+	 */
+	public function reset($pretend = false)
+	{
+		$this->notes = [];
+
+		$migrations = array_reverse($this->repository->getRan());
+
+		if (count($migrations) == 0)
+		{
+			$this->note('<info>Nothing to rollback.</info>');
+
+			return count($migrations);
+		}
+
+		foreach ($migrations as $migration)
+		{
+			$this->runDown((object) ['migration' => $migration], $pretend);
+		}
+
+		return count($migrations);
+	}
+
+	/**
 	 * Run "down" a migration instance.
 	 *
 	 * @param  object  $migration
