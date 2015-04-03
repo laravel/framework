@@ -1479,6 +1479,10 @@ class Validator implements MessageProviderInterface {
 		// custom message, otherwise we'll keep searching for a valid message.
 		if ( ! is_null($inlineMessage))
 		{
+			if (in_array($rule, $this->sizeRules)) {
+                		$type = $this->getAttributeType($attribute);
+                		return $inlineMessage[$type];
+            		}
 			return $inlineMessage;
 		}
 
