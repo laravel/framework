@@ -51,13 +51,13 @@ class FreshCommand extends Command {
 		$files->delete(app_path('Http/Controllers/HomeController.php'));
 
 		$files->delete(base_path('public/css/app.css'));
-		@rmdir(resources('public/css'));
+		@rmdir(base_path('public/css'));
 		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.eot'));
 		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.svg'));
 		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.ttf'));
 		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.woff'));
 		$files->delete(base_path('public/fonts/glyphicons-halflings-regular.woff2'));
-		@rmdir(resources('public/fonts'));
+		@rmdir(base_path('public/fonts'));
 		$files->put(base_path('resources/assets/less/app.less'), ''.PHP_EOL);
 		$files->deleteDirectory(base_path('resources/assets/less/bootstrap'));
 
