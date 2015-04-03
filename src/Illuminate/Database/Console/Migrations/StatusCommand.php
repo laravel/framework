@@ -16,7 +16,7 @@ class StatusCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Show a list of migrations up/down';
+	protected $description = 'Show the status of each migration';
 
 	/**
 	 * The migrator instance.
