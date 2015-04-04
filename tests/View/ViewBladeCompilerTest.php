@@ -584,6 +584,28 @@ empty
 	}
 
 
+	public function testCreateOpenMatcher()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->extend(
+			function($view, BladeCompiler $compiler)
+			{
+				$pattern = $compiler->createOpenMatcher('datetime');
+				$replace = '<?php echo $2->format(\'m/d/Y H:i\'); ?>';
+				return preg_replace($pattern, '$1'.$replace, $view);
+			}
+		);
+
+		$string = '@if($foo)
+@datetime($var)
+@endif';
+		$expected = '<?php if($foo): ?>
+<?php echo $var->format(\'m/d/Y H:i\'); ?>
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testConfiguringContentTags()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
