@@ -416,10 +416,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function forceFill(array $attributes)
 	{
-		return $this->unguarded(function() use ($attributes)
-		{
-			return $this->fill($attributes);
-		});
+		static::unguard();
+
+		$this->fill($attributes);
+
+		static::reguard();
+
+		return $this;
 	}
 
 	/**
@@ -534,10 +537,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function forceCreate(array $attributes)
 	{
-		return static::unguarded(function() use ($attributes)
+		if (static::$unguarded)
 		{
 			return static::create($attributes);
-		});
+		}
+
+		static::unguard();
+
+		$model = static::create($attributes);
+
+		static::reguard();
+
+		return $model;
 	}
 
 	/**
