@@ -759,7 +759,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testUnguaredRunsCallbackWhileBeingUnguarded()
+	public function testUnguardedRunsCallbackWhileBeingUnguarded()
 	{
 		$model = Model::unguarded(function() {
 			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
@@ -769,7 +769,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testUnguaredCallDoesNotChangeUnguardedState()
+	public function testUnguardedCallDoesNotChangeUnguardedState()
 	{
 		Model::unguard();
 		$model = Model::unguarded(function() {
