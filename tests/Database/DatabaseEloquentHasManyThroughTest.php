@@ -3,6 +3,7 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
@@ -139,6 +140,17 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIgnoreSoftDeletingParent()
+	{
+		list($builder, $country,, $firstKey, $secondKey) = $this->getRelationArguments();
+		$user = new EloquentHasManyThroughSoftDeletingModelStub;
+		
+		$builder->shouldReceive('whereNull')->with('users.deleted_at')->once()->andReturn($builder);
+
+		$relation = new HasManyThrough($builder, $country, $user, $firstKey, $secondKey);
+	}
+
+
 	protected function getRelation()
 	{
 		list($builder, $country, $user, $firstKey, $secondKey) = $this->getRelationArguments();
@@ -175,4 +187,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 class EloquentHasManyThroughModelStub extends Illuminate\Database\Eloquent\Model {
 	public $country_id = 'foreign.value';
+}
+
+class EloquentHasManyThroughSoftDeletingModelStub extends Illuminate\Database\Eloquent\Model {
+	use SoftDeletes;
+	public $table = 'users';
 }
