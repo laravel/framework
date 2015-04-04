@@ -784,3 +784,41 @@ if ( ! function_exists('with'))
 		return $object;
 	}
 }
+
+if ( ! function_exists('is_serialized'))
+{
+	/**
+	 * Check value to find if it was serialized.
+	 *
+	 * @param  mixed  $data
+	 * @return bool
+	 */
+
+	function is_serialized($data)
+	{
+		// if it isn't a string, it isn't serialized.
+		if ( ! is_string( $data ) )
+		{
+			return false;
+		}
+ 		if ( 'N;' == $data )
+		{
+			return true;
+		}
+		if ( strlen( $data ) < 4 )
+		{
+			return false;
+		}
+		if ( ':' !== $data[1] )
+		{
+			return false;
+		}
+		$lastc = substr( $data, -1 );
+		if ( ';' !== $lastc && '}' !== $lastc )
+		{
+			return false;
+		}
+
+		return true;
+	}
+}
