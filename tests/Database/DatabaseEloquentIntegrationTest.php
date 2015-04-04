@@ -266,6 +266,20 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
+	{
+		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+		$friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+		EloquentTestUser::first()->friends()->chunk(2, function($friends) use ($user, $friend){
+			$this->assertEquals(1, count($friends));
+			$this->assertEquals('abigailotwell@gmail.com', $friends->first()->email);
+			$this->assertEquals($user->id, $friends->first()->pivot->user_id);
+			$this->assertEquals($friend->id, $friends->first()->pivot->friend_id);
+		});
+	}
+
+
 	public function testBasicHasManyEagerLoading()
 	{
 		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
