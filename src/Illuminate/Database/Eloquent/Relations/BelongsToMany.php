@@ -187,6 +187,25 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
+	 * Chunk the results of the query.
+	 *
+	 * @param  int  $count
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function chunk($count, callable $callback)
+	{
+		$this->query->addSelect($this->getSelectColumns());
+
+		$this->query->chunk($count, function($results) use ($callback)
+		{
+			$this->hydratePivotRelation($results->all());
+
+			call_user_func($callback, $results);
+		});
+	}
+
+	/**
 	 * Hydrate the pivot table relationship on the models.
 	 *
 	 * @param  array  $models
