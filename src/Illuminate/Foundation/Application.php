@@ -499,7 +499,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	public function getProvider($provider)
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
-		return isset($this->serviceProviders[$name]) ? $this->serviceProviders[$name] : null;
+
+		if (isset($this->serviceProviders[$name])) {
+			return $this->serviceProviders[$name];
+		}
+
+		foreach ($this->serviceProviders as $serviceProvider) {
+			if ($serviceProvider instanceof $name) {
+				return $serviceProvider;
+			}
+		}
+
+		return null;
 	}
 
 	/**
