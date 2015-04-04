@@ -97,6 +97,21 @@ class HasManyThrough extends Relation {
 		$foreignKey = $this->related->getTable().'.'.$this->secondKey;
 
 		$query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
+
+		if ($this->parentSoftDeletes())
+		{
+			$query->whereNull($this->parent->getQualifiedDeletedAtColumn());
+		}
+	}
+
+	/**
+	 * Determine whether close parent of the relation uses Soft Deletes.
+	 *
+	 * @return bool
+	 */
+	public function parentSoftDeletes()
+	{
+		return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_class($this->parent)));
 	}
 
 	/**
