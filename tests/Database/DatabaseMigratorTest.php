@@ -191,6 +191,114 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->rollback();
 	}
 
+
+	public function testResettingMigrationsRollsBackAllMigrations()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		]);
+
+		$fooMigration = (object) ['migration' => 'foo'];
+		$barMigration = (object) ['migration' => 'bar'];
+		$bazMigration = (object) ['migration' => 'baz'];
+
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
+			$fooMigration->migration,
+			$barMigration->migration,
+			$bazMigration->migration	
+		]);
+
+		$barMock = m::mock('stdClass');
+		$barMock->shouldReceive('down')->once();
+
+		$fooMock = m::mock('stdClass');
+		$fooMock->shouldReceive('down')->once();
+
+		$bazMock = m::mock('stdClass');
+		$bazMock->shouldReceive('down')->once();		
+
+		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('baz'))->will($this->returnValue($bazMock));
+		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('bar'))->will($this->returnValue($barMock));
+		$migrator->expects($this->at(2))->method('resolve')->with($this->equalTo('foo'))->will($this->returnValue($fooMock));
+
+		$migrator->getRepository()->shouldReceive('delete')->once()->with(m::mustBe($bazMigration));
+		$migrator->getRepository()->shouldReceive('delete')->once()->with(m::mustBe($barMigration));
+		$migrator->getRepository()->shouldReceive('delete')->once()->with(m::mustBe($fooMigration));
+
+		$migrator->reset();
+	}
+
+
+	public function testResetMigrationsCanBePretended()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		]);
+
+		$fooMigration = (object) ['migration' => 'foo'];
+		$barMigration = (object) ['migration' => 'bar'];
+		$bazMigration = (object) ['migration' => 'baz'];
+
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
+			$fooMigration->migration,
+			$barMigration->migration,
+			$bazMigration->migration
+		]);
+
+		$barMock = m::mock('stdClass');
+		$barMock->shouldReceive('getConnection')->once()->andReturn(null);
+		$barMock->shouldReceive('down')->once();
+
+		$fooMock = m::mock('stdClass');
+		$fooMock->shouldReceive('getConnection')->once()->andReturn(null);
+		$fooMock->shouldReceive('down')->once();
+
+		$bazMock = m::mock('stdClass');
+		$bazMock->shouldReceive('getConnection')->once()->andReturn(null);
+		$bazMock->shouldReceive('down')->once();
+
+		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('baz'))->will($this->returnValue($bazMock));
+		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('bar'))->will($this->returnValue($barMock));
+		$migrator->expects($this->at(2))->method('resolve')->with($this->equalTo('foo'))->will($this->returnValue($fooMock));
+
+		$connection = m::mock('stdClass');
+		$connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function($closure)
+		{
+			$closure();
+			return [['query' => 'baz']];
+		},
+		function($closure)
+		{
+			$closure();
+			return [['query' => 'bar']];
+		},
+		function($closure)
+		{
+			$closure();
+			return [['query' => 'foo']];
+		});
+		$resolver->shouldReceive('connection')->with(null)->andReturn($connection);
+
+		$migrator->reset(true);
+	}
+
+
+	public function testNothingIsResetBackWhenNothingInRepository()
+	{
+		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
+			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
+			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
+			m::mock('Illuminate\Filesystem\Filesystem'),
+		]);
+		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([]);
+
+		$migrator->reset();
+	}
+
 }
 
 
