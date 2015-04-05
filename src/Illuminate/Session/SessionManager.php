@@ -168,10 +168,8 @@ class SessionManager extends Manager {
 				$this->app['config']['session.cookie'], $handler, $this->app['encrypter']
 			);
 		}
-		else
-		{
-			return new Store($this->app['config']['session.cookie'], $handler);
-		}
+
+		return new Store($this->app['config']['session.cookie'], $handler);
 	}
 
 	/**

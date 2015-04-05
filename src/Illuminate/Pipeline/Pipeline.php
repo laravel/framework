@@ -119,11 +119,9 @@ class Pipeline implements PipelineContract {
 				{
 					return call_user_func($pipe, $passable, $stack);
 				}
-				else
-				{
-					return $this->container->make($pipe)
-							->{$this->method}($passable, $stack);
-				}
+
+				return $this->container->make($pipe)
+						->{$this->method}($passable, $stack);
 			};
 		};
 	}

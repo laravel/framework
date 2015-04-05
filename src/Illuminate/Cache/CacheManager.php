@@ -93,10 +93,8 @@ class CacheManager implements FactoryContract {
 		{
 			return $this->callCustomCreator($config);
 		}
-		else
-		{
-			return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
-		}
+
+		return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
 	}
 
 	/**

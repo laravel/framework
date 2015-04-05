@@ -324,7 +324,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Remove an item from the cache.
 	 *
 	 * @param  string  $key
-	 * @return void
+	 * @return bool
 	 */
 	public function offsetUnset($key)
 	{

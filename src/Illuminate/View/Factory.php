@@ -555,7 +555,7 @@ class Factory implements FactoryContract {
 	 */
 	public function inject($section, $content)
 	{
-		return $this->startSection($section, $content);
+		$this->startSection($section, $content);
 	}
 
 	/**
