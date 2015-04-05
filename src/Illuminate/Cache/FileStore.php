@@ -114,7 +114,7 @@ class FileStore implements StoreInterface {
 
 		$this->createCacheDirectory($path = $this->path($key));
 
-		$this->files->put($path, $value);
+		$this->files->put($path, $value, true);
 	}
 
 	/**
