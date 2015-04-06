@@ -811,7 +811,6 @@ if ( ! function_exists('is_serialized'))
 		{
 			return false;
 		}
-
 		$lastc = substr($value, -1);
 		if ($lastc !== ';' && $lastc !== '}')
 		{
