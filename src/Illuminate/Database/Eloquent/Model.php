@@ -697,9 +697,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function fresh(array $with = array())
 	{
+		if ( ! $this->exists) return;
+
 		$key = $this->getKeyName();
 
-		return $this->exists ? static::with($with)->where($key, $this->getKey())->first() : null;
+		return static::with($with)->where($key, $this->getKey())->first();
 	}
 
 	/**
