@@ -422,7 +422,7 @@ class Guard implements GuardContract {
 	 * @param  bool  $remember
 	 * @return void
 	 */
-	public function login(UserContract $user, $remember = false)
+	public function login(UserContract $user, $remember = false, $secure = false, $httpOnly = true)
 	{
 		$this->updateSession($user->getAuthIdentifier());
 
@@ -433,7 +433,7 @@ class Guard implements GuardContract {
 		{
 			$this->createRememberTokenIfDoesntExist($user);
 
-			$this->queueRecallerCookie($user);
+			$this->queueRecallerCookie($user, $secure, $httpOnly);
 		}
 
 		// If we have an event dispatcher instance set we will fire an event so that
@@ -507,11 +507,11 @@ class Guard implements GuardContract {
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
-	protected function queueRecallerCookie(UserContract $user)
+	protected function queueRecallerCookie(UserContract $user, $secure = false, $httpOnly = true)
 	{
 		$value = $user->getAuthIdentifier().'|'.$user->getRememberToken();
 
-		$this->getCookieJar()->queue($this->createRecaller($value));
+		$this->getCookieJar()->queue($this->createRecaller($value, $secure, $httpOnly));
 	}
 
 	/**
@@ -520,9 +520,9 @@ class Guard implements GuardContract {
 	 * @param  string  $value
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
-	protected function createRecaller($value)
+	protected function createRecaller($value, $secure = false, $httpOnly = true)
 	{
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $secure, $httpOnly);
 	}
 
 	/**
