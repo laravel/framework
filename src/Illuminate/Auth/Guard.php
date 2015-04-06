@@ -347,7 +347,7 @@ class Guard {
 	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = array(), $remember = false, $login = true)
+	public function attempt(array $credentials = array(), $remember = false, $login = true, $secure = false, $httpOnly = true)
 	{
 		$this->fireAttemptEvent($credentials, $remember, $login);
 
@@ -358,7 +358,7 @@ class Guard {
 		// fact valid we'll log the users into the application and return true.
 		if ($this->hasValidCredentials($user, $credentials))
 		{
-			if ($login) $this->login($user, $remember);
+			if ($login) $this->login($user, $remember, $secure, $httpOnly);
 
 			return true;
 		}
@@ -417,7 +417,7 @@ class Guard {
 	 * @param  bool  $remember
 	 * @return void
 	 */
-	public function login(UserInterface $user, $remember = false)
+	public function login(UserInterface $user, $remember = false, $secure = false, $httpOnly = true)
 	{
 		$this->updateSession($user->getAuthIdentifier());
 
@@ -428,7 +428,7 @@ class Guard {
 		{
 			$this->createRememberTokenIfDoesntExist($user);
 
-			$this->queueRecallerCookie($user);
+			$this->queueRecallerCookie($user, $secure, $httpOnly);
 		}
 
 		// If we have an event dispatcher instance set we will fire an event so that
@@ -490,11 +490,11 @@ class Guard {
 	 * @param  \Illuminate\Auth\UserInterface  $user
 	 * @return void
 	 */
-	protected function queueRecallerCookie(UserInterface $user)
+	protected function queueRecallerCookie(UserInterface $user, $secure = false, $httpOnly = true)
 	{
 		$value = $user->getAuthIdentifier().'|'.$user->getRememberToken();
 
-		$this->getCookieJar()->queue($this->createRecaller($value));
+		$this->getCookieJar()->queue($this->createRecaller($value, $secure, $httpOnly));
 	}
 
 	/**
@@ -503,9 +503,9 @@ class Guard {
 	 * @param  string  $value
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
-	protected function createRecaller($value)
+	protected function createRecaller($value, $secure = false, $httpOnly = true)
 	{
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $secure, $httpOnly);
 	}
 
 	/**
