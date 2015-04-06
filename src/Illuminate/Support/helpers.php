@@ -793,10 +793,9 @@ if ( ! function_exists('is_serialized'))
 	 * @param  mixed  $value
 	 * @return bool
 	 */
-
 	function is_serialized($value)
 	{
-		if ( ! is_string( $value ))
+		if ( ! is_string($value))
 		{
 			return false;
 		}
