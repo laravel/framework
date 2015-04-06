@@ -543,7 +543,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		if ( ! isset($this->json))
 		{
-			$this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+			$this->json = new ParameterBag(json_decode($this->getContent(), true));
 		}
 
 		if (is_null($key)) return $this->json;
