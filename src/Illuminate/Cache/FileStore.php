@@ -80,14 +80,14 @@ class FileStore implements Store {
 
 		// Stored cache may be corrupted
 		$contents = substr($contents, 10);
-		if( ! is_serialized($contents))
+		if ( ! is_serialized($contents))
 		{
 			$this->forget($key);
 
 			return array('data' => null, 'time' => null);
 		}
 
-		$data = unserialize( $contents );
+		$data = unserialize($contents);
 
 		// Next, we'll extract the number of minutes that are remaining for a cache
 		// so that we can properly retain the time for things like the increment

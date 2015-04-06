@@ -790,31 +790,31 @@ if ( ! function_exists('is_serialized'))
 	/**
 	 * Check value to find if it was serialized.
 	 *
-	 * @param  mixed  $data
+	 * @param  mixed  $value
 	 * @return bool
 	 */
 
-	function is_serialized($data)
+	function is_serialized($value)
 	{
-		// if it isn't a string, it isn't serialized.
-		if ( ! is_string( $data ) )
+		if ( ! is_string( $value ))
 		{
 			return false;
 		}
- 		if ( 'N;' == $data )
+ 		if ('N;' == $value)
 		{
 			return true;
 		}
-		if ( strlen( $data ) < 4 )
+		if (strlen( $value ) < 4)
 		{
 			return false;
 		}
-		if ( ':' !== $data[1] )
+		if (':' !== $value[1])
 		{
 			return false;
 		}
-		$lastc = substr( $data, -1 );
-		if ( ';' !== $lastc && '}' !== $lastc )
+
+		$lastc = substr($value, -1);
+		if (';' !== $lastc && '}' !== $lastc)
 		{
 			return false;
 		}
