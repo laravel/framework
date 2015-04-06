@@ -800,21 +800,21 @@ if ( ! function_exists('is_serialized'))
 		{
 			return false;
 		}
- 		if ('N;' == $value)
+ 		if ($value == 'N;')
 		{
 			return true;
 		}
-		if (strlen( $value ) < 4)
+		if (strlen($value) < 4)
 		{
 			return false;
 		}
-		if (':' !== $value[1])
+		if ($value[1] !== ':')
 		{
 			return false;
 		}
 
 		$lastc = substr($value, -1);
-		if (';' !== $lastc && '}' !== $lastc)
+		if ($lastc !== ';' && $lastc !== '}')
 		{
 			return false;
 		}
