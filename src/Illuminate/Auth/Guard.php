@@ -352,7 +352,7 @@ class Guard implements GuardContract {
 	 * @param  bool   $login
 	 * @return bool
 	 */
-	public function attempt(array $credentials = [], $remember = false, $login = true)
+	public function attempt(array $credentials = [], $remember = false, $login = true, $secure = false, $httpOnly = true)
 	{
 		$this->fireAttemptEvent($credentials, $remember, $login);
 
@@ -363,7 +363,7 @@ class Guard implements GuardContract {
 		// fact valid we'll log the users into the application and return true.
 		if ($this->hasValidCredentials($user, $credentials))
 		{
-			if ($login) $this->login($user, $remember);
+			if ($login) $this->login($user, $remember, $secure, $httpOnly);
 
 			return true;
 		}
