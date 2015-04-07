@@ -1388,7 +1388,7 @@ class Builder {
 	{
 		$page = Paginator::resolveCurrentPage();
 
-		$total = $this->getCountForPagination();
+		$total = $this->getCountForPagination($columns);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1420,17 +1420,27 @@ class Builder {
 	/**
 	 * Get the count of the total records for the paginator.
 	 *
+	 * @param  array  $columns
 	 * @return int
 	 */
-	public function getCountForPagination()
+	public function getCountForPagination($columns = ['*'])
 	{
 		$this->backupFieldsForCount();
 
-		$total = $this->count();
+		$this->aggregate = ['function' => 'count', 'columns' => $columns];
+
+		$results = $this->get();
+
+		$this->aggregate = null;
 
 		$this->restoreFieldsForCount();
 
-		return $total;
+		if (isset($results[0]))
+		{
+			if (isset($this->groups)) return count($results);
+
+			return (int) array_change_key_case((array) $results[0])['aggregate'];
+		}
 	}
 
 	/**
@@ -1440,7 +1450,7 @@ class Builder {
 	 */
 	protected function backupFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
@@ -1455,7 +1465,7 @@ class Builder {
 	 */
 	protected function restoreFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
@@ -1568,7 +1578,7 @@ class Builder {
 	{
 		if ( ! is_array($columns))
 		{
-			$columns = array($columns);
+			$columns = [$columns];
 		}
 
 		return (int) $this->aggregate(__FUNCTION__, $columns);
@@ -1578,33 +1588,33 @@ class Builder {
 	 * Retrieve the minimum value of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function min($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
 	 * Retrieve the maximum value of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function max($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
 	 * Retrieve the sum of the values of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function sum($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, [$column]);
 
 		return $result ?: 0;
 	}
@@ -1613,11 +1623,11 @@ class Builder {
 	 * Retrieve the average of the values of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function avg($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1627,7 +1637,7 @@ class Builder {
 	 * @param  array   $columns
 	 * @return mixed
 	 */
-	public function aggregate($function, $columns = array('*'))
+	public function aggregate($function, $columns = ['*'])
 	{
 		$this->aggregate = compact('function', 'columns');
 
