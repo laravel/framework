@@ -10,6 +10,9 @@ class Response extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'Illuminate\Contracts\Routing\ResponseFactory'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'Illuminate\Contracts\Routing\ResponseFactory';
+	}
 
 }
