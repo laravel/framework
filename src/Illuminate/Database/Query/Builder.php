@@ -1388,7 +1388,7 @@ class Builder {
 	{
 		$page = Paginator::resolveCurrentPage();
 
-		$total = $this->getCountForPagination();
+		$total = $this->getCountForPagination($columns);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1420,15 +1420,27 @@ class Builder {
 	/**
 	 * Get the count of the total records for the paginator.
 	 *
+	 * @param  array  $columns
 	 * @return int
 	 */
-	public function getCountForPagination()
+	public function getCountForPagination($columns = ['*'])
 	{
 		$this->backupFieldsForCount();
 
-		$total = $this->count();
+		$this->aggregate = ['function' => 'count', 'columns' => $columns];
+
+		$results = $this->get();
+
+		$this->aggregate = null;
 
 		$this->restoreFieldsForCount();
+
+		if (isset($results[0]))
+		{
+			if (isset($this->groups)) return count($results);
+
+			return (int) array_change_key_case((array) $results[0])['aggregate'];
+		}
 
 		return $total;
 	}
@@ -1440,7 +1452,7 @@ class Builder {
 	 */
 	protected function backupFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
@@ -1455,7 +1467,7 @@ class Builder {
 	 */
 	protected function restoreFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
