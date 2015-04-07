@@ -45,6 +45,9 @@ class Password extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'auth.password'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'auth.password';
+	}
 
 }
