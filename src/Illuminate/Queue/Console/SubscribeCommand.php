@@ -93,10 +93,9 @@ class SubscribeCommand extends Command {
 
 		$url = $this->argument('url');
 
-		// If the provided url is not in a full format, convert it into one.
 		if ( ! starts_with($url, ['http://', 'https://']))
 		{
-			$url = app('url')->to($url);
+			$url = $this->laravel['url']->to($url);
 		}
 
 		$subscribers[] = array('url' => $url);
