@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue;
 
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class SyncQueue extends Queue implements QueueContract {
@@ -65,7 +66,7 @@ class SyncQueue extends Queue implements QueueContract {
 	 */
 	protected function resolveJob($payload)
 	{
-		return new Jobs\SyncJob($this->container, $payload);
+		return new SyncJob($this->container, $payload);
 	}
 
 }
