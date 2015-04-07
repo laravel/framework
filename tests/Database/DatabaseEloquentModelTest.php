@@ -55,7 +55,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$attributes = $model->getAttributes();
 
 		// ensure password attribute was not set to null
-		$this->assertFalse(array_key_exists('password', $attributes));
+		$this->assertArrayNotHasKey('password', $attributes);
 		$this->assertEquals('******', $model->password);
 		$this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $attributes['password_hash']);
 		$this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $model->password_hash);
