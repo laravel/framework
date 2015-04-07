@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database;
 
+use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Doctrine\DBAL\Driver\PDOSqlite\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
@@ -33,7 +34,7 @@ class SQLiteConnection extends Connection {
 	 */
 	protected function getDefaultPostProcessor()
 	{
-		return new Query\Processors\SQLiteProcessor;
+		return new SQLiteProcessor;
 	}
 
 	/**
