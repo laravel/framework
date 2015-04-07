@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -55,7 +54,7 @@ class KeyGenerateCommand extends Command {
 	 */
 	protected function getRandomKey()
 	{
-		return Str::random(32);
+		return str_random(32);
 	}
 
 	/**

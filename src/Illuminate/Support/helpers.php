@@ -550,6 +550,20 @@ if ( ! function_exists('preg_replace_sub'))
 	}
 }
 
+if ( ! function_exists('ascii'))
+{
+	/**
+	 * Transliterate a UTF-8 value to ASCII.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	function ascii($value)
+	{
+		return Str::ascii($value);
+	}
+}
+
 if ( ! function_exists('snake_case'))
 {
 	/**

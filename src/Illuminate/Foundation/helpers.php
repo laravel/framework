@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 
 if ( ! function_exists('abort'))
@@ -626,7 +625,7 @@ if ( ! function_exists('env'))
 				return;
 		}
 
-		if (Str::startsWith($value, '"') && Str::endsWith($value, '"'))
+		if (starts_with($value, '"') && ends_with($value, '"'))
 		{
 			return substr($value, 1, -1);
 		}
