@@ -131,16 +131,13 @@ abstract class ServiceProvider {
 	 */
 	public static function pathsToPublish($provider = null, $group = null)
 	{
-		if ($provider and $group)
+		if ($provider && $group)
 		{
-			if (empty(static::$publishes[$provider]))
+			if (empty(static::$publishes[$provider]) || empty(static::$publishGroups[$group]))
 			{
 				return [];
 			}
-			if (empty(static::$publishGroups[$group]))
-			{
-				return [];
-			}
+
 			return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
 		}
 
