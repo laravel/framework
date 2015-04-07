@@ -14,10 +14,10 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 	public function testSetRelationFail()
 	{
 		$parent = new EloquentRelationResetModelStub;
-		$relation =new EloquentRelationResetModelStub;
-		$parent->setRelation('test',$relation);
-		$parent->setRelation('foo','bar');
-		$this->assertTrue(!array_key_exists('foo', $parent->toArray()));
+		$relation = new EloquentRelationResetModelStub;
+		$parent->setRelation('test', $relation);
+		$parent->setRelation('foo', 'bar');
+		$this->assertArrayNotHasKey('foo', $parent->toArray());
 	}
 
 
