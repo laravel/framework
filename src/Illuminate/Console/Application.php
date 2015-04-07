@@ -21,7 +21,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
 	/**
 	 * The output from the previous command.
 	 *
-	 * @var \Symfony\Component\Console\Output\OutputInterface
+	 * @var \Symfony\Component\Console\Output\BufferedOutput
 	 */
 	protected $lastOutput;
 
