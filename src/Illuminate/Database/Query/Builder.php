@@ -1578,7 +1578,7 @@ class Builder {
 	 * Retrieve the minimum value of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function min($column)
 	{
@@ -1589,7 +1589,7 @@ class Builder {
 	 * Retrieve the maximum value of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function max($column)
 	{
@@ -1600,7 +1600,7 @@ class Builder {
 	 * Retrieve the sum of the values of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function sum($column)
 	{
@@ -1613,7 +1613,7 @@ class Builder {
 	 * Retrieve the average of the values of a given column.
 	 *
 	 * @param  string  $column
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function avg($column)
 	{
@@ -1625,7 +1625,7 @@ class Builder {
 	 *
 	 * @param  string  $function
 	 * @param  array   $columns
-	 * @return mixed
+	 * @return float|int
 	 */
 	public function aggregate($function, $columns = array('*'))
 	{
