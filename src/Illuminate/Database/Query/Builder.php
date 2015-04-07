@@ -1437,9 +1437,9 @@ class Builder {
 
 		if (isset($results[0]))
 		{
-			return (isset($this->groups))
-					? count($results)
-					: (int) array_change_key_case((array) $results[0])['aggregate'];
+			if (isset($this->groups)) return count($results);
+
+			return (int) array_change_key_case((array) $results[0])['aggregate'];
 		}
 	}
 
@@ -1578,7 +1578,7 @@ class Builder {
 	{
 		if ( ! is_array($columns))
 		{
-			$columns = array($columns);
+			$columns = [$columns];
 		}
 
 		return (int) $this->aggregate(__FUNCTION__, $columns);
@@ -1592,7 +1592,7 @@ class Builder {
 	 */
 	public function min($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1603,7 +1603,7 @@ class Builder {
 	 */
 	public function max($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1614,7 +1614,7 @@ class Builder {
 	 */
 	public function sum($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
+		$result = $this->aggregate(__FUNCTION__, [$column]);
 
 		return $result ?: 0;
 	}
@@ -1627,7 +1627,7 @@ class Builder {
 	 */
 	public function avg($column)
 	{
-		return $this->aggregate(__FUNCTION__, array($column));
+		return $this->aggregate(__FUNCTION__, [$column]);
 	}
 
 	/**
@@ -1637,7 +1637,7 @@ class Builder {
 	 * @param  array   $columns
 	 * @return mixed
 	 */
-	public function aggregate($function, $columns = array('*'))
+	public function aggregate($function, $columns = ['*'])
 	{
 		$this->aggregate = compact('function', 'columns');
 
