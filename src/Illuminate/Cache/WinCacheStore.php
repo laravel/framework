@@ -84,7 +84,7 @@ class WinCacheStore extends TaggableStore implements Store {
 	 */
 	public function forever($key, $value)
 	{
-		return $this->put($key, $value, 0);
+		$this->put($key, $value, 0);
 	}
 
 	/**
