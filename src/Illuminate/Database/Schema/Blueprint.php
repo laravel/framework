@@ -585,6 +585,17 @@ class Blueprint {
 	}
 
 	/**
+	 * Create a new jsonb column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function jsonb($column)
+	{
+		return $this->addColumn('jsonb', $column);
+	}
+
+	/**
 	 * Create a new date column on the table.
 	 *
 	 * @param  string  $column
