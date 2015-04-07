@@ -7,6 +7,13 @@ class Arr {
 	use Macroable;
 
 	/**
+	 * Dotted array cache.
+	 *
+	 * @var array
+	 */
+	protected static $dotted = [];
+
+	/**
 	 * Add an element to an array using "dot" notation if it doesn't exist.
 	 *
 	 * @param  array   $array
@@ -65,6 +72,13 @@ class Arr {
 	 */
 	public static function dot($array, $prepend = '')
 	{
+		$cache = serialize(['array' => $array, 'prepend' => $prepend]);
+
+		if (array_key_exists($cache, static::$dotted))
+		{
+			return static::$dotted[$cache];
+		}
+
 		$results = [];
 
 		foreach ($array as $key => $value)
@@ -79,7 +93,7 @@ class Arr {
 			}
 		}
 
-		return $results;
+		return static::$dotted[$cache] = $results;
 	}
 
 	/**
