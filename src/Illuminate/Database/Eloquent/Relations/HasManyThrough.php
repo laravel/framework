@@ -242,7 +242,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Find multiple related models by their primary keys.
 	 *
-	 * @param  mixed  $id
+	 * @param  mixed  $ids
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
@@ -299,7 +299,7 @@ class HasManyThrough extends Relation {
 		return array_merge($columns, [$this->parent->getTable().'.'.$this->firstKey]);
 	}
 
-	/*
+	/**
 	 * Get a paginator for the "select" statement.
 	 *
 	 * @param  int    $perPage
