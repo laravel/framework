@@ -125,10 +125,14 @@ class Route {
 		try
 		{
 			if ( ! is_string($this->action['uses']))
+			{
 				return $this->runCallable($request);
+			}
 
 			if ($this->customDispatcherIsBound())
+			{
 				return $this->runWithCustomDispatcher($request);
+			}
 
 			return $this->runController($request);
 		}
@@ -168,7 +172,9 @@ class Route {
 		);
 
 		if ( ! method_exists($instance = $this->container->make($class), $method))
+		{
 			throw new NotFoundHttpException;
+		}
 
 		return call_user_func_array([$instance, $method], $parameters);
 	}
