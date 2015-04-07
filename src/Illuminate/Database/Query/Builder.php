@@ -1388,7 +1388,7 @@ class Builder {
 	{
 		$page = Paginator::resolveCurrentPage();
 
-		$total = $this->getCountForPagination();
+		$total = $this->getCountForPagination($columns);
 
 		$results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1420,17 +1420,27 @@ class Builder {
 	/**
 	 * Get the count of the total records for the paginator.
 	 *
+	 * @param  array  $columns
 	 * @return int
 	 */
-	public function getCountForPagination()
+	public function getCountForPagination($columns = ['*'])
 	{
 		$this->backupFieldsForCount();
 
-		$total = $this->count();
+		$this->aggregate = ['function' => 'count', 'columns' => $columns];
+
+		$results = $this->get();
+
+		$this->aggregate = null;
 
 		$this->restoreFieldsForCount();
 
-		return $total;
+		if (isset($results[0]))
+		{
+			return (isset($this->groups))
+					? count($results)
+					: (int) array_change_key_case((array) $results[0])['aggregate'];
+		}
 	}
 
 	/**
@@ -1440,7 +1450,7 @@ class Builder {
 	 */
 	protected function backupFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->backups[$field] = $this->{$field};
 
@@ -1455,7 +1465,7 @@ class Builder {
 	 */
 	protected function restoreFieldsForCount()
 	{
-		foreach (['orders', 'limit', 'offset'] as $field)
+		foreach (['orders', 'limit', 'offset', 'columns'] as $field)
 		{
 			$this->{$field} = $this->backups[$field];
 		}
@@ -1566,11 +1576,12 @@ class Builder {
 	 */
 	public function count($columns = '*')
 	{
-		if ( ! is_array($columns)) $columns = array($columns);
+		if ( ! is_array($columns))
+		{
+			$columns = array($columns);
+		}
 
-		$count = $this->aggregate(__FUNCTION__, $columns);
-
-		return is_array($count) ? count($count) : (int) $count;
+		return (int) $this->aggregate(__FUNCTION__, $columns);
 	}
 
 	/**
@@ -1581,9 +1592,7 @@ class Builder {
 	 */
 	public function min($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
-
-		return is_array($result) ? min($result) : $result;
+		return $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**
@@ -1594,9 +1603,7 @@ class Builder {
 	 */
 	public function max($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
-
-		return is_array($result) ? max($result) : $result;
+		return $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**
@@ -1609,7 +1616,7 @@ class Builder {
 	{
 		$result = $this->aggregate(__FUNCTION__, array($column));
 
-		return is_array($result) ? array_sum($result) : $result ?: 0;
+		return $result ?: 0;
 	}
 
 	/**
@@ -1620,11 +1627,7 @@ class Builder {
 	 */
 	public function avg($column)
 	{
-		$result = $this->aggregate(__FUNCTION__, array($column));
-
-		if (is_array($result)) return $result ? array_sum($result) / count($result) : 0;
-
-		return $result ?: 0;
+		return $this->aggregate(__FUNCTION__, array($column));
 	}
 
 	/**
@@ -1649,23 +1652,11 @@ class Builder {
 
 		$this->columns = $previousColumns;
 
-		$results = array_map(function($result)
+		if (isset($results[0]))
 		{
-			$result = array_change_key_case((array) $result);
+			$result = array_change_key_case((array) $results[0]);
 
 			return $result['aggregate'];
-		}, (array) $results);
-
-		// If any groupings have been specified, we return the aggregate results as
-		// is such that we give information about all groups. Otherwise we check
-		// if the aggregate had any results and return the value as a scalar.
-		if (isset($this->groups))
-		{
-			return $results;
-		}
-		elseif (isset($results[0]))
-		{
-			return $results[0];
 		}
 	}
 
@@ -1694,8 +1685,7 @@ class Builder {
 		{
 			foreach ($values as $key => $value)
 			{
-				ksort($value);
-				$values[$key] = $value;
+				ksort($value); $values[$key] = $value;
 			}
 		}
 
