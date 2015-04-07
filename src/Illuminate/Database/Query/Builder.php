@@ -1435,14 +1435,9 @@ class Builder {
 
 		$this->restoreFieldsForCount();
 
-		if (isset($results[0]))
-		{
-			if (isset($this->groups)) return count($results);
+		if (isset($this->groups)) return count($results);
 
-			return (int) array_change_key_case((array) $results[0])['aggregate'];
-		}
-
-		return $total;
+		return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
 	}
 
 	/**
