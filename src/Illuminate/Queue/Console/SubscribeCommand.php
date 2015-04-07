@@ -91,7 +91,15 @@ class SubscribeCommand extends Command {
 	{
 		$subscribers = $this->getCurrentSubscribers();
 
-		$subscribers[] = array('url' => $this->argument('url'));
+		$url = $this->argument('url');
+
+		// If the provided url is not in a full format, convert it into one.
+		if ( ! starts_with($url, ['http://', 'https://']))
+		{
+			$url = app('url')->to($url);
+		}
+
+		$subscribers[] = array('url' => $url);
 
 		return $subscribers;
 	}
