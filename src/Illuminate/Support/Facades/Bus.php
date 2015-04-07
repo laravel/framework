@@ -10,6 +10,9 @@ class Bus extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'Illuminate\Contracts\Bus\Dispatcher'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'Illuminate\Contracts\Bus\Dispatcher';
+	}
 
 }

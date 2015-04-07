@@ -10,6 +10,9 @@ class Redis extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'redis'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'redis';
+	}
 
 }
