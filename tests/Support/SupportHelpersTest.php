@@ -371,7 +371,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	public function testArrayRandom()
 	{
 		$developer = array('firstname' => 'Ferid', 'surname' => 'Mövsümov');
-		$this->assertTrue(in_array(array_random($developer), $developer);
+		$this->assertTrue(in_array(array_random($developer), $developer));
 	}
 
 }
