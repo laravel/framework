@@ -367,6 +367,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('firstname' => 'Ferid'), $developer);
 	}
 
+
+	public function testArrayRandom()
+	{
+		$developer = array('firstname' => 'Ferid', 'surname' => 'Mövsümov');
+		$this->assertTrue(in_array(array_random($developer), $developer);
+	}
+
 }
 
 trait SupportTestTraitOne {}
