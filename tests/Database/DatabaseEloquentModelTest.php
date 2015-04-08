@@ -105,6 +105,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testForceCreateMethodSavesNewModelWithGuardedAttributes()
+	{
+		$_SERVER['__eloquent.saved'] = false;
+		$model = EloquentModelSaveStub::forceCreate(['id' => 21]);
+		$this->assertTrue($_SERVER['__eloquent.saved']);
+		$this->assertEquals(21, $model->id);
+	}
+
+
 	public function testFindMethodCallsQueryBuilderCorrectly()
 	{
 		$result = EloquentModelFindStub::find(1);
@@ -705,6 +714,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testForceFillMethodFillsGuardedAttributes()
+	{
+		$model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
+		$this->assertEquals(21, $model->id);
+	}
+
+
 	public function testUnguardAllowsAnythingToBeSet()
 	{
 		$model = new EloquentModelStub;
@@ -1300,7 +1316,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 
 class EloquentModelSaveStub extends Model {
 	protected $table = 'save_stub';
-	protected $guarded = array();
+	protected $guarded = ['id'];
 	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{
