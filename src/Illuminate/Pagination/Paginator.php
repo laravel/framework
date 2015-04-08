@@ -62,9 +62,14 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 	 */
 	protected function checkForMorePages()
 	{
+		$offset = ($this->currentPage - 1) * $this->perPage;
+
+		$this->items = $this->items->slice($offset, $this->perPage + 1);
 		$this->hasMore = count($this->items) > ($this->perPage);
 
-		$this->items = $this->items->slice(0, $this->perPage);
+		if ($this->hasMore) {
+			$this->items->pop();
+		}
 	}
 
 	/**
