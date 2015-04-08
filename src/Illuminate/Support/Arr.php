@@ -321,6 +321,16 @@ class Arr {
 	}
 
 	/**
+	 * Get a random value from the array.
+	 *
+	 * @param  array  $array
+	 * @return mixed
+	 */
+	public static function random(&$array)
+	{
+		return $array[array_rand($array)];	
+	}
+	/**
 	 * Set an array item to a given value using "dot" notation.
 	 *
 	 * If no key is given to the method, the entire array will be replaced.
