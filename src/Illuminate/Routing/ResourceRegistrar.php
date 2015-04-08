@@ -41,9 +41,16 @@ class ResourceRegistrar {
 	 */
 	public function register($name, $controller, array $options = array())
 	{
+		$methods = $this->getResourceMethods($this->resourceDefaults, $options);
+
 		if (empty($name) || $name == '/')
 		{
-			throw new InvalidArgumentException('Resource routing is not available for root url');
+			$check = array_intersect($methods, ['store', 'show', 'edit', 'update', 'destroy']);
+
+			if (!empty($check) && !isset($options['wildcard']))
+			{
+				throw new InvalidArgumentException('Resource routing is not available for root url');
+			}
 		}
 
 		// If the resource name contains a slash, we will assume the developer wishes to
@@ -59,11 +66,9 @@ class ResourceRegistrar {
 		// We need to extract the base resource from the resource name. Nested resources
 		// are supported in the framework, but we need to know what name to use for a
 		// place-holder on the route wildcards, which should be the base resources.
-		$base = $this->getResourceWildcard(last(explode('.', $name)));
+		$base = (isset($options['wildcard'])) ? $options['wildcard'] : $this->getResourceWildcard(last(explode('.', $name)));
 
-		$defaults = $this->resourceDefaults;
-
-		foreach ($this->getResourceMethods($defaults, $options) as $m)
+		foreach ($methods as $m)
 		{
 			$this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
 		}
@@ -204,7 +209,8 @@ class ResourceRegistrar {
 
 		if ( ! $this->router->hasGroupStack())
 		{
-			return $prefix.$resource.'.'.$method;
+			$resource = $prefix.$resource;
+			return (!empty($resource)) ? $resource.'.'.$method : $method;
 		}
 
 		return $this->getGroupResourceName($prefix, $resource, $method);
