@@ -260,6 +260,21 @@ if ( ! function_exists('array_pull'))
 	}
 }
 
+if ( ! function_exists('array_random'))
+{
+	/**
+	 * Get a random value from the array.
+	 *
+	 * @param  array   $array
+	 * @return mixed
+	 */
+	function array_random(&$array)
+	{
+		return Arr::random($array);
+	}
+}
+
+
 if ( ! function_exists('array_set'))
 {
 	/**
