@@ -723,6 +723,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
 	}
 
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
