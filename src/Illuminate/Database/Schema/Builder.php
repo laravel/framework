@@ -76,9 +76,7 @@ class Builder {
 	 */
 	public function hasColumns($table, array $columns)
 	{
-		$tableColumns = $this->getColumnListing($table);
-
-		array_map('strtolower', $tableColumns);
+		$tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
 		foreach ($columns as $column)
 		{
