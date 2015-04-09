@@ -3351,8 +3351,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		$query = $this->newQuery();
-
-		return call_user_func_array(array($query, $method), $parameters);
+		if(method_exists($query, $method))
+		{
+			return call_user_func_array(array($query, $method), $parameters);
+		}
 	}
 
 	/**
