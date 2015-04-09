@@ -100,6 +100,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $storagePath;
 
 	/**
+	 * The custom cache path.
+	 *
+	 * @var string
+	 */
+	protected static $cachedPath;
+
+	/**
 	 * Indicates if the storage directory should be used for optimizations.
 	 *
 	 * @var bool
@@ -737,6 +744,30 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Determine the cache path.
+	 *
+	 * @return string
+	 */
+	protected function getCachedPath()
+	{
+		if (isset(static::$cachedPath))
+		{
+			return static::$cachedPath;
+		}
+
+		if ($this->vendorIsWritableForOptimizations())
+		{
+			$cachedPath = $this->basePath().'/vendor';
+		}
+		else
+		{
+			$cachedPath = $this->storagePath().'/framework';
+		}
+
+		return static::$cachedPath = $cachedPath;
+	}
+
+	/**
 	 * Determine if the application configuration is cached.
 	 *
 	 * @return bool
@@ -753,14 +784,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedConfigPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/config.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/config.php';
-		}
+		return $this->getCachedPath().'/config.php';
 	}
 
 	/**
@@ -780,14 +804,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/routes.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/routes.php';
-		}
+		return $this->getCachedPath().'/routes.php';
 	}
 
 	/**
@@ -797,14 +814,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedCompilePath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/compiled.php';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/compiled.php';
-		}
+		return $this->getCachedPath().'/compiled.php';
 	}
 
 	/**
@@ -814,14 +824,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedServicesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/services.json';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/services.json';
-		}
+		return $this->getCachedPath().'/services.json';
 	}
 
 	/**
