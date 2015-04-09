@@ -198,12 +198,16 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		return $this->pipeline->send($command)->through($this->pipes)->then(function($command) use ($afterResolving)
 		{
 			if ($command instanceof SelfHandling)
+			{
 				return $this->container->call([$command, 'handle']);
+			}
 
 			$handler = $this->resolveHandler($command);
 
 			if ($afterResolving)
+			{
 				call_user_func($afterResolving, $handler);
+			}
 
 			return call_user_func(
 				[$handler, $this->getHandlerMethod($command)], $command
