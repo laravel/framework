@@ -27,7 +27,21 @@ trait ResponseTrait {
 	 */
 	public function withCookie(Cookie $cookie)
 	{
-		$this->headers->setCookie($cookie);
+		return $this->withCookies([$cookie]);
+	}
+
+	/**
+	 * Add multiple cookies to the response.
+	 *
+	 * @param  array  $cookies
+	 * @return $this
+	 */
+	public function withCookies(array $cookies)
+	{
+		foreach ($cookies as $cookie)
+		{
+			$this->headers->setCookie($cookie);
+		}
 
 		return $this;
 	}

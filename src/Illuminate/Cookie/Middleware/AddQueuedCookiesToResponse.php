@@ -35,12 +35,7 @@ class AddQueuedCookiesToResponse implements Middleware {
 	{
 		$response = $next($request);
 
-		foreach ($this->cookies->getQueuedCookies() as $cookie)
-		{
-			$response->headers->setCookie($cookie);
-		}
-
-		return $response;
+		return $response->withCookies($this->cookies->getQueuedCookies());
 	}
 
 }
