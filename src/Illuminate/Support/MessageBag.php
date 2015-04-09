@@ -135,9 +135,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 		// methods is to return back an array of messages in the first place.
 		if (array_key_exists($key, $this->messages))
 		{
-			$format = $this->checkFormat($format);
-
-			return $this->transform($this->messages[$key], $format, $key);
+			return $this->transform($this->messages[$key], $this->checkFormat($format), $key);
 		}
 
 		return array();
