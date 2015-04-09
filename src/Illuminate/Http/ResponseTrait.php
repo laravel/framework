@@ -27,7 +27,9 @@ trait ResponseTrait {
 	 */
 	public function withCookie(Cookie $cookie)
 	{
-		return $this->withCookies([$cookie]);
+		$this->headers->setCookie($cookie);
+
+		return $this;
 	}
 
 	/**
