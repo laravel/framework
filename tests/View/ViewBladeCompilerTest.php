@@ -668,6 +668,12 @@ empty
 		$this->assertSame([$openingTag, $closingTag], $compiler->getEscapedContentTags());
 	}
 
+	public function testCompileAddAndGetFooter()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->addFooter('foo-bar');
+		$this->assertEquals(['foo-bar'], $compiler->getFooter());
+	}
 
 	public function testGetTagsProvider()
 	{
