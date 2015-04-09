@@ -757,14 +757,12 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
 		if ($this->vendorIsWritableForOptimizations())
 		{
-			$cachedPath = $this->basePath().'/vendor';
+			return static::$cachedPath = $this->basePath().'/vendor';
 		}
 		else
 		{
-			$cachedPath = $this->storagePath().'/framework';
+			return static::$cachedPath = $this->storagePath().'/framework';
 		}
-
-		return static::$cachedPath = $cachedPath;
 	}
 
 	/**
