@@ -810,9 +810,9 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Add Footer
+	 * Add footer.
 	 * 
-	 * @param string $footer
+	 * @param  string $footer
 	 * @return void
 	 */
 	public function addFooter($footer)
@@ -821,7 +821,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Get Footer used for the compiler.
+	 * Get footer used for the compiler.
 	 * 
 	 * @return array
 	 */
