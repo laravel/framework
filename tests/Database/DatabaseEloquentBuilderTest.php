@@ -378,6 +378,15 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($builder, $result);
 	}
 
+	public function testQueryScopeReturningEmptyArray()
+	{
+		$builder = $this->getBuilder();
+		$builder->getQuery()->shouldReceive('from');
+		$builder->setModel($model = new EloquentBuilderTestScopeStub);
+		$result = $builder->listsThings();
+
+		$this->assertEquals(array(), $result);
+	}
 
 	public function testNestedWhere()
 	{
@@ -513,19 +522,15 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
-
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
 		$query->where('foo', 'bar');
 	}
-}
-
-class EloquentBuilderTestWithTrashedStub extends Illuminate\Database\Eloquent\Model {
-	use Illuminate\Database\Eloquent\SoftDeletes;
-	protected $table = 'table';
-	public function getKeyName() { return 'foo'; }
+	public function scopeListsThings($query)
+	{
+		return array();
+	}
 }
 
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
