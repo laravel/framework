@@ -90,8 +90,8 @@ class ConfigureLogging {
 	 */
 	protected function configureSyslogHandler(Application $app, Writer $log)
 	{
-		$name = $app->make('config')->get('app.log_syslog_name', 'laravel');
-		$log->useSyslog($name);
+		$syslogName = $app['config']->get('app.log_syslog_name', 'laravel');
+		$log->useSyslog($syslogName);
 	}
 
 	/**
