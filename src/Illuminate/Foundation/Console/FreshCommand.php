@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\AppNamespaceDetectorTrait;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\ConfirmableTrait;
@@ -7,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class FreshCommand extends Command {
 
-	use ConfirmableTrait;
+	use ConfirmableTrait, AppNamespaceDetectorTrait;
 
 	/**
 	 * The console command name.
@@ -51,7 +52,8 @@ class FreshCommand extends Command {
 		$files->delete(base_path('database/migrations/2014_10_12_100000_create_password_resets_table.php'));
 
 		$files->put(app_path('Http/routes.php'), $files->get(__DIR__.'/stubs/fresh-routes.stub'));
-		$files->put(app_path('Providers/AppServiceProvider.php'), $files->get(__DIR__.'/stubs/fresh-app-provider.stub'));
+        $fresh_app_provider = $files->get(__DIR__.'/stubs/fresh-app-provider.stub');
+		$files->put(app_path('Providers/AppServiceProvider.php'), $this->replaceRootNamespace($fresh_app_provider));
 
 		$this->info('Scaffolding removed! Enjoy your fresh start.');
 	}
@@ -67,5 +69,12 @@ class FreshCommand extends Command {
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 		);
 	}
+
+    protected function replaceRootNamespace($stub)
+    {
+        return str_replace(
+            '{{rootNamespace}}', $this->getAppNamespace(), $stub
+        );
+    }
 
 }
