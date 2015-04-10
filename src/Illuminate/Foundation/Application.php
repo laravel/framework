@@ -532,9 +532,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  \Illuminate\Support\ServiceProvider  $provider
 	 * @return void
 	 */
-	protected function markAsRegistered($provider)
+	protected function markAsRegistered(ServiceProvider $provider)
 	{
-		$this['events']->fire($class = get_class($provider), array($provider));
+		$this['events']->fire($class = get_class($provider), [$provider]);
 
 		$this->serviceProviders[] = $provider;
 
