@@ -686,7 +686,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router = $this->getRouter();
 		$router->resource('foo', 'FooController');
 		$routes = $router->getRoutes();
-		$this->assertCount(8, $routes);
+		$this->assertCount(9, $routes);
 
 		$router = $this->getRouter();
 		$router->resource('foo', 'FooController', array('only' => array('show', 'destroy')));
@@ -698,7 +698,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$router->resource('foo', 'FooController', array('except' => array('show', 'destroy')));
 		$routes = $router->getRoutes();
 
-		$this->assertCount(6, $routes);
+		$this->assertCount(7, $routes);
 
 		$router = $this->getRouter();
 		$router->resource('foo-bars', 'FooController', array('only' => array('show')));
@@ -736,6 +736,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.edit'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.update'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.destroy'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.delete'));
 
 		$router = $this->getRouter();
 		$router->resource('foo.bar', 'FooController');
@@ -747,6 +748,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
 		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+		$this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.delete'));
 
 		$router = $this->getRouter();
 		$router->resource('foo', 'FooController', array('names' => array(
