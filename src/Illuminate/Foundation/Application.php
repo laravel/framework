@@ -509,7 +509,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
 
-		return isset($this->registeredProviders[$name]) ? $this->registeredProviders[$name] : null;
+		if (isset($this->registeredProviders[$name]))
+		{
+			return $this->registeredProviders[$name];
+		}
 	}
 
 	/**
@@ -526,7 +529,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	/**
 	 * Mark the given provider as registered.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
 	 * @return void
 	 */
 	protected function markAsRegistered($provider)
@@ -536,8 +539,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		$this->serviceProviders[] = $provider;
 
 		$this->loadedProviders[$class] = true;
-		
-		$aliases = class_parents($class) + class_implements($class) + array($class);
+
+		$aliases = class_parents($class) + class_implements($class) + [$class];
+
 		foreach ($aliases as $alias)
 		{
 			if ( ! isset($this->registeredProviders[$alias]))
