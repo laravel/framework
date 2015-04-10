@@ -676,7 +676,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		if (method_exists($provider, 'boot'))
 		{
-			return $this->call([$provider, 'boot']);
+			$this->call([$provider, 'boot']);
 		}
 	}
 
