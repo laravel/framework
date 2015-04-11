@@ -1120,6 +1120,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if ($this->exists)
 		{
+			if ($this->beforeDelete() === false) return false;
 			if ($this->fireModelEvent('deleting') === false) return false;
 
 			// Here, we'll touch the owning models, verifying these timestamps get updated
@@ -1135,9 +1136,39 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			// the developers may hook into post-delete operations. We will then return
 			// a boolean true as the delete is presumably successful on the database.
 			$this->fireModelEvent('deleted', false);
+			
+			$this->afterDelete();
 
 			return true;
 		}
+	}
+	
+	/**
+	 * Event method to be called right before the model is about to be deleted.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some model-internal actions before the model is actually deleted.
+	 * 
+	 * This method is being called before the 'deleting' event is fired and may
+	 * prevent firing this event at all if the subclass decides to abort the deletion.
+	 * 
+	 * @return bool
+	 */
+	protected function beforeDelete()
+	{
+		return true;
+	}
+	
+	/**
+	 * Event method to be called right after the model has been deleted from the
+	 * data source.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some model-internal actions after the model has been deleted.
+	 * 
+	 * This method is called after the global 'deleted' event has been fired.
+	 * 
+	 */
+	protected function afterDelete()
+	{
 	}
 
 	/**
@@ -1459,6 +1490,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function save(array $options = array())
 	{
 		$query = $this->newQueryWithoutScopes();
+		
+		if ($this->beforeSave() === false)
+		{
+			return false;
+		}
 
 		// If the "saving" event returns false we'll bail out of the save and return
 		// false, indicating that the save failed. This provides a chance for any
@@ -1488,7 +1524,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		return $saved;
 	}
-
+	
 	/**
 	 * Finish processing on a successful save operation.
 	 *
@@ -1498,10 +1534,40 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected function finishSave(array $options)
 	{
 		$this->fireModelEvent('saved', false);
+		
+		$this->afterSave();
 
 		$this->syncOriginal();
 
 		if (array_get($options, 'touch', true)) $this->touchOwners();
+	}
+
+	/**
+	 * Event method to be called right before the model is about to be saved.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions before the model and
+	 * possible changes are being made persistent.
+	 * 
+	 * This method is being called before the global 'saving' event is fired and may
+	 * prevent firing this event at all if the subclass decides to abort the saving.
+	 * 
+	 * @return bool
+	 */
+	protected function beforeSave()
+	{
+		return true;
+	}
+	
+	/**
+	 * Event method to be called after the model has been successfully saved.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions.
+	 * 
+	 * This method is being called after the global 'saved' event has been fired.
+	 * 
+	 */
+	protected function afterSave()
+	{
 	}
 
 	/**
@@ -1517,6 +1583,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if (count($dirty) > 0)
 		{
+			if ($this->beforeUpdate() === false)
+			{
+				return false;
+			}
+			
 			// If the updating event returns false, we will cancel the update operation so
 			// developers can hook Validation systems into their models and cancel this
 			// operation if the model does not pass validation. Otherwise, we update.
@@ -1543,10 +1614,40 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 				$this->setKeysForSaveQuery($query)->update($dirty);
 
 				$this->fireModelEvent('updated', false);
+				
+				$this->afterUpdate();
 			}
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Event method to be called right before the model is about to be updated.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions before the model changes
+	 * are being made persistent.
+	 * 
+	 * This method is being called before the global 'updating' event is fired and may
+	 * prevent firing this event at all if the subclass decides to abort the update.
+	 * 
+	 * @return bool
+	 */
+	protected function beforeUpdate()
+	{
+		return true;
+	}
+	
+	/**
+	 * Event method to be called after the model has been successfully updated.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions.
+	 * 
+	 * This method is being called after the global 'updated' event has been fired.
+	 * 
+	 */
+	protected function afterUpdate()
+	{
 	}
 
 	/**
@@ -1558,6 +1659,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function performInsert(Builder $query, array $options = [])
 	{
+		if ($this->beforeInsert() === false) return false;
 		if ($this->fireModelEvent('creating') === false) return false;
 
 		// First we'll need to create a fresh query instance and touch the creation and
@@ -1592,8 +1694,39 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		$this->exists = true;
 
 		$this->fireModelEvent('created', false);
+		$this->afterInsert();
 
 		return true;
+	}
+	
+	/**
+	 * Event method to be called right before the model is about to be inserted into
+	 * the data source.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions before the model is being
+	 * made persistent.
+	 * 
+	 * This method is being called before the global 'creating' event is fired and may
+	 * prevent firing this event at all if the subclass decides to abort the creation.
+	 * 
+	 * @return bool
+	 */
+	protected function beforeInsert()
+	{
+		return true;
+	}
+	
+	/**
+	 * Event method to be called after the model has been successfully inserted into
+	 * the data source.
+	 * The standard implementation does nothing but subclasses may override this method
+	 * to perform some internal model-only related actions.
+	 * 
+	 * This method is being called after the global 'created' event has been fired.
+	 * 
+	 */
+	protected function afterInsert()
+	{
 	}
 
 	/**
