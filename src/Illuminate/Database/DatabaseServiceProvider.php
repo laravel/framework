@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseServiceProvider extends ServiceProvider {
@@ -53,7 +54,7 @@ class DatabaseServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function()
 		{
-			return new Eloquent\QueueEntityResolver;
+			return new QueueEntityResolver;
 		});
 	}
 

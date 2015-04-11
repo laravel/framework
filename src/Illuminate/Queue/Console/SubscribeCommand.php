@@ -91,7 +91,14 @@ class SubscribeCommand extends Command {
 	{
 		$subscribers = $this->getCurrentSubscribers();
 
-		$subscribers[] = array('url' => $this->argument('url'));
+		$url = $this->argument('url');
+
+		if ( ! starts_with($url, ['http://', 'https://']))
+		{
+			$url = $this->laravel['url']->to($url);
+		}
+
+		$subscribers[] = array('url' => $url);
 
 		return $subscribers;
 	}

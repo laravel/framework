@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheServiceProvider extends ServiceProvider {
 
@@ -45,12 +47,12 @@ class CacheServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.cache.clear', function($app)
 		{
-			return new Console\ClearCommand($app['cache']);
+			return new ClearCommand($app['cache']);
 		});
 
 		$this->app->singleton('command.cache.table', function($app)
 		{
-			return new Console\CacheTableCommand($app['files'], $app['composer']);
+			return new CacheTableCommand($app['files'], $app['composer']);
 		});
 
 		$this->commands('command.cache.clear', 'command.cache.table');

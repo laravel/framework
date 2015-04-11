@@ -97,6 +97,21 @@ class HasManyThrough extends Relation {
 		$foreignKey = $this->related->getTable().'.'.$this->secondKey;
 
 		$query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
+
+		if ($this->parentSoftDeletes())
+		{
+			$query->whereNull($this->parent->getQualifiedDeletedAtColumn());
+		}
+	}
+
+	/**
+	 * Determine whether close parent of the relation uses Soft Deletes.
+	 *
+	 * @return bool
+	 */
+	public function parentSoftDeletes()
+	{
+		return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_class($this->parent)));
 	}
 
 	/**
@@ -227,7 +242,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Find multiple related models by their primary keys.
 	 *
-	 * @param  mixed  $id
+	 * @param  mixed  $ids
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Collection
 	 */
@@ -284,18 +299,32 @@ class HasManyThrough extends Relation {
 		return array_merge($columns, [$this->parent->getTable().'.'.$this->firstKey]);
 	}
 
-	/*
+	/**
 	 * Get a paginator for the "select" statement.
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	public function paginate($perPage = null, $columns = ['*'])
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
 		return $this->query->paginate($perPage, $columns);
+	}
+
+	/**
+	 * Paginate the given query into a simple paginator.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = null, $columns = ['*'])
+	{
+		$this->query->addSelect($this->getSelectColumns($columns));
+
+		return $this->query->simplePaginate($perPage, $columns);
 	}
 
 	/**

@@ -328,7 +328,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 */
 	public function offsetUnset($key)
 	{
-		return $this->forget($key);
+		$this->forget($key);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Database;
 
+use Illuminate\Database\Query\Expression;
+
 abstract class Grammar {
 
 	/**
@@ -143,7 +145,7 @@ abstract class Grammar {
 	 */
 	public function isExpression($value)
 	{
-		return $value instanceof Query\Expression;
+		return $value instanceof Expression;
 	}
 
 	/**

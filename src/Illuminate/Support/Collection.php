@@ -415,7 +415,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function forPage($page, $perPage)
 	{
-		return new static(array_slice($this->items, ($page - 1) * $perPage, $perPage));
+		return $this->slice(($page - 1) * $perPage, $perPage);
 	}
 
 	/**

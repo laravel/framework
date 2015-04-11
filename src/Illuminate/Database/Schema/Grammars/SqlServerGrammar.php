@@ -395,6 +395,17 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a jsonb type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJsonb(Fluent $column)
+	{
+		return 'nvarchar(max)';
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column

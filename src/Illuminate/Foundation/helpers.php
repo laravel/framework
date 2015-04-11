@@ -106,7 +106,7 @@ if ( ! function_exists('base_path'))
 	 */
 	function base_path($path = '')
 	{
-		return app()->make('path.base').($path ? '/'.$path : $path);
+		return app()->basePath().($path ? '/'.$path : $path);
 	}
 }
 
@@ -237,7 +237,7 @@ if ( ! function_exists('database_path'))
 	 */
 	function database_path($path = '')
 	{
-		return app()->make('path.database').($path ? '/'.$path : $path);
+		return app()->databasePath().($path ? '/'.$path : $path);
 	}
 }
 

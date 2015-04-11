@@ -3,13 +3,14 @@
 use BadMethodCallException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
 class RedirectResponse extends BaseRedirectResponse {
+
+	use ResponseTrait;
 
 	/**
 	 * The request instance.
@@ -26,21 +27,6 @@ class RedirectResponse extends BaseRedirectResponse {
 	protected $session;
 
 	/**
-	 * Set a header on the Response.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  bool  $replace
-	 * @return $this
-	 */
-	public function header($key, $value, $replace = true)
-	{
-		$this->headers->set($key, $value, $replace);
-
-		return $this;
-	}
-
-	/**
 	 * Flash a piece of data to the session.
 	 *
 	 * @param  string  $key
@@ -55,19 +41,6 @@ class RedirectResponse extends BaseRedirectResponse {
 		{
 			$this->session->flash($k, $v);
 		}
-
-		return $this;
-	}
-
-	/**
-	 * Add a cookie to the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-	 * @return $this
-	 */
-	public function withCookie(Cookie $cookie)
-	{
-		$this->headers->setCookie($cookie);
 
 		return $this;
 	}

@@ -112,7 +112,7 @@ class QueueServiceProvider extends ServiceProvider {
 
 		$this->app->singleton('queue.listener', function($app)
 		{
-			return new Listener($app['path.base']);
+			return new Listener($app->basePath());
 		});
 	}
 
