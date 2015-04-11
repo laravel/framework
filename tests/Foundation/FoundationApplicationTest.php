@@ -135,33 +135,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
-
-	public function prepareResponse($value)
-	{
-		$response = m::mock('Symfony\Component\HttpFoundation\Response');
-		$response->shouldReceive('send')->once();
-		return $response;
-	}
-
-	protected function setExceptionHandler(Closure $handler) { return $handler; }
-
-}
-
-class ApplicationKernelExceptionHandlerStub extends Illuminate\Foundation\Application {
-
-	protected function setExceptionHandler(Closure $handler) { return $handler; }
-
-}
-
-class ApplicationGetMiddlewaresStub extends Illuminate\Foundation\Application
-{
-	public function getMiddlewares()
-	{
-		return $this->middlewares;
-	}
-}
-
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider {
 	protected $defer = true;
 	public function register()
