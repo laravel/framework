@@ -139,13 +139,6 @@ class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\S
 	}
 }
 
-class BusDispatcherTestBasicHandler {
-	public function handle(BusDispatcherTestBasicCommand $command)
-	{
-
-	}
-}
-
 class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
 
 }
