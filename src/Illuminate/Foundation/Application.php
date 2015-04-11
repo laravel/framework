@@ -86,11 +86,39 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $deferredServices = array();
 
 	/**
+	 * The custom application path defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $path;
+
+	/**
+	 * The custom application configuration files defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $configPath;
+
+	/**
 	 * The custom database path defined by the developer.
 	 *
 	 * @var string
 	 */
 	protected $databasePath;
+
+	/**
+	 * The custom language files defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $langPath;
+
+	/**
+	 * The custom public / web directory defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $publicPath;
 
 	/**
 	 * The custom storage path defined by the developer.
@@ -270,7 +298,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function path()
 	{
-		return $this->basePath.DIRECTORY_SEPARATOR.'app';
+		return $this->path ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
+	}
+
+	/**
+	 * Set the the application "app" directory.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function usePath($path)
+	{
+		$this->path = $path;
+
+		$this->instance('path', $path);
+
+		return $this;
 	}
 
 	/**
@@ -290,7 +333,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function configPath()
 	{
-		return $this->basePath.DIRECTORY_SEPARATOR.'config';
+		return $this->configPath ?: $this->basePath.DIRECTORY_SEPARATOR.'config';
+	}
+
+	/**
+	 * Set the application configuration files.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function useConfigPath($path)
+	{
+		$this->configPath = $path;
+
+		$this->instance('path.config', $path);
+
+		return $this;
 	}
 
 	/**
@@ -325,7 +383,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function langPath()
 	{
-		return $this->basePath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
+		return $this->langPath ?: $this->basePath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
+	}
+
+	/**
+	 * Set the path to the language files.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function useLangPath($path)
+	{
+		$this->langPath = $path;
+
+		$this->instance('path.lang', $path);
+
+		return $this;
 	}
 
 	/**
@@ -335,7 +408,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function publicPath()
 	{
-		return $this->basePath.DIRECTORY_SEPARATOR.'public';
+		return $this->publicPath ?: $this->basePath.DIRECTORY_SEPARATOR.'public';
+	}
+
+	/**
+	 * Set the path to the public / web directory.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function usePublicPath($path)
+	{
+		$this->publicPath = $path;
+
+		$this->instance('path.public', $path);
+
+		return $this;
 	}
 
 	/**
