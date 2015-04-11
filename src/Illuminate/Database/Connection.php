@@ -9,6 +9,7 @@ use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface {
 
@@ -171,7 +172,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getDefaultQueryGrammar()
 	{
-		return new Query\Grammars\Grammar;
+		return new QueryGrammar;
 	}
 
 	/**
@@ -189,7 +190,10 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @return \Illuminate\Database\Schema\Grammars\Grammar
 	 */
-	protected function getDefaultSchemaGrammar() {}
+	protected function getDefaultSchemaGrammar()
+	{
+		//
+	}
 
 	/**
 	 * Set the query post processor to the default implementation.
@@ -906,7 +910,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getDriverName()
 	{
-		return $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 	}
 
 	/**

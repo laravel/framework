@@ -10,6 +10,9 @@ class Lang extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'translator'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'translator';
+	}
 
 }

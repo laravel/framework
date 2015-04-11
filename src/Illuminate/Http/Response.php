@@ -31,7 +31,7 @@ class Response extends BaseResponse {
 		// from routes that will be automatically transformed to their JSON form.
 		if ($this->shouldBeJson($content))
 		{
-			$this->headers->set('Content-Type', 'application/json');
+			$this->header('Content-Type', 'application/json');
 
 			$content = $this->morphToJson($content);
 		}

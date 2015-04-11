@@ -416,9 +416,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function forceFill(array $attributes)
 	{
-		return $this->unguarded(function() use ($attributes)
+		// Since some versions of PHP have a bug that prevents it from properly
+		// binding the late static context in a closure, we will first store
+		// the model in a variable, which we will then use in the closure.
+		$model = $this;
+
+		return static::unguarded(function() use ($model, $attributes)
 		{
-			return $this->fill($attributes);
+			return $model->fill($attributes);
 		});
 	}
 
@@ -534,9 +539,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public static function forceCreate(array $attributes)
 	{
-		return static::unguarded(function() use ($attributes)
+		// Since some versions of PHP have a bug that prevents it from properly
+		// binding the late static context in a closure, we will first store
+		// the model in a variable, which we will then use in the closure.
+		$model = new static;
+
+		return static::unguarded(function() use ($model, $attributes)
 		{
-			return static::create($attributes);
+			return $model->create($attributes);
 		});
 	}
 
@@ -675,9 +685,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function fresh(array $with = array())
 	{
+		if ( ! $this->exists) return;
+
 		$key = $this->getKeyName();
 
-		return $this->exists ? static::with($with)->where($key, $this->getKey())->first() : null;
+		return static::with($with)->where($key, $this->getKey())->first();
 	}
 
 	/**

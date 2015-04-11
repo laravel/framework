@@ -207,7 +207,7 @@ class Kernel implements KernelContract {
 	{
 		if (is_null($this->artisan))
 		{
-			return $this->artisan = (new Artisan($this->app, $this->events))
+			return $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
 								->resolveCommands($this->commands);
 		}
 

@@ -53,13 +53,32 @@ class CallbackEvent extends Event {
 			touch($this->mutexPath());
 		}
 
-		$response = $container->call($this->callback, $this->parameters);
+		try {
+			$response = $container->call($this->callback, $this->parameters);
+		} catch (\Exception $e) {
+			$this->removeMutex();
 
-		@unlink($this->mutexPath());
+			throw $e;
+		}
+
+		$this->removeMutex();
 
 		parent::callAfterCallbacks($container);
 
 		return $response;
+	}
+
+	/**
+	 * Remove the mutex file from disk.
+	 *
+	 * @return void
+	 */
+	protected function removeMutex()
+	{
+		if ($this->description)
+		{
+			@unlink($this->mutexPath());
+		}
 	}
 
 	/**

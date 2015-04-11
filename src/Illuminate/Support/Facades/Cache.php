@@ -11,6 +11,9 @@ class Cache extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'cache'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'cache';
+	}
 
 }

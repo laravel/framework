@@ -55,7 +55,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$attributes = $model->getAttributes();
 
 		// ensure password attribute was not set to null
-		$this->assertFalse(array_key_exists('password', $attributes));
+		$this->assertArrayNotHasKey('password', $attributes);
 		$this->assertEquals('******', $model->password);
 		$this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $attributes['password_hash']);
 		$this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $model->password_hash);
@@ -102,6 +102,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = EloquentModelSaveStub::create(array('name' => 'taylor'));
 		$this->assertTrue($_SERVER['__eloquent.saved']);
 		$this->assertEquals('taylor', $model->name);
+	}
+
+
+	public function testForceCreateMethodSavesNewModelWithGuardedAttributes()
+	{
+		$_SERVER['__eloquent.saved'] = false;
+		$model = EloquentModelSaveStub::forceCreate(['id' => 21]);
+		$this->assertTrue($_SERVER['__eloquent.saved']);
+		$this->assertEquals(21, $model->id);
 	}
 
 
@@ -755,6 +764,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testForceFillMethodFillsGuardedAttributes()
+	{
+		$model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
+		$this->assertEquals(21, $model->id);
+	}
+
+
 	public function testUnguardAllowsAnythingToBeSet()
 	{
 		$model = new EloquentModelStub;
@@ -809,7 +825,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testUnguaredRunsCallbackWhileBeingUnguarded()
+	public function testUnguardedRunsCallbackWhileBeingUnguarded()
 	{
 		$model = Model::unguarded(function() {
 			return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
@@ -819,7 +835,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testUnguaredCallDoesNotChangeUnguardedState()
+	public function testUnguardedCallDoesNotChangeUnguardedState()
 	{
 		Model::unguard();
 		$model = Model::unguarded(function() {
@@ -1350,7 +1366,7 @@ class EloquentDateModelStub extends EloquentModelStub {
 
 class EloquentModelSaveStub extends Model {
 	protected $table = 'save_stub';
-	protected $guarded = array();
+	protected $guarded = ['id'];
 	public function save(array $options = array()) { $_SERVER['__eloquent.saved'] = true; }
 	public function setIncrementing($value)
 	{

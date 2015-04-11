@@ -173,7 +173,7 @@ class BelongsToMany extends Relation {
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	public function paginate($perPage = null, $columns = array('*'))
 	{
@@ -184,6 +184,43 @@ class BelongsToMany extends Relation {
 		$this->hydratePivotRelation($paginator->items());
 
 		return $paginator;
+	}
+
+	/**
+	 * Paginate the given query into a simple paginator.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = null, $columns = array('*'))
+	{
+		$this->query->addSelect($this->getSelectColumns($columns));
+
+		$paginator = $this->query->simplePaginate($perPage, $columns);
+
+		$this->hydratePivotRelation($paginator->items());
+
+		return $paginator;
+	}
+
+	/**
+	 * Chunk the results of the query.
+	 *
+	 * @param  int  $count
+	 * @param  callable  $callback
+	 * @return void
+	 */
+	public function chunk($count, callable $callback)
+	{
+		$this->query->addSelect($this->getSelectColumns());
+
+		$this->query->chunk($count, function($results) use ($callback)
+		{
+			$this->hydratePivotRelation($results->all());
+
+			call_user_func($callback, $results);
+		});
 	}
 
 	/**
