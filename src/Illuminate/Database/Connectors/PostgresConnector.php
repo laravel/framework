@@ -54,7 +54,7 @@ class PostgresConnector extends Connector implements ConnectorInterface {
 		{
 			$schema = $config['schema'];
 
-			$connection->prepare("set search_path to {$schema}")->execute();
+			$connection->prepare("set search_path to \"{$schema}\"")->execute();
 		}
 
 		return $connection;
