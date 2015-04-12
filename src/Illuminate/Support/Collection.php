@@ -245,10 +245,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function groupBy($groupBy)
 	{
-		if ( ! $this->useAsCallable($groupBy))
-		{
-			return $this->groupBy($this->valueRetriever($groupBy));
-		}
+		$groupBy = $this->valueRetriever($groupBy);
 
 		$results = [];
 
@@ -268,10 +265,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function keyBy($keyBy)
 	{
-		if ( ! $this->useAsCallable($keyBy))
-		{
-			return $this->keyBy($this->valueRetriever($keyBy));
-		}
+		$keyBy = $this->valueRetriever($keyBy);
 
 		$results = [];
 
@@ -617,10 +611,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		$results = [];
 
-		if ( ! $this->useAsCallable($callback))
-		{
-			$callback = $this->valueRetriever($callback);
-		}
+		$callback = $this->valueRetriever($callback);
 
 		// First we will loop through the items and get the comparator from a callback
 		// function which we were given. Then, we will sort the returned values and
@@ -684,10 +675,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 			return array_sum($this->items);
 		}
 
-		if ( ! $this->useAsCallable($callback))
-		{
-			$callback = $this->valueRetriever($callback);
-		}
+		$callback = $this->valueRetriever($callback);
 
 		return $this->reduce(function($result, $item) use ($callback)
 		{
@@ -745,10 +733,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * Get a value retrieving callback.
 	 *
 	 * @param  string  $value
-	 * @return \Closure
+	 * @return callable
 	 */
 	protected function valueRetriever($value)
 	{
+		if ($this->useAsCallable($value)) return $value;
+
 		return function($item) use ($value)
 		{
 			return data_get($item, $value);
