@@ -3,6 +3,15 @@
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
+/**
+ * Class SqlServerGrammar
+ *
+ * @todo There must be different implementations for each major version of MS SQL Server
+ * e.g. SqlServer2000, SqlServer2005, SqlServer2008, SqlServer2012, SqlServer2014
+ * At least, developer must be specify the versions supported.
+ *
+ * @package Illuminate\Database\Schema\Grammars
+ */
 class SqlServerGrammar extends Grammar {
 
 	/**
@@ -427,6 +436,17 @@ class SqlServerGrammar extends Grammar {
 		return 'datetime';
 	}
 
+    /**
+     * Create the column definition for a date-time type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeDateTimeTz(Fluent $column)
+    {
+        return 'datetimeoffset(0)';
+    }
+
 	/**
 	 * Create the column definition for a time type.
 	 *
@@ -438,6 +458,17 @@ class SqlServerGrammar extends Grammar {
 		return 'time';
 	}
 
+    /**
+     * Create the column definition for a time type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTimeTz(Fluent $column)
+    {
+        return 'time';
+    }
+
 	/**
 	 * Create the column definition for a timestamp type.
 	 *
@@ -448,6 +479,19 @@ class SqlServerGrammar extends Grammar {
 	{
 		return 'datetime';
 	}
+
+    /**
+     * Create the column definition for a timestamp type.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTimestampTz(Fluent $column)
+    {
+        return 'datetimeoffset(0)';
+    }
 
 	/**
 	 * Create the column definition for a binary type.
