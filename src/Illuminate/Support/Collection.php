@@ -582,14 +582,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function chunk($size, $preserveKeys = false)
 	{
-		$chunks = [];
+		$chunks = array_chunk($this->items, $size, $preserveKeys);
 
-		foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk)
+		return (new static($chunks))->map(function($chunk)
 		{
-			$chunks[] = new static($chunk);
-		}
-
-		return new static($chunks);
+			return new static($chunk);
+		});
 	}
 
 	/**
