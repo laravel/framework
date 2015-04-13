@@ -94,6 +94,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayCollapse()
+	{
+		$array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
+		$this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], array_collapse($array));
+	}
+
+
 	public function testArrayDivide()
 	{
 		$array = array('name' => 'taylor');
