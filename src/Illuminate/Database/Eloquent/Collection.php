@@ -198,13 +198,14 @@ class Collection extends BaseCollection {
 	/**
 	 * Return only unique items from the collection.
 	 *
+	 * @param  string|callable|null  $key
 	 * @return static
 	 */
-	public function unique()
+	public function unique($key = null)
 	{
-		$dictionary = $this->getDictionary();
+		if ( ! is_null($key)) return parent::unique($key);
 
-		return new static(array_values($dictionary));
+		return new static(array_values($this->getDictionary()));
 	}
 
 	/**
