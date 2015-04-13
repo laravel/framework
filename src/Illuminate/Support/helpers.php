@@ -62,6 +62,20 @@ if ( ! function_exists('array_build'))
 	}
 }
 
+if ( ! function_exists('array_collapse'))
+{
+	/**
+	 * Collapse an array of arrays into a single array.
+	 *
+	 * @param  array|\ArrayAccess  $array
+	 * @return array
+	 */
+	function array_collapse($array)
+	{
+		return Arr::collapse($array);
+	}
+}
+
 if ( ! function_exists('array_divide'))
 {
 	/**
