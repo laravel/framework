@@ -3,7 +3,9 @@
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use RuntimeException;
 use ReflectionParameter;
+use InvalidArgumentException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
@@ -196,12 +198,16 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		return $this->pipeline->send($command)->through($this->pipes)->then(function($command) use ($afterResolving)
 		{
 			if ($command instanceof SelfHandling)
+			{
 				return $this->container->call([$command, 'handle']);
+			}
 
 			$handler = $this->resolveHandler($command);
 
 			if ($afterResolving)
+			{
 				call_user_func($afterResolving, $handler);
+			}
 
 			return call_user_func(
 				[$handler, $this->getHandlerMethod($command)], $command
@@ -239,7 +245,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
 		if ( ! $queue instanceof Queue)
 		{
-			throw new \RuntimeException("Queue resolver did not return a Queue implementation.");
+			throw new RuntimeException("Queue resolver did not return a Queue implementation.");
 		}
 
 		if (method_exists($command, 'queue'))
@@ -311,7 +317,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 			return $this->getMapperSegment($command, $segment);
 		}
 
-		throw new \InvalidArgumentException("No handler registered for command [{$className}]");
+		throw new InvalidArgumentException("No handler registered for command [{$className}]");
 	}
 
 	/**

@@ -14,7 +14,7 @@ interface Registrar {
 	 * Create a new user instance after a valid registration.
 	 *
 	 * @param  array  $data
-	 * @return User
+	 * @return \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	public function create(array $data);
 

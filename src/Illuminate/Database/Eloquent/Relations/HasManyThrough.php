@@ -304,13 +304,27 @@ class HasManyThrough extends Relation {
 	 *
 	 * @param  int    $perPage
 	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
+	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	public function paginate($perPage = null, $columns = ['*'])
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
 		return $this->query->paginate($perPage, $columns);
+	}
+
+	/**
+	 * Paginate the given query into a simple paginator.
+	 *
+	 * @param  int  $perPage
+	 * @param  array  $columns
+	 * @return \Illuminate\Contracts\Pagination\Paginator
+	 */
+	public function simplePaginate($perPage = null, $columns = ['*'])
+	{
+		$this->query->addSelect($this->getSelectColumns($columns));
+
+		return $this->query->simplePaginate($perPage, $columns);
 	}
 
 	/**
