@@ -10,6 +10,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
+	 * All custom statement handlers.
+	 *
+	 * @var array
+	 */
+	protected $statements = [];
+
+	/**
 	 * The file currently being compiled.
 	 *
 	 * @var string
@@ -250,9 +257,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$callback = function($match)
 		{
+			// Blade tags are usually compiled by equally-named
+			// methods. Users can also register their custom
+			// handler callbacks to resolve custom tags.
 			if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
 			{
 				$match[0] = $this->$method(array_get($match, 3));
+			}
+			else if (isset($this->statements[$match[1]]))
+			{
+				$match[0] = call_user_func($this->statements[$match[1]], array_get($match, 3));
 			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -704,6 +718,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function extend(callable $compiler)
 	{
 		$this->extensions[] = $compiler;
+	}
+
+	/**
+	 * Register a handler for custom statements.
+	 *
+	 * @param  string  $name
+	 * @param  callable  $handler
+	 * @return void
+	 */
+	public function addStatement($name, callable $handler)
+	{
+		$this->statements[$name] = $handler;
 	}
 
 	/**
