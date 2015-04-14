@@ -95,7 +95,7 @@ abstract class GeneratorCommand extends Command {
 			$name = str_replace('/', '\\', $name);
 		}
 
-		return $this->parseName($this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name);
+		return $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name;
 	}
 
 	/**
