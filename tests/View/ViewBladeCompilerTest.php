@@ -540,50 +540,6 @@ empty
 	}
 
 
-	public function testCreateMatcher()
-	{
-		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->extend(
-			function($view, BladeCompiler $compiler)
-			{
-				$pattern = $compiler->createMatcher('customControl');
-				$replace = '<?php echo custom_control$2; ?>';
-				return preg_replace($pattern, '$1'.$replace, $view);
-			}
-		);
-
-		$string = '@if($foo)
-@customControl(10, $foo, \'bar\')
-@endif';
-		$expected = '<?php if($foo): ?>
-<?php echo custom_control(10, $foo, \'bar\'); ?>
-<?php endif; ?>';
-		$this->assertEquals($expected, $compiler->compileString($string));
-	}
-
-
-	public function testCreatePlainMatcher()
-	{
-		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->extend(
-			function($view, BladeCompiler $compiler)
-			{
-				$pattern = $compiler->createPlainMatcher('customControl');
-				$replace = '<?php echo custom_control; ?>';
-				return preg_replace($pattern, '$1'.$replace.'$2', $view);
-			}
-		);
-
-		$string = '@if($foo)
-@customControl
-@endif';
-		$expected = '<?php if($foo): ?>
-<?php echo custom_control; ?>
-<?php endif; ?>';
-		$this->assertEquals($expected, $compiler->compileString($string));
-	}
-
-
 	public function testConfiguringContentTags()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
