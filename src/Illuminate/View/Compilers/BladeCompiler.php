@@ -211,7 +211,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Get the echo methdos in the proper order for compilation.
+	 * Get the echo methods in the proper order for compilation.
 	 *
 	 * @return array
 	 */
