@@ -239,6 +239,19 @@ this is a comment
 	}
 
 
+	public function testIfsectionStatementsAreCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@ifsection ("foo")
+breeze
+@endif';
+		$expected = '<?php if($__env->hasSection("foo")): ?>
+breeze
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testIfStatementsAreCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);

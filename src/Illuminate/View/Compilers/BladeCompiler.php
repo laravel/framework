@@ -513,6 +513,17 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the section check statements into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compileIfsection($expression)
+	{
+		return "<?php if(\$__env->hasSection{$expression}): ?>";
+	}
+
+	/**
 	 * Compile the if statements into valid PHP.
 	 *
 	 * @param  string  $expression
