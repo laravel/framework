@@ -557,6 +557,19 @@ empty
 	}
 
 
+	public function testCustomShortStatements()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->addStatement('customControl', function($expression) {
+			return '<?php echo custom_control(); ?>';
+		});
+
+		$string = '@customControl';
+		$expected = '<?php echo custom_control(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testConfiguringContentTags()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
