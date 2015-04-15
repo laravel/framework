@@ -98,7 +98,7 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SQS queue driver (~2.4).",
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~2.4).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.0).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~1.5).",
