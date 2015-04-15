@@ -482,16 +482,16 @@ class MySqlGrammar extends Grammar {
 		return 'datetime';
 	}
 
-    /**
-     * Create the column definition for a date-time type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeDateTimeTz(Fluent $column)
-    {
-        return 'datetime';
-    }
+	/**
+	 * Create the column definition for a date-time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDateTimeTz(Fluent $column)
+	{
+		return 'datetime';
+	}
 
 	/**
 	 * Create the column definition for a time type.
@@ -504,16 +504,16 @@ class MySqlGrammar extends Grammar {
 		return 'time';
 	}
 
-    /**
-     * Create the column definition for a time type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeTimeTz(Fluent $column)
-    {
-        return 'time';
-    }
+	/**
+	 * Create the column definition for a time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimeTz(Fluent $column)
+	{
+		return 'time';
+	}
 
 	/**
 	 * Create the column definition for a timestamp type.
@@ -528,18 +528,18 @@ class MySqlGrammar extends Grammar {
 		return 'timestamp';
 	}
 
-    /**
-     * Create the column definition for a timestamp type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeTimestampTz(Fluent $column)
-    {
-        if ( ! $column->nullable) return 'timestamp default 0';
+	/**
+	 * Create the column definition for a timestamp type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimestampTz(Fluent $column)
+	{
+		if ( ! $column->nullable) return 'timestamp default 0';
 
-        return 'timestamp';
-    }
+		return 'timestamp';
+	}
 
 	/**
 	 * Create the column definition for a binary type.
