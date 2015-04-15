@@ -3068,11 +3068,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Get a specified relationship.
 	 *
 	 * @param  string  $relation
-	 * @return mixed
+	 * @return null|mixed
 	 */
 	public function getRelation($relation)
 	{
-		return $this->relations[$relation];
+		return array_get($this->relations, $relation, null);
 	}
 
 	/**
