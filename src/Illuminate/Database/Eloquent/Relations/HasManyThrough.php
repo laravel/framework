@@ -29,7 +29,7 @@ class HasManyThrough extends Relation {
 	protected $secondKey;
 
 	/**
-	 * The local key on the relationship
+	 * The local key on the relationship.
 	 *
 	 * @var string
 	 */
@@ -43,14 +43,15 @@ class HasManyThrough extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $firstKey
 	 * @param  string  $secondKey
+	 * @param  string  $localKey
 	 * @return void
 	 */
 	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey, $localKey)
 	{
+		$this->localKey = $localKey;
 		$this->firstKey = $firstKey;
 		$this->secondKey = $secondKey;
 		$this->farParent = $farParent;
-		$this->localKey = $localKey;
 
 		parent::__construct($query, $parent);
 	}
