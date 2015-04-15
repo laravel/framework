@@ -120,6 +120,20 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($result, $connection);
 	}
 
+	public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
+	{
+		$config = array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'appname' => 'baz', 'charset' => 'utf-8');
+		$dsn = $this->getDsn($config);
+		$connector = $this->getMock('Illuminate\Database\Connectors\SqlServerConnector', array('createConnection', 'getOptions'));
+		$connection = m::mock('stdClass');
+		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
+		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
+		$result = $connector->connect($config);
+
+		$this->assertSame($result, $connection);
+
+	}
+
 	protected function getDsn(array $config)
 	{
 		extract($config);
@@ -127,12 +141,17 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		if (in_array('dblib', PDO::getAvailableDrivers()))
 		{
 			$port = isset($config['port']) ? ':'.$port : '';
-			return "dblib:host={$host}{$port};dbname={$database}";
+			$appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+			$charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+
+			return "dblib:host={$host}{$port};dbname={$database}{$appname}{$charset}";
 		}
 		else
 		{
 			$port = isset($config['port']) ? ','.$port : '';
-			return "sqlsrv:Server={$host}{$port};Database={$database}";
+			$appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
+
+			return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}";
 		}
 	}
 
