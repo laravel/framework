@@ -151,7 +151,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 		$related = $relation->getRelated();
 		$related->shouldReceive('getQualifiedKeyName')->once()->andReturn('posts.id');
-		
+
 		$relation->find('foo');
 	}
 
@@ -173,10 +173,10 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	{
 		list($builder, $country,, $firstKey, $secondKey) = $this->getRelationArguments();
 		$user = new EloquentHasManyThroughSoftDeletingModelStub;
-		
+
 		$builder->shouldReceive('whereNull')->with('users.deleted_at')->once()->andReturn($builder);
 
-		$relation = new HasManyThrough($builder, $country, $user, $firstKey, $secondKey);
+		$relation = new HasManyThrough($builder, $country, $user, $firstKey, $secondKey, 'id');
 	}
 
 
