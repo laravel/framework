@@ -44,8 +44,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 		{
 			return $this->getDblibDsn($config);
 		}
-
-		return $this->getSqlSrvDsn($config);
+		else
+		{
+			return $this->getSqlSrvDsn($config);
+		}
 	}
 
 	/**
@@ -61,8 +63,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 			'dbname' => $config['database']
 		);
 
-		$arguments = $this->appendIfConfigKeyAvailable('appname', 'appname', $config, $arguments);
-		$arguments = $this->appendIfConfigKeyAvailable('charset', 'charset', $config, $arguments);
+		$arguments = array_merge(
+			$arguments, array_only($config, ['appname', 'charset'])
+		);
 
 		return $this->buildConnectString('dblib', $arguments);
 	}
@@ -79,40 +82,51 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 			'Server' => $this->buildHostString($config, ',')
 		);
 
-		$arguments = $this->appendIfConfigKeyAvailable('database', 'Database', $config, $arguments);
-		$arguments = $this->appendIfConfigKeyAvailable('appname', 'APP', $config, $arguments);
-		
+		if (isset($config['database'])) {
+			$arguments['Database'] = $config['database'];
+		}
+
+		if (isset($config['appname'])) {
+			$arguments['APP'] = $config['appname'];
+		}
+
 		return $this->buildConnectString('sqlsrv', $arguments);
 	}
 
-	private function buildConnectString($driver, array $arguments)
+	/**
+	 * Build a connection string from the given arguments.
+	 *
+	 * @param  string  $driver
+	 * @param  array  $arguments
+	 * @return string
+	 */
+	protected function buildConnectString($driver, array $arguments)
 	{
-		$connectStringOptions = array_map(function($key) use ($arguments)
+		$options = array_map(function($key) use ($arguments)
 		{
 			return sprintf("%s=%s", $key, $arguments[$key]);
 		}, array_keys($arguments));
 
-		return $driver.":".implode(';', $connectStringOptions);
+		return $driver.":".implode(';', $options);
 	}
 
-	private function buildHostString(array $config, $separator)
+	/**
+	 * Build a host string from the given configuration.
+	 *
+	 * @param  array  $config
+	 * @param  string  $separator
+	 * @return string
+	 */
+	protected function buildHostString(array $config, $separator)
 	{
 		if(isset($config['port']))
 		{
 			return $config['host'].$separator.$config['port'];
 		}
-
-		return $config['host'];
-	}
-
-	private function appendIfConfigKeyAvailable($configKey, $targetKey, array $config, array $arguments)
-	{
-		if(isset($config[$configKey]))
+		else
 		{
-			$arguments[$targetKey] = $config[$configKey];
+			return $config['host'];
 		}
-
-		return $arguments;
 	}
 
 	/**
