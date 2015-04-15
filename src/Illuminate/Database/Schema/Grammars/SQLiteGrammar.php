@@ -489,9 +489,6 @@ class SQLiteGrammar extends Grammar {
 	/**
 	 * Create the column definition for a date-time type.
 	 *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
@@ -500,26 +497,23 @@ class SQLiteGrammar extends Grammar {
 		return 'datetime';
 	}
 
-    /**
-     * Create the column definition for a date-time type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeDateTimeTz(Fluent $column)
-    {
-        return 'datetime';
-    }
+	/**
+	 * Create the column definition for a date-time type.
+	 *
+	 * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
+	 * @link https://www.sqlite.org/datatype3.html
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDateTimeTz(Fluent $column)
+	{
+		return 'datetime';
+	}
 
 	/**
 	 * Create the column definition for a time type.
 	 *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
@@ -528,26 +522,20 @@ class SQLiteGrammar extends Grammar {
 		return 'time';
 	}
 
-    /**
-     * Create the column definition for a time type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeTimeTz(Fluent $column)
-    {
-        return 'time';
-    }
+	/**
+	 * Create the column definition for a time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimeTz(Fluent $column)
+	{
+		return 'time';
+	}
 
 	/**
 	 * Create the column definition for a timestamp type.
 	 *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
@@ -556,19 +544,16 @@ class SQLiteGrammar extends Grammar {
 		return 'datetime';
 	}
 
-    /**
-     * Create the column definition for a timestamp type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeTimestampTz(Fluent $column)
-    {
-        return 'datetime';
-    }
+	/**
+	 * Create the column definition for a timestamp type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimestampTz(Fluent $column)
+	{
+		return 'datetime';
+	}
 
 	/**
 	 * Create the column definition for a binary type.

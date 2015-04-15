@@ -617,16 +617,16 @@ class Blueprint {
 		return $this->addColumn('dateTime', $column);
 	}
 
-    /**
-     * Create a new date-time column (with time zone) on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dateTimeTz($column)
-    {
-        return $this->addColumn('dateTimeTz', $column);
-    }
+	/**
+	 * Create a new date-time column (with time zone) on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function dateTimeTz($column)
+	{
+		return $this->addColumn('dateTimeTz', $column);
+	}
 
 	/**
 	 * Create a new time column on the table.
@@ -639,16 +639,16 @@ class Blueprint {
 		return $this->addColumn('time', $column);
 	}
 
-    /**
-     * Create a new time column (with time zone) on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Support\Fluent
-     */
-    public function timeTz($column)
-    {
-        return $this->addColumn('timeTz', $column);
-    }
+	/**
+	 * Create a new time column (with time zone) on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function timeTz($column)
+	{
+		return $this->addColumn('timeTz', $column);
+	}
 
 	/**
 	 * Create a new timestamp column on the table.
@@ -661,16 +661,16 @@ class Blueprint {
 		return $this->addColumn('timestamp', $column);
 	}
 
-    /**
-     * Create a new timestamp (with time zone) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Support\Fluent
-     */
-    public function timestampTz($column)
-    {
-        return $this->addColumn('timestampTz', $column);
-    }
+	/**
+	 * Create a new timestamp (with time zone) column on the table.
+	 *
+	 * @param  string  $column
+	 * @return \Illuminate\Support\Fluent
+	 */
+	public function timestampTz($column)
+	{
+		return $this->addColumn('timestampTz', $column);
+	}
 
 	/**
 	 * Add nullable creation and update timestamps to the table.
@@ -684,17 +684,17 @@ class Blueprint {
 		$this->timestamp('updated_at')->nullable();
 	}
 
-    /**
-     * Add creation and update timestamps to the table.
-     *
-     * @return void
-     */
-    public function timestamps()
-    {
-        $this->timestamp('created_at');
+	/**
+	 * Add creation and update timestamps to the table.
+	 *
+	 * @return void
+	 */
+	public function timestamps()
+	{
+		$this->timestamp('created_at');
 
-        $this->timestamp('updated_at');
-    }
+		$this->timestamp('updated_at');
+	}
 
 	/**
 	 * Add a "deleted at" timestamp for the table.
