@@ -264,7 +264,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			{
 				$match[0] = $this->$method(array_get($match, 3));
 			}
-			else if (isset($this->statements[$match[1]]))
+			elseif (isset($this->statements[$match[1]]))
 			{
 				$match[0] = call_user_func($this->statements[$match[1]], array_get($match, 3));
 			}
