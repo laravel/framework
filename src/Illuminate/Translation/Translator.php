@@ -180,9 +180,8 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
 	{
-		if (strpos($id, '.') === false) {
-			$id = $domain.'.'.$id;
-		}
+		$id = $this->prepareMessageId($id, $domain);
+		
 		return $this->get($id, $parameters, $locale);
 	}
 
@@ -198,10 +197,31 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
 	{
-		if (strpos($id, '.') === false) {
-			$id = $domain.'.'.$id;
-		}
+		$id = $this->prepareMessageId($id, $domain);
+		
 		return $this->choice($id, $number, $parameters, $locale);
+	}
+	
+	/**
+	* Prepare message id.
+	*
+	* @param string $id
+	* @param string $domain
+	*
+	* @return string
+	*/
+	protected function prepareMessageId($id, $domain)
+	{
+		if (strpos($id, '.') !== false) {
+		    return $id;
+		}
+		
+		$segments = parent::parseKey($key);
+		if (is_null($segments[0])) {
+		    return $domain.'.'.$id;
+		}
+		
+		return sprintf('%s::%s', $segments[0], $domain.'.'.$segments[1]);
 	}
 
 	/**
