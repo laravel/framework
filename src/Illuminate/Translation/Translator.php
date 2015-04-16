@@ -216,7 +216,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 		    return $id;
 		}
 		
-		$segments = parent::parseKey($key);
+		$segments = parent::parseKey($id);
 		if (is_null($segments[0])) {
 		    return $domain.'.'.$id;
 		}
