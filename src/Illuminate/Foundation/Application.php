@@ -952,6 +952,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Add a service to the application's deferred services.
+	 *
+	 * @param  string  $service
+	 * @return void
+	 */
+	public function addDeferredService($service)
+	{
+		$this->deferredServices[] = $service;
+	}
+
+	/**
 	 * Determine if the given service is a deferred service.
 	 *
 	 * @param  string  $service
