@@ -236,16 +236,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function groupBy($groupBy)
 	{
-		if ( ! $this->useAsCallable($groupBy))
-		{
-			return $this->groupBy($this->valueRetriever($groupBy));
-		}
+		$groupBy = $this->valueRetriever($groupBy);
 
 		$results = [];
 
 		foreach ($this->items as $key => $value)
 		{
-			$results[$groupBy($value, $key)][] = $value;
+			$groupKey = $groupBy($value, $key);
+
+			if ( ! array_key_exists($groupKey, $results))
+			{
+				$results[$groupKey] = new static;
+			}
+
+			$results[$groupKey]->push($value);
 		}
 
 		return new static($results);
@@ -259,10 +263,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function keyBy($keyBy)
 	{
-		if ( ! $this->useAsCallable($keyBy))
-		{
-			return $this->keyBy($this->valueRetriever($keyBy));
-		}
+		$keyBy = $this->valueRetriever($keyBy);
 
 		$results = [];
 
@@ -618,10 +619,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		$results = [];
 
-		if ( ! $this->useAsCallable($callback))
-		{
-			$callback = $this->valueRetriever($callback);
-		}
+		$callback = $this->valueRetriever($callback);
 
 		// First we will loop through the items and get the comparator from a callback
 		// function which we were given. Then, we will sort the returned values and
@@ -685,10 +683,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 			return array_sum($this->items);
 		}
 
-		if ( ! $this->useAsCallable($callback))
-		{
-			$callback = $this->valueRetriever($callback);
-		}
+		$callback = $this->valueRetriever($callback);
 
 		return $this->reduce(function($result, $item) use ($callback)
 		{
@@ -746,14 +741,38 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * Get a value retrieving callback.
 	 *
 	 * @param  string  $value
-	 * @return \Closure
+	 * @return callable
 	 */
 	protected function valueRetriever($value)
 	{
+		if ($this->useAsCallable($value)) return $value;
+
 		return function($item) use ($value)
 		{
 			return data_get($item, $value);
 		};
+	}
+
+	/**
+	 * Zip the collection together with one or more arrays
+	 *
+	 * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
+	 *      => [[1, 4], [2, 5], [3, 6]]
+	 *
+	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array ...$items
+	 * @return static
+	 */
+	public function zip($items)
+	{
+		$arrayableItems = array_map(function ($items) {
+			return $this->getArrayableItems($items);
+		}, func_get_args());
+
+		$params = array_merge([function () {
+			return new static(func_get_args());
+		}, $this->items], $arrayableItems);
+
+		return new static(call_user_func_array('array_map', $params));
 	}
 
 	/**

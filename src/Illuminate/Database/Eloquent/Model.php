@@ -599,17 +599,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
-	 * Get the first model for the given attributes.
-	 *
-	 * @param  array  $attributes
-	 * @return static|null
-	 */
-	protected static function firstByAttributes($attributes)
-	{
-		return static::where($attributes)->first();
-	}
-
-	/**
 	 * Begin querying the model.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder
@@ -891,7 +880,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  string|null  $secondKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
 	 */
-	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
 	{
 		$through = new $through;
 
@@ -899,7 +888,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
 	}
 
 	/**
@@ -2471,9 +2462,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = array();
 
+		$hidden = $this->getHidden();
+
 		foreach ($this->getArrayableRelations() as $key => $value)
 		{
-			if (in_array($key, $this->hidden)) continue;
+			if (in_array($key, $hidden)) continue;
 
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
@@ -2531,12 +2524,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function getArrayableItems(array $values)
 	{
-		if (count($this->visible) > 0)
+		if (count($this->getVisible()) > 0)
 		{
-			return array_intersect_key($values, array_flip($this->visible));
+			return array_intersect_key($values, array_flip($this->getVisible()));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));
+		return array_diff_key($values, array_flip($this->getHidden()));
 	}
 
 	/**

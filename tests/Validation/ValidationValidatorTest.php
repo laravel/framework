@@ -1443,10 +1443,3 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 }
-
-
-class ValidatorTestAfterCallbackStub {
-	public function validate() {
-		$_SERVER['__validator.after.test'] = true;
-	}
-}

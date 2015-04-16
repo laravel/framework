@@ -498,6 +498,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testKeyByClosure()
+	{
+		$data   = new Collection([
+			['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+			['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR']
+		]);
+		$result = $data->keyBy(function ($item)
+		{
+			return strtolower($item['firstname'].$item['lastname']);
+		});
+		$this->assertEquals([
+			'taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+			'lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR']
+		], $result->all());
+	}
+
+
 	public function testContains()
 	{
 		$c = new Collection([1, 3, 5]);
@@ -633,6 +650,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
 		$this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
 		$this->assertEquals([], $c->forPage(3, 2)->all());
+	}
+
+
+	public function testZip()
+	{
+		$c = new Collection([1, 2, 3]);
+		$c = $c->zip(new Collection([4, 5, 6]));
+		$this->assertInstanceOf('Illuminate\Support\Collection', $c);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $c[0]);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $c[1]);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $c[2]);
+		$this->assertEquals(3, $c->count());
+		$this->assertEquals([1, 4], $c[0]->all());
+		$this->assertEquals([2, 5], $c[1]->all());
+		$this->assertEquals([3, 6], $c[2]->all());
+
+		$c = new Collection([1, 2, 3]);
+		$c = $c->zip([4, 5, 6], [7, 8, 9]);
+		$this->assertEquals(3, $c->count());
+		$this->assertEquals([1, 4, 7], $c[0]->all());
+		$this->assertEquals([2, 5, 8], $c[1]->all());
+		$this->assertEquals([3, 6, 9], $c[2]->all());
+
+		$c = new Collection([1, 2, 3]);
+		$c = $c->zip([4, 5, 6], [7]);
+		$this->assertEquals(3, $c->count());
+		$this->assertEquals([1, 4, 7], $c[0]->all());
+		$this->assertEquals([2, 5, null], $c[1]->all());
+		$this->assertEquals([3, 6, null], $c[2]->all());
 	}
 
 }

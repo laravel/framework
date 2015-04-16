@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\Validator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 
 trait ValidatesRequests {
@@ -13,11 +13,12 @@ trait ValidatesRequests {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  array  $rules
 	 * @param  array  $messages
+	 * @param  array  $customAttributes
 	 * @return void
 	 */
-	public function validate(Request $request, array $rules, array $messages = array())
+	public function validate(Request $request, array $rules, array $messages = array(), array $customAttributes = array())
 	{
-		$validator = $this->getValidationFactory()->make($request->all(), $rules, $messages);
+		$validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
 		if ($validator->fails())
 		{
@@ -61,7 +62,7 @@ trait ValidatesRequests {
 	/**
 	 * Format the validation errors to be returned.
 	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
 	 * @return array
 	 */
 	protected function formatValidationErrors(Validator $validator)

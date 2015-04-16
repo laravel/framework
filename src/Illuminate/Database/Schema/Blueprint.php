@@ -36,6 +36,16 @@ class Blueprint {
 	public $engine;
 
 	/**
+	 * The default character set that should be used for the table
+	 */
+	public $charset;
+
+	/**
+	 * The collation that should be used for the table;
+	 */
+	public $collation;
+
+	/**
 	 * Create a new schema blueprint.
 	 *
 	 * @param  string  $table

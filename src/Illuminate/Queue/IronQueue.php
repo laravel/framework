@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue;
 
-use IronMQ;
+use IronMQ\IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
@@ -11,7 +11,7 @@ class IronQueue extends Queue implements QueueContract {
 	/**
 	 * The IronMQ instance.
 	 *
-	 * @var IronMQ
+	 * @var \IronMQ\IronMQ
 	 */
 	protected $iron;
 
@@ -39,7 +39,7 @@ class IronQueue extends Queue implements QueueContract {
 	/**
 	 * Create a new IronMQ queue instance.
 	 *
-	 * @param  \IronMQ  $iron
+	 * @param  \IronMQ\IronMQ  $iron
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  string  $default
 	 * @param  bool  $shouldEncrypt
@@ -228,7 +228,7 @@ class IronQueue extends Queue implements QueueContract {
 	/**
 	 * Get the underlying IronMQ instance.
 	 *
-	 * @return \IronMQ
+	 * @return \IronMQ\IronMQ
 	 */
 	public function getIron()
 	{
