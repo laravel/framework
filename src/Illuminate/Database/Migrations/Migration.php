@@ -1,7 +1,5 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Illuminate\Database\Schema\Builder;
-
 abstract class Migration {
 
 	/**
@@ -14,7 +12,7 @@ abstract class Migration {
 	/**
 	 * The schema builder for migrations.
 	 * 
-	 * @var Builder
+	 * @var Illuminate\Database\Schema\Builder
 	 */
 	 protected $builder;
 
@@ -39,7 +37,7 @@ abstract class Migration {
 	/**
 	 * Get the schema builder.
 	 * 
-	 * @return Builder
+	 * @return Illuminate\Database\Schema\Builder
 	 */
 	 public function builder()
 	 {
