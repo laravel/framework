@@ -180,6 +180,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
 	{
+		if (strpos($id, '.') === false) {
+			$id = $domain.'.'.$id;
+		}
 		return $this->get($id, $parameters, $locale);
 	}
 
@@ -195,6 +198,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
 	{
+		if (strpos($id, '.') === false) {
+			$id = $domain.'.'.$id;
+		}
 		return $this->choice($id, $number, $parameters, $locale);
 	}
 
