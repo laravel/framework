@@ -952,14 +952,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
-	 * Add a service to the application's deferred services.
+	 * Add an array of services to the application's deferred services.
 	 *
-	 * @param  string  $service
+	 * @param  array  $services
 	 * @return void
 	 */
-	public function addDeferredService($service)
+	public function addDeferredServices(array $services)
 	{
-		$this->deferredServices[] = $service;
+		$this->deferredServices = array_merge($this->deferredServices, $services);
 	}
 
 	/**
