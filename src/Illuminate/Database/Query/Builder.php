@@ -421,7 +421,7 @@ class Builder {
 	/**
 	 * Add a basic where clause to the query.
 	 *
-	 * @param  string  $column
+	 * @param  mixed   $column
 	 * @param  string  $operator
 	 * @param  mixed   $value
 	 * @param  string  $boolean
