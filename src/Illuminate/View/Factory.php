@@ -866,6 +866,17 @@ class Factory implements FactoryContract {
 	}
 
 	/**
+	 * Check if section exists.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function hasSection($name)
+	{
+		return array_key_exists($name, $this->sections);
+	}
+
+	/**
 	 * Get the entire array of sections.
 	 *
 	 * @return array
@@ -873,17 +884,6 @@ class Factory implements FactoryContract {
 	public function getSections()
 	{
 		return $this->sections;
-	}
-
-	/**
-	 * Check if section exists.
-	 *
-	 * @param  $name
-	 * @return bool
-	 */
-	public function hasSection($name)
-	{
-		return array_key_exists($name, $this->sections);
 	}
 
 	/**
