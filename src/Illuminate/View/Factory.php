@@ -876,6 +876,17 @@ class Factory implements FactoryContract {
 	}
 
 	/**
+	 * Check if section exists.
+	 *
+	 * @param  $name
+	 * @return bool
+	 */
+	public function hasSection($name)
+	{
+		return array_key_exists($name, $this->sections);
+	}
+
+	/**
 	 * Get all of the registered named views in environment.
 	 *
 	 * @return array
