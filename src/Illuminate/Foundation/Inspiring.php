@@ -14,12 +14,11 @@ class Inspiring {
 	public static function quote()
 	{
 		return Collection::make([
-
-			'When there is no desire, all things are at peace. - Laozi',
 			'Simplicity is the ultimate sophistication. - Leonardo da Vinci',
+			'When there is no desire, all things are at peace. - Laozi',
 			'Simplicity is the essence of happiness. - Cedric Bledsoe',
-			'Smile, breathe, and go slowly. - Thich Nhat Hanh',
 			'Simplicity is an acquired taste. - Katharine Gerould',
+			'Smile, breathe, and go slowly. - Thich Nhat Hanh',
 			'Well begun is half done. - Aristotle',
 
 		])->random();
