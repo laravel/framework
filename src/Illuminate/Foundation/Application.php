@@ -465,7 +465,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		$manifestPath = $this->getCachedServicesPath();
 
 		(new ProviderRepository($this, new Filesystem, $manifestPath))
-		            ->load($this->config['app.providers']);
+					->load($this->config['app.providers']);
 	}
 
 	/**
@@ -941,14 +941,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
-     * Get the application's deferred services.
-     *
-     * @return array
-     */
-    public function getDeferredServices()
-    {
-        return $this->deferredServices;
-    }
+	 * Get the application's deferred services.
+	 *
+	 * @return array
+	 */
+	public function getDeferredServices()
+	{
+		return $this->deferredServices;
+	}
 
 	/**
 	 * Set the application's deferred services.
