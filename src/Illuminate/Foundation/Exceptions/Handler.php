@@ -87,10 +87,8 @@ class Handler implements ExceptionHandlerContract {
 		{
 			return $this->renderHttpException($e);
 		}
-		else
-		{
-			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
-		}
+
+		return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
 	}
 
 	/**
@@ -119,10 +117,8 @@ class Handler implements ExceptionHandlerContract {
 		{
 			return response()->view("errors.{$status}", [], $status);
 		}
-		else
-		{
-			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
-		}
+
+		return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
 	}
 
 	/**
