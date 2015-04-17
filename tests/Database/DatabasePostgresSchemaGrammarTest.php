@@ -424,6 +424,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingDateTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->dateTimeTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTime()
 	{
@@ -435,6 +444,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" time(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timeTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" time(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTimeStamp()
 	{
@@ -446,6 +464,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingTimeStampTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timestampTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTimeStamps()
 	{
