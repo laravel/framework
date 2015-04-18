@@ -88,8 +88,7 @@ trait AuthenticatesAndRegistersUsers {
 	/**
 	 * Get needed for authorization credentials from request
 	 * 
-	 * @param Request $request
-	 *
+	 * @param  \Illuminate\Http\Request  $request
 	 * @return array
 	 */
 	protected function getCredentials(Request $request)
