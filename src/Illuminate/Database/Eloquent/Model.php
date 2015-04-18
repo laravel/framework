@@ -3070,7 +3070,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 
 	/**
-	 * Check if the relation is loaded
+	 * Determine if the given relation is loaded.
 	 *
 	 * @param  string  $key
 	 * @return bool
