@@ -2553,7 +2553,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($key, $this->relations))
+		if ($this->relationLoaded($key))
 		{
 			return $this->relations[$key];
 		}
@@ -3066,6 +3066,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function getRelation($relation)
 	{
 		return $this->relations[$relation];
+	}
+
+
+	/**
+	 * Check if the relation is loaded
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function relationLoaded($key)
+	{
+		return array_key_exists($key, $this->relations);
 	}
 
 	/**
