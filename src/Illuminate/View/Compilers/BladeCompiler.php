@@ -10,6 +10,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
+	 * All custom statement handlers.
+	 *
+	 * @var array
+	 */
+	protected $statements = [];
+
+	/**
 	 * The file currently being compiled.
 	 *
 	 * @var string
@@ -250,9 +257,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$callback = function($match)
 		{
+			// Blade tags are usually compiled by equally-named
+			// methods. Users can also register their custom
+			// handler callbacks to resolve custom tags.
 			if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
 			{
 				$match[0] = $this->$method(array_get($match, 3));
+			}
+			elseif (isset($this->statements[$match[1]]))
+			{
+				$match[0] = call_user_func($this->statements[$match[1]], array_get($match, 3));
 			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -707,36 +721,15 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Get the regular expression for a generic Blade function.
+	 * Register a handler for custom statements.
 	 *
-	 * @param  string  $function
-	 * @return string
+	 * @param  string  $name
+	 * @param  callable  $handler
+	 * @return void
 	 */
-	public function createMatcher($function)
+	public function addStatement($name, callable $handler)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createOpenMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
-	}
-
-	/**
-	 * Create a plain Blade matcher.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createPlainMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+		$this->statements[$name] = $handler;
 	}
 
 	/**
