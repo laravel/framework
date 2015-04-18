@@ -61,7 +61,7 @@ trait AuthenticatesAndRegistersUsers {
 			'email' => 'required|email', 'password' => 'required',
 		]);
 
-		$credentials = $request->only('email', 'password');
+		$credentials = $this->getCredentials($request);
 
 		if (Auth::attempt($credentials, $request->has('remember')))
 		{
@@ -83,6 +83,18 @@ trait AuthenticatesAndRegistersUsers {
 	protected function getFailedLoginMessage()
 	{
 		return 'These credentials do not match our records.';
+	}
+	
+	/**
+	 * Get needed for authorization credentials from request
+	 * 
+	 * @param Request $request
+	 *
+	 * @return array
+	 */
+	protected function getCredentials(Request $request)
+	{
+		return $request->only('email', 'password');
 	}
 
 	/**
