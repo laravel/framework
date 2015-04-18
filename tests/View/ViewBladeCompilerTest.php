@@ -543,7 +543,7 @@ empty
 	public function testCustomStatements()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->addStatement('customControl', function($expression) {
+		$compiler->directive('customControl', function($expression) {
 			return "<?php echo custom_control{$expression}; ?>";
 		});
 
@@ -560,7 +560,7 @@ empty
 	public function testCustomShortStatements()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->addStatement('customControl', function($expression) {
+		$compiler->directive('customControl', function($expression) {
 			return '<?php echo custom_control(); ?>';
 		});
 

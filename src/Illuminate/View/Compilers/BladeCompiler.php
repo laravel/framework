@@ -7,14 +7,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
 
 	/**
-	 * All custom statement handlers.
+	 * All custom "directive" handlers.
+	 *
+	 * This was implemented as a more usable "extend" in 5.1.
 	 *
 	 * @var array
 	 */
-	protected $statements = [];
+	protected $customDirectives = [];
 
 	/**
 	 * The file currently being compiled.
@@ -257,16 +259,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	{
 		$callback = function($match)
 		{
-			// Blade tags are usually compiled by equally-named
-			// methods. Users can also register their custom
-			// handler callbacks to resolve custom tags.
 			if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
 			{
 				$match[0] = $this->$method(array_get($match, 3));
 			}
-			elseif (isset($this->statements[$match[1]]))
+			elseif (isset($this->customDirectives[$match[1]]))
 			{
-				$match[0] = call_user_func($this->statements[$match[1]], array_get($match, 3));
+				$match[0] = call_user_func($this->customDirectives[$match[1]], array_get($match, 3));
 			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -721,15 +720,15 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Register a handler for custom statements.
+	 * Register a handler for custom directives.
 	 *
 	 * @param  string  $name
 	 * @param  callable  $handler
 	 * @return void
 	 */
-	public function addStatement($name, callable $handler)
+	public function directive($name, callable $handler)
 	{
-		$this->statements[$name] = $handler;
+		$this->customDirectives[$name] = $handler;
 	}
 
 	/**
