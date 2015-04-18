@@ -76,6 +76,17 @@ trait AuthenticatesAndRegistersUsers {
 	}
 
 	/**
+	 * Get the needed authorization credentials from the request.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return array
+	 */
+	protected function getCredentials(Request $request)
+	{
+		return $request->only('email', 'password');
+	}
+
+	/**
 	 * Get the failed login message.
 	 *
 	 * @return string
@@ -83,17 +94,6 @@ trait AuthenticatesAndRegistersUsers {
 	protected function getFailedLoginMessage()
 	{
 		return 'These credentials do not match our records.';
-	}
-	
-	/**
-	 * Get needed for authorization credentials from request.
-	 * 
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return array
-	 */
-	protected function getCredentials(Request $request)
-	{
-		return $request->only('email', 'password');
 	}
 
 	/**
