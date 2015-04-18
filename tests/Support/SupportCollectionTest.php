@@ -185,6 +185,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUniqueWithCallback()
+	{
+		$c = new Collection([
+			1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'], 2 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell'],
+			3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'], 4 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell'],
+			5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift'], 6 => ['id' => 6, 'first' => 'Taylor', 'last' => 'Swift'],
+		]);
+
+		$this->assertEquals([
+			1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
+			3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
+		], $c->unique('first')->all());
+
+		$this->assertEquals([
+			1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
+			3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
+			5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift'],
+		], $c->unique(function($item){ return $item['first'].$item['last']; })->all());
+	}
+
+
 	public function testCollapse()
 	{
 		$data = new Collection(array(array($object1 = new StdClass), array($object2 = new StdClass)));
