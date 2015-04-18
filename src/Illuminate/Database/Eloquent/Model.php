@@ -491,12 +491,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$instance = (new static)->setConnection($connection);
 
-		$collection = $instance->newCollection($items);
-
-		return $collection->map(function ($item) use ($instance)
+		$items = array_map(function ($item) use ($instance)
 		{
 			return $instance->newFromBuilder($item);
-		});
+		}, $items);
+
+		return $instance->newCollection($items);
 	}
 
 	/**
