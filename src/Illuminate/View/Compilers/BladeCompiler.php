@@ -10,6 +10,15 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $extensions = array();
 
 	/**
+	 * All custom "directive" handlers.
+	 *
+	 * This was implemented as a more usable "extend".
+	 *
+	 * @var array
+	 */
+	protected $customDirectives = [];
+
+	/**
 	 * The file currently being compiled.
 	 *
 	 * @var string
@@ -253,6 +262,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
 			{
 				$match[0] = $this->$method(array_get($match, 3));
+			}
+			elseif (isset($this->customDirectives[$match[1]]))
+			{
+				$match[0] = call_user_func($this->customDirectives[$match[1]], array_get($match, 3));
 			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -691,6 +704,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function extend(callable $compiler)
 	{
 		$this->extensions[] = $compiler;
+	}
+
+	/**
+	 * Register a handler for custom directives.
+	 *
+	 * @param  string  $name
+	 * @param  callable  $handler
+	 * @return void
+	 */
+	public function directive($name, callable $handler)
+	{
+		$this->customDirectives[$name] = $handler;
 	}
 
 	/**

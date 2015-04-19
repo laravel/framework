@@ -584,6 +584,34 @@ empty
 	}
 
 
+	public function testCustomStatements()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->directive('customControl', function($expression) {
+			return "<?php echo custom_control{$expression}; ?>";
+		});
+		$string = '@if($foo)
+@customControl(10, $foo, \'bar\')
+@endif';
+		$expected = '<?php if($foo): ?>
+<?php echo custom_control(10, $foo, \'bar\'); ?>
+<?php endif; ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
+	public function testCustomShortStatements()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$compiler->directive('customControl', function($expression) {
+			return '<?php echo custom_control(); ?>';
+		});
+		$string = '@customControl';
+		$expected = '<?php echo custom_control(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	public function testConfiguringContentTags()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
