@@ -46,6 +46,26 @@ class Arr {
 	}
 
 	/**
+	 * Collapse an array of arrays into a single array.
+	 *
+	 * @param  array|\ArrayAccess  $array
+	 * @return array
+	 */
+	public static function collapse($array)
+	{
+		$results = [];
+
+		foreach ($array as $values)
+		{
+			if ($values instanceof Collection) $values = $values->all();
+
+			$results = array_merge($results, $values);
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Divide an array into two arrays. One with keys and the other with values.
 	 *
 	 * @param  array  $array
