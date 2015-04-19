@@ -183,6 +183,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $onDirtyEvents = [];
 
 	/**
+	 * Stores links to relations without extra query parameters
+	 *
+	 * @var array
+	 */
+	public $belongingRelations = [];
+
+	/**
 	 * Indicates whether attributes are snake cased on arrays.
 	 *
 	 * @var bool
@@ -2671,6 +2678,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			throw new LogicException('Relationship method must return an object of type '
 				. 'Illuminate\Database\Eloquent\Relations\Relation');
+		}
+
+		if ($relations instanceof BelongsTo)
+		{
+			$parentClass = get_class($relations->getRelated());
+			if (array_key_exists($parentClass, $this->belongingRelations))
+			{
+				// Load parent from relation cache
+				return $this->relations[$method] = $this->belongingRelations[$parentClass];
+			}
 		}
 
 		return $this->relations[$method] = $relations->getResults();

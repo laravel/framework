@@ -11,7 +11,17 @@ class HasMany extends HasOneOrMany {
 	 */
 	public function getResults()
 	{
-		return $this->query->get();
+		$related = $this->query->get();
+
+		if (static::$constraints)
+		{
+			$related->each(function ($model)
+			{
+				$model->belongingRelations[get_class($this->parent)] = $this->parent;
+			});
+		}
+
+		return $related;
 	}
 
 	/**
