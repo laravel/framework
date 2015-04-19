@@ -120,7 +120,7 @@ class Store implements SessionInterface {
 
 		if ($data)
 		{
-			$data = @unserialize($this->prepareForUnserialize($data));
+			$data = json_decode($this->prepareForUnserialize($data), true);
 
 			if ($data !== false) return $data;
 		}
@@ -252,7 +252,7 @@ class Store implements SessionInterface {
 
 		$this->ageFlashData();
 
-		$this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
+		$this->handler->write($this->getId(), $this->prepareForStorage(json_encode($this->attributes)));
 
 		$this->started = false;
 	}
