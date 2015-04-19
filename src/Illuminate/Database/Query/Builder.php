@@ -1380,9 +1380,9 @@ class Builder {
 	/**
 	 * Paginate the given query into a simple paginator.
 	 *
-	 * @param  int $perPage
-	 * @param  array $columns
-	 * @param  string $pageName
+	 * @param  int     $perPage
+	 * @param  array   $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
 	public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
@@ -1404,9 +1404,9 @@ class Builder {
 	 *
 	 * This is more efficient on larger data-sets, etc.
 	 *
-	 * @param  int $perPage
-	 * @param  array $columns
-	 * @param  string $pageName
+	 * @param  int     $perPage
+	 * @param  array   $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
 	public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
