@@ -171,6 +171,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEach()
+	{
+		$c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
+
+		$result = [];
+		$c->each(function($item, $key) use (&$result) { $result[$key] = $item; });
+		$this->assertEquals($original, $result);
+
+		$result = [];
+		$c->each(function($item, $key) use (&$result) { if (is_string($key)) return false; $result[$key] = $item; });
+		$this->assertEquals([1, 2], $result);
+	}
+
+
 	public function testIntersectCollection()
 	{
 		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
