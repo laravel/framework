@@ -812,6 +812,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		$otherKey = $otherKey ?: $instance->getKeyName();
 
+		$this->onDirty($foreignKey, function() use ($relation)
+		{
+			if ($this->relationLoaded($relation))
+			{
+				unset($this->relations[$relation]);
+			}
+		});
+
 		return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
 	}
 
@@ -836,6 +844,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
+
+		$this->onDirty($type, function() use ($name)
+		{
+			if ($this->relationLoaded($name))
+			{
+				unset($this->relations[$name]);
+			}
+		});
+
+		$this->onDirty($id, function() use ($name)
+		{
+			if ($this->relationLoaded($name))
+			{
+				unset($this->relations[$name]);
+			}
+		});
 
 		// If the type value is null it is probably safe to assume we're eager loading
 		// the relationship. When that is the case we will pass in a dummy query as

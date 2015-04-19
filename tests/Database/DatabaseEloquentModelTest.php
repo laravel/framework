@@ -978,6 +978,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRelationDroppedOnForeignKeyChanged()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('belongs_to_stub_id' => 5));
+		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->id = 1;
+		$model->belongs_to_stub_id = 1;
+		$model->syncOriginal();
+		$relation = $model->belongsToStub();
+		$model->setRelation('belongsToStub', []);
+		$model->belongs_to_stub_id = 5;
+		$model->exists = true;
+		$model->save();
+
+		$this->assertFalse($model->relationLoaded('belongsToStub'));
+	}
+
+
 	public function testModelsAssumeTheirName()
 	{
 		$model = new EloquentModelWithoutTableStub;
