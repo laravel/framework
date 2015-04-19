@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use DateTime;
 use Exception;
 use ArrayAccess;
@@ -173,6 +174,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var bool
 	 */
 	public $exists = false;
+
+	/**
+	 * Events triggered once attribute is changed
+	 *
+	 * @var array
+	 */
+	protected $onDirtyEvents = [];
 
 	/**
 	 * Indicates whether attributes are snake cased on arrays.
@@ -1534,6 +1542,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			{
 				$this->setKeysForSaveQuery($query)->update($dirty);
 
+				foreach (array_only($this->onDirtyEvents, array_keys($dirty)) as $key => $event)
+				{
+					call_user_func($event, $dirty[$key], $this);
+				}
+
 				$this->fireModelEvent('updated', false);
 			}
 		}
@@ -2786,6 +2799,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		$this->attributes[$key] = $value;
+	}
+
+	/**
+	 * Set a callback to apply when attribute is changed
+	 * @param  string  $key
+	 * @param  Closure $callback
+	 * @return void
+	 */
+	public function onDirty($key, Closure $callback)
+	{
+		$this->onDirtyEvents[$key] = $callback;
 	}
 
 	/**

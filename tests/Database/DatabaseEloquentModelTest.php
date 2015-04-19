@@ -172,9 +172,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->foo = 'bar';
 		// make sure foo isn't synced so we can test that dirty attributes only are updated
 		$model->syncOriginal();
+
+		// add an event for dirty attribute
+		$foo = true;
+		$model->onDirty('name', function() use (&$foo)
+		{
+			$foo = false;
+		});
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
+		$this->assertFalse($foo);
 	}
 
 
