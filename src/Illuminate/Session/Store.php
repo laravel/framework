@@ -122,7 +122,7 @@ class Store implements SessionInterface {
 		{
 			$data = json_decode($this->prepareForUnserialize($data), true);
 
-			if ($data !== false) return $data;
+			if ($data !== false && $data !== null) return $data;
 		}
 
 		return [];
