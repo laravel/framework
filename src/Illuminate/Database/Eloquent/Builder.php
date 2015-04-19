@@ -239,8 +239,8 @@ class Builder {
 	/**
 	 * Paginate the given query.
 	 *
-	 * @param  int     $perPage
-	 * @param  array   $columns
+	 * @param  int  $perPage
+	 * @param  array  $columns
 	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
@@ -262,8 +262,8 @@ class Builder {
 	/**
 	 * Paginate the given query into a simple paginator.
 	 *
-	 * @param  int     $perPage
-	 * @param  array   $columns
+	 * @param  int  $perPage
+	 * @param  array  $columns
 	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */

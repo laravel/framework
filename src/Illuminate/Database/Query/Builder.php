@@ -1380,8 +1380,8 @@ class Builder {
 	/**
 	 * Paginate the given query into a simple paginator.
 	 *
-	 * @param  int     $perPage
-	 * @param  array   $columns
+	 * @param  int  $perPage
+	 * @param  array  $columns
 	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
@@ -1404,8 +1404,8 @@ class Builder {
 	 *
 	 * This is more efficient on larger data-sets, etc.
 	 *
-	 * @param  int     $perPage
-	 * @param  array   $columns
+	 * @param  int  $perPage
+	 * @param  array  $columns
 	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
