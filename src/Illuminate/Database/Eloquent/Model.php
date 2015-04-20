@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use DateTime;
 use Exception;
 use ArrayAccess;
@@ -173,6 +174,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var bool
 	 */
 	public $exists = false;
+
+	/**
+	 * Events triggered once attribute is changed
+	 *
+	 * @var array
+	 */
+	protected $onDirtyEvents = [];
+
+	/**
+	 * Stores links to relations without extra query parameters
+	 *
+	 * @var array
+	 */
+	public $belongingRelations = [];
 
 	/**
 	 * Indicates whether attributes are snake cased on arrays.
@@ -804,6 +819,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		$otherKey = $otherKey ?: $instance->getKeyName();
 
+		$this->onDirty($foreignKey, function() use ($relation)
+		{
+			if ($this->relationLoaded($relation))
+			{
+				unset($this->relations[$relation]);
+			}
+		});
+
 		return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
 	}
 
@@ -828,6 +851,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		list($type, $id) = $this->getMorphs($name, $type, $id);
+
+		$this->onDirty($type, function() use ($name)
+		{
+			if ($this->relationLoaded($name))
+			{
+				unset($this->relations[$name]);
+			}
+		});
+
+		$this->onDirty($id, function() use ($name)
+		{
+			if ($this->relationLoaded($name))
+			{
+				unset($this->relations[$name]);
+			}
+		});
 
 		// If the type value is null it is probably safe to assume we're eager loading
 		// the relationship. When that is the case we will pass in a dummy query as
@@ -1533,6 +1572,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			if (count($dirty) > 0)
 			{
 				$this->setKeysForSaveQuery($query)->update($dirty);
+
+				foreach (array_only($this->onDirtyEvents, array_keys($dirty)) as $key => $event)
+				{
+					call_user_func($event, $dirty[$key], $this);
+				}
 
 				$this->fireModelEvent('updated', false);
 			}
@@ -2636,6 +2680,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 				. 'Illuminate\Database\Eloquent\Relations\Relation');
 		}
 
+		if ($relations instanceof BelongsTo)
+		{
+			$parentClass = get_class($relations->getRelated());
+			if (array_key_exists($parentClass, $this->belongingRelations))
+			{
+				// Load parent from relation cache
+				return $this->relations[$method] = $this->belongingRelations[$parentClass];
+			}
+		}
+
 		return $this->relations[$method] = $relations->getResults();
 	}
 
@@ -2786,6 +2840,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		}
 
 		$this->attributes[$key] = $value;
+	}
+
+	/**
+	 * Set a callback to apply when attribute is changed
+	 * @param  string  $key
+	 * @param  Closure $callback
+	 * @return void
+	 */
+	public function onDirty($key, Closure $callback)
+	{
+		$this->onDirtyEvents[$key] = $callback;
 	}
 
 	/**

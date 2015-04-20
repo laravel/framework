@@ -172,9 +172,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model->foo = 'bar';
 		// make sure foo isn't synced so we can test that dirty attributes only are updated
 		$model->syncOriginal();
+
+		// add an event for dirty attribute
+		$foo = true;
+		$model->onDirty('name', function() use (&$foo)
+		{
+			$foo = false;
+		});
 		$model->name = 'taylor';
 		$model->exists = true;
 		$this->assertTrue($model->save());
+		$this->assertFalse($foo);
 	}
 
 
@@ -967,6 +975,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('table.other', $relation->getOtherKey());
 		$this->assertSame($model, $relation->getParent());
 		$this->assertInstanceOf('EloquentModelSaveStub', $relation->getQuery()->getModel());
+	}
+
+
+	public function testRelationDroppedOnForeignKeyChanged()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('belongs_to_stub_id' => 5));
+		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->id = 1;
+		$model->belongs_to_stub_id = 1;
+		$model->syncOriginal();
+		$relation = $model->belongsToStub();
+		$model->setRelation('belongsToStub', []);
+		$model->belongs_to_stub_id = 5;
+		$model->exists = true;
+		$model->save();
+
+		$this->assertFalse($model->relationLoaded('belongsToStub'));
 	}
 
 
