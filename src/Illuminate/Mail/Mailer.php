@@ -385,6 +385,10 @@ class Mailer implements MailerContract, MailQueueContract {
 		{
 			return call_user_func($callback, $message);
 		}
+		elseif (is_object($callback) && method_exists($callback, 'mail'))
+		{
+			return $callback->mail($message);
+		}
 		elseif (is_string($callback))
 		{
 			return $this->container->make($callback)->mail($message);
