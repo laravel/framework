@@ -14,10 +14,12 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 		$two->boot();
 	}
 
+
 	public function tearDown()
 	{
 		m::close();
 	}
+
 
 	public function testSimpleAssetsArePublishedCorrectly()
 	{
@@ -26,6 +28,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 		$this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected published path key.');
 		$this->assertEquals(['source/unmarked/one' => 'destination/unmarked/one', 'source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published paths.');
 	}
+
 
 	public function testMultipleAssetsArePublishedCorrectly()
 	{
@@ -43,6 +46,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published paths.');
 	}
 
+
 	public function testSimpleTaggedAssetsArePublishedCorrectly()
 	{
 		$toPublish = ServiceProvider::pathsToPublish('ServiceProviderForTestingOne', 'some_tag');
@@ -51,6 +55,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 		$this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected tagged path key.');
 		$this->assertEquals(['source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published tagged paths.');
 	}
+
 
 	public function testMultipleTaggedAssetsArePublishedCorrectly()
 	{
@@ -64,6 +69,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 		];
 		$this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
 	}
+
 
 	public function testMultipleTaggedAssetsAreMergedCorrectly()
 	{
@@ -88,6 +94,7 @@ class ServiceProviderForTestingOne extends ServiceProvider {
 
 	}
 
+
 	public function boot()
 	{
 		$this->publishes(['source/unmarked/one' => 'destination/unmarked/one']);
@@ -102,6 +109,7 @@ class ServiceProviderForTestingTwo extends ServiceProvider {
 	{
 
 	}
+
 
 	public function boot()
 	{
