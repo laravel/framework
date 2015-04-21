@@ -5,6 +5,16 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @method Fluent nullable()
+ * @method Fluent unsigned()
+ * @method Fluent unique()
+ * @method Fluent default($value)
+ * @method Fluent onUpdate($value)
+ * @method Fluent onDelete($value)
+ * @method Fluent references($value)
+ * @method Fluent on($value)
+ */
 class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
 
 	/**
