@@ -180,8 +180,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($original, $result);
 
 		$result = [];
-		$c->each(function($item, $key) use (&$result) { if (is_string($key)) return false; $result[$key] = $item; });
-		$this->assertEquals([1, 2], $result);
+		$c->each(function($item, $key) use (&$result) { $result[$key] = $item; if (is_string($key)) return false; });
+		$this->assertEquals([1, 2, 'foo' => 'bar'], $result);
 	}
 
 
