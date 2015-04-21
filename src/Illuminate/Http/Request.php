@@ -630,6 +630,28 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	/**
 	 * {@inheritdoc}
 	 */
+	protected function prepareBaseUrl()
+	{
+		$scriptName = $this->server->get('SCRIPT_NAME');
+
+		if (starts_with(ltrim($this->server->get('REQUEST_URI'), '/'), ltrim($scriptName, '/')))
+		{
+			// if the request URI starts with the script name we can assume
+			// that the filename is used in the URI and use that as base URL
+			$baseUrl = $scriptName;
+		}
+		else
+		{
+			// otherwise we'll just use the directory path relative to the document root
+			$baseUrl = dirname($scriptName);
+		}
+
+		return rtrim($baseUrl, '/\\');
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
 	{
 		return parent::duplicate($query, $request, $attributes, $cookies, array_filter((array) $files), $server);
