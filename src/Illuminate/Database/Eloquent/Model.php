@@ -1651,6 +1651,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Fire the given event for the model.
 	 *
 	 * @param  string  $event
+	 * @return mixed
+     */
+	public function fire($event)
+	{
+		return $this->fireModelEvent($event, false);
+	}
+
+	/**
+	 * Fire the given event for the model.
+	 *
+	 * @param  string  $event
 	 * @param  bool    $halt
 	 * @return mixed
 	 */
