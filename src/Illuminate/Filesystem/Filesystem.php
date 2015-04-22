@@ -115,7 +115,14 @@ class Filesystem {
 
 		$success = true;
 
-		foreach ($paths as $path) { if ( ! @unlink($path)) $success = false; }
+		foreach ($paths as $path) { 
+			try {
+				if ( ! @unlink($path)) 
+					$success = false; 
+			} catch (\Exception $e) {
+				$success = false;
+			}
+		}
 
 		return $success;
 	}
