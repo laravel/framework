@@ -52,7 +52,7 @@ class ResetCommand extends BaseCommand {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
-        $this->allowFacades();
+        	$this->allowFacades();
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 
