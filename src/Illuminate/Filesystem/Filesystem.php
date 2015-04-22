@@ -119,7 +119,7 @@ class Filesystem {
 			try {
 				if ( ! @unlink($path)) 
 					$success = false; 
-			} catch (\Exception $e) {
+			} catch (\ErrorException $e) {
 				$success = false;
 			}
 		}
