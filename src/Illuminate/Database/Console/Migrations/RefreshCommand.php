@@ -31,7 +31,7 @@ class RefreshCommand extends BaseCommand {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
-        $this->allowFacades();
+        	$this->allowFacades();
 
 		$database = $this->input->getOption('database');
 
