@@ -5,7 +5,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends Command {
+class RollbackCommand extends BaseCommand {
 
 	use ConfirmableTrait;
 
@@ -51,6 +51,8 @@ class RollbackCommand extends Command {
 	public function fire()
 	{
 		if ( ! $this->confirmToProceed()) return;
+
+        $this->allowFacades();
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 

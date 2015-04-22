@@ -4,7 +4,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 
-class RefreshCommand extends Command {
+class RefreshCommand extends BaseCommand {
 
 	use ConfirmableTrait;
 
@@ -30,6 +30,8 @@ class RefreshCommand extends Command {
 	public function fire()
 	{
 		if ( ! $this->confirmToProceed()) return;
+
+        $this->allowFacades();
 
 		$database = $this->input->getOption('database');
 
