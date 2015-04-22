@@ -379,7 +379,7 @@ if ( ! function_exists('data_get'))
 	 * Get an item from an array or object using "dot" notation.
 	 *
 	 * @param  mixed   $target
-	 * @param  string  $key
+	 * @param  string|array  $key
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
@@ -387,7 +387,9 @@ if ( ! function_exists('data_get'))
 	{
 		if (is_null($key)) return $target;
 
-		foreach (explode('.', $key) as $segment)
+		$key = is_array($key) ? $key : explode('.', $key);
+
+		foreach ($key as $segment)
 		{
 			if (is_array($target))
 			{

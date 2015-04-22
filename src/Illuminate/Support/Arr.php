@@ -273,13 +273,15 @@ class Arr {
 	 * Pluck an array of values from an array.
 	 *
 	 * @param  array   $array
-	 * @param  string  $value
-	 * @param  string  $key
+	 * @param  string|array  $value
+	 * @param  string|array|null  $key
 	 * @return array
 	 */
 	public static function pluck($array, $value, $key = null)
 	{
 		$results = [];
+
+		list($value, $key) = static::explodePluckParameters($value, $key);
 
 		foreach ($array as $item)
 		{
@@ -301,6 +303,22 @@ class Arr {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Explode the "value" and "key" arguments passed to "pluck".
+	 *
+	 * @param  string|array  $value
+	 * @param  string|array|null  $key
+	 * @return array
+	 */
+	protected static function explodePluckParameters($value, $key)
+	{
+		$value = is_array($value) ? $value : explode('.', $value);
+
+		$key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+
+		return [$value, $key];
 	}
 
 	/**
