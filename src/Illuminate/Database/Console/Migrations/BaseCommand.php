@@ -14,17 +14,16 @@ class BaseCommand extends Command {
 		return $this->laravel->databasePath().'/migrations';
 	}
 
-    /**
-     * Allow facade use for migration commands.
-     *
-     * @return void
-     */
-    protected function allowFacades()
-    {
-        if(method_exists($this->laravel, 'withFacades'))
-        {
-            $this->laravel->withFacades();
-        }
-    }
-
+	/**
+	* Allow facade use for migration commands.
+	*
+	* @return void
+	*/
+	protected function allowFacades()
+	{
+		if(method_exists($this->laravel, 'withFacades'))
+		{
+	    		$this->laravel->withFacades();
+		}
+	}
 }
