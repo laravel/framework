@@ -66,8 +66,6 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path = null)
 	{
-		$this->footer = array();
-
 		if ($path)
 		{
 			$this->setPath($path);
@@ -111,6 +109,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function compileString($value)
 	{
 		$result = '';
+		// reset compiler state before compilation
+		$this->footer = array();
 
 		// Here we will loop through all of the tokens returned by the Zend lexer and
 		// parse each one into the corresponding valid PHP. We will then have this
