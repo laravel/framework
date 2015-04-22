@@ -51,7 +51,7 @@ class MigrateCommand extends BaseCommand {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
-        $this->allowFacades();
+        	$this->allowFacades();
 
 		$this->prepareDatabase();
 
