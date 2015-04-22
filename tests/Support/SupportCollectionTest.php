@@ -650,6 +650,28 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSearchReturnsIndexOfFirstFoundItem()
+	{
+		$c = new Collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
+
+		$this->assertEquals(1, $c->search(2));
+		$this->assertEquals('foo', $c->search('bar'));
+		$this->assertEquals(4, $c->search(function($value){ return $value > 4; }));
+		$this->assertEquals('foo', $c->search(function($value){ return ! is_numeric($value); }));
+	}
+
+
+	public function testSearchReturnsFalseWhenItemIsNotFound()
+	{
+		$c = new Collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+		$this->assertFalse($c->search(6));
+		$this->assertFalse($c->search('foo'));
+		$this->assertFalse($c->search(function($value){ return $value < 1 && is_numeric($value); }));
+		$this->assertFalse($c->search(function($value){ return $value == 'nope'; }));
+	}
+
+
 	public function testKeys()
 	{
 		$c = new Collection(array('name' => 'taylor', 'framework' => 'laravel'));

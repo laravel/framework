@@ -58,9 +58,16 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDblibDsn(array $config)
 	{
-		$port = isset($config['port']) ? ':'.$config['port'] : '';
+		$arguments = array(
+			'host' => $this->buildHostString($config, ':'),
+			'dbname' => $config['database']
+		);
 
-		return "dblib:host={$config['host']}{$port};dbname={$config['database']}";
+		$arguments = array_merge(
+			$arguments, array_only($config, ['appname', 'charset'])
+		);
+
+		return $this->buildConnectString('dblib', $arguments);
 	}
 
 	/**
@@ -71,11 +78,55 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getSqlSrvDsn(array $config)
 	{
-		$port = isset($config['port']) ? ','.$config['port'] : '';
+		$arguments = array(
+			'Server' => $this->buildHostString($config, ',')
+		);
 
-		$dbName = $config['database'] != '' ? ";Database={$config['database']}" : '';
+		if (isset($config['database'])) {
+			$arguments['Database'] = $config['database'];
+		}
 
-		return "sqlsrv:Server={$config['host']}{$port}{$dbName}";
+		if (isset($config['appname'])) {
+			$arguments['APP'] = $config['appname'];
+		}
+
+		return $this->buildConnectString('sqlsrv', $arguments);
+	}
+
+	/**
+	 * Build a connection string from the given arguments.
+	 *
+	 * @param  string  $driver
+	 * @param  array  $arguments
+	 * @return string
+	 */
+	protected function buildConnectString($driver, array $arguments)
+	{
+		$options = array_map(function($key) use ($arguments)
+		{
+			return sprintf("%s=%s", $key, $arguments[$key]);
+		}, array_keys($arguments));
+
+		return $driver.":".implode(';', $options);
+	}
+
+	/**
+	 * Build a host string from the given configuration.
+	 *
+	 * @param  array  $config
+	 * @param  string  $separator
+	 * @return string
+	 */
+	protected function buildHostString(array $config, $separator)
+	{
+		if(isset($config['port']))
+		{
+			return $config['host'].$separator.$config['port'];
+		}
+		else
+		{
+			return $config['host'];
+		}
 	}
 
 	/**
