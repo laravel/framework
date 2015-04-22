@@ -646,6 +646,7 @@ empty
 		$this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
 	}
 
+
 	public function testSequentialCompileStringCalls()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
