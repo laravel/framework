@@ -70,6 +70,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $compiler->getPath());
 	}
 
+
 	public function testCompileWithPathSetBefore()
 	{
 		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
@@ -81,6 +82,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 		$compiler->compile();
 		$this->assertEquals('foo', $compiler->getPath());
 	}
+
 
 	public function testCompileDoesntStoreFilesWhenCachePathIsNull()
 	{
