@@ -54,22 +54,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
-	 * Collapse the collection items into a single array.
+	 * Collapse the collection of items into a single array.
 	 *
 	 * @return static
 	 */
 	public function collapse()
 	{
-		$results = [];
-
-		foreach ($this->items as $values)
-		{
-			if ($values instanceof Collection) $values = $values->all();
-
-			$results = array_merge($results, $values);
-		}
-
-		return new static($results);
+		return new static(array_collapse($this->items));
 	}
 
 	/**
@@ -539,7 +530,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function search($value, $strict = false)
 	{
-		return array_search($value, $this->items, $strict);
+		if ( ! $this->useAsCallable($value))
+		{
+			return array_search($value, $this->items, $strict);
+		}
+
+		foreach ($this->items as $key => $item)
+		{
+			if ($value($item, $key)) return $key;
+		}
+
+		return false;
 	}
 
 	/**

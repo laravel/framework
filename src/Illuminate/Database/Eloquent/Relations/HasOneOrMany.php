@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
 abstract class HasOneOrMany extends Relation {
@@ -50,6 +51,53 @@ abstract class HasOneOrMany extends Relation {
 
 			$this->query->whereNotNull($this->foreignKey);
 		}
+	}
+
+	/**
+	 * Add the constraints for a relationship count query.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQuery(Builder $query, Builder $parent)
+	{
+		if ($parent->getQuery()->from == $query->getQuery()->from)
+		{
+			return $this->getRelationCountQueryForSelfRelation($query, $parent);
+		}
+
+		return parent::getRelationCountQuery($query, $parent);
+	}
+
+	/**
+	 * Add the constraints for a relationship count query on the same table.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function getRelationCountQueryForSelfRelation(Builder $query, Builder $parent)
+	{
+		$query->select(new Expression('count(*)'));
+
+		$tablePrefix = $this->query->getQuery()->getConnection()->getTablePrefix();
+
+		$query->from($query->getModel()->getTable().' as '.$tablePrefix.$hash = $this->getRelationCountHash());
+
+		$key = $this->wrap($this->getQualifiedParentKeyName());
+
+		return $query->where($hash.'.'.$this->getPlainForeignKey(), '=', new Expression($key));
+	}
+
+	/**
+	 * Get a relationship join table hash.
+	 *
+	 * @return string
+	 */
+	public function getRelationCountHash()
+	{
+		return 'self_'.md5(microtime(true));
 	}
 
 	/**

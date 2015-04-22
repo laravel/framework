@@ -342,6 +342,18 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasSection()
+	{
+		$factory = $this->getFactory();
+		$factory->startSection('foo');
+		echo 'hi';
+		$factory->stopSection();
+
+		$this->assertTrue($factory->hasSection('foo'));
+		$this->assertFalse($factory->hasSection('bar'));
+	}
+
+
 	public function testMakeWithSlashAndDot()
 	{
 		$factory = $this->getFactory();
