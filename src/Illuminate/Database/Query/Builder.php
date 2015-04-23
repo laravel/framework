@@ -1503,7 +1503,7 @@ class Builder {
 
 		$results = new Collection($this->get($columns));
 
-		return $results->lists($columns[0], array_get($columns, 1));
+		return $results->lists($columns[0], array_get($columns, 1))->all();
 	}
 
 	/**

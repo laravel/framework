@@ -305,8 +305,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testListsWithArrayAndObjectValues()
 	{
 		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
-		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
-		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name')->all());
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email')->all());
 	}
 
 
@@ -317,8 +317,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 			new TestArrayAccessImplementation(array('name' => 'dayle', 'email' => 'bar'))
 		));
 
-		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name'));
-		$this->assertEquals(array('foo', 'bar'), $data->lists('email'));
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name')->all());
+		$this->assertEquals(array('foo', 'bar'), $data->lists('email')->all());
 	}
 
 
@@ -481,7 +481,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$modelTwo = new TestAccessorEloquentTestStub(array('some' => 'bar'));
 		$data     = new Collection(array($model, $modelTwo));
 
-		$this->assertEquals(array('foo', 'bar'), $data->lists('some'));
+		$this->assertEquals(array('foo', 'bar'), $data->lists('some')->all());
 	}
 
 
@@ -603,7 +603,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		));
 
 		$c = $c->sortBy('foo.bar');
-		$this->assertEquals(array(2, 1), $c->lists('id'));
+		$this->assertEquals(array(2, 1), $c->lists('id')->all());
 	}
 
 
