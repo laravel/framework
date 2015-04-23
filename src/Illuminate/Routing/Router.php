@@ -221,9 +221,9 @@ class Router implements RegistrarContract {
 	 */
 	public function controllers(array $controllers)
 	{
-		foreach ($controllers as $uri => $name)
+		foreach ($controllers as $uri => $controller)
 		{
-			$this->controller($uri, $name);
+			$this->controller($uri, $controller);
 		}
 	}
 
