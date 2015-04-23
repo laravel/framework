@@ -13,7 +13,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSessionIsLoadedFromHandler()
 	{
 		$session = $this->getSession();
-		$session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(array('foo' => 'bar', 'bagged' => array('name' => 'taylor'))));
+		$session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(json_encode(array('foo' => 'bar', 'bagged' => array('name' => 'taylor'))));
 		$session->registerBag(new Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag('bagged'));
 		$session->start();
 
@@ -103,13 +103,13 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSessionIsProperlySaved()
 	{
 		$session = $this->getSession();
-		$session->getHandler()->shouldReceive('read')->once()->andReturn(serialize(array()));
+		$session->getHandler()->shouldReceive('read')->once()->andReturn(json_encode(array()));
 		$session->start();
 		$session->put('foo', 'bar');
 		$session->flash('baz', 'boom');
 		$session->getHandler()->shouldReceive('write')->once()->with(
 			$this->getSessionId(),
-			serialize(array(
+			json_encode(array(
 				'_token' => $session->token(),
 				'foo' => 'bar',
 				'baz' => 'boom',
