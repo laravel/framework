@@ -104,7 +104,9 @@ class ControllerDispatcher {
 	                ->through($middleware)
 	                ->then(function($request) use ($instance, $route, $method)
 					{
-						return $this->call($instance, $route, $method);
+						return $this->router->prepareResponse(
+							$request, $this->call($instance, $route, $method)
+						);
 					});
 	}
 

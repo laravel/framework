@@ -1206,7 +1206,7 @@ class Router implements RegistrarContract {
 	 * @param  mixed  $response
 	 * @return \Illuminate\Http\Response
 	 */
-	protected function prepareResponse($request, $response)
+	public function prepareResponse($request, $response)
 	{
 		if ( ! $response instanceof SymfonyResponse)
 		{
