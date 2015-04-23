@@ -335,7 +335,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function query($key = null, $default = null)
 	{
@@ -358,7 +358,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function cookie($key = null, $default = null)
 	{
@@ -411,7 +411,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function header($key = null, $default = null)
 	{
@@ -423,7 +423,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function server($key = null, $default = null)
 	{
@@ -498,7 +498,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * @param  string  $source
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	protected function retrieveItem($source, $key, $default)
 	{
