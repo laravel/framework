@@ -87,7 +87,7 @@ class FileLoader implements LoaderInterface {
 	 */
 	protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
 	{
-		$file = "{$this->path}/packages/{$locale}/{$namespace}/{$group}.php";
+		$file = "{$this->path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
 		if ($this->files->exists($file))
 		{

@@ -26,7 +26,7 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 	{
 		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with('bar/en/foo.php')->andReturn(true);
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/packages/en/namespace/foo.php')->andReturn(false);
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(false);
 		$files->shouldReceive('getRequire')->once()->with('bar/en/foo.php')->andReturn(array('foo' => 'bar'));
 		$loader->addNamespace('namespace', 'bar');
 
@@ -38,9 +38,9 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 	{
 		$loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
 		$files->shouldReceive('exists')->once()->with('bar/en/foo.php')->andReturn(true);
-		$files->shouldReceive('exists')->once()->with(__DIR__.'/packages/en/namespace/foo.php')->andReturn(true);
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
 		$files->shouldReceive('getRequire')->once()->with('bar/en/foo.php')->andReturn(array('foo' => 'bar'));
-		$files->shouldReceive('getRequire')->once()->with(__DIR__.'/packages/en/namespace/foo.php')->andReturn(array('foo' => 'override', 'baz' => 'boom'));
+		$files->shouldReceive('getRequire')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(array('foo' => 'override', 'baz' => 'boom'));
 		$loader->addNamespace('namespace', 'bar');
 
 		$this->assertEquals(array('foo' => 'override', 'baz' => 'boom'), $loader->load('en', 'foo', 'namespace'));
