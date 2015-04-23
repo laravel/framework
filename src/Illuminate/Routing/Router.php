@@ -711,11 +711,26 @@ class Router implements RegistrarContract {
 	 */
 	public function gatherRouteMiddlewares(Route $route)
 	{
-		return Collection::make($route->middleware())->map(function($m)
+		return Collection::make($route->middleware())->map(function($name)
 		{
-			return Collection::make(array_get($this->middleware, $m, $m));
+			return Collection::make($this->resolveMiddlewareClassName($name));
+		})
+		->collapse()->all();
+	}
 
-		})->collapse()->all();
+	/**
+	 * Resolve the middleware name to a class name preserving passed parameters
+	 *
+	 * @param $name
+	 * @return string
+	 */
+	public function resolveMiddlewareClassName($name)
+	{
+		$map = $this->middleware;
+
+		list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+
+		return array_get($map, $name, $name).($parameters ? ':'.$parameters : '');
 	}
 
 	/**

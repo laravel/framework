@@ -121,8 +121,10 @@ class Pipeline implements PipelineContract {
 				}
 				else
 				{
-					return $this->container->make($pipe)
-							->{$this->method}($passable, $stack);
+					list($name, $parameters) = $this->parsePipeString($pipe);
+
+					return call_user_func_array([$this->container->make($name), $this->method],
+					                            array_merge([$passable, $stack], $parameters));
 				}
 			};
 		};
@@ -140,6 +142,24 @@ class Pipeline implements PipelineContract {
 		{
 			return call_user_func($destination, $passable);
 		};
+	}
+
+	/**
+	 * Parse full pipe string to get name and parameters
+	 *
+	 * @param string $pipe
+	 * @return array
+	 */
+	protected  function parsePipeString($pipe)
+	{
+		list($name, $parameters) = array_pad(explode(':', $pipe, 2), 2, []);
+
+		if (is_string($parameters))
+		{
+			$parameters = explode(',', $parameters);
+		}
+
+		return [$name, $parameters];
 	}
 
 }

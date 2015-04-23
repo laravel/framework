@@ -117,15 +117,13 @@ class ControllerDispatcher {
 	 */
 	protected function getMiddleware($instance, $method)
 	{
-		$middleware = $this->router->getMiddleware();
-
 		$results = [];
 
 		foreach ($instance->getMiddleware() as $name => $options)
 		{
 			if ( ! $this->methodExcludedByOptions($method, $options))
 			{
-				$results[] = array_get($middleware, $name, $name);
+				$results[] = $this->router->resolveMiddlewareClassName($name);
 			}
 		}
 
