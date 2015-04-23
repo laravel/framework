@@ -13,12 +13,12 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase {
 	public function testSessionIsProperlyEncrypted()
 	{
 		$session = $this->getSession();
-		$session->getEncrypter()->shouldReceive('decrypt')->once()->with(serialize([]))->andReturn(serialize([]));
-		$session->getHandler()->shouldReceive('read')->once()->andReturn(serialize(array()));
+		$session->getEncrypter()->shouldReceive('decrypt')->once()->with(json_encode([]))->andReturn(json_encode([]));
+		$session->getHandler()->shouldReceive('read')->once()->andReturn(json_encode(array()));
 		$session->start();
 		$session->put('foo', 'bar');
 		$session->flash('baz', 'boom');
-		$serialized = serialize(array(
+		$serialized = json_encode(array(
 			'_token' => $session->token(),
 			'foo' => 'bar',
 			'baz' => 'boom',
