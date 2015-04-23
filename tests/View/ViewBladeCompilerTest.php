@@ -660,6 +660,21 @@ empty
 	}
 
 
+	public function testSequentialCompileStringCalls()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@extends(\'foo\')
+test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+		
+		// use the same compiler instance to compile another template with @extends directive
+		$string = '@extends(name(foo))'.PHP_EOL.'test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+	}
+
+
 	/**
 	 * @dataProvider testGetTagsProvider()
 	 */
