@@ -73,6 +73,16 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayPluckWithNestedKeys()
+	{
+		$array = [['user' => ['taylor', 'otwell']], ['user' => ['dayle', 'rees']]];
+		$this->assertEquals(['taylor', 'dayle'], array_pluck($array, 'user.0'));
+		$this->assertEquals(['taylor', 'dayle'], array_pluck($array, ['user', 0]));
+		$this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, 'user.1', 'user.0'));
+		$this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
+	}
+
+
 	public function testArrayExcept()
 	{
 		$array = ['name' => 'taylor', 'age' => 26];
@@ -291,6 +301,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 	{
 		$object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));
 		$array = array((object) array('users' => array((object) array('name' => 'Taylor'))));
+		$dottedArray = array('users' => array('first.name' => 'Taylor'));
 		$arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John'])]);
 
 		$this->assertEquals('Taylor', data_get($object, 'users.name.0'));
@@ -298,6 +309,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull(data_get($array, '0.users.3'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
 		$this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
+		$this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
+		$this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
 		$this->assertEquals(56, data_get($arrayAccess, 'price'));
 		$this->assertEquals('John', data_get($arrayAccess, 'user.name'));
 		$this->assertEquals('void', data_get($arrayAccess, 'foo', 'void'));
