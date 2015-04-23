@@ -24,6 +24,26 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBlueprintMacro()
+	{
+		Blueprint::macro('publishing', function()
+		{
+			$this->dateTime('published_from')->nullable();
+			$this->dateTime('published_to')->nullable();
+		});
+
+		$blueprint = new Blueprint('posts');
+
+		$blueprint->publishing();
+
+		$columns = $blueprint->getColumns();
+
+		$this->assertEquals(2, count($columns));
+		$this->assertEquals('published_from', $columns[0]->name);
+		$this->assertTrue($columns[1]->nullable);
+	}
+
+
 	public function testIndexDefaultNames()
 	{
 		$blueprint = new Blueprint('users');
