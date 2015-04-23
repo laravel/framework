@@ -302,7 +302,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
 		if (is_array($first) || is_object($first))
 		{
-			return implode($glue, $this->lists($value));
+			return implode($glue, $this->lists($value)->all());
 		}
 
 		return implode($value, $this->items);
@@ -365,11 +365,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  string  $value
 	 * @param  string  $key
-	 * @return array
+	 * @return static
 	 */
 	public function lists($value, $key = null)
 	{
-		return array_pluck($this->items, $value, $key);
+		return new static(array_pluck($this->items, $value, $key));
 	}
 
 	/**
