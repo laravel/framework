@@ -7,7 +7,7 @@ trait InteractsWithQueue {
 	/**
 	 * The underlying queue job instance.
 	 *
-	 * @var \Illuminate\Contracts\Queue\Jobs
+	 * @var \Illuminate\Contracts\Queue\Job
 	 */
 	protected $job;
 
