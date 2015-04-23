@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Filesystem;
 
+use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;
@@ -115,7 +116,20 @@ class Filesystem {
 
 		$success = true;
 
-		foreach ($paths as $path) { if ( ! @unlink($path)) $success = false; }
+		foreach ($paths as $path)
+		{
+			try
+			{
+				if ( ! @unlink($path))
+				{
+					$success = false;
+				}
+			}
+			catch (ErrorException $e)
+			{
+				$success = false;
+			}
+		}
 
 		return $success;
 	}

@@ -71,6 +71,19 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCompileWithPathSetBefore()
+	{
+		$compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+		$files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+		$files->shouldReceive('put')->once()->with(__DIR__.'/'.md5('foo'), 'Hello World');
+		// set path before compilation
+		$compiler->setPath('foo');
+		// trigger compilation with null $path
+		$compiler->compile();
+		$this->assertEquals('foo', $compiler->getPath());
+	}
+
+
 	public function testCompileDoesntStoreFilesWhenCachePathIsNull()
 	{
 		$compiler = new BladeCompiler($files = $this->getFiles(), null);
@@ -630,6 +643,21 @@ empty
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
 		$this->assertEquals(['{{{', '}}}'], $compiler->getEscapedContentTags());
+	}
+
+
+	public function testSequentialCompileStringCalls()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$string = '@extends(\'foo\')
+test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
+		
+		// use the same compiler instance to compile another template with @extends directive
+		$string = '@extends(name(foo))'.PHP_EOL.'test';
+		$expected = "test".PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
 
