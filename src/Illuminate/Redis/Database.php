@@ -20,7 +20,7 @@ class Database implements DatabaseContract {
 	 */
 	public function __construct(array $servers = array())
 	{
-		if (isset($servers['cluster']) && $servers['cluster'])
+		if (array_pull($servers, 'cluster'))
 		{
 			$this->clients = $this->createAggregateClient($servers);
 		}
@@ -38,8 +38,6 @@ class Database implements DatabaseContract {
 	 */
 	protected function createAggregateClient(array $servers)
 	{
-		$servers = array_except($servers, array('cluster'));
-
 		$options = $this->getClientOptions($servers);
 
 		return array('default' => new Client(array_values($servers), $options));
