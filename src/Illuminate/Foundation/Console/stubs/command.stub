@@ -1,29 +1,27 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace;
 
-use {{rootNamespace}}Commands\Command;
-
+use DummyRootNamespaceCommands\Command;
 use Illuminate\Contracts\Bus\SelfHandling;
 
-class {{class}} extends Command implements SelfHandling {
+class DummyClass extends Command implements SelfHandling
+{
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
 
-	/**
-	 * Create a new command instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		//
-	}
-
-	/**
-	 * Execute the command.
-	 *
-	 * @return void
-	 */
-	public function handle()
-	{
-		//
-	}
-
+    /**
+     * Execute the command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        //
+    }
 }

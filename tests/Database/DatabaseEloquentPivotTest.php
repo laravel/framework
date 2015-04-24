@@ -91,8 +91,6 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 }
 
 
-class DatabaseEloquentPivotTestModelStub extends Illuminate\Database\Eloquent\Model {}
-
 class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
 	public function getDates()
 	{

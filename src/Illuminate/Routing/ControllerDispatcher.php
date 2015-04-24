@@ -104,7 +104,9 @@ class ControllerDispatcher {
 	                ->through($middleware)
 	                ->then(function($request) use ($instance, $route, $method)
 					{
-						return $this->call($instance, $route, $method);
+						return $this->router->prepareResponse(
+							$request, $this->call($instance, $route, $method)
+						);
 					});
 	}
 
@@ -117,15 +119,13 @@ class ControllerDispatcher {
 	 */
 	protected function getMiddleware($instance, $method)
 	{
-		$middleware = $this->router->getMiddleware();
-
 		$results = [];
 
 		foreach ($instance->getMiddleware() as $name => $options)
 		{
 			if ( ! $this->methodExcludedByOptions($method, $options))
 			{
-				$results[] = array_get($middleware, $name, $name);
+				$results[] = $this->router->resolveMiddlewareClassName($name);
 			}
 		}
 

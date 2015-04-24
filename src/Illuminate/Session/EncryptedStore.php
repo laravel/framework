@@ -44,7 +44,7 @@ class EncryptedStore extends Store {
 		}
 		catch (DecryptException $e)
 		{
-			return serialize([]);
+			return json_encode([]);
 		}
 	}
 

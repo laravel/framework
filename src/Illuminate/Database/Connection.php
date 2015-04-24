@@ -67,7 +67,7 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @var int
 	 */
-	protected $fetchMode = PDO::FETCH_ASSOC;
+	protected $fetchMode = PDO::FETCH_OBJ;
 
 	/**
 	 * The number of active transactions.
@@ -103,6 +103,13 @@ class Connection implements ConnectionInterface {
 	 * @var string
 	 */
 	protected $database;
+
+	/**
+	 * The instance of Doctrine connection.
+	 *
+	 * @var \Doctrine\DBAL\Connection
+	 */
+	protected $doctrineConnection;
 
 	/**
 	 * The table prefix for the connection.
@@ -799,11 +806,16 @@ class Connection implements ConnectionInterface {
 	 */
 	public function getDoctrineConnection()
 	{
-		$driver = $this->getDoctrineDriver();
+		if (is_null($this->doctrineConnection))
+		{
+			$driver = $this->getDoctrineDriver();
 
-		$data = array('pdo' => $this->pdo, 'dbname' => $this->getConfig('database'));
+			$data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
 
-		return new DoctrineConnection($data, $driver);
+			$this->doctrineConnection = new DoctrineConnection($data, $driver);
+		}
+
+		return $this->doctrineConnection;
 	}
 
 	/**

@@ -7,7 +7,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
+
+	/**
+	 * All custom "directive" handlers.
+	 *
+	 * This was implemented as a more usable "extend" in 5.1.
+	 *
+	 * @var array
+	 */
+	protected $customDirectives = [];
 
 	/**
 	 * The file currently being compiled.
@@ -254,6 +263,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			{
 				$match[0] = $this->$method(array_get($match, 3));
 			}
+			elseif (isset($this->customDirectives[$match[1]]))
+			{
+				$match[0] = call_user_func($this->customDirectives[$match[1]], array_get($match, 3));
+			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
 		};
@@ -343,6 +356,19 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileEach($expression)
 	{
 		return "<?php echo \$__env->renderEach{$expression}; ?>";
+	}
+
+	/**
+	 * Compile the inject statements into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compileInject($expression)
+	{
+		$segments = explode(',', preg_replace("/[\(\)\\\"\']/", '', $expression));
+
+		return "<?php $".trim($segments[0])." = app('".trim($segments[1])."'); ?>";
 	}
 
 	/**
@@ -694,36 +720,15 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Get the regular expression for a generic Blade function.
+	 * Register a handler for custom directives.
 	 *
-	 * @param  string  $function
-	 * @return string
+	 * @param  string  $name
+	 * @param  callable  $handler
+	 * @return void
 	 */
-	public function createMatcher($function)
+	public function directive($name, callable $handler)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createOpenMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
-	}
-
-	/**
-	 * Create a plain Blade matcher.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createPlainMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+		$this->customDirectives[$name] = $handler;
 	}
 
 	/**

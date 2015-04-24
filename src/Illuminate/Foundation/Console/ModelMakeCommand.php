@@ -35,7 +35,7 @@ class ModelMakeCommand extends GeneratorCommand {
 	{
 		parent::fire();
 
-		if ( ! $this->option('no-migration'))
+		if ($this->option('migration'))
 		{
 			$table = str_plural(snake_case(class_basename($this->argument('name'))));
 
@@ -72,7 +72,7 @@ class ModelMakeCommand extends GeneratorCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('no-migration', null, InputOption::VALUE_NONE, 'Do not create a new migration file.'),
+			array('migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'),
 		);
 	}
 

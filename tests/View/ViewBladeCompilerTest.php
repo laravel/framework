@@ -553,17 +553,12 @@ empty
 	}
 
 
-	public function testCreateMatcher()
+	public function testCustomStatements()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->extend(
-			function($view, BladeCompiler $compiler)
-			{
-				$pattern = $compiler->createMatcher('customControl');
-				$replace = '<?php echo custom_control$2; ?>';
-				return preg_replace($pattern, '$1'.$replace, $view);
-			}
-		);
+		$compiler->directive('customControl', function($expression) {
+			return "<?php echo custom_control{$expression}; ?>";
+		});
 
 		$string = '@if($foo)
 @customControl(10, $foo, \'bar\')
@@ -575,24 +570,15 @@ empty
 	}
 
 
-	public function testCreatePlainMatcher()
+	public function testCustomShortStatements()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
-		$compiler->extend(
-			function($view, BladeCompiler $compiler)
-			{
-				$pattern = $compiler->createPlainMatcher('customControl');
-				$replace = '<?php echo custom_control; ?>';
-				return preg_replace($pattern, '$1'.$replace.'$2', $view);
-			}
-		);
+		$compiler->directive('customControl', function($expression) {
+			return '<?php echo custom_control(); ?>';
+		});
 
-		$string = '@if($foo)
-@customControl
-@endif';
-		$expected = '<?php if($foo): ?>
-<?php echo custom_control; ?>
-<?php endif; ?>';
+		$string = '@customControl';
+		$expected = '<?php echo custom_control(); ?>';
 		$this->assertEquals($expected, $compiler->compileString($string));
 	}
 
