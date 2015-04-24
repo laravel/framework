@@ -294,7 +294,7 @@ class Arr {
 	/**
 	 * Pluck an array of values from an array.
 	 *
-	 * @param  array   $array
+	 * @param  array|\ArrayAccess  $array
 	 * @param  string|array  $value
 	 * @param  string|array|null  $key
 	 * @return array
