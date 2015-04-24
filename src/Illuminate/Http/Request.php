@@ -296,7 +296,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function query($key = null, $default = null)
 	{
