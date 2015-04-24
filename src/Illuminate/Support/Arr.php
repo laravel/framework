@@ -59,6 +59,8 @@ class Arr {
 		{
 			if ($values instanceof Collection) $values = $values->all();
 
+			if ( ! is_array($values)) continue;
+
 			$results = array_merge($results, $values);
 		}
 
