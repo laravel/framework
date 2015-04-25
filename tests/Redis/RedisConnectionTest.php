@@ -36,7 +36,7 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase {
 			'options' => [
 				'prefix' => 'prefix:'
 			],
-	];
+		];
 
 		return new Illuminate\Redis\Database($servers);
 	}
