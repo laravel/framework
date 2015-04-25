@@ -40,7 +40,7 @@ class Database implements DatabaseContract {
 	 * @param  array  $options
 	 * @return array
 	 */
-	protected function createAggregateClient(array $servers, $options = [])
+	protected function createAggregateClient(array $servers, array $options = [])
 	{
 		return array('default' => new Client(array_values($servers), $options));
 	}
@@ -52,7 +52,7 @@ class Database implements DatabaseContract {
 	 * @param  array  $options
 	 * @return array
 	 */
-	protected function createSingleClients(array $servers, $options = [])
+	protected function createSingleClients(array $servers, array $options = [])
 	{
 		$clients = array();
 
