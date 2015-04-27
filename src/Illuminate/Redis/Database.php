@@ -101,14 +101,14 @@ class Database implements DatabaseContract {
 	}
 
 	/**
-	 * Listen to a set of given channels for messages.
+	 * Subscribe to a set of given channels for messages.
 	 *
 	 * @param  array|string  $channels
 	 * @param  \Closure  $callback
 	 * @param  string  $connection
 	 * @return void
 	 */
-	public function listen($channels, Closure $callback, $connection = null)
+	public function subscribe($channels, Closure $callback, $connection = null)
 	{
 		$loop = $this->connection($connection)->pubSubLoop();
 
