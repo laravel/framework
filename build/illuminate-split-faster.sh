@@ -30,6 +30,7 @@ split()
 }
 
 split auth         src/Illuminate/Auth:git@github.com:illuminate/auth.git                "master 5.0 4.2"
+split broadcasting src/Illuminate/Broadcasting:git@github.com:illuminate/broadcasting.git "master"
 split bus          src/Illuminate/Bus:git@github.com:illuminate/bus.git                  "master 5.0"
 split cache        src/Illuminate/Cache:git@github.com:illuminate/cache.git              "master 5.0 4.2"
 split config       src/Illuminate/Config:git@github.com:illuminate/config.git            "master 5.0 4.2"
