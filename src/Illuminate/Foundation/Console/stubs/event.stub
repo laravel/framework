@@ -2,6 +2,7 @@
 
 use DummyRootNamespaceEvents\Event;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class DummyClass extends Event
 {
@@ -15,5 +16,15 @@ class DummyClass extends Event
     public function __construct()
     {
         //
+    }
+
+    /**
+     * Get the channels the event should be broadcast on.
+     *
+     * @return array
+     */
+    public function broadcastOn()
+    {
+        return [];
     }
 }

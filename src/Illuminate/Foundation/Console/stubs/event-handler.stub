@@ -2,7 +2,7 @@
 
 use DummyFullEvent;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class DummyClass
 {

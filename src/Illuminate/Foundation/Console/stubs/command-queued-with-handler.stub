@@ -3,9 +3,9 @@
 use DummyRootNamespaceCommands\Command;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DummyClass extends Command implements ShouldBeQueued
+class DummyClass extends Command implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
 
