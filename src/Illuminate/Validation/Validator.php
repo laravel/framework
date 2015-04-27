@@ -1292,18 +1292,18 @@ class Validator implements ValidatorContract {
 	{
 		return preg_match('/^[\pL\pM\pN_-]+$/u', $value);
 	}
-	
+
 	/**
-     * Validate that an attribute contains only alpha-numeric latin characters, dashes, underscores, apostrophes, and periods.
-     *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @return bool
-     */
-    protected function validateUsername($attribute, $value)
-    {
-        return preg_match('/^[a-zA-Z0-9\'._-]+$/u', $value);
-    }
+	 * Validate that an attribute contains only alpha-numeric latin characters, dashes, underscores, apostrophes, and periods.
+	 * 
+	 * @param  string  $attribute
+	 * @param  mixed   $value
+	 * @return bool
+	 */
+	protected function validateUsername($attribute, $value)
+	{
+		return preg_match('/^[a-zA-Z0-9\'._-]+$/u', $value);
+	}
 
 	/**
 	 * Validate that an attribute passes a regular expression check.
