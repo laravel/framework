@@ -111,10 +111,7 @@ class Arr {
 	 */
 	public static function except($array, $keys)
 	{
-		foreach ((array) $keys as $key)
-		{
-			static::forget($array, $key);
-		}
+		static::forget($array, $keys);
 
 		return $array;
 	}
