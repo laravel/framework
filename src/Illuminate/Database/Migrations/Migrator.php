@@ -125,21 +125,26 @@ class Migrator {
 		// First we will resolve a "real" instance of the migration class from this
 		// migration file name. Once we have the instances we can run the actual
 		// command such as "up" or "down", or we can just simulate the action.
-		$migration = $this->resolve($file);
+    $migration = $this->resolve($file);
 
-		if ($pretend)
-		{
-			return $this->pretendToRun($migration, 'up');
-		}
+    if($migration->enabled)
+    {
 
-		$migration->up();
+		  if ($pretend)
+		  {
+			  return $this->pretendToRun($migration, 'up');
+		  }
 
-		// Once we have run a migrations class, we will log that it was run in this
-		// repository so that we don't try to run it next time we do a migration
-		// in the application. A migration repository keeps the migrate order.
-		$this->repository->log($file, $batch);
+	  	$migration->up();
 
-		$this->note("<info>Migrated:</info> $file");
+		  // Once we have run a migrations class, we will log that it was run in this
+		  // repository so that we don't try to run it next time we do a migration
+	    // in the application. A migration repository keeps the migrate order.
+		  $this->repository->log($file, $batch);
+
+      $this->note("<info>Migrated:</info> $file");
+    }
+    
 	}
 
 	/**
