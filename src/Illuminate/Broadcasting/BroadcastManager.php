@@ -3,7 +3,6 @@
 use Pusher;
 use Closure;
 use InvalidArgumentException;
-use Illuminate\Broadcasting\PusherBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
 class BroadcastManager implements FactoryContract
@@ -118,6 +117,19 @@ class BroadcastManager implements FactoryContract
     {
         return new PusherBroadcaster(
             new Pusher($config['key'], $config['secret'], $config['app_id'])
+        );
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createRedisDriver(array $config)
+    {
+        return new RedisBroadcaster(
+            $this->app->make('redis'), array_get($config, 'connection')
         );
     }
 
