@@ -3,6 +3,7 @@
 use Exception;
 use ReflectionClass;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
@@ -213,6 +214,11 @@ class Dispatcher implements DispatcherContract {
 
 		$this->firing[] = $event;
 
+		if (isset($payload[0]) && $payload[0] instanceof ShouldBroadcast)
+		{
+			$this->broadcastEvent($payload[0]);
+		}
+
 		foreach ($this->getListeners($event) as $listener)
 		{
 			$response = call_user_func_array($listener, $payload);
@@ -238,6 +244,22 @@ class Dispatcher implements DispatcherContract {
 		array_pop($this->firing);
 
 		return $halt ? null : $responses;
+	}
+
+	/**
+	 * Broadcast the given event class.
+	 *
+	 * @param  \Illuminate\Contracts\Broadcasting\ShouldBroadcast  $event
+	 * @return void
+	 */
+	protected function broadcastEvent($event)
+	{
+		if ($this->queueResolver)
+		{
+			$this->resolveQueue()->push('Illuminate\Broadcasting\BroadcastEvent', [
+				'event' => serialize($event)
+			]);
+		}
 	}
 
 	/**
