@@ -54,6 +54,13 @@ class ResetCommand extends Command {
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 
+		if ( ! $this->migrator->repositoryExists())
+		{
+			$this->output->writeln('<comment>Migration table not found.</comment>');
+
+			return;
+		}
+
 		$pretend = $this->input->getOption('pretend');
 
 		$this->migrator->reset($pretend);
