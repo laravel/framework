@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Database\Query\Expression;
+use Illuminate\Contracts\Database\Expression;
 
 abstract class Grammar {
 

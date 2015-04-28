@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Contracts\Database\Expression as ExpressionContract;
 
 class Builder {
 
@@ -496,7 +497,7 @@ class Builder {
 
 		$this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		if ( ! $value instanceof Expression)
+		if ( ! $value instanceof ExpressionContract)
 		{
 			$this->addBinding($value, 'where');
 		}
@@ -1059,7 +1060,7 @@ class Builder {
 
 		$this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-		if ( ! $value instanceof Expression)
+		if ( ! $value instanceof ExpressionContract)
 		{
 			$this->addBinding($value, 'having');
 		}
@@ -1832,7 +1833,7 @@ class Builder {
 	{
 		return array_values(array_filter($bindings, function($binding)
 		{
-			return ! $binding instanceof Expression;
+			return ! $binding instanceof ExpressionContract;
 		}));
 	}
 
