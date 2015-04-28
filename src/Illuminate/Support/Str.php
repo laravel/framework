@@ -61,12 +61,23 @@ class Str {
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
+	 * @param  bool  $caseSensitive
 	 * @return bool
 	 */
-	public static function contains($haystack, $needles)
+	public static function contains($haystack, $needles, $caseSensitive = true)
 	{
+		if ( ! $caseSensitive) 
+		{
+			$haystack = static::lower($haystack);
+		}
+
 		foreach ((array) $needles as $needle)
 		{
+			if ( ! $caseSensitive) 
+			{
+				$needle = static::lower($needle);
+			}
+
 			if ($needle != '' && strpos($haystack, $needle) !== false) return true;
 		}
 
@@ -78,12 +89,23 @@ class Str {
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
+	 * @param  bool  $caseSensitive
 	 * @return bool
 	 */
-	public static function endsWith($haystack, $needles)
+	public static function endsWith($haystack, $needles, $caseSensitive = true)
 	{
+		if ( ! $caseSensitive) 
+		{
+			$haystack = static::lower($haystack);
+		}
+
 		foreach ((array) $needles as $needle)
 		{
+			if ( ! $caseSensitive) 
+			{
+				$needle = static::lower($needle);
+			}
+
 			if ((string) $needle === substr($haystack, -strlen($needle))) return true;
 		}
 
@@ -109,9 +131,10 @@ class Str {
 	 *
 	 * @param  string  $pattern
 	 * @param  string  $value
+	 * @param  bool  $caseSensitive
 	 * @return bool
 	 */
-	public static function is($pattern, $value)
+	public static function is($pattern, $value, $caseSensitive = true)
 	{
 		if ($pattern == $value) return true;
 
@@ -122,7 +145,7 @@ class Str {
 		// pattern such as "library/*", making any string check convenient.
 		$pattern = str_replace('\*', '.*', $pattern).'\z';
 
-		return (bool) preg_match('#^'.$pattern.'#', $value);
+		return (bool) preg_match('#^'.$pattern.'#'.($caseSensitive ? '' : 'i'), $value);
 	}
 
 	/**
@@ -330,12 +353,23 @@ class Str {
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needles
+	 * @param  bool  $caseSensitive
 	 * @return bool
 	 */
-	public static function startsWith($haystack, $needles)
+	public static function startsWith($haystack, $needles, $caseSensitive = true)
 	{
+		if ( ! $caseSensitive) 
+		{
+			$haystack = static::lower($haystack);
+		}
+
 		foreach ((array) $needles as $needle)
 		{
+			if ( ! $caseSensitive) 
+			{
+				$needle = static::lower($needle);
+			}
+
 			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
 		}
 
