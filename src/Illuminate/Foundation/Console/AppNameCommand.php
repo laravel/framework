@@ -112,12 +112,12 @@ class AppNameCommand extends Command {
 	{
 		$namespace = $this->argument('name') . "\\";
 
-    foreach(get_declared_classes() as $name)
+                foreach(get_declared_classes() as $name)
 		{
-    	if(strpos($name, $namespace) === 0) return true;
+    	        	if(strpos($name, $namespace) === 0) return true;
 		}
 
-    return false;
+    		return false;
 	}
 
 	/**
