@@ -134,6 +134,19 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createLogDriver(array $config)
+    {
+        return new LogBroadcaster(
+            $this->app->make('Psr\Log\LoggerInterface')
+        );
+    }
+
+    /**
      * Get the connection configuration.
      *
      * @param  string  $name

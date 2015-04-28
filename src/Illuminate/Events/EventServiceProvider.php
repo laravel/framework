@@ -15,7 +15,7 @@ class EventServiceProvider extends ServiceProvider {
 		{
 			return (new Dispatcher($app))->setQueueResolver(function() use ($app)
 			{
-				return $app->make('Illuminate\Contracts\Queue\Queue');
+				return $app->make('Illuminate\Contracts\Queue\Factory');
 			});
 		});
 	}

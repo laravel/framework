@@ -4,6 +4,7 @@ use Exception;
 use ReflectionClass;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
@@ -256,7 +257,9 @@ class Dispatcher implements DispatcherContract {
 	{
 		if ($this->queueResolver)
 		{
-			$this->resolveQueue()->push('Illuminate\Broadcasting\BroadcastEvent', [
+			$connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
+
+			$this->resolveQueue()->connection($connection)->push('Illuminate\Broadcasting\BroadcastEvent', [
 				'event' => serialize($event)
 			]);
 		}
