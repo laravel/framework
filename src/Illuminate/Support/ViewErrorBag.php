@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Support;
 
 use Countable;
+use JsonSerializable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
-class ViewErrorBag implements Countable {
+class ViewErrorBag implements Countable, JsonSerializable {
 
 	/**
 	 * The array of the view error bags.
@@ -103,4 +104,13 @@ class ViewErrorBag implements Countable {
 		array_set($this->bags, $key, $value);
 	}
 
+	/**
+	 * JsonSerialize the class property with the proper output.
+	 *
+	 * @return string
+	 */
+	public function jsonSerialize()
+	{
+		return json_encode($this->bags);
+	}
 }
