@@ -324,6 +324,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEmptyMorphToRelationship()
+	{
+		$photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
+		
+		$this->assertNull($photo->imageable);
+	}
+
+
 	public function testMultiInsertsWithDifferentValues()
 	{
 		$date = '1970-01-01';
