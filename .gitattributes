@@ -2,9 +2,12 @@
 
 /build export-ignore
 /tests export-ignore
+.editorconfig export-ignore
 .gitattributes export-ignore
 .gitignore export-ignore
 .scrutinizer.yml export-ignore
+.php_cs export-ignore
+.styleci.yml export-ingore
 .travis.yml export-ignore
 phpunit.php export-ignore
 phpunit.xml export-ignore

@@ -1,0 +1,4 @@
+preset: psr2
+
+enabled:
+  - short_array_syntax
