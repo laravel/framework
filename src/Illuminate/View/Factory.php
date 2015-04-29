@@ -860,9 +860,9 @@ class Factory implements FactoryContract {
 	}
 
 	/**
-	 * Get the cache instance.
+	 * Get the cache repository instance.
 	 *
-	 * @return \Illuminate\Contracts\Cache\Factory
+	 * @return \Illuminate\Contracts\Cache\Repository
 	 */
 	public function getCache()
 	{
@@ -870,9 +870,9 @@ class Factory implements FactoryContract {
 	}
 
 	/**
-	 * Set the cache instance.
+	 * Set the cache repository instance.
 	 *
-	 * @param  \Illuminate\Contracts\Cache\Factory
+	 * @param  \Illuminate\Contracts\Cache\Repository
 	 * @return void
 	 */
 	public function setCache(Cache $cache)
