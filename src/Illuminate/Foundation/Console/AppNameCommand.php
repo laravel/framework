@@ -65,6 +65,15 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
+		if ( ! $this->validNamespace())
+		{
+			return $this->error('Invalid application name.');
+		}
+		elseif ($this->namespaceExists())
+		{
+			return $this->error('This name is already used in a namespace.');
+		}
+
 		$this->currentRoot = trim($this->laravel->getNamespace(), '\\');
 
 		$this->setBootstrapNamespaces();
@@ -82,6 +91,33 @@ class AppNameCommand extends Command {
 		$this->composer->dumpAutoloads();
 
 		$this->call('clear-compiled');
+	}
+
+	/**
+	 * Determine if the name is a valid namespace.
+	 *
+	 * @return bool
+	 */
+	protected function validNamespace()
+	{
+		return preg_match('/^[a-z_]\w+$/i', $this->argument('name'));
+	}
+
+	/**
+	 * Determine if there is already a namespace with same name.
+	 *
+	 * @return bool
+	 */
+	protected function namespaceExists()
+	{
+		$namespace = $this->argument('name') . "\\";
+
+                foreach(get_declared_classes() as $name)
+		{
+    	        	if(strpos($name, $namespace) === 0) return true;
+		}
+
+    		return false;
 	}
 
 	/**
