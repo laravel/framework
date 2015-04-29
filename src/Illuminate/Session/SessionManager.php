@@ -34,9 +34,9 @@ class SessionManager extends Manager {
 	 */
 	protected function createCookieDriver()
 	{
-		throw new InvalidArgumentException(
-			"The cookie session driver has been removed. Please use an alternative driver."
-		);
+		$lifetime = $this->app['config']['session.lifetime'];
+
+		return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $lifetime));
 	}
 
 	/**

@@ -109,6 +109,8 @@ class Kernel implements KernelContract {
 
 		$this->bootstrap();
 
+		$this->verifySessionConfigurationIsValid();
+
 		return (new Pipeline($this->app))
 		            ->send($request)
 		            ->through($this->middleware)
@@ -216,6 +218,17 @@ class Kernel implements KernelContract {
 	}
 
 	/**
+	 * Determine if the kernel has a given middleware.
+	 *
+	 * @param  string  $middleware
+	 * @return bool
+	 */
+	public function hasMiddleware($middleware)
+	{
+		return array_key_exists($middleware, array_flip($this->middleware));
+	}
+
+	/**
 	 * Get the bootstrap classes for the application.
 	 *
 	 * @return array
@@ -223,6 +236,20 @@ class Kernel implements KernelContract {
 	protected function bootstrappers()
 	{
 		return $this->bootstrappers;
+	}
+
+	/**
+	 * Verify that the session configuration is valid.
+	 *
+	 * @return void
+	 */
+	protected function verifySessionConfigurationIsValid()
+	{
+		if ($this->app['config']['session.driver'] === 'cookie' &&
+			! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
+
+			throw new \RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
+		}
 	}
 
 	/**
