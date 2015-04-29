@@ -241,19 +241,21 @@ class Builder {
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = null, $columns = ['*'])
+	public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
 	{
 		$total = $this->query->getCountForPagination();
 
 		$this->query->forPage(
-			$page = Paginator::resolveCurrentPage(),
+			$page = Paginator::resolveCurrentPage($pageName),
 			$perPage = $perPage ?: $this->model->getPerPage()
 		);
 
 		return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => $pageName,
 		]);
 	}
 
@@ -262,11 +264,12 @@ class Builder {
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
-	public function simplePaginate($perPage = null, $columns = ['*'])
+	public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
 	{
-		$page = Paginator::resolveCurrentPage();
+		$page = Paginator::resolveCurrentPage($pageName);
 
 		$perPage = $perPage ?: $this->model->getPerPage();
 
@@ -274,6 +277,7 @@ class Builder {
 
 		return new Paginator($this->get($columns), $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => $pageName,
 		]);
 	}
 

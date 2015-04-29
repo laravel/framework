@@ -171,15 +171,16 @@ class BelongsToMany extends Relation {
 	/**
 	 * Get a paginator for the "select" statement.
 	 *
-	 * @param  int    $perPage
+	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = null, $columns = array('*'))
+	public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
-		$paginator = $this->query->paginate($perPage, $columns);
+		$paginator = $this->query->paginate($perPage, $columns, $pageName);
 
 		$this->hydratePivotRelation($paginator->items());
 
