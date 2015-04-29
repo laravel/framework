@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Session;
 
+use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
@@ -33,9 +34,9 @@ class SessionManager extends Manager {
 	 */
 	protected function createCookieDriver()
 	{
-		$lifetime = $this->app['config']['session.lifetime'];
-
-		return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $lifetime));
+		throw new InvalidArgumentException(
+			"The cookie session driver has been removed. Please use an alternative driver."
+		);
 	}
 
 	/**
