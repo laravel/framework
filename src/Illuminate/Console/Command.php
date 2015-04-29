@@ -4,6 +4,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -29,7 +30,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	/**
 	 * The output interface implementation.
 	 *
-	 * @var \Symfony\Component\Console\Output\OutputInterface
+	 * @var \Symfony\Component\Console\Style\SymfonyStyle
 	 */
 	protected $output;
 
@@ -96,7 +97,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	{
 		$this->input = $input;
 
-		$this->output = $output;
+		$this->output = new SymfonyStyle($input, $output);
 
 		return parent::run($input, $output);
 	}
@@ -182,11 +183,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function confirm($question, $default = false)
 	{
-		$helper = $this->getHelperSet()->get('question');
-
-		$question = new ConfirmationQuestion("<question>{$question}</question> ", $default);
-
-		return $helper->ask($this->input, $this->output, $question);
+		return $this->output->confirm($question, $default);
 	}
 
 	/**
@@ -198,11 +195,7 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function ask($question, $default = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
-
-		$question = new Question("<question>$question</question> ", $default);
-
-		return $helper->ask($this->input, $this->output, $question);
+		return $this->output->ask($question, $default);
 	}
 
 	/**
@@ -215,13 +208,11 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function askWithCompletion($question, array $choices, $default = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
-
-		$question = new Question("<question>$question</question> ", $default);
+		$question = new Question($question, $default);
 
 		$question->setAutocompleterValues($choices);
 
-		return $helper->ask($this->input, $this->output, $question);
+		return $this->output->askQuestion($question);
 	}
 
 	/**
@@ -233,13 +224,11 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function secret($question, $fallback = true)
 	{
-		$helper = $this->getHelperSet()->get('question');
-
-		$question = new Question("<question>$question</question> ");
+		$question = new Question($question);
 
 		$question->setHidden(true)->setHiddenFallback($fallback);
 
-		return $helper->ask($this->input, $this->output, $question);
+		return $this->output->askQuestion($question);
 	}
 
 	/**
@@ -254,13 +243,11 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
 	{
-		$helper = $this->getHelperSet()->get('question');
-
-		$question = new ChoiceQuestion("<question>$question</question> ", $choices, $default);
+		$question = new ChoiceQuestion($question, $choices, $default);
 
 		$question->setMaxAttempts($attempts)->setMultiselect($multiple);
 
-		return $helper->ask($this->input, $this->output, $question);
+		return $this->output->askQuestion($question);
 	}
 
 	/**
