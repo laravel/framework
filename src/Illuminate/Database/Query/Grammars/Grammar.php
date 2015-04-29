@@ -626,12 +626,15 @@ class Grammar extends BaseGrammar {
 
 		// We need to build a list of parameter place-holders of values that are bound
 		// to the query. Each insert should have the exact same amount of parameter
-		// bindings so we can just go off the first list of values in this array.
-		$parameters = $this->parameterize(reset($values));
+		// bindings so we will loop through the record and parameterize them all.
+		$parameters = array();
 
-		$value = array_fill(0, count($values), "($parameters)");
+		foreach($values as $record)
+		{
+			$parameters[] = '('.$this->parameterize($record).')';
+		}
 
-		$parameters = implode(', ', $value);
+		$parameters = implode(', ', $parameters);
 
 		return "insert into $table ($columns) values $parameters";
 	}
