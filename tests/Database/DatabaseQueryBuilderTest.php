@@ -926,6 +926,15 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMultipleInsertsWithExpressionValues()
+	{
+		$builder = $this->getBuilder();
+		$builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (UPPER(\'Foo\')), (LOWER(\'Foo\'))', array())->andReturn(true);
+		$result = $builder->from('users')->insert(array(array('email' => new Raw("UPPER('Foo')")), array('email' => new Raw("LOWER('Foo')"))));
+		$this->assertTrue($result);
+	}
+
+
 	public function testUpdateMethod()
 	{
 		$builder = $this->getBuilder();
