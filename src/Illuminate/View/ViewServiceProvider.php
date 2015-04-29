@@ -113,7 +113,7 @@ class ViewServiceProvider extends ServiceProvider {
 
 			$finder = $app['view.finder'];
 
-			$env = new Factory($resolver, $finder, $app['events']);
+			$env = new Factory($resolver, $finder, $app['events'], $app['cache']);
 
 			// We will also set the container instance on this view environment since the
 			// view composers may be classes registered in the container, which allows

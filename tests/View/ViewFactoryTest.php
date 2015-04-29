@@ -267,6 +267,19 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCacheHandling()
+	{
+		$factory = $this->getFactory();
+		$factory->getCache()->shouldReceive('get')->once()->with('foo');
+		$factory->getCache()->shouldReceive('forever')->once()->with('foo', 'hi');
+		$factory->cache('bar', false, function() {});
+		$result = $factory->cache('foo', true, function() {
+			echo 'hi';
+		});
+		$this->assertEquals('hi', $result);
+	}
+
+
 	public function testSingleStackPush()
 	{
 		$factory = $this->getFactory();
@@ -420,7 +433,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return new Factory(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Contracts\Events\Dispatcher')
+			m::mock('Illuminate\Contracts\Events\Dispatcher'),
+			m::mock('Illuminate\Contracts\Cache\Factory')
 		);
 	}
 
@@ -430,7 +444,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		return array(
 			m::mock('Illuminate\View\Engines\EngineResolver'),
 			m::mock('Illuminate\View\ViewFinderInterface'),
-			m::mock('Illuminate\Contracts\Events\Dispatcher')
+			m::mock('Illuminate\Contracts\Events\Dispatcher'),
+			m::mock('Illuminate\Contracts\Cache\Factory')
 		);
 	}
 
