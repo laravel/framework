@@ -7,7 +7,7 @@ use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory as FactoryContract;
-use Illuminate\Contracts\Cache\Factory as Cache;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Factory implements FactoryContract {
 
@@ -33,9 +33,9 @@ class Factory implements FactoryContract {
 	protected $events;
 
 	/**
-	 * The cache instance.
+	 * The cache repository instance.
 	 *
-	 * @var \Illuminate\Contracts\Cache\Factory
+	 * @var \Illuminate\Contracts\Cache\Repository
 	 */
 	protected $cache;
 
