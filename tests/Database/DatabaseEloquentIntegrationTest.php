@@ -156,6 +156,19 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCountForPaginationWithGrouping()
+	{
+		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+		EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+		EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+
+		$query = EloquentTestUser::groupBy('email')->getQuery();
+
+		$this->assertEquals(3, $query->getCountForPagination());
+	}
+
+
 	public function testListsRetrieval()
 	{
 		EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -321,6 +334,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('EloquentTestPost', $photos[2]->imageable);
 		$this->assertEquals('taylorotwell@gmail.com', $photos[1]->imageable->email);
 		$this->assertEquals('First Post', $photos[3]->imageable->name);
+	}
+
+
+	public function testEmptyMorphToRelationship()
+	{
+		$photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
+		
+		$this->assertNull($photo->imageable);
 	}
 
 
