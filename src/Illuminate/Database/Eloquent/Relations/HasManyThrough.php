@@ -313,15 +313,16 @@ class HasManyThrough extends Relation {
 	/**
 	 * Get a paginator for the "select" statement.
 	 *
-	 * @param  int    $perPage
+	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = null, $columns = ['*'])
+	public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
-		return $this->query->paginate($perPage, $columns);
+		return $this->query->paginate($perPage, $columns, $pageName);
 	}
 
 	/**
