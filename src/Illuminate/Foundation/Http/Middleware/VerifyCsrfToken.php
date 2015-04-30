@@ -17,7 +17,7 @@ class VerifyCsrfToken implements Middleware {
 	protected $encrypter;
 
 	/**
-	 * The URIs that shoudl be excluded from CSRF verification.
+	 * The URIs that should be excluded from CSRF verification.
 	 *
 	 * @var array
 	 */
