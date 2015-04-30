@@ -32,9 +32,6 @@ class ScaffoldAuthCommand extends Command {
 		$files->copyDirectory(__DIR__.'/stubs/scaffold/Http/Controllers/Auth', app_path('Http/Controllers/Auth'));
 		$files->copy(__DIR__.'/stubs/scaffold/Http/routes.php', app_path('Http/routes.php'));
 
-		$files->copy(__DIR__.'/stubs/scaffold/migrations/2014_10_12_000000_create_users_table.php', base_path('database/migrations/2014_10_12_000000_create_users_table.php'));
-		$files->copy(__DIR__.'/stubs/scaffold/migrations/2014_10_12_100000_create_password_resets_table.php', base_path('database/migrations/2014_10_12_100000_create_password_resets_table.php'));
-
 		$files->copy(__DIR__.'/stubs/scaffold/Providers/AppServiceProvider.php', app_path('Providers/AppServiceProvider.php'));
 
 		$files->copyDirectory(__DIR__.'/stubs/scaffold/public/css', base_path('public/css'));
