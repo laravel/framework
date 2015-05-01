@@ -30,7 +30,7 @@ class BroadcastEvent
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Jobs\Job  $job
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  array  $data
      * @return void
      */
