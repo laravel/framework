@@ -39,7 +39,7 @@ class BroadcastEvent
         $event = unserialize($data['event']);
 
         $this->broadcaster->broadcast(
-            $event->broadcastOn(), get_class($event), $this->getPayloadFromEvent($event)
+            $event->broadcastOn(), $this->getEventName($event), $this->getPayloadFromEvent($event)
         );
 
         $job->delete();
@@ -81,5 +81,23 @@ class BroadcastEvent
         }
 
         return $value;
+    }
+
+    /**
+     * Get the event name to broadcast
+     *
+     * @param mixed $event
+     * @return string
+     */
+    protected function getEventName($event)
+    {
+        $reflector = new ReflectionClass($event);
+
+        if($reflector->implementsInterface('Illuminate\Contracts\Broadcasting\ShouldBroadcastShortName'))
+        {
+            return $reflector->getShortName();
+        }
+
+        return get_class($event);
     }
 }
