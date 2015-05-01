@@ -106,21 +106,36 @@ class Database implements DatabaseContract {
 	 * @param  array|string  $channels
 	 * @param  \Closure  $callback
 	 * @param  string  $connection
+	 * @param  string  $method
 	 * @return void
 	 */
-	public function subscribe($channels, Closure $callback, $connection = null)
+	public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
 	{
 		$loop = $this->connection($connection)->pubSubLoop();
 
-		call_user_func_array([$loop, 'subscribe'], (array) $channels);
+		call_user_func_array([$loop, $method], (array) $channels);
 
 		foreach ($loop as $message) {
-			if ($message->kind === 'message') {
+			echo $message->kind.PHP_EOL;
+			if ($message->kind === 'message' || $message->kind === 'pmessage') {
 				call_user_func($callback, $message->payload, $message->channel);
 			}
 		}
 
 		unset($loop);
+	}
+
+	/**
+	 * Subscribe to a set of given channels with wildcards.
+	 *
+	 * @param  array|string  $channels
+	 * @param  \Closure  $callback
+	 * @param  string  $connection
+	 * @return void
+	 */
+	public function psubscribe($channels, Closure $callback, $connection = null)
+	{
+		return $this->subscribe($channels, $callback, $connection, __FUNCTION__);
 	}
 
 	/**
