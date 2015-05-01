@@ -108,6 +108,7 @@ class Factory implements FactoryContract {
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Cache\Repository  $cache
 	 * @return void
 	 */
 	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events, Cache $cache)
@@ -560,9 +561,10 @@ class Factory implements FactoryContract {
 	 *
 	 * @param  string  $section
 	 * @param  string  $content
+	 * @param  Closure $closure
 	 * @return void
 	 */
-	public function cache($key, $condition = true, \Closure $closure)
+	public function cache($key, $condition = true, Closure $closure)
 	{
 		if (! $condition) {
 			return $closure();
