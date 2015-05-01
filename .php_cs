@@ -1,12 +1,15 @@
 <?php
 
 $finder = Symfony\Component\Finder\Finder::create()
-	->files()
-	->in(__DIR__)
-	->name('*.stub')
-	->ignoreDotFiles(true)
-	->ignoreVCS(true);
+    ->files()
+    ->in(__DIR__)
+    ->name('*.php')
+    ->name('*.stub')
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true);
 
 return Symfony\CS\Config\Config::create()
-	->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
-	->finder($finder);
+    ->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
+    ->fixers(array('short_array_syntax'))
+    ->setUsingCache(true)
+    ->finder($finder);
