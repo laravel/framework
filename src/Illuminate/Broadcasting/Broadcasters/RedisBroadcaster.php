@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Broadcasting;
+<?php namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
