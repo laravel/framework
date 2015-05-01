@@ -39,8 +39,11 @@ class BroadcastEvent
     {
         $event = unserialize($data['event']);
 
+        $name = method_exists($event, 'broadcastAs')
+                ? $event->broadcastAs() : get_class($event);
+
         $this->broadcaster->broadcast(
-            $event->broadcastOn(), get_class($event), $this->getPayloadFromEvent($event)
+            $event->broadcastOn(), $name, $this->getPayloadFromEvent($event)
         );
 
         $job->delete();
