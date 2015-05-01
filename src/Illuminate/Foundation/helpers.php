@@ -205,6 +205,19 @@ if ( ! function_exists('cookie'))
 	}
 }
 
+if ( ! function_exists('csrf_field'))
+{
+	/**
+	 * Generate a CSRF token form field.
+	 *
+	 * @return string
+	 */
+	function csrf_field()
+	{
+		return '<input type="hidden" name="_token" value="'.csrf_token().'">';
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
