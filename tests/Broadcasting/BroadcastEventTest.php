@@ -1,75 +1,106 @@
 <?php
 
-use Mockery as m;
+namespace {
 
-class BroadcastEventTest extends PHPUnit_Framework_TestCase {
+    use Mockery as m;
+    use Test\NamespacedTestBroadcastEvent;
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    class BroadcastEventTest extends PHPUnit_Framework_TestCase {
 
-
-	public function testBasicEventBroadcastParameterFormatting()
-	{
-		$broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
-
-		$broadcaster->shouldReceive('broadcast')->once()->with(
-			['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
-		);
-
-		$event = new TestBroadcastEvent;
-		$serializedEvent = serialize($event);
-		$jobData = ['event' => $serializedEvent];
-
-		$job = m::mock('Illuminate\Contracts\Queue\Job');
-		$job->shouldReceive('delete')->once();
-
-		(new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
-	}
+        public function tearDown()
+        {
+            m::close();
+        }
 
 
-	public function testManualParameterSpecification()
-	{
-		$broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        public function testBasicEventBroadcastParameterFormatting()
+        {
+            $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
-		$broadcaster->shouldReceive('broadcast')->once()->with(
-			['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
-		);
+            $broadcaster->shouldReceive('broadcast')->once()->with(
+                ['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+            );
 
-		$event = new TestBroadcastEventWithManualData;
-		$serializedEvent = serialize($event);
-		$jobData = ['event' => $serializedEvent];
+            $event = new TestBroadcastEvent;
+            $serializedEvent = serialize($event);
+            $jobData = ['event' => $serializedEvent];
 
-		$job = m::mock('Illuminate\Contracts\Queue\Job');
-		$job->shouldReceive('delete')->once();
+            $job = m::mock('Illuminate\Contracts\Queue\Job');
+            $job->shouldReceive('delete')->once();
 
-		(new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
-	}
+            (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        }
+
+
+        public function testManualParameterSpecification()
+        {
+            $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+
+            $broadcaster->shouldReceive('broadcast')->once()->with(
+                ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
+            );
+
+            $event = new TestBroadcastEventWithManualData;
+            $serializedEvent = serialize($event);
+            $jobData = ['event' => $serializedEvent];
+
+            $job = m::mock('Illuminate\Contracts\Queue\Job');
+            $job->shouldReceive('delete')->once();
+
+            (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        }
+
+        public function testShortClassNameEventBroadcast()
+        {
+            $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+
+            $broadcaster->shouldReceive('broadcast')->once()->with(
+                ['test-channel'], 'NamespacedTestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+            );
+
+            $event = new NamespacedTestBroadcastEvent();
+            $serializedEvent = serialize($event);
+            $jobData = ['event' => $serializedEvent];
+
+            $job = m::mock('Illuminate\Contracts\Queue\Job');
+            $job->shouldReceive('delete')->once();
+
+            (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+        }
+
+    }
+
+
+    class TestBroadcastEvent {
+        public $firstName = 'Taylor';
+        public $lastName = 'Otwell';
+        public $collection;
+        private $title = 'Developer';
+        public function __construct()
+        {
+            $this->collection = collect(['foo' => 'bar']);
+        }
+        public function broadcastOn()
+        {
+            return ['test-channel'];
+        }
+    }
+
+
+    class TestBroadcastEventWithManualData extends TestBroadcastEvent {
+        public function broadcastWith()
+        {
+            return ['name' => 'Taylor'];
+        }
+    }
 
 }
 
+namespace Test {
+    use Illuminate\Contracts\Broadcasting\ShouldBroadcastShortName;
 
-class TestBroadcastEvent {
-	public $firstName = 'Taylor';
-	public $lastName = 'Otwell';
-	public $collection;
-	private $title = 'Developer';
-	public function __construct()
-	{
-		$this->collection = collect(['foo' => 'bar']);
-	}
-	public function broadcastOn()
-	{
-		return ['test-channel'];
-	}
+    class NamespacedTestBroadcastEvent extends \TestBroadcastEvent implements ShouldBroadcastShortName
+    {
+        //
+    }
 }
-
-
-class TestBroadcastEventWithManualData extends TestBroadcastEvent {
-	public function broadcastWith()
-	{
-		return ['name' => 'Taylor'];
-	}
-}
-
