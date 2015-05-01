@@ -2,6 +2,7 @@
 
 use Pusher;
 use ReflectionClass;
+use ReflectionProperty;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
@@ -59,10 +60,8 @@ class BroadcastEvent
 
         $payload = [];
 
-        foreach ((new ReflectionClass($event))->getProperties() as $property) {
-            if ($property->isPublic()) {
-                $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
-            }
+        foreach ((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
         }
 
         return $payload;
