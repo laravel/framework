@@ -23,7 +23,6 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\HandlerEventCommand;
-use Illuminate\Foundation\Console\ScaffoldAuthCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -66,7 +65,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'RouteCache' => 'command.route.cache',
 		'RouteClear' => 'command.route.clear',
 		'RouteList' => 'command.route.list',
-		'ScaffoldAuth' => 'command.scaffold.auth',
 		'Serve' => 'command.serve',
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
@@ -373,19 +371,6 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.route.list', function($app)
 		{
 			return new RouteListCommand($app['router']);
-		});
-	}
-
-	/**
-	 * Register the command.
-	 *
-	 * @return void
-	 */
-	protected function registerScaffoldAuthCommand()
-	{
-		$this->app->singleton('command.scaffold.auth', function()
-		{
-			return new ScaffoldAuthCommand;
 		});
 	}
 
