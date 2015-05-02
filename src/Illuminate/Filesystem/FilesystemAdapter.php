@@ -243,10 +243,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 * Get all (recursive) of the directories within a given directory.
 	 *
 	 * @param  string|null  $directory
-	 * @param  bool  $recursive
 	 * @return array
 	 */
-	public function allDirectories($directory = null, $recursive = false)
+	public function allDirectories($directory = null)
 	{
 		return $this->directories($directory, true);
 	}
