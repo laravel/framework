@@ -183,7 +183,8 @@ class StartSession implements TerminableMiddleware {
 		{
 			$response->headers->setCookie(new Cookie(
 				$session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-				$config['path'], $config['domain'], array_get($config, 'secure', false)
+				$config['path'], $config['domain'], array_get($config, 'secure', false),
+				array_get($config, 'http_only', false)
 			));
 		}
 	}
