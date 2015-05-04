@@ -953,7 +953,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$aliases = array(
 			'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
-			'artisan'              => ['Illuminate\Console\Application', 'Illuminate\Contracts\Console\Application'],
 			'auth'                 => 'Illuminate\Auth\AuthManager',
 			'auth.driver'          => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Guard'],
 			'auth.password.tokens' => 'Illuminate\Auth\Passwords\TokenRepositoryInterface',
