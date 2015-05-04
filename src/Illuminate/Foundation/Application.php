@@ -86,6 +86,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $deferredServices = array();
 
 	/**
+	 * A custom callback used to configure Monolog.
+	 *
+	 * @var callable|null
+	 */
+	protected $monologConfigurator;
+
+	/**
 	 * The custom database path defined by the developer.
 	 *
 	 * @var string
@@ -729,6 +736,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Call the booting callbacks for the application.
+	 *
+	 * @param  array  $callbacks
+	 * @return void
+	 */
+	protected function fireAppCallbacks(array $callbacks)
+	{
+		foreach ($callbacks as $callback)
+		{
+			call_user_func($callback, $this);
+		}
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
@@ -794,20 +815,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	public function getCachedServicesPath()
 	{
 		return $this->basePath().'/bootstrap/cache/services.json';
-	}
-
-	/**
-	 * Call the booting callbacks for the application.
-	 *
-	 * @param  array  $callbacks
-	 * @return void
-	 */
-	protected function fireAppCallbacks(array $callbacks)
-	{
-		foreach ($callbacks as $callback)
-		{
-			call_user_func($callback, $this);
-		}
 	}
 
 	/**
@@ -917,6 +924,39 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	public function isDeferredService($service)
 	{
 		return isset($this->deferredServices[$service]);
+	}
+
+	/**
+	 * Define a callback to be used to configure Monolog.
+	 *
+	 * @param  callable  $callback
+	 * @return this
+	 */
+	public function configureMonologUsing(callable $callback)
+	{
+		$this->monologConfigurator = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Determine if the application has a custom Monolog configurator.
+	 *
+	 * @return bool
+	 */
+	public function hasMonologConfigurator()
+	{
+		return ! is_null($this->monologConfigurator);
+	}
+
+	/**
+	 * Get the custom Monolog configurator for the application.
+	 *
+	 * @return callable
+	 */
+	public function getMonologConfigurator()
+	{
+		return $this->monologConfigurator;
 	}
 
 	/**
