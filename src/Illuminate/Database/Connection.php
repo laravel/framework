@@ -514,7 +514,7 @@ class Connection implements ConnectionInterface {
 		}
 		elseif ($this->transactions > 1)
 		{
-			$this->pdo->exec('ROLLBACK TO trans'.$this->transactions);
+			$this->pdo->exec('ROLLBACK TO SAVEPOINT trans'.$this->transactions);
 		}
 
 		--$this->transactions;
