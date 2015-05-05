@@ -132,7 +132,7 @@ class Migrator {
 			return $this->pretendToRun($migration, 'up');
 		}
 
-		$migration->up();
+		$migration->up($this->getConnectionForMigration($migration));
 
 		// Once we have run a migrations class, we will log that it was run in this
 		// repository so that we don't try to run it next time we do a migration
@@ -223,7 +223,7 @@ class Migrator {
 			return $this->pretendToRun($instance, 'down');
 		}
 
-		$instance->down();
+		$instance->down($this->getConnectionForMigration($instance));
 
 		// Once we have successfully run the migration "down" we will remove it from
 		// the migration repository so it will be considered to have not been run
@@ -307,9 +307,9 @@ class Migrator {
 		// that would get fired against the database system for this migration.
 		$db = $this->resolveConnection($connection);
 
-		return $db->pretend(function() use ($migration, $method)
+		return $db->pretend(function() use ($migration, $method, $db)
 		{
-			$migration->$method();
+			$migration->$method($db);
 		});
 	}
 
@@ -406,6 +406,17 @@ class Migrator {
 	public function getFilesystem()
 	{
 		return $this->files;
+	}
+
+	/**
+	 * Get the database connection for a migration.
+	 *
+	 * @param  object  $migration
+	 * @return \Illuminate\Database\Connection
+	 */
+	protected function getConnectionForMigration($migration)
+	{
+		return $this->resolver->connection($migration->getConnection());
 	}
 
 }
