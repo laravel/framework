@@ -18,7 +18,8 @@
         "ext-mbstring": "*",
         "illuminate/contracts": "5.0.*",
         "doctrine/inflector": "~1.0",
-        "danielstjules/stringy": "~1.8"
+        "danielstjules/stringy": "~1.8",
+        "symfony/var-dumper": "2.6.*"
     },
     "autoload": {
         "psr-4": {
