@@ -111,9 +111,12 @@ class Kernel implements KernelContract {
 
 		$this->verifySessionConfigurationIsValid();
 
+		$shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
+		                        $this->app->make('middleware.disable') === true;
+
 		return (new Pipeline($this->app))
 		            ->send($request)
-		            ->through($this->middleware)
+		            ->through($shouldSkipMiddleware ? [] : $this->middleware)
 		            ->then($this->dispatchToRouter());
 	}
 
