@@ -1,0 +1,18 @@
+<?php namespace Illuminate\Foundation\Testing;
+
+use Exception;
+
+trait WithoutMiddleware
+{
+    /**
+     * @before
+     */
+    public function disableMiddlewareForAllTests()
+    {
+        if (method_exists($this, 'withoutMiddleware')) {
+            $this->withoutMiddleware();
+        } else {
+            throw new Exception("Unable to disable middleware. ApplicationTrait not used.");
+        }
+    }
+}
