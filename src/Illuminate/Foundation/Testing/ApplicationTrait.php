@@ -117,6 +117,18 @@ trait ApplicationTrait {
 	}
 
 	/**
+	 * Disable middleware for the test.
+	 *
+	 * @return $this
+	 */
+	public function withoutMiddleware()
+	{
+		$this->app->instance('middleware.disable', true);
+
+		return $this;
+	}
+
+	/**
 	 * Set the session to the given array.
 	 *
 	 * @param  array  $data
