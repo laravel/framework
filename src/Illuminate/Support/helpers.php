@@ -566,6 +566,29 @@ if ( ! function_exists('preg_replace_sub'))
 	}
 }
 
+if ( ! function_exists('array_sort_recursive')) {
+	/**
+	 * Recursively sort an array by keys and values.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	function array_sort_recursive($array) {
+		foreach ($array as &$value) {
+			if (is_array($value) && isset($value[0])) {
+				sort($value);
+			} elseif (is_array($value)) {
+				array_sort_recursive($value);
+			}
+		}
+
+		ksort($array);
+
+		return $array;
+	}
+}
+
+
 if ( ! function_exists('snake_case'))
 {
 	/**

@@ -85,12 +85,21 @@ class Handler implements ExceptionHandlerContract {
 	{
 		if ($this->isHttpException($e))
 		{
-			return $this->renderHttpException($e);
+			return $this->toIlluminateResponse($this->renderHttpException($e), $e);
 		}
 		else
 		{
-			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+			return $this->toIlluminateResponse((new SymfonyDisplayer(config('app.debug')))->createResponse($e), $e);
 		}
+	}
+
+	protected function toIlluminateResponse($response, $e)
+	{
+		$response = new \Illuminate\Http\Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+
+		$response->exception = $e;
+
+		return $response;
 	}
 
 	/**
