@@ -340,7 +340,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	public function testEmptyMorphToRelationship()
 	{
 		$photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
-		
+
 		$this->assertNull($photo->imageable);
 	}
 
