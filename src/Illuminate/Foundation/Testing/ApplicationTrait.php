@@ -32,6 +32,32 @@ trait ApplicationTrait
     }
 
     /**
+     * Specify a list of events that should be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|dynamic  $events
+     * @return $this
+     */
+    public function expectEvents($events)
+    {
+        $events = is_array($events) ? $events : func_get_args();
+
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+
+        $mock->shouldIgnoreMissing();
+
+        foreach ($events as $event) {
+            $mock->shouldReceive('fire')->atLeast()->once()
+                ->with(Mockery::type($event), [], false);
+        }
+
+        $this->app->instance('events', $mock);
+
+        return $this;
+    }
+
+    /**
      * Mock the event dispatcher so all events are silenced.
      *
      * @return $this
