@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Testing;
 
+use Mockery;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 trait ApplicationTrait
@@ -28,6 +29,22 @@ trait ApplicationTrait
         putenv('APP_ENV=testing');
 
         $this->app = $this->createApplication();
+    }
+
+    /**
+     * Mock the event dispatcher so all events are silenced.
+     *
+     * @return $this
+     */
+    protected function silenceEvents()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+
+        $mock->shouldReceive('fire');
+
+        $this->app->instance('events', $mock);
+
+        return $this;
     }
 
     /**
