@@ -1,11 +1,6 @@
 <?php namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Http\Request;
-use InvalidArgumentException;
-use Symfony\Component\DomCrawler\Form;
-use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
-use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait ApplicationTrait
 {
