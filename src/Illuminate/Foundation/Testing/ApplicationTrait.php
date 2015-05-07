@@ -163,6 +163,18 @@ trait ApplicationTrait
      * @param  array  $data
      * @return $this
      */
+    protected function missingFromDatabase($table, array $data)
+    {
+        return $this->notSeeInDatabase($table, $data);
+    }
+
+    /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
     protected function notSeeInDatabase($table, array $data)
     {
         $count = $this->app->make('db')->table($table)->where($data)->count();
