@@ -36,7 +36,7 @@ trait ApplicationTrait
      *
      * @return $this
      */
-    protected function silenceEvents()
+    protected function withoutEvents()
     {
         $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
