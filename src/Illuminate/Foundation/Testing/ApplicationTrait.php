@@ -157,6 +157,24 @@ trait ApplicationTrait
     }
 
     /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
+    protected function notSeeInDatabase($table, array $data)
+    {
+        $count = $this->app->make('db')->table($table)->where($data)->count();
+
+        $this->assertEquals(0, $count, sprintf(
+            "Found unexpected records in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+        ));
+
+        return $this;
+    }
+
+    /**
      * Seed a given database connection.
      *
      * @param  string  $class
