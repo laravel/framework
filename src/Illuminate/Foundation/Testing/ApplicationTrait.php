@@ -39,7 +39,7 @@ trait ApplicationTrait
      * @param  array|dynamic  $events
      * @return $this
      */
-    public function expectEvents($events)
+    public function expectsEvents($events)
     {
         $events = is_array($events) ? $events : func_get_args();
 
