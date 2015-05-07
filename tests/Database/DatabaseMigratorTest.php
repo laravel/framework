@@ -207,7 +207,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
 			$fooMigration->migration,
 			$barMigration->migration,
-			$bazMigration->migration	
+			$bazMigration->migration
 		]);
 
 		$barMock = m::mock('stdClass');
@@ -217,7 +217,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 		$fooMock->shouldReceive('down')->once();
 
 		$bazMock = m::mock('stdClass');
-		$bazMock->shouldReceive('down')->once();		
+		$bazMock->shouldReceive('down')->once();
 
 		$migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('baz'))->will($this->returnValue($bazMock));
 		$migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('bar'))->will($this->returnValue($barMock));

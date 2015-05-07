@@ -24,7 +24,7 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($builder->hasTable('table'));
 	}
 
-	
+
 	public function testTableHasColumns()
     	{
         	$connection = m::mock('Illuminate\Database\Connection');
