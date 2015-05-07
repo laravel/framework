@@ -51,7 +51,7 @@ trait CrawlerTrait
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
-     * @param  array  $heders
+     * @param  array  $headers
      * @return $this
      */
     public function get($uri, array $headers = array())
@@ -65,7 +65,8 @@ trait CrawlerTrait
      * Visit the given URI with a POST request.
      *
      * @param  string  $uri
-     * @param  array  $heders
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function post($uri, array $data = array(), array $headers = array())
@@ -79,7 +80,8 @@ trait CrawlerTrait
      * Visit the given URI with a PUT request.
      *
      * @param  string  $uri
-     * @param  array  $heders
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function put($uri, array $data = array(), array $headers = array())
@@ -93,7 +95,8 @@ trait CrawlerTrait
      * Visit the given URI with a PATCH request.
      *
      * @param  string  $uri
-     * @param  array  $heders
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function patch($uri, array $data = array(), array $headers = array())
@@ -107,7 +110,8 @@ trait CrawlerTrait
      * Visit the given URI with a DELETE request.
      *
      * @param  string  $uri
-     * @param  array  $heders
+     * @param  array  $data
+     * @param  array  $headers
      * @return $this
      */
     public function delete($uri, array $data = array(), array $headers = array())
@@ -185,7 +189,7 @@ trait CrawlerTrait
      * Assert that a given page successfully loaded.
      *
      * @param  string  $uri
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     protected function assertPageLoaded($uri, $message = null)
@@ -441,7 +445,7 @@ trait CrawlerTrait
     /**
      * Get the form from the page with the given submit button text.
      *
-     * @param  string  $buttonText
+     * @param  string|null  $buttonText
      * @return \Symfony\Component\DomCrawler\Form
      */
     protected function getForm($buttonText = null)
@@ -463,7 +467,7 @@ trait CrawlerTrait
      * Store a form input in the local array.
      *
      * @param  string  $element
-     * @param  string $value
+     * @param  string  $text
      * @return $this
      */
     protected function storeInput($element, $text)
