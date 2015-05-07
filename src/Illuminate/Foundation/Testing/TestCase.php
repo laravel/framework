@@ -5,7 +5,7 @@ use PHPUnit_Framework_TestCase;
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
 
-    use ApplicationTrait, AssertionsTrait;
+    use ApplicationTrait, AssertionsTrait, CrawlerTrait;
 
     /**
      * The callbacks that should be run before the application is destroyed.
