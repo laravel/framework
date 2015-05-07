@@ -227,7 +227,18 @@ trait CrawlerTrait
      * @param  array|null  $data
      * @return $this
      */
-    protected function receiveJson(array $data = null)
+    protected function shouldReturnJson(array $data = null)
+    {
+        return $this->receiveJson($data);
+    }
+
+    /**
+     * Assert that the response contains JSON.
+     *
+     * @param  array|null  $data
+     * @return $this
+     */
+    protected function receiveJson($data = null)
     {
         $this->seeJson();
 

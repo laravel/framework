@@ -32,6 +32,20 @@ trait ApplicationTrait
     }
 
     /**
+     * Register an instance of an object in the container.
+     *
+     * @param  string  $abstract
+     * @param  mixed  $instance
+     * @return $this
+     */
+    protected function instance($abstract, $instance)
+    {
+        $this->app->instance($abstract, $instance);
+
+        return $instance;
+    }
+
+    /**
      * Specify a list of events that should be fired for the given operation.
      *
      * These events will be mocked, so that handlers will not actually be executed.
@@ -122,6 +136,24 @@ trait ApplicationTrait
     public function be(UserContract $user, $driver = null)
     {
         $this->app['auth']->driver($driver)->setUser($user);
+    }
+
+    /**
+     * Assert that a given where condition exists in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
+    protected function seeInDatabase($table, array $data)
+    {
+        $count = $this->app->make('db')->table($table)->where($data)->count();
+
+        $this->assertGreaterThan(0, $count, sprintf(
+            "Unable to find row in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+        ));
+
+        return $this;
     }
 
     /**
