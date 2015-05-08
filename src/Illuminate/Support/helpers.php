@@ -823,3 +823,39 @@ if ( ! function_exists('with'))
 		return $object;
 	}
 }
+
+if ( ! function_exists('be'))
+{
+	/**
+	 * Escape Blade Template entities in a string.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	function be($value)
+	{
+		$blade_entities = [
+			'{{', '}}', '{{--', '--}}', 
+			'@{{', '{!!', '!!}', '@parent', 
+			'@extends', '@stop', '@endsection', '@yield', 
+			'@show', '@if', '@elseif', '@else',
+			'@endif', '@unless', '@endunless', '@for', 
+			'@endfor', '@foreach', '@endforeach', '@forelse', 
+			'@empty', '@endforelse', '@while', '@endwhile',
+			'@include', '@overwrite', '@lang', '@choice',
+			'@section',
+		];
+		$replace_value = [
+			'&#123;&#123;', '&#125;&#125;', '&#123;&#123;--', '--&#125;&#125;', 
+			'&#64;&#123;&#123;', '&#123;!!', '!!&#125;', '&#64;parent', 
+			'&#64;extends', '&#64;stop', '&#64;endsection', '&#64;yield', 
+			'&#64;show', '&#64;if', '&#64;elseif', '&#64;else',
+			'&#64;endif', '&#64;unless', '&#64;endunless', '&#64;for', 
+			'&#64;endfor', '&#64;foreach', '&#64;endforeach', '&#64;forelse', 
+			'&#64;empty', '&#64;endforelse', '&#64;while', '&#64;endwhile',
+			'&#64;include', '&#64;overwrite', '&#64;lang', '&#64;choice',
+			'&#64;section',
+		];
+		return str_replace($blade_entities, $replace_value, $value);
+	}
+}
