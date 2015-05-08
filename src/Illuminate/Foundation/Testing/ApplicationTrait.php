@@ -143,7 +143,7 @@ trait ApplicationTrait
      * Set the currently logged in user for the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return void
      */
     public function actingAs(UserContract $user, $driver = null)
@@ -157,7 +157,7 @@ trait ApplicationTrait
      * Set the currently logged in user for the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return void
      */
     public function be(UserContract $user, $driver = null)
