@@ -135,11 +135,15 @@ class Kernel implements KernelContract {
 
 		foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
 		{
-			$instance = $this->app->make($middleware);
+			list($name, $parameters) = $this->parseMiddleware($middleware);
+
+			$instance = $this->app->make($name);
 
 			if ($instance instanceof TerminableMiddleware)
 			{
-				$instance->terminate($request, $response);
+				$call = array_merge([$request, $response], $parameters);
+
+				call_user_func_array([$instance, 'terminate'], $call);
 			}
 		}
 
@@ -160,6 +164,24 @@ class Kernel implements KernelContract {
 		}
 
 		return [];
+	}
+
+	/**
+	 * Parse a middleware string to get the name and parameters.
+	 *
+	 * @param  string  $middleware
+	 * @return array
+	 */
+	protected function parseMiddleware($middleware)
+	{
+		list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+
+		if (is_string($parameters))
+		{
+			$parameters = explode(',', $parameters);
+		}
+
+		return [$name, $parameters];
 	}
 
 	/**
