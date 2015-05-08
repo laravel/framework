@@ -104,7 +104,7 @@ class FactoryBuilder
                 $results[] = $this->makeInstance($attributes);
             }
 
-            return collect($results);
+            return new Collection($results);
         }
     }
 
