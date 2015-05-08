@@ -89,11 +89,7 @@ trait ResetsPasswords {
 
 		$response = Password::reset($credentials, function($user, $password)
 		{
-			$user->password = bcrypt($password);
-
-			$user->save();
-
-			Auth::login($user);
+			call_user_func([$this, 'passwordReset'], $user, $password);
 		});
 
 		switch ($response)
@@ -106,6 +102,21 @@ trait ResetsPasswords {
 							->withInput($request->only('email'))
 							->withErrors(['email' => trans($response)]);
 		}
+	}
+
+	/**
+	 * Actually reset user's password
+	 *
+	 * @param $user
+	 * @param $password
+	 */
+	protected function passwordReset($user, $password)
+	{
+		$user->password = bcrypt($password);
+
+		$user->save();
+
+		Auth::login($user);
 	}
 
 	/**
