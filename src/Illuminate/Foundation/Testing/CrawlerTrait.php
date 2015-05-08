@@ -248,6 +248,23 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that the response contains an exact JSON array.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function seeJsonEquals(array $data)
+    {
+        $actual = json_encode(array_sort_recursive(
+            json_decode($this->response->getContent(), true)
+        ));
+
+        $this->assertEquals(json_encode(array_sort_recursive($data)), $actual);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
