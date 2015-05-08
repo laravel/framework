@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 class DatabaseServiceProvider extends ServiceProvider {
 
@@ -26,6 +27,8 @@ class DatabaseServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->registerEloquentFactory();
+
 		$this->registerQueueableEntityResolver();
 
 		// The connection factory is used to create the actual connection instances on
@@ -42,6 +45,19 @@ class DatabaseServiceProvider extends ServiceProvider {
 		$this->app->singleton('db', function($app)
 		{
 			return new DatabaseManager($app, $app['db.factory']);
+		});
+	}
+
+	/**
+	 * Register the Eloquent factory instance in the container.
+	 *
+	 * @return void
+	 */
+	protected function registerEloquentFactory()
+	{
+		$this->app->singleton('Illuminate\Database\Eloquent\Factory', function()
+		{
+			return EloquentFactory::construct(database_path('factories'));
 		});
 	}
 
