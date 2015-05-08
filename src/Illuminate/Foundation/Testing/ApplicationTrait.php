@@ -146,6 +146,20 @@ trait ApplicationTrait
      * @param  string  $driver
      * @return void
      */
+    public function actingAs(UserContract $user, $driver = null)
+    {
+        $this->be($user, $driver);
+
+        return $this;
+    }
+
+    /**
+     * Set the currently logged in user for the application.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $driver
+     * @return void
+     */
     public function be(UserContract $user, $driver = null)
     {
         $this->app['auth']->driver($driver)->setUser($user);
