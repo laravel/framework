@@ -93,6 +93,19 @@ trait ApplicationTrait
      * @param  array  $data
      * @return void
      */
+    public function withSession(array $data)
+    {
+        $this->session($data);
+
+        return $this;
+    }
+
+    /**
+     * Set the session to the given array.
+     *
+     * @param  array  $data
+     * @return void
+     */
     public function session(array $data)
     {
         $this->startSession();
