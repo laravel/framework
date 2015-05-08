@@ -141,9 +141,7 @@ class Kernel implements KernelContract {
 
 			if ($instance instanceof TerminableMiddleware)
 			{
-				$call = array_merge([$request, $response], $parameters);
-
-				call_user_func_array([$instance, 'terminate'], $call);
+				$instance->terminate($request, $response);
 			}
 		}
 
