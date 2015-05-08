@@ -387,6 +387,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('firstname' => 'Ferid'), $developer);
 	}
 
+	public function testBe()
+	{
+		$value_with_blade_entities  = "<html><body>{!! @section('base') @parent";
+		$value_with_blade_entities .= " @endsection !!} @if(1==1) {{'OK'}} @endif </body></html>";
+
+		$value_stripped_expected  = "<html><body>&#123;!! &#64;section('base') &#64;parent";
+		$value_stripped_expected .= " &#64;endsection !!&#125; &#64;if(1==1) &#123;&#123;'OK'&#125;&#125; &#64;endif </body></html>";
+
+		$this->assertEquals($value_stripped_expected, be($value_with_blade_entities));
+	}
+
 }
 
 trait SupportTestTraitOne {}
