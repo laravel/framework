@@ -389,11 +389,11 @@ trait CrawlerTrait
     /**
      * Select an option from a drop-down.
      *
-     * @param  string  $element
      * @param  string  $option
+     * @param  string  $element
      * @return $this
      */
-    protected function select($element, $option)
+    protected function select($option, $element)
     {
         return $this->storeInput($element, $option);
     }
