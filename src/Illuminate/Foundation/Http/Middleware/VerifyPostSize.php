@@ -12,7 +12,7 @@ class VerifyPostSize implements Middleware {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Closure  $next
 	 * @return mixed
-	 * 
+	 *
 	 * @throws \Illuminate\Http\Exception\PostTooLargeException
 	 */
 	public function handle($request, Closure $next)
@@ -24,7 +24,7 @@ class VerifyPostSize implements Middleware {
 
 		return $next($request);
 	}
-	
+
 	/**
 	 * Determine the server 'post_max_size' as bytes.
 	 *
@@ -33,7 +33,7 @@ class VerifyPostSize implements Middleware {
    	protected function getPostMaxSize()
    	{
 		$postMaxSize = ini_get('post_max_size');
-		
+
 		switch (substr($postMaxSize, -1))
 		{
 			case 'M':
@@ -46,8 +46,8 @@ class VerifyPostSize implements Middleware {
 			case 'g':
 				return (int) $postMaxSize * 1073741824;
 		}
-		
+
 		return (int) $postMaxSize;
 	}
-	
+
 }
