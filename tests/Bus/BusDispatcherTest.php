@@ -52,6 +52,19 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomQueueAndDelay()
+	{
+		$container = new Container;
+		$dispatcher = new Dispatcher($container, function() {
+			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('BusDispatcherTestSpecificQueueAndDelayCommand'));
+			return $mock;
+		});
+
+		$dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
+	}
+
+
 	public function testHandlersThatShouldBeQueuedAreQueued()
 	{
 		$container = new Container;
@@ -149,4 +162,9 @@ class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\
 	{
 		$queue->push($command);
 	}
+}
+
+class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldBeQueued {
+	public $queue = 'foo';
+	public $delay = 10;
 }
