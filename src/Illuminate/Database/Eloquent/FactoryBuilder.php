@@ -43,11 +43,13 @@ class FactoryBuilder
      * Create an new builder instance.
      *
      * @param  string  $class
+     * @param  string  $name
      * @param  array  $definitions
      * @return void
      */
-    public function __construct($class, array $definitions)
+    public function __construct($class, $name, array $definitions)
     {
+        $this->name = $name;
         $this->class = $class;
         $this->faker = Faker::create();
         $this->definitions = $definitions;

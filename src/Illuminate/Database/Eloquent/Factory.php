@@ -71,6 +71,19 @@ class Factory implements ArrayAccess
     }
 
     /**
+     * Create an instance of the given model and type and persist it to the database.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function createAs($class, $name, array $attributes = array())
+    {
+        return $this->of($class, $name)->create($attributes);
+    }
+
+    /**
      * Create an instance of the given model.
      *
      * @param  string  $class
@@ -80,6 +93,19 @@ class Factory implements ArrayAccess
     public function make($class, array $attributes = array())
     {
         return $this->of($class)->make($attributes);
+    }
+
+    /**
+     * Create an instance of the given model and type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function makeAs($class, $name, array $attributes = array())
+    {
+        return $this->of($class, $name)->make($attributes);
     }
 
     /**
@@ -112,11 +138,12 @@ class Factory implements ArrayAccess
      * Create a builder for the given model.
      *
      * @param  string  $class
+     * @param  string  $name
      * @return \Illuminate\Database\Factory\Builder
      */
-    public function of($class)
+    public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $this->definitions);
+        return new FactoryBuilder($class, $name, $this->definitions);
     }
 
     /**
