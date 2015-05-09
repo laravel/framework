@@ -19,7 +19,7 @@ class ConsoleServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('command.log.tail', function($app)
+		$this->app->singleton('command.log.tail', function()
 		{
 			return new TailCommand();
 		});
