@@ -88,6 +88,32 @@ trait ApplicationTrait
     }
 
     /**
+     * Specify a list of jobs that should be dispatched for the given operation.
+     *
+     * These jobs will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|dynamic  $jobs
+     * @return $this
+     */
+    protected function expectsJobs($jobs)
+    {
+        $jobs = is_array($jobs) ? $jobs : func_get_args();
+
+        $mock = Mockery::mock('Illuminate\Bus\Dispatcher[dispatch]', [$this->app]);
+
+        foreach ($jobs as $job) {
+            $mock->shouldReceive('dispatch')->atLeast()->once()
+                ->with(Mockery::type($job));
+        }
+
+        $this->app->instance(
+            'Illuminate\Contracts\Bus\Dispatcher', $mock
+        );
+
+        return $this;
+    }
+
+    /**
      * Set the session to the given array.
      *
      * @param  array  $data
