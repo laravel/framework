@@ -63,7 +63,7 @@ class ConfigureLogging {
 	 */
 	protected function getLogPath(Application $app)
 	{
-		$path = $app->make('config')->get('log.path');
+		$path = $app->make('config')->get('log.path', 'logs/laravel.log');
 
 		// if the path is relative, it should be relative to the storage path
 		if(substr($path, 0, 1) != DIRECTORY_SEPARATOR) {
