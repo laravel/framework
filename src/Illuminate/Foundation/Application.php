@@ -181,6 +181,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function bootstrapWith(array $bootstrappers)
 	{
+		$this->hasBeenBootstrapped = true;
+
 		foreach ($bootstrappers as $bootstrapper)
 		{
 			$this['events']->fire('bootstrapping: '.$bootstrapper, [$this]);
@@ -189,8 +191,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
 			$this['events']->fire('bootstrapped: '.$bootstrapper, [$this]);
 		}
-
-		$this->hasBeenBootstrapped = true;
 	}
 
 	/**
