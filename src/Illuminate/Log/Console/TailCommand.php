@@ -32,7 +32,7 @@ class TailCommand extends Command {
 				$filepath = $this->getDailyLogfile($date);
 				break;
 			case 'single':
-				$filepath = $this->getLogPath();
+				$filepath = log_path();
 				break;
 			default:
 				$this->error(config('app.log')." not supported.");
@@ -55,7 +55,7 @@ class TailCommand extends Command {
 	 */
 	protected function getDailyLogfile($date = null)
 	{
-		$filepath = $this->getLogPath();
+		$filepath = log_path();
 
 		$folder = pathinfo($filepath, PATHINFO_DIRNAME);
 		$filename = pathinfo($filepath, PATHINFO_FILENAME);
@@ -64,14 +64,6 @@ class TailCommand extends Command {
 		$date = date('Y-m-d', $date);
 
 		return "{$folder}".DIRECTORY_SEPARATOR."{$filename}-{$date}.{$ext}";
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function getLogPath()
-	{
-		return config('log.path', storage_path('/logs/laravel.log'));
 	}
 
 	/**

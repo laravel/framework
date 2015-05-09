@@ -303,6 +303,19 @@ if ( ! function_exists('logger'))
 	}
 }
 
+if ( ! function_exists('log_path'))
+{
+	/**
+	 * Get the path to the log file.
+	 *
+	 * @return string
+	 */
+	function log_path()
+	{
+		return app()->logPath();
+	}
+}
+
 if ( ! function_exists('old'))
 {
 	/**

@@ -55,25 +55,6 @@ class ConfigureLogging {
 	}
 
 	/**
-	 * Get the log file path.
-	 *
-	 * @param Application $app
-	 *
-	 * @return string
-	 */
-	protected function getLogPath(Application $app)
-	{
-		$path = $app->make('config')->get('log.path', 'logs/laravel.log');
-
-		// if the path is relative, it should be relative to the storage path
-		if(substr($path, 0, 1) != DIRECTORY_SEPARATOR) {
-			$path = $app->storagePath().DIRECTORY_SEPARATOR.$path;
-		}
-
-		return $path;
-	}
-
-	/**
 	 * Configure the Monolog handlers for the application.
 	 *
 	 * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -82,7 +63,7 @@ class ConfigureLogging {
 	 */
 	protected function configureSingleHandler(Application $app, Writer $log)
 	{
-		$log->useFiles($this->getLogPath($app));
+		$log->useFiles($app->logPath());
 	}
 
 	/**
@@ -95,7 +76,7 @@ class ConfigureLogging {
 	protected function configureDailyHandler(Application $app, Writer $log)
 	{
 		$log->useDailyFiles(
-			$app->make('config')->get('log.path', $this->getLogPath($app)),
+			$app->logPath(),
 			$app->make('config')->get('log.max_files', 5)
 		);
 	}
