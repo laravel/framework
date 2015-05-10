@@ -2,10 +2,12 @@
 
 use Pusher;
 use Closure;
+use Pubnub\Pubnub;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\PubnubBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
 class BroadcastManager implements FactoryContract
@@ -133,6 +135,19 @@ class BroadcastManager implements FactoryContract
     {
         return new RedisBroadcaster(
             $this->app->make('redis'), array_get($config, 'connection')
+        );
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createPubnubDriver(array $config)
+    {
+        return new PubnubBroadcaster(
+            new Pubnub($config['publish_key'], $config['subscribe_key'])
         );
     }
 
