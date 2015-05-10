@@ -180,10 +180,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		{
 			return $this->dispatchToQueue($command);
 		}
-		else
-		{
-			return $this->dispatchNow($command, $afterResolving);
-		}
+
+		return $this->dispatchNow($command, $afterResolving);
 	}
 
 	/**
