@@ -59,6 +59,8 @@ class Arr {
 		{
 			if ($values instanceof Collection) $values = $values->all();
 
+			if ( ! is_array($values)) continue;
+
 			$results = array_merge($results, $values);
 		}
 
@@ -289,7 +291,7 @@ class Arr {
 	/**
 	 * Pluck an array of values from an array.
 	 *
-	 * @param  array   $array
+	 * @param  array|\ArrayAccess  $array
 	 * @param  string|array  $value
 	 * @param  string|array|null  $key
 	 * @return array
