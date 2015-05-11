@@ -47,6 +47,29 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($model->isDirty(['foo', 'bar']));
 	}
 
+	public function testDirtyDateCastedAttributes()
+	{
+		$model = new EloquentDateModelStub;
+		Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+		$resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
+		$mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
+		$mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+		$model->setRawAttributes(['foo'	=> '2015-05-11', 'bar' => '2015-05-11', 'baz' => '2015-05-11']);
+		$model->syncOriginal();
+
+		$model->foo = '2015-05-11 00:00:00';
+		$model->bar = '2015-05-12';
+		$model->baz = null;
+		$model->created_at = '2015-05-11';
+		$model->updated_at = $model->freshTimestamp();
+
+		$this->assertTrue($model->isDirty());
+		$this->assertFalse($model->isDirty('foo'));
+		$this->assertTrue($model->isDirty('bar'));
+		$this->assertTrue($model->isDirty('baz'));
+		$this->assertTrue($model->isDirty('created_at'));
+		$this->assertTrue($model->isDirty('updated_at'));
+	}
 
 	public function testCalculatedAttributes()
 	{
@@ -1310,7 +1333,7 @@ class EloquentModelCamelStub extends EloquentModelStub {
 class EloquentDateModelStub extends EloquentModelStub {
 	public function getDates()
 	{
-		return array('created_at', 'updated_at');
+		return array('created_at', 'updated_at', 'foo', 'bar', 'baz');
 	}
 }
 
