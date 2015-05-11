@@ -604,7 +604,7 @@ class Route {
 		// across into the "uses" property that will get fired off by this route.
 		elseif ( ! isset($action['uses']))
 		{
-			$action['uses'] = $this->findCallable($action);
+			$action['uses'] = $this->findRouteCallable($action);
 		}
 
 		return $action;
@@ -616,11 +616,11 @@ class Route {
 	 * @param  array  $action
 	 * @return callable
 	 */
-	protected function findCallable(array $action)
+	protected function findRouteCallable(array $action)
 	{
 		return array_first($action, function($key, $value)
 		{
-			return is_callable($value);
+			return is_numeric($key) && is_callable($value);
 		});
 	}
 
