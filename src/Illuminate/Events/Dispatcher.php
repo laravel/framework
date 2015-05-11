@@ -127,7 +127,7 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Register an event subscriber with the dispatcher.
 	 *
-	 * @param  string  $subscriber
+	 * @param  mixed  $subscriber
 	 * @return void
 	 */
 	public function subscribe($subscriber)
