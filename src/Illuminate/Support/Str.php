@@ -213,12 +213,18 @@ class Str {
 	 */
 	public static function random($length = 16)
 	{
-		if ( ! function_exists('openssl_random_pseudo_bytes'))
+		if (function_exists('random_bytes'))
 		{
-			throw new RuntimeException('OpenSSL extension is required.');
+			$bytes = random_bytes($length * 2);
 		}
-
-		$bytes = openssl_random_pseudo_bytes($length * 2);
+		elseif (function_exists('openssl_random_pseudo_bytes'))
+		{
+			$bytes = openssl_random_pseudo_bytes($length * 2);
+		}
+		else
+		{
+			throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+		}
 
 		if ($bytes === false)
 		{
