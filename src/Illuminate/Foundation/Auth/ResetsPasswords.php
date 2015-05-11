@@ -89,7 +89,7 @@ trait ResetsPasswords {
 
 		$response = Password::reset($credentials, function($user, $password)
 		{
-			$this->passwordReset($user, $password);
+			$this->resetPassword($user, $password);
 		});
 
 		switch ($response)
@@ -105,12 +105,13 @@ trait ResetsPasswords {
 	}
 
 	/**
-	 * Actually reset user's password
+	 * Reset the given user's password.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
 	 * @param  string  $password
+	 * @return void
 	 */
-	protected function passwordReset($user, $password)
+	protected function resetPassword($user, $password)
 	{
 		$user->password = bcrypt($password);
 
