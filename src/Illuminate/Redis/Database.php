@@ -22,7 +22,8 @@ class Database implements DatabaseContract {
 	public function __construct(array $servers = array())
 	{
 		$cluster = array_pull($servers, 'cluster');
-		$options = (array)array_pull($servers, 'options');
+
+		$options = (array) array_pull($servers, 'options');
 
 		if ($cluster)
 		{
