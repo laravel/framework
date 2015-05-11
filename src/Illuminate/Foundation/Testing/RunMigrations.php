@@ -1,25 +1,16 @@
 <?php namespace Illuminate\Foundation\Testing;
 
-trait RunMigrations
+trait Migrations
 {
     /**
      * @before
      */
-    public function runMigrations()
+    public function runDatabaseMigrations()
     {
-        // run application migrations
         $this->artisan('migrate');
 
-        // register the rollback action before destroying
-        // the application
         $this->beforeApplicationDestroyed(function() {
-            $this->rollbackMigrations();
+            $this->artisan('migrate:rollback');
         });
-    }
-
-
-    public function rollbackMigrations()
-    {
-        $this->artisan('migrate:rollback');
     }
 }
