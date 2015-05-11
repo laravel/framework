@@ -3043,7 +3043,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getRelation($relation)
 	{
-		return $this->relations[$relation];
+		return array_get($this->relations, $relation);
 	}
 
 
