@@ -205,6 +205,19 @@ if ( ! function_exists('cookie'))
 	}
 }
 
+if ( ! function_exists('csrf_field'))
+{
+	/**
+	 * Generate a CSRF token form field.
+	 *
+	 * @return string
+	 */
+	function csrf_field()
+	{
+		return '<input type="hidden" name="_token" value="'.csrf_token().'">';
+	}
+}
+
 if ( ! function_exists('csrf_token'))
 {
 	/**
@@ -255,6 +268,31 @@ if ( ! function_exists('delete'))
 		return app('router')->delete($uri, $action);
 	}
 }
+
+if ( ! function_exists('factory'))
+{
+	/**
+	 * Create a model factory builder for a given class, name, and amount.
+	 *
+	 * @param  dynamic  class|class,name|class,amount|class,name,amount
+	 * @return \Illuminate\Database\Eloquent\FactoryBuilder
+	 */
+	function factory()
+	{
+		$factory = app('Illuminate\Database\Eloquent\Factory');
+
+		$arguments = func_get_args();
+
+		if (isset($arguments[1]) && is_string($arguments[1])) {
+			return $factory->of($arguments[0], $arguments[1])->times(isset($arguments[2]) ? $arguments[2] : 1);
+		} elseif (isset($arguments[1])) {
+			return $factory->of($arguments[0])->times($arguments[1]);
+		} else {
+			return $factory->of($arguments[0]);
+		}
+	}
+}
+
 
 if ( ! function_exists('get'))
 {

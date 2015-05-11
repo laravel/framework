@@ -20,7 +20,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @var string
 	 */
-	const VERSION = '5.0.30';
+	const VERSION = '5.1-dev';
 
 	/**
 	 * The base path for the Laravel installation.
@@ -86,6 +86,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $deferredServices = array();
 
 	/**
+	 * A custom callback used to configure Monolog.
+	 *
+	 * @var callable|null
+	 */
+	protected $monologConfigurator;
+
+	/**
 	 * The custom database path defined by the developer.
 	 *
 	 * @var string
@@ -100,18 +107,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	protected $storagePath;
 
 	/**
-	 * Indicates if the storage directory should be used for optimizations.
-	 *
-	 * @var bool
-	 */
-	protected $useStoragePathForOptimizations = false;
-
-	/**
 	 * The environment file to load during bootstrapping.
 	 *
 	 * @var string
 	 */
 	protected $environmentFile = '.env';
+
+	/**
+	 * The application namespace.
+	 *
+	 * @var string
+	 */
+	protected $namespace = null;
 
 	/**
 	 * Create a new Illuminate application instance.
@@ -632,7 +639,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, array $parameters = array())
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -729,6 +736,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Call the booting callbacks for the application.
+	 *
+	 * @param  array  $callbacks
+	 * @return void
+	 */
+	protected function fireAppCallbacks(array $callbacks)
+	{
+		foreach ($callbacks as $callback)
+		{
+			call_user_func($callback, $this);
+		}
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
@@ -753,14 +774,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedConfigPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/config.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/config.php';
-		}
+		return $this->basePath().'/bootstrap/cache/config.php';
 	}
 
 	/**
@@ -780,14 +794,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedRoutesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/routes.php';
-		}
-		else
-		{
-			return $this['path.storage'].'/framework/routes.php';
-		}
+		return $this->basePath().'/bootstrap/cache/routes.php';
 	}
 
 	/**
@@ -797,14 +804,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedCompilePath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/compiled.php';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/compiled.php';
-		}
+		return $this->basePath().'/bootstrap/cache/compiled.php';
 	}
 
 	/**
@@ -814,53 +814,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function getCachedServicesPath()
 	{
-		if ($this->vendorIsWritableForOptimizations())
-		{
-			return $this->basePath().'/vendor/services.json';
-		}
-		else
-		{
-			return $this->storagePath().'/framework/services.json';
-		}
-	}
-
-	/**
-	 * Determine if vendor path is writable.
-	 *
-	 * @return bool
-	 */
-	public function vendorIsWritableForOptimizations()
-	{
-		if ($this->useStoragePathForOptimizations) return false;
-
-		return is_writable($this->basePath().'/vendor');
-	}
-
-	/**
-	 * Determines if storage directory should be used for optimizations.
-	 *
-	 * @param  bool  $value
-	 * @return $this
-	 */
-	public function useStoragePathForOptimizations($value = true)
-	{
-		$this->useStoragePathForOptimizations = $value;
-
-		return $this;
-	}
-
-	/**
-	 * Call the booting callbacks for the application.
-	 *
-	 * @param  array  $callbacks
-	 * @return void
-	 */
-	protected function fireAppCallbacks(array $callbacks)
-	{
-		foreach ($callbacks as $callback)
-		{
-			call_user_func($callback, $this);
-		}
+		return $this->basePath().'/bootstrap/cache/services.json';
 	}
 
 	/**
@@ -870,18 +824,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this->storagePath().DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'down');
-	}
-
-	/**
-	 * Register a maintenance mode event listener.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function down(Closure $callback)
-	{
-		$this['events']->listen('illuminate.app.down', $callback);
+		return file_exists($this->storagePath().'/framework/down');
 	}
 
 	/**
@@ -984,6 +927,39 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Define a callback to be used to configure Monolog.
+	 *
+	 * @param  callable  $callback
+	 * @return this
+	 */
+	public function configureMonologUsing(callable $callback)
+	{
+		$this->monologConfigurator = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Determine if the application has a custom Monolog configurator.
+	 *
+	 * @return bool
+	 */
+	public function hasMonologConfigurator()
+	{
+		return ! is_null($this->monologConfigurator);
+	}
+
+	/**
+	 * Get the custom Monolog configurator for the application.
+	 *
+	 * @return callable
+	 */
+	public function getMonologConfigurator()
+	{
+		return $this->monologConfigurator;
+	}
+
+	/**
 	 * Get the current application locale.
 	 *
 	 * @return string
@@ -1017,7 +993,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	{
 		$aliases = array(
 			'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
-			'artisan'              => ['Illuminate\Console\Application', 'Illuminate\Contracts\Console\Application'],
 			'auth'                 => 'Illuminate\Auth\AuthManager',
 			'auth.driver'          => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Guard'],
 			'auth.password.tokens' => 'Illuminate\Auth\Passwords\TokenRepositoryInterface',
@@ -1071,6 +1046,34 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		parent::flush();
 
 		$this->loadedProviders = [];
+	}
+
+	/**
+	 * Get the used kernel object.
+	 *
+	 * @return \Illuminate\Contracts\Console\Kernel|\Illuminate\Contracts\Http\Kernel
+	 */
+	protected function getKernel()
+	{
+		$kernelContract = $this->runningInConsole()
+					? 'Illuminate\Contracts\Console\Kernel'
+					: 'Illuminate\Contracts\Http\Kernel';
+
+		return $this->make($kernelContract);
+	}
+
+	/**
+	 * Get the application namespace.
+	 *
+	 * @return string
+	 */
+	public function getNamespace()
+	{
+		if ( ! is_null($this->namespace)) return $this->namespace;
+
+		$this->namespace = strtok(get_class($this->getKernel()), '\\').'\\';
+
+		return $this->namespace;
 	}
 
 }

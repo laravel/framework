@@ -352,6 +352,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFromDateTime()
+	{
+		$model = new EloquentModelStub();
+
+		$value = Carbon\Carbon::parse('2015-04-17 22:59:01');
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = new DateTime('2015-04-17 22:59:01');
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = '2015-04-17 22:59:01';
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = '2015-04-17';
+		$this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
+
+		$value = '1429311541';
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+	}
+
+
 	public function testInsertProcess()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
@@ -538,7 +559,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $model->id);
 		$this->assertTrue($model->exists);
 		$this->assertEquals(2, count($model->relationMany));
-		$this->assertEquals([2, 3], $model->relationMany->lists('id'));
+		$this->assertEquals([2, 3], $model->relationMany->lists('id')->all());
 	}
 
 
@@ -701,6 +722,56 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$array = $model->toArray();
 
 		$this->assertEquals(array(1, 2, 3), $array['list_items']);
+	}
+
+
+	public function testHidden()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setHidden(['age', 'id']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testVisible()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setVisible(['name', 'id']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testHiddenAreIgnoringWhenVisibleExists()
+	{
+		$model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$model->setVisible(['name', 'id']);
+		$model->setHidden(['name', 'age']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayHasKey('id', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testDynamicHidden()
+	{
+		$model = new EloquentModelDynamicHiddenStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
+	}
+
+
+	public function testDynamicVisible()
+	{
+		$model = new EloquentModelDynamicVisibleStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+		$array = $model->toArray();
+		$this->assertArrayHasKey('name', $array);
+		$this->assertArrayNotHasKey('age', $array);
 	}
 
 
@@ -1426,5 +1497,23 @@ class EloquentModelCastingStub extends Model {
 	public function eighthAttributeValue()
 	{
 		return $this->attributes['eighth'];
+	}
+}
+
+class EloquentModelDynamicHiddenStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'stub';
+	protected $guarded = [];
+	public function getHidden()
+	{
+		return ['age', 'id'];
+	}
+}
+
+class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'stub';
+	protected $guarded = [];
+	public function getVisible()
+	{
+		return ['name', 'id'];
 	}
 }

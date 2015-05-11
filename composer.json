@@ -23,6 +23,7 @@
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",
         "ircmaxell/password-compat": "~1.0",
+        "fzaninotto/faker": "~1.4",
         "jeremeamia/superclosure": "~2.0",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
@@ -30,21 +31,24 @@
         "nesbot/carbon": "~1.0",
         "psy/psysh": "0.4.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "2.6.*",
-        "symfony/debug": "2.6.*",
-        "symfony/finder": "2.6.*",
-        "symfony/http-foundation": "2.6.*",
-        "symfony/http-kernel": "2.6.*",
-        "symfony/process": "2.6.*",
-        "symfony/routing": "2.6.*",
-        "symfony/security-core": "2.6.*",
-        "symfony/translation": "2.6.*",
-        "symfony/var-dumper": "2.6.*",
+        "symfony/console": "2.7.*",
+        "symfony/css-selector": "2.7.*",
+        "symfony/debug": "2.7.*",
+        "symfony/dom-crawler": "2.7.*",
+        "symfony/finder": "2.7.*",
+        "symfony/http-foundation": "2.7.*",
+        "symfony/http-kernel": "2.7.*",
+        "symfony/process": "2.7.*",
+        "symfony/routing": "2.7.*",
+        "symfony/security-core": "2.7.*",
+        "symfony/translation": "2.7.*",
+        "symfony/var-dumper": "2.7.*",
         "vlucas/phpdotenv": "~1.0"
     },
     "replace": {
         "illuminate/auth": "self.version",
         "illuminate/bus": "self.version",
+        "illuminate/broadcasting": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
@@ -74,7 +78,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~2.4",
-        "iron-io/iron_mq": "~1.5",
+        "iron-io/iron_mq": "~2.0",
         "pda/pheanstalk": "~3.0",
         "predis/predis": "~1.0",
         "mockery/mockery": "~0.9",
@@ -94,14 +98,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~2.4).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.0).",
-        "iron-io/iron_mq": "Required to use the iron queue driver (~1.5).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v2": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",

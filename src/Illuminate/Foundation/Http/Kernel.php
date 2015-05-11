@@ -81,6 +81,8 @@ class Kernel implements KernelContract {
 	{
 		try
 		{
+			$request->enableHttpMethodParameterOverride();
+
 			$response = $this->sendRequestThroughRouter($request);
 		}
 		catch (Exception $e)
@@ -109,9 +111,14 @@ class Kernel implements KernelContract {
 
 		$this->bootstrap();
 
+		$this->verifySessionConfigurationIsValid();
+
+		$shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
+		                        $this->app->make('middleware.disable') === true;
+
 		return (new Pipeline($this->app))
 		            ->send($request)
-		            ->through($this->middleware)
+		            ->through($shouldSkipMiddleware ? [] : $this->middleware)
 		            ->then($this->dispatchToRouter());
 	}
 
@@ -128,7 +135,9 @@ class Kernel implements KernelContract {
 
 		foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
 		{
-			$instance = $this->app->make($middleware);
+			list($name, $parameters) = $this->parseMiddleware($middleware);
+
+			$instance = $this->app->make($name);
 
 			if ($instance instanceof TerminableMiddleware)
 			{
@@ -153,6 +162,24 @@ class Kernel implements KernelContract {
 		}
 
 		return [];
+	}
+
+	/**
+	 * Parse a middleware string to get the name and parameters.
+	 *
+	 * @param  string  $middleware
+	 * @return array
+	 */
+	protected function parseMiddleware($middleware)
+	{
+		list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+
+		if (is_string($parameters))
+		{
+			$parameters = explode(',', $parameters);
+		}
+
+		return [$name, $parameters];
 	}
 
 	/**
@@ -216,6 +243,17 @@ class Kernel implements KernelContract {
 	}
 
 	/**
+	 * Determine if the kernel has a given middleware.
+	 *
+	 * @param  string  $middleware
+	 * @return bool
+	 */
+	public function hasMiddleware($middleware)
+	{
+		return array_key_exists($middleware, array_flip($this->middleware));
+	}
+
+	/**
 	 * Get the bootstrap classes for the application.
 	 *
 	 * @return array
@@ -223,6 +261,20 @@ class Kernel implements KernelContract {
 	protected function bootstrappers()
 	{
 		return $this->bootstrappers;
+	}
+
+	/**
+	 * Verify that the session configuration is valid.
+	 *
+	 * @return void
+	 */
+	protected function verifySessionConfigurationIsValid()
+	{
+		if ($this->app['config']['session.driver'] === 'cookie' &&
+			! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
+
+			throw new \RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
+		}
 	}
 
 	/**
