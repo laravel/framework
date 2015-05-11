@@ -7,6 +7,7 @@ use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory as FactoryContract;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Factory implements FactoryContract {
 
@@ -30,6 +31,13 @@ class Factory implements FactoryContract {
 	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $events;
+
+	/**
+	 * The cache repository instance.
+	 *
+	 * @var \Illuminate\Contracts\Cache\Repository
+	 */
+	protected $cache;
 
 	/**
 	 * The IoC container instance.
@@ -100,13 +108,15 @@ class Factory implements FactoryContract {
 	 * @param  \Illuminate\View\Engines\EngineResolver  $engines
 	 * @param  \Illuminate\View\ViewFinderInterface  $finder
 	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+	 * @param  \Illuminate\Contracts\Cache\Repository  $cache
 	 * @return void
 	 */
-	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
+	public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events, Cache $cache)
 	{
 		$this->finder = $finder;
 		$this->events = $events;
 		$this->engines = $engines;
+		$this->cache = $cache;
 
 		$this->share('__env', $this);
 	}
@@ -547,6 +557,35 @@ class Factory implements FactoryContract {
 	}
 
 	/**
+	 * Cache or return content from a content section.
+	 *
+	 * @param  string  $section
+	 * @param  string  $content
+	 * @param  Closure $closure
+	 * @return void
+	 */
+	public function cache($key, $condition = true, Closure $closure)
+	{
+		if (! $condition) {
+			return $closure();
+		}
+
+		if (! $content = $this->cache->get($key)) {
+			ob_start();
+
+			$closure();
+
+			$content = ob_get_contents();
+
+			ob_end_clean();
+
+			$this->cache->forever($key, $content);
+		}
+
+		return $content;
+	}
+
+	/**
 	 * Inject inline content into a section.
 	 *
 	 * @param  string  $section
@@ -820,6 +859,27 @@ class Factory implements FactoryContract {
 	public function setDispatcher(Dispatcher $events)
 	{
 		$this->events = $events;
+	}
+
+	/**
+	 * Get the cache repository instance.
+	 *
+	 * @return \Illuminate\Contracts\Cache\Repository
+	 */
+	public function getCache()
+	{
+		return $this->cache;
+	}
+
+	/**
+	 * Set the cache repository instance.
+	 *
+	 * @param  \Illuminate\Contracts\Cache\Repository
+	 * @return void
+	 */
+	public function setCache(Cache $cache)
+	{
+		$this->cache = $cache;
 	}
 
 	/**

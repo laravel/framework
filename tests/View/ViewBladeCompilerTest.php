@@ -212,6 +212,35 @@ test';
 	}
 
 
+	public function testCacheIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals(
+			'<?php $__fc_vars = get_defined_vars(); $__env->cache(\'key\', function() use ($__fc_vars) { extract($__fc_vars);?>',
+			$compiler->compileString('@cache(\'key\')')
+		);
+		$this->assertEquals(
+			'<?php $__fc_vars = get_defined_vars(); $__env->cache(\'breeze\', true, function() use ($__fc_vars) { extract($__fc_vars);?>',
+			$compiler->compileString('@cache(\'breeze\', true)')
+		);
+		$this->assertEquals(
+			'<?php $__fc_vars = get_defined_vars(); $__env->cache(\'boom\', false, function() use ($__fc_vars) { extract($__fc_vars);?>',
+			$compiler->compileString('@cache(\'boom\', false)')
+		);
+		$this->assertEquals(
+			'<?php $__fc_vars = get_defined_vars(); $__env->cache(\'guest\', Auth::guest(), function() use ($__fc_vars) { extract($__fc_vars);?>',
+			$compiler->compileString('@cache(\'guest\', Auth::guest())')
+		);
+	}
+
+
+	public function testEndcacheIsCompiled()
+	{
+		$compiler = new BladeCompiler($this->getFiles(), __DIR__);
+		$this->assertEquals('<?php }); ?>', $compiler->compileString('@endcache'));
+	}
+
+
 	public function testPushIsCompiled()
 	{
 		$compiler = new BladeCompiler($this->getFiles(), __DIR__);

@@ -640,6 +640,31 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
+	 * Compile the cache statements into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compileCache($expression)
+	{
+		// we need to remove the brackets so that we can add the closure as the last argument
+		$expression = preg_replace('/^\(|\)$/', '', $expression);
+
+		return "<?php \$__fc_vars = get_defined_vars(); \$__env->cache({$expression}, function() use (\$__fc_vars) { extract(\$__fc_vars);?>";
+	}
+
+	/**
+	 * Compile the endcache statements into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compileEndcache($expression)
+	{
+		return "<?php }); ?>";
+	}
+
+	/**
 	 * Compile the extends statements into valid PHP.
 	 *
 	 * @param  string  $expression
