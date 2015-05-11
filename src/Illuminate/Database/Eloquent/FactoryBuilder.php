@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
 use Faker\Factory as Faker;
+use InvalidArgumentException;
 
 class FactoryBuilder
 {
@@ -119,6 +120,10 @@ class FactoryBuilder
     protected function makeInstance(array $attributes = array())
     {
         return Model::unguarded(function () use ($attributes) {
+            if (! isset($this->definitions[$this->class][$this->name])) {
+                throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}].");
+            }
+
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker);
 
             return new $this->class(array_merge($definition, $attributes));
