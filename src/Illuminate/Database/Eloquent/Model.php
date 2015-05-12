@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -140,6 +141,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $casts = array();
 
 	/**
+	 * The attributes that should be encrypted.
+	 *
+	 * @var array
+	 */
+	protected $encrypt = array();
+
+	/**
 	 * The relationships that should be touched on save.
 	 *
 	 * @var array
@@ -194,6 +202,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected static $dispatcher;
+
+	/**
+	 * The encrypter instance.
+	 *
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
+	 */
+	protected static $encrypter;
 
 	/**
 	 * The array of booted models.
@@ -2381,6 +2396,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = $this->getArrayableAttributes();
 
+		// If the attribute exists within the "encrypt" array, we will decrypt
+		// it here upon retrieval, so that the developers may have peace of
+		// mind knowing that the unencrypted value isn't actually stored.
+		foreach ($this->encrypt as $key)
+		{
+			if ( ! array_key_exists($key, $attributes)) continue;
+
+			$attributes[$key] = $this->decrypt($attributes[$key]);
+		}
+
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent
 		// formatting while accessing attributes vs. arraying / JSONing a model.
@@ -2585,6 +2610,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			return $this->mutateAttribute($key, $value);
 		}
 
+		// If the attribute exists within the "encrypt" array, we will decrypt
+		// it here upon retrieval, so that the developers may have peace of
+		// mind knowing that the unencrypted value isn't actually stored.
+		if (in_array($key, $this->encrypt))
+		{
+			$value = $this->decrypt($value);
+		}
+
 		// If the attribute exists within the cast array, we will convert it to
 		// an appropriate native PHP type dependant upon the associated value
 		// given with the key in the pair. Dayle made this comment line up.
@@ -2754,6 +2787,46 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Decrypt the given value.
+	 *
+	 * @param  string  $value
+	 * @return mixed
+	 *
+	 * @throws \Exception
+	 */
+	protected function decrypt($value)
+	{
+		if (is_null($value)) return null;
+
+		if (is_null(static::$encrypter))
+		{
+			throw new Exception('No encrypter set.');
+		}
+
+		return static::$encrypter->decrypt($value);
+	}
+
+	/**
+	 * Encrypt the given value.
+	 *
+	 * @param  mixed  $value
+	 * @return string
+	 *
+	 * @throws \Exception
+	 */
+	protected function encrypt($value)
+	{
+		if (is_null($value)) return null;
+
+		if (is_null(static::$encrypter))
+		{
+			throw new Exception('No encrypter set.');
+		}
+
+		return static::$encrypter->encrypt($value);
+	}
+
+	/**
 	 * Set a given attribute on the model.
 	 *
 	 * @param  string  $key
@@ -2775,7 +2848,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If an attribute is listed as a "date", we'll convert it from a DateTime
 		// instance into a form proper for storage on the database tables using
 		// the connection grammar's date format. We will auto set the values.
-		elseif (in_array($key, $this->getDates()) && $value)
+		if (in_array($key, $this->getDates()) && $value)
 		{
 			$value = $this->fromDateTime($value);
 		}
@@ -2783,6 +2856,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		if ($this->isJsonCastable($key))
 		{
 			$value = json_encode($value);
+		}
+
+		// If the attribute exists within the encrypt array, we will encrypt it
+		// before we're storing it, so that the developer can easily set all
+		// their values directly without having to encrypt it themselves.
+		if (in_array($key, $this->encrypt))
+		{
+			$value = $this->encrypt($value);
 		}
 
 		$this->attributes[$key] = $value;
@@ -3189,6 +3270,37 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public static function unsetEventDispatcher()
 	{
 		static::$dispatcher = null;
+	}
+
+	/**
+	 * Get the encrypter instance.
+	 *
+	 * @return \Illuminate\Contracts\Encryption\Encrypter
+	 */
+	public static function getEncrypter()
+	{
+		return static::$encrypter;
+	}
+
+	/**
+	 * Set the encrypter instance.
+	 *
+	 * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+	 * @return void
+	 */
+	public static function setEncrypter(Encrypter $encrypter)
+	{
+		static::$encrypter = $encrypter;
+	}
+
+	/**
+	 * Unset the encryptor for models.
+	 *
+	 * @return void
+	 */
+	public static function unsetEncrypter()
+	{
+		static::$encrypter = null;
 	}
 
 	/**

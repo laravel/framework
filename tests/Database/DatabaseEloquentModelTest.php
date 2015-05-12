@@ -1229,6 +1229,25 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testEncryptAttributesAreEncrypted()
+	{
+		Model::setEncrypter($encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'));
+		$encrypter->shouldReceive('encrypt')->once()->with('foo')->andReturn('encrypted-foo');
+		$encrypter->shouldReceive('encrypt')->once()->with('bar')->andReturn('encrypted-bar');
+		$attributes = ['one' => 'foo', 'two' => 'bar', 'three' => 'baz'];
+		$model = new EloquentModelEncryptionStub($attributes);
+		$encrypter->shouldReceive('decrypt')->twice()->with('encrypted-foo')->andReturn('foo');
+		$encrypter->shouldReceive('decrypt')->twice()->with('encrypted-bar')->andReturn('bar');
+
+		$this->assertEquals($attributes, $model->toArray());
+		$this->assertEquals('foo', $model->one);
+		$this->assertEquals('bar', $model->two);
+		$this->assertEquals('baz', $model->three);
+
+		Model::unsetEncrypter();
+	}
+
+
 	public function testModelAttributesAreCastedWhenPresentInCastsArray()
 	{
 		$model = new EloquentModelCastingStub;
@@ -1500,7 +1519,12 @@ class EloquentModelCastingStub extends Model {
 	}
 }
 
-class EloquentModelDynamicHiddenStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelEncryptionStub extends Model {
+	protected $encrypt = ['one', 'two'];
+	protected $fillable = ['one', 'two', 'three'];
+}
+
+class EloquentModelDynamicHiddenStub extends Model {
 	protected $table = 'stub';
 	protected $guarded = [];
 	public function getHidden()
@@ -1509,7 +1533,7 @@ class EloquentModelDynamicHiddenStub extends Illuminate\Database\Eloquent\Model 
 	}
 }
 
-class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model {
+class EloquentModelDynamicVisibleStub extends Model {
 	protected $table = 'stub';
 	protected $guarded = [];
 	public function getVisible()

@@ -18,6 +18,8 @@ class DatabaseServiceProvider extends ServiceProvider {
 		Model::setConnectionResolver($this->app['db']);
 
 		Model::setEventDispatcher($this->app['events']);
+
+		Model::setEncrypter($this->app['encrypter']);
 	}
 
 	/**
