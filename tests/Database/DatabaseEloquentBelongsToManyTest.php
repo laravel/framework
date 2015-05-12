@@ -180,6 +180,22 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttachInsertsPivotTableRecordWithCustomTimestampColumns()
+	{
+		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
+		$relation->withTimestamps('custom_created_at', 'custom_updated_at');
+		$query = m::mock('stdClass');
+		$query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+		$query->shouldReceive('insert')->once()->with(array(array('user_id' => 1, 'role_id' => 2, 'foo' => 'bar', 'custom_created_at' => 'time', 'custom_updated_at' => 'time')))->andReturn(true);
+		$relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+		$mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+		$relation->getParent()->shouldReceive('freshTimestamp')->once()->andReturn('time');
+		$relation->expects($this->once())->method('touchIfTouching');
+
+		$relation->attach(2, array('foo' => 'bar'));
+	}
+
+
 	public function testAttachInsertsPivotTableRecordWithACreatedAtTimestamp()
 	{
 		$relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', array('touchIfTouching'), $this->getRelationArguments());
