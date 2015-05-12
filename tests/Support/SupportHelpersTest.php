@@ -250,6 +250,10 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('The PHP...', str_limit($string, 7));
 		$this->assertEquals('The PHP', str_limit($string, 7, ''));
 		$this->assertEquals('The PHP framework for web artisans.', str_limit($string, 100));
+
+		$nonAsciiString = '这是一段中文';
+		$this->assertEquals('这是一...', str_limit($nonAsciiString, 6));
+		$this->assertEquals('这是一', str_limit($nonAsciiString, 6, ''));
 	}
 
 
