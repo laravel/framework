@@ -129,7 +129,7 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Register an event subscriber with the dispatcher.
 	 *
-	 * @param  string  $subscriber
+	 * @param  object|string  $subscriber
 	 * @return void
 	 */
 	public function subscribe($subscriber)
@@ -142,7 +142,7 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Resolve the subscriber instance.
 	 *
-	 * @param  mixed  $subscriber
+	 * @param  object|string  $subscriber
 	 * @return mixed
 	 */
 	protected function resolveSubscriber($subscriber)

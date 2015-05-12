@@ -620,7 +620,7 @@ class Route {
 	{
 		return array_first($action, function($key, $value)
 		{
-			return is_callable($value);
+			return is_callable($value) && is_numeric($key);
 		});
 	}
 
