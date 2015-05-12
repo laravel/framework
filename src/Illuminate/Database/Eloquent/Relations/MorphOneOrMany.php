@@ -125,7 +125,7 @@ abstract class MorphOneOrMany extends HasOneOrMany {
 	{
 		if (is_null($instance = $this->where($attributes)->first()))
 		{
-			$instance = $this->related->newInstance();
+			$instance = $this->related->newInstance($attributes);
 
 			// When saving a polymorphic relationship, we need to set not only the foreign
 			// key, but also the foreign key type, which is typically the class name of
