@@ -853,9 +853,16 @@ class Validator implements ValidatorContract {
 	 * @param  mixed   $value
 	 * @return bool
 	 */
-	protected function validateString($attribute, $value)
+	protected function validateString($attribute, $value, $parameters)
 	{
-		return is_string($value);
+		if(count($parameters) === 0)
+		{
+			return is_string($value);
+		}
+		else
+		{
+			return is_string($value) && $value === $parameters[0];
+		}
 	}
 
 	/**
