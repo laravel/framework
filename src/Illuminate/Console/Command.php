@@ -35,6 +35,13 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	protected $output;
 
 	/**
+	 * The name and signature of the console command.
+	 *
+	 * @var string
+	 */
+	protected $signature;
+
+	/**
 	 * The console command name.
 	 *
 	 * @var string
@@ -55,14 +62,40 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 */
 	public function __construct()
 	{
-		parent::__construct($this->name);
-
 		// We will go ahead and set the name, description, and parameters on console
 		// commands just to make things a little easier on the developer. This is
 		// so they don't have to all be manually specified in the constructors.
+		if (isset($this->signature)) {
+			$this->configureUsingFluentDefinition();
+		} else {
+			parent::__construct($this->name);
+		}
+
 		$this->setDescription($this->description);
 
-		$this->specifyParameters();
+		if ( ! isset($this->signature)) {
+			$this->specifyParameters();
+		}
+	}
+
+	/**
+	 * Configure the console command using a fluent definition.
+	 *
+	 * @return void
+	 */
+	protected function configureUsingFluentDefinition()
+	{
+		$definition = Parser::parse($this->signature);
+
+		parent::__construct($definition[0]);
+
+		foreach ($definition[1] as $argument) {
+			$this->getDefinition()->addArgument($argument);
+		}
+
+		foreach ($definition[2] as $option) {
+			$this->getDefinition()->addOption($option);
+		}
 	}
 
 	/**
