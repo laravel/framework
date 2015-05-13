@@ -2,6 +2,7 @@
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
@@ -93,9 +94,16 @@ class Handler implements ExceptionHandlerContract {
 		}
 	}
 
-	protected function toIlluminateResponse($response, $e)
+	/**
+	 * Map exception into an illuminate response.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Exception  $e
+	 * @return \Illuminate\Http\Response
+	 */
+	protected function toIlluminateResponse($response, Exception $e)
 	{
-		$response = new \Illuminate\Http\Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+		$response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
 
 		$response->exception = $e;
 
