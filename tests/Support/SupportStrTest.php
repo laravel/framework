@@ -123,6 +123,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	public function testLimit()
 	{
 		$this->assertEquals('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
+		$this->assertEquals('这是一...', Str::limit('这是一段中文', 6));
 	}
 
 
