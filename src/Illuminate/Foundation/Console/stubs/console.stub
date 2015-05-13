@@ -1,17 +1,15 @@
 <?php namespace DummyNamespace;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class DummyClass extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'DummyCommand';
+    protected $signature = 'dummy:command';
 
     /**
      * The console command description.
@@ -35,32 +33,8 @@ class DummyClass extends Command
      *
      * @return mixed
      */
-    public function fire()
+    public function handle()
     {
         //
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['example', InputArgument::REQUIRED, 'An example argument.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
-        ];
     }
 }
