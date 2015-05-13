@@ -107,17 +107,3 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 	}
 
 }
-
-
-class DatabaseSoftDeletingScopeBuilderStub {
-	public $extensions = [];
-	public $onDelete;
-	public function extend($name, $callback)
-	{
-		$this->extensions[$name] = $callback;
-	}
-	public function onDelete($callback)
-	{
-		$this->onDelete = $callback;
-	}
-}

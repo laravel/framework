@@ -1,25 +1,12 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResetsPasswords {
-
-	/**
-	 * The Guard implementation.
-	 *
-	 * @var Guard
-	 */
-	protected $auth;
-
-	/**
-	 * The password broker implementation.
-	 *
-	 * @var PasswordBroker
-	 */
-	protected $passwords;
 
 	/**
 	 * Display the form to request a password reset link.
@@ -41,17 +28,17 @@ trait ResetsPasswords {
 	{
 		$this->validate($request, ['email' => 'required|email']);
 
-		$response = $this->passwords->sendResetLink($request->only('email'), function($m)
+		$response = Password::sendResetLink($request->only('email'), function(Message $message)
 		{
-			$m->subject($this->getEmailSubject());
+			$message->subject($this->getEmailSubject());
 		});
 
 		switch ($response)
 		{
-			case PasswordBroker::RESET_LINK_SENT:
+			case Password::RESET_LINK_SENT:
 				return redirect()->back()->with('status', trans($response));
 
-			case PasswordBroker::INVALID_USER:
+			case Password::INVALID_USER:
 				return redirect()->back()->withErrors(['email' => trans($response)]);
 		}
 	}
@@ -100,18 +87,14 @@ trait ResetsPasswords {
 			'email', 'password', 'password_confirmation', 'token'
 		);
 
-		$response = $this->passwords->reset($credentials, function($user, $password)
+		$response = Password::reset($credentials, function($user, $password)
 		{
-			$user->password = bcrypt($password);
-
-			$user->save();
-
-			$this->auth->login($user);
+			$this->resetPassword($user, $password);
 		});
 
 		switch ($response)
 		{
-			case PasswordBroker::PASSWORD_RESET:
+			case Password::PASSWORD_RESET:
 				return redirect($this->redirectPath());
 
 			default:
@@ -119,6 +102,22 @@ trait ResetsPasswords {
 							->withInput($request->only('email'))
 							->withErrors(['email' => trans($response)]);
 		}
+	}
+
+	/**
+	 * Reset the given user's password.
+	 *
+	 * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+	 * @param  string  $password
+	 * @return void
+	 */
+	protected function resetPassword($user, $password)
+	{
+		$user->password = bcrypt($password);
+
+		$user->save();
+
+		Auth::login($user);
 	}
 
 	/**

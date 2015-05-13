@@ -17,6 +17,13 @@ class Response extends BaseResponse {
 	public $original;
 
 	/**
+	 * The exception that triggered the error response (if applicable).
+	 *
+	 * @var \Exception
+	 */
+	public $exception;
+
+	/**
 	 * Set the content on the response.
 	 *
 	 * @param  mixed  $content

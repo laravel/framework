@@ -38,17 +38,17 @@ class HandlerEventCommand extends GeneratorCommand {
 
 		$event = $this->option('event');
 
-		if ( ! starts_with($event, $this->getAppNamespace()))
+		if ( ! starts_with($event, $this->laravel->getNamespace()))
 		{
-			$event = $this->getAppNamespace().'Events\\'.$event;
+			$event = $this->laravel->getNamespace().'Events\\'.$event;
 		}
 
 		$stub = str_replace(
-			'{{event}}', class_basename($event), $stub
+			'DummyEvent', class_basename($event), $stub
 		);
 
 		$stub = str_replace(
-			'{{fullEvent}}', $event, $stub
+			'DummyFullEvent', $event, $stub
 		);
 
 		return $stub;

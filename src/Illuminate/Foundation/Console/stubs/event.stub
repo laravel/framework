@@ -1,21 +1,30 @@
-<?php namespace {{namespace}};
+<?php namespace DummyNamespace;
 
-use {{rootNamespace}}Events\Event;
-
+use DummyRootNamespaceEvents\Event;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class {{class}} extends Event {
+class DummyClass extends Event
+{
+    use SerializesModels;
 
-	use SerializesModels;
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
 
-	/**
-	 * Create a new event instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		//
-	}
-
+    /**
+     * Get the channels the event should be broadcast on.
+     *
+     * @return array
+     */
+    public function broadcastOn()
+    {
+        return [];
+    }
 }

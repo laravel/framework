@@ -522,7 +522,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  array  $attributes
 	 * @return static
 	 */
-	public static function create(array $attributes)
+	public static function create(array $attributes = [])
 	{
 		$model = new static($attributes);
 
@@ -596,17 +596,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		$instance->fill($values)->save();
 
 		return $instance;
-	}
-
-	/**
-	 * Get the first model for the given attributes.
-	 *
-	 * @param  array  $attributes
-	 * @return static|null
-	 */
-	protected static function firstByAttributes($attributes)
-	{
-		return static::where($attributes)->first();
 	}
 
 	/**
@@ -891,7 +880,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  string|null  $secondKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
 	 */
-	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
 	{
 		$through = new $through;
 
@@ -899,7 +888,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		$secondKey = $secondKey ?: $through->getForeignKey();
 
-		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
 	}
 
 	/**
@@ -2471,9 +2462,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = array();
 
+		$hidden = $this->getHidden();
+
 		foreach ($this->getArrayableRelations() as $key => $value)
 		{
-			if (in_array($key, $this->hidden)) continue;
+			if (in_array($key, $hidden)) continue;
 
 			// If the values implements the Arrayable interface we can just call this
 			// toArray method on the instances which will convert both models and
@@ -2531,12 +2524,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function getArrayableItems(array $values)
 	{
-		if (count($this->visible) > 0)
+		if (count($this->getVisible()) > 0)
 		{
-			return array_intersect_key($values, array_flip($this->visible));
+			return array_intersect_key($values, array_flip($this->getVisible()));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));
+		return array_diff_key($values, array_flip($this->getHidden()));
 	}
 
 	/**
@@ -2560,7 +2553,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// If the key already exists in the relationships array, it just means the
 		// relationship has already been loaded, so we'll just return it out of
 		// here because there is no need to query within the relations twice.
-		if (array_key_exists($key, $this->relations))
+		if ($this->relationLoaded($key))
 		{
 			return $this->relations[$key];
 		}
@@ -2828,37 +2821,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$format = $this->getDateFormat();
 
-		// If the value is already a DateTime instance, we will just skip the rest of
-		// these checks since they will be a waste of time, and hinder performance
-		// when checking the field. We will just return the DateTime right away.
-		if ($value instanceof DateTime)
-		{
-			//
-		}
-
-		// If the value is totally numeric, we will assume it is a UNIX timestamp and
-		// format the date as such. Once we have the date in DateTime form we will
-		// format it according to the proper format for the database connection.
-		elseif (is_numeric($value))
-		{
-			$value = Carbon::createFromTimestamp($value);
-		}
-
-		// If the value is in simple year, month, day format, we will format it using
-		// that setup. This is for simple "date" fields which do not have hours on
-		// the field. This conveniently picks up those dates and format correct.
-		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
-		{
-			$value = Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
-		}
-
-		// If this value is some other type of string, we'll create the DateTime with
-		// the format used by the database connection. Once we get the instance we
-		// can return back the finally formatted DateTime instances to the devs.
-		else
-		{
-			$value = Carbon::createFromFormat($format, $value);
-		}
+		$value = $this->asDateTime($value);
 
 		return $value->format($format);
 	}
@@ -2871,10 +2834,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	protected function asDateTime($value)
 	{
+		// If the value is already a DateTime instance, we will just skip the rest of
+		// these checks since they will be a waste of time, and hinder performance
+		// when checking the field. We will just return the DateTime right away.
+		if ($value instanceof DateTime)
+		{
+			//
+		}
+
 		// If this value is an integer, we will assume it is a UNIX timestamp's value
 		// and format a Carbon object from this timestamp. This allows flexibility
 		// when defining your date fields as they might be UNIX timestamps here.
-		if (is_numeric($value))
+		elseif (is_numeric($value))
 		{
 			return Carbon::createFromTimestamp($value);
 		}
@@ -3073,6 +3044,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public function getRelation($relation)
 	{
 		return $this->relations[$relation];
+	}
+
+
+	/**
+	 * Determine if the given relation is loaded.
+	 *
+	 * @param  string  $key
+	 * @return bool
+	 */
+	public function relationLoaded($key)
+	{
+		return array_key_exists($key, $this->relations);
 	}
 
 	/**

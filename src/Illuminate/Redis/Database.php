@@ -21,13 +21,17 @@ class Database implements DatabaseContract {
 	 */
 	public function __construct(array $servers = array())
 	{
-		if (isset($servers['cluster']) && $servers['cluster'])
+		$cluster = array_pull($servers, 'cluster');
+
+		$options = (array) array_pull($servers, 'options');
+
+		if ($cluster)
 		{
-			$this->clients = $this->createAggregateClient($servers);
+			$this->clients = $this->createAggregateClient($servers, $options);
 		}
 		else
 		{
-			$this->clients = $this->createSingleClients($servers);
+			$this->clients = $this->createSingleClients($servers, $options);
 		}
 	}
 
@@ -35,14 +39,11 @@ class Database implements DatabaseContract {
 	 * Create a new aggregate client supporting sharding.
 	 *
 	 * @param  array  $servers
+	 * @param  array  $options
 	 * @return array
 	 */
-	protected function createAggregateClient(array $servers)
+	protected function createAggregateClient(array $servers, array $options = [])
 	{
-		$servers = array_except($servers, array('cluster'));
-
-		$options = $this->getClientOptions($servers);
-
 		return array('default' => new Client(array_values($servers), $options));
 	}
 
@@ -50,13 +51,12 @@ class Database implements DatabaseContract {
 	 * Create an array of single connection clients.
 	 *
 	 * @param  array  $servers
+	 * @param  array  $options
 	 * @return array
 	 */
-	protected function createSingleClients(array $servers)
+	protected function createSingleClients(array $servers, array $options = [])
 	{
 		$clients = array();
-
-		$options = $this->getClientOptions($servers);
 
 		foreach ($servers as $key => $server)
 		{
@@ -67,25 +67,14 @@ class Database implements DatabaseContract {
 	}
 
 	/**
-	 * Get any client options from the configuration array.
-	 *
-	 * @param  array  $servers
-	 * @return array
-	 */
-	protected function getClientOptions(array $servers)
-	{
-		return isset($servers['options']) ? (array) $servers['options'] : [];
-	}
-
-	/**
 	 * Get a specific Redis connection instance.
 	 *
 	 * @param  string  $name
-	 * @return \Predis\ClientInterface
+	 * @return \Predis\ClientInterface|null
 	 */
 	public function connection($name = 'default')
 	{
-		return $this->clients[$name ?: 'default'];
+		return array_get($this->clients, $name ?: 'default');
 	}
 
 	/**
@@ -106,21 +95,35 @@ class Database implements DatabaseContract {
 	 * @param  array|string  $channels
 	 * @param  \Closure  $callback
 	 * @param  string  $connection
+	 * @param  string  $method
 	 * @return void
 	 */
-	public function subscribe($channels, Closure $callback, $connection = null)
+	public function subscribe($channels, Closure $callback, $connection = null, $method = 'subscribe')
 	{
 		$loop = $this->connection($connection)->pubSubLoop();
 
-		call_user_func_array([$loop, 'subscribe'], (array) $channels);
+		call_user_func_array([$loop, $method], (array) $channels);
 
 		foreach ($loop as $message) {
-			if ($message->kind === 'message') {
+			if ($message->kind === 'message' || $message->kind === 'pmessage') {
 				call_user_func($callback, $message->payload, $message->channel);
 			}
 		}
 
 		unset($loop);
+	}
+
+	/**
+	 * Subscribe to a set of given channels with wildcards.
+	 *
+	 * @param  array|string  $channels
+	 * @param  \Closure  $callback
+	 * @param  string  $connection
+	 * @return void
+	 */
+	public function psubscribe($channels, Closure $callback, $connection = null)
+	{
+		return $this->subscribe($channels, $callback, $connection, __FUNCTION__);
 	}
 
 	/**

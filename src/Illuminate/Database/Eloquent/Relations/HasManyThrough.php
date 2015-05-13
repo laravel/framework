@@ -29,6 +29,13 @@ class HasManyThrough extends Relation {
 	protected $secondKey;
 
 	/**
+	 * The local key on the relationship.
+	 *
+	 * @var string
+	 */
+	protected $localKey;
+
+	/**
 	 * Create a new has many through relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -36,10 +43,12 @@ class HasManyThrough extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
 	 * @param  string  $firstKey
 	 * @param  string  $secondKey
+	 * @param  string  $localKey
 	 * @return void
 	 */
-	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey)
+	public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey, $localKey)
 	{
+		$this->localKey = $localKey;
 		$this->firstKey = $firstKey;
 		$this->secondKey = $secondKey;
 		$this->farParent = $farParent;
@@ -56,11 +65,13 @@ class HasManyThrough extends Relation {
 	{
 		$parentTable = $this->parent->getTable();
 
+		$localValue = $this->farParent[$this->localKey];
+
 		$this->setJoin();
 
 		if (static::$constraints)
 		{
-			$this->query->where($parentTable.'.'.$this->firstKey, '=', $this->farParent->getKey());
+			$this->query->where($parentTable.'.'.$this->firstKey, '=', $localValue);
 		}
 	}
 
@@ -302,15 +313,16 @@ class HasManyThrough extends Relation {
 	/**
 	 * Get a paginator for the "select" statement.
 	 *
-	 * @param  int    $perPage
+	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = null, $columns = ['*'])
+	public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
 	{
 		$this->query->addSelect($this->getSelectColumns($columns));
 
-		return $this->query->paginate($perPage, $columns);
+		return $this->query->paginate($perPage, $columns, $pageName);
 	}
 
 	/**
