@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Broadcasting;
 
-use Pusher;
 use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Contracts\Queue\Job;
