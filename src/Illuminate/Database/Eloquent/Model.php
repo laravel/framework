@@ -133,6 +133,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $dates = array();
 
 	/**
+	 * The storage format of the model's date columns.
+	 *
+	 * @var string
+	 */
+	protected $dateFormat;
+
+	/**
 	 * The attributes that should be casted to native types.
 	 *
 	 * @var array
@@ -2388,7 +2395,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			if ( ! isset($attributes[$key])) continue;
 
-			$attributes[$key] = (string) $this->asDateTime($attributes[$key]);
+			$attributes[$key] = $this->serializeDate(
+				$this->asDateTime($attributes[$key])
+			);
 		}
 
 		$mutatedAttributes = $this->getMutatedAttributes();
@@ -2872,13 +2881,37 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	}
 
 	/**
+	 * Prepare a date for array / JSON serialization.
+	 *
+	 * @param  \DateTime
+	 * @return string
+	 */
+	protected function serializeDate(DateTime $date)
+	{
+		return $date->format($this->getDateFormat());
+	}
+
+	/**
 	 * Get the format for database stored dates.
 	 *
 	 * @return string
 	 */
 	protected function getDateFormat()
 	{
-		return $this->getConnection()->getQueryGrammar()->getDateFormat();
+		return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+	}
+
+	/**
+	 * Set the date format used by the model.
+	 *
+	 * @param  string  $format
+	 * @return $this
+	 */
+	public function setDateFormat($format)
+	{
+		$this->dateFormat = $format;
+
+		return $this;
 	}
 
 	/**
