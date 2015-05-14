@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
 use Countable;
 use ArrayAccess;
 use ArrayIterator;
