@@ -251,7 +251,7 @@ class Builder {
 			$callback($query = $this->newQuery());
 		}
 
-		if ($query instanceof Builder)
+		if ($query instanceof self)
 		{
 			$bindings = $query->getBindings();
 
@@ -1816,7 +1816,7 @@ class Builder {
 	 */
 	public function newQuery()
 	{
-		return new Builder($this->connection, $this->grammar, $this->processor);
+		return new static($this->connection, $this->grammar, $this->processor);
 	}
 
 	/**

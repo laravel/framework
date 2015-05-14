@@ -588,7 +588,6 @@ if ( ! function_exists('array_sort_recursive')) {
 	}
 }
 
-
 if ( ! function_exists('snake_case'))
 {
 	/**

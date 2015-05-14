@@ -182,7 +182,6 @@ class Event {
 			$command = $this->command.' > '.$this->output.' 2>&1 &';
 		}
 
-
 		return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
 	}
 
