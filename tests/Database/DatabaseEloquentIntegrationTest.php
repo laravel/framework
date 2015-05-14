@@ -371,6 +371,39 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testToArrayIncludesDefaultFormattedTimestamps()
+	{
+		$model = new EloquentTestUser;
+
+		$model->setRawAttributes(array(
+			'created_at'	=> '2012-12-04',
+			'updated_at'	=> '2012-12-05',
+		));
+
+		$array = $model->toArray();
+
+		$this->assertEquals('2012-12-04 00:00:00', $array['created_at']);
+		$this->assertEquals('2012-12-05 00:00:00', $array['updated_at']);
+	}
+
+
+	public function testToArrayIncludesCustomFormattedTimestamps()
+	{
+		$model = new EloquentTestUser;
+		$model->setDateFormat('d-m-y');
+
+		$model->setRawAttributes(array(
+			'created_at'	=> '2012-12-04',
+			'updated_at'	=> '2012-12-05',
+		));
+
+		$array = $model->toArray();
+
+		$this->assertEquals('04-12-12', $array['created_at']);
+		$this->assertEquals('05-12-12', $array['updated_at']);
+	}
+
+
 	/**
 	 * Helpers...
 	 */
