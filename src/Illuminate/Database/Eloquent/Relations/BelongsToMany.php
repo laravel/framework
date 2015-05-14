@@ -285,6 +285,34 @@ class BelongsToMany extends Relation {
 		return $query->where($hash.'.'.$this->foreignKey, '=', new Expression($key));
 	}
 
+
+	/**
+	 * Get the data for a relationship WHERE... IN constraint for faster processing of has().
+	 *
+	 * @param  \Closure|null  $callback
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return array|null
+	 */
+	 public function getWhereHasOneConstraints(Closure $callback, $parent) {
+
+		if ($parent->getQuery()->from == $this->getRelated()->newQuery()->getQuery()->from) {
+			// Table aliasing isn't implemented here. Return null to tell the caller to fall back
+			// to the count query method.
+			return null;
+		}
+
+		$parentKey = $this->wrap($this->getQualifiedParentKeyName());
+		$selectKey = $this->wrap($this->getHasCompareKey());
+
+		if ($callback) call_user_func($callback, $this->query);
+		$this->query->select(new Expression($selectKey));
+
+		return array(
+			'sql' => new Expression($parentKey .' in (' . $this->query->toSql() . ')'),
+			'bindings' => $this->query->getBindings(),
+		);
+	}
+
 	/**
 	 * Get a relationship join table hash.
 	 *

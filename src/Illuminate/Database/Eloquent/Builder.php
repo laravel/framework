@@ -604,6 +604,21 @@ class Builder {
 
 		$relation = $this->getHasRelationQuery($relation);
 
+		// If we don't need to count but only check for existence of a relationship we
+		// will try to use a faster WHERE ... IN (SELECT ...) constraint instead of a
+		// count query
+		if ( (($operator == '>=') && ($count == 1)) || (($operator == '>') && ($count == 0)) ) {
+			// check if the relationship offers to create a WHERE... IN constraint.
+			if (method_exists($relation, 'getWhereHasOneConstraints')) {
+				$whereHasOneConstraints = $relation->getWhereHasOneConstraints($callback, $this);
+				if (is_array($whereHasOneConstraints) && !empty($whereHasOneConstraints)) {
+					// we got our constraint. Apply it and we are done.
+					return $this->whereRaw($whereHasOneConstraints['sql'], $whereHasOneConstraints['bindings'], $boolean);
+				}
+			}
+		}
+
+
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
 		if ($callback) call_user_func($callback, $query);
