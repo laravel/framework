@@ -29,24 +29,45 @@ class Schedule {
 	 * Add a new Artisan command event to the schedule.
 	 *
 	 * @param  string  $command
+	 * @param  array  $parameters
 	 * @return \Illuminate\Console\Scheduling\Event
 	 */
-	public function command($command)
+	public function command($command, array $parameters = [])
 	{
-		return $this->exec(PHP_BINARY.' artisan '.$command);
+		return $this->exec(PHP_BINARY.' artisan '.$command, $parameters);
 	}
 
 	/**
 	 * Add a new command event to the schedule.
 	 *
 	 * @param  string  $command
+	 * @param  array  $parameters
 	 * @return \Illuminate\Console\Scheduling\Event
 	 */
-	public function exec($command)
+	public function exec($command, array $parameters = [])
 	{
+		if (count($parameters))
+		{
+			$command .= ' '.$this->compileParameters($parameters);
+		}
+
 		$this->events[] = $event = new Event($command);
 
 		return $event;
+	}
+
+	/**
+	 * Compile parameters for a command.
+	 *
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	protected function compileParameters(array $parameters)
+	{
+		return collect($parameters)->map(function($value, $key)
+		{
+			return is_numeric($key) ? $value : $key.'="'.addslashes($value).'"';
+		})->implode(' ');
 	}
 
 	/**
