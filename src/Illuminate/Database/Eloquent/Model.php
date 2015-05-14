@@ -1613,7 +1613,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			$this->$relation()->touch();
 
-			if ($this->$relation instanceof Model)
+			if ($this->$relation instanceof self)
 			{
 				$this->$relation->touchOwners();
 			}
