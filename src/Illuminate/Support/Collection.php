@@ -234,9 +234,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * Group an associative array by a field or using a callback.
 	 *
 	 * @param  callable|string  $groupBy
+	 * @param  bool             $preserveKeys
 	 * @return static
 	 */
-	public function groupBy($groupBy)
+	public function groupBy($groupBy, $preserveKeys = false)
 	{
 		$groupBy = $this->valueRetriever($groupBy);
 
@@ -251,7 +252,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 				$results[$groupKey] = new static;
 			}
 
-			$results[$groupKey]->push($value);
+			$results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
 		}
 
 		return new static($results);
