@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Support;
 
-use Closure;
 use Countable;
 use ArrayAccess;
 use ArrayIterator;
@@ -926,7 +925,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	protected function getArrayableItems($items)
 	{
-		if ($items instanceof Collection)
+		if ($items instanceof self)
 		{
 			$items = $items->all();
 		}

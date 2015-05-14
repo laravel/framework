@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Http;
 
 use Exception;
+use RuntimeException;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
@@ -273,7 +274,7 @@ class Kernel implements KernelContract {
 		if ($this->app['config']['session.driver'] === 'cookie' &&
 			! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
 
-			throw new \RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
+			throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
 		}
 	}
 
