@@ -254,8 +254,32 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		}
 		else
 		{
-			$queue->push($command);
+			$this->pushCommandToQueue($queue, $command);
 		}
+	}
+
+	/**
+	 * Push the command onto the given queue instance.
+	 *
+	 * @param  \Illuminate\Contracts\Queue\Queue  $queue
+	 * @param  mixed  $command
+	 * @return void
+	 */
+	protected function pushCommandToQueue($queue, $command)
+	{
+		if (isset($command->queue) && isset($command->delay)) {
+			return $queue->laterOn($command->queue, $command->delay, $command);
+		}
+
+		if (isset($command->queue)) {
+			return $queue->pushOn($command->queue, $command);
+		}
+
+		if (isset($command->delay)) {
+			return $queue->later($command->delay, $command);
+		}
+
+		$queue->push($command);
 	}
 
 	/**

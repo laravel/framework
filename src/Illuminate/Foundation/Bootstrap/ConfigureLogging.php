@@ -14,7 +14,18 @@ class ConfigureLogging {
 	 */
 	public function bootstrap(Application $app)
 	{
-		$this->configureHandlers($app, $this->registerLogger($app));
+		$log = $this->registerLogger($app);
+
+		// If a custom Monolog configurator has been registered for the application
+		// we will call that, passing Monolog along. Otherwise, we will grab the
+		// the configurations for the log system and use it for configuration.
+		if ($app->hasMonologConfigurator()) {
+			call_user_func(
+				$app->getMonologConfigurator(), $log->getMonolog()
+			);
+		} else {
+			$this->configureHandlers($app, $log);
+		}
 
 		// Next, we will bind a Closure that resolves the PSR logger implementation
 		// as this will grant us the ability to be interoperable with many other

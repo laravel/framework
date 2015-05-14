@@ -2,6 +2,7 @@
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
@@ -85,12 +86,28 @@ class Handler implements ExceptionHandlerContract {
 	{
 		if ($this->isHttpException($e))
 		{
-			return $this->renderHttpException($e);
+			return $this->toIlluminateResponse($this->renderHttpException($e), $e);
 		}
 		else
 		{
-			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+			return $this->toIlluminateResponse((new SymfonyDisplayer(config('app.debug')))->createResponse($e), $e);
 		}
+	}
+
+	/**
+	 * Map exception into an illuminate response.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Response  $response
+	 * @param  \Exception  $e
+	 * @return \Illuminate\Http\Response
+	 */
+	protected function toIlluminateResponse($response, Exception $e)
+	{
+		$response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+
+		$response->exception = $e;
+
+		return $response;
 	}
 
 	/**
@@ -117,7 +134,7 @@ class Handler implements ExceptionHandlerContract {
 
 		if (view()->exists("errors.{$status}"))
 		{
-			return response()->view("errors.{$status}", [], $status);
+			return response()->view("errors.{$status}", ['exception' => $e], $status);
 		}
 		else
 		{

@@ -4,12 +4,9 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Console\AppNamespaceDetectorTrait;
 use Symfony\Component\Console\Input\InputArgument;
 
 class AppNameCommand extends Command {
-
-	use AppNamespaceDetectorTrait;
 
 	/**
 	 * The console command name.
@@ -68,7 +65,7 @@ class AppNameCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->currentRoot = trim($this->getAppNamespace(), '\\');
+		$this->currentRoot = trim($this->laravel->getNamespace(), '\\');
 
 		$this->setBootstrapNamespaces();
 

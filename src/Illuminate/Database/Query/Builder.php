@@ -251,7 +251,7 @@ class Builder {
 			$callback($query = $this->newQuery());
 		}
 
-		if ($query instanceof Builder)
+		if ($query instanceof self)
 		{
 			$bindings = $query->getBindings();
 
@@ -1382,11 +1382,12 @@ class Builder {
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
 	 */
-	public function paginate($perPage = 15, $columns = ['*'])
+	public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
 	{
-		$page = Paginator::resolveCurrentPage();
+		$page = Paginator::resolveCurrentPage($pageName);
 
 		$total = $this->getCountForPagination($columns);
 
@@ -1394,6 +1395,7 @@ class Builder {
 
 		return new LengthAwarePaginator($results, $total, $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => $pageName,
 		]);
 	}
 
@@ -1404,16 +1406,18 @@ class Builder {
 	 *
 	 * @param  int  $perPage
 	 * @param  array  $columns
+	 * @param  string  $pageName
 	 * @return \Illuminate\Contracts\Pagination\Paginator
 	 */
-	public function simplePaginate($perPage = 15, $columns = ['*'])
+	public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
 	{
-		$page = Paginator::resolveCurrentPage();
+		$page = Paginator::resolveCurrentPage($pageName);
 
 		$this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
 		return new Paginator($this->get($columns), $perPage, $page, [
 			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => $pageName,
 		]);
 	}
 
@@ -1510,7 +1514,7 @@ class Builder {
 
 		$results = new Collection($this->get($columns));
 
-		return $results->lists($columns[0], array_get($columns, 1));
+		return $results->lists($columns[0], array_get($columns, 1))->all();
 	}
 
 	/**
@@ -1812,7 +1816,7 @@ class Builder {
 	 */
 	public function newQuery()
 	{
-		return new Builder($this->connection, $this->grammar, $this->processor);
+		return new static($this->connection, $this->grammar, $this->processor);
 	}
 
 	/**

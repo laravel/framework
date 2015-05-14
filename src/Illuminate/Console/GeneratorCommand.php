@@ -5,8 +5,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command {
 
-	use AppNamespaceDetectorTrait;
-
 	/**
 	 * The filesystem instance.
 	 *
@@ -70,7 +68,7 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function getPath($name)
 	{
-		$name = str_replace($this->getAppNamespace(), '', $name);
+		$name = str_replace($this->laravel->getNamespace(), '', $name);
 
 		return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
 	}
@@ -83,7 +81,7 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function parseName($name)
 	{
-		$rootNamespace = $this->getAppNamespace();
+		$rootNamespace = $this->laravel->getNamespace();
 
 		if (starts_with($name, $rootNamespace))
 		{
@@ -146,11 +144,11 @@ abstract class GeneratorCommand extends Command {
 	protected function replaceNamespace(&$stub, $name)
 	{
 		$stub = str_replace(
-			'{{namespace}}', $this->getNamespace($name), $stub
+			'DummyNamespace', $this->getNamespace($name), $stub
 		);
 
 		$stub = str_replace(
-			'{{rootNamespace}}', $this->getAppNamespace(), $stub
+			'DummyRootNamespace', $this->laravel->getNamespace(), $stub
 		);
 
 		return $this;
@@ -178,7 +176,7 @@ abstract class GeneratorCommand extends Command {
 	{
 		$class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-		return str_replace('{{class}}', $class, $stub);
+		return str_replace('DummyClass', $class, $stub);
 	}
 
 	/**

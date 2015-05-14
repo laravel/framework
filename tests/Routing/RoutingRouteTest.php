@@ -808,27 +808,35 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	{
 		unset(
 			$_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'],
-			$_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware']
+			$_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
+			$_SERVER['route.test.controller.middleware.class'],
+			$_SERVER['route.test.controller.middleware.parameters']
 		);
 		$router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
+
 		$router->filter('route.test.controller.before.filter', function()
 		{
 			$_SERVER['route.test.controller.before.filter'] = true;
 		});
+
 		$router->filter('route.test.controller.after.filter', function()
 		{
 			$_SERVER['route.test.controller.after.filter'] = true;
 		});
+
 		$container->singleton('illuminate.route.dispatcher', function($container) use ($router)
 		{
 			return new Illuminate\Routing\ControllerDispatcher($router, $container);
 		});
+
 		$router->get('foo/bar', 'RouteTestControllerStub@index');
 
 		$this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 		$this->assertTrue($_SERVER['route.test.controller.before.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.after.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.middleware']);
+		$this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
+		$this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters']);
 		$this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
 	}
 
@@ -852,6 +860,7 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller {
 	public function __construct()
 	{
 		$this->middleware('RouteTestControllerMiddleware');
+		$this->middleware('RouteTestControllerParameterizedMiddleware:foo,bar');
 		$this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
 		$this->beforeFilter('route.test.controller.before.filter');
 		$this->afterFilter('route.test.controller.after.filter');
@@ -866,6 +875,16 @@ class RouteTestControllerMiddleware {
 	public function handle($request, $next)
 	{
 		$_SERVER['route.test.controller.middleware'] = true;
+		$response = $next($request);
+		$_SERVER['route.test.controller.middleware.class'] = get_class($response);
+		return $response;
+	}
+}
+
+class RouteTestControllerParameterizedMiddleware {
+	public function handle($request, $next, $parameter1, $parameter2)
+	{
+		$_SERVER['route.test.controller.middleware.parameters'] = [$parameter1, $parameter2];
 		return $next($request);
 	}
 }

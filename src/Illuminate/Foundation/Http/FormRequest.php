@@ -5,7 +5,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
-use Illuminate\Validation\Validator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
@@ -66,7 +66,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Get the validator instance for the request.
 	 *
-	 * @return \Illuminate\Validation\Validator
+	 * @return \Illuminate\Contracts\Validation\Validator
 	 */
 	protected function getValidatorInstance()
 	{
@@ -85,7 +85,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Handle a failed validation attempt.
 	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
 	 * @return mixed
 	 */
 	protected function failedValidation(Validator $validator)
@@ -151,7 +151,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Format the errors from the given Validator instance.
 	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
 	 * @return array
 	 */
 	protected function formatErrors(Validator $validator)

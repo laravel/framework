@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Queue\Connectors;
 
-use IronMQ;
+use IronMQ\IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;

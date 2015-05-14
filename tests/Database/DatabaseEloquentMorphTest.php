@@ -205,13 +205,6 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model {}
 
 
-class EloquentMorphResetBuilderStub extends Illuminate\Database\Eloquent\Builder {
-	public function __construct() { $this->query = new EloquentRelationQueryStub; }
-	public function getModel() { return new EloquentMorphResetModelStub; }
-	public function isSoftDeleting() { return false; }
-}
-
-
 class EloquentMorphQueryStub extends Illuminate\Database\Query\Builder {
 	public function __construct() {}
 }

@@ -2,6 +2,9 @@
 
 use ArrayAccess;
 
+/**
+ * This trait is deprecated. Use the DispatchesJobs trait.
+ */
 trait DispatchesCommands {
 
 	/**

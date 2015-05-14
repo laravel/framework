@@ -1,24 +1,9 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\Registrar;
+use Illuminate\Support\Facades\Auth;
 
 trait AuthenticatesAndRegistersUsers {
-
-	/**
-	 * The Guard implementation.
-	 *
-	 * @var \Illuminate\Contracts\Auth\Guard
-	 */
-	protected $auth;
-
-	/**
-	 * The registrar implementation.
-	 *
-	 * @var \Illuminate\Contracts\Auth\Registrar
-	 */
-	protected $registrar;
 
 	/**
 	 * Show the application registration form.
@@ -38,7 +23,7 @@ trait AuthenticatesAndRegistersUsers {
 	 */
 	public function postRegister(Request $request)
 	{
-		$validator = $this->registrar->validator($request->all());
+		$validator = $this->validator($request->all());
 
 		if ($validator->fails())
 		{
@@ -47,7 +32,7 @@ trait AuthenticatesAndRegistersUsers {
 			);
 		}
 
-		$this->auth->login($this->registrar->create($request->all()));
+		Auth::login($this->create($request->all()));
 
 		return redirect($this->redirectPath());
 	}
@@ -74,9 +59,9 @@ trait AuthenticatesAndRegistersUsers {
 			'email' => 'required|email', 'password' => 'required',
 		]);
 
-		$credentials = $request->only('email', 'password');
+		$credentials = $this->getCredentials($request);
 
-		if ($this->auth->attempt($credentials, $request->has('remember')))
+		if (Auth::attempt($credentials, $request->has('remember')))
 		{
 			return redirect()->intended($this->redirectPath());
 		}
@@ -86,6 +71,17 @@ trait AuthenticatesAndRegistersUsers {
 					->withErrors([
 						'email' => $this->getFailedLoginMessage(),
 					]);
+	}
+
+	/**
+	 * Get the needed authorization credentials from the request.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return array
+	 */
+	protected function getCredentials(Request $request)
+	{
+		return $request->only('email', 'password');
 	}
 
 	/**
@@ -105,7 +101,7 @@ trait AuthenticatesAndRegistersUsers {
 	 */
 	public function getLogout()
 	{
-		$this->auth->logout();
+		Auth::logout();
 
 		return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
 	}

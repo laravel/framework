@@ -1,195 +1,264 @@
 <?php namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Http\Request;
+use Mockery;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-trait ApplicationTrait {
+trait ApplicationTrait
+{
+    /**
+     * The Illuminate application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
 
-	/**
-	 * The Illuminate application instance.
-	 *
-	 * @var \Illuminate\Foundation\Application
-	 */
-	protected $app;
+    /**
+     * The last code returned by Artisan CLI.
+     *
+     * @var int
+     */
+    protected $code;
 
-	/**
-	 * The last response returned by the application.
-	 *
-	 * @var \Illuminate\Http\Response
-	 */
-	protected $response;
+    /**
+     * Refresh the application instance.
+     *
+     * @return void
+     */
+    protected function refreshApplication()
+    {
+        putenv('APP_ENV=testing');
 
-	/**
-	 * The last code returned by artisan cli.
-	 *
-	 * @var int
-	 */
-	protected $code;
+        $this->app = $this->createApplication();
+    }
 
-	/**
-	 * Refresh the application instance.
-	 *
-	 * @return void
-	 */
-	protected function refreshApplication()
-	{
-		putenv('APP_ENV=testing');
+    /**
+     * Register an instance of an object in the container.
+     *
+     * @param  string  $abstract
+     * @param  mixed  $instance
+     * @return $this
+     */
+    protected function instance($abstract, $instance)
+    {
+        $this->app->instance($abstract, $instance);
 
-		$this->app = $this->createApplication();
-	}
+        return $instance;
+    }
 
-	/**
-	 * Call the given URI and return the Response.
-	 *
-	 * @param  string  $method
-	 * @param  string  $uri
-	 * @param  array   $parameters
-	 * @param  array   $cookies
-	 * @param  array   $files
-	 * @param  array   $server
-	 * @param  string  $content
-	 * @return \Illuminate\Http\Response
-	 */
-	public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
-	{
-		$request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
+    /**
+     * Specify a list of events that should be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|dynamic  $events
+     * @return $this
+     */
+    public function expectsEvents($events)
+    {
+        $events = is_array($events) ? $events : func_get_args();
 
-		return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
-	}
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
-	/**
-	 * Call the given HTTPS URI and return the Response.
-	 *
-	 * @param  string  $method
-	 * @param  string  $uri
-	 * @param  array   $parameters
-	 * @param  array   $cookies
-	 * @param  array   $files
-	 * @param  array   $server
-	 * @param  string  $content
-	 * @return \Illuminate\Http\Response
-	 */
-	public function callSecure($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
-	{
-		$uri = 'https://localhost/'.ltrim($uri, '/');
+        $mock->shouldIgnoreMissing();
 
-		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
-	}
+        foreach ($events as $event) {
+            $mock->shouldReceive('fire')->atLeast()->once()
+                ->with(Mockery::type($event), [], false);
+        }
 
-	/**
-	 * Call a controller action and return the Response.
-	 *
-	 * @param  string  $method
-	 * @param  string  $action
-	 * @param  array   $wildcards
-	 * @param  array   $parameters
-	 * @param  array   $cookies
-	 * @param  array   $files
-	 * @param  array   $server
-	 * @param  string  $content
-	 * @return \Illuminate\Http\Response
-	 */
-	public function action($method, $action, $wildcards = [], $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
-	{
-		$uri = $this->app['url']->action($action, $wildcards, true);
+        $this->app->instance('events', $mock);
 
-		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
-	}
+        return $this;
+    }
 
-	/**
-	 * Call a named route and return the Response.
-	 *
-	 * @param  string  $method
-	 * @param  string  $name
-	 * @param  array   $routeParameters
-	 * @param  array   $parameters
-	 * @param  array   $cookies
-	 * @param  array   $files
-	 * @param  array   $server
-	 * @param  string  $content
-	 * @return \Illuminate\Http\Response
-	 */
-	public function route($method, $name, $routeParameters = [], $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
-	{
-		$uri = $this->app['url']->route($name, $routeParameters);
+    /**
+     * Mock the event dispatcher so all events are silenced.
+     *
+     * @return $this
+     */
+    protected function withoutEvents()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
-		return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
-	}
+        $mock->shouldReceive('fire');
 
-	/**
-	 * Set the session to the given array.
-	 *
-	 * @param  array  $data
-	 * @return void
-	 */
-	public function session(array $data)
-	{
-		$this->startSession();
+        $this->app->instance('events', $mock);
 
-		foreach ($data as $key => $value)
-		{
-			$this->app['session']->put($key, $value);
-		}
-	}
+        return $this;
+    }
 
-	/**
-	 * Flush all of the current session data.
-	 *
-	 * @return void
-	 */
-	public function flushSession()
-	{
-		$this->startSession();
+    /**
+     * Specify a list of jobs that should be dispatched for the given operation.
+     *
+     * These jobs will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|dynamic  $jobs
+     * @return $this
+     */
+    protected function expectsJobs($jobs)
+    {
+        $jobs = is_array($jobs) ? $jobs : func_get_args();
 
-		$this->app['session']->flush();
-	}
+        $mock = Mockery::mock('Illuminate\Bus\Dispatcher[dispatch]', [$this->app]);
 
-	/**
-	 * Start the session for the application.
-	 *
-	 * @return void
-	 */
-	protected function startSession()
-	{
-		if ( ! $this->app['session']->isStarted())
-		{
-			$this->app['session']->start();
-		}
-	}
+        foreach ($jobs as $job) {
+            $mock->shouldReceive('dispatch')->atLeast()->once()
+                ->with(Mockery::type($job));
+        }
 
-	/**
-	 * Set the currently logged in user for the application.
-	 *
-	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-	 * @param  string  $driver
-	 * @return void
-	 */
-	public function be(UserContract $user, $driver = null)
-	{
-		$this->app['auth']->driver($driver)->setUser($user);
-	}
+        $this->app->instance(
+            'Illuminate\Contracts\Bus\Dispatcher', $mock
+        );
 
-	/**
-	 * Seed a given database connection.
-	 *
-	 * @param  string  $class
-	 * @return void
-	 */
-	public function seed($class = 'DatabaseSeeder')
-	{
-		$this->artisan('db:seed', ['--class' => $class]);
-	}
+        return $this;
+    }
 
-	/**
-	 * Call artisan command and return code.
-	 *
-	 * @param string  $command
-	 * @param array   $parameters
-	 * @return int
-	 */
-	public function artisan($command, $parameters = [])
-	{
-		return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
-	}
+    /**
+     * Set the session to the given array.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function withSession(array $data)
+    {
+        $this->session($data);
 
+        return $this;
+    }
+
+    /**
+     * Set the session to the given array.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function session(array $data)
+    {
+        $this->startSession();
+
+        foreach ($data as $key => $value) {
+            $this->app['session']->put($key, $value);
+        }
+    }
+
+    /**
+     * Start the session for the application.
+     *
+     * @return void
+     */
+    protected function startSession()
+    {
+        if (! $this->app['session']->isStarted()) {
+            $this->app['session']->start();
+        }
+    }
+
+    /**
+     * Flush all of the current session data.
+     *
+     * @return void
+     */
+    public function flushSession()
+    {
+        $this->startSession();
+
+        $this->app['session']->flush();
+    }
+
+    /**
+     * Set the currently logged in user for the application.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string|null  $driver
+     * @return void
+     */
+    public function actingAs(UserContract $user, $driver = null)
+    {
+        $this->be($user, $driver);
+
+        return $this;
+    }
+
+    /**
+     * Set the currently logged in user for the application.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string|null  $driver
+     * @return void
+     */
+    public function be(UserContract $user, $driver = null)
+    {
+        $this->app['auth']->driver($driver)->setUser($user);
+    }
+
+    /**
+     * Assert that a given where condition exists in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
+    protected function seeInDatabase($table, array $data)
+    {
+        $count = $this->app->make('db')->table($table)->where($data)->count();
+
+        $this->assertGreaterThan(0, $count, sprintf(
+            "Unable to find row in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
+    protected function missingFromDatabase($table, array $data)
+    {
+        return $this->notSeeInDatabase($table, $data);
+    }
+
+    /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @return $this
+     */
+    protected function notSeeInDatabase($table, array $data)
+    {
+        $count = $this->app->make('db')->table($table)->where($data)->count();
+
+        $this->assertEquals(0, $count, sprintf(
+            "Found unexpected records in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Seed a given database connection.
+     *
+     * @param  string  $class
+     * @return void
+     */
+    public function seed($class = 'DatabaseSeeder')
+    {
+        $this->artisan('db:seed', ['--class' => $class]);
+    }
+
+    /**
+     * Call artisan command and return code.
+     *
+     * @param string  $command
+     * @param array   $parameters
+     * @return int
+     */
+    public function artisan($command, $parameters = [])
+    {
+        return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
+    }
 }
