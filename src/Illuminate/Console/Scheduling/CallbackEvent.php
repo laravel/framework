@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Console\Scheduling;
 
+use Exception;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -45,6 +46,8 @@ class CallbackEvent extends Event {
 	 *
 	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return mixed
+	 *
+	 * @throws \Exception
 	 */
 	public function run(Container $container)
 	{
@@ -55,7 +58,7 @@ class CallbackEvent extends Event {
 
 		try {
 			$response = $container->call($this->callback, $this->parameters);
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->removeMutex();
 
 			throw $e;
