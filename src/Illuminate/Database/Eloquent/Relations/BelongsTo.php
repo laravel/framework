@@ -54,6 +54,8 @@ class BelongsTo extends Relation {
 	 */
 	public function getResults()
 	{
+		if ($this->mustBeEmpty) return;
+
 		return $this->query->first();
 	}
 
@@ -69,9 +71,18 @@ class BelongsTo extends Relation {
 			// For belongs to relationships, which are essentially the inverse of has one
 			// or has many relationships, we need to actually query on the primary key
 			// of the related models matching on the foreign key that's on a parent.
-			$table = $this->related->getTable();
+			$foreignKey = $this->parent->{$this->foreignKey};
 
-			$this->query->where($table.'.'.$this->otherKey, '=', $this->parent->{$this->foreignKey});
+			if (is_null($foreignKey))
+			{
+				$this->mustBeEmpty = true;
+			}
+			else
+			{
+				$table = $this->related->getTable();
+
+				$this->query->where($table.'.'.$this->otherKey, '=', $foreignKey);
+			}
 		}
 	}
 
@@ -134,12 +145,21 @@ class BelongsTo extends Relation {
 	 */
 	public function addEagerConstraints(array $models)
 	{
-		// We'll grab the primary key name of the related models since it could be set to
-		// a non-standard name and not "id". We will then construct the constraint for
-		// our eagerly loading query so it returns the proper models from execution.
-		$key = $this->related->getTable().'.'.$this->otherKey;
+		$keys = $this->getEagerModelKeys($models);
 
-		$this->query->whereIn($key, $this->getEagerModelKeys($models));
+		if (empty($keys))
+		{
+			$this->mustBeEmpty = true;
+		}
+		else
+		{
+			// We'll grab the primary key name of the related models since it could be set to
+			// a non-standard name and not "id". We will then construct the constraint for
+			// our eagerly loading query so it returns the proper models from execution.
+			$key = $this->related->getTable().'.'.$this->otherKey;
+
+			$this->query->whereIn($key, $keys);
+		}
 	}
 
 	/**
@@ -161,14 +181,6 @@ class BelongsTo extends Relation {
 			{
 				$keys[] = $value;
 			}
-		}
-
-		// If there are no keys that were not null we will just return an array with 0 in
-		// it so the query doesn't fail, but will not return any results, which should
-		// be what this developer is expecting in a case where this happens to them.
-		if (count($keys) == 0)
-		{
-			return array(0);
 		}
 
 		return array_values(array_unique($keys));

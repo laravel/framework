@@ -11,6 +11,8 @@ class MorphOne extends MorphOneOrMany {
 	 */
 	public function getResults()
 	{
+		if ($this->mustBeEmpty) return;
+
 		return $this->query->first();
 	}
 

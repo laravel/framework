@@ -178,6 +178,18 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testNoUnnecessaryQueriesAreRunForEmptyRelationship(){
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(null);
+		$builder->shouldReceive('getModel')->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$builder->shouldNotReceive('get');
+
+		$relation = new HasMany($builder, $parent, 'table.foreign_key', 'id');
+		$relation->getResults();
+	}
+
+
 	protected function getRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

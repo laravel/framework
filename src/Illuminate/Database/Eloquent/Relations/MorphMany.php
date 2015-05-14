@@ -11,6 +11,8 @@ class MorphMany extends MorphOneOrMany {
 	 */
 	public function getResults()
 	{
+		if ($this->mustBeEmpty) return new Collection;
+
 		return $this->query->get();
 	}
 
