@@ -676,3 +676,18 @@ if ( ! function_exists('elixir'))
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
 	}
 }
+
+if ( ! function_exists('input'))
+{
+	/**
+	 * Retrieve an input item from the request.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return string|array
+	 */
+	function input($key = null, $default = null)
+	{
+		return app('request')->input($key, $default);
+	}
+}
