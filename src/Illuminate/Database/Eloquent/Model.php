@@ -3046,7 +3046,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		return $this->relations[$relation];
 	}
 
-
 	/**
 	 * Determine if the given relation is loaded.
 	 *
