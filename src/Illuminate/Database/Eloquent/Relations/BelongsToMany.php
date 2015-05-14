@@ -294,7 +294,7 @@ class BelongsToMany extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return array|null
 	 */
-	 public function getWhereHasOneConstraints(Closure $callback, $parent) {
+	 public function getWhereHasOneConstraints($callback, $parent) {
 
 		if ($parent->getQuery()->from == $this->getRelated()->newQuery()->getQuery()->from) {
 			// Table aliasing isn't implemented here. Return null to tell the caller to fall back

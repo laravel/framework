@@ -101,7 +101,7 @@ class BelongsTo extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return array|null
 	 */
-	public function getWhereHasOneConstraints(Closure $callback, $parent) {
+	public function getWhereHasOneConstraints($callback, $parent) {
 		$parentKey = $this->wrap($this->getQualifiedForeignKey());
 		$selectKey = $this->wrap($this->query->getModel()->getTable().'.'.$this->otherKey);
 

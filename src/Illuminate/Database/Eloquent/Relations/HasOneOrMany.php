@@ -60,7 +60,7 @@ abstract class HasOneOrMany extends Relation {
 	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
 	 * @return array|null
 	 */
-	 public function getWhereHasOneConstraints(Closure $callback, $parent) {
+	 public function getWhereHasOneConstraints($callback, $parent) {
 
 		$parentKey = $this->wrap($this->getQualifiedParentKeyName());
 		$selectKey = $this->wrap($this->getHasCompareKey());
