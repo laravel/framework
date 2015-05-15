@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Database\Console\Seeds;
 
+use Illuminate\Foundation\Composer;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
-class SeedMakeCommand extends GeneratorCommand {
+class SeederMakeCommand extends GeneratorCommand {
 
 	/**
 	 * The console command name.
@@ -25,6 +27,39 @@ class SeedMakeCommand extends GeneratorCommand {
 	 * @var string
 	 */
 	protected $type = 'Seeder';
+
+	/**
+	 * The Composer instance.
+	 *
+	 * @var \Illuminate\Foundation\Composer
+	 */
+	protected $composer;
+
+	/**
+	 * Create a new command instance.
+	 *
+	 * @param  \Illuminate\Filesystem\Filesystem  $files
+	 * @param  \Illuminate\Foundation\Composer  $composer
+	 * @return void
+	 */
+	public function __construct(Filesystem $files, Composer $composer)
+	{
+		parent::__construct($files);
+
+		$this->composer = $composer;
+	}
+
+	/**
+	 * Execute the console command.
+	 *
+	 * @return void
+	 */
+	public function fire()
+	{
+		parent::fire();
+
+		$this->composer->dumpAutoloads();
+	}
 
 	/**
 	 * Get the stub file for the generator.
