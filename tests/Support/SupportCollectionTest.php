@@ -237,16 +237,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testSort()
 	{
 		$data = (new Collection([5, 3, 1, 2, 4]))->sort();
+		$this->assertEquals([1, 2, 3, 4, 5], $data->values()->all());
 
-		$this->assertEquals(range(1, 5), array_values($data->all()));
-	}
-
-
-	public function testSortWithStrings()
-	{
 		$data = (new Collection(['foo', 'bar-10', 'bar-1']))->sort();
-
-		$this->assertEquals(['bar-1', 'bar-10', 'foo'], array_values($data->all()));
+		$this->assertEquals(['bar-1', 'bar-10', 'foo'], $data->values()->all());
 	}
 
 
