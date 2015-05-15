@@ -2,10 +2,12 @@
 
 use Pusher;
 use Closure;
+use Fanout\Fanout;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\FanoutBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
 class BroadcastManager implements FactoryContract
@@ -146,6 +148,19 @@ class BroadcastManager implements FactoryContract
     {
         return new LogBroadcaster(
             $this->app->make('Psr\Log\LoggerInterface')
+        );
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createFanoutDriver(array $config)
+    {
+        return new FanoutBroadcaster(
+            new Fanout($config['realm_id'], $config['realm_key'])
         );
     }
 

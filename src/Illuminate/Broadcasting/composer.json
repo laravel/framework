@@ -29,6 +29,7 @@
         }
     },
     "suggest": {
+        "fanout/fanout": "Required to use the Fanout broadcast driver (~2.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
     },
     "minimum-stability": "dev"
