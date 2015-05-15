@@ -345,19 +345,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testRandom()
 	{
 		$data = new Collection(array(1, 2, 3, 4, 5, 6));
+
 		$random = $data->random();
 		$this->assertInternalType('integer', $random);
 		$this->assertContains($random, $data->all());
+
 		$random = $data->random(3);
+		$this->assertInstanceOf('Illuminate\Support\Collection', $random);
 		$this->assertCount(3, $random);
 	}
 
-
-	public function testRandomOnEmpty()
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
 	{
-		$data = new Collection();
-		$random = $data->random();
-		$this->assertNull($random);
+		(new Collection)->random();
 	}
 
 
