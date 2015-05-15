@@ -6,6 +6,7 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -467,14 +468,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  int  $amount
 	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function random($amount = 1)
 	{
-		if ($this->isEmpty()) return;
+		if ($amount > ($count = $this->count()))
+		{
+			throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection");
+		}
 
 		$keys = array_rand($this->items, $amount);
 
-		return is_array($keys) ? array_intersect_key($this->items, array_flip($keys)) : $this->items[$keys];
+		if ($amount == 1) return $this->items[$keys];
+
+		return new static(array_intersect_key($this->items, array_flip($keys)));
 	}
 
 	/**
