@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait RegistersUsers {
 
-	use Redirectable;
+	use RedirectsUsers;
 
 	/**
 	 * Show the application registration form.

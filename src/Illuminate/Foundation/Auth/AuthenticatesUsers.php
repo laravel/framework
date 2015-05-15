@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait AuthenticatesUsers {
 
-	use Redirectable;
+	use RedirectsUsers;
 
 	/**
 	 * Show the application login form.
