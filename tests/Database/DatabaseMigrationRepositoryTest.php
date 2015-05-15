@@ -18,7 +18,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
 		$connectionMock = m::mock('Illuminate\Database\Connection');
 		$repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
 		$repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
-		$query->shouldReceive('lists')->once()->with('migration')->andReturn('bar');
+		$query->shouldReceive('pluck')->once()->with('migration')->andReturn('bar');
 
 		$this->assertEquals('bar', $repo->getRan());
 	}

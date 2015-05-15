@@ -186,17 +186,6 @@ class Builder {
 	}
 
 	/**
-	 * Alias for the "value" method.
-	 *
-	 * @param  string  $column
-	 * @return mixed
-	 */
-	public function pluck($column)
-	{
-		return $this->value($column);
-	}
-
-	/**
 	 * Chunk the results of the query.
 	 *
 	 * @param  int  $count
@@ -227,9 +216,9 @@ class Builder {
 	 * @param  string  $key
 	 * @return array
 	 */
-	public function lists($column, $key = null)
+	public function pluck($column, $key = null)
 	{
-		$results = $this->query->lists($column, $key);
+		$results = $this->query->pluck($column, $key);
 
 		// If the model has a mutator for the requested column, we will spin through
 		// the results and mutate the values so that the mutated version of these

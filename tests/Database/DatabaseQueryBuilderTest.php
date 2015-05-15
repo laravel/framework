@@ -754,7 +754,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			return $results;
 		});
-		$results = $builder->from('users')->where('id', '=', 1)->lists('foo');
+		$results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
 		$this->assertEquals(array('bar', 'baz'), $results);
 
 		$builder = $this->getBuilder();
@@ -763,7 +763,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		{
 			return $results;
 		});
-		$results = $builder->from('users')->where('id', '=', 1)->lists('foo', 'id');
+		$results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');
 		$this->assertEquals(array(1 => 'bar', 10 => 'baz'), $results);
 	}
 
