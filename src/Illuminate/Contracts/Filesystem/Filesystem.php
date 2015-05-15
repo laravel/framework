@@ -38,7 +38,7 @@ interface Filesystem {
 	 * Write the contents of a file.
 	 *
 	 * @param  string  $path
-	 * @param  string  $contents
+	 * @param  string|resource  $contents
 	 * @param  string  $visibility
 	 * @return bool
 	 */
