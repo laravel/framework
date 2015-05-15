@@ -29,6 +29,8 @@ class MigrateMakeCommand extends BaseCommand {
 	protected $creator;
 
 	/**
+	 * The Composer instance.
+	 *
 	 * @var \Illuminate\Foundation\Composer
 	 */
 	protected $composer;
