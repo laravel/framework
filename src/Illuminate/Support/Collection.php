@@ -618,14 +618,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Sort through each item with a callback.
 	 *
-	 * @param  callable  $callback
+	 * @param  callable|null  $callback
 	 * @return static
 	 */
-	public function sort(callable $callback)
+	public function sort(callable $callback = null)
 	{
 		$items = $this->items;
 
-		uasort($items, $callback);
+		$callback ? uasort($items, $callback) : natcasesort($items);
 
 		return new static($items);
 	}
