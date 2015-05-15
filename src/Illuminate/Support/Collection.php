@@ -206,11 +206,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * Remove an item from the collection by key.
 	 *
 	 * @param  mixed  $key
-	 * @return void
+	 * @return $this
 	 */
 	public function forget($key)
 	{
 		$this->offsetUnset($key);
+
+		return $this;
 	}
 
 	/**
@@ -420,22 +422,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * Push an item onto the beginning of the collection.
 	 *
 	 * @param  mixed  $value
-	 * @return void
+	 * @return $this
 	 */
 	public function prepend($value)
 	{
 		array_unshift($this->items, $value);
+
+		return $this;
 	}
 
 	/**
 	 * Push an item onto the end of the collection.
 	 *
 	 * @param  mixed  $value
-	 * @return void
+	 * @return $this
 	 */
 	public function push($value)
 	{
 		$this->offsetSet(null, $value);
+
+		return $this;
 	}
 
 	/**
@@ -455,11 +461,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  mixed  $key
 	 * @param  mixed  $value
-	 * @return void
+	 * @return $this
 	 */
 	public function put($key, $value)
 	{
 		$this->offsetSet($key, $value);
+
+		return $this;
 	}
 
 	/**
