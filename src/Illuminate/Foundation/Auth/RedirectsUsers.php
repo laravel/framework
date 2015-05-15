@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Auth;
 
-trait Redirectable {
+trait RedirectsUsers {
 
 	/**
 	 * Get the post register / login redirect path.
