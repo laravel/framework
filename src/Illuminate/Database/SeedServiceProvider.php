@@ -21,6 +21,7 @@ class SeedServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->registerSeedCommand();
+
 		$this->registerMakeCommand();
 
 		$this->app->singleton('seeder', function()
@@ -45,7 +46,7 @@ class SeedServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Register the make seeder console command.
+	 * Register the seeder generator command.
 	 *
 	 * @return void
 	 */
