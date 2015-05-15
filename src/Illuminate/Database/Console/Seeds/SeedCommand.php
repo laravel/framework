@@ -1,4 +1,4 @@
-<?php namespace Illuminate\Database\Console;
+<?php namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
