@@ -545,7 +545,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
 		foreach ($this->items as $key => $item)
 		{
-			if ($value($item, $key)) return $key;
+			if (call_user_func($value, $item, $key)) return $key;
 		}
 
 		return false;
