@@ -463,6 +463,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testSplice()
 	{
 		$data = new Collection(array('foo', 'baz'));
+		$data->splice(1);
+		$this->assertEquals(array('foo'), $data->all());
+
+		$data = new Collection(array('foo', 'baz'));
 		$data->splice(1, 0, 'bar');
 		$this->assertEquals(array('foo', 'bar', 'baz'), $data->all());
 
