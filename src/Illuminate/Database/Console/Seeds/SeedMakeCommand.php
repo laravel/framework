@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Composer;
 use Symfony\Component\Console\Input\InputArgument;
 
 class SeedMakeCommand extends GeneratorCommand {
@@ -19,21 +17,7 @@ class SeedMakeCommand extends GeneratorCommand {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Create a new seeder file';
-
-	/**
-	 * The filesystem instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
-
-	/**
-	 * The composer instance.
-	 *
-	 * @var \Illuminate\Foundation\Composer
-	 */
-	protected $composer;
+	protected $description = 'Create a new seeder class';
 
 	/**
 	 * The type of class being generated.
@@ -43,19 +27,6 @@ class SeedMakeCommand extends GeneratorCommand {
 	protected $type = 'Seeder';
 
 	/**
-	 * @param  Filesystem $files
-	 * @param  Composer $composer
-	 * @return void
-	 */
-	public function __construct(Filesystem $files, Composer $composer)
-	{
-		parent::__construct($files);
-
-		$this->files = $files;
-		$this->composer = $composer;
-	}
-
-	/**
 	 * Get the stub file for the generator.
 	 *
 	 * @return string
@@ -63,18 +34,6 @@ class SeedMakeCommand extends GeneratorCommand {
 	protected function getStub()
 	{
 		return __DIR__.'/stubs/seeder.stub';
-	}
-
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		parent::fire();
-
-		$this->composer->dumpAutoloads();
 	}
 
 	/**
