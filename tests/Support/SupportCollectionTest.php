@@ -236,8 +236,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testSort()
 	{
-		$data = new Collection(array(5, 3, 1, 2, 4));
-		$data->sort(function($a, $b)
+		$data = (new Collection([5, 3, 1, 2, 4]))->sort(function($a, $b)
 		{
 			if ($a === $b)
 			{
