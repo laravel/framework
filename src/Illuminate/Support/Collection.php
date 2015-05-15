@@ -636,7 +636,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  callable|string  $callback
 	 * @param  int   $options
 	 * @param  bool  $descending
-	 * @return $this
+	 * @return static
 	 */
 	public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
 	{
@@ -663,9 +663,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 			$results[$key] = $this->items[$key];
 		}
 
-		$this->items = $results;
-
-		return $this;
+		return new static($results);
 	}
 
 	/**
@@ -673,7 +671,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  callable|string  $callback
 	 * @param  int  $options
-	 * @return $this
+	 * @return static
 	 */
 	public function sortByDesc($callback, $options = SORT_REGULAR)
 	{
