@@ -572,13 +572,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Shuffle the items in the collection.
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function shuffle()
 	{
-		shuffle($this->items);
+		$items = $this->items;
 
-		return $this;
+		array_shuffle($items);
+
+		return new static($items);
 	}
 
 	/**
