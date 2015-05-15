@@ -95,6 +95,32 @@ class DatabaseQueue extends Queue implements QueueContract {
 	}
 
 	/**
+	 * Push an array of jobs onto the queue.
+	 *
+	 * @param  array   $jobs
+	 * @param  mixed   $data
+	 * @param  string  $queue
+	 * @return mixed
+	 */
+	public function bulk($jobs, $data = '', $queue = null)
+	{
+		$availableAt = $this->availableAt(0);
+
+		$queue = $this->getQueue($queue);
+
+		$records = [];
+
+		foreach ((array) $jobs as $job)
+		{
+			$records[] = $this->prepareForInsert(
+				$availableAt, $queue, $this->createPayload($job, $data)
+			);
+		}
+
+		return $this->database->table($this->table)->insert($records);
+	}
+
+	/**
 	 * Release a reserved job back onto the queue.
 	 *
 	 * @param  string  $queue
@@ -118,17 +144,46 @@ class DatabaseQueue extends Queue implements QueueContract {
 	 */
 	protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
 	{
+		$attributes = $this->prepareForInsert(
+			$this->getAvailableAt($delay), $this->getQueue($queue), $payload, $attempts
+		);
+
+		return $this->database->table($this->table)->insertGetId($attributes);
+	}
+
+	/**
+	 * Get the "available_at" timestamp.
+	 *
+	 * @param  \DateTime|int  $delay
+	 * @return int
+	 */
+	protected function getAvailableAt($delay)
+	{
 		$availableAt = $delay instanceof DateTime ? $delay : Carbon::now()->addSeconds($delay);
 
-		return $this->database->table($this->table)->insertGetId([
-			'queue' => $this->getQueue($queue),
+		return $availableAt->getTimestamp();
+	}
+
+	/**
+	 * Prepare an array to insert for the given job.
+	 *
+	 * @param  int  $availableAt
+	 * @param  string|null  $queue
+	 * @param  string  $payload
+	 * @param  int  $attempts
+	 * @return array
+	 */
+	protected function prepareForInsert($availableAt, $queue, $payload, $attempts = 0)
+	{
+		return [
+			'queue' => $queue,
 			'payload' => $payload,
 			'attempts' => $attempts,
 			'reserved' => 0,
 			'reserved_at' => null,
-			'available_at' => $availableAt->getTimestamp(),
+			'available_at' => $availableAt,
 			'created_at' => $this->getTime(),
-		]);
+		];
 	}
 
 	/**
