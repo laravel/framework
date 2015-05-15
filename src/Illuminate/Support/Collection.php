@@ -725,7 +725,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  int  $limit
 	 * @return static
 	 */
-	public function take($limit = null)
+	public function take($limit)
 	{
 		if ($limit < 0) return $this->slice($limit, abs($limit));
 
