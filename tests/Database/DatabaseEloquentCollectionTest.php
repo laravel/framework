@@ -202,14 +202,6 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testLists()
-	{
-		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), (object) array('name' => 'dayle', 'email' => 'bar')));
-		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name')->all());
-		$this->assertEquals(array('foo', 'bar'), $data->lists('email')->all());
-	}
-
-
 	public function testOnlyReturnsCollectionWithGivenModelKeys()
 	{
 		$one = m::mock('Illuminate\Database\Eloquent\Model');
