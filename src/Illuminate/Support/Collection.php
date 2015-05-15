@@ -681,15 +681,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
-	 * Splice portion of the underlying collection array.
+	 * Splice a portion of the underlying collection array.
 	 *
-	 * @param  int    $offset
-	 * @param  int    $length
+	 * @param  int  $offset
+	 * @param  int|null  $length
 	 * @param  mixed  $replacement
 	 * @return static
 	 */
-	public function splice($offset, $length = 0, $replacement = [])
+	public function splice($offset, $length = null, $replacement = [])
 	{
+		if (func_num_args() == 1)
+		{
+			return new static(array_splice($this->items, $offset));
+		}
+
 		return new static(array_splice($this->items, $offset, $length, $replacement));
 	}
 
