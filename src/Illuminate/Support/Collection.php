@@ -738,7 +738,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function transform(callable $callback)
 	{
-		$this->items = array_map($callback, $this->items, array_keys($this->items));
+		$this->items = array_map($callback, $this->items);
 
 		return $this;
 	}
