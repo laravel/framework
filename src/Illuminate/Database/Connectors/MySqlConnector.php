@@ -89,9 +89,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getSocketDsn(array $config)
 	{
-		extract($config);
-
-		return "mysql:unix_socket={$config['unix_socket']};dbname={$database}";
+		return "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
 	}
 
 	/**
@@ -104,7 +102,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 	{
 		extract($config);
 
-		return isset($config['port'])
+		return isset($port)
                         ? "mysql:host={$host};port={$port};dbname={$database}"
                         : "mysql:host={$host};dbname={$database}";
 	}
