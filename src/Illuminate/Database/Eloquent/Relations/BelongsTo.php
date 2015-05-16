@@ -232,14 +232,18 @@ class BelongsTo extends Relation {
 	/**
 	 * Associate the model instance to the given parent.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Model  $model
+	 * @param  \Illuminate\Database\Eloquent\Model|int  $model
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function associate(Model $model)
+	public function associate($model)
 	{
-		$this->parent->setAttribute($this->foreignKey, $model->getAttribute($this->otherKey));
+		$otherKey = ($model instanceof Model ? $model->getAttribute($this->otherKey) : $model);
 
-		return $this->parent->setRelation($this->relation, $model);
+		$this->parent->setAttribute($this->foreignKey, $otherKey);
+
+		if ($model instanceof Model) $this->parent->setRelation($this->relation, $model);
+
+		return $this->parent;
 	}
 
 	/**

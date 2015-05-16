@@ -112,7 +112,7 @@ class MorphTo extends BelongsTo {
 	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function associate(Model $model)
+	public function associate($model)
 	{
 		$this->parent->setAttribute($this->foreignKey, $model->getKey());
 
