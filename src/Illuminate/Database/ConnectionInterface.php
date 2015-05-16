@@ -83,6 +83,15 @@ interface ConnectionInterface {
 	 */
 	public function affectingStatement($query, $bindings = array());
 
+    /**
+     * Get the PDO result for a given query
+     *
+     * @param $query
+     * @param array $bindings
+     * @return mixed
+     */
+    public function getPdoStatement($query, $bindings = array());
+
 	/**
 	 * Run a raw, unprepared query against the PDO connection.
 	 *

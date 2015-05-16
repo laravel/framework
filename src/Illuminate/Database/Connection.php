@@ -304,6 +304,20 @@ class Connection implements ConnectionInterface {
 		});
 	}
 
+    /**
+     * Get the PDOStatement for a select query.
+     *
+     * @param string $query
+     * @param array $bindings
+     * @return \PDOStatement
+     */
+    public function getPdoStatement($query, $bindings = array())
+    {
+        $result = $this->getPdoForSelect()->query($query);
+        $result->execute($bindings);
+        return $result;
+    }
+
 	/**
 	 * Get the PDO connection to use for a select query.
 	 *

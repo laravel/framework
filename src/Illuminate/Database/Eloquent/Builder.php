@@ -185,6 +185,23 @@ class Builder {
 		if ($result) return $result->{$column};
 	}
 
+    /**
+     * Stream through results and pass them to a callback.
+     *
+     * @param callable $callback
+     */
+    public function each(callable $callback)
+    {
+        $statement = $this->query->getConnection()->getPdoStatement(
+            $this->query->toSql(),
+            $this->query->getBindings()
+        );
+
+        while($attributes = $statement->fetch()) {
+            call_user_func($callback, $this->model->newFromBuilder($attributes));
+        }
+    }
+
 	/**
 	 * Chunk the results of the query.
 	 *

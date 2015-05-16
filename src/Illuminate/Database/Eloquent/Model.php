@@ -658,6 +658,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		return $instance->newQuery()->get($columns);
 	}
 
+    /**
+     * Stream through results and pass them to a callback.
+     *
+     * @param callable $callback
+     */
+    public static function each(callable $callback)
+    {
+        return static::query()->each($callback);
+    }
+
 	/**
 	 * Find a model by its primary key.
 	 *
