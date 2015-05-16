@@ -50,7 +50,7 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
+		'toSql', 'lists', 'insert', 'insertGetId', 'count',
 		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
 	);
 
@@ -170,6 +170,17 @@ class Builder {
 		}
 
 		return $this->model->newCollection($models);
+	}
+
+	/**
+	 * Pluck a single column's value from the first result of a query.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function value($column)
+	{
+		return $this->pluck($column);
 	}
 
 	/**
