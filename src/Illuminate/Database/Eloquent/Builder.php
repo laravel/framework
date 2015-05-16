@@ -817,6 +817,18 @@ class Builder {
 	}
 
 	/**
+	 * Add the default boolean scope to the query.
+	 * 
+	 * @param  string  $column
+	 * @param  bool    $boolean
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	protected function addBooleanColumnScope($column, $boolean)
+	{
+		return $this->where($column, $boolean);
+	}
+
+	/**
 	 * Get the underlying query builder instance.
 	 *
 	 * @return \Illuminate\Database\Query\Builder|static
@@ -928,6 +940,14 @@ class Builder {
 		elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
 			return $this->callScope($scope, $parameters);
+		}
+		elseif ( ! is_null($this->model['fillable']) && in_array($column = 'is_'.$method, $this->model['fillable']))
+		{
+			return $this->addBooleanColumnScope($column, true);
+		}
+		elseif ( ! is_null($this->model['fillable']) && starts_with($method, 'not') && in_array($column = 'is_'.lcfirst(substr($method, 3)), $this->model['fillable']))
+		{
+			return $this->addBooleanColumnScope($column, false);
 		}
 
 		$result = call_user_func_array(array($this->query, $method), $parameters);
