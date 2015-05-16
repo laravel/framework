@@ -404,6 +404,28 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testEachFiresCallbackWithModelExpectedTimes()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $called = 0;
+        EloquentTestUser::each(function(EloquentTestUser $user) use (&$called) {
+                $called++;
+                switch ($called) {
+                    case 1:
+                        $this->assertEquals('taylorotwell@gmail.com', $user->email);
+                        break;
+                    case 2:
+                        $this->assertEquals('abigailotwell@gmail.com', $user->email);
+                        break;
+                }
+        });
+
+        $this->assertEquals(2, $called);
+    }
+
+
 	/**
 	 * Helpers...
 	 */
