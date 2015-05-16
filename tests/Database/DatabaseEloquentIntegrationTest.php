@@ -410,7 +410,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $called = 0;
-        EloquentTestUser::each(function(EloquentTestUser $user) USE (&$called) {
+        EloquentTestUser::each(function(EloquentTestUser $user) use (&$called) {
                 $called++;
                 switch ($called) {
                     case 1:
