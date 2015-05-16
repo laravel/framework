@@ -50,7 +50,7 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'pluck', 'count',
+		'toSql', 'lists', 'insert', 'insertGetId', 'count',
 		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
 	);
 
@@ -173,12 +173,12 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column from the database.
+	 * Get a single column from the database.
 	 *
 	 * @param  string  $column
 	 * @return mixed
 	 */
-	public function pluck($column)
+	public function value($column)
 	{
 		$result = $this->first(array($column));
 
@@ -216,9 +216,9 @@ class Builder {
 	 * @param  string  $key
 	 * @return array
 	 */
-	public function lists($column, $key = null)
+	public function pluck($column, $key = null)
 	{
-		$results = $this->query->lists($column, $key);
+		$results = $this->query->pluck($column, $key);
 
 		// If the model has a mutator for the requested column, we will spin through
 		// the results and mutate the values so that the mutated version of these

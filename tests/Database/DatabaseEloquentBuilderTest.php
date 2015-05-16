@@ -141,23 +141,23 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPluckMethodWithModelFound()
+	public function testValueMethodWithModelFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$mockModel = new StdClass;
 		$mockModel->name = 'foo';
 		$builder->shouldReceive('first')->with(array('name'))->andReturn($mockModel);
 
-		$this->assertEquals('foo', $builder->pluck('name'));
+		$this->assertEquals('foo', $builder->value('name'));
 	}
 
 
-	public function testPluckMethodWithModelNotFound()
+	public function testValueMethodWithModelNotFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('first')->with(array('name'))->andReturn(null);
 
-		$this->assertNull($builder->pluck('name'));
+		$this->assertNull($builder->value('name'));
 	}
 
 
@@ -182,27 +182,27 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testListsReturnsTheMutatedAttributesOfAModel()
+	public function testPluckReturnsTheMutatedAttributesOfAModel()
 	{
 		$builder = $this->getBuilder();
-		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
-		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'bar'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'bar')));
-		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'baz'))->andReturn(new EloquentBuilderTestListsStub(array('name' => 'baz')));
+		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'bar'))->andReturn(new EloquentBuilderTestPluckStub(array('name' => 'bar')));
+		$builder->getModel()->shouldReceive('newFromBuilder')->with(array('name' => 'baz'))->andReturn(new EloquentBuilderTestPluckStub(array('name' => 'baz')));
 
-		$this->assertEquals(array('foo_bar', 'foo_baz'), $builder->lists('name'));
+		$this->assertEquals(array('foo_bar', 'foo_baz'), $builder->pluck('name'));
 	}
 
 
-	public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+	public function testPluckWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
 	{
 		$builder = $this->getBuilder();
-		$builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(array('bar', 'baz'));
+		$builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
 		$builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
 
-		$this->assertEquals(array('bar', 'baz'), $builder->lists('name'));
+		$this->assertEquals(array('bar', 'baz'), $builder->pluck('name'));
 	}
 
 
@@ -525,7 +525,7 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	use Illuminate\Database\Eloquent\SoftDeletes;
 }
 
-class EloquentBuilderTestListsStub {
+class EloquentBuilderTestPluckStub {
 	protected $attributes;
 	public function __construct($attributes)
 	{

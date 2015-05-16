@@ -1318,12 +1318,12 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column's value from the first result of a query.
+	 * Get a single column's value from the first result of a query.
 	 *
 	 * @param  string  $column
 	 * @return mixed
 	 */
-	public function pluck($column)
+	public function value($column)
 	{
 		$result = (array) $this->first(array($column));
 
@@ -1508,23 +1508,35 @@ class Builder {
 	 * @param  string  $key
 	 * @return array
 	 */
-	public function lists($column, $key = null)
+	public function pluck($column, $key = null)
 	{
-		$columns = $this->getListSelect($column, $key);
+		$columns = $this->getPluckSelect($column, $key);
 
 		$results = new Collection($this->get($columns));
 
-		return $results->lists($columns[0], array_get($columns, 1))->all();
+		return $results->pluck($columns[0], array_get($columns, 1))->all();
 	}
 
 	/**
-	 * Get the columns that should be used in a list array.
+	* Alias for the "pluck" method.
+	*
+	* @param  string  $column
+	* @param  string  $key
+	* @return array
+	*/
+	public function lists($column, $key = null)
+	{
+		return $this->pluck($column);
+	}
+
+	/**
+	 * Get the columns that should be used in a pluck array.
 	 *
 	 * @param  string  $column
 	 * @param  string  $key
 	 * @return array
 	 */
-	protected function getListSelect($column, $key)
+	protected function getPluckSelect($column, $key)
 	{
 		$select = is_null($key) ? array($column) : array($column, $key);
 
@@ -1548,9 +1560,9 @@ class Builder {
 	 */
 	public function implode($column, $glue = null)
 	{
-		if (is_null($glue)) return implode($this->lists($column));
+		if (is_null($glue)) return implode($this->pluck($column));
 
-		return implode($glue, $this->lists($column));
+		return implode($glue, $this->pluck($column));
 	}
 
 	/**
