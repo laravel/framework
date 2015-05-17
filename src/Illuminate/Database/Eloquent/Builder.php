@@ -50,8 +50,8 @@ class Builder {
 	 * @var array
 	 */
 	protected $passthru = array(
-		'toSql', 'lists', 'insert', 'insertGetId', 'count',
-		'min', 'max', 'avg', 'sum', 'exists', 'getBindings',
+		'insert', 'insertGetId', 'getBindings', 'toSql',
+		'exists', 'count', 'min', 'max', 'avg', 'sum',
 	);
 
 	/**
@@ -173,27 +173,29 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column's value from the first result of a query.
+	 * Get a single column's value from the first result of a query.
 	 *
 	 * @param  string  $column
 	 * @return mixed
 	 */
 	public function value($column)
 	{
-		return $this->pluck($column);
-	}
-
-	/**
-	 * Pluck a single column from the database.
-	 *
-	 * @param  string  $column
-	 * @return mixed
-	 */
-	public function pluck($column)
-	{
 		$result = $this->first(array($column));
 
 		if ($result) return $result->{$column};
+	}
+
+	/**
+	 * An alias for the "value" method.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 *
+	 * @deprecated since version 5.1
+	 */
+	public function pluck($column)
+	{
+		return $this->value($column);
 	}
 
 	/**
