@@ -311,23 +311,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testListsWithArrayAndObjectValues()
+	public function testPluckWithArrayAndObjectValues()
 	{
 		$data = new Collection(array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar')));
-		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name')->all());
-		$this->assertEquals(array('foo', 'bar'), $data->lists('email')->all());
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->pluck('email', 'name')->all());
+		$this->assertEquals(array('foo', 'bar'), $data->pluck('email')->all());
 	}
 
 
-	public function testListsWithArrayAccessValues()
+	public function testPluckWithArrayAccessValues()
 	{
 		$data = new Collection(array(
 			new TestArrayAccessImplementation(array('name' => 'taylor', 'email' => 'foo')),
 			new TestArrayAccessImplementation(array('name' => 'dayle', 'email' => 'bar'))
 		));
 
-		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->lists('email', 'name')->all());
-		$this->assertEquals(array('foo', 'bar'), $data->lists('email')->all());
+		$this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), $data->pluck('email', 'name')->all());
+		$this->assertEquals(array('foo', 'bar'), $data->pluck('email')->all());
 	}
 
 
@@ -483,13 +483,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testGetListValueWithAccessors()
+	public function testGetPluckValueWithAccessors()
 	{
 		$model    = new TestAccessorEloquentTestStub(array('some' => 'foo'));
 		$modelTwo = new TestAccessorEloquentTestStub(array('some' => 'bar'));
 		$data     = new Collection(array($model, $modelTwo));
 
-		$this->assertEquals(array('foo', 'bar'), $data->lists('some')->all());
+		$this->assertEquals(array('foo', 'bar'), $data->pluck('some')->all());
 	}
 
 
@@ -611,7 +611,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		));
 
 		$c = $c->sortBy('foo.bar');
-		$this->assertEquals(array(2, 1), $c->lists('id')->all());
+		$this->assertEquals(array(2, 1), $c->pluck('id')->all());
 	}
 
 

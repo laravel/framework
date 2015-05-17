@@ -305,7 +305,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
 		if (is_array($first) || is_object($first))
 		{
-			return implode($glue, $this->lists($value)->all());
+			return implode($glue, $this->pluck($value)->all());
 		}
 
 		return implode($value, $this->items);
@@ -370,9 +370,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  string  $key
 	 * @return static
 	 */
-	public function lists($value, $key = null)
+	public function pluck($value, $key = null)
 	{
 		return new static(array_pluck($this->items, $value, $key));
+	}
+
+	/**
+	 * Alias for the "pluck" method.
+	 *
+	 * @param  string  $value
+	 * @param  string  $key
+	 * @return static
+	 */
+	public function lists($value, $key = null)
+	{
+		return $this->pluck($value, $key);
 	}
 
 	/**
