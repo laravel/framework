@@ -495,9 +495,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testTransform()
 	{
-		$data = new Collection(array('taylor', 'colin', 'shawn'));
-		$data->transform(function($item) { return strrev($item); });
-		$this->assertEquals(array('rolyat', 'niloc', 'nwahs'), array_values($data->all()));
+		$data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+		$data->transform(function($item, $key) { return $key.'-'.strrev($item); });
+		$this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
 	}
 
 
