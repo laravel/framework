@@ -141,23 +141,23 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPluckMethodWithModelFound()
+	public function testValueMethodWithModelFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$mockModel = new StdClass;
 		$mockModel->name = 'foo';
 		$builder->shouldReceive('first')->with(array('name'))->andReturn($mockModel);
 
-		$this->assertEquals('foo', $builder->pluck('name'));
+		$this->assertEquals('foo', $builder->value('name'));
 	}
 
 
-	public function testPluckMethodWithModelNotFound()
+	public function testValueMethodWithModelNotFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('first')->with(array('name'))->andReturn(null);
 
-		$this->assertNull($builder->pluck('name'));
+		$this->assertNull($builder->value('name'));
 	}
 
 
