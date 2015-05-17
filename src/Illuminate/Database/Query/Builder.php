@@ -1318,27 +1318,29 @@ class Builder {
 	}
 
 	/**
-	 * Pluck a single column's value from the first result of a query.
+	 * Get a single column's value from the first result of a query.
 	 *
 	 * @param  string  $column
 	 * @return mixed
 	 */
 	public function value($column)
 	{
-		return $this->pluck($column);
-	}
-
-	/**
-	 * Pluck a single column's value from the first result of a query.
-	 *
-	 * @param  string  $column
-	 * @return mixed
-	 */
-	public function pluck($column)
-	{
 		$result = (array) $this->first(array($column));
 
 		return count($result) > 0 ? reset($result) : null;
+	}
+
+	/**
+	 * Alias for the "value" method.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 *
+	 * @deprecated since version 5.1
+	 */
+	public function pluck($column)
+	{
+		return $this->value($column);
 	}
 
 	/**

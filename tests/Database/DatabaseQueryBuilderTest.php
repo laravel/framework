@@ -792,12 +792,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPluckMethodReturnsSingleColumn()
+	public function testValueMethodReturnsSingleColumn()
 	{
 		$builder = $this->getBuilder();
 		$builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', array(1), true)->andReturn(array(array('foo' => 'bar')));
 		$builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturn(array(array('foo' => 'bar')));
-		$results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
+		$results = $builder->from('users')->where('id', '=', 1)->value('foo');
 		$this->assertEquals('bar', $results);
 	}
 
