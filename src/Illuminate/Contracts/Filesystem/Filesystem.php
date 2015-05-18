@@ -39,10 +39,10 @@ interface Filesystem {
 	 *
 	 * @param  string  $path
 	 * @param  string  $contents
-	 * @param  string  $visibility
+	 * @param  string|array|null  $config
 	 * @return bool
 	 */
-	public function put($path, $contents, $visibility = null);
+	public function put($path, $contents, $config = null);
 
 	/**
 	 * Get the visibility for the given path.
