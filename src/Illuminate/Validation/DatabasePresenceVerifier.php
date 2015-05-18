@@ -110,6 +110,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	 */
 	protected function table($table)
 	{
+		$table = $this->setTable($table);
 		return $this->db->connection($this->connection)->table($table);
 	}
 
@@ -122,6 +123,29 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	public function setConnection($connection)
 	{
 		$this->connection = $connection;
+	}
+
+	/**
+	 * Set the connection and table to be used.
+	 *
+	 * @param  string  $table
+	 * @return string
+	 */
+	protected function setTable($table)
+	{
+		$segments = explode('.', $table);
+
+		if (isset($segments[1]))
+		{
+			$table = $segments[1];
+			$this->setConnection($segments[0]);
+		}
+		else
+		{
+			$table = $segments[0];
+		}
+
+		return $table;
 	}
 
 }
