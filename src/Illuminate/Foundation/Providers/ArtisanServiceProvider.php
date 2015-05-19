@@ -11,6 +11,7 @@ use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
+use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\CommandMakeCommand;
@@ -69,6 +70,7 @@ class ArtisanServiceProvider extends ServiceProvider {
 		'Tinker' => 'command.tinker',
 		'Up' => 'command.up',
 		'VendorPublish' => 'command.vendor.publish',
+		'ViewClear' => 'command.view.clear',
 	];
 
 	/**
@@ -423,6 +425,19 @@ class ArtisanServiceProvider extends ServiceProvider {
 		$this->app->singleton('command.vendor.publish', function($app)
 		{
 			return new VendorPublishCommand($app['files']);
+		});
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerViewClearCommand()
+	{
+		$this->app->singleton('command.view.clear', function($app)
+		{
+			return new ViewClearCommand($app['files']);
 		});
 	}
 
