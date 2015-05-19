@@ -3,7 +3,7 @@
 use ArrayAccess;
 
 /**
- * This trait is deprecated. Use the DispatchesJobs trait.
+ * @deprecated since version 5.1. Use the DispatchesJobs trait instead.
  */
 trait DispatchesCommands {
 
