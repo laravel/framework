@@ -47,7 +47,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	protected $queueResolver;
 
 	/**
-	 * All of the command to handler mappings.
+	 * All of the command-to-handler mappings.
 	 *
 	 * @var array
 	 */
@@ -64,7 +64,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * Create a new command dispatcher instance.
 	 *
 	 * @param  \Illuminate\Contracts\Container\Container  $container
-	 * @param  \Closure|null $queueResolver
+	 * @param  \Closure|null  $queueResolver
 	 * @return void
 	 */
 	public function __construct(Container $container, Closure $queueResolver = null)
@@ -147,7 +147,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 * @return mixed
 	 */
 	protected function getParameterValueForCommand($command, ArrayAccess $source,
-                                                   ReflectionParameter $parameter, array $extras = array())
+		ReflectionParameter $parameter, array $extras = array())
 	{
 		if (array_key_exists($parameter->name, $extras))
 		{
@@ -224,7 +224,10 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	protected function commandShouldBeQueued($command)
 	{
-		if ($command instanceof ShouldBeQueued) return true;
+		if ($command instanceof ShouldBeQueued)
+		{
+			return true;
+		}
 
 		return (new ReflectionClass($this->getHandlerClass($command)))->implementsInterface(
 			'Illuminate\Contracts\Queue\ShouldBeQueued'
@@ -266,7 +269,10 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function resolveHandler($command)
 	{
-		if ($command instanceof SelfHandling) return $command;
+		if ($command instanceof SelfHandling)
+		{
+			return $command;
+		}
 
 		return $this->container->make($this->getHandlerClass($command));
 	}
@@ -279,7 +285,10 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function getHandlerClass($command)
 	{
-		if ($command instanceof SelfHandling) return get_class($command);
+		if ($command instanceof SelfHandling)
+		{
+			return get_class($command);
+		}
 
 		return $this->inflectSegment($command, 0);
 	}
@@ -292,7 +301,10 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	 */
 	public function getHandlerMethod($command)
 	{
-		if ($command instanceof SelfHandling) return 'handle';
+		if ($command instanceof SelfHandling)
+		{
+			return 'handle';
+		}
 
 		return $this->inflectSegment($command, 1);
 	}
@@ -345,7 +357,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Register command to handler mappings.
+	 * Register command-to-handler mappings.
 	 *
 	 * @param  array  $commands
 	 * @return void
@@ -382,7 +394,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 	}
 
 	/**
-	 * Set the pipes commands should be piped through before dispatching.
+	 * Set the pipes through which commands should be piped before dispatching.
 	 *
 	 * @param  array  $pipes
 	 * @return $this
