@@ -19,7 +19,8 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 		$engine->getCompiler()->shouldReceive('compile')->once()->with(__DIR__.'/fixtures/foo.php');
 		$results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-		$this->assertEquals("Hello World\n", $results);
+		$this->assertEquals("Hello World
+", $results);
 	}
 
 
@@ -31,7 +32,8 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 		$engine->getCompiler()->shouldReceive('compile')->never();
 		$results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-		$this->assertEquals("Hello World\n", $results);
+		$this->assertEquals("Hello World
+", $results);
 	}
 
 
