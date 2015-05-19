@@ -122,6 +122,20 @@ class MorphTo extends BelongsTo {
 	}
 
 	/**
+	 * Dissociate previously associated model from the given parent.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public function dissociate()
+	{
+		$this->parent->setAttribute($this->foreignKey, null);
+
+		$this->parent->setAttribute($this->morphType, null);
+
+		return $this->parent->setRelation($this->relation, null);
+	}
+
+	/**
 	 * Get the results of the relationship.
 	 *
 	 * Called via eager load method of Eloquent query builder.
