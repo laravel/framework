@@ -3,7 +3,6 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo {
 
@@ -188,11 +187,11 @@ class MorphTo extends BelongsTo {
 	{
 		$foreign = $this->foreignKey;
 
-		return BaseCollection::make($this->dictionary[$type])->map(function($models) use ($foreign)
+		return collect($this->dictionary[$type])->map(function($models) use ($foreign)
 		{
 			return head($models)->{$foreign};
 
-		})->unique();
+		})->values()->unique();
 	}
 
 	/**
