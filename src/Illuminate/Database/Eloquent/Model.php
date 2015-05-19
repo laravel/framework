@@ -2813,6 +2813,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getDates()
 	{
+		if (false === $this->dates) {
+			return array();
+		}
+
 		$defaults = array(static::CREATED_AT, static::UPDATED_AT);
 
 		return array_merge($this->dates, $defaults);
