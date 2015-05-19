@@ -2813,7 +2813,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getDates()
 	{
-		if (false === $this->dates) {
+		if ( ! $this->dates) {
 			return array();
 		}
 
