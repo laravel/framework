@@ -57,18 +57,18 @@ class DatabaseUserProvider implements UserProvider {
 	}
 
 	/**
-	 * Retrieve a user by by their unique identifier and "remember me" token.
+	 * Retrieve a user by their unique identifier and "remember me" token.
 	 *
-	 * @param  mixed   $identifier
+	 * @param  mixed  $identifier
 	 * @param  string  $token
 	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByToken($identifier, $token)
 	{
 		$user = $this->conn->table($this->table)
-                                ->where('id', $identifier)
-                                ->where('remember_token', $token)
-                                ->first();
+			->where('id', $identifier)
+			->where('remember_token', $token)
+			->first();
 
 		return $this->getGenericUser($user);
 	}
@@ -83,8 +83,8 @@ class DatabaseUserProvider implements UserProvider {
 	public function updateRememberToken(UserContract $user, $token)
 	{
 		$this->conn->table($this->table)
-                            ->where('id', $user->getAuthIdentifier())
-                            ->update(['remember_token' => $token]);
+			->where('id', $user->getAuthIdentifier())
+			->update(['remember_token' => $token]);
 	}
 
 	/**
