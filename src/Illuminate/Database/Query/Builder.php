@@ -1640,6 +1640,10 @@ class Builder {
 
 		$previousColumns = $this->columns;
 
+		$previousOrders = $this->orders;
+
+		$this->orders = null;
+
 		$results = $this->get($columns);
 
 		// Once we have executed the query, we will reset the aggregate property so
@@ -1648,6 +1652,8 @@ class Builder {
 		$this->aggregate = null;
 
 		$this->columns = $previousColumns;
+
+		$this->orders = $previousOrders;
 
 		if (isset($results[0]))
 		{
