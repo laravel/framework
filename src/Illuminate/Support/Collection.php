@@ -395,7 +395,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function map(callable $callback)
 	{
-		return new static(array_map($callback, $this->items, array_keys($this->items)));
+		$keys = array_keys($this->items);
+
+		$items = array_map($callback, $this->items, $keys);
+
+		return new static(array_combine($keys, $items));
 	}
 
 	/**
@@ -750,9 +754,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function transform(callable $callback)
 	{
-		$keys = array_keys($this->items);
-
-		$this->items = array_combine($keys, array_map($callback, $this->items, $keys));
+		$this->items = $this->map($callback)->all();
 
 		return $this;
 	}
