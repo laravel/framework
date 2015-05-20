@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Arrayable;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
@@ -43,6 +44,47 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection();
 
 		$this->assertTrue($c->isEmpty());
+	}
+
+
+	public function testEmptyCollectionIsConstructed()
+	{
+		$collection = new Collection('foo');
+		$this->assertSame(['foo'], $collection->all());
+
+		$collection = new Collection(2);
+		$this->assertSame([2], $collection->all());
+
+		$collection = new Collection(false);
+		$this->assertSame([false], $collection->all());
+
+		$collection = new Collection(null);
+		$this->assertSame([], $collection->all());
+
+		$collection = new Collection;
+		$this->assertSame([], $collection->all());
+	}
+
+
+	public function testGetArrayableItems()
+	{
+		$collection = new Collection;
+
+		$class  = new ReflectionClass($collection);
+		$method = $class->getMethod('getArrayableItems');
+		$method->setAccessible(true);
+
+		$items = new TestArrayableObject;
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
+
+		$items = new Collection(['foo' => 'bar']);
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
+
+		$items = ['foo' => 'bar'];
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
 	}
 
 
@@ -799,5 +841,13 @@ class TestArrayAccessImplementation implements ArrayAccess
 	public function offsetUnset($offset)
 	{
 		unset($this->arr[$offset]);
+	}
+}
+
+class TestArrayableObject implements Arrayable
+{
+	public function toArray()
+	{
+		return ['foo' => 'bar'];
 	}
 }
