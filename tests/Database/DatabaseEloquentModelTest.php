@@ -114,23 +114,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testFindMethodCallsQueryBuilderCorrectly()
-	{
-		$result = EloquentModelFindStub::find(1);
-		$this->assertEquals('foo', $result);
-	}
-
-
 	public function testFindMethodUseWritePdo()
 	{
 		$result =  EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
-	}
-
-
-	public function testFindMethodWithArrayCallsQueryBuilderCorrectly()
-	{
-		$result = EloquentModelFindManyStub::find(array(1, 2));
-		$this->assertEquals('foo', $result);
 	}
 
 
