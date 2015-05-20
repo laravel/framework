@@ -20,6 +20,20 @@ trait AuthenticatesAndRegistersUsers {
 	 */
 	protected $registrar;
 
+    /**
+     * The field used in login form
+     *
+     * @var String
+     */
+    protected $login_field = "email";
+
+    /**
+     * The type of form validation for login field used in login form
+     *
+     * @var String
+     */
+    protected $login_field_validation = "require|email";
+
 	/**
 	 * Show the application registration form.
 	 *
@@ -71,10 +85,10 @@ trait AuthenticatesAndRegistersUsers {
 	public function postLogin(Request $request)
 	{
 		$this->validate($request, [
-			'email' => 'required|email', 'password' => 'required',
+            $this->login_field => $this->$login_field_validation, 'password' => 'required',
 		]);
 
-		$credentials = $request->only('email', 'password');
+		$credentials = $request->only($this->login_field, 'password');
 
 		if ($this->auth->attempt($credentials, $request->has('remember')))
 		{
@@ -82,9 +96,9 @@ trait AuthenticatesAndRegistersUsers {
 		}
 
 		return redirect($this->loginPath())
-					->withInput($request->only('email', 'remember'))
+					->withInput($request->only($this->login_field, 'remember'))
 					->withErrors([
-						'email' => $this->getFailedLoginMessage(),
+                        $this->login_field => $this->getFailedLoginMessage(),
 					]);
 	}
 
