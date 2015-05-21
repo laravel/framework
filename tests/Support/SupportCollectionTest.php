@@ -192,6 +192,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMergeNull()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'Hello'), $c->merge(null)->all());
+	}
+
+
 	public function testMergeArray()
 	{
 		$c = new Collection(array('name' => 'Hello'));
@@ -213,6 +220,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDiffNull()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals(array('id' => 1, 'first_word' => 'Hello'), $c->diff(null)->all());
+	}
+
+
 	public function testEach()
 	{
 		$c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
@@ -224,6 +238,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$result = [];
 		$c->each(function($item, $key) use (&$result) { $result[$key] = $item; if (is_string($key)) return false; });
 		$this->assertEquals([1, 2, 'foo' => 'bar'], $result);
+	}
+
+
+	public function testIntersectNull()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals([], $c->intersect(null)->all());
 	}
 
 
