@@ -30,6 +30,13 @@ abstract class Relation {
 	protected $related;
 
 	/**
+	 * Indicates if, based on the set constraints, the relation can't possibly have any results.
+	 *
+	 * @var bool
+	 */
+	protected $mustBeEmpty = false;
+
+	/**
 	 * Indicates if the relation is adding constraints.
 	 *
 	 * @var bool
@@ -100,6 +107,8 @@ abstract class Relation {
 	 */
 	public function getEager()
 	{
+		if ($this->mustBeEmpty) return new Collection;
+
 		return $this->get();
 	}
 

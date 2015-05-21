@@ -76,6 +76,34 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testNoUnnecessaryQueriesAreRunForEmptyRelationship(){
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->with('foreign_key')->andReturn(null);
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder->shouldReceive('getModel')->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$builder->shouldNotReceive('first');
+
+		$relation = new BelongsTo($builder, $parent, 'foreign_key', 'id', 'relation');
+		$relation->getResults();
+	}
+
+
+	public function testNoUnnecessaryQueriesAreRunForEagerLoadingEmptyRelationship(){
+		$model1 = m::mock('Illuminate\Database\Eloquent\Model');
+		$model1->shouldReceive('getAttribute')->with('foreign_key')->andReturn(null);
+		$model2 = clone $model1;
+		$parent = clone $model1;
+
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder->shouldReceive('getModel')->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$builder->shouldNotReceive('get');
+
+		$relation = new BelongsTo($builder, $parent, 'foreign_key', 'id', 'relation');
+		$relation->addEagerConstraints([$model1, $model2]);
+		$relation->getEager();
+	}
+
+
 	protected function getRelation($parent = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

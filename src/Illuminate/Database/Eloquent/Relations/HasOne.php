@@ -11,6 +11,8 @@ class HasOne extends HasOneOrMany {
 	 */
 	public function getResults()
 	{
+		if ($this->mustBeEmpty) return;
+
 		return $this->query->first();
 	}
 

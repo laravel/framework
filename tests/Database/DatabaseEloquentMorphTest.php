@@ -170,6 +170,35 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($relation->updateOrCreate(array('foo'),array('bar')) instanceof Model);
 	}
 
+
+	public function testMorphOneNoUnnecessaryQueriesAreRunForEmptyRelationship(){
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(null);
+		$parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+		$builder->shouldReceive('getModel')->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+		$builder->shouldNotReceive('first');
+
+		$relation = new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+		$relation->getResults();
+	}
+
+
+	public function testMorphManyNoUnnecessaryQueriesAreRunForEmptyRelationship(){
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->with('id')->andReturn(null);
+		$parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+		$builder->shouldReceive('getModel')->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+		$builder->shouldNotReceive('get');
+
+		$relation = new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+		$relation->getResults();
+	}
+
+
 	protected function getOneRelation()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
