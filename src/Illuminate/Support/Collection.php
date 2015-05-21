@@ -25,11 +25,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * @param  mixed  $items
 	 * @return void
 	 */
-	public function __construct($items = array())
+	public function __construct($items = [])
 	{
-		$items = is_null($items) ? [] : $this->getArrayableItems($items);
-
-		$this->items = (array) $items;
+		$this->items = is_array($items) ? $items : $this->getArrayableItems($items);
 	}
 
 	/**
@@ -967,14 +965,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		if ($items instanceof self)
 		{
-			$items = $items->all();
+			return $items->all();
 		}
 		elseif ($items instanceof Arrayable)
 		{
-			$items = $items->toArray();
+			return $items->toArray();
 		}
 
-		return $items;
+		return (array) $items;
 	}
 
 }

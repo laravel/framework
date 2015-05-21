@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Arrayable;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
@@ -43,6 +44,47 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$c = new Collection();
 
 		$this->assertTrue($c->isEmpty());
+	}
+
+
+	public function testCollectionIsConstructed()
+	{
+		$collection = new Collection('foo');
+		$this->assertSame(['foo'], $collection->all());
+
+		$collection = new Collection(2);
+		$this->assertSame([2], $collection->all());
+
+		$collection = new Collection(false);
+		$this->assertSame([false], $collection->all());
+
+		$collection = new Collection(null);
+		$this->assertSame([], $collection->all());
+
+		$collection = new Collection;
+		$this->assertSame([], $collection->all());
+	}
+
+
+	public function testGetArrayableItems()
+	{
+		$collection = new Collection;
+
+		$class  = new ReflectionClass($collection);
+		$method = $class->getMethod('getArrayableItems');
+		$method->setAccessible(true);
+
+		$items = new TestArrayableObject;
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
+
+		$items = new Collection(['foo' => 'bar']);
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
+
+		$items = ['foo' => 'bar'];
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
 	}
 
 
@@ -150,6 +192,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testMergeNull()
+	{
+		$c = new Collection(array('name' => 'Hello'));
+		$this->assertEquals(array('name' => 'Hello'), $c->merge(null)->all());
+	}
+
+
 	public function testMergeArray()
 	{
 		$c = new Collection(array('name' => 'Hello'));
@@ -171,6 +220,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDiffNull()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals(array('id' => 1, 'first_word' => 'Hello'), $c->diff(null)->all());
+	}
+
+
 	public function testEach()
 	{
 		$c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
@@ -182,6 +238,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$result = [];
 		$c->each(function($item, $key) use (&$result) { $result[$key] = $item; if (is_string($key)) return false; });
 		$this->assertEquals([1, 2, 'foo' => 'bar'], $result);
+	}
+
+
+	public function testIntersectNull()
+	{
+		$c = new Collection(array('id' => 1, 'first_word' => 'Hello'));
+		$this->assertEquals([], $c->intersect(null)->all());
 	}
 
 
@@ -799,5 +862,13 @@ class TestArrayAccessImplementation implements ArrayAccess
 	public function offsetUnset($offset)
 	{
 		unset($this->arr[$offset]);
+	}
+}
+
+class TestArrayableObject implements Arrayable
+{
+	public function toArray()
+	{
+		return ['foo' => 'bar'];
 	}
 }
