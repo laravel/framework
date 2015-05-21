@@ -510,9 +510,13 @@ class Guard implements GuardContract {
 	 */
 	public function onceUsingId($id)
 	{
-		$this->setUser($this->provider->retrieveById($id));
-
-		return $this->user instanceof UserContract;
+		$user = $this->provider->retrieveById($id);
+		if ($user)
+		{
+			$this->setUser($user);
+			return $this->user instanceof UserContract;
+		}
+		return false;
 	}
 
 	/**
@@ -710,7 +714,7 @@ class Guard implements GuardContract {
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
-	public function setUser(UserContract $user = null)
+	public function setUser(UserContract $user)
 	{
 		$this->user = $user;
 
