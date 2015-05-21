@@ -513,8 +513,10 @@ class Guard implements GuardContract {
 		if ( ! is_null($user = $this->provider->retrieveById($id)))
 		{
 			$this->setUser($user);
+
 			return true;
 		}
+
 		return false;
 	}
 
