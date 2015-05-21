@@ -19,7 +19,7 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  int  $queue
+     * @param  string  $queue
      * @return $this
      */
     public function onQueue($queue)
