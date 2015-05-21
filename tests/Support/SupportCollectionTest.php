@@ -47,7 +47,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testEmptyCollectionIsConstructed()
+	public function testCollectionIsConstructed()
 	{
 		$collection = new Collection('foo');
 		$this->assertSame(['foo'], $collection->all());
