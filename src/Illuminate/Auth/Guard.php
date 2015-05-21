@@ -510,9 +510,12 @@ class Guard implements GuardContract {
 	 */
 	public function onceUsingId($id)
 	{
-		$this->setUser($this->provider->retrieveById($id));
-
-		return $this->user instanceof UserContract;
+		if ( ! is_null($user = $this->provider->retrieveById($id)))
+		{
+			$this->setUser($user);
+			return true;
+		}
+		return false;
 	}
 
 	/**
