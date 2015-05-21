@@ -928,6 +928,20 @@ class Builder {
 	}
 
 	/**
+	 * Determine if a method can be called on object
+	 *
+	 * @param  string  $method
+	 * @return bool
+	 */
+	public function isCallable($method)
+	{
+		return method_exists($this, $method) ||
+			isset($this->macros[$method]) ||
+			method_exists($this->model, 'scope'.ucfirst($method)) ||
+			$this->query->isCallable($method);
+	}
+
+	/**
 	 * Dynamically handle calls into the query instance.
 	 *
 	 * @param  string  $method

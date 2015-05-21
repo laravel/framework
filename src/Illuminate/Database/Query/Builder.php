@@ -1996,6 +1996,17 @@ class Builder {
 	}
 
 	/**
+	 * Determine if a method can be called on object
+	 *
+	 * @param  string  $method
+	 * @return bool
+	 */
+	public function isCallable($method)
+	{
+		return method_exists($this, $method) || starts_with($method, 'where');
+	}
+
+	/**
 	 * Handle dynamic method calls into the method.
 	 *
 	 * @param  string  $method
