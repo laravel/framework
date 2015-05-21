@@ -330,7 +330,7 @@ if ( ! function_exists('logger'))
 	 *
 	 * @param  string  $message
 	 * @param  array  $context
-	 * @return void
+	 * @return null|\Illuminate\Contracts\Logging\Log
 	 */
 	function logger($message = null, array $context = array())
 	{
