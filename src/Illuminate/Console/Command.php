@@ -85,15 +85,15 @@ class Command extends SymfonyCommand {
 	 */
 	protected function configureUsingFluentDefinition()
 	{
-		$definition = Parser::parse($this->signature);
+		list($name, $arguments, $options) = Parser::parse($this->signature);
 
-		parent::__construct($definition[0]);
+		parent::__construct($name);
 
-		foreach ($definition[1] as $argument) {
+		foreach ($arguments as $argument) {
 			$this->getDefinition()->addArgument($argument);
 		}
 
-		foreach ($definition[2] as $option) {
+		foreach ($options as $option) {
 			$this->getDefinition()->addOption($option);
 		}
 	}
