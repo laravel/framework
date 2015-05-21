@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputArgument;
 
 class SeederMakeCommand extends GeneratorCommand {
 
