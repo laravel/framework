@@ -175,7 +175,10 @@ class Guard implements GuardContract {
 	 */
 	public function id()
 	{
-		if ($this->loggedOut) return;
+		if ($this->loggedOut)
+		{
+			return;
+		}
 
 		$id = $this->session->get($this->getName(), $this->getRecallerId());
 
@@ -282,12 +285,18 @@ class Guard implements GuardContract {
 	 */
 	public function basic($field = 'email')
 	{
-		if ($this->check()) return;
+		if ($this->check())
+		{
+			return;
+		}
 
 		// If a username is set on the HTTP basic request, we will return out without
 		// interrupting the request lifecycle. Otherwise, we'll need to generate a
 		// request indicating that the given credentials were invalid for login.
-		if ($this->attemptBasic($this->getRequest(), $field)) return;
+		if ($this->attemptBasic($this->getRequest(), $field))
+		{
+			return;
+		}
 
 		return $this->getBasicResponse();
 	}
@@ -315,7 +324,10 @@ class Guard implements GuardContract {
 	 */
 	protected function attemptBasic(Request $request, $field)
 	{
-		if ( ! $request->getUser()) return false;
+		if ( ! $request->getUser())
+		{
+			return false;
+		}
 
 		return $this->attempt($this->getBasicCredentials($request, $field));
 	}
@@ -364,8 +376,10 @@ class Guard implements GuardContract {
 		if ($this->hasValidCredentials($user, $credentials))
 		{
 			if ($login) $this->login($user, $remember);
+			{
+				return true;
 
-			return true;
+			}
 		}
 
 		return false;
@@ -387,8 +401,8 @@ class Guard implements GuardContract {
 	 * Fire the attempt event with the arguments.
 	 *
 	 * @param  array  $credentials
-	 * @param  bool   $remember
-	 * @param  bool   $login
+	 * @param  bool  $remember
+	 * @param  bool  $login
 	 * @return void
 	 */
 	protected function fireAttemptEvent(array $credentials, $remember, $login)
@@ -496,9 +510,14 @@ class Guard implements GuardContract {
 	 */
 	public function onceUsingId($id)
 	{
-		$this->setUser($this->provider->retrieveById($id));
+		if ( ! is_null($user = $this->provider->retrieveById($id)))
+		{
+			$this->setUser($user);
 
-		return $this->user instanceof UserContract;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -515,7 +534,7 @@ class Guard implements GuardContract {
 	}
 
 	/**
-	 * Create a remember me cookie for a given ID.
+	 * Create a "remember me" cookie for a given ID.
 	 *
 	 * @param  string  $value
 	 * @return \Symfony\Component\HttpFoundation\Cookie
@@ -572,7 +591,7 @@ class Guard implements GuardContract {
 	}
 
 	/**
-	 * Refresh the remember token for the user.
+	 * Refresh the "remember me" token for the user.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
@@ -585,7 +604,7 @@ class Guard implements GuardContract {
 	}
 
 	/**
-	 * Create a new remember token for the user if one doesn't already exist.
+	 * Create a new "remember me" token for the user if one doesn't already exist.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
@@ -681,7 +700,7 @@ class Guard implements GuardContract {
 	}
 
 	/**
-	 * Return the currently cached user of the application.
+	 * Return the currently cached user.
 	 *
 	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
@@ -691,7 +710,7 @@ class Guard implements GuardContract {
 	}
 
 	/**
-	 * Set the current user of the application.
+	 * Set the current user.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void

@@ -64,13 +64,22 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 * Write the contents of a file.
 	 *
 	 * @param  string  $path
-	 * @param  string  $contents
+	 * @param  string|resource  $contents
 	 * @param  string  $visibility
 	 * @return bool
 	 */
 	public function put($path, $contents, $visibility = null)
 	{
-		return $this->driver->put($path, $contents, ['visibility' => $this->parseVisibility($visibility)]);
+		$config = ['visibility' => $this->parseVisibility($visibility)];
+        
+		if (is_resource($contents))
+		{
+			return $this->driver->putStream($path, $contents, $config);
+		}
+		else
+		{
+			return $this->driver->put($path, $contents, $config);
+		}
 	}
 
 	/**
@@ -164,7 +173,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	public function move($from, $to)
 	{
-		$this->driver->rename($from, $to);
+		return $this->driver->rename($from, $to);
 	}
 
 	/**

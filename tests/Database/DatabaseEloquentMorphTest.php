@@ -110,7 +110,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getOneRelation();
 		$relation->getQuery()->shouldReceive('where')->once()->with(array('foo'))->andReturn($relation->getQuery());
 		$relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-		$relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('foo'))->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
 		$model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
 		$model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
 		$model->shouldReceive('save')->never();
@@ -161,7 +161,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
 		$relation = $this->getOneRelation();
 		$relation->getQuery()->shouldReceive('where')->once()->with(array('foo'))->andReturn($relation->getQuery());
 		$relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-		$relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('foo'))->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
 		$model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
 		$model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
 		$model->shouldReceive('save')->once()->andReturn(true);

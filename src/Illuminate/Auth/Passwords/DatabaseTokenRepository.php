@@ -120,9 +120,9 @@ class DatabaseTokenRepository implements TokenRepositoryInterface {
 	 */
 	protected function tokenExpired($token)
 	{
-		$createdPlusHour = strtotime($token['created_at']) + $this->expires;
+		$expirationTime = strtotime($token['created_at']) + $this->expires;
 
-		return $createdPlusHour < $this->getCurrentTime();
+		return $expirationTime < $this->getCurrentTime();
 	}
 
 	/**
@@ -153,9 +153,9 @@ class DatabaseTokenRepository implements TokenRepositoryInterface {
 	 */
 	public function deleteExpired()
 	{
-		$expired = Carbon::now()->subSeconds($this->expires);
+		$expiredAt = Carbon::now()->subSeconds($this->expires);
 
-		$this->getTable()->where('created_at', '<', $expired)->delete();
+		$this->getTable()->where('created_at', '<', $expiredAt)->delete();
 	}
 
 	/**
