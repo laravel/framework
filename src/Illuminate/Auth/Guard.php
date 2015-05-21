@@ -710,7 +710,7 @@ class Guard implements GuardContract {
 	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @return void
 	 */
-	public function setUser(UserContract $user)
+	public function setUser(UserContract $user = null)
 	{
 		$this->user = $user;
 
