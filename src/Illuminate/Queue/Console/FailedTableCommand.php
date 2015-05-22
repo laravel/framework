@@ -57,7 +57,9 @@ class FailedTableCommand extends Command {
 
 		$table = $this->laravel['config']['queue.failed.table'];
 
-		$stub = str_replace('{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub'));
+		$stub = str_replace(
+			'{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
+		);
 
 		$this->files->put($fullPath, $stub);
 
