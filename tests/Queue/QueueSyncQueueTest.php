@@ -1,5 +1,6 @@
 <?php
 
+use Exception;
 use Mockery as m;
 
 class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
@@ -63,6 +64,30 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('SyncQueueTestEntity', $_SERVER['__sync.test'][1]);
 	}
 
+
+	public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
+	{
+		unset($_SERVER['__sync.failed']);
+
+		$sync = new Illuminate\Queue\SyncQueue;
+		$container = new Illuminate\Container\Container;
+		$encrypter = new Illuminate\Encryption\Encrypter(str_random(32));
+		$container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
+		$events = m::mock('Illuminate\Contracts\Events\Dispatcher');
+		$events->shouldReceive('fire')->once();
+		$container->instance('events', $events);
+		$sync->setContainer($container);
+		$sync->setEncrypter($encrypter);
+
+		try {
+			$sync->push('FailingSyncQueueTestHandler', ['foo' => 'bar']);
+		}
+		catch(Exception $e)
+		{
+			$this->assertTrue($_SERVER['__sync.failed']);
+		}
+	}
+
 }
 
 class SyncQueueTestEntity implements Illuminate\Contracts\Queue\QueueableEntity {
@@ -74,5 +99,14 @@ class SyncQueueTestEntity implements Illuminate\Contracts\Queue\QueueableEntity 
 class SyncQueueTestHandler {
 	public function fire($job, $data) {
 		$_SERVER['__sync.test'] = func_get_args();
+	}
+}
+
+class FailingSyncQueueTestHandler {
+	public function fire($job, $data) {
+		throw new Exception();
+	}
+	public function failed(){
+		$_SERVER['__sync.failed'] = true;
 	}
 }
