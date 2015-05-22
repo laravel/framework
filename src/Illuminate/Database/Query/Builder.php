@@ -1976,7 +1976,7 @@ class Builder {
 	/**
 	 * Get the query grammar instance.
 	 *
-	 * @return \Illuminate\Database\Grammar
+	 * @return \Illuminate\Database\Query\Grammars\Grammar
 	 */
 	public function getGrammar()
 	{
