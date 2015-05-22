@@ -2397,6 +2397,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = $this->getArrayableAttributes();
 
+		// If an attribute is listed as to "encrypt", we'll decrypt it using Crypt facade.
+		foreach ($attributes as $key => $value)
+        {
+            if (in_array($key, $this->encrypt) && $value)
+            {
+                $attributes[$key] = \Crypt::decrypt($value);
+            }
+        }
+
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent
 		// formatting while accessing attributes vs. arraying / JSONing a model.
