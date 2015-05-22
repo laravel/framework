@@ -55,7 +55,7 @@ class TableCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$table = config('queue.connections.database.table', 'jobs');
+		$table = $this->laravel->make('config')->get('queue.connections.database.table', 'jobs');
 
 		$stub = str_replace('{{table}}', $table, $this->files->get(__DIR__.'/stubs/jobs.stub'));
 
