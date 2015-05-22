@@ -72,7 +72,11 @@ class RefreshCommand extends Command {
 	{
 		$class = $this->option('seeder') ?: 'DatabaseSeeder';
 
-		$this->call('db:seed', array('--database' => $database, '--class' => $class));
+		$force = $this->input->getOption('force');
+
+		$this->call('db:seed', array(
+			'--database' => $database, '--class' => $class, '--force' => $force,
+		));
 	}
 
 	/**
