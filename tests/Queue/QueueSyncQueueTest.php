@@ -1,6 +1,5 @@
 <?php
 
-use Exception;
 use Mockery as m;
 
 class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
