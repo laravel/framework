@@ -55,7 +55,11 @@ class FailedTableCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/failed_jobs.stub'));
+		$table = config('queue.failed.table', 'failed_jobs');
+
+		$stub = str_replace('{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub'));
+
+		$this->files->put($fullPath, $stub);
 
 		$this->info('Migration created successfully!');
 
