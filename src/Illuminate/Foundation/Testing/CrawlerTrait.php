@@ -303,6 +303,8 @@ trait CrawlerTrait
                 "Unable to find JSON fragment [{$expected}] within [{$actual}]."
             );
         }
+
+        return $this;
     }
 
     /**
