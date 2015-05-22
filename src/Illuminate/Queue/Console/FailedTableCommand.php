@@ -55,7 +55,7 @@ class FailedTableCommand extends Command {
 	{
 		$fullPath = $this->createBaseMigration();
 
-		$table = $this->laravel->make('config')->get('queue.failed.table', 'failed_jobs');
+		$table = $this->laravel['config']['queue.failed.table'];
 
 		$stub = str_replace('{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub'));
 
