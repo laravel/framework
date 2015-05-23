@@ -54,6 +54,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->schema()->create('posts', function($table) {
 			$table->increments('id');
 			$table->integer('user_id');
+			$table->integer('parent_id')->nullable();
 			$table->string('name');
 			$table->timestamps();
 		});
@@ -279,6 +280,30 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasOnSelfReferencingBelongsToRelationship()
+	{
+		$parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+		$childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+		$results = EloquentTestPost::has('parentPost')->get();
+
+		$this->assertEquals(1, count($results));
+		$this->assertEquals('Child Post', $results->first()->name);
+	}
+
+
+	public function testHasOnSelfReferencingHasManyRelationship()
+	{
+		$parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+		$childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+		$results = EloquentTestPost::has('childPosts')->get();
+
+		$this->assertEquals(1, count($results));
+		$this->assertEquals('Parent Post', $results->first()->name);
+	}
+
+
 	public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
 	{
 		$user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -428,6 +453,12 @@ class EloquentTestPost extends Eloquent {
 	}
 	public function photos() {
 		return $this->morphMany('EloquentTestPhoto', 'imageable');
+	}
+	public function childPosts() {
+		return $this->hasMany('EloquentTestPost', 'parent_id');
+	}
+	public function parentPost() {
+		return $this->belongsTo('EloquentTestPost', 'parent_id');
 	}
 }
 
