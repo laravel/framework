@@ -930,7 +930,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * Define a callback to be used to configure Monolog.
 	 *
 	 * @param  callable  $callback
-	 * @return this
+	 * @return $this
 	 */
 	public function configureMonologUsing(callable $callback)
 	{
