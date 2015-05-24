@@ -35,20 +35,10 @@ class ControllerMakeCommand extends GeneratorCommand {
 	{
 		if ($this->option('plain'))
 		{
-			if ( ! empty($this->laravel['config']['console.stubs.controller.plain']))
-			{
-				return base_path($this->laravel['config']['console.stubs.controller.plain']);
-			}
-
-			return __DIR__.'/stubs/controller.plain.stub';
+			return $this->laravel['config']->get('console.stubs.controller.plain', __DIR__.'/stubs/controller.plain.stub');
 		}
 
-		if ( ! empty($this->laravel['config']['console.stubs.controller.default']))
-		{
-			return base_path($this->laravel['config']['console.stubs.controller.default']);
-		}
-
-		return __DIR__.'/stubs/controller.stub';
+		return $this->laravel['config']->get('console.stubs.controller.default', __DIR__.'/stubs/controller.stub');
 	}
 
 	/**

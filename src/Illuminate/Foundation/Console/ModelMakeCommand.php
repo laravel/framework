@@ -50,12 +50,7 @@ class ModelMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		if ( ! empty($this->laravel['config']['console.stubs.model.default']))
-		{
-			return base_path($this->laravel['config']['console.stubs.model.default']);
-		}
-
-		return __DIR__.'/stubs/model.stub';
+		return $this->laravel['config']->get('console.stubs.model.default', __DIR__.'/stubs/model.stub');
 	}
 
 	/**

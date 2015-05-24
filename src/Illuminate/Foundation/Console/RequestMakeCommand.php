@@ -32,12 +32,7 @@ class RequestMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		if ( ! empty($this->laravel['config']['console.stubs.request.default']))
-		{
-			return base_path($this->laravel['config']['console.stubs.request.default']);
-		}
-
-		return __DIR__.'/stubs/request.stub';
+		return $this->laravel['config']->get('console.stubs.request.default', __DIR__.'/stubs/request.stub');
 	}
 
 	/**
