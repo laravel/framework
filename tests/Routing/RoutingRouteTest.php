@@ -911,11 +911,19 @@ class RouteBindingStub {
 }
 
 class RouteModelBindingStub {
-	public function find($value) { return strtoupper($value); }
+	public function getRouteKeyName() { return 'id'; }
+	public function where($key, $value)
+	{
+		$this->value = $value;
+		return $this;
+	}
+	public function first() { return strtoupper($this->value); }
 }
 
 class RouteModelBindingNullStub {
-	public function find($value) {}
+	public function getRouteKeyName() { return 'id'; }
+	public function where($key, $value) { return $this; }
+	public function first() {}
 }
 
 class RouteModelBindingClosureStub {
