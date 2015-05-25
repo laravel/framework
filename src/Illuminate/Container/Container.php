@@ -916,7 +916,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 * Register a new resolving callback.
 	 *
 	 * @param  string    $abstract
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return void
 	 */
 	public function resolving($abstract, Closure $callback = null)
@@ -935,7 +935,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 * Register a new after resolving callback for all types.
 	 *
 	 * @param  string   $abstract
-	 * @param  \Closure $callback
+	 * @param  \Closure|null $callback
 	 * @return void
 	 */
 	public function afterResolving($abstract, Closure $callback = null)
