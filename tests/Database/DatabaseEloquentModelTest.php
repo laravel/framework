@@ -1229,6 +1229,19 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testModelJsonCastingOptions()
+	{
+		$model = new EloquentModelCastingStub;
+		EloquentModelCastingStub::setJsonOptions(JSON_UNESCAPED_UNICODE);
+		$model->eighth = array('foo' => 'Юникод');
+
+		$this->assertEquals(array('foo' => 'Юникод'), $model->eighth);
+		$this->assertEquals('{"foo":"Юникод"}', $model->eighthAttributeValue());
+
+		$this->assertEquals('{"eighth":{"foo":"Юникод"}}', $model->toJson());
+	}
+
+
 	public function testModelAttributeCastingPreservesNull()
 	{
 		$model = new EloquentModelCastingStub;
