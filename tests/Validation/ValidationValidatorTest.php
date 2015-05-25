@@ -872,6 +872,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v->setPresenceVerifier($mock);
 		$this->assertTrue($v->passes());
 
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:connection.users'));
+		$mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+		$mock->shouldReceive('setConnection')->once()->with('connection');
+		$mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, array())->andReturn(0);
+		$v->setPresenceVerifier($mock);
+		$this->assertTrue($v->passes());
+
 		$v = new Validator($trans, array('email' => 'foo'), array('email' => 'Unique:users,email_addr,1'));
 		$mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
 		$mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id', array())->andReturn(1);
