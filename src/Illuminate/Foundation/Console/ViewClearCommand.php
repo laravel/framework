@@ -46,7 +46,6 @@ class ViewClearCommand extends Command {
 	 */
 	public function fire()
 	{
-		// Because glob ignores hidden files, .gitignore will be preserved.
 		$views = $this->files->glob($this->laravel['config']['view.compiled'].'/*');
 
 		foreach ($views as $view)
