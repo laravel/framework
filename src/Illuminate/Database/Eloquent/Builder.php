@@ -592,7 +592,7 @@ class Builder {
 	 * @param  string  $operator
 	 * @param  int     $count
 	 * @param  string  $boolean
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return \Illuminate\Database\Eloquent\Builder|static
 	 */
 	protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
