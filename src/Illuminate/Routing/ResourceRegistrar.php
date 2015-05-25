@@ -5,7 +5,7 @@ class ResourceRegistrar {
 	/**
 	 * Create a new resource registrar.
 	 *
-	 * @param  \Illuminate\Routing\Router
+	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
