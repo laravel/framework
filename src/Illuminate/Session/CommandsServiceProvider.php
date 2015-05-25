@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Session\Console\SessionTableCommand;
 
 class CommandsServiceProvider extends ServiceProvider {
 
@@ -20,7 +21,7 @@ class CommandsServiceProvider extends ServiceProvider {
 	{
 		$this->app->singleton('command.session.database', function($app)
 		{
-			return new Console\SessionTableCommand($app['files'], $app['composer']);
+			return new SessionTableCommand($app['files'], $app['composer']);
 		});
 
 		$this->commands('command.session.database');

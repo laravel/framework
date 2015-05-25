@@ -6,9 +6,12 @@ use DateTime;
 use Exception;
 use LogicException;
 use RuntimeException;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface {
@@ -212,7 +215,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function getDefaultPostProcessor()
 	{
-		return new Query\Processors\Processor;
+		return new Processor;
 	}
 
 	/**
@@ -224,7 +227,7 @@ class Connection implements ConnectionInterface {
 	{
 		if (is_null($this->schemaGrammar)) { $this->useDefaultSchemaGrammar(); }
 
-		return new Schema\Builder($this);
+		return new SchemaBuilder($this);
 	}
 
 	/**
@@ -237,7 +240,7 @@ class Connection implements ConnectionInterface {
 	{
 		$processor = $this->getPostProcessor();
 
-		$query = new Query\Builder($this, $this->getQueryGrammar(), $processor);
+		$query = new QueryBuilder($this, $this->getQueryGrammar(), $processor);
 
 		return $query->from($table);
 	}
@@ -250,7 +253,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function raw($value)
 	{
-		return new Query\Expression($value);
+		return new Expression($value);
 	}
 
 	/**
