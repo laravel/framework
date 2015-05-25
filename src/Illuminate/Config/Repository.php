@@ -38,7 +38,7 @@ class Repository implements ArrayAccess, ConfigContract {
 	 * Get the specified configuration value.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function get($key, $default = null)
@@ -50,7 +50,7 @@ class Repository implements ArrayAccess, ConfigContract {
 	 * Set a given configuration value.
 	 *
 	 * @param  array|string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function set($key, $value = null)

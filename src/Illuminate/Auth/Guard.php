@@ -360,8 +360,8 @@ class Guard implements GuardContract {
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @param  bool   $remember
-	 * @param  bool   $login
+	 * @param  bool  $remember
+	 * @param  bool  $login
 	 * @return bool
 	 */
 	public function attempt(array $credentials = [], $remember = false, $login = true)
@@ -490,7 +490,7 @@ class Guard implements GuardContract {
 	 * Log the given user ID into the application.
 	 *
 	 * @param  mixed  $id
-	 * @param  bool   $remember
+	 * @param  bool  $remember
 	 * @return \Illuminate\Contracts\Auth\Authenticatable
 	 */
 	public function loginUsingId($id, $remember = false)
@@ -660,7 +660,7 @@ class Guard implements GuardContract {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
@@ -735,7 +735,7 @@ class Guard implements GuardContract {
 	/**
 	 * Set the current request instance.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return $this
 	 */
 	public function setRequest(Request $request)

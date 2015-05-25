@@ -525,8 +525,8 @@ class Blueprint {
 	 * Create a new float column on the table.
 	 *
 	 * @param  string  $column
-	 * @param  int     $total
-	 * @param  int     $places
+	 * @param  int  $total
+	 * @param  int  $places
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function float($column, $total = 8, $places = 2)
@@ -537,7 +537,7 @@ class Blueprint {
 	/**
 	 * Create a new double column on the table.
 	 *
-	 * @param  string   $column
+	 * @param  string  $column
 	 * @param  int|null	$total
 	 * @param  int|null $places
 	 * @return \Illuminate\Support\Fluent
@@ -551,8 +551,8 @@ class Blueprint {
 	 * Create a new decimal column on the table.
 	 *
 	 * @param  string  $column
-	 * @param  int     $total
-	 * @param  int     $places
+	 * @param  int  $total
+	 * @param  int  $places
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function decimal($column, $total = 8, $places = 2)
@@ -575,7 +575,7 @@ class Blueprint {
 	 * Create a new enum column on the table.
 	 *
 	 * @param  string  $column
-	 * @param  array   $allowed
+	 * @param  array  $allowed
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function enum($column, array $allowed)
@@ -781,9 +781,9 @@ class Blueprint {
 	/**
 	 * Add a new index command to the blueprint.
 	 *
-	 * @param  string        $type
+	 * @param  string  $type
 	 * @param  string|array  $columns
-	 * @param  string        $index
+	 * @param  string  $index
 	 * @return \Illuminate\Support\Fluent
 	 */
 	protected function indexCommand($type, $columns, $index)
@@ -805,7 +805,7 @@ class Blueprint {
 	 * Create a default index name for the table.
 	 *
 	 * @param  string  $type
-	 * @param  array   $columns
+	 * @param  array  $columns
 	 * @return string
 	 */
 	protected function createIndexName($type, array $columns)
@@ -820,7 +820,7 @@ class Blueprint {
 	 *
 	 * @param  string  $type
 	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return \Illuminate\Support\Fluent
 	 */
 	protected function addColumn($type, $name, array $parameters = array())
@@ -866,7 +866,7 @@ class Blueprint {
 	 * Create a new Fluent command.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return \Illuminate\Support\Fluent
 	 */
 	protected function createCommand($name, array $parameters = array())

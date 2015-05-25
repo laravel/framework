@@ -70,7 +70,7 @@ abstract class Relation {
 	/**
 	 * Initialize the relation on a set of models.
 	 *
-	 * @param  array   $models
+	 * @param  array  $models
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -79,7 +79,7 @@ abstract class Relation {
 	/**
 	 * Match the eagerly loaded results to their parents.
 	 *
-	 * @param  array   $models
+	 * @param  array  $models
 	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
@@ -167,7 +167,7 @@ abstract class Relation {
 	/**
 	 * Get all of the primary keys for an array of models.
 	 *
-	 * @param  array   $models
+	 * @param  array  $models
 	 * @param  string  $key
 	 * @return array
 	 */
@@ -275,7 +275,7 @@ abstract class Relation {
 	 * Handle dynamic method calls to the relationship.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)

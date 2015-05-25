@@ -22,7 +22,7 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Create a new Memcached store.
 	 *
 	 * @param  \Memcached  $memcached
-	 * @param  string      $prefix
+	 * @param  string  $prefix
 	 * @return void
 	 */
 	public function __construct($memcached, $prefix = '')
@@ -51,8 +51,8 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Store an item in the cache for a given number of minutes.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  mixed  $value
+	 * @param  int  $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -64,8 +64,8 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Store an item in the cache if the key doesn't exist.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  mixed  $value
+	 * @param  int  $minutes
 	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
@@ -77,7 +77,7 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Increment the value of an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return int|bool
 	 */
 	public function increment($key, $value = 1)
@@ -89,7 +89,7 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Decrement the value of an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return int|bool
 	 */
 	public function decrement($key, $value = 1)
@@ -101,7 +101,7 @@ class MemcachedStore extends TaggableStore implements Store {
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function forever($key, $value)

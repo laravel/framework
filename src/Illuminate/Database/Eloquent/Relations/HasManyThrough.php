@@ -141,7 +141,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Initialize the relation on a set of models.
 	 *
-	 * @param  array   $models
+	 * @param  array  $models
 	 * @param  string  $relation
 	 * @return array
 	 */
@@ -158,7 +158,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Match the eagerly loaded results to their parents.
 	 *
-	 * @param  array   $models
+	 * @param  array  $models
 	 * @param  \Illuminate\Database\Eloquent\Collection  $results
 	 * @param  string  $relation
 	 * @return array
@@ -221,7 +221,7 @@ class HasManyThrough extends Relation {
 	/**
 	 * Execute the query and get the first related model.
 	 *
-	 * @param  array   $columns
+	 * @param  array  $columns
 	 * @return mixed
 	 */
 	public function first($columns = ['*'])

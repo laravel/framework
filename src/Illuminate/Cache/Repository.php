@@ -49,7 +49,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $events)
@@ -87,7 +87,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function get($key, $default = null)
@@ -112,7 +112,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Retrieve an item from the cache and delete it.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function pull($key, $default = null)
@@ -128,7 +128,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Store an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @param  \DateTime|int  $minutes
 	 * @return void
 	 */
@@ -148,7 +148,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Store an item in the cache if the key does not exist.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @param  \DateTime|int  $minutes
 	 * @return bool
 	 */
@@ -173,7 +173,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function forever($key, $value)
@@ -209,7 +209,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
+	 * @param  string  $key
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
@@ -221,7 +221,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
+	 * @param  string  $key
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
@@ -268,7 +268,7 @@ class Repository implements CacheContract, ArrayAccess {
 	/**
 	 * Set the default cache time in minutes.
 	 *
-	 * @param  int   $minutes
+	 * @param  int  $minutes
 	 * @return void
 	 */
 	public function setDefaultCacheTime($minutes)
@@ -312,7 +312,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Store an item in the cache for the default time.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function offsetSet($key, $value)
@@ -353,7 +353,7 @@ class Repository implements CacheContract, ArrayAccess {
 	 * Handle dynamic calls into macros or pass missing methods to the store.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)

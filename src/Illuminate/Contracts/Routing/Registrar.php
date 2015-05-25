@@ -73,7 +73,7 @@ interface Registrar {
 	 *
 	 * @param  string  $name
 	 * @param  string  $controller
-	 * @param  array   $options
+	 * @param  array  $options
 	 * @return void
 	 */
 	public function resource($name, $controller, array $options = array());
@@ -81,7 +81,7 @@ interface Registrar {
 	/**
 	 * Create a route group with shared attributes.
 	 *
-	 * @param  array     $attributes
+	 * @param  array  $attributes
 	 * @param  \Closure  $callback
 	 * @return void
 	 */

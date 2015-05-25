@@ -340,7 +340,7 @@ class Store implements SessionInterface {
 	 * Get the requested item from the flashed input array.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function getOldInput($key = null, $default = null)
@@ -365,7 +365,7 @@ class Store implements SessionInterface {
 	 * Put a key / value pair or array of key / value pairs in the session.
 	 *
 	 * @param  string|array  $key
-	 * @param  mixed|null  	 $value
+	 * @param  mixed|null  $value
 	 * @return void
 	 */
 	public function put($key, $value = null)
@@ -382,7 +382,7 @@ class Store implements SessionInterface {
 	 * Push a value onto a session array.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function push($key, $value)
@@ -398,7 +398,7 @@ class Store implements SessionInterface {
 	 * Flash a key / value pair to the session.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function flash($key, $value)

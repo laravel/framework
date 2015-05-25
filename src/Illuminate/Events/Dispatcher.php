@@ -67,8 +67,8 @@ class Dispatcher implements DispatcherContract {
 	 * Register an event listener with the dispatcher.
 	 *
 	 * @param  string|array  $events
-	 * @param  mixed   $listener
-	 * @param  int     $priority
+	 * @param  mixed  $listener
+	 * @param  int  $priority
 	 * @return void
 	 */
 	public function listen($events, $listener, $priority = 0)
@@ -92,7 +92,7 @@ class Dispatcher implements DispatcherContract {
 	 * Setup a wildcard listener callback.
 	 *
 	 * @param  string  $event
-	 * @param  mixed   $listener
+	 * @param  mixed  $listener
 	 * @return void
 	 */
 	protected function setupWildcardListen($event, $listener)
@@ -115,7 +115,7 @@ class Dispatcher implements DispatcherContract {
 	 * Register an event and payload to be fired later.
 	 *
 	 * @param  string  $event
-	 * @param  array   $payload
+	 * @param  array  $payload
 	 * @return void
 	 */
 	public function push($event, $payload = array())
@@ -159,7 +159,7 @@ class Dispatcher implements DispatcherContract {
 	 * Fire an event until the first non-null response is returned.
 	 *
 	 * @param  string  $event
-	 * @param  array   $payload
+	 * @param  array  $payload
 	 * @return mixed
 	 */
 	public function until($event, $payload = array())
@@ -192,8 +192,8 @@ class Dispatcher implements DispatcherContract {
 	 * Fire an event and call the listeners.
 	 *
 	 * @param  string|object  $event
-	 * @param  mixed   $payload
-	 * @param  bool    $halt
+	 * @param  mixed  $payload
+	 * @param  bool  $halt
 	 * @return array|null
 	 */
 	public function fire($event, $payload = array(), $halt = false)
@@ -327,7 +327,7 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Register an event listener with the dispatcher.
 	 *
-	 * @param  mixed   $listener
+	 * @param  mixed  $listener
 	 * @return mixed
 	 */
 	public function makeListener($listener)
@@ -338,7 +338,7 @@ class Dispatcher implements DispatcherContract {
 	/**
 	 * Create a class based listener using the IoC container.
 	 *
-	 * @param  mixed    $listener
+	 * @param  mixed  $listener
 	 * @return \Closure
 	 */
 	public function createClassListener($listener)

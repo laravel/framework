@@ -28,7 +28,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a select query into SQL.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return string
 	 */
 	public function compileSelect(Builder $query)
@@ -41,7 +41,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the components necessary for a select clause.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return array
 	 */
 	protected function compileComponents(Builder $query)
@@ -170,7 +170,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Create a join clause constraint segment.
 	 *
-	 * @param  array   $clause
+	 * @param  array  $clause
 	 * @return string
 	 */
 	protected function compileJoinConstraint(array $clause)
@@ -235,7 +235,7 @@ class Grammar extends BaseGrammar {
 	 * Compile a where condition with a sub-select.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder $query
-	 * @param  array   $where
+	 * @param  array  $where
 	 * @return string
 	 */
 	protected function whereSub(Builder $query, $where)
@@ -485,7 +485,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a single having clause.
 	 *
-	 * @param  array   $having
+	 * @param  array  $having
 	 * @return string
 	 */
 	protected function compileHaving(array $having)
@@ -504,7 +504,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a basic having clause.
 	 *
-	 * @param  array   $having
+	 * @param  array  $having
 	 * @return string
 	 */
 	protected function compileBasicHaving($having)
@@ -643,7 +643,7 @@ class Grammar extends BaseGrammar {
 	 * Compile an insert and get ID statement into SQL.
 	 *
 	 * @param  \Illuminate\Database\Query\Builder  $query
-	 * @param  array   $values
+	 * @param  array  $values
 	 * @param  string  $sequence
 	 * @return string
 	 */
@@ -736,7 +736,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Concatenate an array of segments, removing empties.
 	 *
-	 * @param  array   $segments
+	 * @param  array  $segments
 	 * @return string
 	 */
 	protected function concatenate($segments)

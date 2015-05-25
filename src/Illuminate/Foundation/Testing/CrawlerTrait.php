@@ -149,7 +149,7 @@ trait CrawlerTrait
     /**
      * Make a request to the application using the given form.
      *
-     * @param  \Symfony\Component\DomCrawler\Form
+     * @param  \Symfony\Component\DomCrawler\Form  $form
      * @return $this
      */
     protected function makeRequestUsingForm(Form $form)
@@ -547,10 +547,10 @@ trait CrawlerTrait
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -571,10 +571,10 @@ trait CrawlerTrait
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -590,11 +590,11 @@ trait CrawlerTrait
      *
      * @param  string  $method
      * @param  string  $action
-     * @param  array   $wildcards
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $wildcards
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
@@ -610,11 +610,11 @@ trait CrawlerTrait
      *
      * @param  string  $method
      * @param  string  $name
-     * @param  array   $routeParameters
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
-     * @param  array   $server
+     * @param  array  $routeParameters
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
+     * @param  array  $server
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */

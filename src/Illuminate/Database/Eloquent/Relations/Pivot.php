@@ -37,9 +37,9 @@ class Pivot extends Model {
 	 * Create a new pivot model instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Model  $parent
-	 * @param  array   $attributes
+	 * @param  array  $attributes
 	 * @param  string  $table
-	 * @param  bool    $exists
+	 * @param  bool  $exists
 	 * @return void
 	 */
 	public function __construct(Model $parent, $attributes, $table, $exists = false)
@@ -68,7 +68,7 @@ class Pivot extends Model {
 	/**
 	 * Set the keys for a save update query.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	protected function setKeysForSaveQuery(Builder $query)

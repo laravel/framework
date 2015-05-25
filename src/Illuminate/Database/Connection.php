@@ -128,10 +128,10 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Create a new database connection instance.
 	 *
-	 * @param  \PDO     $pdo
-	 * @param  string   $database
-	 * @param  string   $tablePrefix
-	 * @param  array    $config
+	 * @param  \PDO  $pdo
+	 * @param  string  $database
+	 * @param  string  $tablePrefix
+	 * @param  array  $config
 	 * @return void
 	 */
 	public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = array())
@@ -257,7 +257,7 @@ class Connection implements ConnectionInterface {
 	 * Run a select statement and return a single result.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return mixed
 	 */
 	public function selectOne($query, $bindings = array())
@@ -271,7 +271,7 @@ class Connection implements ConnectionInterface {
 	 * Run a select statement against the database.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return array
 	 */
 	public function selectFromWriteConnection($query, $bindings = array())
@@ -319,7 +319,7 @@ class Connection implements ConnectionInterface {
 	 * Run an insert statement against the database.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return bool
 	 */
 	public function insert($query, $bindings = array())
@@ -331,7 +331,7 @@ class Connection implements ConnectionInterface {
 	 * Run an update statement against the database.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return int
 	 */
 	public function update($query, $bindings = array())
@@ -343,7 +343,7 @@ class Connection implements ConnectionInterface {
 	 * Run a delete statement against the database.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return int
 	 */
 	public function delete($query, $bindings = array())
@@ -355,7 +355,7 @@ class Connection implements ConnectionInterface {
 	 * Execute an SQL statement and return the boolean result.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return bool
 	 */
 	public function statement($query, $bindings = array())
@@ -374,7 +374,7 @@ class Connection implements ConnectionInterface {
 	 * Run an SQL statement and get the number of rows affected.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @return int
 	 */
 	public function affectingStatement($query, $bindings = array())
@@ -566,8 +566,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement and log its execution context.
 	 *
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array  $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -606,8 +606,8 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Run a SQL statement.
 	 *
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array  $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -640,8 +640,8 @@ class Connection implements ConnectionInterface {
 	 * Handle a query exception that occurred during query execution.
 	 *
 	 * @param  \Illuminate\Database\QueryException  $e
-	 * @param  string    $query
-	 * @param  array     $bindings
+	 * @param  string  $query
+	 * @param  array  $bindings
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 *
@@ -720,7 +720,7 @@ class Connection implements ConnectionInterface {
 	 * Log a query in the connection's query log.
 	 *
 	 * @param  string  $query
-	 * @param  array   $bindings
+	 * @param  array  $bindings
 	 * @param  float|null  $time
 	 * @return void
 	 */
@@ -767,7 +767,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Get the elapsed time since a given starting point.
 	 *
-	 * @param  int    $start
+	 * @param  int  $start
 	 * @return float
 	 */
 	protected function getElapsedTime($start)
@@ -926,7 +926,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query grammar used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Query\Grammars\Grammar
+	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @return void
 	 */
 	public function setQueryGrammar(Query\Grammars\Grammar $grammar)
@@ -947,7 +947,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the schema grammar used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Schema\Grammars\Grammar
+	 * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
 	 * @return void
 	 */
 	public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
@@ -968,7 +968,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query post processor used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Query\Processors\Processor
+	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
 	 * @return void
 	 */
 	public function setPostProcessor(Processor $processor)
@@ -989,7 +989,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $events)

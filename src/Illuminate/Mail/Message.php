@@ -164,7 +164,7 @@ class Message {
 	 * Attach a file to the message.
 	 *
 	 * @param  string  $file
-	 * @param  array   $options
+	 * @param  array  $options
 	 * @return $this
 	 */
 	public function attach($file, array $options = array())
@@ -190,7 +190,7 @@ class Message {
 	 *
 	 * @param  string  $data
 	 * @param  string  $name
-	 * @param  array   $options
+	 * @param  array  $options
 	 * @return $this
 	 */
 	public function attachData($data, $name, array $options = array())
@@ -282,7 +282,7 @@ class Message {
 	 * Dynamically pass missing methods to the Swift instance.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)

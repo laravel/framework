@@ -42,8 +42,8 @@ class XCacheStore extends TaggableStore implements Store {
 	 * Store an item in the cache for a given number of minutes.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  int     $minutes
+	 * @param  mixed  $value
+	 * @param  int  $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
@@ -55,7 +55,7 @@ class XCacheStore extends TaggableStore implements Store {
 	 * Increment the value of an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return int
 	 */
 	public function increment($key, $value = 1)
@@ -67,7 +67,7 @@ class XCacheStore extends TaggableStore implements Store {
 	 * Increment the value of an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return int
 	 */
 	public function decrement($key, $value = 1)
@@ -79,7 +79,7 @@ class XCacheStore extends TaggableStore implements Store {
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function forever($key, $value)
