@@ -744,17 +744,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function offsetGet($offset)
 	{
-		$input = $this->input();
+        $all = $this->all();
 
-		if (array_has($input, $offset))
-		{
-			return array_get($input, $offset);
-		}
-
-		if ($this->hasFile($offset))
-		{
-			return $this->file($offset);
-		}
+        return array_get($all, $offset, null);
 	}
 
 	/**
@@ -788,11 +780,11 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function __get($key)
 	{
-		$input = $this->input();
+		$all = $this->all();
 
-		if (array_key_exists($key, $input))
+		if (array_key_exists($key, $all))
 		{
-			return $this->input($key);
+			return $this->all($key);
 		}
 		elseif ( ! is_null($this->route()))
 		{
