@@ -153,7 +153,7 @@ class Command extends SymfonyCommand {
 	 * Call another console command.
 	 *
 	 * @param  string  $command
-	 * @param  array   $arguments
+	 * @param  array  $arguments
 	 * @return int
 	 */
 	public function call($command, array $arguments = array())
@@ -169,7 +169,7 @@ class Command extends SymfonyCommand {
 	 * Call another console command silently.
 	 *
 	 * @param  string  $command
-	 * @param  array   $arguments
+	 * @param  array  $arguments
 	 * @return int
 	 */
 	public function callSilent($command, array $arguments = array())
@@ -211,7 +211,7 @@ class Command extends SymfonyCommand {
 	 * Confirm a question with the user.
 	 *
 	 * @param  string  $question
-	 * @param  bool    $default
+	 * @param  bool  $default
 	 * @return bool
 	 */
 	public function confirm($question, $default = false)
@@ -235,7 +235,7 @@ class Command extends SymfonyCommand {
 	 * Prompt the user for input with auto completion.
 	 *
 	 * @param  string  $question
-	 * @param  array   $choices
+	 * @param  array  $choices
 	 * @param  string  $default
 	 * @return string
 	 */
@@ -252,7 +252,7 @@ class Command extends SymfonyCommand {
 	 * Prompt the user for input but hide the answer from the console.
 	 *
 	 * @param  string  $question
-	 * @param  bool    $fallback
+	 * @param  bool  $fallback
 	 * @return string
 	 */
 	public function secret($question, $fallback = true)
@@ -268,10 +268,10 @@ class Command extends SymfonyCommand {
 	 * Give the user a single choice from an array of answers.
 	 *
 	 * @param  string  $question
-	 * @param  array   $choices
+	 * @param  array  $choices
 	 * @param  string  $default
-	 * @param  mixed   $attempts
-	 * @param  bool    $multiple
+	 * @param  mixed  $attempts
+	 * @param  bool  $multiple
 	 * @return bool
 	 */
 	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
@@ -286,8 +286,8 @@ class Command extends SymfonyCommand {
 	/**
 	 * Format input to textual table.
 	 *
-	 * @param  array   $headers
-	 * @param  array   $rows
+	 * @param  array  $headers
+	 * @param  array  $rows
 	 * @param  string  $style
 	 * @return void
 	 */

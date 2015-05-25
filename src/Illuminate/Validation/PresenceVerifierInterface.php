@@ -8,9 +8,9 @@ interface PresenceVerifierInterface {
 	 * @param  string  $collection
 	 * @param  string  $column
 	 * @param  string  $value
-	 * @param  int     $excludeId
+	 * @param  int  $excludeId
 	 * @param  string  $idColumn
-	 * @param  array   $extra
+	 * @param  array  $extra
 	 * @return int
 	 */
 	public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = array());
@@ -20,8 +20,8 @@ interface PresenceVerifierInterface {
 	 *
 	 * @param  string  $collection
 	 * @param  string  $column
-	 * @param  array   $values
-	 * @param  array   $extra
+	 * @param  array  $values
+	 * @param  array  $extra
 	 * @return int
 	 */
 	public function getMultiCount($collection, $column, array $values, array $extra = array());

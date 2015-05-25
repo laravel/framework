@@ -30,7 +30,7 @@ class RedirectResponse extends BaseRedirectResponse {
 	 * Flash a piece of data to the session.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function with($key, $value = null)

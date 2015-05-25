@@ -135,7 +135,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	/**
 	 * Add a queue connection resolver.
 	 *
-	 * @param  string    $driver
+	 * @param  string  $driver
 	 * @param  \Closure  $resolver
 	 * @return void
 	 */
@@ -147,7 +147,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	/**
 	 * Add a queue connection resolver.
 	 *
-	 * @param  string    $driver
+	 * @param  string  $driver
 	 * @param  \Closure  $resolver
 	 * @return void
 	 */
@@ -213,7 +213,7 @@ class QueueManager implements FactoryContract, MonitorContract {
 	 * Dynamically pass calls to the default connection.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)

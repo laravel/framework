@@ -36,7 +36,7 @@ class MigrationCreator {
 	 * @param  string  $name
 	 * @param  string  $path
 	 * @param  string  $table
-	 * @param  bool    $create
+	 * @param  bool  $create
 	 * @return string
 	 */
 	public function create($name, $path, $table = null, $create = false)
@@ -59,7 +59,7 @@ class MigrationCreator {
 	 * Get the migration stub file.
 	 *
 	 * @param  string  $table
-	 * @param  bool    $create
+	 * @param  bool  $create
 	 * @return string
 	 */
 	protected function getStub($table, $create)

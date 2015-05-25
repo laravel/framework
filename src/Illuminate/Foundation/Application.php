@@ -480,7 +480,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 *
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param  array  $options
-	 * @param  bool   $force
+	 * @param  bool  $force
 	 * @return \Illuminate\Support\ServiceProvider
 	 */
 	public function register($provider, $options = array(), $force = false)
@@ -636,7 +636,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 * (Overriding Container::make)
 	 *
 	 * @param  string  $abstract
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function make($abstract, array $parameters = array())
@@ -830,9 +830,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	/**
 	 * Throw an HttpException with the given data.
 	 *
-	 * @param  int     $code
+	 * @param  int  $code
 	 * @param  string  $message
-	 * @param  array   $headers
+	 * @param  array  $headers
 	 * @return void
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException

@@ -97,7 +97,7 @@ trait AssertionsTrait {
 	 * Assert whether the client was redirected to a given URI.
 	 *
 	 * @param  string  $uri
-	 * @param  array   $with
+	 * @param  array  $with
 	 * @return void
 	 */
 	public function assertRedirectedTo($uri, $with = array())
@@ -113,8 +113,8 @@ trait AssertionsTrait {
 	 * Assert whether the client was redirected to a given route.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
-	 * @param  array   $with
+	 * @param  array  $parameters
+	 * @param  array  $with
 	 * @return void
 	 */
 	public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
@@ -126,8 +126,8 @@ trait AssertionsTrait {
 	 * Assert whether the client was redirected to a given action.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
-	 * @param  array   $with
+	 * @param  array  $parameters
+	 * @param  array  $with
 	 * @return void
 	 */
 	public function assertRedirectedToAction($name, $parameters = array(), $with = array())

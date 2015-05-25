@@ -15,7 +15,7 @@ trait Macroable {
 	/**
 	 * Register a custom macro.
 	 *
-	 * @param  string    $name
+	 * @param  string  $name
 	 * @param  callable  $macro
 	 * @return void
 	 */
@@ -39,7 +39,7 @@ trait Macroable {
 	 * Dynamically handle calls to the class.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 *
 	 * @throws \BadMethodCallException
@@ -65,7 +65,7 @@ trait Macroable {
 	 * Dynamically handle calls to the class.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 *
 	 * @throws \BadMethodCallException

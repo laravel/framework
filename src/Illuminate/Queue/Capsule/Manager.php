@@ -83,7 +83,7 @@ class Manager {
 	 * Push a new job onto the queue.
 	 *
 	 * @param  string  $job
-	 * @param  mixed   $data
+	 * @param  mixed  $data
 	 * @param  string  $queue
 	 * @param  string  $connection
 	 * @return mixed
@@ -96,8 +96,8 @@ class Manager {
 	/**
 	 * Push a new an array of jobs onto the queue.
 	 *
-	 * @param  array   $jobs
-	 * @param  mixed   $data
+	 * @param  array  $jobs
+	 * @param  mixed  $data
 	 * @param  string  $queue
 	 * @param  string  $connection
 	 * @return mixed
@@ -112,7 +112,7 @@ class Manager {
 	 *
 	 * @param  \DateTime|int  $delay
 	 * @param  string  $job
-	 * @param  mixed   $data
+	 * @param  mixed  $data
 	 * @param  string  $queue
 	 * @param  string  $connection
 	 * @return mixed
@@ -136,7 +136,7 @@ class Manager {
 	/**
 	 * Register a connection with the manager.
 	 *
-	 * @param  array   $config
+	 * @param  array  $config
 	 * @param  string  $name
 	 * @return void
 	 */
@@ -171,7 +171,7 @@ class Manager {
 	 * Dynamically pass methods to the default connection.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public static function __callStatic($method, $parameters)

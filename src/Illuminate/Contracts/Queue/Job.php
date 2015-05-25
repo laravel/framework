@@ -19,7 +19,7 @@ interface Job {
 	/**
 	 * Release the job back into the queue.
 	 *
-	 * @param  int   $delay
+	 * @param  int  $delay
 	 * @return void
 	 */
 	public function release($delay = 0);

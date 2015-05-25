@@ -8,9 +8,9 @@ if ( ! function_exists('abort'))
 	/**
 	 * Throw an HttpException with the given data.
 	 *
-	 * @param  int     $code
+	 * @param  int  $code
 	 * @param  string  $message
-	 * @param  array   $headers
+	 * @param  array  $headers
 	 * @return void
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -28,7 +28,7 @@ if ( ! function_exists('action'))
 	 * Generate a URL to a controller action.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return string
 	 */
 	function action($name, $parameters = array())
@@ -43,7 +43,7 @@ if ( ! function_exists('app'))
 	 * Get the available container instance.
 	 *
 	 * @param  string  $make
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed|\Illuminate\Foundation\Application
 	 */
 	function app($make = null, $parameters = [])
@@ -74,7 +74,7 @@ if ( ! function_exists('asset'))
 	 * Generate an asset path for the application.
 	 *
 	 * @param  string  $path
-	 * @param  bool    $secure
+	 * @param  bool  $secure
 	 * @return string
 	 */
 	function asset($path, $secure = null)
@@ -115,7 +115,7 @@ if ( ! function_exists('back'))
 	/**
 	 * Create a new redirect response to the previous location.
 	 *
-	 * @param  int    $status
+	 * @param  int  $status
 	 * @param  array  $headers
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
@@ -131,7 +131,7 @@ if ( ! function_exists('bcrypt'))
 	 * Hash the given value.
 	 *
 	 * @param  string  $value
-	 * @param  array   $options
+	 * @param  array  $options
 	 * @return string
 	 */
 	function bcrypt($value, $options = array())
@@ -185,11 +185,11 @@ if ( ! function_exists('cookie'))
 	 *
 	 * @param  string  $name
 	 * @param  string  $value
-	 * @param  int     $minutes
+	 * @param  int  $minutes
 	 * @param  string  $path
 	 * @param  string  $domain
-	 * @param  bool    $secure
-	 * @param  bool    $httpOnly
+	 * @param  bool  $secure
+	 * @param  bool  $httpOnly
 	 * @return \Symfony\Component\HttpFoundation\Cookie
 	 */
 	function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
@@ -314,7 +314,7 @@ if ( ! function_exists('info'))
 	 * Write some information to the log.
 	 *
 	 * @param  string  $message
-	 * @param  array   $context
+	 * @param  array  $context
 	 * @return void
 	 */
 	function info($message, $context = array())
@@ -346,7 +346,7 @@ if ( ! function_exists('old'))
 	 * Retrieve an old input item.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function old($key = null, $default = null)
@@ -420,9 +420,9 @@ if ( ! function_exists('redirect'))
 	 * Get an instance of the redirector.
 	 *
 	 * @param  string|null  $to
-	 * @param  int     $status
-	 * @param  array   $headers
-	 * @param  bool    $secure
+	 * @param  int  $status
+	 * @param  array  $headers
+	 * @param  bool  $secure
 	 * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
 	 */
 	function redirect($to = null, $status = 302, $headers = array(), $secure = null)
@@ -440,7 +440,7 @@ if ( ! function_exists('resource'))
 	 *
 	 * @param  string  $name
 	 * @param  string  $controller
-	 * @param  array   $options
+	 * @param  array  $options
 	 * @return void
 	 */
 	function resource($name, $controller, array $options = [])
@@ -455,8 +455,8 @@ if ( ! function_exists('response'))
 	 * Return a new response from the application.
 	 *
 	 * @param  string  $content
-	 * @param  int     $status
-	 * @param  array   $headers
+	 * @param  int  $status
+	 * @param  array  $headers
 	 * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
 	 */
 	function response($content = '', $status = 200, array $headers = array())
@@ -478,8 +478,8 @@ if ( ! function_exists('route'))
 	 * Generate a URL to a named route.
 	 *
 	 * @param  string  $name
-	 * @param  array   $parameters
-	 * @param  bool    $absolute
+	 * @param  array  $parameters
+	 * @param  bool  $absolute
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @return string
 	 */
@@ -509,7 +509,7 @@ if ( ! function_exists('secure_url'))
 	 * Generate a HTTPS url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  mixed   $parameters
+	 * @param  mixed  $parameters
 	 * @return string
 	 */
 	function secure_url($path, $parameters = array())
@@ -559,7 +559,7 @@ if ( ! function_exists('trans'))
 	 * Translate the given message.
 	 *
 	 * @param  string  $id
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @param  string  $domain
 	 * @param  string  $locale
 	 * @return string
@@ -578,8 +578,8 @@ if ( ! function_exists('trans_choice'))
 	 * Translates the given message based on a count.
 	 *
 	 * @param  string  $id
-	 * @param  int     $number
-	 * @param  array   $parameters
+	 * @param  int  $number
+	 * @param  array  $parameters
 	 * @param  string  $domain
 	 * @param  string  $locale
 	 * @return string
@@ -596,8 +596,8 @@ if ( ! function_exists('url'))
 	 * Generate a url for the application.
 	 *
 	 * @param  string  $path
-	 * @param  mixed   $parameters
-	 * @param  bool    $secure
+	 * @param  mixed  $parameters
+	 * @param  bool  $secure
 	 * @return string
 	 */
 	function url($path = null, $parameters = array(), $secure = null)
@@ -612,8 +612,8 @@ if ( ! function_exists('view'))
 	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
-	 * @param  array   $data
-	 * @param  array   $mergeData
+	 * @param  array  $data
+	 * @param  array  $mergeData
 	 * @return \Illuminate\View\View
 	 */
 	function view($view = null, $data = array(), $mergeData = array())
@@ -635,7 +635,7 @@ if ( ! function_exists('env'))
 	 * Gets the value of an environment variable. Supports boolean, empty and null.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function env($key, $default = null)
@@ -678,8 +678,8 @@ if ( ! function_exists('event'))
 	 * Fire an event and call the listeners.
 	 *
 	 * @param  string  $event
-	 * @param  mixed   $payload
-	 * @param  bool    $halt
+	 * @param  mixed  $payload
+	 * @param  bool  $halt
 	 * @return array|null
 	 */
 	function event($event, $payload = array(), $halt = false)

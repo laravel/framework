@@ -281,7 +281,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve an input item from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	public function input($key = null, $default = null)
@@ -334,7 +334,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve a query string item from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	public function query($key = null, $default = null)
@@ -357,7 +357,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve a cookie from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	public function cookie($key = null, $default = null)
@@ -369,7 +369,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve a file from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return \Symfony\Component\HttpFoundation\File\UploadedFile|array
 	 */
 	public function file($key = null, $default = null)
@@ -410,7 +410,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve a header from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	public function header($key = null, $default = null)
@@ -422,7 +422,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve a server variable from the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	public function server($key = null, $default = null)
@@ -434,7 +434,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Retrieve an old input item.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function old($key = null, $default = null)
@@ -446,7 +446,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Flash the input for the current request to the session.
 	 *
 	 * @param  string  $filter
-	 * @param  array   $keys
+	 * @param  array  $keys
 	 * @return void
 	 */
 	public function flash($filter = null, $keys = array())
@@ -497,7 +497,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 *
 	 * @param  string  $source
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return string|array
 	 */
 	protected function retrieveItem($source, $key, $default)
@@ -536,7 +536,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 * Get the JSON payload for the request.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function json($key = null, $default = null)

@@ -116,7 +116,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * Send a new message when only a raw text part.
 	 *
 	 * @param  string  $text
-	 * @param  mixed   $callback
+	 * @param  mixed  $callback
 	 * @return int
 	 */
 	public function raw($text, $callback)
@@ -128,8 +128,8 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * Send a new message when only a plain part.
 	 *
 	 * @param  string  $view
-	 * @param  array   $data
-	 * @param  mixed   $callback
+	 * @param  array  $data
+	 * @param  mixed  $callback
 	 * @return int
 	 */
 	public function plain($view, array $data, $callback)
@@ -172,7 +172,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * Queue a new e-mail message for sending.
 	 *
 	 * @param  string|array  $view
-	 * @param  array   $data
+	 * @param  array  $data
 	 * @param  \Closure|string  $callback
 	 * @param  string  $queue
 	 * @return mixed
@@ -189,7 +189,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 *
 	 * @param  string  $queue
 	 * @param  string|array  $view
-	 * @param  array   $data
+	 * @param  array  $data
 	 * @param  \Closure|string  $callback
 	 * @return mixed
 	 */
@@ -292,7 +292,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * @param  string  $view
 	 * @param  string  $plain
 	 * @param  string  $raw
-	 * @param  array   $data
+	 * @param  array  $data
 	 * @return void
 	 */
 	protected function addContent($message, $view, $plain, $raw, $data)
@@ -431,7 +431,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	 * Render the given view.
 	 *
 	 * @param  string  $view
-	 * @param  array   $data
+	 * @param  array  $data
 	 * @return \Illuminate\View\View
 	 */
 	protected function getView($view, $data)

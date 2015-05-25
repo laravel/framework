@@ -16,7 +16,7 @@ interface Repository {
 	 * Retrieve an item from the cache by key.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function get($key, $default = null);
@@ -25,7 +25,7 @@ interface Repository {
 	 * Retrieve an item from the cache and delete it.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $default
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function pull($key, $default = null);
@@ -34,7 +34,7 @@ interface Repository {
 	 * Store an item in the cache.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @param  \DateTime|int  $minutes
 	 * @return void
 	 */
@@ -44,7 +44,7 @@ interface Repository {
 	 * Store an item in the cache if the key does not exist.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @param  \DateTime|int  $minutes
 	 * @return bool
 	 */
@@ -54,7 +54,7 @@ interface Repository {
 	 * Store an item in the cache indefinitely.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function forever($key, $value);
@@ -72,7 +72,7 @@ interface Repository {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
+	 * @param  string  $key
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
@@ -81,7 +81,7 @@ interface Repository {
 	/**
 	 * Get an item from the cache, or store the default value forever.
 	 *
-	 * @param  string   $key
+	 * @param  string  $key
 	 * @param  \Closure  $callback
 	 * @return mixed
 	 */
