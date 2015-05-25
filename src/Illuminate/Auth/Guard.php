@@ -660,7 +660,7 @@ class Guard implements GuardContract {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
@@ -735,7 +735,7 @@ class Guard implements GuardContract {
 	/**
 	 * Set the current request instance.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
 	 * @return $this
 	 */
 	public function setRequest(Request $request)

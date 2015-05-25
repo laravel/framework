@@ -28,7 +28,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a select query into SQL.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return string
 	 */
 	public function compileSelect(Builder $query)
@@ -41,7 +41,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the components necessary for a select clause.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return array
 	 */
 	protected function compileComponents(Builder $query)
