@@ -23,7 +23,6 @@
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",
         "ircmaxell/password-compat": "~1.0",
-        "fzaninotto/faker": "~1.4",
         "jeremeamia/superclosure": "~2.0",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
@@ -104,6 +103,7 @@
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~2.4).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
+        "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.0).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v2": "Required to use the Flysystem S3 driver (~1.0).",
