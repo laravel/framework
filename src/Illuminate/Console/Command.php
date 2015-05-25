@@ -240,6 +240,19 @@ class Command extends SymfonyCommand {
 	 * @param  string  $default
 	 * @return string
 	 */
+	public function anticipate($question, array $choices, $default = null)
+	{
+		return $this->askWithCompletion($question, $choices, $default);
+	}
+
+	/**
+	 * Prompt the user for input with auto completion.
+	 *
+	 * @param  string  $question
+	 * @param  array   $choices
+	 * @param  string  $default
+	 * @return string
+	 */
 	public function askWithCompletion($question, array $choices, $default = null)
 	{
 		$question = new Question($question, $default);
@@ -295,9 +308,9 @@ class Command extends SymfonyCommand {
 	public function table(array $headers, $rows, $style = 'default')
 	{
 		$table = new Table($this->output);
-		
+
 		if ($rows instanceof Arrayable) {
-			$rows = $rows->toArray();    
+			$rows = $rows->toArray();
 		}
 
 		$table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
