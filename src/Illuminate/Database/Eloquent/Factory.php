@@ -16,7 +16,7 @@ class Factory implements ArrayAccess
     /**
      * Create a new factory container.
      *
-     * @param  string  $pathToFactories
+     * @param  string|null  $pathToFactories
      * @return static
      */
     public static function construct($pathToFactories = null)
@@ -25,8 +25,10 @@ class Factory implements ArrayAccess
 
         $factory = new static;
 
-        foreach (Finder::create()->files()->in($pathToFactories) as $file) {
-            require $file->getRealPath();
+        if (file_exists($pathToFactories)) {
+            foreach (Finder::create()->files()->in($pathToFactories) as $file) {
+                require $file->getRealPath();
+            } 
         }
 
         return $factory;
