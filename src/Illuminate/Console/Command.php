@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Console;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -287,13 +288,17 @@ class Command extends SymfonyCommand {
 	 * Format input to textual table.
 	 *
 	 * @param  array   $headers
-	 * @param  array   $rows
+	 * @param  array|\Illuminate\Contracts\Support\Arrayable  $rows
 	 * @param  string  $style
 	 * @return void
 	 */
-	public function table(array $headers, array $rows, $style = 'default')
+	public function table(array $headers, $rows, $style = 'default')
 	{
 		$table = new Table($this->output);
+		
+		if ($rows instanceof Arrayable) {
+			$rows = $rows->toArray();    
+		}
 
 		$table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
 	}
