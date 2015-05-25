@@ -167,8 +167,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get the first item from the collection.
 	 *
-	 * @param  callable|null   $callback
-	 * @param  mixed      $default
+	 * @param  callable|null  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public function first(callable $callback = null, $default = null)
