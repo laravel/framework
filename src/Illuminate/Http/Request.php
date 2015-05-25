@@ -784,7 +784,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 
 		if (array_key_exists($key, $all))
 		{
-			return $this->all($key);
+			return $this->all();
 		}
 		elseif ( ! is_null($this->route()))
 		{
