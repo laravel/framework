@@ -278,11 +278,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
 
-        $this->assertEquals('http://www.foo.com:8080/foo//baz', $url->route('foo', ['two' => 'baz']));
-        $this->assertEquals('http://www.foo.com:8080/foo//stuff', $url->route('foo', ['three' => 'stuff']));
+		$this->assertEquals('http://www.foo.com:8080/foo//baz', $url->route('foo', ['two' => 'baz']));
+		$this->assertEquals('http://www.foo.com:8080/foo//stuff', $url->route('foo', ['three' => 'stuff']));
 
-        $this->assertEquals('http://www.foo.com:8080/foo/bar/baz', $url->route('foo', ['one' => 'bar', 'two' => 'baz']));
-        $this->assertEquals('http://www.foo.com:8080/foo/bar/stuff', $url->route('foo', ['one' => 'bar', 'three' => 'stuff']));
+		$this->assertEquals('http://www.foo.com:8080/foo/bar/baz', $url->route('foo', ['one' => 'bar', 'two' => 'baz']));
+		$this->assertEquals('http://www.foo.com:8080/foo/bar/stuff', $url->route('foo', ['one' => 'bar', 'three' => 'stuff']));
 
 	}
 
