@@ -926,7 +926,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query grammar used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Query\Grammars\Grammar
+	 * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
 	 * @return void
 	 */
 	public function setQueryGrammar(Query\Grammars\Grammar $grammar)
@@ -947,7 +947,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the schema grammar used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Schema\Grammars\Grammar
+	 * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
 	 * @return void
 	 */
 	public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
@@ -968,7 +968,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the query post processor used by the connection.
 	 *
-	 * @param  \Illuminate\Database\Query\Processors\Processor
+	 * @param  \Illuminate\Database\Query\Processors\Processor  $processor
 	 * @return void
 	 */
 	public function setPostProcessor(Processor $processor)
@@ -989,7 +989,7 @@ class Connection implements ConnectionInterface {
 	/**
 	 * Set the event dispatcher instance on the connection.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $events)

@@ -396,7 +396,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the join clause for the relation query.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder|null
+	 * @param  \Illuminate\Database\Eloquent\Builder|null  $query
 	 * @return $this
 	 */
 	protected function setJoin($query = null)

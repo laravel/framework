@@ -25,7 +25,7 @@ class QueuedJob {
 	/**
 	 * Fire the job.
 	 *
-	 * @param  \Illuminate\Queue\Jobs\Job
+	 * @param  \Illuminate\Queue\Jobs\Job  $job
 	 * @param  array  $data
 	 * @return void
 	 */

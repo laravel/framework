@@ -15,7 +15,7 @@ class CallQueuedHandler {
 	/**
 	 * Create a new handler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Bus\Dispatcher
+	 * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public function __construct(Dispatcher $dispatcher)

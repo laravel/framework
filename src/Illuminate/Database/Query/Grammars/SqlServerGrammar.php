@@ -18,7 +18,7 @@ class SqlServerGrammar extends Grammar {
 	/**
 	 * Compile a select query into SQL.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return string
 	 */
 	public function compileSelect(Builder $query)
