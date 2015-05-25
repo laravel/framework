@@ -231,6 +231,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
 
 	/**
+	 * Options used for JSON encoding operations
+	 *
+	 * @var int
+	 */
+	protected static $jsonOptions = 0;
+
+	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -304,6 +311,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 				forward_static_call([get_called_class(), $method]);
 			}
 		}
+	}
+
+	/**
+	 * Set JSON encoding options
+	 *
+	 * @param int $options
+	 */
+	public static function setJsonOptions($options)
+	{
+		static::$jsonOptions = $options;
 	}
 
 	/**
@@ -2354,8 +2371,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @param  int  $options
 	 * @return string
 	 */
-	public function toJson($options = 0)
+	public function toJson($options = null)
 	{
+		$options = (is_null($options)) ? static::$jsonOptions : $options;
+
 		return json_encode($this->toArray(), $options);
 	}
 
@@ -2789,7 +2808,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if ($this->isJsonCastable($key))
 		{
-			$value = json_encode($value);
+			$value = json_encode($value, static::$jsonOptions);
 		}
 
 		$this->attributes[$key] = $value;
