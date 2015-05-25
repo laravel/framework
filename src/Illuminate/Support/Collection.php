@@ -354,9 +354,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get the last item from the collection.
 	 *
-	 * @param  callable  $callback
+	 * @param  callable|null  $callback
 	 * @param  mixed  $default
-	 * @return mixed|null
+	 * @return mixed
 	 */
 	public function last(callable $callback = null, $default = null)
 	{
