@@ -167,9 +167,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get the first item from the collection.
 	 *
-	 * @param  callable   $callback
+	 * @param  callable|null   $callback
 	 * @param  mixed      $default
-	 * @return mixed|null
+	 * @return mixed
 	 */
 	public function first(callable $callback = null, $default = null)
 	{
@@ -354,7 +354,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	* Get the last item from the collection.
 	*
-	* @return mixed|null
+	* @return mixed
 	*/
 	public function last()
 	{
@@ -426,7 +426,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get and remove the last item from the collection.
 	 *
-	 * @return mixed|null
+	 * @return mixed
 	 */
 	public function pop()
 	{
@@ -576,7 +576,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Get and remove the first item from the collection.
 	 *
-	 * @return mixed|null
+	 * @return mixed
 	 */
 	public function shift()
 	{
