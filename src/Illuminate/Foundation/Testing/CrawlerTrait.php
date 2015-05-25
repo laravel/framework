@@ -149,7 +149,7 @@ trait CrawlerTrait
     /**
      * Make a request to the application using the given form.
      *
-     * @param  \Symfony\Component\DomCrawler\Form
+     * @param  \Symfony\Component\DomCrawler\Form  $form
      * @return $this
      */
     protected function makeRequestUsingForm(Form $form)
