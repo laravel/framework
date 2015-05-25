@@ -746,7 +746,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		$all = $this->all();
 
-		return array_get($all, $offset, null);
+		return array_get($all, $offset);
 	}
 
 	/**
