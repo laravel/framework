@@ -218,7 +218,7 @@ class Builder {
 	/**
 	 * Set the database connection instance.
 	 *
-	 * @param  \Illuminate\Database\Connection
+	 * @param  \Illuminate\Database\Connection  $connection
 	 * @return $this
 	 */
 	public function setConnection(Connection $connection)

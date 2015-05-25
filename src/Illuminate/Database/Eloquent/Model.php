@@ -2871,7 +2871,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	/**
 	 * Prepare a date for array / JSON serialization.
 	 *
-	 * @param  \DateTime
+	 * @param  \DateTime  $date
 	 * @return string
 	 */
 	protected function serializeDate(DateTime $date)
