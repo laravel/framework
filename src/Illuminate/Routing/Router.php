@@ -1044,7 +1044,7 @@ class Router implements RegistrarContract {
 	 *
 	 * @param  \Illuminate\Routing\Route  $route
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return mixed|null
+	 * @return mixed
 	 */
 	protected function callPatternFilters($route, $request)
 	{
