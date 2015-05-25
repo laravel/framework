@@ -3,9 +3,9 @@
 class ResourceRegistrar {
 
 	/**
-	 * Create a new resource registrar.
+	 * The router instance.
 	 *
-	 * @param  \Illuminate\Routing\Router
+	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
