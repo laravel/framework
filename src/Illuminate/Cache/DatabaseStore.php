@@ -118,12 +118,10 @@ class DatabaseStore implements Store {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
-	 *
-	 * @throws \LogicException
 	 */
 	public function increment($key, $value = 1)
 	{
-		throw new LogicException("Increment operations not supported by this driver.");
+		$this->table()->where('key', '=', $key)->increment('value', $value);
 	}
 
 	/**
@@ -132,12 +130,10 @@ class DatabaseStore implements Store {
 	 * @param  string  $key
 	 * @param  mixed   $value
 	 * @return void
-	 *
-	 * @throws \LogicException
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new LogicException("Decrement operations not supported by this driver.");
+		$this->table()->where('key', '=', $key)->decrement('value', $value);
 	}
 
 	/**
