@@ -112,6 +112,18 @@ class Mailer implements MailerContract, MailQueueContract {
 	}
 
 	/**
+	 * Set the global to address and name.
+	 *
+	 * @param  string  $address
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function alwaysTo($address, $name = null)
+	{
+		$this->to = compact('address', 'name');
+	}
+
+	/**
 	 * Send a new message when only a plain part.
 	 *
 	 * @param  string  $view
