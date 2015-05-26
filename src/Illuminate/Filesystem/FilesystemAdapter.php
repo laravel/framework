@@ -71,7 +71,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	public function put($path, $contents, $visibility = null)
 	{
 		$config = ['visibility' => $this->parseVisibility($visibility)];
-        
+
 		if (is_resource($contents))
 		{
 			return $this->driver->putStream($path, $contents, $config);
@@ -330,17 +330,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	}
 
 	/**
-	 * Call a Flysystem driver plugin.
+	 * Pass dynamic methods call onto Flysystem.
 	 *
 	 * @param  string  $method
-	 * @param  array  $arguments
+	 * @param  array  $parameters
 	 * @return mixed
 	 *
 	 * @throws \BadMethodCallException
 	 */
-	public function __call($method, array $arguments)
+	public function __call($method, array $parameters)
 	{
-		return $this->driver->__call($method, $arguments);
+		return call_user_func_array([$this->driver, $method], $parameters);
 	}
 
 }
