@@ -287,6 +287,11 @@ class Kernel implements KernelContract {
 	 */
 	protected function reportException(Exception $e)
 	{
+		if ($e instanceof HttpResponseException)
+		{
+			return;
+		}
+
 		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
 	}
 
@@ -303,6 +308,7 @@ class Kernel implements KernelContract {
 		{
 			return $e->getResponse();
 		}
+
 		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
 	}
 
