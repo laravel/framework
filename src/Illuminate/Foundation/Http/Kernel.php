@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
@@ -298,6 +299,10 @@ class Kernel implements KernelContract {
 	 */
 	protected function renderException($request, Exception $e)
 	{
+		if ($e instanceof HttpResponseException)
+		{
+			return $e->getResponse();
+		}
 		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
 	}
 
