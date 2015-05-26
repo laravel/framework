@@ -10,7 +10,6 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
-use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Route {
@@ -122,24 +121,17 @@ class Route {
 	{
 		$this->container = $this->container ?: new Container;
 
-		try
+		if ( ! is_string($this->action['uses']))
 		{
-			if ( ! is_string($this->action['uses']))
-			{
-				return $this->runCallable($request);
-			}
-
-			if ($this->customDispatcherIsBound())
-			{
-				return $this->runWithCustomDispatcher($request);
-			}
-
-			return $this->runController($request);
+			return $this->runCallable($request);
 		}
-		catch (HttpResponseException $e)
+
+		if ($this->customDispatcherIsBound())
 		{
-			return $e->getResponse();
+			return $this->runWithCustomDispatcher($request);
 		}
+
+		return $this->runController($request);
 	}
 
 	/**
