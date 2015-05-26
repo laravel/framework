@@ -43,9 +43,10 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function report(Exception $e)
 	{
-		if ($this->shouldntReport($e)) return;
-
-		$this->log->error((string) $e);
+		if ($this->shouldReport($e))
+		{
+			$this->log->error($e);
+		}
 	}
 
 	/**
