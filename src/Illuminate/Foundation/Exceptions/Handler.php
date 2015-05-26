@@ -43,7 +43,7 @@ class Handler implements ExceptionHandlerContract {
 	 */
 	public function report(Exception $e)
 	{
-		if ($this->shouldReport())
+		if ($this->shouldReport($e))
 		{
 			$this->log->error($e);
 		}
