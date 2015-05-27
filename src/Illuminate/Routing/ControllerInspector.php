@@ -143,13 +143,11 @@ class ControllerInspector {
 	{
 		$args = array('/{one?}', '/{two?}', '/{three?}', '/{four?}', '/{five?}');
 
-		$index = 0;
-
-		foreach ($method->getParameters() as $param)
+		foreach ($method->getParameters() as $index => $param)
 		{
 			if (in_array($param->name, $binders))
 			{
-				$args[$index++] = '/{'.$param->name.($param->isOptional() ? '?' : '').'}';
+				$args[$index] = '/{'.$param->name.($param->isOptional() ? '?' : '').'}';
 			}
 		}
 
