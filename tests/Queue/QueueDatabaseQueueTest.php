@@ -49,4 +49,35 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 		$queue->later(10, 'foo', array('data'));
 	}
 
+
+	public function testBulkBatchPushesOntoDatabase()
+	{
+		$database = m::mock('Illuminate\Database\Connection');
+		$queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getTime', 'availableAt'], [$database, 'table', 'default']);
+		$queue->expects($this->any())->method('getTime')->will($this->returnValue('created'));
+		$queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
+		$database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+		$query->shouldReceive('insert')->once()->andReturnUsing(function($records) {
+			$this->assertEquals([[
+				'queue' => 'queue',
+				'payload' => json_encode(['job' => 'foo', 'data' => ['data']]),
+				'attempts' => 0,
+				'reserved' => 0,
+				'reserved_at' => null,
+				'available_at' => 'available',
+				'created_at' => 'created',
+			],[
+				'queue' => 'queue',
+				'payload' => json_encode(['job' => 'bar', 'data' => ['data']]),
+				'attempts' => 0,
+				'reserved' => 0,
+				'reserved_at' => null,
+				'available_at' => 'available',
+				'created_at' => 'created',
+			]], $records);
+		});
+
+		$queue->bulk(['foo', 'bar'], ['data'], 'queue');
+	}
+
 }
