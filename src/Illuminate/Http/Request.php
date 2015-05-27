@@ -622,6 +622,26 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	}
 
 	/**
+	 * Determines whether a request accepts JSON.
+	 *
+	 * @return bool
+	 */
+	public function acceptsJson()
+	{
+		return $this->accepts('application/json');
+	}
+
+	/**
+	 * Determines whether a request accepts HTML.
+	 *
+	 * @return bool
+	 */
+	public function acceptsHtml()
+	{
+		return $this->accepts('text/html');
+	}
+
+	/**
 	 * Get the data format expected in the response.
 	 *
 	 * @param  string  $default
