@@ -104,18 +104,15 @@ class DatabaseQueue extends Queue implements QueueContract {
 	 */
 	public function bulk($jobs, $data = '', $queue = null)
 	{
-		$availableAt = $this->availableAt(0);
-
 		$queue = $this->getQueue($queue);
 
-		$records = [];
+		$availableAt = $this->getAvailableAt(0);
 
-		foreach ((array) $jobs as $job)
-		{
-			$records[] = $this->prepareForInsert(
-				$availableAt, $queue, $this->createPayload($job, $data)
+		$records = array_map(function($job) use ($queue, $data, $availableAt) {
+			return $this->buildDatabaseRecord(
+				$queue, $this->createPayload($job, $data), $availableAt
 			);
-		}
+		}, (array) $jobs);
 
 		return $this->database->table($this->table)->insert($records);
 	}
@@ -144,46 +141,11 @@ class DatabaseQueue extends Queue implements QueueContract {
 	 */
 	protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
 	{
-		$attributes = $this->prepareForInsert(
-			$this->getAvailableAt($delay), $this->getQueue($queue), $payload, $attempts
+		$attributes = $this->buildDatabaseRecord(
+			$this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
 		);
 
 		return $this->database->table($this->table)->insertGetId($attributes);
-	}
-
-	/**
-	 * Get the "available_at" timestamp.
-	 *
-	 * @param  \DateTime|int  $delay
-	 * @return int
-	 */
-	protected function getAvailableAt($delay)
-	{
-		$availableAt = $delay instanceof DateTime ? $delay : Carbon::now()->addSeconds($delay);
-
-		return $availableAt->getTimestamp();
-	}
-
-	/**
-	 * Prepare an array to insert for the given job.
-	 *
-	 * @param  int  $availableAt
-	 * @param  string|null  $queue
-	 * @param  string  $payload
-	 * @param  int  $attempts
-	 * @return array
-	 */
-	protected function prepareForInsert($availableAt, $queue, $payload, $attempts = 0)
-	{
-		return [
-			'queue' => $queue,
-			'payload' => $payload,
-			'attempts' => $attempts,
-			'reserved' => 0,
-			'reserved_at' => null,
-			'available_at' => $availableAt,
-			'created_at' => $this->getTime(),
-		];
 	}
 
 	/**
@@ -280,6 +242,41 @@ class DatabaseQueue extends Queue implements QueueContract {
 	public function deleteReserved($queue, $id)
 	{
 		$this->database->table($this->table)->where('id', $id)->delete();
+	}
+
+	/**
+	 * Get the "available at" UNIX timestamp.
+	 *
+	 * @param  \DateTime|int  $delay
+	 * @return int
+	 */
+	protected function getAvailableAt($delay)
+	{
+		$availableAt = $delay instanceof DateTime ? $delay : Carbon::now()->addSeconds($delay);
+
+		return $availableAt->getTimestamp();
+	}
+
+	/**
+	 * Create an array to insert for the given job.
+	 *
+	 * @param  string|null  $queue
+	 * @param  string  $payload
+	 * @param  int  $availableAt
+	 * @param  int  $attempts
+	 * @return array
+	 */
+	protected function buildDatabaseRecord($queue, $payload, $availableAt, $attempts = 0)
+	{
+		return [
+			'queue' => $queue,
+			'payload' => $payload,
+			'attempts' => $attempts,
+			'reserved' => 0,
+			'reserved_at' => null,
+			'available_at' => $availableAt,
+			'created_at' => $this->getTime(),
+		];
 	}
 
 	/**
