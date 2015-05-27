@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -1213,7 +1214,17 @@ class Router implements RegistrarContract {
 	 */
 	public function prepareResponse($request, $response)
 	{
-		if ( ! $response instanceof SymfonyResponse)
+		if ($response instanceof PsrResponseInterface)
+		{
+			$psrResponse = $response;
+			$response = new Response(
+			  $psrResponse->getBody()->__toString(),
+			  $psrResponse->getStatusCode(),
+			  $psrResponse->getHeaders()
+		  	);
+        		$response->setProtocolVersion($psrResponse->getProtocolVersion());
+		}
+		elseif ( ! $response instanceof SymfonyResponse)
 		{
 			$response = new Response($response);
 		}
