@@ -235,15 +235,15 @@ class Arr {
 
 		if (isset($array[$key])) return $array[$key];
 
-		$key = strtok($key, '.');
+		$segment = strtok($key, '.');
 
-		while ($key !== false)
+		while ($segment !== false)
 		{
-			if ( ! isset($array[$key])) return value($default);
+			if ( ! isset($array[$segment])) return value($default);
 
-			$array = $array[$key];
+			$array = $array[$segment];
 
-			$key = strtok('.');
+			$segment = strtok('.');
 		}
 
 		return $array;
