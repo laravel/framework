@@ -22,7 +22,7 @@ class ControllerInspector {
 	 * @param  string  $prefix
 	 * @return array
 	 */
-	public function getRoutable($controller, $prefix)
+	public function getRoutable($controller, $prefix, array $binders = array())
 	{
 		$routable = array();
 
@@ -37,7 +37,7 @@ class ControllerInspector {
 		{
 			if ($this->isRoutable($method))
 			{
-				$data = $this->getMethodData($method, $prefix);
+				$data = $this->getMethodData($method, $prefix, $binders);
 
 				$routable[$method->name][] = $data;
 
@@ -74,11 +74,13 @@ class ControllerInspector {
 	 * @param  string  $prefix
 	 * @return array
 	 */
-	public function getMethodData(ReflectionMethod $method, $prefix)
+	public function getMethodData(ReflectionMethod $method, $prefix, array $binders = array())
 	{
 		$verb = $this->getVerb($name = $method->name);
 
-		$uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix));
+		$plain = $this->getPlainUri($name, $prefix);
+
+		$uri = $this->addMethodUriParameters($method, $plain, $binders);
 
 		return compact('verb', 'plain', 'uri');
 	}
@@ -127,6 +129,31 @@ class ControllerInspector {
 	public function addUriWildcards($uri)
 	{
 		return $uri.'/{one?}/{two?}/{three?}/{four?}/{five?}';
+	}
+
+	/**
+	 * Add wildcards and parameter bindings to the given method URI.
+	 *
+	 * @param  \ReflectionMethod  $method
+	 * @param  string  $uri
+	 * @param  array  $binders
+	 * @return string
+	 */
+	public function addMethodUriParameters(ReflectionMethod $method, $uri, array $binders = array())
+	{
+		$args = array('/{one?}', '/{two?}', '/{three?}', '/{four?}', '/{five?}');
+
+		$index = 0;
+
+		foreach ($method->getParameters() as $param)
+		{
+			if (in_array($param->name, $binders))
+			{
+				$args[$index++] = '/{'.$param->name.($param->isOptional() ? '?' : '').'}';
+			}
+		}
+
+		return $uri.join($args);
 	}
 
 }
