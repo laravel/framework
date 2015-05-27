@@ -23,6 +23,15 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($pivot->exists);
 	}
 
+	public function testMutatorsAreCalledFromConstructor() {
+			$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+			$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+			$pivot = new DatabaseEloquentPivotTestMutatorStub($parent, array('foo' => 'bar'), 'table', true);
+
+			$this->assertTrue($pivot->getMutatorCalled());
+	}
+
 
 	public function testPropertiesUnchangedAreNotDirty()
 	{
@@ -97,5 +106,18 @@ class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Rel
 	public function getDates()
 	{
 		return array();
+	}
+}
+
+class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+	private $mutatorCalled = false;
+
+	public function setFooAttribute($value) {
+			$this->mutatorCalled = true;
+			return $value;
+	}
+
+	public function getMutatorCalled() {
+			return $this->mutatorCalled;
 	}
 }
