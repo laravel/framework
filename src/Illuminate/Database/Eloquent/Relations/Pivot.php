@@ -50,6 +50,7 @@ class Pivot extends Model {
 		// for the instance. This allows it work for any intermediate tables for the
 		// many to many relationship that are defined by this developer's classes.
 		$this->forceFill($attributes);
+
 		$this->syncOriginal();
 
 		$this->setTable($table);
