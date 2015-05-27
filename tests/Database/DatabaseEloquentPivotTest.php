@@ -24,12 +24,12 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMutatorsAreCalledFromConstructor() {
-			$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
-			$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
-			$pivot = new DatabaseEloquentPivotTestMutatorStub($parent, array('foo' => 'bar'), 'table', true);
+		$pivot = new DatabaseEloquentPivotTestMutatorStub($parent, array('foo' => 'bar'), 'table', true);
 
-			$this->assertTrue($pivot->getMutatorCalled());
+		$this->assertTrue($pivot->getMutatorCalled());
 	}
 
 
@@ -113,11 +113,11 @@ class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\
 	private $mutatorCalled = false;
 
 	public function setFooAttribute($value) {
-			$this->mutatorCalled = true;
-			return $value;
+		$this->mutatorCalled = true;
+		return $value;
 	}
 
 	public function getMutatorCalled() {
-			return $this->mutatorCalled;
+		return $this->mutatorCalled;
 	}
 }
