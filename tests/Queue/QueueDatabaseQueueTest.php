@@ -53,9 +53,9 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 	public function testBulkBatchPushesOntoDatabase()
 	{
 		$database = m::mock('Illuminate\Database\Connection');
-		$queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getTime', 'availableAt'], [$database, 'table', 'default']);
+		$queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getTime', 'getAvailableAt'], [$database, 'table', 'default']);
 		$queue->expects($this->any())->method('getTime')->will($this->returnValue('created'));
-		$queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
+		$queue->expects($this->any())->method('getAvailableAt')->will($this->returnValue('available'));
 		$database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
 		$query->shouldReceive('insert')->once()->andReturnUsing(function($records) {
 			$this->assertEquals([[
