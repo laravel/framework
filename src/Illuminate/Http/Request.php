@@ -586,6 +586,62 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	}
 
 	/**
+	 * Determines whether the current requests accepts a given content type.
+	 *
+	 * @param  string|array $contentTypes
+	 * @return bool
+	 */
+	public function accepts($contentTypes)
+	{
+		$accepts = $this->getAcceptableContentTypes();
+
+		foreach ($accepts as $accept)
+		{
+			if ($accept === '*/*')
+			{
+				return true;
+			}
+
+			foreach ((array) $contentTypes as $type)
+			{
+				$split = explode('/', $type);
+
+				if ($type === $accept || $type === $split[0].'/*')
+				{
+					return true;
+				}
+
+				if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $accept))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determines whether a request accepts JSON.
+	 *
+	 * @return bool
+	 */
+	public function acceptsJson()
+	{
+		return $this->accepts('application/json');
+	}
+
+	/**
+	 * Determines whether a request accepts HTML.
+	 *
+	 * @return bool
+	 */
+	public function acceptsHtml()
+	{
+		return $this->accepts('text/html');
+	}
+
+	/**
 	 * Get the data format expected in the response.
 	 *
 	 * @param  string  $default

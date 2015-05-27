@@ -432,17 +432,50 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormatReturnsAcceptableFormat()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 		$this->assertEquals('json', $request->format());
 		$this->assertTrue($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/atom+xml']);
 		$this->assertEquals('atom', $request->format());
 		$this->assertFalse($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'is/not/known'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'is/not/known']);
 		$this->assertEquals('html', $request->format());
 		$this->assertEquals('foo', $request->format('foo'));
+	}
+
+	public function testFormatReturnsAcceptsJson()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+		$this->assertEquals('json', $request->format());
+		$this->assertTrue($request->accepts('*/*'));
+		$this->assertTrue($request->accepts('application/json'));
+		$this->assertTrue($request->accepts('application/*'));
+		$this->assertTrue($request->acceptsJson());
+		$this->assertFalse($request->acceptsHtml());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json']);
+		$this->assertTrue($request->accepts('application/foo+json'));
+	}
+
+
+	public function testFormatReturnsAcceptsHtml()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+		$this->assertEquals('html', $request->format());
+		$this->assertTrue($request->accepts('*/*'));
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->acceptsHtml());
+		$this->assertFalse($request->acceptsJson());
+	}
+
+
+	public function testFormatReturnsAcceptsMultiple()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json,text/html']);
+		$this->assertTrue($request->accepts(['*/*', 'text/html', 'application/json']));
+		$this->assertTrue($request->accepts('*/*'));
 	}
 
 
