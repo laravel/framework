@@ -186,7 +186,7 @@ class RouteCollection implements Countable, IteratorAggregate {
 		{
 			return (new Route('OPTIONS', $request->path(), function() use ($methods)
 			{
-				return new Response('', 200, array('Allow' => implode(',', $methods)));
+				return new Response('', Response::HTTP_OK, array('Allow' => implode(',', $methods)));
 
 			}))->bind($request);
 		}

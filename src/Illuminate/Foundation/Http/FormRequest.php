@@ -130,7 +130,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	{
 		if ($this->ajax() || $this->wantsJson())
 		{
-			return new JsonResponse($errors, 422);
+			return new JsonResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
 		}
 
 		return $this->redirector->to($this->getRedirectUrl())
@@ -145,7 +145,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 */
 	public function forbiddenResponse()
 	{
-		return new Response('Forbidden', 403);
+		return new Response('Forbidden', Response::HTTP_FORBIDDEN);
 	}
 
 	/**
