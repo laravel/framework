@@ -449,14 +449,17 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 		$this->assertEquals('json', $request->format());
-		$this->assertTrue($request->accepts('*/*'));
 		$this->assertTrue($request->accepts('application/json'));
-		$this->assertTrue($request->accepts('application/*'));
 		$this->assertTrue($request->acceptsJson());
 		$this->assertFalse($request->acceptsHtml());
 
 		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json']);
 		$this->assertTrue($request->accepts('application/foo+json'));
+		$this->assertTrue($request->accepts('application/json'));
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*']);
+		$this->assertTrue($request->accepts('application/xml'));
+		$this->assertTrue($request->accepts('application/json'));
 	}
 
 
@@ -464,18 +467,23 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
 		$this->assertEquals('html', $request->format());
-		$this->assertTrue($request->accepts('*/*'));
 		$this->assertTrue($request->accepts('text/html'));
 		$this->assertTrue($request->acceptsHtml());
 		$this->assertFalse($request->acceptsJson());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/*']);
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->accepts('text/plain'));
 	}
 
 
 	public function testFormatReturnsAcceptsMultiple()
 	{
-		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json,text/html']);
-		$this->assertTrue($request->accepts(['*/*', 'text/html', 'application/json']));
-		$this->assertTrue($request->accepts('*/*'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json,text/*']);
+		$this->assertTrue($request->accepts(['text/html', 'application/json']));
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->accepts('text/foo'));
+		$this->assertTrue($request->accepts('application/json'));
 	}
 
 
