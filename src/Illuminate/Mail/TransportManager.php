@@ -2,6 +2,7 @@
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
+use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
@@ -87,9 +88,10 @@ class TransportManager extends Manager {
 	 */
 	protected function createMailgunDriver()
 	{
-		$config = $this->app['config']->get('services.mailgun', array());
+		$client = new HttpClient;
+		$config = $this->app['config']->get('services.mailgun', []);
 
-		return new MailgunTransport($config['secret'], $config['domain']);
+		return new MailgunTransport($client, $config['secret'], $config['domain']);
 	}
 
 	/**
@@ -99,9 +101,10 @@ class TransportManager extends Manager {
 	 */
 	protected function createMandrillDriver()
 	{
-		$config = $this->app['config']->get('services.mandrill', array());
+		$client = new HttpClient;
+		$config = $this->app['config']->get('services.mandrill', []);
 
-		return new MandrillTransport($config['secret']);
+		return new MandrillTransport($client, $config['secret']);
 	}
 
 	/**
