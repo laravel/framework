@@ -122,6 +122,8 @@ class Arr {
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @return array
+	 *
+	 * @deprecated since version 5.1. Use pluck instead.
 	 */
 	public static function fetch($array, $key)
 	{
