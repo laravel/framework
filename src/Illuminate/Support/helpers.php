@@ -128,6 +128,8 @@ if ( ! function_exists('array_fetch'))
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @return array
+	 *
+	 * @deprecated since version 5.1. Use array_pluck instead.
 	 */
 	function array_fetch($array, $key)
 	{
