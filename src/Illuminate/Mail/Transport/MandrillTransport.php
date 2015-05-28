@@ -1,11 +1,18 @@
 <?php namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
-use GuzzleHttp\Client;
 use Swift_Mime_Message;
 use Swift_Events_EventListener;
+use GuzzleHttp\ClientInterface;
 
 class MandrillTransport implements Swift_Transport {
+
+	/**
+	 * Guzzle client instance.
+	 *
+	 * @var \GuzzleHttp\ClientInterface
+	 */
+	protected $client;
 
 	/**
 	 * The Mandrill API key.
@@ -17,11 +24,13 @@ class MandrillTransport implements Swift_Transport {
 	/**
 	 * Create a new Mandrill transport instance.
 	 *
+	 * @param  \GuzzleHttp\ClientInterface  $client
 	 * @param  string  $key
 	 * @return void
 	 */
-	public function __construct($key)
+	public function __construct(ClientInterface $client, $key)
 	{
+		$this->client = $client;
 		$this->key = $key;
 	}
 
@@ -54,10 +63,8 @@ class MandrillTransport implements Swift_Transport {
 	 */
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
-		$client = $this->getHttpClient();
-
-		return $client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
-			'body' => [
+		return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', [
+			'form_params' => [
 				'key' => $this->key,
 				'to' => $this->getToAddresses($message),
 				'raw_message' => (string) $message,
@@ -104,15 +111,6 @@ class MandrillTransport implements Swift_Transport {
 		//
 	}
 
-	/**
-	 * Get a new HTTP client instance.
-	 *
-	 * @return \GuzzleHttp\Client
-	 */
-	protected function getHttpClient()
-	{
-		return new Client;
-	}
 
 	/**
 	 * Get the API key being used by the transport.
