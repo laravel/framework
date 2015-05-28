@@ -800,9 +800,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function offsetGet($offset)
 	{
-		$all = $this->all();
-
-		return array_get($all, $offset);
+		return array_get($this->all(), $offset);
 	}
 
 	/**
