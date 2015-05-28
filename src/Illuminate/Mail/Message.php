@@ -68,13 +68,14 @@ class Message {
 	 * Add a recipient to the message.
 	 *
 	 * @param  string|array  $address
-	 * @param  string|null   $name
-	 * @param  boolean       $override   Will force ignoring the previous recipients
+	 * @param  string|null  $name
+	 * @param  bool  $override  Will force ignoring the previous recipients
 	 * @return $this
 	 */
 	public function to($address, $name = null, $override = false)
 	{
-		if ($override) {
+		if ($override)
+		{
 			return $this->swift->setTo($address, $name);
 		}
 

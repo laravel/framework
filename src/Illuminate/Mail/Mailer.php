@@ -103,7 +103,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	/**
 	 * Set the global from address and name.
 	 *
-	 * @param  string       $address
+	 * @param  string  $address
 	 * @param  string|null  $name
 	 * @return void
 	 */
@@ -115,7 +115,7 @@ class Mailer implements MailerContract, MailQueueContract {
 	/**
 	 * Set the global to address and name.
 	 *
-	 * @param  string       $address
+	 * @param  string  $address
 	 * @param  string|null  $name
 	 * @return void
 	 */
