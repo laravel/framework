@@ -33,7 +33,7 @@ class ModelMakeCommand extends GeneratorCommand {
 	 */
 	public function fire()
 	{
-		if(parent::fire() == null)
+		if (parent::fire() !== false)
 		{
 			if ( ! $this->option('no-migration'))
 			{
