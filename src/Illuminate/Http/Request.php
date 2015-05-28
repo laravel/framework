@@ -604,14 +604,14 @@ class Request extends SymfonyRequest implements ArrayAccess {
 
 			foreach ((array) $contentTypes as $type)
 			{
-				$split = explode('/', $type);
-
-				if ($accept === $type || $accept === $split[0].'/*')
+				if ($accept === $type || $accept === strtok('/', $type).'/*')
 				{
 					return true;
 				}
 
-				if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $accept))
+				$split = explode('/', $accept);
+
+				if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type))
 				{
 					return true;
 				}
