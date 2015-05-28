@@ -157,7 +157,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		foreach (func_get_args() as $pattern)
 		{
-			if (str_is($pattern, urldecode($this->path())))
+			if (str_is($pattern, urldecode($this->path())) || str_is($pattern, urldecode($this->url())))
 			{
 				return true;
 			}
