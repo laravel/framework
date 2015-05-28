@@ -118,6 +118,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 *
 	 * @param  string  $key
 	 * @return static
+	 *
+	 * @deprecated since version 5.1. Use pluck instead.
 	 */
 	public function fetch($key)
 	{
