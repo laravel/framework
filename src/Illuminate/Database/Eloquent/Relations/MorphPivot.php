@@ -75,5 +75,4 @@ class MorphPivot extends Pivot {
 		return $this;
 	}
 
-
 }

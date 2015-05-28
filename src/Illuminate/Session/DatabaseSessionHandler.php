@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\Database\Connection;
+use SessionHandlerInterface;
+use Illuminate\Database\ConnectionInterface;
 
-class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
+class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface {
 
 	/**
 	 * The database connection instance.
 	 *
-	 * @var \Illuminate\Database\Connection
+	 * @var \Illuminate\Database\ConnectionInterface
 	 */
 	protected $connection;
 
@@ -28,11 +29,11 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAware
 	/**
 	 * Create a new database session handler instance.
 	 *
-	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Database\ConnectionInterface  $connection
 	 * @param  string  $table
 	 * @return void
 	 */
-	public function __construct(Connection $connection, $table)
+	public function __construct(ConnectionInterface $connection, $table)
 	{
 		$this->table = $table;
 		$this->connection = $connection;
@@ -86,6 +87,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAware
 				'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
 			]);
 		}
+
+		$this->exists = true;
 	}
 
 	/**

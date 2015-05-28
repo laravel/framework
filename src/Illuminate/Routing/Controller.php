@@ -1,10 +1,18 @@
 <?php namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Container\Container;
+use BadMethodCallException;
+use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Controller {
+
+	/**
+	 * The middleware registered on the controller.
+	 *
+	 * @var array
+	 */
+	protected $middleware = [];
 
 	/**
 	 * The "before" filters registered on the controller.
@@ -21,18 +29,23 @@ abstract class Controller {
 	protected $afterFilters = array();
 
 	/**
-	 * The container instance.
+	 * The router instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Routing\Router
 	 */
-	protected $container;
+	protected static $router;
 
 	/**
-	 * The route filterer implementation.
+	 * Register middleware on the controller.
 	 *
-	 * @var \Illuminate\Routing\RouteFiltererInterface
+	 * @param  string  $middleware
+	 * @param  array   $options
+	 * @return void
 	 */
-	protected static $filterer;
+	public function middleware($middleware, array $options = array())
+	{
+		$this->middleware[$middleware] = $options;
+	}
 
 	/**
 	 * Register a "before" filter on the controller.
@@ -95,7 +108,7 @@ abstract class Controller {
 	 */
 	protected function registerClosureFilter(Closure $filter)
 	{
-		$this->getFilterer()->filter($name = spl_object_hash($filter), $filter);
+		$this->getRouter()->filter($name = spl_object_hash($filter), $filter);
 
 		return $name;
 	}
@@ -108,7 +121,7 @@ abstract class Controller {
 	 */
 	protected function registerInstanceFilter($filter)
 	{
-		$this->getFilterer()->filter($filter, array($this, substr($filter, 1)));
+		$this->getRouter()->filter($filter, array($this, substr($filter, 1)));
 
 		return $filter;
 	}
@@ -117,7 +130,7 @@ abstract class Controller {
 	 * Determine if a filter is a local method on the controller.
 	 *
 	 * @param  mixed  $filter
-	 * @return boolean
+	 * @return bool
 	 *
 	 * @throws \InvalidArgumentException
 	 */
@@ -127,7 +140,7 @@ abstract class Controller {
 		{
 			if (method_exists($this, substr($filter, 1))) return true;
 
-			throw new \InvalidArgumentException("Filter method [$filter] does not exist.");
+			throw new InvalidArgumentException("Filter method [$filter] does not exist.");
 		}
 
 		return false;
@@ -159,7 +172,7 @@ abstract class Controller {
 	 * Remove the given controller filter from the provided filter array.
 	 *
 	 * @param  string  $removing
-	 * @param  array  $current
+	 * @param  array   $current
 	 * @return array
 	 */
 	protected function removeFilter($removing, $current)
@@ -168,6 +181,16 @@ abstract class Controller {
 		{
 			return $filter['original'] != $removing;
 		});
+	}
+
+	/**
+	 * Get the middleware assigned to the controller.
+	 *
+	 * @return array
+	 */
+	public function getMiddleware()
+	{
+		return $this->middleware;
 	}
 
 	/**
@@ -191,24 +214,24 @@ abstract class Controller {
 	}
 
 	/**
-	 * Get the route filterer implementation.
+	 * Get the router instance.
 	 *
-	 * @return \Illuminate\Routing\RouteFiltererInterface
+	 * @return \Illuminate\Routing\Router
 	 */
-	public static function getFilterer()
+	public static function getRouter()
 	{
-		return static::$filterer;
+		return static::$router;
 	}
 
 	/**
-	 * Set the route filterer implementation.
+	 * Set the router instance.
 	 *
-	 * @param  \Illuminate\Routing\RouteFiltererInterface  $filterer
+	 * @param  \Illuminate\Routing\Router  $router
 	 * @return void
 	 */
-	public static function setFilterer(RouteFiltererInterface $filterer)
+	public static function setRouter(Router $router)
 	{
-		static::$filterer = $filterer;
+		static::$router = $router;
 	}
 
 	/**
@@ -237,19 +260,6 @@ abstract class Controller {
 	}
 
 	/**
-	 * Set the container instance on the controller.
-	 *
-	 * @param  \Illuminate\Container\Container  $container
-	 * @return $this
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
-	}
-
-	/**
 	 * Handle calls to missing methods on the controller.
 	 *
 	 * @param  string  $method
@@ -260,7 +270,7 @@ abstract class Controller {
 	 */
 	public function __call($method, $parameters)
 	{
-		throw new \BadMethodCallException("Method [$method] does not exist.");
+		throw new BadMethodCallException("Method [$method] does not exist.");
 	}
 
 }

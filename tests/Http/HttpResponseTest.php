@@ -69,48 +69,11 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testHeaderOnRedirect()
+	public function testSetAndRetrieveStatusCode()
 	{
-		$response = new RedirectResponse('foo.bar');
-		$this->assertNull($response->headers->get('foo'));
-		$response->header('foo', 'bar');
-		$this->assertEquals('bar', $response->headers->get('foo'));
-		$response->header('foo', 'baz', false);
-		$this->assertEquals('bar', $response->headers->get('foo'));
-		$response->header('foo', 'baz');
-		$this->assertEquals('baz', $response->headers->get('foo'));
-	}
-
-
-	public function testWithOnRedirect()
-{
-		$response = new RedirectResponse('foo.bar');
-		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
-		$response->setSession($session = m::mock('Illuminate\Session\Store'));
-		$session->shouldReceive('flash')->twice();
-		$response->with(array('name', 'age'));
-	}
-
-
-	public function testWithCookieOnRedirect()
-	{
-		$response = new RedirectResponse('foo.bar');
-		$this->assertEquals(0, count($response->headers->getCookies()));
-		$this->assertEquals($response, $response->withCookie(new \Symfony\Component\HttpFoundation\Cookie('foo', 'bar')));
-		$cookies = $response->headers->getCookies();
-		$this->assertEquals(1, count($cookies));
-		$this->assertEquals('foo', $cookies[0]->getName());
-		$this->assertEquals('bar', $cookies[0]->getValue());
-	}
-
-
-	public function testInputOnRedirect()
-	{
-		$response = new RedirectResponse('foo.bar');
-		$response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
-		$response->setSession($session = m::mock('Illuminate\Session\Store'));
-		$session->shouldReceive('flashInput')->once()->with(array('name' => 'Taylor', 'age' => 26));
-		$response->withInput();
+		$response = new Illuminate\Http\Response('foo');
+		$response->setStatusCode(404);
+		$this->assertSame(404, $response->getStatusCode());
 	}
 
 

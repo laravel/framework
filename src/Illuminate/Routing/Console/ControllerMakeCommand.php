@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -38,10 +37,19 @@ class ControllerMakeCommand extends GeneratorCommand {
 		{
 			return __DIR__.'/stubs/controller.plain.stub';
 		}
-		else
-		{
-			return __DIR__.'/stubs/controller.stub';
-		}
+
+		return __DIR__.'/stubs/controller.stub';
+	}
+
+	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace.'\Http\Controllers';
 	}
 
 	/**

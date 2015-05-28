@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 
 class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
@@ -35,15 +34,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$app->register($provider);
 
 		$this->assertTrue(in_array($class, $app->getLoadedProviders()));
-	}
-
-
-	public function testForgetMiddleware()
-	{
-		$app = new ApplicationGetMiddlewaresStub;
-		$app->middleware('Illuminate\Http\FrameGuard');
-		$app->forgetMiddleware('Illuminate\Http\FrameGuard');
-		$this->assertEquals(0, count($app->getMiddlewares()));
 	}
 
 
@@ -96,7 +86,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($app->bound('foo'));
 		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$app->extend('foo', function($instance, $container) { return $instance.'bar'; });
-		$this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
+		$this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
 		$this->assertEquals('foobar', $app->make('foo'));
 		$this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
 	}
@@ -124,40 +114,32 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobar', $app->make('bar'));
 	}
 
-}
 
-class ApplicationCustomExceptionHandlerStub extends Illuminate\Foundation\Application {
-
-	public function prepareResponse($value)
+	public function testEnvironment()
 	{
-		$response = m::mock('Symfony\Component\HttpFoundation\Response');
-		$response->shouldReceive('send')->once();
-		return $response;
+		$app = new Application;
+		$app['env'] = 'foo';
+
+		$this->assertEquals('foo', $app->environment());
+
+		$this->assertTrue($app->environment('foo'));
+		$this->assertTrue($app->environment('f*'));
+		$this->assertTrue($app->environment('foo', 'bar'));
+		$this->assertTrue($app->environment(['foo', 'bar']));
+
+		$this->assertFalse($app->environment('qux'));
+		$this->assertFalse($app->environment('q*'));
+		$this->assertFalse($app->environment('qux', 'bar'));
+		$this->assertFalse($app->environment(['qux', 'bar']));
 	}
 
-	protected function setExceptionHandler(Closure $handler) { return $handler; }
-
-}
-
-class ApplicationKernelExceptionHandlerStub extends Illuminate\Foundation\Application {
-
-	protected function setExceptionHandler(Closure $handler) { return $handler; }
-
-}
-
-class ApplicationGetMiddlewaresStub extends Illuminate\Foundation\Application
-{
-	public function getMiddlewares()
-	{
-		return $this->middlewares;
-	}
 }
 
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() {
+		$this->app->singleton('foo', function() {
 			return new StdClass;
 		});
 	}
@@ -198,7 +180,7 @@ class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
-		$this->app->bindShared('foo', function() { return 'foo'; });
-		$this->app->bindShared('bar', function($app) { return $app['foo'].'bar'; });
+		$this->app->singleton('foo', function() { return 'foo'; });
+		$this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
 	}
 }

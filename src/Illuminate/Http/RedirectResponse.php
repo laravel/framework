@@ -1,12 +1,16 @@
 <?php namespace Illuminate\Http;
 
+use BadMethodCallException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectResponse {
+class RedirectResponse extends BaseRedirectResponse {
+
+	use ResponseTrait;
 
 	/**
 	 * The request instance.
@@ -23,21 +27,6 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	protected $session;
 
 	/**
-	 * Set a header on the Response.
-	 *
-	 * @param  string  $key
-	 * @param  string  $value
-	 * @param  bool  $replace
-	 * @return $this
-	 */
-	public function header($key, $value, $replace = true)
-	{
-		$this->headers->set($key, $value, $replace);
-
-		return $this;
-	}
-
-	/**
 	 * Flash a piece of data to the session.
 	 *
 	 * @param  string  $key
@@ -46,27 +35,28 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	 */
 	public function with($key, $value = null)
 	{
-		if (is_array($key))
+		$key = is_array($key) ? $key : [$key => $value];
+
+		foreach ($key as $k => $v)
 		{
-			foreach ($key as $k => $v) $this->with($k, $v);
-		}
-		else
-		{
-			$this->session->flash($key, $value);
+			$this->session->flash($k, $v);
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Add a cookie to the response.
+	 * Add multiple cookies to the response.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
+	 * @param  array  $cookies
 	 * @return $this
 	 */
-	public function withCookie(Cookie $cookie)
+	public function withCookies(array $cookies)
 	{
-		$this->headers->setCookie($cookie);
+		foreach ($cookies as $cookie)
+		{
+			$this->headers->setCookie($cookie);
+		}
 
 		return $this;
 	}
@@ -81,7 +71,15 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	{
 		$input = $input ?: $this->request->input();
 
-		$this->session->flashInput($input);
+		$this->session->flashInput($data = array_filter($input, $callback = function (&$value) use (&$callback)
+		{
+			if (is_array($value))
+			{
+				$value = array_filter($value, $callback);
+			}
+
+			return ! $value instanceof UploadedFile;
+		}));
 
 		return $this;
 	}
@@ -111,7 +109,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Flash a container of errors to the session.
 	 *
-	 * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+	 * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
 	 * @param  string  $key
 	 * @return $this
 	 */
@@ -129,7 +127,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Parse the given errors into an appropriate value.
 	 *
-	 * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+	 * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
 	 * @return \Illuminate\Support\MessageBag
 	 */
 	protected function parseErrors($provider)
@@ -145,7 +143,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 	/**
 	 * Get the request instance.
 	 *
-	 * @return  \Illuminate\Http\Request
+	 * @return \Illuminate\Http\Request
 	 */
 	public function getRequest()
 	{
@@ -200,7 +198,7 @@ class RedirectResponse extends \Symfony\Component\HttpFoundation\RedirectRespons
 			return $this->with(snake_case(substr($method, 4)), $parameters[0]);
 		}
 
-		throw new \BadMethodCallException("Method [$method] does not exist on Redirect.");
+		throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
 	}
 
 }

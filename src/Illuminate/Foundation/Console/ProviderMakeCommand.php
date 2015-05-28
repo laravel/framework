@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ProviderMakeCommand extends GeneratorCommand {
 
@@ -35,6 +33,17 @@ class ProviderMakeCommand extends GeneratorCommand {
 	protected function getStub()
 	{
 		return __DIR__.'/stubs/provider.stub';
+	}
+
+	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace.'\Providers';
 	}
 
 }

@@ -25,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerAuthenticator()
 	{
-		$this->app->bindShared('auth', function($app)
+		$this->app->singleton('auth', function($app)
 		{
 			// Once the authentication service has actually been requested by the developer
 			// we will set a variable in the application indicating such. This helps us
@@ -35,7 +35,7 @@ class AuthServiceProvider extends ServiceProvider {
 			return new AuthManager($app);
 		});
 
-		$this->app->bindShared('auth.driver', function($app)
+		$this->app->singleton('auth.driver', function($app)
 		{
 			return $app['auth']->driver();
 		});
@@ -48,7 +48,7 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUserResolver()
 	{
-		$this->app->bind('Illuminate\Contracts\Auth\User', function($app)
+		$this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function($app)
 		{
 			return $app['auth']->user();
 		});

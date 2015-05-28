@@ -1,9 +1,11 @@
 <?php namespace Illuminate\Queue;
 
+use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class Worker {
 
@@ -38,7 +40,7 @@ class Worker {
 	/**
 	 * The exception handler instance.
 	 *
-	 * @var \Illuminate\Exception\Handler
+	 * @var \Illuminate\Foundation\Exceptions\Handler
 	 */
 	protected $exceptions;
 
@@ -110,9 +112,9 @@ class Worker {
 		{
 			$this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
-			if ($this->exceptions) $this->exceptions->handleException($e);
+			if ($this->exceptions) $this->exceptions->report($e);
 		}
 	}
 
@@ -207,7 +209,7 @@ class Worker {
 			return ['job' => $job, 'failed' => false];
 		}
 
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			// If we catch an exception, we will attempt to release the job back onto
 			// the queue so it is not lost. This will let is be retried at a later
@@ -232,6 +234,8 @@ class Worker {
 			$this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 
 			$job->delete();
+
+			$job->failed();
 
 			$this->raiseFailedJobEvent($connection, $job);
 		}
@@ -317,10 +321,10 @@ class Worker {
 	/**
 	 * Set the exception handler to use in Daemon mode.
 	 *
-	 * @param  \Illuminate\Exception\Handler  $handler
+	 * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
 	 * @return void
 	 */
-	public function setDaemonExceptionHandler($handler)
+	public function setDaemonExceptionHandler(ExceptionHandler $handler)
 	{
 		$this->exceptions = $handler;
 	}

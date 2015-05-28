@@ -40,7 +40,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 		$config = array(
 			'read' => array('database' => 'database'),
 			'write' => array('database' => 'database'),
-			'driver' => 'mysql', 'prefix' => 'prefix', 'name' => 'foo'
+			'driver' => 'mysql', 'prefix' => 'prefix', 'name' => 'foo',
 		);
 		$expect = $config;
 		unset($expect['read']);

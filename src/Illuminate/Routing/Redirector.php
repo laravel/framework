@@ -50,7 +50,7 @@ class Redirector {
 	 */
 	public function back($status = 302, $headers = array())
 	{
-		$back = $this->generator->getRequest()->headers->get('referer');
+		$back = $this->generator->previous();
 
 		return $this->createRedirect($back, $status, $headers);
 	}
@@ -198,7 +198,7 @@ class Redirector {
 	/**
 	 * Get the URL generator instance.
 	 *
-	 * @return  \Illuminate\Routing\UrlGenerator
+	 * @return \Illuminate\Routing\UrlGenerator
 	 */
 	public function getUrlGenerator()
 	{

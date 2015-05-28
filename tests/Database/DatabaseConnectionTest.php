@@ -182,6 +182,26 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testTransactionMethodDisallowPDOChanging()
+	{
+		$pdo = $this->getMock('DatabaseConnectionTestMockPDO', array('beginTransaction', 'commit', 'rollBack'));
+		$pdo->expects($this->once())->method('beginTransaction');
+		$pdo->expects($this->once())->method('rollBack');
+		$pdo->expects($this->never())->method('commit');
+
+		$mock = $this->getMockConnection(array(), $pdo);
+
+		$mock->setReconnector(function ($connection)
+		{
+			$connection->setPDO(null);
+		});
+
+		$mock->transaction(function ($connection) { $connection->reconnect(); });
+	}
+
 
 	public function testFromCreatesNewQueryBuilder()
 	{
@@ -239,35 +259,14 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testResolvingPaginatorThroughClosure()
-	{
-		$connection = $this->getMockConnection();
-		$paginator  = m::mock('Illuminate\Pagination\Factory');
-		$connection->setPaginator(function() use ($paginator)
-		{
-			return $paginator;
-		});
-		$this->assertEquals($paginator, $connection->getPaginator());
-	}
-
-
-	public function testResolvingCacheThroughClosure()
-	{
-		$connection = $this->getMockConnection();
-		$cache  = m::mock('Illuminate\Cache\CacheManager');
-		$connection->setCacheManager(function() use ($cache)
-		{
-			return $cache;
-		});
-		$this->assertEquals($cache, $connection->getCacheManager());
-	}
-
 
 	protected function getMockConnection($methods = array(), $pdo = null)
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
 		$defaults = array('getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar');
-		return $this->getMock('Illuminate\Database\Connection', array_merge($defaults, $methods), array($pdo));
+		$connection = $this->getMock('Illuminate\Database\Connection', array_merge($defaults, $methods), array($pdo));
+		$connection->enableQueryLog();
+		return $connection;
 	}
 
 }

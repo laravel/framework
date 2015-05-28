@@ -54,21 +54,23 @@ class ResetCommand extends Command {
 
 		$this->migrator->setConnection($this->input->getOption('database'));
 
+		if ( ! $this->migrator->repositoryExists())
+		{
+			$this->output->writeln('<comment>Migration table not found.</comment>');
+
+			return;
+		}
+
 		$pretend = $this->input->getOption('pretend');
 
-		while (true)
+		$this->migrator->reset($pretend);
+
+		// Once the migrator has run we will grab the note output and send it out to
+		// the console screen, since the migrator itself functions without having
+		// any instances of the OutputInterface contract passed into the class.
+		foreach ($this->migrator->getNotes() as $note)
 		{
-			$count = $this->migrator->rollback($pretend);
-
-			// Once the migrator has run we will grab the note output and send it out to
-			// the console screen, since the migrator itself functions without having
-			// any instances of the OutputInterface contract passed into the class.
-			foreach ($this->migrator->getNotes() as $note)
-			{
-				$this->output->writeln($note);
-			}
-
-			if ($count == 0) break;
+			$this->output->writeln($note);
 		}
 	}
 

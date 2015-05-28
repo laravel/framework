@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Queue\Jobs;
 
-use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
@@ -50,7 +49,7 @@ class SyncJob extends Job implements JobContract {
 	 */
 	public function getRawBody()
 	{
-		//
+		return $this->payload;
 	}
 
 	/**
@@ -61,7 +60,7 @@ class SyncJob extends Job implements JobContract {
 	 */
 	public function release($delay = 0)
 	{
-		//
+		parent::release($delay);
 	}
 
 	/**

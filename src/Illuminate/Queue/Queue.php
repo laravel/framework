@@ -2,8 +2,9 @@
 
 use Closure;
 use DateTime;
+use RuntimeException;
+use SuperClosure\Serializer;
 use Illuminate\Container\Container;
-use Illuminate\Support\SerializableClosure;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
@@ -17,17 +18,44 @@ abstract class Queue {
 	protected $container;
 
 	/**
+	 * Push a new job onto the queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function pushOn($queue, $job, $data = '')
+	{
+		return $this->push($job, $data, $queue);
+	}
+
+	/**
+	 * Push a new job onto the queue after a delay.
+	 *
+	 * @param  string  $queue
+	 * @param  \DateTime|int  $delay
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function laterOn($queue, $delay, $job, $data = '')
+	{
+		return $this->later($delay, $job, $data, $queue);
+	}
+
+	/**
 	 * Marshal a push queue request and fire the job.
 	 *
 	 * @throws \RuntimeException
 	 */
 	public function marshal()
 	{
-		throw new \RuntimeException("Push queues only supported by Iron.");
+		throw new RuntimeException("Push queues only supported by Iron.");
 	}
 
 	/**
-	 * Push a new an array of jobs onto the queue.
+	 * Push an array of jobs onto the queue.
 	 *
 	 * @param  array   $jobs
 	 * @param  mixed   $data
@@ -55,6 +83,13 @@ abstract class Queue {
 		if ($job instanceof Closure)
 		{
 			return json_encode($this->createClosurePayload($job, $data));
+		}
+		elseif (is_object($job))
+		{
+			return json_encode([
+				'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+				'data' => ['command' => serialize(clone $job)],
+			]);
 		}
 
 		return json_encode($this->createPlainPayload($job, $data));
@@ -118,7 +153,7 @@ abstract class Queue {
 	 */
 	protected function createClosurePayload($job, $data)
 	{
-		$closure = $this->crypt->encrypt(serialize(new SerializableClosure($job)));
+		$closure = $this->crypt->encrypt((new Serializer)->serialize($job));
 
 		return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
 	}
@@ -159,7 +194,7 @@ abstract class Queue {
 	 *
 	 * @return int
 	 */
-	public function getTime()
+	protected function getTime()
 	{
 		return time();
 	}

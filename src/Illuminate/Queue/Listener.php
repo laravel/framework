@@ -22,14 +22,14 @@ class Listener {
 	/**
 	 * The amount of seconds to wait before polling the queue.
 	 *
-	 * @var  int
+	 * @var int
 	 */
 	protected $sleep = 3;
 
 	/**
 	 * The amount of times to try a job before logging it failed.
 	 *
-	 * @var  int
+	 * @var int
 	 */
 	protected $maxTries = 0;
 
@@ -73,7 +73,7 @@ class Listener {
 	{
 		$process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
 
-		while(true)
+		while (true)
 		{
 			$this->runProcess($process, $memory);
 		}
@@ -95,10 +95,10 @@ class Listener {
 
 		// Once we have run the job we'll go check if the memory limit has been
 		// exceeded for the script. If it has, we will kill this script so a
-		// process managers will restart this with a clean slate of memory.
+		// process manager will restart this with a clean slate of memory.
 		if ($this->memoryExceeded($memory))
 		{
-			$this->stop(); return;
+			$this->stop();
 		}
 	}
 
@@ -153,7 +153,7 @@ class Listener {
 	/**
 	 * Determine if the memory limit has been exceeded.
 	 *
-	 * @param  int   $memoryLimit
+	 * @param  int  $memoryLimit
 	 * @return bool
 	 */
 	public function memoryExceeded($memoryLimit)

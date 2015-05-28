@@ -29,17 +29,7 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$this->app['router'] = $this->app->share(function($app)
 		{
-			$router = new Router($app['events'], $app);
-
-			// If the current application environment is "testing", we will disable the
-			// routing filters, since they can be tested independently of the routes
-			// and just get in the way of our typical controller testing concerns.
-			if ($app['env'] == 'testing')
-			{
-				$router->disableFilters();
-			}
-
-			return $router;
+			return new Router($app['events'], $app);
 		});
 	}
 
@@ -52,17 +42,23 @@ class RoutingServiceProvider extends ServiceProvider {
 	{
 		$this->app['url'] = $this->app->share(function($app)
 		{
+			$routes = $app['router']->getRoutes();
+
 			// The URL generator needs the route collection that exists on the router.
 			// Keep in mind this is an object, so we're passing by references here
 			// and all the registered routes will be available to the generator.
-			$routes = $app['router']->getRoutes();
-
 			$app->instance('routes', $routes);
 
-			$url = new UrlGenerator($routes, $app->rebinding('request', function($app, $request)
+			$url = new UrlGenerator(
+				$routes, $app->rebinding(
+					'request', $this->requestRebinder()
+				)
+			);
+
+			$url->setSessionResolver(function()
 			{
-				$app['url']->setRequest($request);
-			}));
+				return $this->app['session'];
+			});
 
 			// If the route collection is "rebound", for example, when the routes stay
 			// cached for the application, we will need to rebind the routes on the
@@ -74,6 +70,19 @@ class RoutingServiceProvider extends ServiceProvider {
 
 			return $url;
 		});
+	}
+
+	/**
+	 * Get the URL generator request rebinder.
+	 *
+	 * @return \Closure
+	 */
+	protected function requestRebinder()
+	{
+		return function($app, $request)
+		{
+			$app['url']->setRequest($request);
+		};
 	}
 
 	/**
@@ -106,7 +115,7 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerResponseFactory()
 	{
-		$this->app->bindShared('Illuminate\Contracts\Routing\ResponseFactory', function($app)
+		$this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function($app)
 		{
 			return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
 		});

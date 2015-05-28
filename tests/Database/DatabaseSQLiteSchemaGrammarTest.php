@@ -321,6 +321,28 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingJson()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->json('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
+	}
+
+
+	public function testAddingJsonb()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->jsonb('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
+	}
+
+
 	public function testAddingDate()
 	{
 		$blueprint = new Blueprint('users');
@@ -342,11 +364,30 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
 	}
 
+	public function testAddingDateTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->dateTimeTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
+	}
 
 	public function testAddingTime()
 	{
 		$blueprint = new Blueprint('users');
 		$blueprint->time('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" time not null', $statements[0]);
+	}
+
+	public function testAddingTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timeTz('foo');
 		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
 		$this->assertEquals(1, count($statements));
@@ -364,6 +405,16 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
 	}
 
+	public function testAddingTimeStampTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timestampTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" datetime not null', $statements[0]);
+	}
+
 
 	public function testAddingTimeStamps()
 	{
@@ -374,7 +425,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(2, count($statements));
 		$expected = array(
 			'alter table "users" add column "created_at" datetime not null',
-			'alter table "users" add column "updated_at" datetime not null'
+			'alter table "users" add column "updated_at" datetime not null',
 		);
 		$this->assertEquals($expected, $statements);
 	}

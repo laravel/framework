@@ -1,12 +1,11 @@
 <?php namespace Illuminate\Foundation\Http;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
-use Illuminate\Validation\Validator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
@@ -18,16 +17,16 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * The container instance.
 	 *
-	 * @var  Container  $container
+	 * @var \Illuminate\Container\Container
 	 */
 	protected $container;
 
 	/**
-	 * The route instance the request is dispatched to.
+	 * The redirector instance.
 	 *
-	 * @var \Illuminate\Routing\Route
+	 * @var \Illuminate\Routing\Redirector
 	 */
-	public $route;
+	protected $redirector;
 
 	/**
 	 * The URI to redirect to if validation fails.
@@ -51,6 +50,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $redirectAction;
 
 	/**
+	 * The key to be used for the view error bag.
+	 *
+	 * @var string
+	 */
+	protected $errorBag = 'default';
+
+	/**
 	 * The input keys that should not be flashed on redirect.
 	 *
 	 * @var array
@@ -60,7 +66,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Get the validator instance for the request.
 	 *
-	 * @return \Illuminate\Validation\Validator
+	 * @return \Illuminate\Contracts\Validation\Validator
 	 */
 	protected function getValidatorInstance()
 	{
@@ -70,28 +76,16 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		{
 			return $this->container->call([$this, 'validator'], compact('factory'));
 		}
-		else
-		{
-			return $factory->make(
-				$this->formatInput(), $this->container->call([$this, 'rules']), $this->messages()
-			);
-		}
-	}
 
-	/**
-	 * Get the input that should be fed to the validator.
-	 *
-	 * @return array
-	 */
-	protected function formatInput()
-	{
-		return $this->all();
+		return $factory->make(
+			$this->all(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
+		);
 	}
 
 	/**
 	 * Handle a failed validation attempt.
 	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
 	 * @return mixed
 	 */
 	protected function failedValidation(Validator $validator)
@@ -102,7 +96,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	}
 
 	/**
-	 * Deteremine if the request passes the authorization check.
+	 * Determine if the request passes the authorization check.
 	 *
 	 * @return bool
 	 */
@@ -134,16 +128,14 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 */
 	public function response(array $errors)
 	{
-		if ($this->ajax())
+		if ($this->ajax() || $this->wantsJson())
 		{
 			return new JsonResponse($errors, 422);
 		}
-		else
-		{
-			return $this->redirector->to($this->getRedirectUrl())
-                                            ->withInput($this->except($this->dontFlash))
-                                            ->withErrors($errors);
-		}
+
+		return $this->redirector->to($this->getRedirectUrl())
+                                        ->withInput($this->except($this->dontFlash))
+                                        ->withErrors($errors, $this->errorBag);
 	}
 
 	/**
@@ -159,7 +151,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Format the errors from the given Validator instance.
 	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
+	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
 	 * @return array
 	 */
 	protected function formatErrors(Validator $validator)
@@ -188,23 +180,8 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 		{
 			return $url->action($this->redirectAction);
 		}
-		else
-		{
-			return $url->previous();
-		}
-	}
 
-	/**
-	 * Set the route handling the request.
-	 *
-	 * @param  \Illuminate\Routing\Route  $route
-	 * @return \Illuminate\Foundation\Http\FormRequest
-	 */
-	public function setRoute(Route $route)
-	{
-		$this->route = $route;
-
-		return $this;
+		return $url->previous();
 	}
 
 	/**
@@ -223,7 +200,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	/**
 	 * Set the container implementation.
 	 *
-	 * @param  Container  $container
+	 * @param  \Illuminate\Container\Container  $container
 	 * @return $this
 	 */
 	public function setContainer(Container $container)
@@ -234,21 +211,21 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	}
 
 	/**
-	 * Get an input element from the request.
+	 * Set custom messages for validator errors.
 	 *
-	 * @return mixed
+	 * @return array
 	 */
-	public function __get($key)
+	public function messages()
 	{
-		return $this->input($key);
+		return [];
 	}
 
 	/**
-	* Set custom messages for validator errors.
-	*
-	* @return array
-	*/
-	public function messages()
+	 * Set custom attributes for validator errors.
+	 *
+	 * @return array
+	 */
+	public function attributes()
 	{
 		return [];
 	}

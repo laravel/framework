@@ -7,7 +7,7 @@ class IlluminateQueueClosure {
 	/**
 	 * The encrypter instance.
 	 *
-	 * @var \Illuminate\Contracts\Encryption\Encrypter  $crypt
+	 * @var \Illuminate\Contracts\Encryption\Encrypter
 	 */
 	protected $crypt;
 

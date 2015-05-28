@@ -4,15 +4,15 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
   - hhvm
 
-before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
-
-script: vendor/bin/phpunit --verbose
-
 matrix:
-  allow_failures:
-    - php: hhvm
-  fast_finish: true
+    allow_failures:
+        - php: 7.0
+
+sudo: false
+
+install: travis_retry composer install --no-interaction --prefer-source
+
+script: vendor/bin/phpunit

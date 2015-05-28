@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Session;
 
+use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Contracts\Cookie\Factory as CookieJar;
+use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class CookieSessionHandler implements \SessionHandlerInterface {
+class CookieSessionHandler implements SessionHandlerInterface {
 
 	/**
 	 * The cookie jar instance.
@@ -22,7 +23,7 @@ class CookieSessionHandler implements \SessionHandlerInterface {
 	/**
 	 * Create a new cookie driven handler instance.
 	 *
-	 * @param  \Illuminate\Contracts\Cookie\Factory  $cookie
+	 * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
 	 * @param  int  $minutes
 	 * @return void
 	 */

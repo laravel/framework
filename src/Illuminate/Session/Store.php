@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use SessionHandlerInterface;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -66,9 +67,9 @@ class Store implements SessionInterface {
 	/**
 	 * Create a new session instance.
 	 *
-	 * @param  string  $name
-	 * @param  \SessionHandlerInterface  $handler
-	 * @param  string|null  $id
+	 * @param  string $name
+	 * @param  \SessionHandlerInterface $handler
+	 * @param  string|null $id
 	 * @return void
 	 */
 	public function __construct($name, SessionHandlerInterface $handler, $id = null)
@@ -98,7 +99,7 @@ class Store implements SessionInterface {
 	 */
 	protected function loadSession()
 	{
-		$this->attributes = $this->readFromHandler();
+		$this->attributes = array_merge($this->attributes, $this->readFromHandler());
 
 		foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
 		{
@@ -117,7 +118,25 @@ class Store implements SessionInterface {
 	{
 		$data = $this->handler->read($this->getId());
 
-		return $data ? unserialize($data) : array();
+		if ($data)
+		{
+			$data = @unserialize($this->prepareForUnserialize($data));
+
+			if ($data !== false && $data !== null && is_array($data)) return $data;
+		}
+
+		return [];
+	}
+
+	/**
+	 * Prepare the raw string data from the session for unserialization.
+	 *
+	 * @param  string  $data
+	 * @return string
+	 */
+	protected function prepareForUnserialize($data)
+	{
+		return $data;
 	}
 
 	/**
@@ -194,11 +213,9 @@ class Store implements SessionInterface {
 	 */
 	public function invalidate($lifetime = null)
 	{
-		$this->attributes = array();
+		$this->clear();
 
-		$this->migrate();
-
-		return true;
+		return $this->migrate(true, $lifetime);
 	}
 
 	/**
@@ -210,7 +227,9 @@ class Store implements SessionInterface {
 
 		$this->setExists(false);
 
-		$this->id = $this->generateSessionId(); return true;
+		$this->id = $this->generateSessionId();
+
+		return true;
 	}
 
 	/**
@@ -233,9 +252,20 @@ class Store implements SessionInterface {
 
 		$this->ageFlashData();
 
-		$this->handler->write($this->getId(), serialize($this->attributes));
+		$this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
 
 		$this->started = false;
+	}
+
+	/**
+	 * Prepare the serialized session data for storage.
+	 *
+	 * @param  string  $data
+	 * @return string
+	 */
+	protected function prepareForStorage($data)
+	{
+		return $data;
 	}
 
 	/**
@@ -455,10 +485,7 @@ class Store implements SessionInterface {
 	 */
 	public function replace(array $attributes)
 	{
-		foreach ($attributes as $key => $value)
-		{
-			$this->put($key, $value);
-		}
+		$this->put($attributes);
 	}
 
 	/**
@@ -526,7 +553,7 @@ class Store implements SessionInterface {
 	{
 		return array_get($this->bags, $name, function()
 		{
-			throw new \InvalidArgumentException("Bag not registered.");
+			throw new InvalidArgumentException("Bag not registered.");
 		});
 	}
 
@@ -577,6 +604,27 @@ class Store implements SessionInterface {
 	public function regenerateToken()
 	{
 		$this->put('_token', str_random(40));
+	}
+
+	/**
+	 * Get the previous URL from the session.
+	 *
+	 * @return string|null
+	 */
+	public function previousUrl()
+	{
+		return $this->get('_previous.url');
+	}
+
+	/**
+	 * Set the "previous" URL in the session.
+	 *
+	 * @param  string  $url
+	 * @return void
+	 */
+	public function setPreviousUrl($url)
+	{
+		return $this->put('_previous.url', $url);
 	}
 
 	/**

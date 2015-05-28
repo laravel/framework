@@ -4,11 +4,6 @@ use Illuminate\Support\Fluent;
 
 class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
-	/**
-	 * Test the Fluent constructor.
-	 *
-	 * @test
-	 */
 	public function testAttributesAreSetByConstructor()
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
@@ -23,11 +18,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * Test the Fluent constructor when given \stdClass/object.
-	 *
-	 * @test
-	 */
 	public function testAttributesAreSetByConstructorGivenStdClass()
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
@@ -42,11 +32,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * Test the Fluent constructor when given ArrayIterator interface.
-	 *
-	 * @test
-	 */
 	public function testAttributesAreSetByConstructorGivenArrayIterator()
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
@@ -61,11 +46,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * Test the Fluent::get() method.
-	 *
-	 * @test
-	 */
 	public function testGetMethodReturnsAttribute()
 	{
 		$fluent = new Fluent(array('name' => 'Taylor'));
@@ -76,11 +56,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($fluent->foo);
 	}
 
-	/**
-	 * Test the Fluent magic methods can be used to set attributes.
-	 *
-	 * @test
-	 */
+
 	public function testMagicMethodsCanBeUsedToSetAttributes()
 	{
 		$fluent = new Fluent;
@@ -96,11 +72,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * Test the Fluent::__isset() method.
-	 *
-	 * @test
-	 */
 	public function testIssetMagicMethod()
 	{
 		$array  = array('name' => 'Taylor', 'age' => 25);
@@ -131,6 +102,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(json_encode('foo'), $results);
 	}
+
 }
 
 

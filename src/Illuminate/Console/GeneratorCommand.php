@@ -5,8 +5,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command {
 
-	use AppNamespaceDetectorTrait;
-
 	/**
 	 * The filesystem instance.
 	 *
@@ -48,7 +46,9 @@ abstract class GeneratorCommand extends Command {
 	 */
 	public function fire()
 	{
-		if ($this->files->exists($path = $this->getPath($name = $this->getNameInput())))
+		$name = $this->parseName($this->getNameInput());
+
+		if ($this->files->exists($path = $this->getPath($name)))
 		{
 			return $this->error($this->type.' already exists!');
 		}
@@ -68,9 +68,43 @@ abstract class GeneratorCommand extends Command {
 	 */
 	protected function getPath($name)
 	{
-		$name = str_replace($this->getAppNamespace(), '', $name);
+		$name = str_replace($this->laravel->getNamespace(), '', $name);
 
 		return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+	}
+
+	/**
+	 * Parse the name and format according to the root namespace.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function parseName($name)
+	{
+		$rootNamespace = $this->laravel->getNamespace();
+
+		if (starts_with($name, $rootNamespace))
+		{
+			return $name;
+		}
+
+		if (str_contains($name, '/'))
+		{
+			$name = str_replace('/', '\\', $name);
+		}
+
+		return $this->parseName($this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name);
+	}
+
+	/**
+	 * Get the default namespace for the class.
+	 *
+	 * @param  string  $rootNamespace
+	 * @return string
+	 */
+	protected function getDefaultNamespace($rootNamespace)
+	{
+		return $rootNamespace;
 	}
 
 	/**
@@ -88,7 +122,7 @@ abstract class GeneratorCommand extends Command {
 	}
 
 	/**
-	 * Build the controller class with the given name.
+	 * Build the class with the given name.
 	 *
 	 * @param  string  $name
 	 * @return string
@@ -110,7 +144,11 @@ abstract class GeneratorCommand extends Command {
 	protected function replaceNamespace(&$stub, $name)
 	{
 		$stub = str_replace(
-			'{{namespace}}', $this->getNamespace($name), $stub
+			'DummyNamespace', $this->getNamespace($name), $stub
+		);
+
+		$stub = str_replace(
+			'DummyRootNamespace', $this->laravel->getNamespace(), $stub
 		);
 
 		return $this;
@@ -138,7 +176,7 @@ abstract class GeneratorCommand extends Command {
 	{
 		$class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-		return str_replace('{{class}}', $class, $stub);
+		return str_replace('DummyClass', $class, $stub);
 	}
 
 	/**

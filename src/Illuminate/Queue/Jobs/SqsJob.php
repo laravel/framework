@@ -84,7 +84,13 @@ class SqsJob extends Job implements JobContract {
 	 */
 	public function release($delay = 0)
 	{
-		// SQS job releases are handled by the server configuration...
+		parent::release($delay);
+
+		$this->sqs->changeMessageVisibility([
+			'QueueUrl' => $this->queue,
+			'ReceiptHandle' => $this->job['ReceiptHandle'],
+			'VisibilityTimeout' => $delay,
+		]);
 	}
 
 	/**

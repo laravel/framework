@@ -1,11 +1,13 @@
 <?php namespace Illuminate\Mail;
 
+use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager {
@@ -54,6 +56,18 @@ class TransportManager extends Manager {
 		$command = $this->app['config']['mail']['sendmail'];
 
 		return SendmailTransport::newInstance($command);
+	}
+
+	/**
+	 * Create an instance of the Amazon SES Swift Transport driver.
+	 *
+	 * @return \Swift_SendmailTransport
+	 */
+	protected function createSesDriver()
+	{
+		$sesClient = SesClient::factory($this->app['config']->get('services.ses', []));
+
+		return new SesTransport($sesClient);
 	}
 
 	/**

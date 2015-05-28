@@ -10,6 +10,9 @@ class Log extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'log'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'log';
+	}
 
 }

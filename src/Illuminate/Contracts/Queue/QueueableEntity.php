@@ -5,7 +5,7 @@ interface QueueableEntity {
 	/**
 	 * Get the queueable identity for the entity.
 	 *
-	 * @var mixed
+	 * @return mixed
 	 */
 	public function getQueueableId();
 

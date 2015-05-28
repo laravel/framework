@@ -25,19 +25,12 @@ class FormRequestServiceProvider extends ServiceProvider {
 	{
 		$this->app['events']->listen('router.matched', function()
 		{
-			$this->app->resolvingAny(function($resolved, $app)
+			$this->app->resolving(function(FormRequest $request, $app)
 			{
-				// If the resolved instance is an instance of the FormRequest object, we will go
-				// ahead and initialize the request as well as set a few dependencies on this
-				// request instance. The "ValidatesWhenResolved" hook will fire "validate".
-				if ($resolved instanceof FormRequest)
-				{
-					$this->initializeRequest($resolved, $app['request']);
+				$this->initializeRequest($request, $app['request']);
 
-					$resolved->setContainer($app)
-                             ->setRoute($app['Illuminate\Routing\Route'])
-                             ->setRedirector($app['Illuminate\Routing\Redirector']);
-				}
+				$request->setContainer($app)
+                        ->setRedirector($app['Illuminate\Routing\Redirector']);
 			});
 		});
 	}
@@ -46,7 +39,7 @@ class FormRequestServiceProvider extends ServiceProvider {
 	 * Initialize the form request with data from the given request.
 	 *
 	 * @param  \Illuminate\Foundation\Http\FormRequest  $form
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param  \Symfony\Component\HttpFoundation\Request  $current
 	 * @return void
 	 */
 	protected function initializeRequest(FormRequest $form, Request $current)
@@ -60,7 +53,14 @@ class FormRequestServiceProvider extends ServiceProvider {
 			$current->cookies->all(), $files, $current->server->all(), $current->getContent()
 		);
 
+		if ($session = $current->getSession())
+		{
+			$form->setSession($session);
+		}
+
 		$form->setUserResolver($current->getUserResolver());
+
+		$form->setRouteResolver($current->getRouteResolver());
 	}
 
 }
