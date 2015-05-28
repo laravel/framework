@@ -26,7 +26,7 @@ class RetryCommand extends Command {
 	 */
 	public function fire()
 	{
-		$failed = $this->laravel['queue.failer']->find($this->argument('id'));
+		$failed = (object)$this->laravel['queue.failer']->find($this->argument('id'));
 
 		if ( ! is_null($failed))
 		{
