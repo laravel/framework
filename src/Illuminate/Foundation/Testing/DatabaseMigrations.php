@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Foundation\Testing;
 
-trait Migrations
+trait DatabaseMigrations
 {
     /**
      * @before
