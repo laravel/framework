@@ -18,6 +18,15 @@ class ListFailedCommand extends Command {
 	 */
 	protected $description = 'List all of the failed queue jobs';
 
+
+	/**
+	 * The table headers for the command.
+	 *
+	 * @var array
+	 */
+	protected $headers = ['ID', 'Connection', 'Queue', 'Class', 'Failed At'];
+
+
 	/**
 	 * Execute the console command.
 	 *
@@ -25,23 +34,31 @@ class ListFailedCommand extends Command {
 	 */
 	public function fire()
 	{
-		$rows = array();
+		$jobs = $this->getFailedJobs();
 
-		foreach ($this->laravel['queue.failer']->all() as $failed)
-		{
-			$rows[] = $this->parseFailedJob((array) $failed);
-		}
-
-		if (count($rows) == 0)
+		if (count($jobs) == 0)
 		{
 			return $this->info('No failed jobs!');
 		}
 
-		$table = $this->getHelperSet()->get('table');
+		$this->displayFailedJobs($jobs);
+	}
 
-		$table->setHeaders(array('ID', 'Connection', 'Queue', 'Class', 'Failed At'))
-              ->setRows($rows)
-              ->render($this->output);
+	/**
+	 * Compile the failed jobs into a displayable format.
+	 *
+	 * @return array
+	 */
+	protected function getFailedJobs()
+	{
+		$results = [];
+
+		foreach ($this->laravel['queue.failer']->all() as $failed)
+		{
+			$results[] = $this->parseFailedJob((array) $failed);
+		}
+
+		return array_filter($results);
 	}
 
 	/**
@@ -59,4 +76,14 @@ class ListFailedCommand extends Command {
 		return $row;
 	}
 
+	/**
+	 * Display the failed jobs in the console.
+	 *
+	 * @param  array  $jobs
+	 * @return void
+	 */
+	protected function displayFailedJobs(array $jobs)
+	{
+		$this->table($this->headers, $jobs);
+	}
 }
