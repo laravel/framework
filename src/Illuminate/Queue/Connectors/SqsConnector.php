@@ -23,7 +23,7 @@ class SqsConnector implements ConnectorInterface {
 
 		unset($config['key'], $config['secret']);
 
-		return new SqsQueue(SqsClient::factory($config), $config['queue']);
+		return new SqsQueue(new SqsClient($config), $config['queue']);
 	}
 
 }
