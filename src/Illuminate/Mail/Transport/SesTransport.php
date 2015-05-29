@@ -55,10 +55,10 @@ class SesTransport implements Swift_Transport {
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
 		return $this->ses->sendRawEmail([
-			'Source' => $message->getSender(),
+			'Source' => key($message->getSender()),
 			'Destinations' => $this->getTo($message),
 			'RawMessage' => [
-				'Data' => base64_encode((string) $message),
+				'Data' => $this->getMessage($message),
 			],
 		]);
 	}
@@ -91,6 +91,26 @@ class SesTransport implements Swift_Transport {
 		}
 
 		return $destinations;
+	}
+
+	/**
+	 * Get the "message" payload field for the API request.
+	 *
+	 * This method provides compatibility with Version 2 and Version 3 of the AWS SDK.
+	 *
+	 * @param  \Swift_Mime_Message  $message
+	 * @return array
+	 */
+	protected function getMessage(Swift_Mime_Message $message)
+	{
+		$message = (string) $message;
+
+		// Version 2 of the SDK requires you to explicitly base64_encode().
+		if (defined('Aws\Common\Aws::VERSION')) {
+			$message = base64_encode($message);
+		}
+
+		return $message;
 	}
 
 }
