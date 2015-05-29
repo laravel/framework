@@ -16,8 +16,7 @@
     "require": {
         "php": ">=5.5.9",
         "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "ircmaxell/password-compat": "~1.0"
+        "illuminate/support": "5.1.*"
     },
     "autoload": {
         "psr-4": {
