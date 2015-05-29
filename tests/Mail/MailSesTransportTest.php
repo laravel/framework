@@ -45,12 +45,6 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 			->getMock();
 		$transport = new SesTransport($client);
 
-		// Version 3 of the SDK base64 encodes the message automatically, but
-		// since we mocking away the whole SDK client, we need to simulate it.
-		$expectedData = defined('Aws\Sdk::VERSION')
-			? strval($message)
-			: base64_encode($message);
-
 		$client->expects($this->once())
 			->method('sendRawEmail')
 			->with($this->equalTo([
@@ -59,7 +53,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 					'me@example.com',
 					'you@example.com',
 				],
-				'RawMessage' => ['Data' => $expectedData],
+				'RawMessage' => ['Data' => (string) $message],
 			]));
 
 		$transport->send($message);
