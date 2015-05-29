@@ -7,26 +7,12 @@ php:
   - 7.0
   - hhvm
 
-env:
-  global:
-    - setup=basic
-
 matrix:
-  include:
-    - php: 5.4
-      env: setup=lowest
-    - php: 5.4
-      env: setup=stable
-  allow_failures:
-    - env: setup=lowest
-    - env: setup=stable
-    - php: 7.0
+    allow_failures:
+        - php: 7.0
 
 sudo: false
 
-install:
-  - if [[ $setup = 'basic' ]]; then travis_retry composer install --no-interaction --prefer-source; fi
-  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-stable; fi
-  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-lowest --prefer-stable; fi
+install: travis_retry composer install --no-interaction --prefer-source
 
 script: vendor/bin/phpunit
