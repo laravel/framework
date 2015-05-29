@@ -16,7 +16,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 				'services.ses' => [
 					'key'    => 'foo',
 					'secret' => 'bar',
-					'region' => 'baz',
+					'region' => 'us-east-1',
 				]
 			])
 		];
@@ -29,7 +29,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 		/** @var SesClient $ses */
 		$ses = $this->readAttribute($transport, 'ses');
 
-		$this->assertEquals('baz', $ses->getRegion());
+		$this->assertEquals('us-east-1', $ses->getRegion());
 	}
 
 	public function testSend()
