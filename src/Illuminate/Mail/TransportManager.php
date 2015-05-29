@@ -66,9 +66,20 @@ class TransportManager extends Manager {
 	 */
 	protected function createSesDriver()
 	{
-		$sesClient = SesClient::factory($this->app['config']->get('services.ses', []));
+		$config = $this->app['config']->get('services.ses', []);
 
-		return new SesTransport($sesClient);
+		$config += [
+			'version' => 'latest',
+			'service' => 'email',
+			'credentials' => [
+				'key'    => $config['key'],
+				'secret' => $config['secret'],
+			],
+		];
+
+		unset($config['key'], $config['secret']);
+
+		return new SesTransport(SesClient::factory($config));
 	}
 
 	/**
