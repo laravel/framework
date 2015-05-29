@@ -13,21 +13,17 @@ class SqsConnector implements ConnectorInterface {
 	 */
 	public function connect(array $config)
 	{
-		// Adjust configuration for V3 of the AWS SDK.
-		if (defined('Aws\Sdk::VERSION')) {
-			$config += [
-				'version' => 'latest',
-				'credentials' => [
-					'key'    => $config['key'],
-					'secret' => $config['secret'],
-				],
-			];
-			unset($config['key'], $config['secret']);
-		}
+		$config += [
+			'version' => 'latest',
+			'credentials' => [
+				'key'    => $config['key'],
+				'secret' => $config['secret'],
+			],
+		];
 
-		$sqs = SqsClient::factory($config);
+		unset($config['key'], $config['secret']);
 
-		return new SqsQueue($sqs, $config['queue']);
+		return new SqsQueue(SqsClient::factory($config), $config['queue']);
 	}
 
 }
