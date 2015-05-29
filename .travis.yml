@@ -17,10 +17,6 @@ matrix:
       env: setup=lowest
     - php: 5.4
       env: setup=stable
-  allow_failures:
-    - env: setup=lowest
-    - env: setup=stable
-    - php: 7.0
 
 sudo: false
 
