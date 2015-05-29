@@ -148,10 +148,15 @@ class FilesystemManager implements FactoryContract {
 	 */
 	public function createS3Driver(array $config)
 	{
-		$s3Config = array_only($config, ['key', 'region', 'secret', 'signature', 'base_url']);
+		$config += [
+			'credentials' => array_only($config, ['key', 'secret']),
+			'version'     => 'latest',
+		];
+
+		unset($config['key'], $config['secret']);
 
 		return $this->adapt(
-			new Flysystem(new S3Adapter(S3Client::factory($s3Config), $config['bucket']))
+			new Flysystem(new S3Adapter(new S3Client($config), $config['bucket']))
 		);
 	}
 
