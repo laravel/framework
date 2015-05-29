@@ -80,7 +80,7 @@
         "iron-io/iron_mq": "~2.0",
         "pda/pheanstalk": "~3.0",
         "predis/predis": "~1.0",
-        "mockery/mockery": "~0.9",
+        "mockery/mockery": "^0.9.1",
         "phpunit/phpunit": "~4.0"
     },
     "autoload": {
