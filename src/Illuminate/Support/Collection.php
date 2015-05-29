@@ -354,13 +354,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
-	* Get the last item from the collection.
-	*
-	* @return mixed
-	*/
-	public function last()
+	 * Get the last item from the collection.
+	 *
+	 * @param  callable|null  $callback
+	 * @param  mixed  $default
+	 * @return mixed
+	 */
+	public function last(callable $callback = null, $default = null)
 	{
-		return count($this->items) > 0 ? end($this->items) : null;
+		if (is_null($callback))
+		{
+			return count($this->items) > 0 ? end($this->items) : null;
+		}
+
+		return array_last($this->items, $callback, $default);
 	}
 
 	/**
