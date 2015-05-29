@@ -19,16 +19,14 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$this->baseUrl = 'https://sqs.someregion.amazonaws.com';
 		$this->releaseDelay = 0;
 
-		// The Aws\Common\AbstractClient needs these three constructor parameters
-		$this->credentials = new Credentials( $this->key, $this->secret );
-		$this->signature = new SignatureV4( $this->service, $this->region );
-		$this->config = new Collection();
-
 		// This is how the modified getQueue builds the queueUrl
 		$this->queueUrl = $this->baseUrl . '/' . $this->account . '/' . $this->queueName;
 
 		// Get a mock of the SqsClient
-		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('deleteMessage'), array($this->credentials, $this->signature, $this->config));
+		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+			->setMethods(array('deleteMessage'))
+			->disableOriginalConstructor()
+			->getMock();
 
 		// Use Mockery to mock the IoC Container
 		$this->mockedContainer = m::mock('Illuminate\Container\Container');
@@ -65,7 +63,10 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeleteRemovesTheJobFromSqs()
 	{
-		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('deleteMessage'), array($this->credentials, $this->signature, $this->config));
+		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+			->setMethods(array('deleteMessage'))
+			->disableOriginalConstructor()
+			->getMock();
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
@@ -76,7 +77,10 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testReleaseProperlyReleasesTheJobOntoSqs()
 	{
-		$this->mockedSqsClient = $this->getMock('Aws\Sqs\SqsClient', array('changeMessageVisibility'), array($this->credentials, $this->signature, $this->config));
+		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+			->setMethods(array('changeMessageVisibility'))
+			->disableOriginalConstructor()
+			->getMock();
 		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
