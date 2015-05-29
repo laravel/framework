@@ -22,7 +22,6 @@
         "classpreloader/classpreloader": "~1.2",
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",
-        "ircmaxell/password-compat": "~1.0",
         "jeremeamia/superclosure": "~2.0",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
@@ -76,7 +75,7 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "~2.4",
+        "aws/aws-sdk-php": "~3.0",
         "iron-io/iron_mq": "~2.0",
         "pda/pheanstalk": "~3.0",
         "predis/predis": "~1.0",
@@ -101,7 +100,7 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~2.4).",
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
