@@ -257,8 +257,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testUnique()
 	{
-		$c = new Collection(array('Hello', 'World', 'World'));
-		$this->assertEquals(array('Hello', 'World'), $c->unique()->all());
+		$c = new Collection(['Hello', 'World', 'World']);
+		$this->assertEquals(['Hello', 'World'], $c->unique()->all());
+
+		$c = new Collection([[1, 2], [1, 2], [2, 3], [3, 4], [2, 3]]);
+		$this->assertEquals([[1, 2], [2, 3], [3, 4]], $c->unique()->values()->all());
 	}
 
 
