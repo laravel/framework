@@ -362,7 +362,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function last(callable $callback = null, $default = null)
 	{
-		return $this->reverse()->first($callback, $default);
+		if (is_null($callback))
+		{
+			return count($this->items) > 0 ? end($this->items) : null;
+		}
+
+		return array_last($this->items, $callback, $default);
 	}
 
 	/**
