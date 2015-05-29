@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Mail;
 
-use Aws\Sdk;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
@@ -69,18 +68,16 @@ class TransportManager extends Manager {
 	{
 		$config = $this->app['config']->get('services.ses', []);
 
-		// Adjust configuration for V3 of the AWS SDK.
-		if (defined('Aws\Sdk::VERSION')) {
-			$config += [
-				'version' => 'latest',
-				'service' => 'email',
-				'credentials' => [
-					'key'    => $config['key'],
-					'secret' => $config['secret'],
-				],
-			];
-			unset($config['key'], $config['secret']);
-		}
+		$config += [
+			'version' => 'latest',
+			'service' => 'email',
+			'credentials' => [
+				'key'    => $config['key'],
+				'secret' => $config['secret'],
+			],
+		];
+
+		unset($config['key'], $config['secret']);
 
 		return new SesTransport(SesClient::factory($config));
 	}
