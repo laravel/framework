@@ -767,7 +767,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 */
 	public function unique($key = null)
 	{
-		if (is_null($key)) return new static(array_unique($this->items));
+		if (is_null($key)) return new static(array_unique($this->items, SORT_REGULAR));
 
 		$key = $this->valueRetriever($key);
 
