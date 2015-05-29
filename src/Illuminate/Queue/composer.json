@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.9",
         "illuminate/console": "5.1.*",
         "illuminate/contracts": "5.1.*",
         "illuminate/container": "5.1.*",
