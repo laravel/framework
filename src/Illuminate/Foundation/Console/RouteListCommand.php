@@ -42,9 +42,7 @@ class RouteListCommand extends Command {
 	 *
 	 * @var array
 	 */
-	protected $headers = array(
-		'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware',
-	);
+	protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
 	/**
 	 * Create a new route command instance.
@@ -82,7 +80,7 @@ class RouteListCommand extends Command {
 	 */
 	protected function getRoutes()
 	{
-		$results = array();
+		$results = [];
 
 		foreach ($this->routes as $route)
 		{
