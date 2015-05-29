@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -2744,7 +2745,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			case 'json':
 				return json_decode($value, true);
 			case 'collection':
-				return $this->newCollection(json_decode($value, true));
+				return new BaseCollection(json_decode($value, true));
 			default:
 				return $value;
 		}
