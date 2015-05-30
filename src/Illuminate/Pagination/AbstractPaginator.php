@@ -362,7 +362,7 @@ abstract class AbstractPaginator {
 	 */
 	public function setPath($path)
 	{
-		$this->path = $path;
+		$this->path = url($path);
 
 		return $this;
 	}
