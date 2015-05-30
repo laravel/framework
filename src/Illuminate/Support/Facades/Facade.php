@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Mockery;
+use RuntimeException;
 use Mockery\MockInterface;
 
 abstract class Facade {
@@ -7,7 +9,7 @@ abstract class Facade {
 	/**
 	 * The application instance being facaded.
 	 *
-	 * @var \Illuminate\Foundation\Application
+	 * @var \Illuminate\Contracts\Foundation\Application
 	 */
 	protected static $app;
 
@@ -81,7 +83,7 @@ abstract class Facade {
 	{
 		$class = static::getMockableClass($name);
 
-		return $class ? \Mockery::mock($class) : \Mockery::mock();
+		return $class ? Mockery::mock($class) : Mockery::mock();
 	}
 
 	/**
@@ -125,7 +127,7 @@ abstract class Facade {
 	 */
 	protected static function getFacadeAccessor()
 	{
-		throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
+		throw new RuntimeException("Facade does not implement getFacadeAccessor method.");
 	}
 
 	/**
@@ -170,7 +172,7 @@ abstract class Facade {
 	/**
 	 * Get the application instance behind the facade.
 	 *
-	 * @return \Illuminate\Foundation\Application
+	 * @return \Illuminate\Contracts\Foundation\Application
 	 */
 	public static function getFacadeApplication()
 	{
@@ -180,7 +182,7 @@ abstract class Facade {
 	/**
 	 * Set the application instance.
 	 *
-	 * @param  \Illuminate\Foundation\Application  $app
+	 * @param  \Illuminate\Contracts\Foundation\Application  $app
 	 * @return void
 	 */
 	public static function setFacadeApplication($app)

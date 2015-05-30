@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
@@ -127,6 +128,24 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($request->ajax());
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'), '{}');
 		$this->assertTrue($request->ajax());
+		$request = Request::create('/', 'POST');
+		$request->headers->set('X-Requested-With', 'XMLHttpRequest');
+		$this->assertTrue($request->ajax());
+		$request->headers->set('X-Requested-With', '');
+		$this->assertFalse($request->ajax());
+	}
+
+
+	public function testPjaxMethod()
+	{
+		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_PJAX' => 'true'), '{}');
+		$this->assertTrue($request->pjax());
+		$request->headers->set('X-PJAX', 'false');
+		$this->assertTrue($request->pjax());
+		$request->headers->set('X-PJAX', null);
+		$this->assertFalse($request->pjax());
+		$request->headers->set('X-PJAX', '');
+		$this->assertFalse($request->pjax());
 	}
 
 
@@ -136,6 +155,26 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($request->secure());
 		$request = Request::create('https://example.com', 'GET');
 		$this->assertTrue($request->secure());
+	}
+
+
+	public function testExistsMethod()
+	{
+		$request = Request::create('/', 'GET', ['name' => 'Taylor']);
+		$this->assertTrue($request->exists('name'));
+		$this->assertFalse($request->exists('foo'));
+		$this->assertFalse($request->exists('name', 'email'));
+
+		$request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+		$this->assertTrue($request->exists('name'));
+		$this->assertTrue($request->exists('name', 'email'));
+
+		$request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
+		$this->assertTrue($request->exists('foo'));
+
+		$request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
+		$this->assertTrue($request->exists('foo'));
+		$this->assertTrue($request->exists('bar'));
 	}
 
 
@@ -160,7 +199,11 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	{
 		$request = Request::create('/', 'GET', array('name' => 'Taylor'));
 		$this->assertEquals('Taylor', $request->input('name'));
+		$this->assertEquals('Taylor', $request['name']);
 		$this->assertEquals('Bob', $request->input('foo', 'Bob'));
+
+		$request = Request::create('/', 'GET', [], [], ['file' => new Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
 	}
 
 
@@ -349,6 +392,24 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testInputWithEmptyFilename()
+	{
+		$invalidFiles = [
+			'file' => [
+				'name' => null,
+				'type' => null,
+				'tmp_name' => null,
+				'error' => 4,
+				'size' => 0
+			]
+		];
+
+		$baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', array('foo' => array('bar' => 'baz')), array(), $invalidFiles);
+
+		$request = Request::createFromBase($baseRequest);
+	}
+
+
 	public function testOldMethodCallsSession()
 	{
 		$request = Request::create('/', 'GET');
@@ -371,17 +432,73 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testFormatReturnsAcceptableFormat()
 	{
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 		$this->assertEquals('json', $request->format());
 		$this->assertTrue($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/atom+xml'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/atom+xml']);
 		$this->assertEquals('atom', $request->format());
 		$this->assertFalse($request->wantsJson());
 
-		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'is/not/known'));
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'is/not/known']);
 		$this->assertEquals('html', $request->format());
 		$this->assertEquals('foo', $request->format('foo'));
+	}
+
+	public function testFormatReturnsAcceptsJson()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+		$this->assertEquals('json', $request->format());
+		$this->assertTrue($request->accepts('application/json'));
+		$this->assertTrue($request->accepts('application/baz+json'));
+		$this->assertTrue($request->acceptsJson());
+		$this->assertFalse($request->acceptsHtml());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json']);
+		$this->assertTrue($request->accepts('application/foo+json'));
+		$this->assertFalse($request->accepts('application/bar+json'));
+		$this->assertFalse($request->accepts('application/json'));
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*']);
+		$this->assertTrue($request->accepts('application/xml'));
+		$this->assertTrue($request->accepts('application/json'));
+	}
+
+
+	public function testFormatReturnsAcceptsHtml()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+		$this->assertEquals('html', $request->format());
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->acceptsHtml());
+		$this->assertFalse($request->acceptsJson());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/*']);
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->accepts('text/plain'));
+	}
+
+
+	public function testFormatReturnsAcceptsAll()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+		$this->assertEquals('html', $request->format());
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->accepts('foo/bar'));
+		$this->assertTrue($request->accepts('application/baz+xml'));
+		$this->assertTrue($request->acceptsHtml());
+		$this->assertTrue($request->acceptsJson());
+	}
+
+
+	public function testFormatReturnsAcceptsMultiple()
+	{
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json,text/*']);
+		$this->assertTrue($request->accepts(['text/html', 'application/json']));
+		$this->assertTrue($request->accepts('text/html'));
+		$this->assertTrue($request->accepts('text/foo'));
+		$this->assertTrue($request->accepts('application/json'));
+		$this->assertTrue($request->accepts('application/baz+json'));
 	}
 
 
@@ -398,6 +515,25 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 		$request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
 		$request->setUserResolver(function() { return 'user'; });
 		$this->assertEquals('user', $request->user());
+	}
+
+
+	public function testCreateFromBase()
+	{
+		$body = [
+			'foo' => 'bar',
+			'baz' => ['qux'],
+		];
+
+		$server = array(
+			'CONTENT_TYPE' => 'application/json',
+		);
+
+		$base = SymfonyRequest::create('/', 'GET', array(), array(), array(), $server, json_encode($body));
+
+		$request = Request::createFromBase($base);
+
+		$this->assertEquals($request->request->all(), $body);
 	}
 
 }

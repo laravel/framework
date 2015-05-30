@@ -75,15 +75,15 @@ class RouteCacheCommand extends Command {
 	 */
 	protected function getFreshApplicationRoutes()
 	{
-		$app = require $this->laravel['path.base'].'/bootstrap/start.php';
+		$app = require $this->laravel->basePath().'/bootstrap/app.php';
 
-		$app->boot();
+		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 		return $app['router']->getRoutes();
 	}
 
 	/**
-	 * Built the route cache file.
+	 * Build the route cache file.
 	 *
 	 * @param  \Illuminate\Routing\RouteCollection  $routes
 	 * @return string

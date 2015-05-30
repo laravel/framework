@@ -1,7 +1,10 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\UrlWindow;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator as Paginator;
+use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
 
 class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 
@@ -11,203 +14,160 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPaginationContextIsSetupCorrectly()
+	public function testPaginatorCanGiveMeRelevantPageInformation()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$p->setupPaginationContext();
+		$p = new LengthAwarePaginator($array = ['item3', 'item4'], 4, 2, 2);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals(2, $p->lastPage());
+		$this->assertEquals(2, $p->currentPage());
+		$this->assertTrue($p->hasPages());
+		$this->assertFalse($p->hasMorePages());
+		$this->assertEquals(['item3', 'item4'], $p->items());
 	}
 
 
-	public function testSimplePagination()
+	public function testPaginatorCanGenerateUrls()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$p->setupPaginationContext();
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
-		$this->assertEquals(['foo', 'bar'], $p->getItems());
+		$this->assertEquals('http://website.com/?foo=2', $p->url($p->currentPage()));
+		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 1));
+		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 2));
 	}
 
 
-	public function testSimplePaginationLastPage()
+	public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), ['foo', 'bar', 'baz'], 3);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$p->setupPaginationContext();
-
-		$this->assertEquals(1, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
-		$this->assertEquals(3, count($p->getItems()));
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+		$window = new UrlWindow($p);
+		$this->assertTrue($window->hasPages());
 	}
 
 
-	public function testPaginationContextIsSetupCorrectlyInCursorMode()
+	public function testPresenterCanGetAUrlRangeForASmallNumberOfUrls()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$p->setupPaginationContext();
-
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+		$window = new UrlWindow($p);
+		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
 	}
 
 
-	public function testPaginationContextSetsUpRangeCorrectly()
+	public function testPresenterCanGetAUrlRangeForAWindowOfLinks()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$p->setupPaginationContext();
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 7);
+		$window = new UrlWindow($p);
+		$slider = [];
+		for ($i = 4; $i <= 10; $i++)
+			$slider[$i] = '/?page='.$i;
 
-		$this->assertEquals(1, $p->getFrom());
-		$this->assertEquals(2, $p->getTo());
+		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+
+		/**
+		 * Test Being Near The End Of The List
+		 */
+		$p = new LengthAwarePaginator($array, count($array), 1, 8);
+		$window = new UrlWindow($p);
+		$last = [];
+		for ($i = 5; $i <= 13; $i++)
+			$last[$i] = '/?page='.$i;
+
+		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
 	}
 
 
-	public function testPaginationContextHandlesHugeCurrentPage()
+	public function testBootstrapPresenterCanGeneratorLinksForSlider()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(15);
-		$p->setupPaginationContext();
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 7);
+		$presenter = new BootstrapPresenter($p);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(2, $p->getCurrentPage());
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
 	}
 
 
-	public function testPaginationContextHandlesPageLessThanOne()
+	public function testCustomPresenter()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(-1);
-		$p->setupPaginationContext();
+		$p = new LengthAwarePaginator([], 1, 1, 1);
+		$presenter = m::mock('StdClass');
+		\Illuminate\Pagination\AbstractPaginator::presenter(function() use ($presenter) {
+			return $presenter;
+		});
+		$presenter->shouldReceive('render')->andReturn('presenter');
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals('presenter', $p->render());
+
+		\Illuminate\Pagination\AbstractPaginator::presenter(function() {
+			return;
+		});
 	}
 
 
-	public function testPaginationContextHandlesPageLessThanOneAsString()
+	public function testBootstrapPresenterCanGeneratorLinksForTooCloseToBeginning()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn('-1');
-		$p->setupPaginationContext();
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 2);
+		$presenter = new BootstrapPresenter($p);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning.html')), $presenter->render());
 	}
 
 
-	public function testPaginationContextHandlesPageInvalidFormat()
+	public function testBootstrapPresenterCanGeneratorLinksForTooCloseToEnding()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn('abc');
-		$p->setupPaginationContext();
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 12);
+		$presenter = new BootstrapPresenter($p);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending.html')), $presenter->render());
 	}
 
 
-	public function testPaginationContextHandlesPageMissing()
+	public function testBootstrapPresenterCanGeneratorLinksForWhenOnLastPage()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getCurrentPage')->once()->andReturn(null);
-		$p->setupPaginationContext();
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 13);
+		$presenter = new BootstrapPresenter($p);
 
-		$this->assertEquals(2, $p->getLastPage());
-		$this->assertEquals(1, $p->getCurrentPage());
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page.html')), $presenter->render());
 	}
 
 
-	public function testGetLinksCallsEnvironmentProperly()
+	public function testBootstrapPresenterCanGeneratorLinksForWhenOnFirstPage()
 	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$factory->shouldReceive('getPaginationView')->once()->with($p, null)->andReturn('foo');
+		$array = [];
+		for ($i = 1; $i <= 13; $i++)
+			$array[$i] = 'item'.$i;
+		$p = new LengthAwarePaginator($array, count($array), 1, 1);
+		$presenter = new BootstrapPresenter($p);
 
-		$this->assertEquals('foo', $p->links());
+		$this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/first_page.html')), $presenter->render());
 	}
 
 
-	public function testGetUrlProperlyFormatsUrl()
+	public function testSimplePaginatorReturnsRelevantContextInformation()
 	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$env->shouldReceive('getCurrentUrl')->andReturn('http://foo.com');
-		$env->shouldReceive('getPageName')->andReturn('page');
+		$p = new Paginator($array = ['item3', 'item4', 'item5'], 2, 2);
 
-		$this->assertEquals('http://foo.com?page=1', $p->getUrl(1));
-		$p->addQuery('foo', 'bar');
-		$this->assertEquals('http://foo.com?foo=bar&page=1', $p->getUrl(1));
-	}
+		$this->assertEquals(2, $p->currentPage());
+		$this->assertTrue($p->hasPages());
+		$this->assertTrue($p->hasMorePages());
+		$this->assertEquals(['item3', 'item4'], $p->items());
 
-
-	public function testEnvironmentAccess()
-	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$this->assertInstanceOf('Illuminate\Pagination\Factory', $p->getFactory());
-	}
-
-
-	public function testPaginatorIsCountable()
-	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-
-		$this->assertEquals(3, count($p));
-	}
-
-
-	public function testPaginatorIsIterable()
-	{
-		$p = new Paginator($factory = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-
-		$this->assertInstanceOf('ArrayIterator', $p->getIterator());
-		$this->assertEquals(array('foo', 'bar', 'baz'), $p->getIterator()->getArrayCopy());
-	}
-
-
-	public function testGetUrlAddsFragment()
-	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$env->shouldReceive('getCurrentUrl')->andReturn('http://foo.com');
-		$env->shouldReceive('getPageName')->andReturn('page');
-
-		$p->fragment("a-fragment");
-
-		$this->assertEquals('http://foo.com?page=1#a-fragment', $p->getUrl(1));
-		$p->addQuery('foo', 'bar');
-		$this->assertEquals('http://foo.com?foo=bar&page=1#a-fragment', $p->getUrl(1));
-	}
-
-
-	public function testGetUrlHasPriorityOverAppends()
-	{
-		$p = new Paginator($env = m::mock('Illuminate\Pagination\Factory'), array('foo', 'bar', 'baz'), 3, 2);
-		$env->shouldReceive('getCurrentUrl')->andReturn('http://foo.com');
-		$env->shouldReceive('getPageName')->andReturn('page');
-
-		$p->appends(array(
-			'sort' => 'asc',
-			'page' => 2,
-		));
-		$this->assertEquals('http://foo.com?sort=asc&page=1', $p->getUrl(1));
-
-		$p->appends(array(
-			'sort' => 'desc',
-			'page' => '2',
-		));
-		$this->assertEquals('http://foo.com?sort=desc&page=1', $p->getUrl(1));
-	}
-
-
-	public function testPaginatorDecoratesCollection()
-	{
-		$p = new Paginator(m::mock('Illuminate\Pagination\Factory'), array('a', 'b', 'c'), 3, 2);
-		$last = $p->last();
-
-		$this->assertEquals('c', $last);
+		$this->assertEquals([
+			'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
+			'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4']
+		], $p->toArray());
 	}
 
 }

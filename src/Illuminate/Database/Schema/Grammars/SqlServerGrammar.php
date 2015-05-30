@@ -133,6 +133,18 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Compile a drop table (if exists) command.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $command
+	 * @return string
+	 */
+	public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
+	{
+		return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table '.$blueprint->getTable();
+	}
+
+	/**
 	 * Compile a drop column command.
 	 *
 	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -384,6 +396,28 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a json type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJson(Fluent $column)
+	{
+		return 'nvarchar(max)';
+	}
+
+	/**
+	 * Create the column definition for a jsonb type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJsonb(Fluent $column)
+	{
+		return 'nvarchar(max)';
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -406,12 +440,34 @@ class SqlServerGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a date-time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDateTimeTz(Fluent $column)
+	{
+		return 'datetimeoffset(0)';
+	}
+
+	/**
 	 * Create the column definition for a time type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function typeTime(Fluent $column)
+	{
+		return 'time';
+	}
+
+	/**
+	 * Create the column definition for a time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimeTz(Fluent $column)
 	{
 		return 'time';
 	}
@@ -425,6 +481,19 @@ class SqlServerGrammar extends Grammar {
 	protected function typeTimestamp(Fluent $column)
 	{
 		return 'datetime';
+	}
+
+	/**
+	 * Create the column definition for a timestamp type.
+	 *
+	 * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimestampTz(Fluent $column)
+	{
+		return 'datetimeoffset(0)';
 	}
 
 	/**

@@ -24,11 +24,11 @@ interface Container {
 	/**
 	 * Assign a set of tags to a given binding.
 	 *
-	 * @param  string  $abstract
-	 * @param  array|dynamic  $tags
+	 * @param  array|string  $abstracts
+	 * @param  array|mixed   ...$tags
 	 * @return void
 	 */
-	public function tag($abstract, $tags);
+	public function tag($abstracts, $tags);
 
 	/**
 	 * Resolve all of the bindings for a given tag.
@@ -79,6 +79,15 @@ interface Container {
 	public function extend($abstract, Closure $closure);
 
 	/**
+	 * Register an existing instance as shared in the container.
+	 *
+	 * @param  string  $abstract
+	 * @param  mixed   $instance
+	 * @return void
+	 */
+	public function instance($abstract, $instance);
+
+	/**
 	 * Define a contextual binding.
 	 *
 	 * @param  string  $concrete
@@ -93,7 +102,7 @@ interface Container {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array());
+	public function make($abstract, array $parameters = []);
 
 	/**
 	 * Call the given Closure / class@method and inject its dependencies.
@@ -103,7 +112,7 @@ interface Container {
 	 * @param  string|null  $defaultMethod
 	 * @return mixed
 	 */
-	public function call($callback, array $parameters = array(), $defaultMethod = null);
+	public function call($callback, array $parameters = [], $defaultMethod = null);
 
 	/**
 	 * Determine if the given abstract type has been resolved.
@@ -117,17 +126,18 @@ interface Container {
 	 * Register a new resolving callback.
 	 *
 	 * @param  string    $abstract
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return void
 	 */
-	public function resolving($abstract, Closure $callback);
+	public function resolving($abstract, Closure $callback = null);
 
 	/**
-	 * Register a new resolving callback for all types.
+	 * Register a new after resolving callback.
 	 *
-	 * @param  \Closure  $callback
+	 * @param  string    $abstract
+	 * @param  \Closure|null  $callback
 	 * @return void
 	 */
-	public function resolvingAny(Closure $callback);
+	public function afterResolving($abstract, Closure $callback = null);
 
 }

@@ -43,7 +43,7 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 		$hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
 		$hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
 		$provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'foo');
-		$user = m::mock('Illuminate\Contracts\Auth\User');
+		$user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
 		$user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
 		$result = $provider->validateCredentials($user, array('password' => 'plain'));
 

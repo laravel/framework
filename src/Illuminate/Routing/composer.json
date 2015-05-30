@@ -1,6 +1,12 @@
 {
     "name": "illuminate/routing",
+    "description": "The Illuminate Routing package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,19 +14,16 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/container": "5.0.*",
-        "illuminate/contracts": "5.0.*",
-        "illuminate/http": "5.0.*",
-        "illuminate/session": "5.0.*",
-        "illuminate/support": "5.0.*",
-        "symfony/http-foundation": "2.6.*",
-        "symfony/http-kernel": "2.6.*",
-        "symfony/routing": "2.6.*"
-    },
-    "require-dev": {
-        "illuminate/console": "5.0.*",
-        "illuminate/filesystem": "5.0.*"
+        "php": ">=5.5.9",
+        "illuminate/container": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/http": "5.1.*",
+        "illuminate/pipeline": "5.1.*",
+        "illuminate/session": "5.1.*",
+        "illuminate/support": "5.1.*",
+        "symfony/http-foundation": "2.7.*",
+        "symfony/http-kernel": "2.7.*",
+        "symfony/routing": "2.7.*"
     },
     "autoload": {
         "psr-4": {
@@ -29,8 +32,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
+    },
+    "suggest": {
+        "illuminate/console": "Required to use the make commands (5.1.*)."
     },
     "minimum-stability": "dev"
 }

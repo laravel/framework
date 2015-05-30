@@ -3,11 +3,11 @@
 interface Factory {
 
 	/**
-	 * Get a cache driver instance.
+	 * Get a cache store instance by name.
 	 *
-	 * @param  string  $driver
+	 * @param  string|null  $name
 	 * @return mixed
 	 */
-	public function driver($driver = null);
+	public function store($name = null);
 
 }

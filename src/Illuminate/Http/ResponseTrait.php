@@ -5,6 +5,26 @@ use Symfony\Component\HttpFoundation\Cookie;
 trait ResponseTrait {
 
 	/**
+	 * Get the status code for the response.
+	 *
+	 * @return int
+	 */
+	public function status()
+	{
+		return $this->getStatusCode();
+	}
+
+	/**
+	 * Get the content of the response.
+	 *
+	 * @return string
+	 */
+	public function content()
+	{
+		return $this->getContent();
+	}
+
+	/**
 	 * Set a header on the Response.
 	 *
 	 * @param  string  $key

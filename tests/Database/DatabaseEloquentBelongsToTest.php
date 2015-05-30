@@ -76,6 +76,27 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDissociateMethodUnsetsForeignKeyOnModel()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+		$relation = $this->getRelation($parent);
+		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
+		$parent->shouldReceive('setRelation')->once()->with('relation', null);
+		$relation->dissociate();
+	}
+
+
+	public function testAssociateMethodSetsForeignKeyOnModelById()
+	{
+		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+		$relation = $this->getRelation($parent);
+		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+		$relation->associate(1);
+	}
+
+
 	protected function getRelation($parent = null)
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder');

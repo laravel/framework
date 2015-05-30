@@ -7,20 +7,23 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
+         stopOnError="false"
          stopOnFailure="false"
-         syntaxCheck="false"
+         syntaxCheck="true"
+         verbose="true"
 >
     <testsuites>
         <testsuite name="Laravel Test Suite">
-            <directory>./tests/</directory>
+            <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
-
     <filter>
-        <whitelist addUncoveredFilesFromWhitelist="false">
-            <directory suffix=".php">src</directory>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
             <exclude>
-                <directory suffix=".php">vendor</directory>
+                <file>./src/Illuminate/Foundation/start.php</file>
+                <file>./src/Illuminate/Foundation/Console/Optimize/config.php</file>
+                <directory>./src/Illuminate/Pagination/views</directory>
             </exclude>
         </whitelist>
     </filter>

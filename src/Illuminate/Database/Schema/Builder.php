@@ -68,6 +68,25 @@ class Builder {
 	}
 
 	/**
+	 * Determine if the given table has given columns.
+	 *
+	 * @param  string  $table
+	 * @param  array   $columns
+	 * @return bool
+	 */
+	public function hasColumns($table, array $columns)
+	{
+		$tableColumns = array_map('strtolower', $this->getColumnListing($table));
+
+		foreach ($columns as $column)
+		{
+			if ( ! in_array(strtolower($column), $tableColumns)) return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get the column listing for a given table.
 	 *
 	 * @param  string  $table
@@ -172,8 +191,8 @@ class Builder {
 	/**
 	 * Create a new command set with a Closure.
 	 *
-	 * @param  string    $table
-	 * @param  \Closure  $callback
+	 * @param  string  $table
+	 * @param  \Closure|null  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
@@ -199,7 +218,7 @@ class Builder {
 	/**
 	 * Set the database connection instance.
 	 *
-	 * @param  \Illuminate\Database\Connection
+	 * @param  \Illuminate\Database\Connection  $connection
 	 * @return $this
 	 */
 	public function setConnection(Connection $connection)

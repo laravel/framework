@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-class ArrayStore extends TaggableStore implements StoreInterface {
+use Illuminate\Contracts\Cache\Store;
+
+class ArrayStore extends TaggableStore implements Store {
 
 	/**
 	 * The array of stored values.
@@ -59,9 +61,7 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		$this->storage[$key] = $this->storage[$key] - $value;
-
-		return $this->storage[$key];
+		return $this->increment($key, $value * -1);
 	}
 
 	/**
@@ -73,7 +73,7 @@ class ArrayStore extends TaggableStore implements StoreInterface {
 	 */
 	public function forever($key, $value)
 	{
-		return $this->put($key, $value, 0);
+		$this->put($key, $value, 0);
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputArgument;
 
 class ClearCommand extends Command {
 
@@ -28,25 +28,16 @@ class ClearCommand extends Command {
 	protected $cache;
 
 	/**
-	 * The file system instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
-
-	/**
 	 * Create a new cache clear command instance.
 	 *
 	 * @param  \Illuminate\Cache\CacheManager  $cache
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CacheManager $cache, Filesystem $files)
+	public function __construct(CacheManager $cache)
 	{
 		parent::__construct();
 
 		$this->cache = $cache;
-		$this->files = $files;
 	}
 
 	/**
@@ -56,13 +47,27 @@ class ClearCommand extends Command {
 	 */
 	public function fire()
 	{
-		$this->cache->flush();
+		$storeName = $this->argument('store');
 
-		$this->files->delete($this->laravel['config']['app.manifest'].'/services.json');
+		$this->laravel['events']->fire('cache:clearing', [$storeName]);
 
-		$this->laravel['events']->fire('cache:cleared');
+		$this->cache->store($storeName)->flush();
+
+		$this->laravel['events']->fire('cache:cleared', [$storeName]);
 
 		$this->info('Application cache cleared!');
+	}
+
+	/**
+	 * Get the console command arguments.
+	 *
+	 * @return array
+	 */
+	protected function getArguments()
+	{
+		return [
+			['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
+		];
 	}
 
 }

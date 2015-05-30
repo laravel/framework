@@ -3,8 +3,9 @@
 use ArrayObject;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class Response extends \Symfony\Component\HttpFoundation\Response {
+class Response extends BaseResponse {
 
 	use ResponseTrait;
 
@@ -14,6 +15,13 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 	 * @var mixed
 	 */
 	public $original;
+
+	/**
+	 * The exception that triggered the error response (if applicable).
+	 *
+	 * @var \Exception
+	 */
+	public $exception;
 
 	/**
 	 * Set the content on the response.
@@ -30,7 +38,7 @@ class Response extends \Symfony\Component\HttpFoundation\Response {
 		// from routes that will be automatically transformed to their JSON form.
 		if ($this->shouldBeJson($content))
 		{
-			$this->headers->set('Content-Type', 'application/json');
+			$this->header('Content-Type', 'application/json');
 
 			$content = $this->morphToJson($content);
 		}

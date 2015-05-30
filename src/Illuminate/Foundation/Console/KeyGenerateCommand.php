@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command {
 
@@ -21,57 +21,31 @@ class KeyGenerateCommand extends Command {
 	protected $description = "Set the application key";
 
 	/**
-	 * The filesystem instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
-
-	/**
-	 * Create a new key generator command.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
-
-		$this->files = $files;
-	}
-
-	/**
 	 * Execute the console command.
 	 *
 	 * @return void
 	 */
 	public function fire()
 	{
-		list($path, $contents) = $this->getKeyFile();
-
 		$key = $this->getRandomKey();
 
-		$contents = str_replace($this->laravel['config']['app.key'], $key, $contents);
+		if ($this->option('show'))
+		{
+			return $this->line('<comment>'.$key.'</comment>');
+		}
 
-		$this->files->put($path, $contents);
+		$path = base_path('.env');
+
+		if (file_exists($path))
+		{
+			file_put_contents($path, str_replace(
+				$this->laravel['config']['app.key'], $key, file_get_contents($path)
+			));
+		}
 
 		$this->laravel['config']['app.key'] = $key;
 
 		$this->info("Application key [$key] set successfully.");
-	}
-
-	/**
-	 * Get the key file and contents.
-	 *
-	 * @return array
-	 */
-	protected function getKeyFile()
-	{
-		$env = $this->option('env') ? $this->option('env').'/' : '';
-
-		$contents = $this->files->get($path = $this->laravel['path.config']."/{$env}app.php");
-
-		return array($path, $contents);
 	}
 
 	/**
@@ -82,6 +56,18 @@ class KeyGenerateCommand extends Command {
 	protected function getRandomKey()
 	{
 		return Str::random(32);
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'),
+		);
 	}
 
 }

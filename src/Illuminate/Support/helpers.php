@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Debug\Dumper;
 
 if ( ! function_exists('append_config'))
 {
@@ -50,13 +52,27 @@ if ( ! function_exists('array_build'))
 	/**
 	 * Build a new array using a callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	function array_build($array, Closure $callback)
+	function array_build($array, callable $callback)
 	{
 		return Arr::build($array, $callback);
+	}
+}
+
+if ( ! function_exists('array_collapse'))
+{
+	/**
+	 * Collapse an array of arrays into a single array.
+	 *
+	 * @param  array|\ArrayAccess  $array
+	 * @return array
+	 */
+	function array_collapse($array)
+	{
+		return Arr::collapse($array);
 	}
 }
 
@@ -112,6 +128,8 @@ if ( ! function_exists('array_fetch'))
 	 * @param  array   $array
 	 * @param  string  $key
 	 * @return array
+	 *
+	 * @deprecated since version 5.1. Use array_pluck instead.
 	 */
 	function array_fetch($array, $key)
 	{
@@ -124,12 +142,12 @@ if ( ! function_exists('array_first'))
 	/**
 	 * Return the first element in an array passing a given truth test.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
-	 * @param  mixed     $default
+	 * @param  array  $array
+	 * @param  callable  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	function array_first($array, $callback, $default = null)
+	function array_first($array, callable $callback, $default = null)
 	{
 		return Arr::first($array, $callback, $default);
 	}
@@ -140,9 +158,9 @@ if ( ! function_exists('array_last'))
 	/**
 	 * Return the last element in an array passing a given truth test.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
-	 * @param  mixed     $default
+	 * @param  array  $array
+	 * @param  callable  $callback
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	function array_last($array, $callback, $default = null)
@@ -193,6 +211,21 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		return Arr::get($array, $key, $default);
+	}
+}
+
+if ( ! function_exists('array_has'))
+{
+	/**
+	 * Check if an item exists in an array using "dot" notation.
+	 *
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return bool
+	 */
+	function array_has($array, $key)
+	{
+		return Arr::has($array, $key);
 	}
 }
 
@@ -264,13 +297,13 @@ if ( ! function_exists('array_set'))
 if ( ! function_exists('array_sort'))
 {
 	/**
-	 * Sort the array using the given Closure.
+	 * Sort the array using the given callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	function array_sort($array, Closure $callback)
+	function array_sort($array, callable $callback)
 	{
 		return Arr::sort($array, $callback);
 	}
@@ -279,13 +312,13 @@ if ( ! function_exists('array_sort'))
 if ( ! function_exists('array_where'))
 {
 	/**
-	 * Filter the array using the given Closure.
+	 * Filter the array using the given callback.
 	 *
-	 * @param  array     $array
-	 * @param  \Closure  $callback
+	 * @param  array  $array
+	 * @param  callable  $callback
 	 * @return array
 	 */
-	function array_where($array, Closure $callback)
+	function array_where($array, callable $callback)
 	{
 		return Arr::where($array, $callback);
 	}
@@ -324,7 +357,7 @@ if ( ! function_exists('class_basename'))
 if ( ! function_exists('class_uses_recursive'))
 {
 	/**
-	 * Returns all traits used by a class, it's subclasses and trait of their traits
+	 * Returns all traits used by a class, its subclasses and trait of their traits.
 	 *
 	 * @param  string  $class
 	 * @return array
@@ -342,13 +375,27 @@ if ( ! function_exists('class_uses_recursive'))
 	}
 }
 
+if ( ! function_exists('collect'))
+{
+	/**
+	 * Create a collection from the given value.
+	 *
+	 * @param  mixed  $value
+	 * @return \Illuminate\Support\Collection
+	 */
+	function collect($value = null)
+	{
+		return new Collection($value);
+	}
+}
+
 if ( ! function_exists('data_get'))
 {
 	/**
 	 * Get an item from an array or object using "dot" notation.
 	 *
 	 * @param  mixed   $target
-	 * @param  string  $key
+	 * @param  string|array  $key
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
@@ -356,11 +403,22 @@ if ( ! function_exists('data_get'))
 	{
 		if (is_null($key)) return $target;
 
-		foreach (explode('.', $key) as $segment)
+		$key = is_array($key) ? $key : explode('.', $key);
+
+		foreach ($key as $segment)
 		{
 			if (is_array($target))
 			{
 				if ( ! array_key_exists($segment, $target))
+				{
+					return value($default);
+				}
+
+				$target = $target[$segment];
+			}
+			elseif ($target instanceof ArrayAccess)
+			{
+				if ( ! isset($target[$segment]))
 				{
 					return value($default);
 				}
@@ -396,7 +454,9 @@ if ( ! function_exists('dd'))
 	 */
 	function dd()
 	{
-		array_map(function($x) { var_dump($x); }, func_get_args()); die;
+		array_map(function($x) { (new Dumper)->dump($x); }, func_get_args());
+
+		die(1);
 	}
 }
 
@@ -499,9 +559,34 @@ if ( ! function_exists('preg_replace_sub'))
 	{
 		return preg_replace_callback($pattern, function($match) use (&$replacements)
 		{
-			return array_shift($replacements);
+			foreach ($replacements as $key => $value)
+			{
+				return array_shift($replacements);
+			}
 
 		}, $subject);
+	}
+}
+
+if ( ! function_exists('array_sort_recursive')) {
+	/**
+	 * Recursively sort an array by keys and values.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	function array_sort_recursive($array) {
+		foreach ($array as &$value) {
+			if (is_array($value) && isset($value[0])) {
+				sort($value);
+			} elseif (is_array($value)) {
+				array_sort_recursive($value);
+			}
+		}
+
+		ksort($array);
+
+		return $array;
 	}
 }
 
@@ -662,6 +747,21 @@ if ( ! function_exists('str_singular'))
 	}
 }
 
+if ( ! function_exists('str_slug'))
+{
+	/**
+	 * Generate a URL friendly "slug" from a given string.
+	 *
+	 * @param  string  $title
+	 * @param  string  $separator
+	 * @return string
+	 */
+	function str_slug($title, $separator = '-')
+	{
+		return Str::slug($title, $separator);
+	}
+}
+
 if ( ! function_exists('studly_case'))
 {
 	/**
@@ -679,7 +779,7 @@ if ( ! function_exists('studly_case'))
 if ( ! function_exists('trait_uses_recursive'))
 {
 	/**
-	 * Returns all traits used by a trait and its traits
+	 * Returns all traits used by a trait and its traits.
 	 *
 	 * @param  string  $trait
 	 * @return array

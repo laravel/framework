@@ -1,6 +1,9 @@
 <?php namespace Illuminate\Log;
 
 use Closure;
+use RuntimeException;
+use InvalidArgumentException;
+use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
@@ -27,6 +30,22 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 * @var \Illuminate\Contracts\Events\Dispatcher
 	 */
 	protected $dispatcher;
+
+	/**
+	 * The Log levels.
+	 *
+	 * @var array
+	 */
+	protected $levels = [
+		'debug'     => MonologLogger::DEBUG,
+		'info'      => MonologLogger::INFO,
+		'notice'    => MonologLogger::NOTICE,
+		'warning'   => MonologLogger::WARNING,
+		'error'     => MonologLogger::ERROR,
+		'critical'  => MonologLogger::CRITICAL,
+		'alert'     => MonologLogger::ALERT,
+		'emergency' => MonologLogger::EMERGENCY,
+	];
 
 	/**
 	 * Create a new log writer instance.
@@ -144,6 +163,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	/**
 	 * Log a message to the logs.
 	 *
+	 * @param  string  $level
 	 * @param  string  $message
 	 * @param  array  $context
 	 * @return void
@@ -163,7 +183,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	public function write($level, $message, array $context = array())
 	{
-		return $this->log($level, $message, $context);
+		return $this->writeLog($level, $message, $context);
 	}
 
 	/**
@@ -213,10 +233,22 @@ class Writer implements LogContract, PsrLoggerInterface {
 	}
 
 	/**
+	 * Register a Syslog handler.
+	 *
+	 * @param  string  $name
+	 * @param  string  $level
+	 * @return void
+	 */
+	public function useSyslog($name = 'laravel', $level = 'debug')
+	{
+		return $this->monolog->pushHandler(new SyslogHandler($name, LOG_USER, $level));
+	}
+
+	/**
 	 * Register an error_log handler.
 	 *
 	 * @param  string  $level
-	 * @param  integer $messageType
+	 * @param  int  $messageType
 	 * @return void
 	 */
 	public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
@@ -229,8 +261,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	}
 
 	/**
-	 * Register a new callback handler for when
-	 * a log event is triggered.
+	 * Register a new callback handler for when a log event is triggered.
 	 *
 	 * @param  \Closure  $callback
 	 * @return void
@@ -241,7 +272,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	{
 		if ( ! isset($this->dispatcher))
 		{
-			throw new \RuntimeException("Events dispatcher has not been set.");
+			throw new RuntimeException("Events dispatcher has not been set.");
 		}
 
 		$this->dispatcher->listen('illuminate.log', $callback);
@@ -300,35 +331,12 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function parseLevel($level)
 	{
-		switch ($level)
+		if (isset($this->levels[$level]))
 		{
-			case 'debug':
-				return MonologLogger::DEBUG;
-
-			case 'info':
-				return MonologLogger::INFO;
-
-			case 'notice':
-				return MonologLogger::NOTICE;
-
-			case 'warning':
-				return MonologLogger::WARNING;
-
-			case 'error':
-				return MonologLogger::ERROR;
-
-			case 'critical':
-				return MonologLogger::CRITICAL;
-
-			case 'alert':
-				return MonologLogger::ALERT;
-
-			case 'emergency':
-				return MonologLogger::EMERGENCY;
-
-			default:
-				throw new \InvalidArgumentException("Invalid log level.");
+			return $this->levels[$level];
 		}
+
+		throw new InvalidArgumentException("Invalid log level.");
 	}
 
 	/**
@@ -348,7 +356,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	protected function getDefaultFormatter()
 	{
-		return new LineFormatter(null, null, true);
+		return new LineFormatter(null, null, true, true);
 	}
 
 	/**
@@ -364,7 +372,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $dispatcher)

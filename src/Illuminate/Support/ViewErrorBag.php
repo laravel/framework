@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use Countable;
+use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
 class ViewErrorBag implements Countable {
 
@@ -26,7 +27,7 @@ class ViewErrorBag implements Countable {
 	 * Get a MessageBag instance from the bags.
 	 *
 	 * @param  string  $key
-	 * @return \Illuminate\Support\MessageBag
+	 * @return \Illuminate\Contracts\Support\MessageBag
 	 */
 	public function getBag($key)
 	{
@@ -34,13 +35,23 @@ class ViewErrorBag implements Countable {
 	}
 
 	/**
+	 * Get all the bags.
+	 *
+	 * @return array
+	 */
+	public function getBags()
+	{
+		return $this->bags;
+	}
+
+	/**
 	 * Add a new MessageBag instance to the bags.
 	 *
 	 * @param  string  $key
-	 * @param  \Illuminate\Support\MessageBag  $bag
+	 * @param  \Illuminate\Contracts\Support\MessageBag  $bag
 	 * @return $this
 	 */
-	public function put($key, MessageBag $bag)
+	public function put($key, MessageBagContract $bag)
 	{
 		$this->bags[$key] = $bag;
 
@@ -73,7 +84,7 @@ class ViewErrorBag implements Countable {
 	 * Dynamically access a view error bag.
 	 *
 	 * @param  string  $key
-	 * @return \Illuminate\Support\MessageBag
+	 * @return \Illuminate\Contracts\Support\MessageBag
 	 */
 	public function __get($key)
 	{
@@ -84,7 +95,7 @@ class ViewErrorBag implements Countable {
 	 * Dynamically set a view error bag.
 	 *
 	 * @param  string  $key
-	 * @param  \Illuminate\Support\MessageBag  $value
+	 * @param  \Illuminate\Contracts\Support\MessageBag  $value
 	 * @return void
 	 */
 	public function __set($key, $value)

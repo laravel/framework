@@ -176,12 +176,13 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 			'baz@baz' => array('qux', 'foo'),
 		));
 
+		$this->assertCount(3, $composers);
 		$reflections = array(
 			new ReflectionFunction($composers[0]),
 			new ReflectionFunction($composers[1]),
 		);
-		$this->assertEquals(array('class' => 'foo', 'method' => 'compose', 'container' => null), $reflections[0]->getStaticVariables());
-		$this->assertEquals(array('class' => 'baz', 'method' => 'baz', 'container' => null), $reflections[1]->getStaticVariables());
+		$this->assertEquals(array('class' => 'foo', 'method' => 'compose'), $reflections[0]->getStaticVariables());
+		$this->assertEquals(array('class' => 'baz', 'method' => 'baz'), $reflections[1]->getStaticVariables());
 	}
 
 
@@ -333,11 +334,23 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		echo 'hi';
 		$factory->stopSection();
 
-		$this->assertEquals(1, count($factory->getSections()));
+		$this->assertCount(1, $factory->getSections());
 
 		$factory->flushSections();
 
-		$this->assertEquals(0, count($factory->getSections()));
+		$this->assertCount(0, $factory->getSections());
+	}
+
+
+	public function testHasSection()
+	{
+		$factory = $this->getFactory();
+		$factory->startSection('foo');
+		echo 'hi';
+		$factory->stopSection();
+
+		$this->assertTrue($factory->hasSection('foo'));
+		$this->assertFalse($factory->hasSection('bar'));
 	}
 
 

@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
@@ -42,7 +43,6 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class AppDatabaseMigrationRollbackStub {
-	public $env = 'development';
-	public function environment() { return $this->env; }
+class AppDatabaseMigrationRollbackStub extends Application {
+	public function environment() { return 'development'; }
 }

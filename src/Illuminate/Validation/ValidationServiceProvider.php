@@ -12,7 +12,7 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->registerValiationResolverHook();
+		$this->registerValidationResolverHook();
 
 		$this->registerPresenceVerifier();
 
@@ -24,14 +24,11 @@ class ValidationServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	protected function registerValiationResolverHook()
+	protected function registerValidationResolverHook()
 	{
-		$this->app->afterResolvingAny(function($resolved)
+		$this->app->afterResolving(function(ValidatesWhenResolved $resolved)
 		{
-			if ($resolved instanceof ValidatesWhenResolved)
-			{
-				$resolved->validate();
-			}
+			$resolved->validate();
 		});
 	}
 
@@ -42,7 +39,7 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerValidationFactory()
 	{
-		$this->app->bindShared('validator', function($app)
+		$this->app->singleton('validator', function($app)
 		{
 			$validator = new Factory($app['translator'], $app);
 
@@ -65,7 +62,7 @@ class ValidationServiceProvider extends ServiceProvider {
 	 */
 	protected function registerPresenceVerifier()
 	{
-		$this->app->bindShared('validation.presence', function($app)
+		$this->app->singleton('validation.presence', function($app)
 		{
 			return new DatabasePresenceVerifier($app['db']);
 		});

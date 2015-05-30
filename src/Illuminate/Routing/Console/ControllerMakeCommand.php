@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Routing\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -38,10 +37,8 @@ class ControllerMakeCommand extends GeneratorCommand {
 		{
 			return __DIR__.'/stubs/controller.plain.stub';
 		}
-		else
-		{
-			return __DIR__.'/stubs/controller.stub';
-		}
+
+		return __DIR__.'/stubs/controller.stub';
 	}
 
 	/**

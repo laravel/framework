@@ -1,8 +1,6 @@
 <?php namespace Illuminate\Foundation\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ProviderMakeCommand extends GeneratorCommand {
 

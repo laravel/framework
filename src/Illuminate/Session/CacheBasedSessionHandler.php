@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Session;
 
+use SessionHandlerInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
-class CacheBasedSessionHandler implements \SessionHandlerInterface {
+class CacheBasedSessionHandler implements SessionHandlerInterface {
 
 	/**
 	 * The cache repository instance.

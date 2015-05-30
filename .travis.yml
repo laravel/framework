@@ -1,18 +1,28 @@
 language: php
 
 php:
-  - 5.4
+  - 5.5.9
   - 5.5
   - 5.6
+  - 7.0
   - hhvm
 
-before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
-
-script: vendor/bin/phpunit --verbose
+env:
+  global:
+    - setup=basic
 
 matrix:
-  allow_failures:
-    - php: hhvm
-  fast_finish: true
+  include:
+    - php: 5.5.9
+      env: setup=lowest
+    - php: 5.5.9
+      env: setup=stable
+
+sudo: false
+
+install:
+  - if [[ $setup = 'basic' ]]; then travis_retry composer install --no-interaction --prefer-source; fi
+  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-stable; fi
+  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-source --no-interaction --prefer-lowest --prefer-stable; fi
+
+script: vendor/bin/phpunit

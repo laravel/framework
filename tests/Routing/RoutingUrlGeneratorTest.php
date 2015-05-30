@@ -65,21 +65,33 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$routes->add($route);
 
 		/**
+		 * Single Parameter...
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz}', array('as' => 'foobar'));
+		$routes->add($route);
+
+		/**
 		 * HTTPS...
 		 */
-		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('as' => 'baz', 'https'));
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/baz', array('as' => 'baz', 'https'));
 		$routes->add($route);
 
 		/**
 		 * Controller Route Route
 		 */
-		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar', array('controller' => 'foo@bar'));
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bam', array('controller' => 'foo@bar'));
 		$routes->add($route);
 
 		/**
 		 * Non ASCII routes
 		 */
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/åαф/{baz}', array('as' => 'foobarbaz'));
+		$routes->add($route);
+
+		/**
+		 * Fragments
+		 */
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar#derp', array('as' => 'fragment'));
 		$routes->add($route);
 
 		$this->assertEquals('/', $url->route('plain', array(), false));
@@ -89,12 +101,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/foo/bar?foo=bar', $url->route('foo', array('foo' => 'bar'), false));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall')));
 		$this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', array('boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall')));
+		$this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
+		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
 		$this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', array('taylor', 'otwell', 'fly' => 'wall'), false));
-		$this->assertEquals('https://www.foo.com/foo/bar', $url->route('baz'));
-		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+		$this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
+		$this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor')));
 		$this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', array('taylor', 'otwell', 'wall', 'woz')));
 		$this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', array('baz' => 'åαф')));
+		$this->assertEquals('/foo/bar#derp', $url->route('fragment', array(), false));
+		$this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', array('foo' => 'bar'), false));
+		$this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', array('baz' => 'åαф'), false));
 	}
 
 
@@ -120,6 +137,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
 	}
 
+
 	public function testRoutableInterfaceRouting()
 	{
 		$url = new UrlGenerator(
@@ -134,6 +152,23 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$model->key = 'routable';
 
 		$this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
+	}
+
+
+	public function testRoutableInterfaceRoutingWithSingleParameter()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{bar}', array('as' => 'routable'));
+		$routes->add($route);
+
+		$model = new RoutableInterfaceStub;
+		$model->key = 'routable';
+
+		$this->assertEquals('/foo/routable', $url->route('routable', $model, false));
 	}
 
 
@@ -255,6 +290,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$url->forceRootUrl('https://www.bar.com');
 		$this->assertEquals('http://www.bar.com/foo/bar', $url->to('foo/bar'));
 
+		// Ensure trailing slash is trimmed from root URL as UrlGenerator already handles this
+		$url->forceRootUrl('http://www.foo.com/');
+		$this->assertEquals('http://www.foo.com/bar', $url->to('/bar'));
 
 		/**
 		 * Route Based...
@@ -272,6 +310,21 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$url->forceRootUrl('https://www.bar.com');
 		$this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
+	}
+
+
+	public function testPrevious()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$url->getRequest()->headers->set('referer', 'http://www.bar.com/');
+		$this->assertEquals('http://www.bar.com/', $url->previous());
+
+		$url->getRequest()->headers->remove('referer');
+		$this->assertEquals($url->to('/'), $url->previous());
 	}
 
 }

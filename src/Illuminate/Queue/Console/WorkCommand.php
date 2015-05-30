@@ -23,9 +23,9 @@ class WorkCommand extends Command {
 	protected $description = 'Process the next job on a queue';
 
 	/**
-	 * The queue listener instance.
+	 * The queue worker instance.
 	 *
-	 * @var \Illuminate\Queue\Listener
+	 * @var \Illuminate\Queue\Worker
 	 */
 	protected $worker;
 
@@ -91,7 +91,9 @@ class WorkCommand extends Command {
 		{
 			$this->worker->setCache($this->laravel['cache']->driver());
 
-			$this->worker->setDaemonExceptionHandler($this->laravel['exception']);
+			$this->worker->setDaemonExceptionHandler(
+				$this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+			);
 
 			return $this->worker->daemon(
 				$connection, $queue, $delay, $memory,

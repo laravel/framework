@@ -22,10 +22,28 @@ interface Repository {
 	/**
 	 * Set a given configuration value.
 	 *
-	 * @param  string  $key
+	 * @param  array|string  $key
 	 * @param  mixed   $value
 	 * @return void
 	 */
-	public function set($key, $value);
+	public function set($key, $value = null);
+
+	/**
+	 * Prepend a value onto an array configuration value.
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function prepend($key, $value);
+
+	/**
+	 * Push a value onto an array configuration value.
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function push($key, $value);
 
 }

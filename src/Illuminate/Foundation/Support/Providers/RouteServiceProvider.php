@@ -1,23 +1,48 @@
 <?php namespace Illuminate\Foundation\Support\Providers;
 
-use Closure;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider {
 
 	/**
-	 * Register the service provider.
+	 * The controller namespace for the application.
+	 *
+	 * @var string|null
+	 */
+	protected $namespace;
+
+	/**
+	 * Bootstrap any application services.
+	 *
+	 * @param  \Illuminate\Routing\Router  $router
+	 * @return void
+	 */
+	public function boot(Router $router)
+	{
+		$this->setRootControllerNamespace();
+
+		if ($this->app->routesAreCached())
+		{
+			$this->loadCachedRoutes();
+		}
+		else
+		{
+			$this->loadRoutes();
+		}
+	}
+
+	/**
+	 * Set the root controller namespace for the application.
 	 *
 	 * @return void
 	 */
-	public function boot()
+	protected function setRootControllerNamespace()
 	{
-		$this->app->call([$this, 'before']);
+		if (is_null($this->namespace)) return;
 
-		if ($this->app->routesAreCached())
-			return $this->loadCachedRoutes();
-
-		$this->loadRoutes();
+		$this->app['Illuminate\Contracts\Routing\UrlGenerator']
+						->setRootControllerNamespace($this->namespace);
 	}
 
 	/**
@@ -40,24 +65,24 @@ class RouteServiceProvider extends ServiceProvider {
 	 */
 	protected function loadRoutes()
 	{
-		if ($this->app->routesAreScanned())
-			$this->loadScannedRoutes();
-
 		$this->app->call([$this, 'map']);
 	}
 
 	/**
-	 * Load the scanned application routes.
+	 * Load the standard routes file for the application.
 	 *
+	 * @param  string  $path
 	 * @return void
 	 */
-	protected function loadScannedRoutes()
+	protected function loadRoutesFrom($path)
 	{
-		$this->app->booted(function()
-		{
-			$router = app('Illuminate\Contracts\Routing\Registrar');
+		$router = $this->app['Illuminate\Routing\Router'];
 
-			require $this->app->getScannedRoutesPath();
+		if (is_null($this->namespace)) return require $path;
+
+		$router->group(['namespace' => $this->namespace], function($router) use ($path)
+		{
+			require $path;
 		});
 	}
 
@@ -66,25 +91,9 @@ class RouteServiceProvider extends ServiceProvider {
 	 *
 	 * @return void
 	 */
-	public function register() {}
-
-	/**
-	 * Register the given Closure with the "group" function namespace set.
-	 *
-	 * @param  string  $namespace
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	protected function namespaced($namespace, Closure $callback)
+	public function register()
 	{
-		if (empty($namespace))
-		{
-			$callback($this->app['router']);
-		}
-		else
-		{
-			$this->app['router']->group(compact('namespace'), $callback);
-		}
+		//
 	}
 
 	/**

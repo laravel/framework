@@ -62,11 +62,21 @@ class Collection extends BaseCollection {
 	 * Determine if a key exists in the collection.
 	 *
 	 * @param  mixed  $key
+	 * @param  mixed  $value
 	 * @return bool
 	 */
-	public function contains($key)
+	public function contains($key, $value = null)
 	{
-		return ! is_null($this->find($key));
+		if (func_num_args() == 2) return parent::contains($key, $value);
+
+		if ($this->useAsCallable($key)) return parent::contains($key);
+
+		$key = $key instanceof Model ? $key->getKey() : $key;
+
+		return parent::contains(function($k, $m) use ($key)
+		{
+			return $m->getKey() == $key;
+		});
 	}
 
 	/**
@@ -90,7 +100,7 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} > $result) ? $item->{$key} : $result;
+			return is_null($result) || $item->{$key} > $result ? $item->{$key} : $result;
 		});
 	}
 
@@ -104,12 +114,12 @@ class Collection extends BaseCollection {
 	{
 		return $this->reduce(function($result, $item) use ($key)
 		{
-			return (is_null($result) || $item->{$key} < $result) ? $item->{$key} : $result;
+			return is_null($result) || $item->{$key} < $result ? $item->{$key} : $result;
 		});
 	}
 
 	/**
-	 * Get the array of primary keys
+	 * Get the array of primary keys.
 	 *
 	 * @return array
 	 */
@@ -185,13 +195,14 @@ class Collection extends BaseCollection {
 	/**
 	 * Return only unique items from the collection.
 	 *
+	 * @param  string|callable|null  $key
 	 * @return static
 	 */
-	public function unique()
+	public function unique($key = null)
 	{
-		$dictionary = $this->getDictionary();
+		if ( ! is_null($key)) return parent::unique($key);
 
-		return new static(array_values($dictionary));
+		return new static(array_values($this->getDictionary()));
 	}
 
 	/**

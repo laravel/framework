@@ -5,10 +5,10 @@ use Closure;
 trait ConfirmableTrait {
 
 	/**
-	 * Confirm before proceeding with the action
+	 * Confirm before proceeding with the action.
 	 *
 	 * @param  string    $warning
-	 * @param  \Closure  $callback
+	 * @param  \Closure|null  $callback
 	 * @return bool
 	 */
 	public function confirmToProceed($warning = 'Application In Production!', Closure $callback = null)
@@ -24,7 +24,7 @@ trait ConfirmableTrait {
 			$this->comment(str_repeat('*', strlen($warning) + 12));
 			$this->output->writeln('');
 
-			$confirmed = $this->confirm('Do you really wish to run this command?');
+			$confirmed = $this->confirm('Do you really wish to run this command? [y/N]');
 
 			if ( ! $confirmed)
 			{

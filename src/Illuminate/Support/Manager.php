@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Support;
 
 use Closure;
+use InvalidArgumentException;
 
 abstract class Manager {
 
@@ -88,7 +89,7 @@ abstract class Manager {
 			return $this->$method();
 		}
 
-		throw new \InvalidArgumentException("Driver [$driver] not supported.");
+		throw new InvalidArgumentException("Driver [$driver] not supported.");
 	}
 
 	/**

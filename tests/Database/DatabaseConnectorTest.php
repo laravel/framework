@@ -71,7 +71,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-		$connection->shouldReceive('prepare')->once()->with("set search_path to public")->andReturn($connection);
+		$connection->shouldReceive('prepare')->once()->with('set search_path to "public"')->andReturn($connection);
 		$connection->shouldReceive('execute')->twice();
 		$result = $connector->connect($config);
 
@@ -120,19 +120,38 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($result, $connection);
 	}
 
+	public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
+	{
+		$config = array('host' => 'foo', 'database' => 'bar', 'port' => 111, 'appname' => 'baz', 'charset' => 'utf-8');
+		$dsn = $this->getDsn($config);
+		$connector = $this->getMock('Illuminate\Database\Connectors\SqlServerConnector', array('createConnection', 'getOptions'));
+		$connection = m::mock('stdClass');
+		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
+		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
+		$result = $connector->connect($config);
+
+		$this->assertSame($result, $connection);
+
+	}
+
 	protected function getDsn(array $config)
 	{
 		extract($config);
 
-		$port = isset($config['port']) ? ','.$port : '';
-
 		if (in_array('dblib', PDO::getAvailableDrivers()))
 		{
-			return "dblib:host={$host}{$port};dbname={$database}";
+			$port = isset($config['port']) ? ':'.$port : '';
+			$appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+			$charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+
+			return "dblib:host={$host}{$port};dbname={$database}{$appname}{$charset}";
 		}
 		else
 		{
-			return "sqlsrv:Server={$host}{$port};Database={$database}";
+			$port = isset($config['port']) ? ','.$port : '';
+			$appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
+
+			return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}";
 		}
 	}
 

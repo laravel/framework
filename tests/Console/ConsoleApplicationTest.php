@@ -12,10 +12,9 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testAddSetsLaravelInstance()
 	{
-		$app = $this->getMock('Illuminate\Console\Application', array('addToParent'));
-		$app->setLaravel('foo');
+		$app = $this->getMockConsole(['addToParent']);
 		$command = m::mock('Illuminate\Console\Command');
-		$command->shouldReceive('setLaravel')->once()->with('foo');
+		$command->shouldReceive('setLaravel')->once()->with(m::type('Illuminate\Contracts\Foundation\Application'));
 		$app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
 		$result = $app->add($command);
 
@@ -25,8 +24,7 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testLaravelNotSetOnSymfonyCommands()
 	{
-		$app = $this->getMock('Illuminate\Console\Application', array('addToParent'));
-		$app->setLaravel('foo');
+		$app = $this->getMockConsole(['addToParent']);
 		$command = m::mock('Symfony\Component\Console\Command\Command');
 		$command->shouldReceive('setLaravel')->never();
 		$app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
@@ -38,9 +36,9 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testResolveAddsCommandViaApplicationResolution()
 	{
-		$app = $this->getMock('Illuminate\Console\Application', array('addToParent'));
+		$app = $this->getMockConsole(['addToParent']);
 		$command = m::mock('Symfony\Component\Console\Command\Command');
-		$app->setLaravel(array('foo' => $command));
+		$app->getLaravel()->shouldReceive('make')->once()->with('foo')->andReturn(m::mock('Symfony\Component\Console\Command\Command'));
 		$app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
 		$result = $app->resolve('foo');
 
@@ -48,19 +46,16 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testResolveCommandsCallsResolveForAllCommandsItsGiven()
+	protected function getMockConsole(array $methods)
 	{
-		$app = m::mock('Illuminate\Console\Application[resolve]');
-		$app->shouldReceive('resolve')->twice()->with('foo');
-		$app->resolveCommands('foo', 'foo');
-	}
+		$app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.1']);
+		$events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['fire' => null]);
 
+		$console = $this->getMock('Illuminate\Console\Application', $methods, [
+			$app, $events, 'test-version'
+		]);
 
-	public function testResolveCommandsCallsResolveForAllCommandsItsGivenViaArray()
-	{
-		$app = m::mock('Illuminate\Console\Application[resolve]');
-		$app->shouldReceive('resolve')->twice()->with('foo');
-		$app->resolveCommands(array('foo', 'foo'));
+		return $console;
 	}
 
 }

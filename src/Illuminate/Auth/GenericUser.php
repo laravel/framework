@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth;
 
-use Illuminate\Contracts\Auth\User as UserContract;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 class GenericUser implements UserContract {
 
@@ -43,7 +43,7 @@ class GenericUser implements UserContract {
 	}
 
 	/**
-	 * Get the token value for the "remember me" session.
+	 * Get the "remember me" token value.
 	 *
 	 * @return string
 	 */
@@ -53,7 +53,7 @@ class GenericUser implements UserContract {
 	}
 
 	/**
-	 * Set the token value for the "remember me" session.
+	 * Set the "remember me" token value.
 	 *
 	 * @param  string  $value
 	 * @return void
@@ -88,7 +88,7 @@ class GenericUser implements UserContract {
 	 * Dynamically set an attribute on the user.
 	 *
 	 * @param  string  $key
-	 * @param  mixed   $value
+	 * @param  mixed  $value
 	 * @return void
 	 */
 	public function __set($key, $value)

@@ -11,7 +11,7 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('foo' => 'bar'), $loader->getAliases());
 		$this->assertFalse($loader->isRegistered());
 		$loader->register();
-		$loader->register();
+
 		$this->assertTrue($loader->isRegistered());
 	}
 

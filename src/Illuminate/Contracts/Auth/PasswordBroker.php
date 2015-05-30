@@ -7,46 +7,46 @@ interface PasswordBroker {
 	/**
 	 * Constant representing a successfully sent reminder.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	const REMINDER_SENT = 'reminders.sent';
+	const RESET_LINK_SENT = 'passwords.sent';
 
 	/**
 	 * Constant representing a successfully reset password.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	const PASSWORD_RESET = 'reminders.reset';
+	const PASSWORD_RESET = 'passwords.reset';
 
 	/**
 	 * Constant representing the user not found response.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	const INVALID_USER = 'reminders.user';
+	const INVALID_USER = 'passwords.user';
 
 	/**
 	 * Constant representing an invalid password.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	const INVALID_PASSWORD = 'reminders.password';
+	const INVALID_PASSWORD = 'passwords.password';
 
 	/**
 	 * Constant representing an invalid token.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	const INVALID_TOKEN = 'reminders.token';
+	const INVALID_TOKEN = 'passwords.token';
 
 	/**
-	 * Send a password reminder to a user.
+	 * Send a password reset link to a user.
 	 *
-	 * @param  array     $credentials
-	 * @param  \Closure  $callback
+	 * @param  array  $credentials
+	 * @param  \Closure|null  $callback
 	 * @return string
 	 */
-	public function remind(array $credentials, Closure $callback = null);
+	public function sendResetLink(array $credentials, Closure $callback = null);
 
 	/**
 	 * Reset the password for the given token.
@@ -64,5 +64,13 @@ interface PasswordBroker {
 	 * @return void
 	 */
 	public function validator(Closure $callback);
+
+	/**
+	 * Determine if the passwords match for the request.
+	 *
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function validateNewPassword(array $credentials);
 
 }

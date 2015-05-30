@@ -214,6 +214,19 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testExtendCanBeCalledBeforeBind()
+	{
+		$container = new Container;
+		$container->extend('foo', function($old, $container)
+		{
+			return $old.'bar';
+		});
+		$container['foo'] = 'foo';
+
+		$this->assertEquals('foobar', $container->make('foo'));
+	}
+
+
 	public function testParametersCanBePassedThroughToClosure()
 	{
 		$container = new Container;
@@ -249,7 +262,18 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testResolvingCallbacksAreCalled()
 	{
 		$container = new Container;
-		$container->resolvingAny(function($object) { return $object->name = 'taylor'; });
+		$container->resolving(function($object) { return $object->name = 'taylor'; });
+		$container->bind('foo', function() { return new StdClass; });
+		$instance = $container->make('foo');
+
+		$this->assertEquals('taylor', $instance->name);
+	}
+
+
+	public function testResolvingCallbacksAreCalledForType()
+	{
+		$container = new Container;
+		$container->resolving('StdClass', function($object) { return $object->name = 'taylor'; });
 		$container->bind('foo', function() { return new StdClass; });
 		$instance = $container->make('foo');
 
@@ -363,7 +387,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
-	 * @expectedException InvalidArgumentException
+	 * @expectedException ReflectionException
 	 */
 	public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
 	{
@@ -391,6 +415,33 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
 		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
+
+	public function testCallWithCallableArray()
+	{
+		$container = new Container;
+		$stub = new ContainerTestCallStub();
+		$result = $container->call([$stub, 'work'], ['foo', 'bar']);
+		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
+
+	public function testCallWithStaticMethodNameString()
+	{
+		$container = new Container;
+		$result = $container->call('ContainerStaticMethodStub::inject');
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
+	}
+
+
+	public function testCallWithGlobalMethodName()
+	{
+		$container = new Container;
+		$result = $container->call('containerTestInject');
+		$this->assertInstanceOf('ContainerConcreteStub', $result[0]);
+		$this->assertEquals('taylor', $result[1]);
 	}
 
 
@@ -435,8 +486,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container->tag('ContainerImplementationStub', 'foo', 'bar');
 		$container->tag('ContainerImplementationStubTwo', ['foo']);
 
-		$this->assertEquals(1, count($container->tagged('bar')));
-		$this->assertEquals(2, count($container->tagged('foo')));
+		$this->assertCount(1, $container->tagged('bar'));
+		$this->assertCount(2, $container->tagged('foo'));
 		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
 		$this->assertInstanceOf('ContainerImplementationStub', $container->tagged('bar')[0]);
 		$this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
@@ -531,4 +582,17 @@ class ContainerTestContextInjectTwo {
 	{
 		$this->impl = $impl;
 	}
+}
+
+class ContainerStaticMethodStub
+{
+	public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
+	{
+		return func_get_args();
+	}
+}
+
+function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
+{
+	return func_get_args();
 }

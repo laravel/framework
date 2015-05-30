@@ -33,6 +33,13 @@ abstract class Job {
 	protected $deleted = false;
 
 	/**
+	 * Indicates if the job has been released.
+	 *
+	 * @var bool
+	 */
+	protected $released = false;
+
+	/**
 	 * Fire the job.
 	 *
 	 * @return void
@@ -65,7 +72,30 @@ abstract class Job {
 	 * @param  int   $delay
 	 * @return void
 	 */
-	abstract public function release($delay = 0);
+	public function release($delay = 0)
+	{
+		$this->released = true;
+	}
+
+	/**
+	 * Determine if the job was released back into the queue.
+	 *
+	 * @return bool
+	 */
+	public function isReleased()
+	{
+		return $this->released;
+	}
+
+	/**
+	 * Determine if the job has been deleted or released.
+	 *
+	 * @return bool
+	 */
+	public function isDeletedOrReleased()
+	{
+		return $this->isDeleted() || $this->isReleased();
+	}
 
 	/**
 	 * Get the number of times the job has been attempted.
@@ -149,7 +179,7 @@ abstract class Job {
 	 */
 	protected function resolveQueueableEntity($value)
 	{
-		if (is_string($value) and starts_with($value, '::entity::'))
+		if (is_string($value) && starts_with($value, '::entity::'))
 		{
 			list($marker, $type, $id) = explode('|', $value, 3);
 
@@ -157,6 +187,25 @@ abstract class Job {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Call the failed method on the job instance.
+	 *
+	 * @return void
+	 */
+	public function failed()
+	{
+		$payload = json_decode($this->getRawBody(), true);
+
+		list($class, $method) = $this->parseJob($payload['job']);
+
+		$this->instance = $this->resolve($class);
+
+		if (method_exists($this->instance, 'failed'))
+		{
+			$this->instance->failed($this->resolveQueueableEntities($payload['data']));
+		}
 	}
 
 	/**

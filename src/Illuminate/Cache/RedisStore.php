@@ -1,8 +1,9 @@
 <?php namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Redis\Database as Redis;
 
-class RedisStore extends TaggableStore implements StoreInterface {
+class RedisStore extends TaggableStore implements Store {
 
 	/**
 	 * The Redis database connection.
@@ -65,6 +66,8 @@ class RedisStore extends TaggableStore implements StoreInterface {
 	public function put($key, $value, $minutes)
 	{
 		$value = is_numeric($value) ? $value : serialize($value);
+
+		$minutes = max(1, $minutes);
 
 		$this->connection()->setex($this->prefix.$key, $minutes * 60, $value);
 	}

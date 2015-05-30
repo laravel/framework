@@ -280,6 +280,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->mediumInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" serial primary key not null', $statements[0]);
 	}
 
 
@@ -291,6 +298,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->tinyInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
 	}
 
 
@@ -302,6 +316,13 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table "users" add column "foo" smallint not null', $statements[0]);
+
+		$blueprint = new Blueprint('users');
+		$blueprint->smallInteger('foo', true);
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" smallserial primary key not null', $statements[0]);
 	}
 
 
@@ -371,6 +392,28 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAddingJson()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->json('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" json not null', $statements[0]);
+	}
+
+
+	public function testAddingJsonb()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->jsonb('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" jsonb not null', $statements[0]);
+	}
+
+
 	public function testAddingDateTime()
 	{
 		$blueprint = new Blueprint('users');
@@ -381,6 +424,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingDateTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->dateTimeTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTime()
 	{
@@ -392,6 +444,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" time(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingTimeTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timeTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" time(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTimeStamp()
 	{
@@ -403,6 +464,15 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
 	}
 
+	public function testAddingTimeStampTz()
+	{
+		$blueprint = new Blueprint('users');
+		$blueprint->timestampTz('foo');
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+		$this->assertEquals(1, count($statements));
+		$this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+	}
 
 	public function testAddingTimeStamps()
 	{

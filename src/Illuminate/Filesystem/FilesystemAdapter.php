@@ -1,8 +1,10 @@
 <?php namespace Illuminate\Filesystem;
 
+use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
@@ -52,7 +54,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 		{
 			return $this->driver->read($path);
 		}
-		catch (\League\Flysystem\FileNotFoundException $e)
+		catch (FileNotFoundException $e)
 		{
 			throw new ContractFileNotFoundException($path, $e->getCode(), $e);
 		}
@@ -62,13 +64,22 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 * Write the contents of a file.
 	 *
 	 * @param  string  $path
-	 * @param  string  $contents
+	 * @param  string|resource  $contents
 	 * @param  string  $visibility
 	 * @return bool
 	 */
 	public function put($path, $contents, $visibility = null)
 	{
-		return $this->driver->put($path, $contents, $this->parseVisibility($visibility));
+		$config = ['visibility' => $this->parseVisibility($visibility)];
+
+		if (is_resource($contents))
+		{
+			return $this->driver->putStream($path, $contents, $config);
+		}
+		else
+		{
+			return $this->driver->put($path, $contents, $config);
+		}
 	}
 
 	/**
@@ -162,9 +173,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	public function move($from, $to)
 	{
-		$this->driver->copy($from, $to);
-
-		$this->driver->delete($from);
+		return $this->driver->rename($from, $to);
 	}
 
 	/**
@@ -176,6 +185,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	public function size($path)
 	{
 		return $this->driver->getSize($path);
+	}
+
+	/**
+	 * Get the mime-type of a given file.
+	 *
+	 * @param  string  $path
+	 * @return string|false
+	 */
+	public function mimeType($path)
+	{
+		return $this->driver->getMimetype($path);
 	}
 
 	/**
@@ -232,10 +252,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 * Get all (recursive) of the directories within a given directory.
 	 *
 	 * @param  string|null  $directory
-	 * @param  bool  $recursive
 	 * @return array
 	 */
-	public function allDirectories($directory = null, $recursive = false)
+	public function allDirectories($directory = null)
 	{
 		return $this->directories($directory, true);
 	}
@@ -263,6 +282,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	}
 
 	/**
+	 * Get the Flysystem driver.
+	 *
+	 * @return \League\Flysystem\FilesystemInterface
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	/**
 	 * Filter directory contents by type.
 	 *
 	 * @param  array  $contents
@@ -271,18 +300,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	protected function filterContentsByType($contents, $type)
 	{
-		$contents = Collection::make($contents);
-
-		$contents = $contents->filter(function($value) use ($type)
-		{
-			return $value['type'] == $type;
-		})
-		->map(function($value)
-		{
-			return $value['path'];
-		});
-
-        return $contents->values()->all();
+		return Collection::make($contents)
+			->where('type', $type)
+			->fetch('path')
+			->values()->all();
 	}
 
 	/**
@@ -294,7 +315,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 	 */
 	protected function parseVisibility($visibility)
 	{
-		if (is_null($visibility)) return null;
+		if (is_null($visibility)) return;
 
 		switch ($visibility)
 		{
@@ -305,7 +326,21 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 				return AdapterInterface::VISIBILITY_PRIVATE;
 		}
 
-		throw new \InvalidArgumentException('Unknown visibility: '.$visibility);
+		throw new InvalidArgumentException('Unknown visibility: '.$visibility);
+	}
+
+	/**
+	 * Pass dynamic methods call onto Flysystem.
+	 *
+	 * @param  string  $method
+	 * @param  array  $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, array $parameters)
+	{
+		return call_user_func_array([$this->driver, $method], $parameters);
 	}
 
 }
