@@ -30,7 +30,7 @@ class RetryCommand extends Command {
 
 		if ( ! is_null($failed))
 		{
-            $failed = (object)$failed;
+			$failed = (object)$failed;
 
 			$failed->payload = $this->resetAttempts($failed->payload);
 
