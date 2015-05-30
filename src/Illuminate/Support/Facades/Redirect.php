@@ -10,6 +10,9 @@ class Redirect extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'redirect'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'redirect';
+	}
 
 }

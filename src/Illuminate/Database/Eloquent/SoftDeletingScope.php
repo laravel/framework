@@ -13,12 +13,11 @@ class SoftDeletingScope implements ScopeInterface {
 	 * Apply the scope to a given Eloquent query builder.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $builder
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return void
 	 */
-	public function apply(Builder $builder)
+	public function apply(Builder $builder, Model $model)
 	{
-		$model = $builder->getModel();
-
 		$builder->whereNull($model->getQualifiedDeletedAtColumn());
 
 		$this->extend($builder);
@@ -28,26 +27,19 @@ class SoftDeletingScope implements ScopeInterface {
 	 * Remove the scope from the given Eloquent query builder.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $builder
+	 * @param  \Illuminate\Database\Eloquent\Model  $model
 	 * @return void
 	 */
-	public function remove(Builder $builder)
+	public function remove(Builder $builder, Model $model)
 	{
-		$column = $builder->getModel()->getQualifiedDeletedAtColumn();
+		$column = $model->getQualifiedDeletedAtColumn();
 
 		$query = $builder->getQuery();
 
-		foreach ((array) $query->wheres as $key => $where)
+		$query->wheres = collect($query->wheres)->reject(function($where) use ($column)
 		{
-			// If the where clause is a soft delete date constraint, we will remove it from
-			// the query and reset the keys on the wheres. This allows this developer to
-			// include deleted model in a relationship result set that is lazy loaded.
-			if ($this->isSoftDeleteConstraint($where, $column))
-			{
-				unset($query->wheres[$key]);
-
-				$query->wheres = array_values($query->wheres);
-			}
-		}
+			return $this->isSoftDeleteConstraint($where, $column);
+		})->values()->all();
 	}
 
 	/**
@@ -65,12 +57,30 @@ class SoftDeletingScope implements ScopeInterface {
 
 		$builder->onDelete(function(Builder $builder)
 		{
-			$column = $builder->getModel()->getDeletedAtColumn();
+			$column = $this->getDeletedAtColumn($builder);
 
 			return $builder->update(array(
-				$column => $builder->getModel()->freshTimestampString()
+				$column => $builder->getModel()->freshTimestampString(),
 			));
 		});
+	}
+
+	/**
+	 * Get the "deleted at" column for the builder.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $builder
+	 * @return string
+	 */
+	protected function getDeletedAtColumn(Builder $builder)
+	{
+		if (count($builder->getQuery()->joins) > 0)
+		{
+			return $builder->getModel()->getQualifiedDeletedAtColumn();
+		}
+		else
+		{
+			return $builder->getModel()->getDeletedAtColumn();
+		}
 	}
 
 	/**
@@ -113,7 +123,7 @@ class SoftDeletingScope implements ScopeInterface {
 	{
 		$builder->macro('withTrashed', function(Builder $builder)
 		{
-			$this->remove($builder);
+			$this->remove($builder, $builder->getModel());
 
 			return $builder;
 		});
@@ -129,9 +139,11 @@ class SoftDeletingScope implements ScopeInterface {
 	{
 		$builder->macro('onlyTrashed', function(Builder $builder)
 		{
-			$this->remove($builder);
+			$model = $builder->getModel();
 
-			$builder->getQuery()->whereNotNull($builder->getModel()->getQualifiedDeletedAtColumn());
+			$this->remove($builder, $model);
+
+			$builder->getQuery()->whereNotNull($model->getQualifiedDeletedAtColumn());
 
 			return $builder;
 		});

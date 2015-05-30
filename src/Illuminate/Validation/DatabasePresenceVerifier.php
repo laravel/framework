@@ -7,7 +7,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
 	/**
 	 * The database connection instance.
 	 *
-	 * @var  \Illuminate\Database\ConnectionResolverInterface
+	 * @var \Illuminate\Database\ConnectionResolverInterface
 	 */
 	protected $db;
 

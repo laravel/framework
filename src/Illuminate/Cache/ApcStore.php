@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Cache;
 
-class ApcStore extends TaggableStore implements StoreInterface {
+use Illuminate\Contracts\Cache\Store;
+
+class ApcStore extends TaggableStore implements Store {
 
 	/**
 	 * The APC wrapper instance.

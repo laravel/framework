@@ -71,6 +71,18 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
+	public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
+	{
+		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder->setModel($this->getMockModel());
+		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+		$builder->shouldReceive('get')->with(array('column'))->andReturn(new Collection([1]));
+		$result = $builder->findOrFail([1, 2], array('column'));
+	}
+
+	/**
+	 * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
 	public function testFirstOrFailMethodThrowsModelNotFoundException()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
@@ -129,23 +141,23 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPluckMethodWithModelFound()
+	public function testValueMethodWithModelFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$mockModel = new StdClass;
 		$mockModel->name = 'foo';
 		$builder->shouldReceive('first')->with(array('name'))->andReturn($mockModel);
 
-		$this->assertEquals('foo', $builder->pluck('name'));
+		$this->assertEquals('foo', $builder->value('name'));
 	}
 
 
-	public function testPluckMethodWithModelNotFound()
+	public function testValueMethodWithModelNotFound()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('first')->with(array('name'))->andReturn(null);
 
-		$this->assertNull($builder->pluck('name'));
+		$this->assertNull($builder->value('name'));
 	}
 
 
@@ -216,92 +228,20 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testPaginateMethod()
-	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
-		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('getPerPage')->once()->andReturn(15);
-		$builder->getQuery()->shouldReceive('getPaginationCount')->once()->andReturn(10);
-		$conn = m::mock('stdClass');
-		$paginator = m::mock('stdClass');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$builder->getQuery()->shouldReceive('getConnection')->once()->andReturn($conn);
-		$builder->getQuery()->shouldReceive('forPage')->once()->with(1, 15);
-		$builder->shouldReceive('get')->with(array('*'))->andReturn(new Collection(array('results')));
-		$paginator->shouldReceive('make')->once()->with(array('results'), 10, 15)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->paginate());
-	}
-
-
-	public function testPaginateMethodWithGroupedQuery()
-	{
-		$query = $this->getMock('Illuminate\Database\Query\Builder', array('from', 'getConnection'), array(
-			m::mock('Illuminate\Database\ConnectionInterface'),
-			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
-			m::mock('Illuminate\Database\Query\Processors\Processor'),
-		));
-		$query->expects($this->once())->method('from')->will($this->returnValue('foo_table'));
-		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), array($query));
-		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('getPerPage')->once()->andReturn(2);
-		$conn = m::mock('stdClass');
-		$paginator = m::mock('stdClass');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(2);
-		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$query->expects($this->once())->method('getConnection')->will($this->returnValue($conn));
-		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('foo', 'bar', 'baz'))));
-		$paginator->shouldReceive('make')->once()->with(array('baz'), 3, 2)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->groupBy('foo')->paginate());
-	}
-
-
-	public function testQuickPaginateMethod()
-	{
-		$query = $this->getMock('Illuminate\Database\Query\Builder', array('from', 'getConnection', 'skip', 'take'), array(
-			m::mock('Illuminate\Database\ConnectionInterface'),
-			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
-			m::mock('Illuminate\Database\Query\Processors\Processor'),
-		));
-		$query->expects($this->once())->method('from')->will($this->returnValue('foo_table'));
-		$builder = $this->getMock('Illuminate\Database\Eloquent\Builder', array('get'), array($query));
-		$builder->setModel($this->getMockModel());
-		$builder->getModel()->shouldReceive('getPerPage')->once()->andReturn(15);
-		$conn = m::mock('stdClass');
-		$paginator = m::mock('stdClass');
-		$paginator->shouldReceive('getCurrentPage')->once()->andReturn(1);
-		$conn->shouldReceive('getPaginator')->once()->andReturn($paginator);
-		$query->expects($this->once())->method('getConnection')->will($this->returnValue($conn));
-		$query->expects($this->once())->method('skip')->with(0)->will($this->returnValue($query));
-		$query->expects($this->once())->method('take')->with(16)->will($this->returnValue($query));
-		$builder->expects($this->once())->method('get')->with($this->equalTo(array('*')))->will($this->returnValue(new Collection(array('results'))));
-		$paginator->shouldReceive('make')->once()->with(array('results'), 15)->andReturn(array('results'));
-
-		$this->assertEquals(array('results'), $builder->simplePaginate());
-	}
-
-
 	public function testGetModelsProperlyHydratesModels()
 	{
 		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
 		$records[] = array('name' => 'taylor', 'age' => 26);
 		$records[] = array('name' => 'dayle', 'age' => 28);
 		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
-		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,newInstance]');
+		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,hydrate]');
 		$model->shouldReceive('getTable')->once()->andReturn('foo_table');
 		$builder->setModel($model);
 		$model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-		$model->shouldReceive('newInstance')->andReturnUsing(function() { return new EloquentBuilderTestModelStub; });
+		$model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection(['hydrated']));
 		$models = $builder->getModels(array('foo'));
 
-		$this->assertEquals('taylor', $models[0]->name);
-		$this->assertEquals($models[0]->getAttributes(), $models[0]->getOriginal());
-		$this->assertEquals('dayle', $models[1]->name);
-		$this->assertEquals($models[1]->getAttributes(), $models[1]->getOriginal());
-		$this->assertEquals('foo_connection', $models[0]->getConnectionName());
-		$this->assertEquals('foo_connection', $models[1]->getConnectionName());
+		$this->assertEquals($models, ['hydrated']);
 	}
 
 
@@ -487,6 +427,54 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHasNestedWithConstraints()
+	{
+		$model = new EloquentBuilderTestModelParentStub;
+
+		$builder = $model->whereHas('foo', function ($q) {
+			$q->whereHas('bar', function ($q) {
+				$q->where('baz', 'bam');
+			});
+		})->toSql();
+
+		$result = $model->whereHas('foo.bar', function ($q) {
+			$q->where('baz', 'bam');
+		})->toSql();
+
+		$this->assertEquals($builder, $result);
+	}
+
+
+	public function testHasNested()
+	{
+		$model = new EloquentBuilderTestModelParentStub;
+
+		$builder = $model->whereHas('foo', function ($q) {
+			$q->has('bar');
+		});
+
+		$result = $model->has('foo.bar')->toSql();
+
+		$this->assertEquals($builder->toSql(), $result);
+	}
+
+
+	public function testOrHasNested()
+	{
+		$model = new EloquentBuilderTestModelParentStub;
+
+		$builder = $model->whereHas('foo', function ($q) {
+			$q->has('bar');
+		})->orWhereHas('foo', function ($q) {
+			$q->has('baz');
+		});
+
+		$result = $model->has('foo.bar')->orHas('foo.baz')->toSql();
+
+		$this->assertEquals($builder->toSql(), $result);
+	}
+
+
 	protected function mockConnectionForModel($model, $database)
 	{
 		$grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -525,8 +513,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentBuilderTestModelStub extends Illuminate\Database\Eloquent\Model {}
-
 class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	public function scopeApproved($query)
 	{
@@ -534,15 +520,9 @@ class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
 	}
 }
 
-class EloquentBuilderTestWithTrashedStub extends Illuminate\Database\Eloquent\Model {
-	use Illuminate\Database\Eloquent\SoftDeletingTrait;
-	protected $table = 'table';
-	public function getKeyName() { return 'foo'; }
-}
-
 class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
 	protected $table = 'table';
-	use Illuminate\Database\Eloquent\SoftDeletingTrait;
+	use Illuminate\Database\Eloquent\SoftDeletes;
 }
 
 class EloquentBuilderTestListsStub {
@@ -556,3 +536,23 @@ class EloquentBuilderTestListsStub {
 		return 'foo_' . $this->attributes[$key];
 	}
 }
+
+class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model {
+	public function foo()
+	{
+		return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
+	}
+}
+
+class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model {
+	public function bar()
+	{
+		return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
+	}
+	public function baz()
+	{
+		return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
+	}
+}
+
+class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model {}

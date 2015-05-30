@@ -51,7 +51,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
 
 
 class DatabaseSoftDeletingTraitStub {
-	use Illuminate\Database\Eloquent\SoftDeletingTrait;
+	use Illuminate\Database\Eloquent\SoftDeletes;
 	public $deleted_at;
 	public function newQuery()
 	{

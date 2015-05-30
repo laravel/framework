@@ -27,7 +27,7 @@ class RouteClearCommand extends Command {
 	protected $files;
 
 	/**
-	 * Create a new route command instance.
+	 * Create a new route clear command instance.
 	 *
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void

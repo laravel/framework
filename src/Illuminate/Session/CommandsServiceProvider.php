@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Session\Console\SessionTableCommand;
 
 class CommandsServiceProvider extends ServiceProvider {
 
@@ -18,9 +19,9 @@ class CommandsServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->bindShared('command.session.database', function($app)
+		$this->app->singleton('command.session.database', function($app)
 		{
-			return new Console\SessionTableCommand($app['files']);
+			return new SessionTableCommand($app['files'], $app['composer']);
 		});
 
 		$this->commands('command.session.database');

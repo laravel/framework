@@ -32,7 +32,7 @@ interface Dispatcher {
 	/**
 	 * Fire an event and call the listeners.
 	 *
-	 * @param  string  $event
+	 * @param  string|object  $event
 	 * @param  mixed   $payload
 	 * @param  bool    $halt
 	 * @return array|null
@@ -59,6 +59,6 @@ interface Dispatcher {
 	 *
 	 * @return void
 	 */
-	public function forgetQueued();
+	public function forgetPushed();
 
 }

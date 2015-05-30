@@ -1,10 +1,11 @@
 <?php namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Container\Container;
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract {
@@ -33,7 +34,7 @@ class Factory implements FactoryContract {
 	/**
 	 * The IoC container instance.
 	 *
-	 * @var \Illuminate\Container\Container
+	 * @var \Illuminate\Contracts\Container\Container
 	 */
 	protected $container;
 
@@ -111,24 +112,20 @@ class Factory implements FactoryContract {
 	}
 
 	/**
-	 * Normalize a view name.
+	 * Get the evaluated view contents for the given view.
 	 *
-	 * @param  string $name
-	 *
-	 * @return string
+	 * @param  string  $path
+	 * @param  array   $data
+	 * @param  array   $mergeData
+	 * @return \Illuminate\View\View
 	 */
-	protected function normalizeName($name)
+	public function file($path, $data = array(), $mergeData = array())
 	{
-		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+		$data = array_merge($mergeData, $this->parseData($data));
 
-		if (strpos($name, $delimiter) === false)
-		{
-			return str_replace('/', '.', $name);
-		}
+		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $path, $path, $data));
 
-		list($namespace, $name) = explode($delimiter, $name);
-
-		return $namespace . $delimiter . str_replace('/', '.', $name);
+		return $view;
 	}
 
 	/**
@@ -152,6 +149,27 @@ class Factory implements FactoryContract {
 		$this->callCreator($view = new View($this, $this->getEngineFromPath($path), $view, $path, $data));
 
 		return $view;
+	}
+
+	/**
+	 * Normalize a view name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+		$delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
+
+		if (strpos($name, $delimiter) === false)
+		{
+			return str_replace('/', '.', $name);
+		}
+
+		list($namespace, $name) = explode($delimiter, $name);
+
+		return $namespace . $delimiter . str_replace('/', '.', $name);
 	}
 
 	/**
@@ -213,7 +231,7 @@ class Factory implements FactoryContract {
 		{
 			$this->finder->find($view);
 		}
-		catch (\InvalidArgumentException $e)
+		catch (InvalidArgumentException $e)
 		{
 			return false;
 		}
@@ -277,7 +295,7 @@ class Factory implements FactoryContract {
 	{
 		if ( ! $extension = $this->getExtension($path))
 		{
-			throw new \InvalidArgumentException("Unrecognized extension in file: $path");
+			throw new InvalidArgumentException("Unrecognized extension in file: $path");
 		}
 
 		$engine = $this->extensions[$extension];
@@ -349,7 +367,7 @@ class Factory implements FactoryContract {
 
 		foreach ($composers as $callback => $views)
 		{
-			$registered += $this->composer($views, $callback);
+			$registered = array_merge($registered, $this->composer($views, $callback));
 		}
 
 		return $registered;
@@ -426,9 +444,9 @@ class Factory implements FactoryContract {
 	/**
 	 * Add a listener to the event dispatcher.
 	 *
-	 * @param  string   $name
-	 * @param  \Closure $callback
-	 * @param  integer  $priority
+	 * @param  string    $name
+	 * @param  \Closure  $callback
+	 * @param  int      $priority
 	 * @return void
 	 */
 	protected function addEventListener($name, $callback, $priority = null)
@@ -452,16 +470,14 @@ class Factory implements FactoryContract {
 	 */
 	protected function buildClassEventCallback($class, $prefix)
 	{
-		$container = $this->container;
-
 		list($class, $method) = $this->parseClassEvent($class, $prefix);
 
 		// Once we have the class and method name, we can build the Closure to resolve
 		// the instance out of the IoC container and call the method on it with the
 		// given arguments that are passed to the Closure as the composer's data.
-		return function() use ($class, $method, $container)
+		return function() use ($class, $method)
 		{
-			$callable = array($container->make($class), $method);
+			$callable = array($this->container->make($class), $method);
 
 			return call_user_func_array($callable, func_get_args());
 		};
@@ -628,7 +644,11 @@ class Factory implements FactoryContract {
 			$sectionContent = $this->sections[$section];
 		}
 
-		return str_replace('@parent', '', $sectionContent);
+		$sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
+
+		return str_replace(
+			'--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+		);
 	}
 
 	/**
@@ -794,7 +814,7 @@ class Factory implements FactoryContract {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher  $events
 	 * @return void
 	 */
 	public function setDispatcher(Dispatcher $events)
@@ -805,7 +825,7 @@ class Factory implements FactoryContract {
 	/**
 	 * Get the IoC container instance.
 	 *
-	 * @return \Illuminate\Container\Container
+	 * @return \Illuminate\Contracts\Container\Container
 	 */
 	public function getContainer()
 	{
@@ -815,7 +835,7 @@ class Factory implements FactoryContract {
 	/**
 	 * Set the IoC container instance.
 	 *
-	 * @param  \Illuminate\Container\Container  $container
+	 * @param  \Illuminate\Contracts\Container\Container  $container
 	 * @return void
 	 */
 	public function setContainer(Container $container)
@@ -843,6 +863,17 @@ class Factory implements FactoryContract {
 	public function getShared()
 	{
 		return $this->shared;
+	}
+
+	/**
+	 * Check if section exists.
+	 *
+	 * @param  string  $name
+	 * @return bool
+	 */
+	public function hasSection($name)
+	{
+		return array_key_exists($name, $this->sections);
 	}
 
 	/**

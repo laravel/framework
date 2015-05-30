@@ -81,6 +81,8 @@ class BeanstalkdJob extends Job implements JobContract {
 	 */
 	public function release($delay = 0)
 	{
+		parent::release($delay);
+
 		$priority = Pheanstalk::DEFAULT_PRIORITY;
 
 		$this->pheanstalk->release($this->job, $priority, $delay);

@@ -1,6 +1,12 @@
 {
     "name": "illuminate/support",
+    "description": "The Illuminate Support package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,12 +14,11 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/contracts": "5.0.*"
-    },
-    "require-dev": {
-        "jeremeamia/superclosure": "~1.0.1",
-        "patchwork/utf8": "~1.1"
+        "php": ">=5.5.9",
+        "ext-mbstring": "*",
+        "illuminate/contracts": "5.1.*",
+        "doctrine/inflector": "~1.0",
+        "danielstjules/stringy": "~1.8"
     },
     "autoload": {
         "psr-4": {
@@ -25,8 +30,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
+    },
+    "suggest": {
+        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
+        "symfony/var-dumper": "Required to use the dd function (2.7.*)."
     },
     "minimum-stability": "dev"
 }

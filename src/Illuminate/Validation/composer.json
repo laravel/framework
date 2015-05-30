@@ -1,6 +1,12 @@
 {
     "name": "illuminate/validation",
+    "description": "The Illuminate Validation package.",
     "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -8,15 +14,12 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/container": "5.0.*",
-        "illuminate/contracts": "5.0.*",
-        "illuminate/support": "5.0.*",
-        "symfony/http-foundation": "2.6.*",
-        "symfony/translation": "2.6.*"
-    },
-    "require-dev": {
-        "illuminate/database": "5.0.*"
+        "php": ">=5.5.9",
+        "illuminate/container": "5.1.*",
+        "illuminate/contracts": "5.1.*",
+        "illuminate/support": "5.1.*",
+        "symfony/http-foundation": "2.7.*",
+        "symfony/translation": "2.7.*"
     },
     "autoload": {
         "psr-4": {
@@ -25,8 +28,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0-dev"
+            "dev-master": "5.1-dev"
         }
+    },
+    "suggest": {
+        "illuminate/database": "Required to use the database presence verifier (5.1.*)."
     },
     "minimum-stability": "dev"
 }

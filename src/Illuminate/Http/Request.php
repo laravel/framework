@@ -1,11 +1,13 @@
 <?php namespace Illuminate\Http;
 
 use Closure;
+use ArrayAccess;
 use SplFileInfo;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class Request extends SymfonyRequest {
+class Request extends SymfonyRequest implements ArrayAccess {
 
 	/**
 	 * The decoded JSON content for the request.
@@ -20,6 +22,32 @@ class Request extends SymfonyRequest {
 	 * @var \Illuminate\Session\Store
 	 */
 	protected $sessionStore;
+
+	/**
+	 * The user resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $userResolver;
+
+	/**
+	 * The route resolver callback.
+	 *
+	 * @var \Closure
+	 */
+	protected $routeResolver;
+
+	/**
+	 * Create a new Illuminate HTTP request from server variables.
+	 *
+	 * @return static
+	 */
+	public static function capture()
+	{
+		static::enableHttpMethodParameterOverride();
+
+		return static::createFromBase(SymfonyRequest::createFromGlobals());
+	}
 
 	/**
 	 * Return the Request instance.
@@ -98,8 +126,8 @@ class Request extends SymfonyRequest {
 	/**
 	 * Get a segment from the URI (1 based index).
 	 *
-	 * @param  string  $index
-	 * @param  mixed   $default
+	 * @param  int  $index
+	 * @param  mixed  $default
 	 * @return string
 	 */
 	public function segment($index, $default = null)
@@ -146,6 +174,16 @@ class Request extends SymfonyRequest {
 	public function ajax()
 	{
 		return $this->isXmlHttpRequest();
+	}
+
+	/**
+	 * Determine if the request is the result of an PJAX call.
+	 *
+	 * @return bool
+	 */
+	public function pjax()
+	{
+		return $this->headers->get('X-PJAX') == true;
 	}
 
 	/**
@@ -244,7 +282,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function input($key = null, $default = null)
 	{
@@ -297,7 +335,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function query($key = null, $default = null)
 	{
@@ -320,7 +358,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function cookie($key = null, $default = null)
 	{
@@ -373,7 +411,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function header($key = null, $default = null)
 	{
@@ -385,7 +423,7 @@ class Request extends SymfonyRequest {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	public function server($key = null, $default = null)
 	{
@@ -407,8 +445,8 @@ class Request extends SymfonyRequest {
 	/**
 	 * Flash the input for the current request to the session.
 	 *
-	 * @param  string $filter
-	 * @param  array  $keys
+	 * @param  string  $filter
+	 * @param  array   $keys
 	 * @return void
 	 */
 	public function flash($filter = null, $keys = array())
@@ -460,7 +498,7 @@ class Request extends SymfonyRequest {
 	 * @param  string  $source
 	 * @param  string  $key
 	 * @param  mixed   $default
-	 * @return string
+	 * @return string|array
 	 */
 	protected function retrieveItem($source, $key, $default)
 	{
@@ -548,6 +586,62 @@ class Request extends SymfonyRequest {
 	}
 
 	/**
+	 * Determines whether the current requests accepts a given content type.
+	 *
+	 * @param  string|array  $contentTypes
+	 * @return bool
+	 */
+	public function accepts($contentTypes)
+	{
+		$accepts = $this->getAcceptableContentTypes();
+
+		foreach ($accepts as $accept)
+		{
+			if ($accept === '*/*')
+			{
+				return true;
+			}
+
+			foreach ((array) $contentTypes as $type)
+			{
+				if ($accept === $type || $accept === strtok('/', $type).'/*')
+				{
+					return true;
+				}
+
+				$split = explode('/', $accept);
+
+				if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determines whether a request accepts JSON.
+	 *
+	 * @return bool
+	 */
+	public function acceptsJson()
+	{
+		return $this->accepts('application/json');
+	}
+
+	/**
+	 * Determines whether a request accepts HTML.
+	 *
+	 * @return bool
+	 */
+	public function acceptsHtml()
+	{
+		return $this->accepts('text/html');
+	}
+
+	/**
 	 * Get the data format expected in the response.
 	 *
 	 * @param  string  $default
@@ -573,12 +667,28 @@ class Request extends SymfonyRequest {
 	{
 		if ($request instanceof static) return $request;
 
-		return (new static)->duplicate(
+		$content = $request->content;
+
+		$request = (new static)->duplicate(
 
 			$request->query->all(), $request->request->all(), $request->attributes->all(),
 
 			$request->cookies->all(), $request->files->all(), $request->server->all()
 		);
+
+		$request->content = $content;
+
+		$request->request = $request->getInputSource();
+
+		return $request;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+	{
+		return parent::duplicate($query, $request, $attributes, $cookies, array_filter((array) $files), $server);
 	}
 
 	/**
@@ -592,7 +702,7 @@ class Request extends SymfonyRequest {
 	{
 		if ( ! $this->hasSession())
 		{
-			throw new \RuntimeException("Session store not set on request.");
+			throw new RuntimeException("Session store not set on request.");
 		}
 
 		return $this->getSession();
@@ -606,6 +716,23 @@ class Request extends SymfonyRequest {
 	public function user()
 	{
 		return call_user_func($this->getUserResolver());
+	}
+
+	/**
+	 * Get the route handling the request.
+	 *
+	 * @return \Illuminate\Routing\Route|null
+	 */
+	public function route()
+	{
+		if (func_num_args() == 1)
+		{
+			return $this->route()->parameter(func_get_arg(0));
+		}
+		else
+		{
+			return call_user_func($this->getRouteResolver());
+		}
 	}
 
 	/**
@@ -629,6 +756,94 @@ class Request extends SymfonyRequest {
 		$this->userResolver = $callback;
 
 		return $this;
+	}
+
+	/**
+	 * Get the route resolver callback.
+	 *
+	 * @return \Closure
+	 */
+	public function getRouteResolver()
+	{
+		return $this->routeResolver ?: function() {};
+	}
+
+	/**
+	 * Set the route resolver callback.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function setRouteResolver(Closure $callback)
+	{
+		$this->routeResolver = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Determine if the given offset exists.
+	 *
+	 * @param  string  $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset)
+	{
+		return array_key_exists($offset, $this->all());
+	}
+
+	/**
+	 * Get the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset)
+	{
+		return array_get($this->all(), $offset);
+	}
+
+	/**
+	 * Set the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		return $this->getInputSource()->set($offset, $value);
+	}
+
+	/**
+	 * Remove the value at the given offset.
+	 *
+	 * @param  string  $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
+	{
+		return $this->getInputSource()->remove($offset);
+	}
+
+	/**
+	 * Get an input element from the request.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		$all = $this->all();
+
+		if (array_key_exists($key, $all))
+		{
+			return $all[$key];
+		}
+		elseif ( ! is_null($this->route()))
+		{
+			return $this->route()->parameter($key);
+		}
 	}
 
 }

@@ -1,11 +1,14 @@
 <?php namespace Illuminate\Mail;
 
+use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
+use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager {
@@ -57,6 +60,29 @@ class TransportManager extends Manager {
 	}
 
 	/**
+	 * Create an instance of the Amazon SES Swift Transport driver.
+	 *
+	 * @return \Swift_SendmailTransport
+	 */
+	protected function createSesDriver()
+	{
+		$config = $this->app['config']->get('services.ses', []);
+
+		$config += [
+			'version' => 'latest',
+			'service' => 'email',
+			'credentials' => [
+				'key'    => $config['key'],
+				'secret' => $config['secret'],
+			],
+		];
+
+		unset($config['key'], $config['secret']);
+
+		return new SesTransport(new SesClient($config));
+	}
+
+	/**
 	 * Create an instance of the Mail Swift Transport driver.
 	 *
 	 * @return \Swift_MailTransport
@@ -73,9 +99,10 @@ class TransportManager extends Manager {
 	 */
 	protected function createMailgunDriver()
 	{
-		$config = $this->app['config']->get('services.mailgun', array());
+		$client = new HttpClient;
+		$config = $this->app['config']->get('services.mailgun', []);
 
-		return new MailgunTransport($config['secret'], $config['domain']);
+		return new MailgunTransport($client, $config['secret'], $config['domain']);
 	}
 
 	/**
@@ -85,9 +112,10 @@ class TransportManager extends Manager {
 	 */
 	protected function createMandrillDriver()
 	{
-		$config = $this->app['config']->get('services.mandrill', array());
+		$client = new HttpClient;
+		$config = $this->app['config']->get('services.mandrill', []);
 
-		return new MandrillTransport($config['secret']);
+		return new MandrillTransport($client, $config['secret']);
 	}
 
 	/**

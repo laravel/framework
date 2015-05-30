@@ -1,9 +1,10 @@
 <?php namespace Illuminate\Auth;
 
-use Illuminate\Contracts\Auth\User as UserContract;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class EloquentUserProvider implements UserProviderInterface {
+class EloquentUserProvider implements UserProvider {
 
 	/**
 	 * The hasher implementation.
@@ -36,7 +37,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by their unique identifier.
 	 *
 	 * @param  mixed  $identifier
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveById($identifier)
 	{
@@ -48,22 +49,22 @@ class EloquentUserProvider implements UserProviderInterface {
 	 *
 	 * @param  mixed  $identifier
 	 * @param  string  $token
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByToken($identifier, $token)
 	{
 		$model = $this->createModel();
 
 		return $model->newQuery()
-                        ->where($model->getKeyName(), $identifier)
-                        ->where($model->getRememberTokenName(), $token)
-                        ->first();
+			->where($model->getKeyName(), $identifier)
+			->where($model->getRememberTokenName(), $token)
+			->first();
 	}
 
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  string  $token
 	 * @return void
 	 */
@@ -78,7 +79,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
-	 * @return \Illuminate\Contracts\Auth\User|null
+	 * @return \Illuminate\Contracts\Auth\Authenticatable|null
 	 */
 	public function retrieveByCredentials(array $credentials)
 	{
@@ -89,7 +90,10 @@ class EloquentUserProvider implements UserProviderInterface {
 
 		foreach ($credentials as $key => $value)
 		{
-			if ( ! str_contains($key, 'password')) $query->where($key, $value);
+			if ( ! str_contains($key, 'password'))
+			{
+				$query->where($key, $value);
+			}
 		}
 
 		return $query->first();
@@ -98,7 +102,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	/**
 	 * Validate a user against the given credentials.
 	 *
-	 * @param  \Illuminate\Contracts\Auth\User  $user
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
 	 * @param  array  $credentials
 	 * @return bool
 	 */

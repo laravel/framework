@@ -11,10 +11,10 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @var array
 	 */
-	protected $modifiers = array('Unsigned', 'Nullable', 'Default', 'Increment', 'After', 'Comment');
+	protected $modifiers = array('Unsigned', 'Charset', 'Collate', 'Nullable', 'Default', 'Increment', 'Comment', 'After');
 
 	/**
-	 * The possible column serials
+	 * The possible column serials.
 	 *
 	 * @var array
 	 */
@@ -57,7 +57,7 @@ class MySqlGrammar extends Grammar {
 		// Once we have the primary SQL, we can add the encoding option to the SQL for
 		// the table.  Then, we can check if a storage engine has been supplied for
 		// the table. If so, we will add the engine declaration to the SQL query.
-		$sql = $this->compileCreateEncoding($sql, $connection);
+		$sql = $this->compileCreateEncoding($sql, $connection, $blueprint);
 
 		if (isset($blueprint->engine))
 		{
@@ -72,16 +72,25 @@ class MySqlGrammar extends Grammar {
 	 *
 	 * @param  string  $sql
 	 * @param  \Illuminate\Database\Connection  $connection
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
 	 * @return string
 	 */
-	protected function compileCreateEncoding($sql, Connection $connection)
+	protected function compileCreateEncoding($sql, Connection $connection, Blueprint $blueprint)
 	{
-		if ( ! is_null($charset = $connection->getConfig('charset')))
+		if (isset($blueprint->charset))
+		{
+			$sql .= ' default character set '.$blueprint->charset;
+		}
+		elseif ( ! is_null($charset = $connection->getConfig('charset')))
 		{
 			$sql .= ' default character set '.$charset;
 		}
 
-		if ( ! is_null($collation = $connection->getConfig('collation')))
+		if (isset($blueprint->collation))
+		{
+			$sql .= ' collate '.$blueprint->collation;
+		}
+		elseif ( ! is_null($collation = $connection->getConfig('collation')))
 		{
 			$sql .= ' collate '.$collation;
 		}
@@ -439,6 +448,28 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a json type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJson(Fluent $column)
+	{
+		return 'text';
+	}
+
+	/**
+	 * Create the column definition for a jsonb type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeJsonb(Fluent $column)
+	{
+		return "text";
+	}
+
+	/**
 	 * Create the column definition for a date type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -461,6 +492,17 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a date-time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeDateTimeTz(Fluent $column)
+	{
+		return 'datetime';
+	}
+
+	/**
 	 * Create the column definition for a time type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
@@ -472,12 +514,36 @@ class MySqlGrammar extends Grammar {
 	}
 
 	/**
+	 * Create the column definition for a time type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimeTz(Fluent $column)
+	{
+		return 'time';
+	}
+
+	/**
 	 * Create the column definition for a timestamp type.
 	 *
 	 * @param  \Illuminate\Support\Fluent  $column
 	 * @return string
 	 */
 	protected function typeTimestamp(Fluent $column)
+	{
+		if ( ! $column->nullable) return 'timestamp default 0';
+
+		return 'timestamp';
+	}
+
+	/**
+	 * Create the column definition for a timestamp type.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string
+	 */
+	protected function typeTimestampTz(Fluent $column)
 	{
 		if ( ! $column->nullable) return 'timestamp default 0';
 
@@ -505,6 +571,36 @@ class MySqlGrammar extends Grammar {
 	protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
 	{
 		if ($column->unsigned) return ' unsigned';
+	}
+
+	/**
+	 * Get the SQL for a character set column modifier.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyCharset(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->charset))
+		{
+			return ' character set '.$column->charset;
+		}
+	}
+
+	/**
+	 * Get the SQL for a collation column modifier.
+	 *
+	 * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+	 * @param  \Illuminate\Support\Fluent  $column
+	 * @return string|null
+	 */
+	protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+	{
+		if ( ! is_null($column->collation))
+		{
+			return ' collate '.$column->collation;
+		}
 	}
 
 	/**

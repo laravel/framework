@@ -16,7 +16,7 @@ class StatusCommand extends BaseCommand {
 	 *
 	 * @var string
 	 */
-	protected $description = 'Show a list of migrations up/down';
+	protected $description = 'Show the status of each migration';
 
 	/**
 	 * The migrator instance.
@@ -56,7 +56,7 @@ class StatusCommand extends BaseCommand {
 
 		foreach ($this->getAllMigrationFiles() as $migration)
 		{
-			$migrations[] = in_array($migration, $ran) ? ['<info>✔</info>', $migration] : ['<fg=red>✗</fg=red>', $migration];
+			$migrations[] = in_array($migration, $ran) ? ['<info>Y</info>', $migration] : ['<fg=red>N</fg=red>', $migration];
 		}
 
 		if (count($migrations) > 0)
@@ -76,7 +76,7 @@ class StatusCommand extends BaseCommand {
 	 */
 	protected function getAllMigrationFiles()
 	{
-		return $this->migrator->getMigrationFiles($this->laravel['path.database'].'/migrations');
+		return $this->migrator->getMigrationFiles($this->getMigrationPath());
 	}
 
 }

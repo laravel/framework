@@ -11,6 +11,9 @@ class Queue extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'queue'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'queue';
+	}
 
 }

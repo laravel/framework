@@ -30,23 +30,16 @@ class MigrateCommand extends BaseCommand {
 	protected $migrator;
 
 	/**
-	 * The path to the packages directory (vendor).
-	 */
-	protected $packagePath;
-
-	/**
 	 * Create a new migration command instance.
 	 *
 	 * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-	 * @param  string  $packagePath
 	 * @return void
 	 */
-	public function __construct(Migrator $migrator, $packagePath)
+	public function __construct(Migrator $migrator)
 	{
 		parent::__construct();
 
 		$this->migrator = $migrator;
-		$this->packagePath = $packagePath;
 	}
 
 	/**
@@ -65,7 +58,17 @@ class MigrateCommand extends BaseCommand {
 		// a database for real, which is helpful for double checking migrations.
 		$pretend = $this->input->getOption('pretend');
 
-		$path = $this->getMigrationPath();
+		// Next, we will check to see if a path option has been defined. If it has
+		// we will use the path relative to the root of this installation folder
+		// so that migrations may be run for any path within the applications.
+		if ( ! is_null($path = $this->input->getOption('path')))
+		{
+			$path = $this->laravel->basePath().'/'.$path;
+		}
+		else
+		{
+			$path = $this->getMigrationPath();
+		}
 
 		$this->migrator->run($path, $pretend);
 
@@ -111,15 +114,11 @@ class MigrateCommand extends BaseCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('bench', null, InputOption::VALUE_OPTIONAL, 'The name of the workbench to migrate.', null),
-
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
 			array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to migration files.', null),
-
-			array('package', null, InputOption::VALUE_OPTIONAL, 'The package to migrate.', null),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
 

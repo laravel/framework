@@ -3,9 +3,9 @@
 class ResourceRegistrar {
 
 	/**
-	 * Create a new resource registrar.
+	 * The router instance.
 	 *
-	 * @param  \Illuminate\Routing\Router
+	 * @var \Illuminate\Routing\Router
 	 */
 	protected $router;
 
@@ -30,7 +30,6 @@ class ResourceRegistrar {
 	/**
 	 * Route a resource to a controller.
 	 *
-	 * @param  Router  $router
 	 * @param  string  $name
 	 * @param  string  $controller
 	 * @param  array   $options
@@ -212,7 +211,12 @@ class ResourceRegistrar {
 	 */
 	protected function getGroupResourceName($prefix, $resource, $method)
 	{
-		$group = str_replace('/', '.', $this->router->getLastGroupPrefix());
+		$group = trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
+
+		if (empty($group))
+		{
+			return trim("{$prefix}{$resource}.{$method}", '.');
+		}
 
 		return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
 	}

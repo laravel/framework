@@ -123,6 +123,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	public function testLimit()
 	{
 		$this->assertEquals('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
+		$this->assertEquals('这是一...', Str::limit('这是一段中文', 6));
 	}
 
 
@@ -147,6 +148,12 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$randomInteger = mt_rand(1, 100);
 		$this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
 		$this->assertInternalType('string', Str::random());
+	}
+
+	public function testSnake()
+	{
+		$this->assertEquals('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
+		$this->assertEquals('laravel_php_framework', Str::snake('LaravelPhpFramework'));
 	}
 
 }

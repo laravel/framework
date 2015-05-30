@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Queue\Console;
 
+use Exception;
 use RuntimeException;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Console\Command;
@@ -58,7 +59,7 @@ class SubscribeCommand extends Command {
 	protected function getQueueOptions()
 	{
 		return array(
-			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList()
+			'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList(),
 		);
 	}
 
@@ -75,7 +76,7 @@ class SubscribeCommand extends Command {
 		{
 			return $this->getQueue()->push_type;
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return 'multicast';
 		}
@@ -90,7 +91,14 @@ class SubscribeCommand extends Command {
 	{
 		$subscribers = $this->getCurrentSubscribers();
 
-		$subscribers[] = array('url' => $this->argument('url'));
+		$url = $this->argument('url');
+
+		if ( ! starts_with($url, ['http://', 'https://']))
+		{
+			$url = $this->laravel['url']->to($url);
+		}
+
+		$subscribers[] = array('url' => $url);
 
 		return $subscribers;
 	}
@@ -106,7 +114,7 @@ class SubscribeCommand extends Command {
 		{
 			return $this->getQueue()->subscribers;
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			return array();
 		}

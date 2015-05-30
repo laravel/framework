@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Cache;
 
 use Memcached;
+use RuntimeException;
 
 class MemcachedConnector {
 
@@ -26,9 +27,16 @@ class MemcachedConnector {
 			);
 		}
 
-		if ($memcached->getVersion() === false)
+		$memcachedStatus = $memcached->getVersion();
+
+		if ( ! is_array($memcachedStatus))
 		{
-			throw new \RuntimeException("Could not establish Memcached connection.");
+			throw new RuntimeException("No Memcached servers added.");
+		}
+
+		if (in_array('255.255.255', $memcachedStatus) && count(array_unique($memcachedStatus)) === 1)
+		{
+			throw new RuntimeException("Could not establish Memcached connection.");
 		}
 
 		return $memcached;

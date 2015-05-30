@@ -28,7 +28,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile a select query into SQL.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return string
 	 */
 	public function compileSelect(Builder $query)
@@ -41,7 +41,7 @@ class Grammar extends BaseGrammar {
 	/**
 	 * Compile the components necessary for a select clause.
 	 *
-	 * @param  \Illuminate\Database\Query\Builder
+	 * @param  \Illuminate\Database\Query\Builder  $query
 	 * @return array
 	 */
 	protected function compileComponents(Builder $query)
@@ -128,6 +128,8 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = array();
 
+		$query->setBindings(array(), 'join');
+
 		foreach ($joins as $join)
 		{
 			$table = $this->wrapTable($join->table);
@@ -209,7 +211,7 @@ class Grammar extends BaseGrammar {
 		{
 			$sql = implode(' ', $sql);
 
-			return 'where '.preg_replace('/and |or /', '', $sql, 1);
+			return 'where '.$this->removeLeadingBoolean($sql);
 		}
 
 		return '';
@@ -304,6 +306,8 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereIn(Builder $query, $where)
 	{
+		if (empty($where['values'])) return '0 = 1';
+
 		$values = $this->parameterize($where['values']);
 
 		return $this->wrap($where['column']).' in ('.$values.')';
@@ -318,6 +322,8 @@ class Grammar extends BaseGrammar {
 	 */
 	protected function whereNotIn(Builder $query, $where)
 	{
+		if (empty($where['values'])) return '1 = 1';
+
 		$values = $this->parameterize($where['values']);
 
 		return $this->wrap($where['column']).' not in ('.$values.')';
@@ -373,6 +379,18 @@ class Grammar extends BaseGrammar {
 	protected function whereNotNull(Builder $query, $where)
 	{
 		return $this->wrap($where['column']).' is not null';
+	}
+
+	/**
+	 * Compile a "where date" clause.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  array  $where
+	 * @return string
+	 */
+	protected function whereDate(Builder $query, $where)
+	{
+		return $this->dateBasedWhere('date', $query, $where);
 	}
 
 	/**
@@ -461,7 +479,7 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
 
-		return 'having '.preg_replace('/and /', '', $sql, 1);
+		return 'having '.$this->removeLeadingBoolean($sql);
 	}
 
 	/**
@@ -512,8 +530,7 @@ class Grammar extends BaseGrammar {
 			if (isset($order['sql'])) return $order['sql'];
 
 			return $this->wrap($order['column']).' '.$order['direction'];
-		}
-		, $orders));
+		}, $orders));
 	}
 
 	/**
@@ -555,6 +572,21 @@ class Grammar extends BaseGrammar {
 			$sql .= $this->compileUnion($union);
 		}
 
+		if (isset($query->unionOrders))
+		{
+			$sql .= ' '.$this->compileOrders($query, $query->unionOrders);
+		}
+
+		if (isset($query->unionLimit))
+		{
+			$sql .= ' '.$this->compileLimit($query, $query->unionLimit);
+		}
+
+		if (isset($query->unionOffset))
+		{
+			$sql .= ' '.$this->compileOffset($query, $query->unionOffset);
+		}
+
 		return ltrim($sql);
 	}
 
@@ -594,12 +626,15 @@ class Grammar extends BaseGrammar {
 
 		// We need to build a list of parameter place-holders of values that are bound
 		// to the query. Each insert should have the exact same amount of parameter
-		// bindings so we can just go off the first list of values in this array.
-		$parameters = $this->parameterize(reset($values));
+		// bindings so we will loop through the record and parameterize them all.
+		$parameters = array();
 
-		$value = array_fill(0, count($values), "($parameters)");
+		foreach($values as $record)
+		{
+			$parameters[] = '('.$this->parameterize($record).')';
+		}
 
-		$parameters = implode(', ', $value);
+		$parameters = implode(', ', $parameters);
 
 		return "insert into $table ($columns) values $parameters";
 	}

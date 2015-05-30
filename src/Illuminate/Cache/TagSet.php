@@ -1,11 +1,13 @@
 <?php namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\Store;
+
 class TagSet {
 
 	/**
 	 * The cache store implementation.
 	 *
-	 * @var \Illuminate\Cache\StoreInterface
+	 * @var \Illuminate\Contracts\Cache\Store
 	 */
 	protected $store;
 
@@ -19,11 +21,11 @@ class TagSet {
 	/**
 	 * Create a new TagSet instance.
 	 *
-	 * @param  \Illuminate\Cache\StoreInterface  $store
+	 * @param  \Illuminate\Contracts\Cache\Store  $store
 	 * @param  array  $names
 	 * @return void
 	 */
-	public function __construct(StoreInterface $store, array $names = array())
+	public function __construct(Store $store, array $names = array())
 	{
 		$this->store = $store;
 		$this->names = $names;
@@ -71,7 +73,7 @@ class TagSet {
 	}
 
 	/**
-	 * Reset the tag and return the new tag identifier
+	 * Reset the tag and return the new tag identifier.
 	 *
 	 * @param  string  $name
 	 * @return string

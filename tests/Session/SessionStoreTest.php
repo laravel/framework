@@ -70,13 +70,13 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session = $this->getSession();
 
 		$session->setId(null);
-		$this->assertFalse(null == $session->getId());
+		$this->assertNotNull($session->getId());
 
 		$session->setId(array('a'));
-		$this->assertFalse(array('a') == $session->getId());
+		$this->assertNotSame(array('a'), $session->getId());
 
 		$session->setId('wrong');
-		$this->assertFalse('wrong' == $session->getId());
+		$this->assertNotEquals('wrong', $session->getId());
 	}
 
 
@@ -84,10 +84,17 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$session = $this->getSession();
 		$oldId = $session->getId();
+
 		$session->set('foo','bar');
 		$this->assertGreaterThan(0, count($session->all()));
-		$session->getHandler()->shouldReceive('destroy')->never();
+
+		$session->flash('name', 'Taylor');
+		$this->assertTrue($session->has('name'));
+
+		$session->getHandler()->shouldReceive('destroy')->once()->with($oldId);
 		$this->assertTrue($session->invalidate());
+
+		$this->assertFalse($session->has('name'));
 		$this->assertNotEquals($oldId, $session->getId());
 		$this->assertCount(0, $session->all());
 	}

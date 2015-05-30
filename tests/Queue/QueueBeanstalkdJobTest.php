@@ -21,6 +21,17 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFailedProperlyCallsTheJobHandler()
+	{
+		$job = $this->getJob();
+		$job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
+		$job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('BeanstalkdJobTestFailedTest'));
+		$handler->shouldReceive('failed')->once()->with(array('data'));
+
+		$job->failed();
+	}
+
+
 	public function testDeleteRemovesTheJobFromBeanstalkd()
 	{
 		$job = $this->getJob();
@@ -58,4 +69,11 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+}
+
+class BeanstalkdJobTestFailedTest {
+	public function failed(array $data)
+	{
+		//
+	}
 }

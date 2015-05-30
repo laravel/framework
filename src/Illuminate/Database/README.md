@@ -27,15 +27,14 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 $capsule->setEventDispatcher(new Dispatcher(new Container));
 
-// Set the cache manager instance used by connections... (optional)
-$capsule->setCacheManager(...);
-
 // Make this Capsule instance available globally via static methods... (optional)
 $capsule->setAsGlobal();
 
 // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
 ```
+
+> `composer require "illuminate/events"` required when you need to use observers with Eloquent.
 
 Once the Capsule instance has been registered. You may use it like so:
 

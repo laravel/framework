@@ -1,7 +1,5 @@
 <?php namespace Illuminate\View\Compilers;
 
-use Closure;
-
 class BladeCompiler extends Compiler implements CompilerInterface {
 
 	/**
@@ -9,7 +7,16 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 *
 	 * @var array
 	 */
-	protected $extensions = array();
+	protected $extensions = [];
+
+	/**
+	 * All custom "directive" handlers.
+	 *
+	 * This was implemented as a more usable "extend" in 5.1.
+	 *
+	 * @var array
+	 */
+	protected $customDirectives = [];
 
 	/**
 	 * The file currently being compiled.
@@ -27,18 +34,18 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		'Extensions',
 		'Statements',
 		'Comments',
-		'Echos'
+		'Echos',
 	);
 
 	/**
-	 * Array of opening and closing tags for escaped echos.
+	 * Array of opening and closing tags for raw echos.
 	 *
 	 * @var array
 	 */
 	protected $rawTags = array('{!!', '!!}');
 
 	/**
-	 * Array of opening and closing tags for escaped echos.
+	 * Array of opening and closing tags for regular echos.
 	 *
 	 * @var array
 	 */
@@ -80,14 +87,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function compile($path = null)
 	{
-		$this->footer = array();
-
 		if ($path)
 		{
 			$this->setPath($path);
 		}
 
-		$contents = $this->compileString($this->files->get($path));
+		$contents = $this->compileString($this->files->get($this->getPath()));
 
 		if ( ! is_null($this->cachePath))
 		{
@@ -125,6 +130,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	public function compileString($value)
 	{
 		$result = '';
+
+		$this->footer = [];
 
 		// Here we will loop through all of the tokens returned by the Zend lexer and
 		// parse each one into the corresponding valid PHP. We will then have this
@@ -204,20 +211,46 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	protected function compileEchos($value)
 	{
-		$value = $this->compileRawEchos($value);
-
-		$difference = strlen($this->contentTags[0]) - strlen($this->escapedTags[0]);
-
-		if ($difference > 0)
+		foreach ($this->getEchoMethods() as $method => $length)
 		{
-			return $this->compileEscapedEchos($this->compileRegularEchos($value));
+			$value = $this->$method($value);
 		}
 
-		return $this->compileRegularEchos($this->compileEscapedEchos($value));
+		return $value;
 	}
 
 	/**
-	 * Compile Blade Statements that start with "@"
+	 * Get the echo methods in the proper order for compilation.
+	 *
+	 * @return array
+	 */
+	protected function getEchoMethods()
+	{
+		$methods = [
+			"compileRawEchos" => strlen(stripcslashes($this->rawTags[0])),
+			"compileEscapedEchos" => strlen(stripcslashes($this->escapedTags[0])),
+			"compileRegularEchos" => strlen(stripcslashes($this->contentTags[0])),
+		];
+
+		uksort($methods, function($method1, $method2) use ($methods)
+		{
+			// Ensure the longest tags are processed first
+			if ($methods[$method1] > $methods[$method2]) return -1;
+			if ($methods[$method1] < $methods[$method2]) return 1;
+
+			// Otherwise give preference to raw tags (assuming they've overridden)
+			if ($method1 === "compileRawEchos") return -1;
+			if ($method2 === "compileRawEchos") return 1;
+
+			if ($method1 === "compileEscapedEchos") return -1;
+			if ($method2 === "compileEscapedEchos") return 1;
+		});
+
+		return $methods;
+	}
+
+	/**
+	 * Compile Blade statements that start with "@".
 	 *
 	 * @param  string  $value
 	 * @return mixed
@@ -229,6 +262,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 			if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
 			{
 				$match[0] = $this->$method(array_get($match, 3));
+			}
+			elseif (isset($this->customDirectives[$match[1]]))
+			{
+				$match[0] = call_user_func($this->customDirectives[$match[1]], array_get($match, 3));
 			}
 
 			return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -319,6 +356,19 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected function compileEach($expression)
 	{
 		return "<?php echo \$__env->renderEach{$expression}; ?>";
+	}
+
+	/**
+	 * Compile the inject statements into valid PHP.
+	 *
+	 * @param  string  $expression
+	 * @return string
+	 */
+	protected function compileInject($expression)
+	{
+		$segments = explode(',', preg_replace("/[\(\)\\\"\']/", '', $expression));
+
+		return "<?php $".trim($segments[0])." = app('".trim($segments[1])."'); ?>";
 	}
 
 	/**
@@ -626,7 +676,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	}
 
 	/**
-	 * Compile the stack statements into the content
+	 * Compile the stack statements into the content.
 	 *
 	 * @param  string  $expression
 	 * @return string
@@ -661,45 +711,24 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	/**
 	 * Register a custom Blade compiler.
 	 *
-	 * @param  \Closure  $compiler
+	 * @param  callable  $compiler
 	 * @return void
 	 */
-	public function extend(Closure $compiler)
+	public function extend(callable $compiler)
 	{
 		$this->extensions[] = $compiler;
 	}
 
 	/**
-	 * Get the regular expression for a generic Blade function.
+	 * Register a handler for custom directives.
 	 *
-	 * @param  string  $function
-	 * @return string
+	 * @param  string  $name
+	 * @param  callable  $handler
+	 * @return void
 	 */
-	public function createMatcher($function)
+	public function directive($name, callable $handler)
 	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*\))/';
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createOpenMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*\(.*)\)/';
-	}
-
-	/**
-	 * Create a plain Blade matcher.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public function createPlainMatcher($function)
-	{
-		return '/(?<!\w)(\s*)@'.$function.'(\s*)/';
+		$this->customDirectives[$name] = $handler;
 	}
 
 	/**
@@ -748,7 +777,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	*/
 	public function getContentTags()
 	{
-		return $this->contentTags;
+		return $this->getTags();
 	}
 
 	/**
@@ -758,7 +787,20 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	*/
 	public function getEscapedContentTags()
 	{
-		return $this->escapedTags;
+		return $this->getTags(true);
+	}
+
+	/**
+	 * Gets the tags used for the compiler.
+	 *
+	 * @param  bool  $escaped
+	 * @return array
+	 */
+	protected function getTags($escaped = false)
+	{
+		$tags = $escaped ? $this->escapedTags : $this->contentTags;
+
+		return array_map('stripcslashes', $tags);
 	}
 
 	/**

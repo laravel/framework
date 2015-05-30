@@ -1,39 +1,40 @@
 <?php namespace Illuminate\Foundation;
 
 use Closure;
-use Stack\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Config\FileLoader;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
-use Illuminate\Contracts\Support\ResponsePreparer;
-use Illuminate\Exception\ExceptionServiceProvider;
-use Illuminate\Config\FileEnvironmentVariablesLoader;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements HttpKernelInterface,
-                                               TerminableInterface,
-                                               ApplicationContract,
-                                               ResponsePreparer {
+class Application extends Container implements ApplicationContract, HttpKernelInterface {
 
 	/**
 	 * The Laravel framework version.
 	 *
 	 * @var string
 	 */
-	const VERSION = '5.0-dev';
+	const VERSION = '5.1-dev';
+
+	/**
+	 * The base path for the Laravel installation.
+	 *
+	 * @var string
+	 */
+	protected $basePath;
+
+	/**
+	 * Indicates if the application has been bootstrapped before.
+	 *
+	 * @var bool
+	 */
+	protected $hasBeenBootstrapped = false;
 
 	/**
 	 * Indicates if the application has "booted".
@@ -57,25 +58,11 @@ class Application extends Container implements HttpKernelInterface,
 	protected $bootedCallbacks = array();
 
 	/**
-	 * The array of finish callbacks.
+	 * The array of terminating callbacks.
 	 *
 	 * @var array
 	 */
-	protected $finishCallbacks = array();
-
-	/**
-	 * The array of shutdown callbacks.
-	 *
-	 * @var array
-	 */
-	protected $shutdownCallbacks = array();
-
-	/**
-	 * All of the developer defined middlewares.
-	 *
-	 * @var array
-	 */
-	protected $middlewares = array();
+	protected $terminatingCallbacks = array();
 
 	/**
 	 * All of the registered service providers.
@@ -99,46 +86,77 @@ class Application extends Container implements HttpKernelInterface,
 	protected $deferredServices = array();
 
 	/**
-	 * The request class used by the application.
+	 * A custom callback used to configure Monolog.
+	 *
+	 * @var callable|null
+	 */
+	protected $monologConfigurator;
+
+	/**
+	 * The custom database path defined by the developer.
 	 *
 	 * @var string
 	 */
-	protected static $requestClass = 'Illuminate\Http\Request';
+	protected $databasePath;
+
+	/**
+	 * The custom storage path defined by the developer.
+	 *
+	 * @var string
+	 */
+	protected $storagePath;
+
+	/**
+	 * The environment file to load during bootstrapping.
+	 *
+	 * @var string
+	 */
+	protected $environmentFile = '.env';
+
+	/**
+	 * The application namespace.
+	 *
+	 * @var string
+	 */
+	protected $namespace = null;
 
 	/**
 	 * Create a new Illuminate application instance.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  string|null  $basePath
 	 * @return void
 	 */
-	public function __construct(Request $request = null)
+	public function __construct($basePath = null)
 	{
-		$this->registerBaseBindings($request ?: $this->createNewRequest());
+		$this->registerBaseBindings();
 
 		$this->registerBaseServiceProviders();
 
-		$this->registerBaseMiddlewares();
+		$this->registerCoreContainerAliases();
+
+		if ($basePath) $this->setBasePath($basePath);
 	}
 
 	/**
-	 * Create a new request instance from the request class.
+	 * Get the version number of the application.
 	 *
-	 * @return \Illuminate\Http\Request
+	 * @return string
 	 */
-	protected function createNewRequest()
+	public function version()
 	{
-		return forward_static_call(array(static::$requestClass, 'createFromGlobals'));
+		return static::VERSION;
 	}
 
 	/**
 	 * Register the basic bindings into the container.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
 	 * @return void
 	 */
-	protected function registerBaseBindings($request)
+	protected function registerBaseBindings()
 	{
-		$this->instance('request', $request);
+		static::setInstance($this);
+
+		$this->instance('app', $this);
 
 		$this->instance('Illuminate\Container\Container', $this);
 	}
@@ -150,81 +168,229 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	protected function registerBaseServiceProviders()
 	{
-		foreach (array('Event', 'Exception', 'Routing') as $name)
-		{
-			$this->{"register{$name}Provider"}();
-		}
-	}
+		$this->register(new EventServiceProvider($this));
 
-	/**
-	 * Register the exception service provider.
-	 *
-	 * @return void
-	 */
-	protected function registerExceptionProvider()
-	{
-		$this->register(new ExceptionServiceProvider($this));
-	}
-
-	/**
-	 * Register the routing service provider.
-	 *
-	 * @return void
-	 */
-	protected function registerRoutingProvider()
-	{
 		$this->register(new RoutingServiceProvider($this));
 	}
 
 	/**
-	 * Register the event service provider.
+	 * Run the given array of bootstrap classes.
 	 *
+	 * @param  array  $bootstrappers
 	 * @return void
 	 */
-	protected function registerEventProvider()
+	public function bootstrapWith(array $bootstrappers)
 	{
-		$this->register(new EventServiceProvider($this));
-	}
+		$this->hasBeenBootstrapped = true;
 
-	/**
-	 * Bind the installation paths to the application.
-	 *
-	 * @param  array  $paths
-	 * @return void
-	 */
-	public function bindInstallPaths(array $paths)
-	{
-		$this->instance('path', realpath($paths['app']));
-
-		// Here we will bind the install paths into the container as strings that can be
-		// accessed from any point in the system. Each path key is prefixed with path
-		// so that they have the consistent naming convention inside the container.
-		foreach (array_except($paths, array('app')) as $key => $value)
+		foreach ($bootstrappers as $bootstrapper)
 		{
-			$this->instance("path.{$key}", realpath($value));
+			$this['events']->fire('bootstrapping: '.$bootstrapper, [$this]);
+
+			$this->make($bootstrapper)->bootstrap($this);
+
+			$this['events']->fire('bootstrapped: '.$bootstrapper, [$this]);
 		}
 	}
 
 	/**
-	 * Get the application bootstrap file.
+	 * Register a callback to run after loading the environment.
 	 *
-	 * @return string
+	 * @param  \Closure  $callback
+	 * @return void
 	 */
-	public static function getBootstrapFile()
+	public function afterLoadingEnvironment(Closure $callback)
 	{
-		return __DIR__.'/start.php';
+		return $this->afterBootstrapping(
+			'Illuminate\Foundation\Bootstrap\DetectEnvironment', $callback
+		);
 	}
 
 	/**
-	 * Start the exception handling for the request.
+	 * Register a callback to run before a bootstrapper.
+	 *
+	 * @param  string  $bootstrapper
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function beforeBootstrapping($bootstrapper, Closure $callback)
+	{
+		$this['events']->listen('bootstrapping: '.$bootstrapper, $callback);
+	}
+
+	/**
+	 * Register a callback to run after a bootstrapper.
+	 *
+	 * @param  string  $bootstrapper
+	 * @param  Closure  $callback
+	 * @return void
+	 */
+	public function afterBootstrapping($bootstrapper, Closure $callback)
+	{
+		$this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
+	}
+
+	/**
+	 * Determine if the application has been bootstrapped before.
+	 *
+	 * @return bool
+	 */
+	public function hasBeenBootstrapped()
+	{
+		return $this->hasBeenBootstrapped;
+	}
+
+	/**
+	 * Set the base path for the application.
+	 *
+	 * @param  string  $basePath
+	 * @return $this
+	 */
+	public function setBasePath($basePath)
+	{
+		$this->basePath = $basePath;
+
+		$this->bindPathsInContainer();
+
+		return $this;
+	}
+
+	/**
+	 * Bind all of the application paths in the container.
 	 *
 	 * @return void
 	 */
-	public function startExceptionHandling()
+	protected function bindPathsInContainer()
 	{
-		$this['exception']->register($this->environment());
+		$this->instance('path', $this->path());
 
-		$this['exception']->setDebug($this['config']['app.debug']);
+		foreach (['base', 'config', 'database', 'lang', 'public', 'storage'] as $path)
+		{
+			$this->instance('path.'.$path, $this->{$path.'Path'}());
+		}
+	}
+
+	/**
+	 * Get the path to the application "app" directory.
+	 *
+	 * @return string
+	 */
+	public function path()
+	{
+		return $this->basePath.DIRECTORY_SEPARATOR.'app';
+	}
+
+	/**
+	 * Get the base path of the Laravel installation.
+	 *
+	 * @return string
+	 */
+	public function basePath()
+	{
+		return $this->basePath;
+	}
+
+	/**
+	 * Get the path to the application configuration files.
+	 *
+	 * @return string
+	 */
+	public function configPath()
+	{
+		return $this->basePath.DIRECTORY_SEPARATOR.'config';
+	}
+
+	/**
+	 * Get the path to the database directory.
+	 *
+	 * @return string
+	 */
+	public function databasePath()
+	{
+		return $this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database';
+	}
+
+	/**
+	 * Set the database directory.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function useDatabasePath($path)
+	{
+		$this->databasePath = $path;
+
+		$this->instance('path.database', $path);
+
+		return $this;
+	}
+
+	/**
+	 * Get the path to the language files.
+	 *
+	 * @return string
+	 */
+	public function langPath()
+	{
+		return $this->basePath.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
+	}
+
+	/**
+	 * Get the path to the public / web directory.
+	 *
+	 * @return string
+	 */
+	public function publicPath()
+	{
+		return $this->basePath.DIRECTORY_SEPARATOR.'public';
+	}
+
+	/**
+	 * Get the path to the storage directory.
+	 *
+	 * @return string
+	 */
+	public function storagePath()
+	{
+		return $this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage';
+	}
+
+	/**
+	 * Set the storage directory.
+	 *
+	 * @param  string  $path
+	 * @return $this
+	 */
+	public function useStoragePath($path)
+	{
+		$this->storagePath = $path;
+
+		$this->instance('path.storage', $path);
+
+		return $this;
+	}
+
+	/**
+	 * Set the environment file to be loaded during bootstrapping.
+	 *
+	 * @param  string  $file
+	 * @return $this
+	 */
+	public function loadEnvironmentFrom($file)
+	{
+		$this->environmentFile = $file;
+
+		return $this;
+	}
+
+	/**
+	 * Get the environment file the application is using.
+	 *
+	 * @return string
+	 */
+	public function environmentFile()
+	{
+		return $this->environmentFile ?: '.env';
 	}
 
 	/**
@@ -235,9 +401,19 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function environment()
 	{
-		if (count(func_get_args()) > 0)
+		if (func_num_args() > 0)
 		{
-			return in_array($this['env'], func_get_args());
+			$patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
+
+			foreach ($patterns as $pattern)
+			{
+				if (str_is($pattern, $this['env']))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		return $this['env'];
@@ -256,14 +432,14 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Detect the application's current environment.
 	 *
-	 * @param  array|string  $envs
+	 * @param  \Closure  $callback
 	 * @return string
 	 */
-	public function detectEnvironment($envs)
+	public function detectEnvironment(Closure $callback)
 	{
 		$args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
-		return $this['env'] = (new EnvironmentDetector())->detect($envs, $args);
+		return $this['env'] = (new EnvironmentDetector())->detect($callback, $args);
 	}
 
 	/**
@@ -287,15 +463,16 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Force register a service provider with the application.
+	 * Register all of the configured providers.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
-	 * @param  array  $options
-	 * @return \Illuminate\Support\ServiceProvider
+	 * @return void
 	 */
-	public function forceRegister($provider, $options = array())
+	public function registerConfiguredProviders()
 	{
-		return $this->register($provider, $options, true);
+		$manifestPath = $this->getCachedServicesPath();
+
+		(new ProviderRepository($this, new Filesystem, $manifestPath))
+					->load($this->config['app.providers']);
 	}
 
 	/**
@@ -308,8 +485,10 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function register($provider, $options = array(), $force = false)
 	{
-		if ($registered = $this->getRegistered($provider) && ! $force)
-                                     return $registered;
+		if ($registered = $this->getProvider($provider) && ! $force)
+		{
+			return $registered;
+		}
 
 		// If the given "provider" is a string, we will resolve it, passing in the
 		// application instance automatically for the developer. This is simply
@@ -348,17 +527,14 @@ class Application extends Container implements HttpKernelInterface,
 	 * @param  \Illuminate\Support\ServiceProvider|string  $provider
 	 * @return \Illuminate\Support\ServiceProvider|null
 	 */
-	public function getRegistered($provider)
+	public function getProvider($provider)
 	{
 		$name = is_string($provider) ? $provider : get_class($provider);
 
-		if (array_key_exists($name, $this->loadedProviders))
+		return array_first($this->serviceProviders, function($key, $value) use ($name)
 		{
-			return array_first($this->serviceProviders, function($key, $value) use ($name)
-			{
-				return get_class($value) == $name;
-			});
-		}
+			return $value instanceof $name;
+		});
 	}
 
 	/**
@@ -375,7 +551,7 @@ class Application extends Container implements HttpKernelInterface,
 	/**
 	 * Mark the given provider as registered.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
 	 * @return void
 	 */
 	protected function markAsRegistered($provider)
@@ -411,8 +587,13 @@ class Application extends Container implements HttpKernelInterface,
 	 * @param  string  $service
 	 * @return void
 	 */
-	protected function loadDeferredProvider($service)
+	public function loadDeferredProvider($service)
 	{
+		if ( ! isset($this->deferredServices[$service]))
+		{
+			return;
+		}
+
 		$provider = $this->deferredServices[$service];
 
 		// If the service provider has not already been loaded and registered we can
@@ -458,7 +639,7 @@ class Application extends Container implements HttpKernelInterface,
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = array())
+	public function make($abstract, array $parameters = array())
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -484,94 +665,6 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * "Extend" an abstract type in the container.
-	 *
-	 * (Overriding Container::extend)
-	 *
-	 * @param  string   $abstract
-	 * @param  \Closure  $closure
-	 * @return void
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function extend($abstract, Closure $closure)
-	{
-		$abstract = $this->getAlias($abstract);
-
-		if (isset($this->deferredServices[$abstract]))
-		{
-			$this->loadDeferredProvider($abstract);
-		}
-
-		return parent::extend($abstract, $closure);
-	}
-
-	/**
-	 * Register a "before" application filter.
-	 *
-	 * @param  \Closure|string  $callback
-	 * @return void
-	 */
-	public function before($callback)
-	{
-		return $this['router']->before($callback);
-	}
-
-	/**
-	 * Register an "after" application filter.
-	 *
-	 * @param  \Closure|string  $callback
-	 * @return void
-	 */
-	public function after($callback)
-	{
-		return $this['router']->after($callback);
-	}
-
-	/**
-	 * Register a "finish" application filter.
-	 *
-	 * @param  \Closure|string  $callback
-	 * @return void
-	 */
-	public function finish($callback)
-	{
-		$this->finishCallbacks[] = $callback;
-	}
-
-	/**
-	 * Register a "shutdown" callback.
-	 *
-	 * @param  callable  $callback
-	 * @return void
-	 */
-	public function shutdown(callable $callback = null)
-	{
-		if (is_null($callback))
-		{
-			$this->fireAppCallbacks($this->shutdownCallbacks);
-		}
-		else
-		{
-			$this->shutdownCallbacks[] = $callback;
-		}
-	}
-
-	/**
-	 * Register a function for determining when to use array sessions.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function useArraySessions(Closure $callback)
-	{
-		$this->bind('session.reject', function() use ($callback)
-		{
-			return $callback;
-		});
-	}
-
-	/**
 	 * Determine if the application has booted.
 	 *
 	 * @return bool
@@ -590,26 +683,32 @@ class Application extends Container implements HttpKernelInterface,
 	{
 		if ($this->booted) return;
 
-		array_walk($this->serviceProviders, function($p) { $this->bootProvider($p); });
-
-		$this->bootApplication();
-	}
-
-	/**
-	 * Boot the application and fire app callbacks.
-	 *
-	 * @return void
-	 */
-	protected function bootApplication()
-	{
 		// Once the application has booted we will also fire some "booted" callbacks
 		// for any listeners that need to do work after this initial booting gets
 		// finished. This is useful when ordering the boot-up processes we run.
 		$this->fireAppCallbacks($this->bootingCallbacks);
 
+		array_walk($this->serviceProviders, function($p) {
+			$this->bootProvider($p);
+		});
+
 		$this->booted = true;
 
 		$this->fireAppCallbacks($this->bootedCallbacks);
+	}
+
+	/**
+	 * Boot the given service provider.
+	 *
+	 * @param  \Illuminate\Support\ServiceProvider  $provider
+	 * @return void
+	 */
+	protected function bootProvider(ServiceProvider $provider)
+	{
+		if (method_exists($provider, 'boot'))
+		{
+			return $this->call([$provider, 'boot']);
+		}
 	}
 
 	/**
@@ -637,109 +736,45 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Boot the given service provider.
+	 * Call the booting callbacks for the application.
 	 *
-	 * @param  \Illuminate\Support\ServiceProvider  $provider
+	 * @param  array  $callbacks
 	 * @return void
 	 */
-	protected function bootProvider(ServiceProvider $provider)
+	protected function fireAppCallbacks(array $callbacks)
 	{
-		if (method_exists($provider, 'boot'))
+		foreach ($callbacks as $callback)
 		{
-			return $this->call([$provider, 'boot']);
+			call_user_func($callback, $this);
 		}
 	}
 
 	/**
-	 * Run the application and send the response.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @return void
+	 * {@inheritdoc}
 	 */
-	public function run(SymfonyRequest $request = null)
+	public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
 	{
-		$request = $request ?: $this['request'];
-
-		$response = with($stack = $this->getStackedClient())->handle($request);
-
-		$response->send();
-
-		$stack->terminate($request, $response);
+		return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
 	}
 
 	/**
-	 * Get the stacked HTTP kernel for the application.
+	 * Determine if the application configuration is cached.
 	 *
-	 * @return  \Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return bool
 	 */
-	protected function getStackedClient()
+	public function configurationIsCached()
 	{
-		$sessionReject = $this->bound('session.reject') ? $this['session.reject'] : null;
-
-		$client = (new Builder)
-                    ->push('Illuminate\Cookie\Guard', $this['encrypter'])
-                    ->push('Illuminate\Cookie\Queue', $this['cookie'])
-                    ->push('Illuminate\Session\Middleware', $this['session'], $sessionReject);
-
-		$this->mergeCustomMiddlewares($client);
-
-		return $client->resolve($this);
+		return $this['files']->exists($this->getCachedConfigPath());
 	}
 
 	/**
-	 * Merge the developer defined middlewares onto the stack.
+	 * Get the path to the configuration cache file.
 	 *
-	 * @param  \Stack\Builder
-	 * @return void
+	 * @return string
 	 */
-	protected function mergeCustomMiddlewares(Builder $stack)
+	public function getCachedConfigPath()
 	{
-		foreach ($this->middlewares as $middleware)
-		{
-			list($class, $parameters) = array_values($middleware);
-
-			array_unshift($parameters, $class);
-
-			call_user_func_array(array($stack, 'push'), $parameters);
-		}
-	}
-
-	/**
-	 * Register the default, but optional middlewares.
-	 *
-	 * @return void
-	 */
-	protected function registerBaseMiddlewares()
-	{
-		//
-	}
-
-	/**
-	 * Add a HttpKernel middleware onto the stack.
-	 *
-	 * @param  string  $class
-	 * @param  array  $parameters
-	 * @return $this
-	 */
-	public function middleware($class, array $parameters = array())
-	{
-		$this->middlewares[] = compact('class', 'parameters');
-
-		return $this;
-	}
-
-	/**
-	 * Remove a custom middleware from the application.
-	 *
-	 * @param  string  $class
-	 * @return void
-	 */
-	public function forgetMiddleware($class)
-	{
-		$this->middlewares = array_filter($this->middlewares, function($m) use ($class)
-		{
-			return $m['class'] != $class;
-		});
+		return $this->basePath().'/bootstrap/cache/config.php';
 	}
 
 	/**
@@ -759,170 +794,27 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function getCachedRoutesPath()
 	{
-		return $this['path.storage'].'/framework/routes.php';
+		return $this->basePath().'/bootstrap/cache/routes.php';
 	}
 
 	/**
-	 * Determine if the application routes have been scanned.
-	 *
-	 * @return bool
-	 */
-	public function routesAreScanned()
-	{
-		return $this['files']->exists($this->getScannedRoutesPath());
-	}
-
-	/**
-	 * Get the path to the scanned routes file.
+	 * Get the path to the cached "compiled.php" file.
 	 *
 	 * @return string
 	 */
-	public function getScannedRoutesPath()
+	public function getCachedCompilePath()
 	{
-		return $this['path.storage'].'/framework/routes.scanned.php';
+		return $this->basePath().'/bootstrap/cache/compiled.php';
 	}
 
 	/**
-	 * Handle the given request and get the response.
+	 * Get the path to the cached services.json file.
 	 *
-	 * Provides compatibility with BrowserKit functional testing.
-	 *
-	 * @implements HttpKernelInterface::handle
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  int   $type
-	 * @param  bool  $catch
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 *
-	 * @throws \Exception
+	 * @return string
 	 */
-	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	public function getCachedServicesPath()
 	{
-		try
-		{
-			$this->refreshRequest($request = Request::createFromBase($request));
-
-			$this->boot();
-
-			return $this->dispatch($request);
-		}
-		catch (\Exception $e)
-		{
-			if ($this->runningUnitTests()) throw $e;
-
-			return $this['exception']->handleException($e);
-		}
-	}
-
-	/**
-	 * Handle the given request and get the response.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function dispatch(Request $request)
-	{
-		if ($this->runningUnitTests() && ! $this['session']->isStarted())
-		{
-			$this['session']->start();
-		}
-
-		return $this['router']->dispatch($this->prepareRequest($request));
-	}
-
-	/**
-	 * Terminate the request and send the response to the browser.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @return void
-	 */
-	public function terminate(SymfonyRequest $request, SymfonyResponse $response)
-	{
-		$this->callFinishCallbacks($request, $response);
-
-		$this->shutdown();
-	}
-
-	/**
-	 * Refresh the bound request instance in the container.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return void
-	 */
-	protected function refreshRequest(Request $request)
-	{
-		$this->instance('request', $request);
-
-		Facade::clearResolvedInstance('request');
-	}
-
-	/**
-	 * Call the "finish" callbacks assigned to the application.
-	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request  $request
-	 * @param  \Symfony\Component\HttpFoundation\Response  $response
-	 * @return void
-	 */
-	public function callFinishCallbacks(SymfonyRequest $request, SymfonyResponse $response)
-	{
-		foreach ($this->finishCallbacks as $callback)
-		{
-			call_user_func($callback, $request, $response);
-		}
-	}
-
-	/**
-	 * Call the booting callbacks for the application.
-	 *
-	 * @param  array  $callbacks
-	 * @return void
-	 */
-	protected function fireAppCallbacks(array $callbacks)
-	{
-		foreach ($callbacks as $callback)
-		{
-			call_user_func($callback, $this);
-		}
-	}
-
-	/**
-	 * Prepare the request by injecting any services.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Request
-	 */
-	public function prepareRequest(Request $request)
-	{
-		if ( ! is_null($this['config']['session.driver']) && ! $request->hasSession())
-		{
-			$request->setSession($this['session']->driver());
-		}
-
-		return $request;
-	}
-
-	/**
-	 * Prepare the given value as a Response object.
-	 *
-	 * @param  mixed  $value
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function prepareResponse($value)
-	{
-		if ( ! $value instanceof SymfonyResponse) $value = new Response($value);
-
-		return $value->prepare($this['request']);
-	}
-
-	/**
-	 * Determine if the application is ready for responses.
-	 *
-	 * @return bool
-	 */
-	public function readyForResponses()
-	{
-		return $this->booted;
+		return $this->basePath().'/bootstrap/cache/services.json';
 	}
 
 	/**
@@ -932,18 +824,7 @@ class Application extends Container implements HttpKernelInterface,
 	 */
 	public function isDownForMaintenance()
 	{
-		return file_exists($this['config']['app.manifest'].'/down');
-	}
-
-	/**
-	 * Register a maintenance mode event listener.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function down(Closure $callback)
-	{
-		$this['events']->listen('illuminate.app.down', $callback);
+		return file_exists($this->storagePath().'/framework/down');
 	}
 
 	/**
@@ -955,7 +836,6 @@ class Application extends Container implements HttpKernelInterface,
 	 * @return void
 	 *
 	 * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 */
 	public function abort($code, $message = '', array $headers = array())
 	{
@@ -968,85 +848,29 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Register a 404 error handler.
+	 * Register a terminating callback with the application.
 	 *
 	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function terminating(Closure $callback)
+	{
+		$this->terminatingCallbacks[] = $callback;
+
+		return $this;
+	}
+
+	/**
+	 * Terminate the application.
+	 *
 	 * @return void
 	 */
-	public function missing(Closure $callback)
+	public function terminate()
 	{
-		$this->error(function(NotFoundHttpException $e) use ($callback)
+		foreach ($this->terminatingCallbacks as $terminating)
 		{
-			return call_user_func($callback, $e);
-		});
-	}
-
-	/**
-	 * Register an application error handler.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function error(Closure $callback)
-	{
-		$this['exception']->error($callback);
-	}
-
-	/**
-	 * Register an error handler at the bottom of the stack.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function pushError(Closure $callback)
-	{
-		$this['exception']->pushError($callback);
-	}
-
-	/**
-	 * Register an error handler for fatal errors.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 */
-	public function fatal(Closure $callback)
-	{
-		$this->error(function(FatalErrorException $e) use ($callback)
-		{
-			return call_user_func($callback, $e);
-		});
-	}
-
-	/**
-	 * Get the configuration loader instance.
-	 *
-	 * @return \Illuminate\Config\LoaderInterface
-	 */
-	public function getConfigLoader()
-	{
-		return new FileLoader(new Filesystem, $this['path.config']);
-	}
-
-	/**
-	 * Get the environment variables loader instance.
-	 *
-	 * @return \Illuminate\Config\EnvironmentVariablesLoaderInterface
-	 */
-	public function getEnvironmentVariablesLoader()
-	{
-		return new FileEnvironmentVariablesLoader(new Filesystem, $this['path.base']);
-	}
-
-	/**
-	 * Get the service provider repository instance.
-	 *
-	 * @return \Illuminate\Foundation\ProviderRepository
-	 */
-	public function getProviderRepository()
-	{
-		$manifest = $this['config']['app.manifest'];
-
-		return new ProviderRepository(new Filesystem, $manifest);
+			$this->call($terminating);
+		}
 	}
 
 	/**
@@ -1057,6 +881,16 @@ class Application extends Container implements HttpKernelInterface,
 	public function getLoadedProviders()
 	{
 		return $this->loadedProviders;
+	}
+
+	/**
+	 * Get the application's deferred services.
+	 *
+	 * @return array
+	 */
+	public function getDeferredServices()
+	{
+		return $this->deferredServices;
 	}
 
 	/**
@@ -1071,6 +905,17 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
+	 * Add an array of services to the application's deferred services.
+	 *
+	 * @param  array  $services
+	 * @return void
+	 */
+	public function addDeferredServices(array $services)
+	{
+		$this->deferredServices = array_merge($this->deferredServices, $services);
+	}
+
+	/**
 	 * Determine if the given service is a deferred service.
 	 *
 	 * @param  string  $service
@@ -1082,42 +927,36 @@ class Application extends Container implements HttpKernelInterface,
 	}
 
 	/**
-	 * Get or set the request class for the application.
+	 * Define a callback to be used to configure Monolog.
 	 *
-	 * @param  string  $class
-	 * @return string
+	 * @param  callable  $callback
+	 * @return $this
 	 */
-	public static function requestClass($class = null)
+	public function configureMonologUsing(callable $callback)
 	{
-		if ( ! is_null($class)) static::$requestClass = $class;
+		$this->monologConfigurator = $callback;
 
-		return static::$requestClass;
+		return $this;
 	}
 
 	/**
-	 * Set the application request for the console environment.
+	 * Determine if the application has a custom Monolog configurator.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public function setRequestForConsoleEnvironment()
+	public function hasMonologConfigurator()
 	{
-		$url = $this['config']->get('app.url', 'http://localhost');
-
-		$parameters = array($url, 'GET', array(), array(), array(), $_SERVER);
-
-		$this->refreshRequest(static::onRequest('create', $parameters));
+		return ! is_null($this->monologConfigurator);
 	}
 
 	/**
-	 * Call a method on the default request class.
+	 * Get the custom Monolog configurator for the application.
 	 *
-	 * @param  string  $method
-	 * @param  array  $parameters
-	 * @return mixed
+	 * @return callable
 	 */
-	public static function onRequest($method, $parameters = array())
+	public function getMonologConfigurator()
 	{
-		return forward_static_call_array(array(static::requestClass(), $method), $parameters);
+		return $this->monologConfigurator;
 	}
 
 	/**
@@ -1153,41 +992,39 @@ class Application extends Container implements HttpKernelInterface,
 	public function registerCoreContainerAliases()
 	{
 		$aliases = array(
-			'app'            => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
-			'artisan'        => 'Illuminate\Console\Application',
-			'auth'           => 'Illuminate\Auth\AuthManager',
-			'auth.driver'    => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Authenticator'],
-			'auth.reminder.repository' => 'Illuminate\Auth\Reminders\ReminderRepositoryInterface',
-			'blade.compiler' => 'Illuminate\View\Compilers\BladeCompiler',
-			'cache'          => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
-			'cache.store'    => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Repository'],
-			'config'         => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Repository'],
-			'cookie'         => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
-			'exception'      => 'Illuminate\Contracts\Exception\Handler',
-			'encrypter'      => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
-			'db'             => 'Illuminate\Database\DatabaseManager',
-			'events'         => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
-			'files'          => 'Illuminate\Filesystem\Filesystem',
-			'filesystem'     => 'Illuminate\Contracts\Filesystem\Factory',
-			'filesystem.disk' => 'Illuminate\Contracts\Filesystem\Filesystem',
-			'filesystem.cloud' => 'Illuminate\Contracts\Filesystem\Cloud',
-			'hash'           => 'Illuminate\Contracts\Hashing\Hasher',
-			'translator'     => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
-			'log'            => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
-			'mailer'         => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
-			'paginator'      => 'Illuminate\Pagination\Factory',
-			'auth.reminder'  => ['Illuminate\Auth\Reminders\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
-			'queue'          => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory'],
-			'queue.connection' => 'Illuminate\Contracts\Queue\Queue',
-			'redirect'       => 'Illuminate\Routing\Redirector',
-			'redis'          => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
-			'request'        => 'Illuminate\Http\Request',
-			'router'         => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],
-			'session'        => 'Illuminate\Session\SessionManager',
-			'session.store'  => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
-			'url'            => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
-			'validator'      => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
-			'view'           => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
+			'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
+			'auth'                 => 'Illuminate\Auth\AuthManager',
+			'auth.driver'          => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Guard'],
+			'auth.password.tokens' => 'Illuminate\Auth\Passwords\TokenRepositoryInterface',
+			'blade.compiler'       => 'Illuminate\View\Compilers\BladeCompiler',
+			'cache'                => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
+			'cache.store'          => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Repository'],
+			'config'               => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Repository'],
+			'cookie'               => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
+			'encrypter'            => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
+			'db'                   => 'Illuminate\Database\DatabaseManager',
+			'events'               => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
+			'files'                => 'Illuminate\Filesystem\Filesystem',
+			'filesystem'           => ['Illuminate\Filesystem\FilesystemManager', 'Illuminate\Contracts\Filesystem\Factory'],
+			'filesystem.disk'      => 'Illuminate\Contracts\Filesystem\Filesystem',
+			'filesystem.cloud'     => 'Illuminate\Contracts\Filesystem\Cloud',
+			'hash'                 => 'Illuminate\Contracts\Hashing\Hasher',
+			'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
+			'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
+			'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
+			'paginator'            => 'Illuminate\Pagination\Factory',
+			'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
+			'queue'                => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory', 'Illuminate\Contracts\Queue\Monitor'],
+			'queue.connection'     => 'Illuminate\Contracts\Queue\Queue',
+			'redirect'             => 'Illuminate\Routing\Redirector',
+			'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
+			'request'              => 'Illuminate\Http\Request',
+			'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],
+			'session'              => 'Illuminate\Session\SessionManager',
+			'session.store'        => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
+			'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
+			'validator'            => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
+			'view'                 => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
 		);
 
 		foreach ($aliases as $key => $aliases)
@@ -1209,6 +1046,34 @@ class Application extends Container implements HttpKernelInterface,
 		parent::flush();
 
 		$this->loadedProviders = [];
+	}
+
+	/**
+	 * Get the used kernel object.
+	 *
+	 * @return \Illuminate\Contracts\Console\Kernel|\Illuminate\Contracts\Http\Kernel
+	 */
+	protected function getKernel()
+	{
+		$kernelContract = $this->runningInConsole()
+					? 'Illuminate\Contracts\Console\Kernel'
+					: 'Illuminate\Contracts\Http\Kernel';
+
+		return $this->make($kernelContract);
+	}
+
+	/**
+	 * Get the application namespace.
+	 *
+	 * @return string
+	 */
+	public function getNamespace()
+	{
+		if ( ! is_null($this->namespace)) return $this->namespace;
+
+		$this->namespace = strtok(get_class($this->getKernel()), '\\').'\\';
+
+		return $this->namespace;
 	}
 
 }

@@ -34,6 +34,27 @@ interface Queue {
 	public function later($delay, $job, $data = '', $queue = null);
 
 	/**
+	 * Push a new job onto the queue.
+	 *
+	 * @param  string  $queue
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function pushOn($queue, $job, $data = '');
+
+	/**
+	 * Push a new job onto the queue after a delay.
+	 *
+	 * @param  string  $queue
+	 * @param  \DateTime|int  $delay
+	 * @param  string  $job
+	 * @param  mixed   $data
+	 * @return mixed
+	 */
+	public function laterOn($queue, $delay, $job, $data = '');
+
+	/**
 	 * Pop the next job off of the queue.
 	 *
 	 * @param  string  $queue

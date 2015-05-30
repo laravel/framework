@@ -45,7 +45,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['__event.test']);
 		$d = new Dispatcher;
-		$d->queue('update', array('name' => 'taylor'));
+		$d->push('update', array('name' => 'taylor'));
 		$d->listen('update', function($name)
 		{
 			$_SERVER['__event.test'] = $name;
@@ -61,13 +61,13 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$_SERVER['__event.test'] = 'unset';
 		$d = new Dispatcher;
-		$d->queue('update', array('name' => 'taylor'));
+		$d->push('update', array('name' => 'taylor'));
 		$d->listen('update', function($name)
 		{
 			$_SERVER['__event.test'] = $name;
 		});
 
-		$d->forgetQueued();
+		$d->forgetPushed();
 		$d->flush('update');
 		$this->assertEquals('unset', $_SERVER['__event.test']);
 	}
@@ -109,4 +109,48 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $_SERVER['__event.test']);
 	}
 
+
+	public function testQueuedEventHandlersAreQueued()
+	{
+		$d = new Dispatcher;
+		$queue = m::mock('Illuminate\Contracts\Queue\Queue');
+		$queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+			'class' => 'TestDispatcherQueuedHandler',
+			'method' => 'someMethod',
+			'data' => serialize(['foo', 'bar']),
+		]);
+		$d->setQueueResolver(function() use ($queue) { return $queue; });
+
+		$d->listen('some.event', 'TestDispatcherQueuedHandler@someMethod');
+		$d->fire('some.event', ['foo', 'bar']);
+	}
+
+
+	public function testQueuedEventHandlersAreQueuedWithCustomHandlers()
+	{
+		$d = new Dispatcher;
+		$queue = m::mock('Illuminate\Contracts\Queue\Queue');
+		$queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+			'class' => 'TestDispatcherQueuedHandlerCustomQueue',
+			'method' => 'someMethod',
+			'data' => serialize(['foo', 'bar']),
+		]);
+		$d->setQueueResolver(function() use ($queue) { return $queue; });
+
+		$d->listen('some.event', 'TestDispatcherQueuedHandlerCustomQueue@someMethod');
+		$d->fire('some.event', ['foo', 'bar']);
+	}
+
+}
+
+class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
+	public function handle() {}
+}
+
+class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Queue\ShouldBeQueued {
+	public function handle() {}
+	public function queue($queue, $handler, array $payload)
+	{
+		$queue->push($handler, $payload);
+	}
 }

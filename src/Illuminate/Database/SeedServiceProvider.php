@@ -1,7 +1,8 @@
 <?php namespace Illuminate\Database;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Console\SeedCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 
 class SeedServiceProvider extends ServiceProvider {
 
@@ -21,12 +22,14 @@ class SeedServiceProvider extends ServiceProvider {
 	{
 		$this->registerSeedCommand();
 
-		$this->app->bindShared('seeder', function()
+		$this->registerMakeCommand();
+
+		$this->app->singleton('seeder', function()
 		{
 			return new Seeder;
 		});
 
-		$this->commands('command.seed');
+		$this->commands('command.seed', 'command.seeder.make');
 	}
 
 	/**
@@ -36,9 +39,22 @@ class SeedServiceProvider extends ServiceProvider {
 	 */
 	protected function registerSeedCommand()
 	{
-		$this->app->bindShared('command.seed', function($app)
+		$this->app->singleton('command.seed', function($app)
 		{
 			return new SeedCommand($app['db']);
+		});
+	}
+
+	/**
+	 * Register the seeder generator command.
+	 *
+	 * @return void
+	 */
+	protected function registerMakeCommand()
+	{
+		$this->app->singleton('command.seeder.make', function($app)
+		{
+			return new SeederMakeCommand($app['files'], $app['composer']);
 		});
 	}
 
@@ -49,7 +65,7 @@ class SeedServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('seeder', 'command.seed');
+		return array('seeder', 'command.seed', 'command.seeder.make');
 	}
 
 }

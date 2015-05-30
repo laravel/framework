@@ -10,10 +10,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 * @var array
 	 */
 	protected $options = array(
-			PDO::ATTR_CASE => PDO::CASE_NATURAL,
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-			PDO::ATTR_STRINGIFY_FETCHES => false,
+		PDO::ATTR_CASE => PDO::CASE_NATURAL,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+		PDO::ATTR_STRINGIFY_FETCHES => false,
 	);
 
 	/**
@@ -37,21 +37,96 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
 	 */
 	protected function getDsn(array $config)
 	{
-		extract($config);
-
 		// First we will create the basic DSN setup as well as the port if it is in
 		// in the configuration options. This will give us the basic DSN we will
 		// need to establish the PDO connections and return them back for use.
-		$port = isset($config['port']) ? ','.$port : '';
-
 		if (in_array('dblib', $this->getAvailableDrivers()))
 		{
-			return "dblib:host={$host}{$port};dbname={$database}";
+			return $this->getDblibDsn($config);
+		}
+		else
+		{
+			return $this->getSqlSrvDsn($config);
+		}
+	}
+
+	/**
+	 * Get the DSN string for a DbLib connection.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getDblibDsn(array $config)
+	{
+		$arguments = array(
+			'host' => $this->buildHostString($config, ':'),
+			'dbname' => $config['database']
+		);
+
+		$arguments = array_merge(
+			$arguments, array_only($config, ['appname', 'charset'])
+		);
+
+		return $this->buildConnectString('dblib', $arguments);
+	}
+
+	/**
+	 * Get the DSN string for a SqlSrv connection.
+	 *
+	 * @param  array  $config
+	 * @return string
+	 */
+	protected function getSqlSrvDsn(array $config)
+	{
+		$arguments = array(
+			'Server' => $this->buildHostString($config, ',')
+		);
+
+		if (isset($config['database'])) {
+			$arguments['Database'] = $config['database'];
 		}
 
-		$dbName = $database != '' ? ";Database={$database}" : '';
+		if (isset($config['appname'])) {
+			$arguments['APP'] = $config['appname'];
+		}
 
-		return "sqlsrv:Server={$host}{$port}{$dbName}";
+		return $this->buildConnectString('sqlsrv', $arguments);
+	}
+
+	/**
+	 * Build a connection string from the given arguments.
+	 *
+	 * @param  string  $driver
+	 * @param  array  $arguments
+	 * @return string
+	 */
+	protected function buildConnectString($driver, array $arguments)
+	{
+		$options = array_map(function($key) use ($arguments)
+		{
+			return sprintf("%s=%s", $key, $arguments[$key]);
+		}, array_keys($arguments));
+
+		return $driver.":".implode(';', $options);
+	}
+
+	/**
+	 * Build a host string from the given configuration.
+	 *
+	 * @param  array  $config
+	 * @param  string  $separator
+	 * @return string
+	 */
+	protected function buildHostString(array $config, $separator)
+	{
+		if(isset($config['port']))
+		{
+			return $config['host'].$separator.$config['port'];
+		}
+		else
+		{
+			return $config['host'];
+		}
 	}
 
 	/**

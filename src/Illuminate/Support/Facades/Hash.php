@@ -10,6 +10,9 @@ class Hash extends Facade {
 	 *
 	 * @return string
 	 */
-	protected static function getFacadeAccessor() { return 'hash'; }
+	protected static function getFacadeAccessor()
+	{
+		return 'hash';
+	}
 
 }

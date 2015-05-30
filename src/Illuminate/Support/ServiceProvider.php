@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Support;
 
-use ReflectionClass;
+use BadMethodCallException;
 
 abstract class ServiceProvider {
 
@@ -17,6 +17,20 @@ abstract class ServiceProvider {
 	 * @var bool
 	 */
 	protected $defer = false;
+
+	/**
+	 * The paths that should be published.
+	 *
+	 * @var array
+	 */
+	protected static $publishes = [];
+
+	/**
+	 * The paths that should be published by group.
+	 *
+	 * @var array
+	 */
+	protected static $publishGroups = [];
 
 	/**
 	 * Create a new service provider instance.
@@ -37,87 +51,119 @@ abstract class ServiceProvider {
 	abstract public function register();
 
 	/**
-	 * Register the package's component namespaces.
+	 * Merge the given configuration with the existing configuration.
 	 *
-	 * @param  string  $package
-	 * @param  string  $namespace
 	 * @param  string  $path
+	 * @param  string  $key
 	 * @return void
 	 */
-	public function package($package, $namespace = null, $path = null)
+	protected function mergeConfigFrom($path, $key)
 	{
-		$namespace = $this->getPackageNamespace($package, $namespace);
+		$config = $this->app['config']->get($key, []);
 
-		// In this method we will register the configuration package for the package
-		// so that the configuration options cleanly cascade into the application
-		// folder to make the developers lives much easier in maintaining them.
-		$path = $path ?: $this->guessPackagePath();
-
-		$config = $path.'/config';
-
-		if ($this->app['files']->isDirectory($config))
-		{
-			$this->app['config']->package($package, $config, $namespace);
-		}
-
-		// Next we will check for any "language" components. If language files exist
-		// we will register them with this given package's namespace so that they
-		// may be accessed using the translation facilities of the application.
-		$lang = $path.'/lang';
-
-		if ($this->app['files']->isDirectory($lang))
-		{
-			$this->app['translator']->addNamespace($namespace, $lang);
-		}
-
-		// Next, we will see if the application view folder contains a folder for the
-		// package and namespace. If it does, we'll give that folder precedence on
-		// the loader list for the views so the package views can be overridden.
-		$appView = $this->getAppViewPath($package);
-
-		if ($this->app['files']->isDirectory($appView))
-		{
-			$this->app['view']->addNamespace($namespace, $appView);
-		}
-
-		// Finally we will register the view namespace so that we can access each of
-		// the views available in this package. We use a standard convention when
-		// registering the paths to every package's views and other components.
-		$view = $path.'/views';
-
-		if ($this->app['files']->isDirectory($view))
-		{
-			$this->app['view']->addNamespace($namespace, $view);
-		}
+		$this->app['config']->set($key, array_merge(require $path, $config));
 	}
 
 	/**
-	 * Guess the package path for the provider.
+	 * Register a view file namespace.
 	 *
-	 * @return string
-	 */
-	public function guessPackagePath()
-	{
-		$path = (new ReflectionClass($this))->getFileName();
-
-		return realpath(dirname($path).'/../../');
-	}
-
-	/**
-	 * Determine the namespace for a package.
-	 *
-	 * @param  string  $package
+	 * @param  string  $path
 	 * @param  string  $namespace
-	 * @return string
+	 * @return void
 	 */
-	protected function getPackageNamespace($package, $namespace)
+	protected function loadViewsFrom($path, $namespace)
 	{
-		if (is_null($namespace))
+		if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace))
 		{
-			list($vendor, $namespace) = explode('/', $package);
+			$this->app['view']->addNamespace($namespace, $appPath);
 		}
 
-		return $namespace;
+		$this->app['view']->addNamespace($namespace, $path);
+	}
+
+	/**
+	 * Register a translation file namespace.
+	 *
+	 * @param  string  $path
+	 * @param  string  $namespace
+	 * @return void
+	 */
+	protected function loadTranslationsFrom($path, $namespace)
+	{
+		$this->app['translator']->addNamespace($namespace, $path);
+	}
+
+	/**
+	 * Register paths to be published by the publish command.
+	 *
+	 * @param  array  $paths
+	 * @param  string  $group
+	 * @return void
+	 */
+	protected function publishes(array $paths, $group = null)
+	{
+		$class = get_class($this);
+
+		if ( ! array_key_exists($class, static::$publishes))
+		{
+			static::$publishes[$class] = [];
+		}
+
+		static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
+
+		if ($group)
+		{
+			if ( ! array_key_exists($group, static::$publishGroups))
+			{
+				static::$publishGroups[$group] = [];
+			}
+
+			static::$publishGroups[$group] = array_merge(static::$publishGroups[$group], $paths);
+		}
+	}
+
+	/**
+	 * Get the paths to publish.
+	 *
+	 * @param  string  $provider
+	 * @param  string  $group
+	 * @return array
+	 */
+	public static function pathsToPublish($provider = null, $group = null)
+	{
+		if ($provider && $group)
+		{
+			if (empty(static::$publishes[$provider]) || empty(static::$publishGroups[$group]))
+			{
+				return [];
+			}
+
+			return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
+		}
+
+		if ($group && array_key_exists($group, static::$publishGroups))
+		{
+			return static::$publishGroups[$group];
+		}
+
+		if ($provider && array_key_exists($provider, static::$publishes))
+		{
+			return static::$publishes[$provider];
+		}
+
+		if ($group || $provider)
+		{
+			return [];
+		}
+
+		$paths = [];
+
+		foreach (static::$publishes as $class => $publish)
+		{
+			$paths = array_merge($paths, $publish);
+		}
+
+		return $paths;
 	}
 
 	/**
@@ -142,24 +188,13 @@ abstract class ServiceProvider {
 	}
 
 	/**
-	 * Get the application package view path.
-	 *
-	 * @param  string  $package
-	 * @return string
-	 */
-	protected function getAppViewPath($package)
-	{
-		return $this->app['path.base']."/resources/views/packages/{$package}";
-	}
-
-	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
 	 */
 	public function provides()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -169,7 +204,7 @@ abstract class ServiceProvider {
 	 */
 	public function when()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -203,7 +238,7 @@ abstract class ServiceProvider {
 	{
 		if ($method == 'boot') return;
 
-		throw new \BadMethodCallException("Call to undefined method [{$method}]");
+		throw new BadMethodCallException("Call to undefined method [{$method}]");
 	}
 
 }
