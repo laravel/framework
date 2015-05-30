@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase {
@@ -91,6 +92,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$method->setAccessible(true);
 
 		$items = new TestArrayableObject;
+		$array = $method->invokeArgs($collection, [$items]);
+		$this->assertSame(['foo' => 'bar'], $array);
+
+		$items = new TestJsonableObject;
 		$array = $method->invokeArgs($collection, [$items]);
 		$this->assertSame(['foo' => 'bar'], $array);
 
@@ -889,5 +894,13 @@ class TestArrayableObject implements Arrayable
 	public function toArray()
 	{
 		return ['foo' => 'bar'];
+	}
+}
+
+class TestJsonableObject implements Jsonable
+{
+	public function toJson($options = 0)
+	{
+		return '{"foo":"bar"}';
 	}
 }
