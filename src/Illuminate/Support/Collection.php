@@ -955,6 +955,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	}
 
 	/**
+	 * Checks if the collection is associative.
+	 *
+	 * @return bool
+	 */
+	public function isAssociative()
+	{
+		return ! $this->isSequential();
+	}
+
+	/**
+	 * Checks if the collection is sequential.
+	 *
+	 * @return bool
+	 */
+	public function isSequential()
+	{
+		return $this->keys()->filter('is_string')->isEmpty();
+	}
+
+	/**
 	 * Convert the collection to its string representation.
 	 *
 	 * @return string
