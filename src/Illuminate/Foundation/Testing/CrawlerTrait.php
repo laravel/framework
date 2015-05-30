@@ -335,6 +335,17 @@ trait CrawlerTrait
      * @param  string  $uri
      * @return $this
      */
+    protected function seePageIs($uri)
+    {
+        return $this->landOn($uri);
+    }
+
+    /**
+     * Assert that the current page matches a given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
     protected function onPage($uri)
     {
         return $this->landOn($uri);
