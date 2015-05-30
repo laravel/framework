@@ -30,6 +30,8 @@ class RetryCommand extends Command {
 
 		if ( ! is_null($failed))
 		{
+            $failed = (object)$failed;
+
 			$failed->payload = $this->resetAttempts($failed->payload);
 
 			$this->laravel['queue']->connection($failed->connection)->pushRaw($failed->payload, $failed->queue);
