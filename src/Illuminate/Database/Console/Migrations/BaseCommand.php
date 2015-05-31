@@ -6,12 +6,12 @@ class BaseCommand extends Command {
 
 	/**
 	 * Get the path to the migration directory.
-	 *
+	 * @param  string $path
 	 * @return string
 	 */
-	protected function getMigrationPath()
+	protected function getMigrationPath($path = null)
 	{
-		return $this->laravel->databasePath().'/migrations';
+		return $path ? $this->laravel->basePath().'/'.$path : $this->laravel->databasePath().'/migrations';
 	}
 
 }
