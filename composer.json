@@ -105,7 +105,7 @@
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
-        "league/flysystem-aws-s3-v2": "Required to use the Flysystem S3 driver (~1.0).",
+        "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
