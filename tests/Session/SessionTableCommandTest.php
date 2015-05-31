@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Foundation\Application;
 use Mockery as m;
+use Illuminate\Foundation\Composer;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Database\Migrations\MigrationCreator;
 
 class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
 
@@ -15,10 +20,10 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
 	public function testCreateMakesMigration()
 	{
 		$command = new SessionTableCommandTestStub(
-			$files = m::mock('Illuminate\Filesystem\Filesystem'),
-			$composer = m::mock('Illuminate\Foundation\Composer')
+			$files = m::mock(Filesystem::class),
+			$composer = m::mock(Composer::class)
 		);
-		$creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
+		$creator = m::mock(MigrationCreator::class)->shouldIgnoreMissing();
 
 		$app = new Application();
 		$app->useDatabasePath(__DIR__);
@@ -36,7 +41,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function runCommand($command, $input = array())
 	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+		return $command->run(new ArrayInput($input), new NullOutput);
 	}
 
 }

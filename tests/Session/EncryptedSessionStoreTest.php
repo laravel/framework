@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Session\EncryptedStore;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase {
 
@@ -41,7 +43,7 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function getSession()
 	{
-		$reflection = new ReflectionClass('Illuminate\Session\EncryptedStore');
+		$reflection = new ReflectionClass(EncryptedStore::class);
 		return $reflection->newInstanceArgs($this->getMocks());
 	}
 
@@ -51,7 +53,7 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase {
 		return array(
 			$this->getSessionName(),
 			m::mock('SessionHandlerInterface'),
-			m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+			m::mock(Encrypter::class),
 			$this->getSessionId(),
 		);
 	}
