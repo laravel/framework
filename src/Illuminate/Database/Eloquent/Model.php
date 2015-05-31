@@ -356,9 +356,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Register an observer with the Model.
 	 *
 	 * @param  object|string  $class
+	 * @param  int  $priority
 	 * @return void
 	 */
-	public static function observe($class)
+	public static function observe($class, $priority = 0)
 	{
 		$instance = new static;
 
@@ -371,7 +372,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		{
 			if (method_exists($class, $event))
 			{
-				static::registerModelEvent($event, $className.'@'.$event);
+				static::registerModelEvent($event, $className.'@'.$event, $priority);
 			}
 		}
 	}
