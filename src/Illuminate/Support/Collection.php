@@ -89,7 +89,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Diff the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
+	 * @param  mixed  $items
 	 * @return static
 	 */
 	public function diff($items)
@@ -314,7 +314,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Intersect the collection with the given items.
 	 *
- 	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
+ 	 * @param  mixed  $items
 	 * @return static
 	 */
 	public function intersect($items)
@@ -412,7 +412,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Merge the collection with the given items.
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
+	 * @param  mixed  $items
 	 * @return static
 	 */
 	public function merge($items)
@@ -820,7 +820,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	 * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
 	 *      => [[1, 4], [2, 5], [3, 6]]
 	 *
-	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array ...$items
+	 * @param  mixed ...$items
 	 * @return static
 	 */
 	public function zip($items)
@@ -967,7 +967,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	/**
 	 * Results array of items from Collection or Arrayable.
 	 *
-  	 * @param  \Illuminate\Support\Collection|\Illuminate\Contracts\Support\Arrayable|array  $items
+  	 * @param  mixed  $items
 	 * @return array
 	 */
 	protected function getArrayableItems($items)
@@ -979,6 +979,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 		elseif ($items instanceof Arrayable)
 		{
 			return $items->toArray();
+		}
+		elseif ($items instanceof Jsonable)
+		{
+			return json_decode($items->toJson(), true);
 		}
 
 		return (array) $items;
