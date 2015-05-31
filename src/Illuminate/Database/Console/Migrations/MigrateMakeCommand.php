@@ -73,7 +73,7 @@ class MigrateMakeCommand extends BaseCommand {
 		// Now we are ready to write the migration out to disk. Once we've written
 		// the migration out, we will dump-autoload for the entire framework to
 		// make sure that the migrations are registered by the class loaders.
-		$this->writeMigration($name, $table, $create);
+		$this->writeMigration($name, $table, $create, $path);
 
 		$this->composer->dumpAutoloads();
 	}
@@ -86,7 +86,7 @@ class MigrateMakeCommand extends BaseCommand {
 	 * @param  bool    $create
 	 * @return string
 	 */
-	protected function writeMigration($name, $table, $create)
+	protected function writeMigration($name, $table, $create, $path)
 	{
 		$path = $this->getMigrationPath();
 
