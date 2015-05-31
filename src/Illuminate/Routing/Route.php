@@ -756,7 +756,9 @@ class Route {
 	 */
 	public function prefix($prefix)
 	{
-		$this->uri = trim($prefix, '/').'/'.trim($this->uri, '/');
+		$uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
+
+		$this->uri = trim($uri , '/');
 
 		return $this;
 	}
