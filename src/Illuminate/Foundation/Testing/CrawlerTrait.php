@@ -222,19 +222,6 @@ trait CrawlerTrait
     }
 
     /**
-     * Asserts that the status code of the response matches the
-     * desired status code that's provided.
-     *
-     * @param  int $status
-     * @return $this
-     */
-    protected function seeStatusCode($status)
-    {
-      $this->assertEquals($this->response->getStatusCode(), $status);
-      return $this;
-    }
-
-    /**
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
@@ -340,6 +327,19 @@ trait CrawlerTrait
         }
 
         return $expected;
+    }
+
+    /**
+     * Asserts that the status code of the response matches the given code.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    protected function seeStatusCode($status)
+    {
+        $this->assertEquals($this->response->getStatusCode(), $status);
+
+        return $this;
     }
 
     /**
