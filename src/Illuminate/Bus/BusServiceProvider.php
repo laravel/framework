@@ -1,6 +1,10 @@
 <?php namespace Illuminate\Bus;
 
+use Illuminate\Bus\Dispatcher;
+use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 
 class BusServiceProvider extends ServiceProvider {
 
@@ -18,21 +22,17 @@ class BusServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app->singleton('Illuminate\Bus\Dispatcher', function($app)
+		$this->app->singleton(Dispatcher::class, function($app)
 		{
 			return new Dispatcher($app, function() use ($app)
 			{
-				return $app['Illuminate\Contracts\Queue\Queue'];
+				return $app[Queue::class];
 			});
 		});
 
-		$this->app->alias(
-			'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\Dispatcher'
-		);
+		$this->app->alias(Dispatcher::class, DispatcherContract::class);
 
-		$this->app->alias(
-			'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\QueueingDispatcher'
-		);
+		$this->app->alias(Dispatcher::class, QueueingDispatcher::class);
 	}
 
 	/**
@@ -43,9 +43,9 @@ class BusServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Illuminate\Bus\Dispatcher',
-			'Illuminate\Contracts\Bus\Dispatcher',
-			'Illuminate\Contracts\Bus\QueueingDispatcher',
+			Dispatcher::class,
+			DispatcherContract::class,
+			QueueingDispatcher::class,
 		];
 	}
 

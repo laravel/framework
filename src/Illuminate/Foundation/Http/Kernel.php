@@ -5,7 +5,9 @@ use RuntimeException;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
@@ -272,7 +274,7 @@ class Kernel implements KernelContract {
 	protected function verifySessionConfigurationIsValid()
 	{
 		if ($this->app['config']['session.driver'] === 'cookie' &&
-			! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
+			! $this->hasMiddleware(EncryptCookies::class)) {
 
 			throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
 		}
@@ -286,7 +288,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function reportException(Exception $e)
 	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+		$this->app[ExceptionHandler::class]->report($e);
 	}
 
 	/**
@@ -298,7 +300,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function renderException($request, Exception $e)
 	{
-		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
+		return $this->app[ExceptionHandler::class]->render($request, $e);
 	}
 
 	/**

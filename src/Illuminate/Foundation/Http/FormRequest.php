@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
 class FormRequest extends Request implements ValidatesWhenResolved {
@@ -70,7 +71,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	 */
 	protected function getValidatorInstance()
 	{
-		$factory = $this->container->make('Illuminate\Validation\Factory');
+		$factory = $this->container->make(ValidationFactory::class);
 
 		if (method_exists($this, 'validator'))
 		{

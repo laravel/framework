@@ -229,9 +229,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 			return true;
 		}
 
-		return (new ReflectionClass($this->getHandlerClass($command)))->implementsInterface(
-			'Illuminate\Contracts\Queue\ShouldBeQueued'
-		);
+		$reflection = new ReflectionClass($this->getHandlerClass($command));
+
+		return $reflection->implementsInterface(ShouldBeQueued::class);
 	}
 
 	/**

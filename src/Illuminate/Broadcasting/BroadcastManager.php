@@ -2,6 +2,7 @@
 
 use Pusher;
 use Closure;
+use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
@@ -144,9 +145,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function createLogDriver(array $config)
     {
-        return new LogBroadcaster(
-            $this->app->make('Psr\Log\LoggerInterface')
-        );
+        return new LogBroadcaster($this->app->make(LoggerInterface::class));
     }
 
     /**

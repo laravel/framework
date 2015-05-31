@@ -3,6 +3,7 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 
 class RouteCacheCommand extends Command {
 
@@ -77,7 +78,7 @@ class RouteCacheCommand extends Command {
 	{
 		$app = require $this->laravel->basePath().'/bootstrap/app.php';
 
-		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+		$app->make(ConsoleKernel::class)->bootstrap();
 
 		return $app['router']->getRoutes();
 	}

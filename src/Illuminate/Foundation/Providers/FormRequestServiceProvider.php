@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,8 +30,7 @@ class FormRequestServiceProvider extends ServiceProvider {
 			{
 				$this->initializeRequest($request, $app['request']);
 
-				$request->setContainer($app)
-                        ->setRedirector($app['Illuminate\Routing\Redirector']);
+				$request->setContainer($app)->setRedirector($app[Redirector::class]);
 			});
 		});
 	}

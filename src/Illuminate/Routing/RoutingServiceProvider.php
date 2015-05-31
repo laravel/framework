@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 class RoutingServiceProvider extends ServiceProvider {
 
@@ -115,9 +117,9 @@ class RoutingServiceProvider extends ServiceProvider {
 	 */
 	protected function registerResponseFactory()
 	{
-		$this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function($app)
+		$this->app->singleton(ResponseFactoryContract::class, function($app)
 		{
-			return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
+			return new ResponseFactory($app[ViewFactoryContract::class], $app['redirect']);
 		});
 	}
 
