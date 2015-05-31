@@ -777,6 +777,26 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIsSequential()
+	{
+		$c = new Collection(['foo', 'bar', 2 => 'baz']);
+		$this->assertTrue($c->isSequential());
+
+		$c = new Collection(['foo', 'bar', 'zoo' => 'baz']);
+		$this->assertFalse($c->isSequential());
+	}
+
+
+	public function testIsAssociative()
+	{
+		$c = new Collection(['foo' => 'bar', 'bar' => 'baz']);
+		$this->assertTrue($c->isAssociative());
+
+		$c = new Collection([0 => 'bar', 1 => 'bar', 'baz']);
+		$this->assertFalse($c->isAssociative());
+	}
+
+
 	public function testPaginate()
 	{
 		$c = new Collection(['one', 'two', 'three', 'four']);
