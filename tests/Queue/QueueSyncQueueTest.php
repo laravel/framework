@@ -1,6 +1,14 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Queue\SyncQueue;
+use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Container\Container;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\EntityResolver;
+use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 
@@ -17,10 +25,10 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 		/**
 		 * Test Synced Closure
 		 */
-		$sync = new Illuminate\Queue\SyncQueue;
-		$container = new Illuminate\Container\Container;
-		$encrypter = new Illuminate\Encryption\Encrypter(str_random(32));
-		$container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
+		$sync = new SyncQueue;
+		$container = new Container;
+		$encrypter = new Encrypter(str_random(32));
+		$container->instance(EncrypterContract::class, $encrypter);
 		$sync->setContainer($container);
 		$sync->setEncrypter($encrypter);
 		$sync->push(function($job) {
@@ -35,16 +43,16 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 		 * Test Synced Class Handler
 		 */
 		$sync->push('SyncQueueTestHandler', ['foo' => 'bar']);
-		$this->assertInstanceOf('Illuminate\Queue\Jobs\SyncJob', $_SERVER['__sync.test'][0]);
+		$this->assertInstanceOf(SyncJob::class, $_SERVER['__sync.test'][0]);
 		$this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
 	}
 
 
 	public function testQueueableEntitiesAreSerializedAndResolved()
 	{
-		$sync = new Illuminate\Queue\SyncQueue;
-		$sync->setContainer($container = new Illuminate\Container\Container);
-		$container->instance('Illuminate\Contracts\Queue\EntityResolver', $resolver = m::mock('Illuminate\Contracts\Queue\EntityResolver'));
+		$sync = new SyncQueue;
+		$sync->setContainer($container = new Container);
+		$container->instance(EntityResolver::class, $resolver = m::mock(EntityResolver::class));
 		$resolver->shouldReceive('resolve')->once()->with('SyncQueueTestEntity', 1)->andReturn(new SyncQueueTestEntity);
 		$sync->push('SyncQueueTestHandler', ['entity' => new SyncQueueTestEntity]);
 
@@ -54,9 +62,9 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testQueueableEntitiesAreSerializedAndResolvedWhenPassedAsSingleEntities()
 	{
-		$sync = new Illuminate\Queue\SyncQueue;
-		$sync->setContainer($container = new Illuminate\Container\Container);
-		$container->instance('Illuminate\Contracts\Queue\EntityResolver', $resolver = m::mock('Illuminate\Contracts\Queue\EntityResolver'));
+		$sync = new SyncQueue;
+		$sync->setContainer($container = new Container);
+		$container->instance(EntityResolver::class, $resolver = m::mock(EntityResolver::class));
 		$resolver->shouldReceive('resolve')->once()->with('SyncQueueTestEntity', 1)->andReturn(new SyncQueueTestEntity);
 		$sync->push('SyncQueueTestHandler', new SyncQueueTestEntity);
 
@@ -68,11 +76,11 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 	{
 		unset($_SERVER['__sync.failed']);
 
-		$sync = new Illuminate\Queue\SyncQueue;
-		$container = new Illuminate\Container\Container;
-		$encrypter = new Illuminate\Encryption\Encrypter(str_random(32));
-		$container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
-		$events = m::mock('Illuminate\Contracts\Events\Dispatcher');
+		$sync = new SyncQueue;
+		$container = new Container;
+		$encrypter = new Encrypter(str_random(32));
+		$container->instance(EncrypterContract::class, $encrypter);
+		$events = m::mock(Dispatcher::class);
 		$events->shouldReceive('fire')->once();
 		$container->instance('events', $events);
 		$sync->setContainer($container);
@@ -89,7 +97,7 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class SyncQueueTestEntity implements Illuminate\Contracts\Queue\QueueableEntity {
+class SyncQueueTestEntity implements QueueableEntity {
 	public function getQueueableId() {
 		return 1;
 	}

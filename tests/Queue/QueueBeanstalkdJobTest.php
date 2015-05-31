@@ -1,6 +1,10 @@
 <?php
 
 use Mockery as m;
+use Pheanstalk\Pheanstalk;
+use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\BeanstalkdJob;
+use Pheanstalk\Job as BeanstalkdBaseJob;
 
 class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 
@@ -44,7 +48,7 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 	public function testReleaseProperlyReleasesJobOntoBeanstalkd()
 	{
 		$job = $this->getJob();
-		$job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
+		$job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk::DEFAULT_PRIORITY, 0);
 
 		$job->release();
 	}
@@ -61,10 +65,10 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
 
 	protected function getJob()
 	{
-		return new Illuminate\Queue\Jobs\BeanstalkdJob(
-			m::mock('Illuminate\Container\Container'),
-			m::mock('Pheanstalk\Pheanstalk'),
-			m::mock('Pheanstalk\Job'),
+		return new BeanstalkdJob(
+			m::mock(Container::class),
+			m::mock(Pheanstalk::class),
+			m::mock(BeanstalkdBaseJob::class),
 			'default'
 		);
 	}

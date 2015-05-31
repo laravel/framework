@@ -3,6 +3,9 @@
 use Mockery as m;
 use Aws\Sqs\SqsClient;
 use Guzzle\Common\Collection;
+use Illuminate\Queue\SqsQueue;
+use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Container\Container;
 use Aws\Common\Signature\SignatureV4;
 use Aws\Common\Credentials\Credentials;
 
@@ -23,13 +26,13 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 		$this->queueUrl = $this->baseUrl . '/' . $this->account . '/' . $this->queueName;
 
 		// Get a mock of the SqsClient
-		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+		$this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
 			->setMethods(array('deleteMessage'))
 			->disableOriginalConstructor()
 			->getMock();
 
 		// Use Mockery to mock the IoC Container
-		$this->mockedContainer = m::mock('Illuminate\Container\Container');
+		$this->mockedContainer = m::mock(Container::class);
 
 		$this->mockedJob = 'foo';
 		$this->mockedData = array('data');
@@ -63,11 +66,11 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeleteRemovesTheJobFromSqs()
 	{
-		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+		$this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
 			->setMethods(array('deleteMessage'))
 			->disableOriginalConstructor()
 			->getMock();
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
+		$queue = $this->getMock(SqsQueue::class, array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
 		$job->getSqs()->expects($this->once())->method('deleteMessage')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle));
@@ -77,11 +80,11 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testReleaseProperlyReleasesTheJobOntoSqs()
 	{
-		$this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
+		$this->mockedSqsClient = $this->getMockBuilder(SqsClient::class)
 			->setMethods(array('changeMessageVisibility'))
 			->disableOriginalConstructor()
 			->getMock();
-		$queue = $this->getMock('Illuminate\Queue\SqsQueue', array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
+		$queue = $this->getMock(SqsQueue::class, array('getQueue'), array($this->mockedSqsClient, $this->queueName, $this->account));
 		$queue->setContainer($this->mockedContainer);
 		$job = $this->getJob();
 		$job->getSqs()->expects($this->once())->method('changeMessageVisibility')->with(array('QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay));
@@ -92,7 +95,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
 
 	protected function getJob()
 	{
-		return new Illuminate\Queue\Jobs\SqsJob(
+		return new SqsJob(
 			$this->mockedContainer,
 			$this->mockedSqsClient,
 			$this->queueUrl,

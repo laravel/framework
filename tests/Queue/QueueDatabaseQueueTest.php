@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Database\Connection;
 
 class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 
@@ -12,7 +14,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushProperlyPushesJobOntoDatabase()
 	{
-		$queue = $this->getMock('Illuminate\Queue\DatabaseQueue', array('getTime'), array($database = m::mock('Illuminate\Database\Connection'), 'table', 'default'));
+		$queue = $this->getMock(DatabaseQueue::class, array('getTime'), array($database = m::mock(Connection::class), 'table', 'default'));
 		$queue->expects($this->any())->method('getTime')->will($this->returnValue('time'));
 		$database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
 		$query->shouldReceive('insertGetId')->once()->andReturnUsing(function($array) {
@@ -31,9 +33,9 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 	public function testDelayedPushProperlyPushesJobOntoDatabase()
 	{
 		$queue = $this->getMock(
-			'Illuminate\Queue\DatabaseQueue',
+			DatabaseQueue::class,
 			array('getTime'),
-			array($database = m::mock('Illuminate\Database\Connection'), 'table', 'default')
+			array($database = m::mock(Connection::class), 'table', 'default')
 		);
 		$queue->expects($this->any())->method('getTime')->will($this->returnValue('time'));
 		$database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
@@ -52,8 +54,8 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testBulkBatchPushesOntoDatabase()
 	{
-		$database = m::mock('Illuminate\Database\Connection');
-		$queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getTime', 'getAvailableAt'], [$database, 'table', 'default']);
+		$database = m::mock(Connection::class);
+		$queue = $this->getMock(DatabaseQueue::class, ['getTime', 'getAvailableAt'], [$database, 'table', 'default']);
 		$queue->expects($this->any())->method('getTime')->will($this->returnValue('created'));
 		$queue->expects($this->any())->method('getAvailableAt')->will($this->returnValue('available'));
 		$database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
