@@ -1,13 +1,14 @@
 <?php
 
-use Illuminate\Support\ServiceProvider;
 use Mockery as m;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp()
 	{
-		$app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
+		$app = m::mock(Application::class)->makePartial();
 		$one = new ServiceProviderForTestingOne($app);
 		$one->boot();
 		$two = new ServiceProviderForTestingTwo($app);
