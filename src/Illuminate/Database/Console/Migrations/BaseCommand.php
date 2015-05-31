@@ -6,7 +6,7 @@ class BaseCommand extends Command {
 
 	/**
 	 * Get the path to the migration directory.
-	 *
+	 * @param  string $path
 	 * @return string
 	 */
 	protected function getMigrationPath($path = null)
