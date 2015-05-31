@@ -1,6 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
@@ -12,9 +15,9 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testApplyingScopeToABuilder()
 	{
-		$scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[extend]');
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$scope = m::mock(SoftDeletingScope::class.'[extend]');
+		$builder = m::mock(Builder::class);
+		$model = m::mock(Model::class);
 		$model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
 		$builder->shouldReceive('whereNull')->once()->with('table.deleted_at');
 		$scope->shouldReceive('extend')->once();
@@ -25,9 +28,9 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testScopeCanRemoveDeletedAtConstraints()
 	{
-		$scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$scope = new SoftDeletingScope;
+		$builder = m::mock(Builder::class);
+		$model = m::mock(Model::class);
 		$builder->shouldReceive('getModel')->andReturn($model);
 		$model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
 		$builder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
@@ -40,12 +43,12 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testForceDeleteExtension()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldDeferMissing();
-		$scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+		$scope = new SoftDeletingScope;
 		$scope->extend($builder);
 		$callback = $builder->getMacro('forceDelete');
-		$givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$givenBuilder = m::mock(Builder::class);
 		$givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
 		$query->shouldReceive('delete')->once();
 
@@ -55,12 +58,12 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testRestoreExtension()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldDeferMissing();
-		$scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
+		$scope = new SoftDeletingScope;
 		$scope->extend($builder);
 		$callback = $builder->getMacro('restore');
-		$givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$givenBuilder = m::mock(Builder::class);
 		$givenBuilder->shouldReceive('withTrashed')->once();
 		$givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock('StdClass'));
 		$model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
@@ -72,13 +75,13 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testWithTrashedExtension()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldDeferMissing();
-		$scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[remove]');
+		$scope = m::mock(SoftDeletingScope::class.'[remove]');
 		$scope->extend($builder);
 		$callback = $builder->getMacro('withTrashed');
-		$givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$givenBuilder->shouldReceive('getModel')->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
+		$givenBuilder = m::mock(Builder::class);
+		$givenBuilder->shouldReceive('getModel')->andReturn($model = m::mock(Model::class));
 		$scope->shouldReceive('remove')->once()->with($givenBuilder, $model);
 		$result = $callback($givenBuilder);
 
@@ -88,14 +91,14 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
 	public function testOnlyTrashedExtension()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldDeferMissing();
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock(Model::class);
 		$model->shouldDeferMissing();
-		$scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[remove]');
+		$scope = m::mock(SoftDeletingScope::class.'[remove]');
 		$scope->extend($builder);
 		$callback = $builder->getMacro('onlyTrashed');
-		$givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$givenBuilder = m::mock(Builder::class);
 		$scope->shouldReceive('remove')->once()->with($givenBuilder, $model);
 		$givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
 		$givenBuilder->shouldReceive('getModel')->andReturn($model);

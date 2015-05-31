@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
 
 class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
@@ -52,9 +53,9 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
 
 	protected function getCreator()
 	{
-		$files = m::mock('Illuminate\Filesystem\Filesystem');
+		$files = m::mock(Filesystem::class);
 
-		return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', array('getDatePrefix'), array($files));
+		return $this->getMock(MigrationCreator::class, array('getDatePrefix'), array($files));
 	}
 
 }

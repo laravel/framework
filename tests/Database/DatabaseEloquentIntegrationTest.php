@@ -1,7 +1,12 @@
 <?php
 
+use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
@@ -17,9 +22,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 			new DatabaseIntegrationTestConnectionResolver
 		);
 
-		Eloquent::setEventDispatcher(
-			new Illuminate\Events\Dispatcher
-		);
+		Eloquent::setEventDispatcher(new Dispatcher);
 	}
 
 
@@ -105,11 +108,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$this->assertNull($missing);
 
 		$collection = EloquentTestUser::find([]);
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
+		$this->assertInstanceOf(Collection::class, $collection);
 		$this->assertEquals(0, $collection->count());
 
 		$collection = EloquentTestUser::find([1, 2, 3]);
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
+		$this->assertInstanceOf(Collection::class, $collection);
 		$this->assertEquals(2, $collection->count());
 	}
 
@@ -122,7 +125,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$models = EloquentTestUser::oldest('id')->get();
 
 		$this->assertEquals(2, $models->count());
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
+		$this->assertInstanceOf(Collection::class, $models);
 		$this->assertInstanceOf('EloquentTestUser', $models[0]);
 		$this->assertInstanceOf('EloquentTestUser', $models[1]);
 		$this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
@@ -140,7 +143,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$models = EloquentTestUser::oldest('id')->paginate(2);
 
 		$this->assertEquals(2, $models->count());
-		$this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+		$this->assertInstanceOf(LengthAwarePaginator::class, $models);
 		$this->assertInstanceOf('EloquentTestUser', $models[0]);
 		$this->assertInstanceOf('EloquentTestUser', $models[1]);
 		$this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
@@ -150,7 +153,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$models = EloquentTestUser::oldest('id')->paginate(2);
 
 		$this->assertEquals(1, $models->count());
-		$this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+		$this->assertInstanceOf(LengthAwarePaginator::class, $models);
 		$this->assertInstanceOf('EloquentTestUser', $models[0]);
 		$this->assertEquals('foo@gmail.com', $models[0]->email);
 	}
@@ -192,7 +195,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('EloquentTestUser', $single);
 		$this->assertEquals('taylorotwell@gmail.com', $single->email);
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $multiple);
+		$this->assertInstanceOf(Collection::class, $multiple);
 		$this->assertInstanceOf('EloquentTestUser', $multiple[0]);
 		$this->assertInstanceOf('EloquentTestUser', $multiple[1]);
 	}
@@ -241,7 +244,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$posts = $user->posts;
 		$post2 = $user->posts()->where('name', 'Second Post')->first();
 
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $posts);
+		$this->assertInstanceOf(Collection::class, $posts);
 		$this->assertEquals(2, $posts->count());
 		$this->assertInstanceOf('EloquentTestPost', $posts[0]);
 		$this->assertInstanceOf('EloquentTestPost', $posts[1]);
@@ -259,7 +262,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
 		$models = EloquentTestUser::hydrateRaw('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com'], 'foo_connection');
 
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
+		$this->assertInstanceOf(Collection::class, $models);
 		$this->assertInstanceOf('EloquentTestUser', $models[0]);
 		$this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
 		$this->assertEquals('foo_connection', $models[0]->getConnectionName());
@@ -315,9 +318,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 		$post->photos()->create(['name' => 'Hero 1']);
 		$post->photos()->create(['name' => 'Hero 2']);
 
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $user->photos);
+		$this->assertInstanceOf(Collection::class, $user->photos);
 		$this->assertInstanceOf('EloquentTestPhoto', $user->photos[0]);
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
+		$this->assertInstanceOf(Collection::class, $post->photos);
 		$this->assertInstanceOf('EloquentTestPhoto', $post->photos[0]);
 		$this->assertEquals(2, $user->photos->count());
 		$this->assertEquals(2, $post->photos->count());
@@ -328,7 +331,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
 
 		$photos = EloquentTestPhoto::orderBy('name')->get();
 
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $photos);
+		$this->assertInstanceOf(Collection::class, $photos);
 		$this->assertEquals(4, $photos->count());
 		$this->assertInstanceOf('EloquentTestUser', $photos[0]->imageable);
 		$this->assertInstanceOf('EloquentTestPost', $photos[2]->imageable);
@@ -476,14 +479,14 @@ class EloquentTestPhoto extends Eloquent {
  * Connection Resolver
  */
 
-class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface {
+class DatabaseIntegrationTestConnectionResolver implements ConnectionResolverInterface {
 
 	protected $connection;
 
 	public function connection($name = null)
 	{
 		if (isset($this->connection)) return $this->connection;
-		return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
+		return $this->connection = new SQLiteConnection(new PDO('sqlite::memory:'));
 	}
 	public function getDefaultConnection()
 	{

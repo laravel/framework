@@ -1,6 +1,10 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Foundation\Application;
+use Illuminate\Database\Migrations\Migrator;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
@@ -13,7 +17,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testResetCommandCallsMigratorWithProperArguments()
 	{
-		$command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+		$command = new ResetCommand($migrator = m::mock(Migrator::class));
 		$command->setLaravel(new AppDatabaseMigrationStub());
 		$migrator->shouldReceive('setConnection')->once()->with(null);
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
@@ -26,8 +30,8 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testResetCommandCanBePretended()
 	{
-		$command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
-		$command->setLaravel(new AppDatabaseMigrationStub());
+		$command = new ResetCommand($migrator = m::mock(Migrator::class));
+		$command->setLaravel(new AppDatabaseMigrationStub);
 		$migrator->shouldReceive('setConnection')->once()->with('foo');
 		$migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 		$migrator->shouldReceive('reset')->once()->with(true);
@@ -39,11 +43,11 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function runCommand($command, $input = array())
 	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+		return $command->run(new ArrayInput($input), new NullOutput);
 	}
 
 }
 
-class AppDatabaseMigrationStub extends \Illuminate\Foundation\Application {
+class AppDatabaseMigrationStub extends Application {
 	public function environment() { return 'development'; }
 }

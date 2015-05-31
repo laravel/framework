@@ -2,7 +2,15 @@
 
 use Mockery as m;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Expression as Raw;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
+use Illuminate\Database\Query\Grammars\SQLiteGrammar;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
+use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\Processors\MySqlProcessor;
 
 class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
@@ -912,7 +920,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$builder = $this->getBuilder();
 		$builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email", "bar") values (?, bar)', array('foo'), 'id')->andReturn(1);
-		$result = $builder->from('users')->insertGetId(array('email' => 'foo', 'bar' => new Illuminate\Database\Query\Expression('bar')), 'id');
+		$result = $builder->from('users')->insertGetId(array('email' => 'foo', 'bar' => new Raw('bar')), 'id');
 		$this->assertEquals(1, $result);
 	}
 
@@ -1019,7 +1027,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', array());
 		$builder->from('users')->truncate();
 
-		$sqlite = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
+		$sqlite = new SQLiteGrammar;
 		$builder = $this->getBuilder();
 		$builder->from('users');
 		$this->assertEquals(array(
@@ -1096,7 +1104,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$method     = 'whereFooBarAndBazOrQux';
 		$parameters = array('corge', 'waldo', 'fred');
-		$builder    = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+		$builder    = m::mock(Builder::class)->makePartial();
 
 		$builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturn($builder);
 		$builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturn($builder);
@@ -1110,7 +1118,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$method     = 'whereIosVersionAndAndroidVersionOrOrientation';
 		$parameters = array('6.1', '4.2', 'Vertical');
-		$builder    = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+		$builder    = m::mock(Builder::class)->makePartial();
 
 		$builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturn($builder);
 		$builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturn($builder);
@@ -1142,14 +1150,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function setupCacheTestQuery($cache, $driver)
 	{
-		$connection = m::mock('Illuminate\Database\ConnectionInterface');
+		$connection = m::mock(ConnectionInterface::class);
 		$connection->shouldReceive('getName')->andReturn('connection_name');
 		$connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
 		$cache->shouldReceive('driver')->once()->andReturn($driver);
-		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+		$grammar = new Grammar;
+		$processor = m::mock(Processor::class);
 
-		$builder = $this->getMock('Illuminate\Database\Query\Builder', array('getFresh'), array($connection, $grammar, $processor));
+		$builder = $this->getMock(Builder::class, array('getFresh'), array($connection, $grammar, $processor));
 		$builder->expects($this->once())->method('getFresh')->with($this->equalTo(array('*')))->will($this->returnValue(array('results')));
 		return $builder->select('*')->from('users')->where('email', 'foo@bar.com');
 	}
@@ -1279,49 +1287,49 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getBuilder()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\Grammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new Grammar;
+		$processor = m::mock(Processor::class);
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 
 	protected function getPostgresBuilder()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\PostgresGrammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new PostgresGrammar;
+		$processor = m::mock(Processor::class);
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 
 	protected function getMySqlBuilder()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new MySqlGrammar;
+		$processor = m::mock(Processor::class);
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 
 	protected function getSQLiteBuilder()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new SQLiteGrammar;
+		$processor = m::mock(Processor::class);
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 
 	protected function getSqlServerBuilder()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar;
-		$processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new SqlServerGrammar;
+		$processor = m::mock(Processor::class);
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 
 	protected function getMySqlBuilderWithProcessor()
 	{
-		$grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
-		$processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
-		return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+		$grammar = new MySqlGrammar;
+		$processor = new MySqlProcessor;
+		return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
 	}
 
 }

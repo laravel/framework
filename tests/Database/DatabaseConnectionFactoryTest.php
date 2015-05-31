@@ -1,6 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Container\Container;
+use Illuminate\Database\Connectors\MySqlConnector;
+use Illuminate\Database\Connectors\SQLiteConnector;
+use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Connectors\PostgresConnector;
+use Illuminate\Database\Connectors\SqlServerConnector;
 
 class DatabaseConnectionFactoryPDOStub extends PDO {
 	public function __construct() {}
@@ -16,7 +22,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testMakeCallsCreateConnection()
 	{
-		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector', 'createConnection'), array($container = m::mock('Illuminate\Container\Container')));
+		$factory = $this->getMock(ConnectionFactory::class, array('createConnector', 'createConnection'), array($container = m::mock(Container::class)));
 		$container->shouldReceive('bound')->andReturn(false);
 		$connector = m::mock('stdClass');
 		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo');
@@ -34,7 +40,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testMakeCallsCreateConnectionForReadWrite()
 	{
-		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector', 'createConnection'), array($container = m::mock('Illuminate\Container\Container')));
+		$factory = $this->getMock(ConnectionFactory::class, array('createConnector', 'createConnection'), array($container = m::mock(Container::class)));
 		$container->shouldReceive('bound')->andReturn(false);
 		$connector = m::mock('stdClass');
 		$config = array(
@@ -61,7 +67,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testMakeCanCallTheContainer()
 	{
-		$factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', array('createConnector'), array($container = m::mock('Illuminate\Container\Container')));
+		$factory = $this->getMock(ConnectionFactory::class, array('createConnector'), array($container = m::mock(Container::class)));
 		$container->shouldReceive('bound')->andReturn(true);
 		$connector = m::mock('stdClass');
 		$config = array('driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo');
@@ -78,12 +84,12 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testProperInstancesAreReturnedForProperDrivers()
 	{
-		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$factory = new ConnectionFactory($container = m::mock(Container::class));
 		$container->shouldReceive('bound')->andReturn(false);
-		$this->assertInstanceOf('Illuminate\Database\Connectors\MySqlConnector', $factory->createConnector(array('driver' => 'mysql')));
-		$this->assertInstanceOf('Illuminate\Database\Connectors\PostgresConnector', $factory->createConnector(array('driver' => 'pgsql')));
-		$this->assertInstanceOf('Illuminate\Database\Connectors\SQLiteConnector', $factory->createConnector(array('driver' => 'sqlite')));
-		$this->assertInstanceOf('Illuminate\Database\Connectors\SqlServerConnector', $factory->createConnector(array('driver' => 'sqlsrv')));
+		$this->assertInstanceOf(MySqlConnector::class, $factory->createConnector(['driver' => 'mysql']));
+		$this->assertInstanceOf(SQLiteConnector::class, $factory->createConnector(['driver' => 'sqlite']));
+		$this->assertInstanceOf(PostgresConnector::class, $factory->createConnector(['driver' => 'pgsql']));
+		$this->assertInstanceOf(SqlServerConnector::class, $factory->createConnector(['driver' => 'sqlsrv']));
 	}
 
 
@@ -92,7 +98,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testIfDriverIsntSetExceptionIsThrown()
 	{
-		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$factory = new ConnectionFactory($container = m::mock(Container::class));
 		$factory->createConnector(array('foo'));
 	}
 
@@ -102,7 +108,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExceptionIsThrownOnUnsupportedDriver()
 	{
-		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$factory = new ConnectionFactory($container = m::mock(Container::class));
 		$container->shouldReceive('bound')->once()->andReturn(false);
 		$factory->createConnector(array('driver' => 'foo'));
 	}
@@ -110,7 +116,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testCustomConnectorsCanBeResolvedViaContainer()
 	{
-		$factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+		$factory = new ConnectionFactory($container = m::mock(Container::class));
 		$container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
 		$container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 

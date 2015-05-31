@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -15,7 +17,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	public function testUpdateMethodRetrievesModelAndUpdates()
 	{
 		$relation = $this->getRelation();
-		$mock = m::mock('Illuminate\Database\Eloquent\Model');
+		$mock = m::mock(Model::class);
 		$mock->shouldReceive('fill')->once()->with(array('attributes'))->andReturn($mock);
 		$mock->shouldReceive('save')->once()->andReturn(true);
 		$relation->getQuery()->shouldReceive('first')->once()->andReturn($mock);
@@ -36,7 +38,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 	public function testRelationIsProperlyInitialized()
 	{
 		$relation = $this->getRelation();
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock(Model::class);
 		$model->shouldReceive('setRelation')->once()->with('foo', null);
 		$models = $relation->initRelation(array($model), 'foo');
 
@@ -64,10 +66,10 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 
 	public function testAssociateMethodSetsForeignKeyOnModel()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent = m::mock(Model::class);
 		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 		$relation = $this->getRelation($parent);
-		$associate = m::mock('Illuminate\Database\Eloquent\Model');
+		$associate = m::mock(Model::class);
 		$associate->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
 		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 		$parent->shouldReceive('setRelation')->once()->with('relation', $associate);
@@ -78,7 +80,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 
 	public function testDissociateMethodUnsetsForeignKeyOnModel()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent = m::mock(Model::class);
 		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 		$relation = $this->getRelation($parent);
 		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
@@ -89,7 +91,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 
 	public function testAssociateMethodSetsForeignKeyOnModelById()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent = m::mock(Model::class);
 		$parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 		$relation = $this->getRelation($parent);
 		$parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
@@ -99,9 +101,9 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRelation($parent = null)
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-		$related = m::mock('Illuminate\Database\Eloquent\Model');
+		$related = m::mock(Model::class);
 		$related->shouldReceive('getKeyName')->andReturn('id');
 		$related->shouldReceive('getTable')->andReturn('relation');
 		$builder->shouldReceive('getModel')->andReturn($related);
@@ -111,13 +113,13 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBelongsToModelStub extends Model {
 
 	public $foreign_key = 'foreign.value';
 
 }
 
-class AnotherEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model {
+class AnotherEloquentBelongsToModelStub extends Model {
 
 	public $foreign_key = 'foreign.value.two';
 

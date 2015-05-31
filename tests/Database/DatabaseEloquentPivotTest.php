@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
@@ -13,7 +14,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testPropertiesAreSetCorrectly()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = new Pivot($parent, array('foo' => 'bar'), 'table', true);
 
@@ -24,7 +25,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMutatorsAreCalledFromConstructor() {
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
 		$pivot = new DatabaseEloquentPivotTestMutatorStub($parent, array('foo' => 'bar'), 'table', true);
@@ -35,7 +36,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testPropertiesUnchangedAreNotDirty()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
 
@@ -45,7 +46,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testPropertiesChangedAreDirty()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
 		$pivot->shimy = 'changed';
@@ -56,7 +57,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
+		$parent = m::mock(Model::class.'[getConnectionName,getDates]');
 		$parent->shouldReceive('getConnectionName')->andReturn('connection');
 		$parent->shouldReceive('getDates')->andReturn(array());
 		$pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
@@ -69,7 +70,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testKeysCanBeSetProperly()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 		$pivot = new Pivot($parent, array('foo' => 'bar'), 'table');
 		$pivot->setPivotKeys('foreign', 'other');
@@ -81,10 +82,10 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeleteMethodDeletesModelByKeys()
 	{
-		$parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+		$parent = m::mock(Model::class.'[getConnectionName]');
 		$parent->guard(array());
 		$parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-		$pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', array('newQuery'), array($parent, array('foo' => 'bar'), 'table'));
+		$pivot = $this->getMock(Pivot::class, array('newQuery'), array($parent, array('foo' => 'bar'), 'table'));
 		$pivot->setPivotKeys('foreign', 'other');
 		$pivot->foreign = 'foreign.value';
 		$pivot->other = 'other.value';
@@ -100,14 +101,14 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 }
 
 
-class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+class DatabaseEloquentPivotTestDateStub extends Pivot {
 	public function getDates()
 	{
 		return array();
 	}
 }
 
-class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+class DatabaseEloquentPivotTestMutatorStub extends Pivot {
 	private $mutatorCalled = false;
 
 	public function setFooAttribute($value) {
