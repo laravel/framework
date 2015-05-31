@@ -1,8 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Contracts\Cache\Repository;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
@@ -14,14 +18,11 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testClearWithNoStoreOption()
 	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+		$command = new ClearCommandTestStub($cacheManager = m::mock(CacheManager::class));
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+		$cacheRepository = m::mock(Repository::class);
 
-		$app = new Application();
-		$command->setLaravel($app);
+		$command->setLaravel(new Application);
 
 		$cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
 		$cacheRepository->shouldReceive('flush')->once();
@@ -32,14 +33,11 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testClearWithStoreOption()
 	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+		$command = new ClearCommandTestStub($cacheManager = m::mock(CacheManager::class));
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+		$cacheRepository = m::mock(Repository::class);
 
-		$app = new Application();
-		$command->setLaravel($app);
+		$command->setLaravel(new Application);
 
 		$cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
 		$cacheRepository->shouldReceive('flush')->once();
@@ -50,18 +48,15 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testClearWithInvalidStoreOption()
 	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+		$command = new ClearCommandTestStub($cacheManager = m::mock(CacheManager::class));
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+		$cacheRepository = m::mock(Repository::class);
 
-		$app = new Application();
-		$command->setLaravel($app);
+		$command->setLaravel(new Application);
 
-		$cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('\InvalidArgumentException');
+		$cacheManager->shouldReceive('store')->once()->with('bar')->andThrow(InvalidArgumentException::class);
 		$cacheRepository->shouldReceive('flush')->never();
-		$this->setExpectedException('InvalidArgumentException');
+		$this->setExpectedException(InvalidArgumentException::class);
 
 		$this->runCommand($command, ['store' => 'bar']);
 	}
@@ -69,7 +64,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function runCommand($command, $input = array())
 	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+		return $command->run(new ArrayInput($input), new NullOutput);
 	}
 
 }

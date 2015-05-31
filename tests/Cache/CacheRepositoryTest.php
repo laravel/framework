@@ -1,6 +1,10 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Cache\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Store;
+use Illuminate\Events\Dispatcher as EventDispacther;
 
 class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
@@ -85,8 +89,8 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRepository()
 	{
-		$dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
-		$repository = new Illuminate\Cache\Repository(m::mock('Illuminate\Contracts\Cache\Store'));
+		$dispatcher = new EventDispacther(m::mock(Container::class));
+		$repository = new Repository(m::mock(Store::class));
 
 		$repository->setEventDispatcher($dispatcher);
 

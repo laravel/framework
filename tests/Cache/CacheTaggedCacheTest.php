@@ -1,7 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Cache\TagSet;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Contracts\Cache\Store;
 
 class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 
@@ -74,8 +76,8 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 
 	public function testRedisCacheTagsPushForeverKeysCorrectly()
 	{
-		$store = m::mock('Illuminate\Contracts\Cache\Store');
-		$tagSet = m::mock('Illuminate\Cache\TagSet', array($store, array('foo', 'bar')));
+		$store = m::mock(Store::class);
+		$tagSet = m::mock(TagSet::class, array($store, array('foo', 'bar')));
 		$tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
 		$redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
 		$store->shouldReceive('getPrefix')->andReturn('prefix:');
@@ -90,8 +92,8 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 
 	public function testRedisCacheForeverTagsCanBeFlushed()
 	{
-		$store = m::mock('Illuminate\Contracts\Cache\Store');
-		$tagSet = m::mock('Illuminate\Cache\TagSet', array($store, array('foo', 'bar')));
+		$store = m::mock(Store::class);
+		$tagSet = m::mock(TagSet::class, array($store, array('foo', 'bar')));
 		$tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
 		$redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
 		$store->shouldReceive('getPrefix')->andReturn('prefix:');
