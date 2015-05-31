@@ -1258,10 +1258,12 @@ class Validator implements ValidatorContract {
 
 		// If the parameters contain a slash, we assume it's a proper mime type,
 		// and do a comparison with the real mime type of the file.
-		if(count($parameters) > 0 && strpos($parameters[0], '/') !== false) {
+		if(count($parameters) > 0 && strpos($parameters[0], '/') !== false)
+		{
 			$data = $value->getMimeType();
 		}
-		else {
+		else
+		{
 			$data = $value->guessExtension();
 		}
 
