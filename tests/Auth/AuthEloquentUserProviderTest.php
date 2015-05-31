@@ -1,6 +1,10 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Connection;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 
@@ -39,11 +43,11 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 
 	public function testCredentialValidation()
 	{
-		$conn = m::mock('Illuminate\Database\Connection');
-		$hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+		$conn = m::mock(Connection::class);
+		$hasher = m::mock(Hasher::class);
 		$hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-		$provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'foo');
-		$user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+		$provider = new EloquentUserProvider($hasher, 'foo');
+		$user = m::mock(Authenticatable::class);
 		$user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
 		$result = $provider->validateCredentials($user, array('password' => 'plain'));
 
@@ -53,9 +57,9 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 
 	public function testModelsCanBeCreated()
 	{
-		$conn = m::mock('Illuminate\Database\Connection');
-		$hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-		$provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'EloquentProviderUserStub');
+		$conn = m::mock(Connection::class);
+		$hasher = m::mock(Hasher::class);
+		$provider = new EloquentUserProvider($hasher, 'EloquentProviderUserStub');
 		$model = $provider->createModel();
 
 		$this->assertInstanceOf('EloquentProviderUserStub', $model);
@@ -64,8 +68,8 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getProviderMock()
 	{
-		$hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-		return $this->getMock('Illuminate\Auth\EloquentUserProvider', array('createModel'), array($hasher, 'foo'));
+		$hasher = m::mock(Hasher::class);
+		return $this->getMock(EloquentUserProvider::class, array('createModel'), array($hasher, 'foo'));
 	}
 
 }
