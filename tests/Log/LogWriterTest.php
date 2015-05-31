@@ -1,7 +1,13 @@
 <?php
 
 use Mockery as m;
+use Monolog\Logger;
 use Illuminate\Log\Writer;
+use Illuminate\Events\Dispatcher;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\RotatingFileHandler;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class LogWriterTest extends PHPUnit_Framework_TestCase {
 
@@ -13,31 +19,31 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 
 	public function testFileHandlerCanBeAdded()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
-		$monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\StreamHandler'));
+		$writer = new Writer($monolog = m::mock(Logger::class));
+		$monolog->shouldReceive('pushHandler')->once()->with(m::type(StreamHandler::class));
 		$writer->useFiles(__DIR__);
 	}
 
 
 	public function testRotatingFileHandlerCanBeAdded()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
-		$monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\RotatingFileHandler'));
+		$writer = new Writer($monolog = m::mock(Logger::class));
+		$monolog->shouldReceive('pushHandler')->once()->with(m::type(RotatingFileHandler::class));
 		$writer->useDailyFiles(__DIR__, 5);
 	}
 
 
 	public function testErrorLogHandlerCanBeAdded()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
-		$monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\ErrorLogHandler'));
+		$writer = new Writer($monolog = m::mock(Logger::class));
+		$monolog->shouldReceive('pushHandler')->once()->with(m::type(ErrorLogHandler::class));
 		$writer->useErrorLog();
 	}
 
 
 	public function testMethodsPassErrorAdditionsToMonolog()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$writer = new Writer($monolog = m::mock(Logger::class));
 		$monolog->shouldReceive('error')->once()->with('foo', []);
 
 		$writer->error('foo');
@@ -46,7 +52,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 
 	public function testWriterFiresEventsDispatcher()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
+		$writer = new Writer($monolog = m::mock(Logger::class), $events = new Dispatcher);
 		$monolog->shouldReceive('error')->once()->with('foo', array());
 
 		$events->listen('illuminate.log', function($level, $message, array $context = array())
@@ -74,14 +80,14 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testListenShortcutFailsWithNoDispatcher()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'));
+		$writer = new Writer($monolog = m::mock(Logger::class));
 		$writer->listen(function() {});
 	}
 
 
 	public function testListenShortcut()
 	{
-		$writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$writer = new Writer($monolog = m::mock(Logger::class), $events = m::mock(DispatcherContract::class));
 
 		$callback = function() { return 'success'; };
 		$events->shouldReceive('listen')->with('illuminate.log', $callback)->once();
