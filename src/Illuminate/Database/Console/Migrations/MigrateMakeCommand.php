@@ -120,7 +120,7 @@ class MigrateMakeCommand extends BaseCommand {
 
 			array('table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'),
 
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path where migration it will be stored.'),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path where migration will be stored.'),
 		);
 	}
 
