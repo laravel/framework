@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
@@ -628,7 +629,7 @@ empty
 
 	protected function getFiles()
 	{
-		return m::mock('Illuminate\Filesystem\Filesystem');
+		return m::mock(Filesystem::class);
 	}
 
 

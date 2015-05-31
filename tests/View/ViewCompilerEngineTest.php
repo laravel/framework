@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\View\Engines\CompilerEngine;
+use Illuminate\View\Compilers\CompilerInterface;
 
 class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 
@@ -39,7 +40,7 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
 
 	protected function getEngine()
 	{
-		return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+		return new CompilerEngine(m::mock(CompilerInterface::class));
 	}
 
 }
