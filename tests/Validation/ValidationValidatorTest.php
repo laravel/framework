@@ -1050,6 +1050,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$v = new Validator($trans, array(), array('x' => 'mimes:php'));
 		$v->setFiles(array('x' => $file2));
 		$this->assertFalse($v->passes());
+
+		$file3 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array('getMimeType'), $uploadedFile);
+		$file3->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
+		$v = new Validator($trans, array(), array('x' => 'mimes:image/jpeg'));
+		$v->setFiles(array('x' => $file3));
+		$this->assertTrue($v->passes());
 	}
 
 
