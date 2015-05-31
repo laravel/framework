@@ -1,10 +1,10 @@
 <?php
 
 use Aws\Ses\SesClient;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\TransportManager;
-use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Collection;
+use Illuminate\Mail\TransportManager;
+use Illuminate\Foundation\Application;
+use Illuminate\Mail\Transport\SesTransport;
 
 class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 
@@ -39,7 +39,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase {
 		$message->setTo('me@example.com');
 		$message->setBcc('you@example.com');
 
-		$client = $this->getMockBuilder('Aws\Ses\SesClient')
+		$client = $this->getMockBuilder(SesClient::class)
 			->setMethods(['sendRawEmail'])
 			->disableOriginalConstructor()
 			->getMock();
