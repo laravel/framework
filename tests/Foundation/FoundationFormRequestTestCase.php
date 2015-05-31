@@ -1,7 +1,13 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Validation\Validator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Factory as ValidationFactory;
 
 class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 
@@ -16,9 +22,9 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	{
 		$request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
 		$request->setContainer(new Container);
-		$factory = m::mock('Illuminate\Validation\Factory');
+		$factory = m::mock(ValidationFactory::class);
 		$factory->shouldReceive('make')->once()->with(['name' => 'abigail'], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
+			$validator = m::mock(Validator::class)
 		);
 		$validator->shouldReceive('fails')->once()->andReturn(false);
 
@@ -36,14 +42,14 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 		$request = m::mock('FoundationTestFormRequestStub[response]');
 		$request->initialize(['name' => null]);
 		$request->setContainer(new Container);
-		$factory = m::mock('Illuminate\Validation\Factory');
+		$factory = m::mock(ValidationFactory::class);
 		$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
+			$validator = m::mock(Validator::class)
 		);
 		$validator->shouldReceive('fails')->once()->andReturn(true);
 		$validator->shouldReceive('errors')->once()->andReturn($messages = m::mock('StdClass'));
 		$messages->shouldReceive('all')->once()->andReturn([]);
-		$request->shouldReceive('response')->once()->andReturn(new Illuminate\Http\Response);
+		$request->shouldReceive('response')->once()->andReturn(new Response);
 
 
 		$request->validate($factory);
@@ -58,12 +64,12 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 		$request = m::mock('FoundationTestFormRequestForbiddenStub[forbiddenResponse]');
 		$request->initialize(['name' => null]);
 		$request->setContainer(new Container);
-		$factory = m::mock('Illuminate\Validation\Factory');
+		$factory = m::mock(ValidationFactory::class);
 		$factory->shouldReceive('make')->once()->with(['name' => null], ['name' => 'required'])->andReturn(
-			$validator = m::mock('Illuminate\Validation\Validator')
+			$validator = m::mock(Validator::class)
 		);
 		$validator->shouldReceive('fails')->once()->andReturn(false);
-		$request->shouldReceive('forbiddenResponse')->once()->andReturn(new Illuminate\Http\Response);
+		$request->shouldReceive('forbiddenResponse')->once()->andReturn(new Response);
 
 		$request->validate($factory);
 	}
@@ -72,8 +78,8 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 	public function testRedirectResponseIsProperlyCreatedWithGivenErrors()
 	{
 		$request = FoundationTestFormRequestStub::create('/', 'GET');
-		$request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
-		$redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock('Illuminate\Http\RedirectResponse'));
+		$request->setRedirector($redirector = m::mock(Redirector::class));
+		$redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock(RedirectResponse::class));
 		$redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
 		$url->shouldReceive('previous')->once()->andReturn('previous');
 		$response->shouldReceive('withInput')->andReturn($response);
@@ -86,7 +92,7 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 
 }
 
-class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest {
+class FoundationTestFormRequestStub extends FormRequest {
 	public function rules(StdClass $dep) {
 		return ['name' => 'required'];
 	}
@@ -98,7 +104,7 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
 	}
 }
 
-class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\FormRequest {
+class FoundationTestFormRequestForbiddenStub extends FormRequest {
 	public function rules() {
 		return ['name' => 'required'];
 	}

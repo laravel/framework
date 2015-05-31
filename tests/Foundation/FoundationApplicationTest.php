@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\ServiceProvider;
 
 class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
@@ -27,7 +28,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testServiceProvidersAreCorrectlyRegistered()
 	{
-		$provider = m::mock('Illuminate\Support\ServiceProvider');
+		$provider = m::mock(ServiceProvider::class);
 		$class = get_class($provider);
 		$provider->shouldReceive('register')->once();
 		$app = new Application;
@@ -135,7 +136,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
@@ -145,7 +146,7 @@ class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\Se
 	}
 }
 
-class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredServiceProviderCountStub extends ServiceProvider {
 	public static $count = 0;
 	protected $defer = true;
 	public function register()
@@ -155,7 +156,7 @@ class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\Ser
 	}
 }
 
-class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredServiceProviderStub extends ServiceProvider {
 	public static $initialized = false;
 	protected $defer = true;
 	public function register()
@@ -165,7 +166,7 @@ class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceP
 	}
 }
 
-class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationFactoryProviderStub extends ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
@@ -176,7 +177,7 @@ class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider 
 	}
 }
 
-class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationMultiProviderStub extends ServiceProvider {
 	protected $defer = true;
 	public function register()
 	{
