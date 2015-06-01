@@ -9,28 +9,25 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
+        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
-        $handler->shouldReceive('fire')->once()->with($job, array('data'));
+        $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
         $job->fire();
     }
 
-
     public function testFailedProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(array('job' => 'foo', 'data' => array('data'))));
+        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('BeanstalkdJobTestFailedTest'));
-        $handler->shouldReceive('failed')->once()->with(array('data'));
+        $handler->shouldReceive('failed')->once()->with(['data']);
 
         $job->failed();
     }
-
 
     public function testDeleteRemovesTheJobFromBeanstalkd()
     {
@@ -40,7 +37,6 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
         $job->delete();
     }
 
-
     public function testReleaseProperlyReleasesJobOntoBeanstalkd()
     {
         $job = $this->getJob();
@@ -49,7 +45,6 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
         $job->release();
     }
 
-
     public function testBuryProperlyBuryTheJobFromBeanstalkd()
     {
         $job = $this->getJob();
@@ -57,7 +52,6 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
 
         $job->bury();
     }
-
 
     protected function getJob()
     {

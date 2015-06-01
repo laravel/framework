@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -54,7 +56,7 @@ trait CrawlerTrait
      * @param  array  $headers
      * @return $this
      */
-    public function get($uri, array $headers = array())
+    public function get($uri, array $headers = [])
     {
         $this->call('GET', $uri, [], [], [], $headers);
 
@@ -69,7 +71,7 @@ trait CrawlerTrait
      * @param  array  $headers
      * @return $this
      */
-    public function post($uri, array $data = array(), array $headers = array())
+    public function post($uri, array $data = [], array $headers = [])
     {
         $this->call('POST', $uri, $data, [], [], $headers);
 
@@ -84,7 +86,7 @@ trait CrawlerTrait
      * @param  array  $headers
      * @return $this
      */
-    public function put($uri, array $data = array(), array $headers = array())
+    public function put($uri, array $data = [], array $headers = [])
     {
         $this->call('PUT', $uri, $data, [], [], $headers);
 
@@ -99,7 +101,7 @@ trait CrawlerTrait
      * @param  array  $headers
      * @return $this
      */
-    public function patch($uri, array $data = array(), array $headers = array())
+    public function patch($uri, array $data = [], array $headers = [])
     {
         $this->call('PATCH', $uri, $data, [], [], $headers);
 
@@ -114,7 +116,7 @@ trait CrawlerTrait
      * @param  array  $headers
      * @return $this
      */
-    public function delete($uri, array $data = array(), array $headers = array())
+    public function delete($uri, array $data = [], array $headers = [])
     {
         $this->call('DELETE', $uri, $data, [], [], $headers);
 
@@ -216,7 +218,7 @@ trait CrawlerTrait
     {
         $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
 
-        $this->$method("/".preg_quote($text, '/')."/i", $this->response->getContent());
+        $this->$method('/'.preg_quote($text, '/').'/i', $this->response->getContent());
 
         return $this;
     }
@@ -242,7 +244,7 @@ trait CrawlerTrait
     {
         $this->seeJson();
 
-        if (! is_null($data)) {
+        if (!is_null($data)) {
             return $this->seeJson($data);
         }
     }
@@ -391,10 +393,10 @@ trait CrawlerTrait
     {
         $link = $this->crawler->selectLink($name);
 
-        if (! count($link)) {
+        if (!count($link)) {
             $link = $this->filterByNameOrId($name, 'a');
 
-            if (! count($link)) {
+            if (!count($link)) {
                 throw new InvalidArgumentException(
                     "Could not find a link with a body, name, or ID attribute of [{$name}]."
                 );
@@ -487,7 +489,7 @@ trait CrawlerTrait
      */
     protected function fillForm($buttonText, $inputs = [])
     {
-        if (! is_string($buttonText)) {
+        if (!is_string($buttonText)) {
             $inputs = $buttonText;
 
             $buttonText = null;
@@ -545,7 +547,7 @@ trait CrawlerTrait
     {
         $crawler = $this->filterByNameOrId($filter);
 
-        if (! count($crawler)) {
+        if (!count($crawler)) {
             throw new InvalidArgumentException(
                 "Nothing matched the filter [{$filter}] CSS query provided for [{$this->currentUri}]."
             );
@@ -661,7 +663,7 @@ trait CrawlerTrait
             $uri = substr($uri, 1);
         }
 
-        if (! starts_with($uri, 'http')) {
+        if (!starts_with($uri, 'http')) {
             $uri = $this->baseUrl.'/'.$uri;
         }
 

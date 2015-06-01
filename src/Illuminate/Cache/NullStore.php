@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
 
@@ -9,7 +11,7 @@ class NullStore extends TaggableStore implements Store
      *
      * @var array
      */
-    protected $storage = array();
+    protected $storage = [];
 
     /**
      * Retrieve an item from the cache by key.

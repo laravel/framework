@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Translation;
+<?php
+
+namespace Illuminate\Translation;
 
 interface LoaderInterface
 {

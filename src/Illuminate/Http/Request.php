@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http;
+<?php
+
+namespace Illuminate\Http;
 
 use Closure;
 use ArrayAccess;
@@ -227,7 +229,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $value) {
-            if (! array_key_exists($value, $input)) {
+            if (!array_key_exists($value, $input)) {
                 return false;
             }
         }
@@ -264,7 +266,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $boolOrArray = is_bool($this->input($key)) || is_array($this->input($key));
 
-        return ! $boolOrArray && trim((string) $this->input($key)) === '';
+        return !$boolOrArray && trim((string) $this->input($key)) === '';
     }
 
     /**
@@ -349,7 +351,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasCookie($key)
     {
-        return ! is_null($this->cookie($key));
+        return !is_null($this->cookie($key));
     }
 
     /**
@@ -384,8 +386,8 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasFile($key)
     {
-        if (! is_array($files = $this->file($key))) {
-            $files = array($files);
+        if (!is_array($files = $this->file($key))) {
+            $files = [$files];
         }
 
         foreach ($files as $file) {
@@ -451,9 +453,9 @@ class Request extends SymfonyRequest implements ArrayAccess
      * @param  array   $keys
      * @return void
      */
-    public function flash($filter = null, $keys = array())
+    public function flash($filter = null, $keys = [])
     {
-        $flash = (! is_null($filter)) ? $this->$filter($keys) : $this->input();
+        $flash = (!is_null($filter)) ? $this->$filter($keys) : $this->input();
 
         $this->session()->flashInput($flash);
     }
@@ -491,7 +493,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function flush()
     {
-        $this->session()->flashInput(array());
+        $this->session()->flashInput([]);
     }
 
     /**
@@ -542,7 +544,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (! isset($this->json)) {
+        if (!isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
         }
 
@@ -702,8 +704,8 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function session()
     {
-        if (! $this->hasSession()) {
-            throw new RuntimeException("Session store not set on request.");
+        if (!$this->hasSession()) {
+            throw new RuntimeException('Session store not set on request.');
         }
 
         return $this->getSession();
@@ -836,7 +838,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         if (array_key_exists($key, $all)) {
             return $all[$key];
-        } elseif (! is_null($this->route())) {
+        } elseif (!is_null($this->route())) {
             return $this->route()->parameter($key);
         }
     }

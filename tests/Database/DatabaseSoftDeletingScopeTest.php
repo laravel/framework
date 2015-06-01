@@ -9,7 +9,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testApplyingScopeToABuilder()
     {
         $scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[extend]');
@@ -21,7 +20,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
 
         $scope->apply($builder, $model);
     }
-
 
     public function testScopeCanRemoveDeletedAtConstraints()
     {
@@ -37,7 +35,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($query->wheres, [['type' => 'Null', 'column' => 'foo']]);
     }
 
-
     public function testForceDeleteExtension()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -51,7 +48,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
 
         $callback($givenBuilder);
     }
-
 
     public function testRestoreExtension()
     {
@@ -69,7 +65,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $callback($givenBuilder);
     }
 
-
     public function testWithTrashedExtension()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -84,7 +79,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($givenBuilder, $result);
     }
-
 
     public function testOnlyTrashedExtension()
     {

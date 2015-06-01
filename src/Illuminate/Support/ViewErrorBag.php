@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use Countable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
@@ -77,7 +79,7 @@ class ViewErrorBag implements Countable
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->default, $method), $parameters);
+        return call_user_func_array([$this->default, $method], $parameters);
     }
 
     /**

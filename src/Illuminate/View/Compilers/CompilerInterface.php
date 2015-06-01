@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View\Compilers;
+<?php
+
+namespace Illuminate\View\Compilers;
 
 interface CompilerInterface
 {

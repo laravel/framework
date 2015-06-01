@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Translation;
+<?php
+
+namespace Illuminate\Translation;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
@@ -33,7 +35,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @var array
      */
-    protected $loaded = array();
+    protected $loaded = [];
 
     /**
      * Create a new translator instance.
@@ -57,7 +59,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function has($key, $locale = null)
     {
-        return $this->get($key, array(), $locale) !== $key;
+        return $this->get($key, [], $locale) !== $key;
     }
 
     /**
@@ -68,7 +70,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $locale
      * @return string
      */
-    public function get($key, array $replace = array(), $locale = null)
+    public function get($key, array $replace = [], $locale = null)
     {
         list($namespace, $group, $item) = $this->parseKey($key);
 
@@ -82,7 +84,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
                 $namespace, $group, $locale, $item, $replace
             );
 
-            if (! is_null($line)) {
+            if (!is_null($line)) {
                 break;
             }
         }
@@ -90,7 +92,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        if (! isset($line)) {
+        if (!isset($line)) {
             return $key;
         }
 
@@ -158,7 +160,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $locale
      * @return string
      */
-    public function choice($key, $number, array $replace = array(), $locale = null)
+    public function choice($key, $number, array $replace = [], $locale = null)
     {
         $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
 
@@ -176,7 +178,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $locale
      * @return string
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = [], $domain = 'messages', $locale = null)
     {
         return $this->get($id, $parameters, $locale);
     }
@@ -191,7 +193,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $locale
      * @return string
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
         return $this->choice($id, $number, $parameters, $locale);
     }
@@ -268,11 +270,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     protected function parseLocale($locale)
     {
-        if (! is_null($locale)) {
-            return array_filter(array($locale, $this->fallback));
+        if (!is_null($locale)) {
+            return array_filter([$locale, $this->fallback]);
         }
 
-        return array_filter(array($this->locale, $this->fallback));
+        return array_filter([$this->locale, $this->fallback]);
     }
 
     /**
@@ -282,7 +284,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function getSelector()
     {
-        if (! isset($this->selector)) {
+        if (!isset($this->selector)) {
             $this->selector = new MessageSelector;
         }
 

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
@@ -18,7 +20,7 @@ class KeyGenerateCommand extends Command
      *
      * @var string
      */
-    protected $description = "Set the application key";
+    protected $description = 'Set the application key';
 
     /**
      * Execute the console command.
@@ -63,8 +65,8 @@ class KeyGenerateCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'),
-        );
+        return [
+            ['show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'],
+        ];
     }
 }

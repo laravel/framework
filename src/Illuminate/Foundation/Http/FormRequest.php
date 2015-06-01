@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Http;
+<?php
+
+namespace Illuminate\Foundation\Http;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

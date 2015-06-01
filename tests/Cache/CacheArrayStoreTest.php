@@ -11,14 +11,12 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $store->get('foo'));
     }
 
-
     public function testStoreItemForeverProperlyStoresInArray()
     {
-        $mock = $this->getMock('Illuminate\Cache\ArrayStore', array('put'));
+        $mock = $this->getMock('Illuminate\Cache\ArrayStore', ['put']);
         $mock->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
         $mock->forever('foo', 'bar');
     }
-
 
     public function testValuesCanBeIncremented()
     {
@@ -28,7 +26,6 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $store->get('foo'));
     }
 
-
     public function testValuesCanBeDecremented()
     {
         $store = new ArrayStore;
@@ -37,7 +34,6 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $store->get('foo'));
     }
 
-
     public function testItemsCanBeRemoved()
     {
         $store = new ArrayStore;
@@ -45,7 +41,6 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $store->forget('foo');
         $this->assertNull($store->get('foo'));
     }
-
 
     public function testItemsCanBeFlushed()
     {
@@ -56,7 +51,6 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $this->assertNull($store->get('foo'));
         $this->assertNull($store->get('baz'));
     }
-
 
     public function testCacheKey()
     {

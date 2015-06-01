@@ -11,7 +11,6 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testCreateMakesMigration()
     {
         $command = new SessionTableCommandTestStub(
@@ -24,7 +23,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);
-        $path = __DIR__ . '/migrations';
+        $path = __DIR__.'/migrations';
         $creator->shouldReceive('create')->once()->with('create_session_table', $path)->andReturn($path);
         $files->shouldReceive('get')->once()->andReturn('foo');
         $files->shouldReceive('put')->once()->with($path, 'foo');
@@ -33,8 +32,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command);
     }
 
-
-    protected function runCommand($command, $input = array())
+    protected function runCommand($command, $input = [])
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
@@ -42,7 +40,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
 
 class SessionTableCommandTestStub extends SessionTableCommand
 {
-    public function call($command, array $arguments = array())
+    public function call($command, array $arguments = [])
     {
         //
     }

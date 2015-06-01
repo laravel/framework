@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pipeline;
+<?php
+
+namespace Illuminate\Pipeline;
 
 use Illuminate\Support\ServiceProvider;
 

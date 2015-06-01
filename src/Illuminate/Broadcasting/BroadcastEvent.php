@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Broadcasting;
+<?php
+
+namespace Illuminate\Broadcasting;
 
 use ReflectionClass;
 use ReflectionProperty;

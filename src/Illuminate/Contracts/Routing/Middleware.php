@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Routing;
+<?php
+
+namespace Illuminate\Contracts\Routing;
 
 use Closure;
 

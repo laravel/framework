@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Hashing;
+<?php
+
+namespace Illuminate\Hashing;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -28,6 +30,6 @@ class HashServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('hash');
+        return ['hash'];
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Capsule;
+<?php
+
+namespace Illuminate\Database\Capsule;
 
 use PDO;
 use Illuminate\Container\Container;
@@ -194,6 +196,6 @@ class Manager
      */
     public static function __callStatic($method, $parameters)
     {
-        return call_user_func_array(array(static::connection(), $method), $parameters);
+        return call_user_func_array([static::connection(), $method], $parameters);
     }
 }

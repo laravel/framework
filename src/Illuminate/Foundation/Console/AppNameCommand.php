@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
@@ -20,7 +22,7 @@ class AppNameCommand extends Command
      *
      * @var string
      */
-    protected $description = "Set the application namespace";
+    protected $description = 'Set the application namespace';
 
     /**
      * The Composer class instance.
@@ -315,8 +317,8 @@ class AppNameCommand extends Command
      */
     protected function getArguments()
     {
-        return array(
-            array('name', InputArgument::REQUIRED, 'The desired namespace.'),
-        );
+        return [
+            ['name', InputArgument::REQUIRED, 'The desired namespace.'],
+        ];
     }
 }

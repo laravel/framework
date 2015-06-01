@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Pipeline;
+<?php
+
+namespace Illuminate\Contracts\Pipeline;
 
 use Closure;
 

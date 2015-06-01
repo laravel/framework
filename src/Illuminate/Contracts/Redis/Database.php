@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Redis;
+<?php
+
+namespace Illuminate\Contracts\Redis;
 
 interface Database
 {
@@ -9,5 +11,5 @@ interface Database
      * @param  array   $parameters
      * @return mixed
      */
-    public function command($method, array $parameters = array());
+    public function command($method, array $parameters = []);
 }

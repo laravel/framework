@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Doctrine\DBAL\Driver\PDOPgSql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Processors\PostgresProcessor;

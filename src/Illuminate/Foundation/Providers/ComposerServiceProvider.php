@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Providers;
+<?php
+
+namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Foundation\Composer;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +33,6 @@ class ComposerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('composer');
+        return ['composer'];
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,7 +30,7 @@ class RetryCommand extends Command
     {
         $failed = $this->laravel['queue.failer']->find($this->argument('id'));
 
-        if (! is_null($failed)) {
+        if (!is_null($failed)) {
             $failed->payload = $this->resetAttempts($failed->payload);
 
             $this->laravel['queue']->connection($failed->connection)->pushRaw($failed->payload, $failed->queue);
@@ -65,8 +67,8 @@ class RetryCommand extends Command
      */
     protected function getArguments()
     {
-        return array(
-            array('id', InputArgument::REQUIRED, 'The ID of the failed job'),
-        );
+        return [
+            ['id', InputArgument::REQUIRED, 'The ID of the failed job'],
+        ];
     }
 }

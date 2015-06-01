@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Console\Seeds;
+<?php
+
+namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;

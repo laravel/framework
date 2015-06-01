@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing\Console;
+<?php
+
+namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -58,8 +60,8 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return array(
-            array('plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'),
-        );
+        return [
+            ['plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'],
+        ];
     }
 }

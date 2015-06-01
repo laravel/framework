@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Redis;
+<?php
+
+namespace Illuminate\Redis;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -30,6 +32,6 @@ class RedisServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('redis');
+        return ['redis'];
     }
 }

@@ -11,7 +11,6 @@ class CookieTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testCookiesAreCreatedWithProperOptions()
     {
         $cookie = $this->getCreator();
@@ -35,7 +34,6 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($c3->getExpiresTime() < time());
     }
 
-
     public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain()
     {
         $cookie = $this->getCreator();
@@ -47,7 +45,6 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/domain', $c->getDomain());
         $this->assertEquals('/path', $c->getPath());
     }
-
 
     public function testQueuedCookies()
     {
@@ -64,7 +61,6 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('qu'));
     }
 
-
     public function testUnqueue()
     {
         $cookie = $this->getCreator();
@@ -74,14 +70,13 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($cookie->getQueuedCookies());
     }
 
-
     public function getCreator()
     {
-        return new CookieJar(Request::create('/foo', 'GET'), array(
+        return new CookieJar(Request::create('/foo', 'GET'), [
             'path'     => '/path',
             'domain'   => '/domain',
             'secure'   => true,
             'httpOnly' => false,
-        ));
+        ]);
     }
 }

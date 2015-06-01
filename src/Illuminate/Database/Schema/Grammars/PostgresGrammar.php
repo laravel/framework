@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema\Grammars;
+<?php
+
+namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,14 +12,14 @@ class PostgresGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = array('Increment', 'Nullable', 'Default');
+    protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
     /**
      * The columns available as serials.
      *
      * @var array
      */
-    protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
+    protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * Compile the query to determine if a table exists.
@@ -386,7 +388,7 @@ class PostgresGrammar extends Grammar
     {
         $allowed = array_map(function ($a) { return "'".$a."'"; }, $column->allowed);
 
-        return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed)."))";
+        return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed).'))';
     }
 
     /**
@@ -397,7 +399,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
-        return "json";
+        return 'json';
     }
 
     /**
@@ -408,7 +410,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
-        return "jsonb";
+        return 'jsonb';
     }
 
     /**
@@ -520,8 +522,8 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
-            return " default ".$this->getDefaultValue($column->default);
+        if (!is_null($column->default)) {
+            return ' default '.$this->getDefaultValue($column->default);
         }
     }
 

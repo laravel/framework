@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
@@ -58,8 +60,8 @@ class GeneratorServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
+        return [
             'command.controller.make', 'command.middleware.make',
-        );
+        ];
     }
 }

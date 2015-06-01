@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Closure;
 use InvalidArgumentException;
@@ -19,7 +21,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @var array
      */
-    protected $connections = array();
+    protected $connections = [];
 
     /**
      * Create a new queue manager instance.
@@ -89,7 +91,7 @@ class QueueManager implements FactoryContract, MonitorContract
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
         // not make any unnecessary connection to the various queue end-points.
-        if (! isset($this->connections[$name])) {
+        if (!isset($this->connections[$name])) {
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
@@ -198,10 +200,10 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-    * Determine if the application is in maintenance mode.
-    *
-    * @return bool
-    */
+     * Determine if the application is in maintenance mode.
+     *
+     * @return bool
+     */
     public function isDownForMaintenance()
     {
         return $this->app->isDownForMaintenance();
@@ -216,7 +218,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function __call($method, $parameters)
     {
-        $callable = array($this->connection(), $method);
+        $callable = [$this->connection(), $method];
 
         return call_user_func_array($callable, $parameters);
     }

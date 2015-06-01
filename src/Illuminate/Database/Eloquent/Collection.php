@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -158,7 +160,7 @@ class Collection extends BaseCollection
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
-            if (! isset($dictionary[$item->getKey()])) {
+            if (!isset($dictionary[$item->getKey()])) {
                 $diff->add($item);
             }
         }
@@ -169,7 +171,7 @@ class Collection extends BaseCollection
     /**
      * Intersect the collection with the given items.
      *
-      * @param  \ArrayAccess|array  $items
+     * @param  \ArrayAccess|array  $items
      * @return static
      */
     public function intersect($items)
@@ -195,7 +197,7 @@ class Collection extends BaseCollection
      */
     public function unique($key = null)
     {
-        if (! is_null($key)) {
+        if (!is_null($key)) {
             return parent::unique($key);
         }
 
@@ -238,7 +240,7 @@ class Collection extends BaseCollection
     {
         $items = is_null($items) ? $this->items : $items;
 
-        $dictionary = array();
+        $dictionary = [];
 
         foreach ($items as $value) {
             $dictionary[$value->getKey()] = $value;

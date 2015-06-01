@@ -13,7 +13,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testPaginatorCanGiveMeRelevantPageInformation()
     {
         $p = new LengthAwarePaginator($array = ['item3', 'item4'], 4, 2, 2);
@@ -25,7 +24,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['item3', 'item4'], $p->items());
     }
 
-
     public function testPaginatorCanGenerateUrls()
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
@@ -35,7 +33,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 2));
     }
 
-
     public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
@@ -43,14 +40,12 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($window->hasPages());
     }
 
-
     public function testPresenterCanGetAUrlRangeForASmallNumberOfUrls()
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
         $window = new UrlWindow($p);
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
     }
-
 
     public function testPresenterCanGetAUrlRangeForAWindowOfLinks()
     {
@@ -67,7 +62,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
 
-        /**
+        /*
          * Test Being Near The End Of The List
          */
         $p = new LengthAwarePaginator($array, count($array), 1, 8);
@@ -80,7 +75,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
     }
 
-
     public function testBootstrapPresenterCanGeneratorLinksForSlider()
     {
         $array = [];
@@ -92,7 +86,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
     }
-
 
     public function testCustomPresenter()
     {
@@ -110,7 +103,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         });
     }
 
-
     public function testBootstrapPresenterCanGeneratorLinksForTooCloseToBeginning()
     {
         $array = [];
@@ -122,7 +114,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning.html')), $presenter->render());
     }
-
 
     public function testBootstrapPresenterCanGeneratorLinksForTooCloseToEnding()
     {
@@ -136,7 +127,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending.html')), $presenter->render());
     }
 
-
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnLastPage()
     {
         $array = [];
@@ -148,7 +138,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page.html')), $presenter->render());
     }
-
 
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnFirstPage()
     {
@@ -162,7 +151,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/first_page.html')), $presenter->render());
     }
 
-
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
         $p = new Paginator($array = ['item3', 'item4', 'item5'], 2, 2);
@@ -174,7 +162,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
-            'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4']
+            'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4'],
         ], $p->toArray());
     }
 }

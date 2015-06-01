@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console\Tinker\Presenters;
+<?php
+
+namespace Illuminate\Foundation\Console\Tinker\Presenters;
 
 use Psy\Presenter\ArrayPresenter;
 use Illuminate\Support\Collection;

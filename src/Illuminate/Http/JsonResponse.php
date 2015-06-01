@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http;
+<?php
+
+namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
@@ -21,8 +23,8 @@ class JsonResponse extends BaseJsonResponse
      * @param  int    $status
      * @param  array  $headers
      * @param  int    $options
-    */
-    public function __construct($data = null, $status = 200, $headers = array(), $options = 0)
+     */
+    public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
         $this->jsonOptions = $options;
 
@@ -44,7 +46,7 @@ class JsonResponse extends BaseJsonResponse
     /**
      * {@inheritdoc}
      */
-    public function setData($data = array())
+    public function setData($data = [])
     {
         $this->data = $data instanceof Jsonable
                                    ? $data->toJson($this->jsonOptions)

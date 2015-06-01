@@ -1,8 +1,9 @@
-<?php namespace DummyNamespace;
+<?php
+
+namespace DummyNamespace;
 
 use DummyRootNamespaceEvents\Event;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class DummyClass extends Event
 {

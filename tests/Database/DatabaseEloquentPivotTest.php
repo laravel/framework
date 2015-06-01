@@ -10,14 +10,13 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = new Pivot($parent, array('foo' => 'bar'), 'table', true);
+        $pivot = new Pivot($parent, ['foo' => 'bar'], 'table', true);
 
-        $this->assertEquals(array('foo' => 'bar'), $pivot->getAttributes());
+        $this->assertEquals(['foo' => 'bar'], $pivot->getAttributes());
         $this->assertEquals('connection', $pivot->getConnectionName());
         $this->assertEquals('table', $pivot->getTable());
         $this->assertTrue($pivot->exists);
@@ -28,64 +27,59 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
-        $pivot = new DatabaseEloquentPivotTestMutatorStub($parent, array('foo' => 'bar'), 'table', true);
+        $pivot = new DatabaseEloquentPivotTestMutatorStub($parent, ['foo' => 'bar'], 'table', true);
 
         $this->assertTrue($pivot->getMutatorCalled());
     }
-
 
     public function testPropertiesUnchangedAreNotDirty()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+        $pivot = new Pivot($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
-        $this->assertEquals(array(), $pivot->getDirty());
+        $this->assertEquals([], $pivot->getDirty());
     }
-
 
     public function testPropertiesChangedAreDirty()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = new Pivot($parent, array('foo' => 'bar', 'shimy' => 'shake'), 'table', true);
+        $pivot = new Pivot($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
-        $this->assertEquals(array('shimy' => 'changed'), $pivot->getDirty());
+        $this->assertEquals(['shimy' => 'changed'], $pivot->getDirty());
     }
-
 
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
-        $parent->shouldReceive('getDates')->andReturn(array());
-        $pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar', 'created_at' => 'foo'), 'table');
+        $parent->shouldReceive('getDates')->andReturn([]);
+        $pivot = new DatabaseEloquentPivotTestDateStub($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
 
-        $pivot = new DatabaseEloquentPivotTestDateStub($parent, array('foo' => 'bar'), 'table');
+        $pivot = new DatabaseEloquentPivotTestDateStub($parent, ['foo' => 'bar'], 'table');
         $this->assertFalse($pivot->timestamps);
     }
-
 
     public function testKeysCanBeSetProperly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = new Pivot($parent, array('foo' => 'bar'), 'table');
+        $pivot = new Pivot($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
         $this->assertEquals('foreign', $pivot->getForeignKey());
         $this->assertEquals('other', $pivot->getOtherKey());
     }
 
-
     public function testDeleteMethodDeletesModelByKeys()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
-        $parent->guard(array());
+        $parent->guard([]);
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', array('newQuery'), array($parent, array('foo' => 'bar'), 'table'));
+        $pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', ['newQuery'], [$parent, ['foo' => 'bar'], 'table']);
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
@@ -99,12 +93,11 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
 class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot
 {
     public function getDates()
     {
-        return array();
+        return [];
     }
 }
 
@@ -115,6 +108,7 @@ class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\
     public function setFooAttribute($value)
     {
         $this->mutatorCalled = true;
+
         return $value;
     }
 

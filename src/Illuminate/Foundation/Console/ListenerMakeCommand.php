@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,7 +40,7 @@ class ListenerMakeCommand extends GeneratorCommand
 
         $event = $this->option('event');
 
-        if (! starts_with($event, $this->laravel->getNamespace())) {
+        if (!starts_with($event, $this->laravel->getNamespace())) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
@@ -85,10 +87,10 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return array(
-            array('event', null, InputOption::VALUE_REQUIRED, 'The event class the being listened for.'),
+        return [
+            ['event', null, InputOption::VALUE_REQUIRED, 'The event class the being listened for.'],
 
-            array('queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'),
-        );
+            ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'],
+        ];
     }
 }

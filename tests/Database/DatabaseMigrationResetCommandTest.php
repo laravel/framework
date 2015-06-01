@@ -10,7 +10,6 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testResetCommandCallsMigratorWithProperArguments()
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
@@ -23,7 +22,6 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command);
     }
 
-
     public function testResetCommandCanBePretended()
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
@@ -33,11 +31,10 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
         $migrator->shouldReceive('reset')->once()->with(true);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
-        $this->runCommand($command, array('--pretend' => true, '--database' => 'foo'));
+        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
-
-    protected function runCommand($command, $input = array())
+    protected function runCommand($command, $input = [])
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }

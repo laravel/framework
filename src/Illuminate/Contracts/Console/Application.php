@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Console;
+<?php
+
+namespace Illuminate\Contracts\Console;
 
 interface Application
 {
@@ -9,7 +11,7 @@ interface Application
      * @param  array  $parameters
      * @return int
      */
-    public function call($command, array $parameters = array());
+    public function call($command, array $parameters = []);
 
     /**
      * Get the output from the last command.

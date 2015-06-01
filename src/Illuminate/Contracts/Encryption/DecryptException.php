@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Encryption;
+<?php
+
+namespace Illuminate\Contracts\Encryption;
 
 use RuntimeException;
 

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php
+
+namespace Illuminate\Auth;
 
 use RuntimeException;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -106,7 +108,7 @@ class Guard implements GuardContract
      */
     public function check()
     {
-        return ! is_null($this->user());
+        return !is_null($this->user());
     }
 
     /**
@@ -116,7 +118,7 @@ class Guard implements GuardContract
      */
     public function guest()
     {
-        return ! $this->check();
+        return !$this->check();
     }
 
     /**
@@ -133,7 +135,7 @@ class Guard implements GuardContract
         // If we have already retrieved the user for the current request we can just
         // return it back immediately. We do not want to pull the user data every
         // request into the method because that would tremendously slow an app.
-        if (! is_null($this->user)) {
+        if (!is_null($this->user)) {
             return $this->user;
         }
 
@@ -144,7 +146,7 @@ class Guard implements GuardContract
         // request, and if one exists, attempt to retrieve the user using that.
         $user = null;
 
-        if (! is_null($id)) {
+        if (!is_null($id)) {
             $user = $this->provider->retrieveById($id);
         }
 
@@ -153,7 +155,7 @@ class Guard implements GuardContract
         // the application. Once we have a user we can return it to the caller.
         $recaller = $this->getRecaller();
 
-        if (is_null($user) && ! is_null($recaller)) {
+        if (is_null($user) && !is_null($recaller)) {
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
@@ -194,12 +196,12 @@ class Guard implements GuardContract
      */
     protected function getUserByRecaller($recaller)
     {
-        if ($this->validRecaller($recaller) && ! $this->tokenRetrievalAttempted) {
+        if ($this->validRecaller($recaller) && !$this->tokenRetrievalAttempted) {
             $this->tokenRetrievalAttempted = true;
 
             list($id, $token) = explode('|', $recaller, 2);
 
-            $this->viaRemember = ! is_null($user = $this->provider->retrieveByToken($id, $token));
+            $this->viaRemember = !is_null($user = $this->provider->retrieveByToken($id, $token));
 
             return $user;
         }
@@ -235,7 +237,7 @@ class Guard implements GuardContract
      */
     protected function validRecaller($recaller)
     {
-        if (! is_string($recaller) || ! str_contains($recaller, '|')) {
+        if (!is_string($recaller) || !str_contains($recaller, '|')) {
             return false;
         }
 
@@ -302,7 +304,7 @@ class Guard implements GuardContract
      */
     public function onceBasic($field = 'email')
     {
-        if (! $this->once($this->getBasicCredentials($this->getRequest(), $field))) {
+        if (!$this->once($this->getBasicCredentials($this->getRequest(), $field))) {
             return $this->getBasicResponse();
         }
     }
@@ -316,7 +318,7 @@ class Guard implements GuardContract
      */
     protected function attemptBasic(Request $request, $field)
     {
-        if (! $request->getUser()) {
+        if (!$request->getUser()) {
             return false;
         }
 
@@ -386,7 +388,7 @@ class Guard implements GuardContract
      */
     protected function hasValidCredentials($user, $credentials)
     {
-        return ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
+        return !is_null($user) && $this->provider->validateCredentials($user, $credentials);
     }
 
     /**
@@ -498,7 +500,7 @@ class Guard implements GuardContract
      */
     public function onceUsingId($id)
     {
-        if (! is_null($user = $this->provider->retrieveById($id))) {
+        if (!is_null($user = $this->provider->retrieveById($id))) {
             $this->setUser($user);
 
             return true;
@@ -545,7 +547,7 @@ class Guard implements GuardContract
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user)) {
+        if (!is_null($this->user)) {
             $this->refreshRememberToken($user);
         }
 
@@ -610,8 +612,8 @@ class Guard implements GuardContract
      */
     public function getCookieJar()
     {
-        if (! isset($this->cookie)) {
-            throw new RuntimeException("Cookie jar has not been set.");
+        if (!isset($this->cookie)) {
+            throw new RuntimeException('Cookie jar has not been set.');
         }
 
         return $this->cookie;

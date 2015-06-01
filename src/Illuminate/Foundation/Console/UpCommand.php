@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 
@@ -16,7 +18,7 @@ class UpCommand extends Command
      *
      * @var string
      */
-    protected $description = "Bring the application out of maintenance mode";
+    protected $description = 'Bring the application out of maintenance mode';
 
     /**
      * Execute the console command.

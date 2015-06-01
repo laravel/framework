@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Http;
+<?php
+
+namespace Illuminate\Contracts\Http;
 
 interface Kernel
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -124,7 +126,7 @@ class MorphToMany extends BelongsToMany
      * @param  bool   $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(array $attributes = array(), $exists = false)
+    public function newPivot(array $attributes = [], $exists = false)
     {
         $pivot = new MorphPivot($this->parent, $attributes, $this->table, $exists);
 

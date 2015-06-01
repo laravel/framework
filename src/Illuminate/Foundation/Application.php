@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation;
+<?php
+
+namespace Illuminate\Foundation;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -48,42 +50,42 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var array
      */
-    protected $bootingCallbacks = array();
+    protected $bootingCallbacks = [];
 
     /**
      * The array of booted callbacks.
      *
      * @var array
      */
-    protected $bootedCallbacks = array();
+    protected $bootedCallbacks = [];
 
     /**
      * The array of terminating callbacks.
      *
      * @var array
      */
-    protected $terminatingCallbacks = array();
+    protected $terminatingCallbacks = [];
 
     /**
      * All of the registered service providers.
      *
      * @var array
      */
-    protected $serviceProviders = array();
+    protected $serviceProviders = [];
 
     /**
      * The names of the loaded service providers.
      *
      * @var array
      */
-    protected $loadedProviders = array();
+    protected $loadedProviders = [];
 
     /**
      * The deferred services and their providers.
      *
      * @var array
      */
-    protected $deferredServices = array();
+    protected $deferredServices = [];
 
     /**
      * A custom callback used to configure Monolog.
@@ -480,9 +482,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  bool   $force
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $options = array(), $force = false)
+    public function register($provider, $options = [], $force = false)
     {
-        if ($registered = $this->getProvider($provider) && ! $force) {
+        if ($registered = $this->getProvider($provider) && !$force) {
             return $registered;
         }
 
@@ -548,7 +550,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function markAsRegistered($provider)
     {
-        $this['events']->fire($class = get_class($provider), array($provider));
+        $this['events']->fire($class = get_class($provider), [$provider]);
 
         $this->serviceProviders[] = $provider;
 
@@ -569,7 +571,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->loadDeferredProvider($service);
         }
 
-        $this->deferredServices = array();
+        $this->deferredServices = [];
     }
 
     /**
@@ -580,7 +582,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function loadDeferredProvider($service)
     {
-        if (! isset($this->deferredServices[$service])) {
+        if (!isset($this->deferredServices[$service])) {
             return;
         }
 
@@ -589,7 +591,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if (! isset($this->loadedProviders[$provider])) {
+        if (!isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -612,7 +614,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->register($instance = new $provider($this));
 
-        if (! $this->booted) {
+        if (!$this->booted) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -628,7 +630,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  array   $parameters
      * @return mixed
      */
-    public function make($abstract, array $parameters = array())
+    public function make($abstract, array $parameters = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -722,7 +724,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->bootedCallbacks[] = $callback;
 
         if ($this->isBooted()) {
-            $this->fireAppCallbacks(array($callback));
+            $this->fireAppCallbacks([$callback]);
         }
     }
 
@@ -827,7 +829,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function abort($code, $message = '', array $headers = array())
+    public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
             throw new NotFoundHttpException($message);
@@ -934,7 +936,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function hasMonologConfigurator()
     {
-        return ! is_null($this->monologConfigurator);
+        return !is_null($this->monologConfigurator);
     }
 
     /**
@@ -969,7 +971,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->fire('locale.changed', array($locale));
+        $this['events']->fire('locale.changed', [$locale]);
     }
 
     /**
@@ -979,7 +981,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerCoreContainerAliases()
     {
-        $aliases = array(
+        $aliases = [
             'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
             'auth'                 => 'Illuminate\Auth\AuthManager',
             'auth.driver'          => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Guard'],
@@ -1013,7 +1015,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
             'validator'            => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
             'view'                 => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
-        );
+        ];
 
         foreach ($aliases as $key => $aliases) {
             foreach ((array) $aliases as $alias) {
@@ -1055,7 +1057,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if (!is_null($this->namespace)) {
             return $this->namespace;
         }
 

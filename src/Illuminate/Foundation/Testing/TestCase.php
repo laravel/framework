@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Mockery;
 use PHPUnit_Framework_TestCase;
@@ -37,11 +39,11 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        if (! $this->app) {
+        if (!$this->app) {
             $this->refreshApplication();
         }
 
-        if (! $this->factory) {
+        if (!$this->factory) {
             $this->factory = $this->app->make('Illuminate\Database\Eloquent\Factory');
         }
     }

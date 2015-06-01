@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pagination;
+<?php
+
+namespace Illuminate\Pagination;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as PaginatorContract;
 
@@ -73,7 +75,7 @@ class UrlWindow
     {
         $window = $onEachSide * 2;
 
-        if (! $this->hasPages()) {
+        if (!$this->hasPages()) {
             return [
                 'first'  => null,
                 'slider' => null,

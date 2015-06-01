@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Closure;
 use LogicException;
@@ -43,14 +45,14 @@ class Route
      *
      * @var array
      */
-    protected $defaults = array();
+    protected $defaults = [];
 
     /**
      * The regular expression requirements.
      *
      * @var array
      */
-    protected $wheres = array();
+    protected $wheres = [];
 
     /**
      * The array of matched parameters.
@@ -101,7 +103,7 @@ class Route
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
-        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
+        if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
@@ -121,7 +123,7 @@ class Route
         $this->container = $this->container ?: new Container;
 
         try {
-            if (! is_string($this->action['uses'])) {
+            if (!is_string($this->action['uses'])) {
                 return $this->runCallable($request);
             }
 
@@ -164,7 +166,7 @@ class Route
             $this->parametersWithoutNulls(), $class, $method
         );
 
-        if (! method_exists($instance = $this->container->make($class), $method)) {
+        if (!method_exists($instance = $this->container->make($class), $method)) {
             throw new NotFoundHttpException;
         }
 
@@ -208,11 +210,11 @@ class Route
         $this->compileRoute();
 
         foreach ($this->getValidators() as $validator) {
-            if (! $includingMethod && $validator instanceof MethodValidator) {
+            if (!$includingMethod && $validator instanceof MethodValidator) {
                 continue;
             }
 
-            if (! $validator->matches($this, $request)) {
+            if (!$validator->matches($this, $request)) {
                 return false;
             }
         }
@@ -233,7 +235,7 @@ class Route
 
         $this->compiled = with(
 
-            new SymfonyRoute($uri, $optionals, $this->wheres, array(), $this->domain() ?: '')
+            new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
 
         )->compile();
     }
@@ -267,8 +269,8 @@ class Route
      */
     public function beforeFilters()
     {
-        if (! isset($this->action['before'])) {
-            return array();
+        if (!isset($this->action['before'])) {
+            return [];
         }
 
         return $this->parseFilters($this->action['before']);
@@ -281,8 +283,8 @@ class Route
      */
     public function afterFilters()
     {
-        if (! isset($this->action['after'])) {
-            return array();
+        if (!isset($this->action['after'])) {
+            return [];
         }
 
         return $this->parseFilters($this->action['after']);
@@ -324,7 +326,7 @@ class Route
      */
     protected static function explodeArrayFilters(array $filters)
     {
-        $results = array();
+        $results = [];
 
         foreach ($filters as $filter) {
             $results = array_merge($results, array_map('trim', explode('|', $filter)));
@@ -341,8 +343,8 @@ class Route
      */
     public static function parseFilter($filter)
     {
-        if (! str_contains($filter, ':')) {
-            return array($filter, array());
+        if (!str_contains($filter, ':')) {
+            return [$filter, []];
         }
 
         return static::parseParameterFilter($filter);
@@ -358,7 +360,7 @@ class Route
     {
         list($name, $parameters) = explode(':', $filter, 2);
 
-        return array($name, explode(',', $parameters));
+        return [$name, explode(',', $parameters)];
     }
 
     /**
@@ -439,7 +441,7 @@ class Route
             }, $this->parameters);
         }
 
-        throw new LogicException("Route is not bound.");
+        throw new LogicException('Route is not bound.');
     }
 
     /**
@@ -449,7 +451,7 @@ class Route
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), function ($p) { return ! is_null($p); });
+        return array_filter($this->parameters(), function ($p) { return !is_null($p); });
     }
 
     /**
@@ -513,7 +515,7 @@ class Route
         // If the route has a regular expression for the host part of the URI, we will
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
-        if (! is_null($this->compiled->getHostRegex())) {
+        if (!is_null($this->compiled->getHostRegex())) {
             $params = $this->bindHostParameters(
                 $request, $params
             );
@@ -558,7 +560,7 @@ class Route
     protected function matchToKeys(array $matches)
     {
         if (count($this->parameterNames()) == 0) {
-            return array();
+            return [];
         }
 
         $parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
@@ -595,13 +597,13 @@ class Route
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
         if (is_callable($action)) {
-            return array('uses' => $action);
+            return ['uses' => $action];
         }
 
         // If no "uses" property has been set, we will dig through the array to find a
         // Closure instance within this list. We will set the first Closure we come
         // across into the "uses" property that will get fired off by this route.
-        elseif (! isset($action['uses'])) {
+        elseif (!isset($action['uses'])) {
             $action['uses'] = $this->findCallable($action);
         }
 
@@ -635,10 +637,10 @@ class Route
         // To match the route, we will use a chain of responsibility pattern with the
         // validator implementations. We will spin through each one making sure it
         // passes and then we will know if the route as a whole matches request.
-        return static::$validators = array(
+        return static::$validators = [
             new MethodValidator, new SchemeValidator,
             new HostValidator, new UriValidator,
-        );
+        ];
     }
 
     /**
@@ -724,7 +726,7 @@ class Route
      */
     protected function parseWhere($name, $expression)
     {
-        return is_array($name) ? $name : array($name => $expression);
+        return is_array($name) ? $name : [$name => $expression];
     }
 
     /**

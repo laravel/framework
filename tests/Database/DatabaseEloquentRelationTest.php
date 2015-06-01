@@ -10,7 +10,6 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;
@@ -19,7 +18,6 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $parent->setRelation('foo', 'bar');
         $this->assertArrayNotHasKey('foo', $parent->toArray());
     }
-
 
     public function testTouchMethodUpdatesRelatedTimestamps()
     {
@@ -33,20 +31,20 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $related->shouldReceive('freshTimestampString')->andReturn(Carbon\Carbon::now());
-        $builder->shouldReceive('update')->once()->with(array('updated_at' => Carbon\Carbon::now()));
+        $builder->shouldReceive('update')->once()->with(['updated_at' => Carbon\Carbon::now()]);
 
         $relation->touch();
     }
 
     /**
-     * Testing to ensure loop does not occur during relational queries in global scopes
+     * Testing to ensure loop does not occur during relational queries in global scopes.
      *
      * Executing parent model's global scopes could result in an infinite loop when the
      * parent model's global scope utilizes a relation in a query like has or whereHas
      */
     public function testDonNotRunParentModelGlobalScopes()
     {
-        /** @var Mockery\MockInterface $parent */
+        /* @var Mockery\MockInterface $parent */
         $eloquentBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
         $queryBuilder = m::mock('Illuminate\Database\Query\Builder');
         $parent = m::mock('EloquentRelationResetModelStub')->makePartial();
@@ -74,7 +72,6 @@ class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model
         return $this->newQuery()->getQuery();
     }
 }
-
 
 class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relation
 {

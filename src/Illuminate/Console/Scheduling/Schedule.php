@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console\Scheduling;
+<?php
+
+namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Contracts\Foundation\Application;
 
@@ -18,7 +20,7 @@ class Schedule
      * @param  array   $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
-    public function call($callback, array $parameters = array())
+    public function call($callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent($callback, $parameters);
 

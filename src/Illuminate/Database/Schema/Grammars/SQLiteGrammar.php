@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema\Grammars;
+<?php
+
+namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
@@ -11,14 +13,14 @@ class SQLiteGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = array('Nullable', 'Default', 'Increment');
+    protected $modifiers = ['Nullable', 'Default', 'Increment'];
 
     /**
      * The columns available as serials.
      *
      * @var array
      */
-    protected $serials = array('bigInteger', 'integer');
+    protected $serials = ['bigInteger', 'integer'];
 
     /**
      * Compile the query to determine if a table exists.
@@ -82,11 +84,11 @@ class SQLiteGrammar extends Grammar
         foreach ($foreigns as $foreign) {
             $sql .= $this->getForeignKey($foreign);
 
-            if (! is_null($foreign->onDelete)) {
+            if (!is_null($foreign->onDelete)) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
-            if (! is_null($foreign->onUpdate)) {
+            if (!is_null($foreign->onUpdate)) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
         }
@@ -124,7 +126,7 @@ class SQLiteGrammar extends Grammar
     {
         $primary = $this->getCommandByName($blueprint, 'primary');
 
-        if (! is_null($primary)) {
+        if (!is_null($primary)) {
             $columns = $this->columnize($primary->columns);
 
             return ", primary key ({$columns})";
@@ -144,7 +146,7 @@ class SQLiteGrammar extends Grammar
 
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-        $statements = array();
+        $statements = [];
 
         foreach ($columns as $column) {
             $statements[] = 'alter table '.$table.' '.$column;
@@ -581,8 +583,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
-            return " default ".$this->getDefaultValue($column->default);
+        if (!is_null($column->default)) {
+            return ' default '.$this->getDefaultValue($column->default);
         }
     }
 

@@ -9,19 +9,17 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
         $queue = new Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))), 1024, 0, 60);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['job' => 'foo', 'data' => ['data']]), 1024, 0, 60);
 
-        $queue->push('foo', array('data'), 'stack');
-        $queue->push('foo', array('data'));
+        $queue->push('foo', ['data'], 'stack');
+        $queue->push('foo', ['data']);
     }
-
 
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
     {
@@ -29,12 +27,11 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(array('job' => 'foo', 'data' => array('data'))), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk\Pheanstalk::DEFAULT_TTR);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['job' => 'foo', 'data' => ['data']]), Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk\Pheanstalk::DEFAULT_TTR);
 
-        $queue->later(5, 'foo', array('data'), 'stack');
-        $queue->later(5, 'foo', array('data'));
+        $queue->later(5, 'foo', ['data'], 'stack');
+        $queue->later(5, 'foo', ['data']);
     }
-
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
     {
@@ -49,7 +46,6 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Illuminate\Queue\Jobs\BeanstalkdJob', $result);
     }
-
 
     public function testDeleteProperlyRemoveJobsOffBeanstalkd()
     {

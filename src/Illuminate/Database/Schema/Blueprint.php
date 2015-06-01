@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema;
+<?php
+
+namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Support\Fluent;
@@ -19,14 +21,14 @@ class Blueprint
      *
      * @var array
      */
-    protected $columns = array();
+    protected $columns = [];
 
     /**
      * The commands that should be run for the table.
      *
      * @var array
      */
-    protected $commands = array();
+    protected $commands = [];
 
     /**
      * The storage engine that should be used for the table.
@@ -36,12 +38,12 @@ class Blueprint
     public $engine;
 
     /**
-     * The default character set that should be used for the table
+     * The default character set that should be used for the table.
      */
     public $charset;
 
     /**
-     * The collation that should be used for the table;
+     * The collation that should be used for the table;.
      */
     public $collation;
 
@@ -56,7 +58,7 @@ class Blueprint
     {
         $this->table = $table;
 
-        if (! is_null($callback)) {
+        if (!is_null($callback)) {
             $callback($this);
         }
     }
@@ -86,7 +88,7 @@ class Blueprint
     {
         $this->addImpliedCommands();
 
-        $statements = array();
+        $statements = [];
 
         // Each type of command has a corresponding compiler function on the schema
         // grammar which is used to build the necessary SQL statements to build
@@ -95,7 +97,7 @@ class Blueprint
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method)) {
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (!is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -111,11 +113,11 @@ class Blueprint
      */
     protected function addImpliedCommands()
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+        if (count($this->getAddedColumns()) > 0 && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
+        if (count($this->getChangedColumns()) > 0 && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -130,7 +132,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (array('primary', 'unique', 'index') as $index) {
+            foreach (['primary', 'unique', 'index'] as $index) {
                 // If the index has been specified on the given column, but is simply
                 // equal to "true" (boolean), no name has been specified for this
                 // index, so we will simply call the index methods without one.
@@ -278,10 +280,10 @@ class Blueprint
     }
 
     /**
-    * Indicate that the soft delete column should be dropped.
-    *
-    * @return void
-    */
+     * Indicate that the soft delete column should be dropped.
+     *
+     * @return void
+     */
     public function dropSoftDeletes()
     {
         $this->dropColumn('deleted_at');
@@ -733,7 +735,7 @@ class Blueprint
 
         $this->string("{$name}_type");
 
-        $this->index(array("{$name}_id", "{$name}_type"), $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -756,7 +758,7 @@ class Blueprint
      */
     protected function dropIndexCommand($command, $type, $index)
     {
-        $columns = array();
+        $columns = [];
 
         // If the given "index" is actually an array of columns, the developer means
         // to drop an index merely by specifying the columns involved without the
@@ -803,7 +805,7 @@ class Blueprint
     {
         $index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
 
-        return str_replace(array('-', '.'), '_', $index);
+        return str_replace(['-', '.'], '_', $index);
     }
 
     /**
@@ -814,7 +816,7 @@ class Blueprint
      * @param  array   $parameters
      * @return \Illuminate\Support\Fluent
      */
-    protected function addColumn($type, $name, array $parameters = array())
+    protected function addColumn($type, $name, array $parameters = [])
     {
         $attributes = array_merge(compact('type', 'name'), $parameters);
 
@@ -845,7 +847,7 @@ class Blueprint
      * @param  array  $parameters
      * @return \Illuminate\Support\Fluent
      */
-    protected function addCommand($name, array $parameters = array())
+    protected function addCommand($name, array $parameters = [])
     {
         $this->commands[] = $command = $this->createCommand($name, $parameters);
 
@@ -859,7 +861,7 @@ class Blueprint
      * @param  array   $parameters
      * @return \Illuminate\Support\Fluent
      */
-    protected function createCommand($name, array $parameters = array())
+    protected function createCommand($name, array $parameters = [])
     {
         return new Fluent(array_merge(compact('name'), $parameters));
     }

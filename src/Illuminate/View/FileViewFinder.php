@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
@@ -24,21 +26,21 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @var array
      */
-    protected $views = array();
+    protected $views = [];
 
     /**
      * The namespace to file path hints.
      *
      * @var array
      */
-    protected $hints = array();
+    protected $hints = [];
 
     /**
      * Register a view extension with the finder.
      *
      * @var array
      */
-    protected $extensions = array('blade.php', 'php');
+    protected $extensions = ['blade.php', 'php'];
 
     /**
      * Create a new file view loader instance.
@@ -106,7 +108,7 @@ class FileViewFinder implements ViewFinderInterface
             throw new InvalidArgumentException("View [$name] has an invalid name.");
         }
 
-        if (! isset($this->hints[$segments[0]])) {
+        if (!isset($this->hints[$segments[0]])) {
             throw new InvalidArgumentException("No hint path defined for [{$segments[0]}].");
         }
 

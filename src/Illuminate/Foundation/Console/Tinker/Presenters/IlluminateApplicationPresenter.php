@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console\Tinker\Presenters;
+<?php
+
+namespace Illuminate\Foundation\Console\Tinker\Presenters;
 
 use Exception;
 use ReflectionClass;
@@ -56,7 +58,7 @@ class IlluminateApplicationPresenter extends ObjectPresenter
             try {
                 $val = $value->$property();
 
-                if (! is_null($val)) {
+                if (!is_null($val)) {
                     $properties[$property] = $val;
                 }
             } catch (Exception $e) {

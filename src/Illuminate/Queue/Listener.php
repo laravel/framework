@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Closure;
 use Symfony\Component\Process\Process;
@@ -56,7 +58,7 @@ class Listener
     public function __construct($commandPath)
     {
         $this->commandPath = $commandPath;
-        $this->workerCommand =  '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
+        $this->workerCommand = '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
     }
 
     /**

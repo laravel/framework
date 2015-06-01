@@ -10,16 +10,14 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testBasicEventExecution()
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
         $d->listen('foo', function ($foo) { $_SERVER['__event.test'] = $foo; });
-        $d->fire('foo', array('bar'));
+        $d->fire('foo', ['bar']);
         $this->assertEquals('bar', $_SERVER['__event.test']);
     }
-
 
     public function testContainerResolutionOfEventHandlers()
     {
@@ -27,9 +25,8 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
-        $d->fire('foo', array('foo', 'bar'));
+        $d->fire('foo', ['foo', 'bar']);
     }
-
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
@@ -37,15 +34,14 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
-        $d->fire('foo', array('foo', 'bar'));
+        $d->fire('foo', ['foo', 'bar']);
     }
-
 
     public function testQueuedEventsAreFired()
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->push('update', array('name' => 'taylor'));
+        $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
         });
@@ -55,12 +51,11 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylor', $_SERVER['__event.test']);
     }
 
-
     public function testQueuedEventsCanBeForgotten()
     {
         $_SERVER['__event.test'] = 'unset';
         $d = new Dispatcher;
-        $d->push('update', array('name' => 'taylor'));
+        $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
         });
@@ -69,7 +64,6 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $d->flush('update');
         $this->assertEquals('unset', $_SERVER['__event.test']);
     }
-
 
     public function testWildcardListeners()
     {
@@ -83,7 +77,6 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('wildcard', $_SERVER['__event.test']);
     }
 
-
     public function testListenersCanBeRemoved()
     {
         unset($_SERVER['__event.test']);
@@ -95,7 +88,6 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
 
-
     public function testFiringReturnsCurrentlyFiredEvent()
     {
         unset($_SERVER['__event.test']);
@@ -106,7 +98,6 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar', $_SERVER['__event.test']);
     }
-
 
     public function testQueuedEventHandlersAreQueued()
     {
@@ -122,7 +113,6 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $d->listen('some.event', 'TestDispatcherQueuedHandler@someMethod');
         $d->fire('some.event', ['foo', 'bar']);
     }
-
 
     public function testQueuedEventHandlersAreQueuedWithCustomHandlers()
     {

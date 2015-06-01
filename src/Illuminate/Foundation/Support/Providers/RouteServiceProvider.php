@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Support\Providers;
+<?php
+
+namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;

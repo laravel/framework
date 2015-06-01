@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Connectors;
+<?php
+
+namespace Illuminate\Database\Connectors;
 
 use PDO;
 
@@ -9,12 +11,12 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      *
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         PDO::ATTR_CASE => PDO::CASE_NATURAL,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
         PDO::ATTR_STRINGIFY_FETCHES => false,
-    );
+    ];
 
     /**
      * Establish a database connection.
@@ -55,10 +57,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function getDblibDsn(array $config)
     {
-        $arguments = array(
+        $arguments = [
             'host' => $this->buildHostString($config, ':'),
-            'dbname' => $config['database']
-        );
+            'dbname' => $config['database'],
+        ];
 
         $arguments = array_merge(
             $arguments, array_only($config, ['appname', 'charset'])
@@ -75,9 +77,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function getSqlSrvDsn(array $config)
     {
-        $arguments = array(
-            'Server' => $this->buildHostString($config, ',')
-        );
+        $arguments = [
+            'Server' => $this->buildHostString($config, ','),
+        ];
 
         if (isset($config['database'])) {
             $arguments['Database'] = $config['database'];
@@ -100,10 +102,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     protected function buildConnectString($driver, array $arguments)
     {
         $options = array_map(function ($key) use ($arguments) {
-            return sprintf("%s=%s", $key, $arguments[$key]);
+            return sprintf('%s=%s', $key, $arguments[$key]);
         }, array_keys($arguments));
 
-        return $driver.":".implode(';', $options);
+        return $driver.':'.implode(';', $options);
     }
 
     /**

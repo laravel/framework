@@ -9,12 +9,11 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testPushShouldFireJobInstantly()
     {
         unset($_SERVER['__sync.test']);
 
-        /**
+        /*
          * Test Synced Closure
          */
         $sync = new Illuminate\Queue\SyncQueue;
@@ -31,14 +30,13 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($_SERVER['__sync.test']);
         unset($_SERVER['__sync.test']);
 
-        /**
+        /*
          * Test Synced Class Handler
          */
         $sync->push('SyncQueueTestHandler', ['foo' => 'bar']);
         $this->assertInstanceOf('Illuminate\Queue\Jobs\SyncJob', $_SERVER['__sync.test'][0]);
         $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
     }
-
 
     public function testQueueableEntitiesAreSerializedAndResolved()
     {
@@ -51,7 +49,6 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SyncQueueTestEntity', $_SERVER['__sync.test'][1]['entity']);
     }
 
-
     public function testQueueableEntitiesAreSerializedAndResolvedWhenPassedAsSingleEntities()
     {
         $sync = new Illuminate\Queue\SyncQueue;
@@ -62,7 +59,6 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('SyncQueueTestEntity', $_SERVER['__sync.test'][1]);
     }
-
 
     public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
     {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cookie\Middleware;
+<?php
+
+namespace Illuminate\Cookie\Middleware;
 
 use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -80,7 +82,7 @@ class EncryptCookies implements Middleware
      */
     protected function decryptArray(array $cookie)
     {
-        $decrypted = array();
+        $decrypted = [];
 
         foreach ($cookie as $key => $value) {
             $decrypted[$key] = $this->encrypter->decrypt($value);

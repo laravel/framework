@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Illuminate\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
@@ -43,7 +45,7 @@ trait AssertionsTrait
             return $this->assertViewHasAll($key);
         }
 
-        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+        if (!isset($this->response->original) || !$this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
@@ -79,7 +81,7 @@ trait AssertionsTrait
      */
     public function assertViewMissing($key)
     {
-        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+        if (!isset($this->response->original) || !$this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
@@ -93,7 +95,7 @@ trait AssertionsTrait
      * @param  array   $with
      * @return void
      */
-    public function assertRedirectedTo($uri, $with = array())
+    public function assertRedirectedTo($uri, $with = [])
     {
         PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $this->response);
 
@@ -110,7 +112,7 @@ trait AssertionsTrait
      * @param  array   $with
      * @return void
      */
-    public function assertRedirectedToRoute($name, $parameters = array(), $with = array())
+    public function assertRedirectedToRoute($name, $parameters = [], $with = [])
     {
         $this->assertRedirectedTo($this->app['url']->route($name, $parameters), $with);
     }
@@ -123,7 +125,7 @@ trait AssertionsTrait
      * @param  array   $with
      * @return void
      */
-    public function assertRedirectedToAction($name, $parameters = array(), $with = array())
+    public function assertRedirectedToAction($name, $parameters = [], $with = [])
     {
         $this->assertRedirectedTo($this->app['url']->action($name, $parameters), $with);
     }
@@ -172,7 +174,7 @@ trait AssertionsTrait
      * @param  mixed  $format
      * @return void
      */
-    public function assertSessionHasErrors($bindings = array(), $format = null)
+    public function assertSessionHasErrors($bindings = [], $format = null)
     {
         $this->assertSessionHas('errors');
 

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Migrations\Migrator;
@@ -76,7 +78,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerCommands()
     {
-        $commands = array('Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status');
+        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status'];
 
         // We'll simply spin through the list of commands that are migration related
         // and register each one of them with an application container. They will
@@ -203,12 +205,12 @@ class MigrationServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
+        return [
             'migrator', 'migration.repository', 'command.migrate',
             'command.migrate.rollback', 'command.migrate.reset',
             'command.migrate.refresh', 'command.migrate.install',
             'command.migrate.status', 'migration.creator',
             'command.migrate.make',
-        );
+        ];
     }
 }

@@ -22,7 +22,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         );
     }
 
-
     /**
      * Tear down Eloquent.
      */
@@ -31,7 +30,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         Eloquent::unsetEventDispatcher();
         Eloquent::unsetConnectionResolver();
     }
-
 
     /**
      * Setup the database schema.
@@ -66,7 +64,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         });
     }
 
-
     /**
      * Tear down the database schema.
      *
@@ -80,11 +77,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('photos');
     }
 
-
     /**
      * Tests...
      */
-
     public function testBasicModelRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -113,7 +108,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $collection->count());
     }
 
-
     public function testBasicModelCollectionRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -128,7 +122,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
         $this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
     }
-
 
     public function testPaginatedModelCollectionRetrieval()
     {
@@ -155,7 +148,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo@gmail.com', $models[0]->email);
     }
 
-
     public function testCountForPaginationWithGrouping()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -168,7 +160,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
-
     public function testListsRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -180,7 +171,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
     }
-
 
     public function testFindOrFail()
     {
@@ -197,7 +187,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('EloquentTestUser', $multiple[1]);
     }
 
-
     /**
      * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -205,7 +194,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         EloquentTestUser::findOrFail(1);
     }
-
 
     /**
      * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
@@ -215,7 +203,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail([1, 2]);
     }
-
 
     public function testOneToOneRelationship()
     {
@@ -230,7 +217,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $user->email);
         $this->assertEquals('First Post', $post->name);
     }
-
 
     public function testOneToManyRelationship()
     {
@@ -251,7 +237,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $post2->user->email);
     }
 
-
     public function testBasicModelHydration()
     {
         EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -266,7 +251,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $models->count());
     }
 
-
     public function testHasOnSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -277,7 +261,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($results));
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
-
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
     {
@@ -292,7 +275,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         });
     }
 
-
     public function testBasicHasManyEagerLoading()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -304,7 +286,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $post = EloquentTestPost::with('user')->where('name', 'First Post')->get();
         $this->assertEquals('taylorotwell@gmail.com', $post->first()->user->email);
     }
-
 
     public function testBasicMorphManyRelationship()
     {
@@ -336,14 +317,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('First Post', $photos[3]->imageable->name);
     }
 
-
     public function testEmptyMorphToRelationship()
     {
         $photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
 
         $this->assertNull($photo->imageable);
     }
-
 
     public function testMultiInsertsWithDifferentValues()
     {
@@ -357,7 +336,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
-
     public function testMultiInsertsWithSameValues()
     {
         $date = '1970-01-01';
@@ -370,15 +348,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
-
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;
 
-        $model->setRawAttributes(array(
+        $model->setRawAttributes([
             'created_at'    => '2012-12-04',
             'updated_at'    => '2012-12-05',
-        ));
+        ]);
 
         $array = $model->toArray();
 
@@ -386,16 +363,15 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('2012-12-05 00:00:00', $array['updated_at']);
     }
 
-
     public function testToArrayIncludesCustomFormattedTimestamps()
     {
         $model = new EloquentTestUser;
         $model->setDateFormat('d-m-y');
 
-        $model->setRawAttributes(array(
+        $model->setRawAttributes([
             'created_at'    => '2012-12-04',
             'updated_at'    => '2012-12-05',
-        ));
+        ]);
 
         $array = $model->toArray();
 
@@ -403,11 +379,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
-
     /**
      * Helpers...
      */
-
 
     /**
      * Get a database connection instance.
@@ -418,7 +392,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         return Eloquent::getConnectionResolver()->connection();
     }
-
 
     /**
      * Get a schema builder instance.
@@ -434,7 +407,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 /**
  * Eloquent Models...
  */
-
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
@@ -482,9 +454,8 @@ class EloquentTestPhoto extends Eloquent
 }
 
 /**
- * Connection Resolver
+ * Connection Resolver.
  */
-
 class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
 {
     protected $connection;
@@ -494,6 +465,7 @@ class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\C
         if (isset($this->connection)) {
             return $this->connection;
         }
+
         return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
     }
     public function getDefaultConnection()

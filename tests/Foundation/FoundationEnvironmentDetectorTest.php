@@ -9,7 +9,6 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testClosureCanBeUsedForCustomEnvironmentDetection()
     {
         $env = new Illuminate\Foundation\EnvironmentDetector;
@@ -18,12 +17,11 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $result);
     }
 
-
     public function testConsoleEnvironmentDetection()
     {
         $env = new Illuminate\Foundation\EnvironmentDetector;
 
-        $result = $env->detect(function () { return 'foobar'; }, array('--env=local'));
+        $result = $env->detect(function () { return 'foobar'; }, ['--env=local']);
         $this->assertEquals('local', $result);
     }
 }

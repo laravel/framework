@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -75,8 +77,8 @@ class HandlerCommandCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return array(
-            array('command', null, InputOption::VALUE_REQUIRED, 'The command class the handler handles.'),
-        );
+        return [
+            ['command', null, InputOption::VALUE_REQUIRED, 'The command class the handler handles.'],
+        ];
     }
 }

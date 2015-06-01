@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Translation;
+<?php
+
+namespace Illuminate\Translation;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -55,6 +57,6 @@ class TranslationServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('translator', 'translation.loader');
+        return ['translator', 'translation.loader'];
     }
 }

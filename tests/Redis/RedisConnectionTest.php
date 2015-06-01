@@ -13,7 +13,6 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertNull($client, 'options parameter should not create as redis server');
     }
 
-
     public function testRedisClusterNotCreateClusterAndOptionsServer()
     {
         $redis = $this->getRedis(true);
@@ -21,7 +20,6 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $client->getConnection()->count());
     }
-
 
     protected function getRedis($cluster = false)
     {
@@ -33,7 +31,7 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase
                 'database' => 0,
             ],
             'options' => [
-                'prefix' => 'prefix:'
+                'prefix' => 'prefix:',
             ],
         ];
 

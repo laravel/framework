@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use League\Flysystem\MountManager;
@@ -29,7 +31,7 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $description = "Publish any publishable assets from vendor packages";
+    protected $description = 'Publish any publishable assets from vendor packages';
 
     /**
      * Create a new command instance.
@@ -56,7 +58,7 @@ class VendorPublishCommand extends Command
         );
 
         if (empty($paths)) {
-            return $this->comment("Nothing to publish.");
+            return $this->comment('Nothing to publish.');
         }
 
         foreach ($paths as $from => $to) {
@@ -81,7 +83,7 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
-        if ($this->files->exists($to) && ! $this->option('force')) {
+        if ($this->files->exists($to) && !$this->option('force')) {
             return;
         }
 
@@ -107,7 +109,7 @@ class VendorPublishCommand extends Command
         ]);
 
         foreach ($manager->listContents('from://', true) as $file) {
-            if ($file['type'] === 'file' && (! $manager->has('to://'.$file['path']) || $this->option('force'))) {
+            if ($file['type'] === 'file' && (!$manager->has('to://'.$file['path']) || $this->option('force'))) {
                 $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
             }
         }
@@ -123,7 +125,7 @@ class VendorPublishCommand extends Command
      */
     protected function createParentDirectory($directory)
     {
-        if (! $this->files->isDirectory($directory)) {
+        if (!$this->files->isDirectory($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
     }
@@ -152,12 +154,12 @@ class VendorPublishCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'),
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'],
 
-            array('provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'),
+            ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'],
 
-            array('tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'),
-        );
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'],
+        ];
     }
 }

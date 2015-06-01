@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Config;
+<?php
+
+namespace Illuminate\Config;
 
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -18,7 +20,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  array  $items
      * @return void
      */
-    public function __construct(array $items = array())
+    public function __construct(array $items = [])
     {
         $this->items = $items;
     }

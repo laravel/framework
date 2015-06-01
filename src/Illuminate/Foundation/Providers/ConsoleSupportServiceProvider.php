@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Providers;
+<?php
+
+namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\AggregateServiceProvider;
 

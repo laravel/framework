@@ -12,7 +12,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/file.txt');
     }
 
-
     public function testPutStoresFiles()
     {
         $files = new Filesystem;
@@ -20,7 +19,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
         @unlink(__DIR__.'/file.txt');
     }
-
 
     public function testDeleteRemovesFiles()
     {
@@ -31,7 +29,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/file.txt');
     }
 
-
     public function testPrependExistingFiles()
     {
         $files = new Filesystem;
@@ -41,7 +38,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/file.txt');
     }
 
-
     public function testPrependNewFiles()
     {
         $files = new Filesystem;
@@ -49,7 +45,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
         @unlink(__DIR__.'/file.txt');
     }
-
 
     public function testDeleteDirectory()
     {
@@ -60,7 +55,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(is_dir(__DIR__.'/foo'));
         $this->assertFileNotExists(__DIR__.'/foo/file.txt');
     }
-
 
     public function testCleanDirectory()
     {
@@ -73,7 +67,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @rmdir(__DIR__.'/foo');
     }
 
-
     public function testMacro()
     {
         file_put_contents(__DIR__.'/foo.txt', 'Hello World');
@@ -83,7 +76,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
-
     public function testFilesMethod()
     {
         mkdir(__DIR__.'/foo');
@@ -91,7 +83,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         file_put_contents(__DIR__.'/foo/2.txt', '2');
         mkdir(__DIR__.'/foo/bar');
         $files = new Filesystem;
-        $this->assertEquals(array(__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'), $files->files(__DIR__.'/foo'));
+        $this->assertEquals([__DIR__.'/foo/1.txt', __DIR__.'/foo/2.txt'], $files->files(__DIR__.'/foo'));
         unset($files);
         @unlink(__DIR__.'/foo/1.txt');
         @unlink(__DIR__.'/foo/2.txt');
@@ -99,13 +91,11 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @rmdir(__DIR__.'/foo');
     }
 
-
     public function testCopyDirectoryReturnsFalseIfSourceIsntDirectory()
     {
         $files = new Filesystem;
         $this->assertFalse($files->copyDirectory(__DIR__.'/foo/bar/baz/breeze/boom', __DIR__));
     }
-
 
     public function testCopyDirectoryMovesEntireDirectory()
     {
@@ -136,7 +126,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         rmdir(__DIR__.'/tmp2');
     }
 
-
     /**
      * @expectedException Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -146,7 +135,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $files->get(__DIR__.'/unknown-file.txt');
     }
 
-
     public function testGetRequireReturnsProperly()
     {
         file_put_contents(__DIR__.'/file.php', '<?php return "Howdy?"; ?>');
@@ -154,7 +142,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Howdy?', $files->getRequire(__DIR__.'/file.php'));
         @unlink(__DIR__.'/file.php');
     }
-
 
     /**
      * @expectedException Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -164,7 +151,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $files = new Filesystem;
         $files->getRequire(__DIR__.'/file.php');
     }
-
 
     public function testAppendAddsDataToFile()
     {
@@ -177,7 +163,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/file.txt');
     }
 
-
     public function testMoveMovesFiles()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');
@@ -188,7 +173,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/bar.txt');
     }
 
-
     public function testExtensionReturnsExtension()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');
@@ -196,7 +180,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('txt', $files->extension(__DIR__.'/foo.txt'));
         @unlink(__DIR__.'/foo.txt');
     }
-
 
     public function testTypeIndentifiesFile()
     {
@@ -206,7 +189,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
-
     public function testTypeIndentifiesDirectory()
     {
         mkdir(__DIR__.'/foo');
@@ -214,7 +196,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('dir', $files->type(__DIR__.'/foo'));
         @rmdir(__DIR__.'/foo');
     }
-
 
     public function testSizeOutputsSize()
     {
@@ -224,7 +205,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
-
     public function testMimeTypeOutputsMimeType()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');
@@ -232,7 +212,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('text/plain', $files->mimeType(__DIR__.'/foo.txt'));
         @unlink(__DIR__.'/foo.txt');
     }
-
 
     public function testIsWritable()
     {
@@ -245,7 +224,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
-
     public function testGlobFindsFiles()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');
@@ -257,7 +235,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
         @unlink(__DIR__.'/bar.txt');
     }
-
 
     public function testAllFilesFindsFiles()
     {
@@ -273,7 +250,6 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
         @unlink(__DIR__.'/bar.txt');
     }
-
 
     public function testDirectoriesFindsDirectories()
     {

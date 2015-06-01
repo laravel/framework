@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
@@ -32,7 +34,7 @@ class LoadConfiguration
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
-        if (! isset($loadedFromCache)) {
+        if (!isset($loadedFromCache)) {
             $this->loadConfigurationFiles($app, $config);
         }
 

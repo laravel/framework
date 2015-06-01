@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php
+
+namespace Illuminate\Database\Migrations;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -38,7 +40,7 @@ class Migrator
      *
      * @var array
      */
-    protected $notes = array();
+    protected $notes = [];
 
     /**
      * Create a new migrator instance.
@@ -66,7 +68,7 @@ class Migrator
      */
     public function run($path, $pretend = false)
     {
-        $this->notes = array();
+        $this->notes = [];
 
         $files = $this->getMigrationFiles($path);
 
@@ -147,7 +149,7 @@ class Migrator
      */
     public function rollback($pretend = false)
     {
-        $this->notes = array();
+        $this->notes = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
@@ -239,7 +241,7 @@ class Migrator
         // extension and take the basename of the file which is all we need when
         // finding the migrations that haven't been run against the databases.
         if ($files === false) {
-            return array();
+            return [];
         }
 
         $files = array_map(function ($file) {
@@ -361,7 +363,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
+        if (!is_null($name)) {
             $this->resolver->setDefaultConnection($name);
         }
 

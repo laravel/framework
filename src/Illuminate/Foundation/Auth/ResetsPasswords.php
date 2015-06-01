@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Auth;
+<?php
+
+namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;

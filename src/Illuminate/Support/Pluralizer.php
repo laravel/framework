@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use Doctrine\Common\Inflector\Inflector;
 
@@ -9,7 +11,7 @@ class Pluralizer
      *
      * @var array
      */
-    public static $uncountable = array(
+    public static $uncountable = [
         'audio',
         'bison',
         'chassis',
@@ -33,7 +35,7 @@ class Pluralizer
         'species',
         'swine',
         'traffic',
-    );
+    ];
 
     /**
      * Get the plural form of an English word.
@@ -86,7 +88,7 @@ class Pluralizer
      */
     protected static function matchCase($value, $comparison)
     {
-        $functions = array('mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords');
+        $functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
 
         foreach ($functions as $function) {
             if (call_user_func($function, $comparison) === $comparison) {

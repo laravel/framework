@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Auth;
+<?php
+
+namespace Illuminate\Contracts\Auth;
 
 interface Guard
 {
@@ -29,7 +31,7 @@ interface Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function once(array $credentials = array());
+    public function once(array $credentials = []);
 
     /**
      * Attempt to authenticate a user using the given credentials.
@@ -39,7 +41,7 @@ interface Guard
      * @param  bool   $login
      * @return bool
      */
-    public function attempt(array $credentials = array(), $remember = false, $login = true);
+    public function attempt(array $credentials = [], $remember = false, $login = true);
 
     /**
      * Attempt to authenticate using HTTP Basic Auth.
@@ -63,7 +65,7 @@ interface Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(array $credentials = array());
+    public function validate(array $credentials = []);
 
     /**
      * Log a user into the application.

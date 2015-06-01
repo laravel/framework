@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth\Passwords;
+<?php
+
+namespace Illuminate\Auth\Passwords;
 
 use Closure;
 use UnexpectedValueException;
@@ -110,7 +112,7 @@ class PasswordBroker implements PasswordBrokerContract
         return $this->mailer->send($view, compact('token', 'user'), function ($m) use ($user, $token, $callback) {
             $m->to($user->getEmailForPasswordReset());
 
-            if (! is_null($callback)) {
+            if (!is_null($callback)) {
                 call_user_func($callback, $m, $user, $token);
             }
         });
@@ -130,7 +132,7 @@ class PasswordBroker implements PasswordBrokerContract
         // the user is properly redirected having an error message on the post.
         $user = $this->validateReset($credentials);
 
-        if (! $user instanceof CanResetPasswordContract) {
+        if (!$user instanceof CanResetPasswordContract) {
             return $user;
         }
 
@@ -158,11 +160,11 @@ class PasswordBroker implements PasswordBrokerContract
             return PasswordBrokerContract::INVALID_USER;
         }
 
-        if (! $this->validateNewPassword($credentials)) {
+        if (!$this->validateNewPassword($credentials)) {
             return PasswordBrokerContract::INVALID_PASSWORD;
         }
 
-        if (! $this->tokens->exists($user, $credentials['token'])) {
+        if (!$this->tokens->exists($user, $credentials['token'])) {
             return PasswordBrokerContract::INVALID_TOKEN;
         }
 
@@ -231,8 +233,8 @@ class PasswordBroker implements PasswordBrokerContract
 
         $user = $this->users->retrieveByCredentials($credentials);
 
-        if ($user && ! $user instanceof CanResetPasswordContract) {
-            throw new UnexpectedValueException("User must implement CanResetPassword interface.");
+        if ($user && !$user instanceof CanResetPasswordContract) {
+            throw new UnexpectedValueException('User must implement CanResetPassword interface.');
         }
 
         return $user;

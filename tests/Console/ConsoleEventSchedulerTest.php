@@ -10,7 +10,6 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testExecCreatesNewCommand()
     {
         $schedule = new Schedule;
@@ -29,7 +28,6 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('path/to/command -f --foo="bar"', $events[4]->command);
         $this->assertEquals('path/to/command --title="A \"real\" test"', $events[5]->command);
     }
-
 
     public function testCommandCreatesNewArtisanCommand()
     {

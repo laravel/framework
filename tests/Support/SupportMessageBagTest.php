@@ -10,16 +10,14 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testUniqueness()
     {
         $container = new MessageBag;
         $container->add('foo', 'bar');
         $container->add('foo', 'bar');
         $messages = $container->getMessages();
-        $this->assertEquals(array('bar'), $messages['foo']);
+        $this->assertEquals(['bar'], $messages['foo']);
     }
-
 
     public function testMessagesAreAdded()
     {
@@ -29,27 +27,24 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'baz');
         $container->add('boom', 'bust');
         $messages = $container->getMessages();
-        $this->assertEquals(array('bar', 'baz'), $messages['foo']);
-        $this->assertEquals(array('bust'), $messages['boom']);
+        $this->assertEquals(['bar', 'baz'], $messages['foo']);
+        $this->assertEquals(['bust'], $messages['boom']);
     }
-
 
     public function testMessagesMayBeMerged()
     {
-        $container = new MessageBag(array('username' => array('foo')));
-        $container->merge(array('username' => array('bar')));
-        $this->assertEquals(array('username' => array('foo', 'bar')), $container->getMessages());
+        $container = new MessageBag(['username' => ['foo']]);
+        $container->merge(['username' => ['bar']]);
+        $this->assertEquals(['username' => ['foo', 'bar']], $container->getMessages());
     }
-
 
     public function testMessageBagsCanBeMerged()
     {
-        $container = new MessageBag(array('foo' => array('bar')));
-        $otherContainer = new MessageBag(array('foo' => array('baz'), 'bar' => array('foo')));
+        $container = new MessageBag(['foo' => ['bar']]);
+        $otherContainer = new MessageBag(['foo' => ['baz'], 'bar' => ['foo']]);
         $container->merge($otherContainer);
-        $this->assertEquals(array('foo' => array('bar', 'baz'), 'bar' => array('foo')), $container->getMessages());
+        $this->assertEquals(['foo' => ['bar', 'baz'], 'bar' => ['foo']], $container->getMessages());
     }
-
 
     public function testGetReturnsArrayOfMessagesByKey()
     {
@@ -57,9 +52,8 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
-        $this->assertEquals(array('bar', 'baz'), $container->get('foo'));
+        $this->assertEquals(['bar', 'baz'], $container->get('foo'));
     }
-
 
     public function testFirstReturnsSingleMessage()
     {
@@ -71,7 +65,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $container->first('foo'));
     }
 
-
     public function testHasIndicatesExistence()
     {
         $container = new MessageBag;
@@ -81,16 +74,14 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($container->has('bar'));
     }
 
-
     public function testAllReturnsAllMessages()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
-        $this->assertEquals(array('bar', 'baz'), $container->all());
+        $this->assertEquals(['bar', 'baz'], $container->all());
     }
-
 
     public function testFormatIsRespected()
     {
@@ -99,16 +90,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
         $this->assertEquals('<p>bar</p>', $container->first('foo'));
-        $this->assertEquals(array('<p>bar</p>'), $container->get('foo'));
-        $this->assertEquals(array('<p>bar</p>', '<p>baz</p>'), $container->all());
+        $this->assertEquals(['<p>bar</p>'], $container->get('foo'));
+        $this->assertEquals(['<p>bar</p>', '<p>baz</p>'], $container->all());
         $this->assertEquals('bar', $container->first('foo', ':message'));
-        $this->assertEquals(array('bar'), $container->get('foo', ':message'));
-        $this->assertEquals(array('bar', 'baz'), $container->all(':message'));
+        $this->assertEquals(['bar'], $container->get('foo', ':message'));
+        $this->assertEquals(['bar', 'baz'], $container->all(':message'));
 
         $container->setFormat(':key :message');
         $this->assertEquals('foo bar', $container->first('foo'));
     }
-
 
     public function testMessageBagReturnsCorrectArray()
     {
@@ -117,9 +107,8 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
 
-        $this->assertEquals(array('foo' => array('bar'), 'boom' => array('baz')), $container->toArray());
+        $this->assertEquals(['foo' => ['bar'], 'boom' => ['baz']], $container->toArray());
     }
-
 
     public function testMessageBagReturnsExpectedJson()
     {
@@ -130,7 +119,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
     }
-
 
     public function testCountReturnsCorrectValue()
     {
@@ -144,7 +132,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $container->count());
     }
 
-
     public function testCountable()
     {
         $container = new MessageBag;
@@ -155,10 +142,9 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(2, $container);
     }
 
-
     public function testConstructor()
     {
-        $messageBag = new MessageBag(array('country' => 'Azerbaijan', 'capital' => 'Baku'));
-        $this->assertEquals(array('country' => array('Azerbaijan'), 'capital' => array('Baku')), $messageBag->getMessages());
+        $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
+        $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
     }
 }

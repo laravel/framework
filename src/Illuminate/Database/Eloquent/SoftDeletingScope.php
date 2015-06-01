@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 class SoftDeletingScope implements ScopeInterface
 {
@@ -56,9 +58,9 @@ class SoftDeletingScope implements ScopeInterface
         $builder->onDelete(function (Builder $builder) {
             $column = $this->getDeletedAtColumn($builder);
 
-            return $builder->update(array(
+            return $builder->update([
                 $column => $builder->getModel()->freshTimestampString(),
-            ));
+            ]);
         });
     }
 
@@ -101,7 +103,7 @@ class SoftDeletingScope implements ScopeInterface
         $builder->macro('restore', function (Builder $builder) {
             $builder->withTrashed();
 
-            return $builder->update(array($builder->getModel()->getDeletedAtColumn() => null));
+            return $builder->update([$builder->getModel()->getDeletedAtColumn() => null]);
         });
     }
 

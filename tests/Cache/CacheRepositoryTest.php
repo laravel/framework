@@ -9,14 +9,12 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testGetReturnsValueFromCache()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $this->assertEquals('bar', $repo->get('foo'));
     }
-
 
     public function testDefaultValueIsReturned()
     {
@@ -26,14 +24,12 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $repo->get('boom', function () { return 'baz'; }));
     }
 
-
     public function testSettingDefaultCacheTime()
     {
         $repo = $this->getRepository();
         $repo->setDefaultCacheTime(10);
         $this->assertEquals(10, $repo->getDefaultCacheTime());
     }
-
 
     public function testHasMethod()
     {
@@ -45,7 +41,6 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($repo->has('foo'));
     }
 
-
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -54,7 +49,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $result = $repo->remember('foo', 10, function () { return 'bar'; });
         $this->assertEquals('bar', $result);
 
-        /**
+        /*
          * Use Carbon object...
          */
         // $repo = $this->getRepository();
@@ -63,7 +58,6 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         // $result = $repo->remember('foo', Carbon\Carbon::now()->addMinutes(10), function() { return 'bar'; });
         // $this->assertEquals('bar', $result);
     }
-
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
@@ -74,14 +68,12 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $result);
     }
 
-
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();
         $repo::macro(__CLASS__, function () { return 'Taylor'; });
         $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
     }
-
 
     protected function getRepository()
     {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session;
+<?php
+
+namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\Console\SessionTableCommand;
@@ -33,6 +35,6 @@ class CommandsServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('command.session.database');
+        return ['command.session.database'];
     }
 }

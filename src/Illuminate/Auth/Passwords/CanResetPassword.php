@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth\Passwords;
+<?php
+
+namespace Illuminate\Auth\Passwords;
 
 trait CanResetPassword
 {

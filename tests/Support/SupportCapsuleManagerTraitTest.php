@@ -23,7 +23,6 @@ class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Illuminate\Support\Fluent', $app['config']);
     }
 
-
     public function testSetupContainerForCapsuleWhenConfigIsBound()
     {
         $this->container = null;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console\Scheduling;
+<?php
+
+namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Carbon\Carbon;
@@ -196,7 +198,7 @@ class Event
      */
     public function isDue(Application $app)
     {
-        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
+        if (!$this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
         }
 
@@ -229,7 +231,7 @@ class Event
      */
     protected function filtersPass(Application $app)
     {
-        if (($this->filter && ! $app->call($this->filter)) ||
+        if (($this->filter && !$app->call($this->filter)) ||
              $this->reject && $app->call($this->reject)) {
             return false;
         }
@@ -618,7 +620,7 @@ class Event
     public function emailOutputTo($addresses)
     {
         if (is_null($this->output) || $this->output == '/dev/null') {
-            throw new LogicException("Must direct output to a file in order to e-mail results.");
+            throw new LogicException('Must direct output to a file in order to e-mail results.');
         }
 
         $addresses = is_array($addresses) ? $addresses : func_get_args();

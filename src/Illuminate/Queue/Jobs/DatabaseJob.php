@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Container\Container;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema\Grammars;
+<?php
+
+namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
@@ -11,14 +13,14 @@ class MySqlGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = array('Unsigned', 'Charset', 'Collate', 'Nullable', 'Default', 'Increment', 'Comment', 'After');
+    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Nullable', 'Default', 'Increment', 'Comment', 'After'];
 
     /**
      * The possible column serials.
      *
      * @var array
      */
-    protected $serials = array('bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger');
+    protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * Compile the query to determine the list of tables.
@@ -37,7 +39,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileColumnExists()
     {
-        return "select column_name from information_schema.columns where table_schema = ? and table_name = ?";
+        return 'select column_name from information_schema.columns where table_schema = ? and table_name = ?';
     }
 
     /**
@@ -78,13 +80,13 @@ class MySqlGrammar extends Grammar
     {
         if (isset($blueprint->charset)) {
             $sql .= ' default character set '.$blueprint->charset;
-        } elseif (! is_null($charset = $connection->getConfig('charset'))) {
+        } elseif (!is_null($charset = $connection->getConfig('charset'))) {
             $sql .= ' default character set '.$charset;
         }
 
         if (isset($blueprint->collation)) {
             $sql .= ' collate '.$blueprint->collation;
-        } elseif (! is_null($collation = $connection->getConfig('collation'))) {
+        } elseif (!is_null($collation = $connection->getConfig('collation'))) {
             $sql .= ' collate '.$collation;
         }
 
@@ -458,7 +460,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
-        return "text";
+        return 'text';
     }
 
     /**
@@ -524,7 +526,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if (! $column->nullable) {
+        if (!$column->nullable) {
             return 'timestamp default 0';
         }
 
@@ -539,7 +541,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if (! $column->nullable) {
+        if (!$column->nullable) {
             return 'timestamp default 0';
         }
 
@@ -580,7 +582,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyCharset(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->charset)) {
+        if (!is_null($column->charset)) {
             return ' character set '.$column->charset;
         }
     }
@@ -594,7 +596,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (!is_null($column->collation)) {
             return ' collate '.$column->collation;
         }
     }
@@ -620,8 +622,8 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
-            return " default ".$this->getDefaultValue($column->default);
+        if (!is_null($column->default)) {
+            return ' default '.$this->getDefaultValue($column->default);
         }
     }
 
@@ -648,7 +650,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyAfter(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->after)) {
+        if (!is_null($column->after)) {
             return ' after '.$this->wrap($column->after);
         }
     }
@@ -662,7 +664,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->comment)) {
+        if (!is_null($column->comment)) {
             return ' comment "'.$column->comment.'"';
         }
     }

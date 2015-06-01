@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Http\Exception;
+<?php
+
+namespace Illuminate\Http\Exception;
 
 use Exception;
 

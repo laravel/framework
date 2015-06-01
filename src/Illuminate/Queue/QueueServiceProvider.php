@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use IlluminateQueueClosure;
 use Illuminate\Support\ServiceProvider;
@@ -161,7 +163,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (array('Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs', 'Iron') as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs', 'Iron'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -310,10 +312,10 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
+        return [
             'queue', 'queue.worker', 'queue.listener', 'queue.failer',
             'command.queue.work', 'command.queue.listen', 'command.queue.restart',
             'command.queue.subscribe', 'queue.connection',
-        );
+        ];
     }
 }

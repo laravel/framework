@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Validation;
+<?php
+
+namespace Illuminate\Validation;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;

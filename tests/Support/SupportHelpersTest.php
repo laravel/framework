@@ -4,49 +4,44 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 {
     public function testArrayBuild()
     {
-        $this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function ($key, $value) {
-            return array($key, $value);
+        $this->assertEquals(['foo' => 'bar'], array_build(['foo' => 'bar'], function ($key, $value) {
+            return [$key, $value];
         }));
     }
 
-
     public function testArrayDot()
     {
-        $array = array_dot(array('name' => 'taylor', 'languages' => array('php' => true)));
-        $this->assertEquals($array, array('name' => 'taylor', 'languages.php' => true));
+        $array = array_dot(['name' => 'taylor', 'languages' => ['php' => true]]);
+        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
     }
-
 
     public function testArrayGet()
     {
-        $array = array('names' => array('developer' => 'taylor'));
+        $array = ['names' => ['developer' => 'taylor']];
         $this->assertEquals('taylor', array_get($array, 'names.developer'));
         $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', 'dayle'));
         $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function () { return 'dayle'; }));
     }
 
-
     public function testArrayHas()
     {
-        $array = array('names' => array('developer' => 'taylor'));
+        $array = ['names' => ['developer' => 'taylor']];
         $this->assertTrue(array_has($array, 'names'));
         $this->assertTrue(array_has($array, 'names.developer'));
         $this->assertFalse(array_has($array, 'foo'));
         $this->assertFalse(array_has($array, 'foo.bar'));
     }
 
-
     public function testArraySet()
     {
-        $array = array();
+        $array = [];
         array_set($array, 'names.developer', 'taylor');
         $this->assertEquals('taylor', $array['names']['developer']);
     }
 
-
     public function testArrayForget()
     {
-        $array = array('names' => array('developer' => 'taylor', 'otherDeveloper' => 'dayle'));
+        $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle']];
         array_forget($array, 'names.developer');
         $this->assertFalse(isset($array['names']['developer']));
         $this->assertTrue(isset($array['names']['otherDeveloper']));
@@ -63,14 +58,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $array);
     }
 
-
     public function testArrayPluckWithArrayAndObjectValues()
     {
-        $array = array((object) array('name' => 'taylor', 'email' => 'foo'), array('name' => 'dayle', 'email' => 'bar'));
-        $this->assertEquals(array('taylor', 'dayle'), array_pluck($array, 'name'));
-        $this->assertEquals(array('taylor' => 'foo', 'dayle' => 'bar'), array_pluck($array, 'email', 'name'));
+        $array = [(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']];
+        $this->assertEquals(['taylor', 'dayle'], array_pluck($array, 'name'));
+        $this->assertEquals(['taylor' => 'foo', 'dayle' => 'bar'], array_pluck($array, 'email', 'name'));
     }
-
 
     public function testArrayPluckWithNestedKeys()
     {
@@ -80,7 +73,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, 'user.1', 'user.0'));
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
     }
-
 
     public function testArrayExcept()
     {
@@ -94,14 +86,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['framework' => ['language' => 'PHP']], array_except($array, ['name', 'framework.name']));
     }
 
-
     public function testArrayOnly()
     {
-        $array = array('name' => 'taylor', 'age' => 26);
-        $this->assertEquals(array('name' => 'taylor'), array_only($array, array('name')));
-        $this->assertSame(array(), array_only($array, array('nonExistingKey')));
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor'], array_only($array, ['name']));
+        $this->assertSame([], array_only($array, ['nonExistingKey']));
     }
-
 
     public function testArrayCollapse()
     {
@@ -109,72 +99,67 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], array_collapse($array));
     }
 
-
     public function testArrayDivide()
     {
-        $array = array('name' => 'taylor');
+        $array = ['name' => 'taylor'];
         list($keys, $values) = array_divide($array);
-        $this->assertEquals(array('name'), $keys);
-        $this->assertEquals(array('taylor'), $values);
+        $this->assertEquals(['name'], $keys);
+        $this->assertEquals(['taylor'], $values);
     }
-
 
     public function testArrayFirst()
     {
-        $array = array('name' => 'taylor', 'otherDeveloper' => 'dayle');
+        $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];
         $this->assertEquals('dayle', array_first($array, function ($key, $value) { return $value == 'dayle'; }));
     }
 
     public function testArrayLast()
     {
-        $array = array(100, 250, 290, 320, 500, 560, 670);
+        $array = [100, 250, 290, 320, 500, 560, 670];
         $this->assertEquals(670, array_last($array, function ($key, $value) { return $value > 320; }));
     }
 
-
     public function testArrayFetch()
     {
-        $data = array(
-            'post-1' => array(
-                'comments' => array(
-                    'tags' => array(
+        $data = [
+            'post-1' => [
+                'comments' => [
+                    'tags' => [
                         '#foo', '#bar',
-                    ),
-                ),
-            ),
-            'post-2' => array(
-                'comments' => array(
-                    'tags' => array(
+                    ],
+                ],
+            ],
+            'post-2' => [
+                'comments' => [
+                    'tags' => [
                         '#baz',
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
-        $this->assertEquals(array(
-            0 => array(
-                'tags' => array(
+        $this->assertEquals([
+            0 => [
+                'tags' => [
                     '#foo', '#bar',
-                ),
-            ),
-            1 => array(
-                'tags' => array(
+                ],
+            ],
+            1 => [
+                'tags' => [
                     '#baz',
-                ),
-            ),
-        ), array_fetch($data, 'comments'));
+                ],
+            ],
+        ], array_fetch($data, 'comments'));
 
-        $this->assertEquals(array(array('#foo', '#bar'), array('#baz')), array_fetch($data, 'comments.tags'));
+        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_fetch($data, 'comments.tags'));
         $this->assertEquals([], array_fetch($data, 'foo'));
         $this->assertEquals([], array_fetch($data, 'foo.bar'));
     }
 
-
     public function testArrayFlatten()
     {
-        $this->assertEquals(array('#foo', '#bar', '#baz'), array_flatten(array(array('#foo', '#bar'), array('#baz'))));
+        $this->assertEquals(['#foo', '#bar', '#baz'], array_flatten([['#foo', '#bar'], ['#baz']]));
     }
-
 
     public function testStrIs()
     {
@@ -191,7 +176,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(str_is('foo?bar', 'fobar'));
     }
 
-
     public function testStrRandom()
     {
         $result = str_random(20);
@@ -199,34 +183,30 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(20, strlen($result));
     }
 
-
     public function testStartsWith()
     {
         $this->assertTrue(starts_with('jason', 'jas'));
-        $this->assertTrue(starts_with('jason', array('jas')));
+        $this->assertTrue(starts_with('jason', ['jas']));
         $this->assertFalse(starts_with('jason', 'day'));
-        $this->assertFalse(starts_with('jason', array('day')));
+        $this->assertFalse(starts_with('jason', ['day']));
     }
-
 
     public function testEndsWith()
     {
         $this->assertTrue(ends_with('jason', 'on'));
-        $this->assertTrue(ends_with('jason', array('on')));
+        $this->assertTrue(ends_with('jason', ['on']));
         $this->assertFalse(ends_with('jason', 'no'));
-        $this->assertFalse(ends_with('jason', array('no')));
+        $this->assertFalse(ends_with('jason', ['no']));
     }
-
 
     public function testStrContains()
     {
         $this->assertTrue(str_contains('taylor', 'ylo'));
-        $this->assertTrue(str_contains('taylor', array('ylo')));
+        $this->assertTrue(str_contains('taylor', ['ylo']));
         $this->assertFalse(str_contains('taylor', 'xxx'));
-        $this->assertFalse(str_contains('taylor', array('xxx')));
-        $this->assertTrue(str_contains('taylor', array('xxx', 'taylor')));
+        $this->assertFalse(str_contains('taylor', ['xxx']));
+        $this->assertTrue(str_contains('taylor', ['xxx', 'taylor']));
     }
-
 
     public function testStrFinish()
     {
@@ -235,13 +215,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test/string/', str_finish('test/string//', '/'));
     }
 
-
     public function testSnakeCase()
     {
         $this->assertEquals('foo_bar', snake_case('fooBar'));
         $this->assertEquals('foo_bar', snake_case('fooBar')); // test cache
     }
-
 
     public function testStrLimit()
     {
@@ -255,7 +233,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('这是一', str_limit($nonAsciiString, 6, ''));
     }
 
-
     public function testCamelCase()
     {
         $this->assertEquals('fooBar', camel_case('FooBar'));
@@ -264,7 +241,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('fooBarBaz', camel_case('Foo-barBaz'));
         $this->assertEquals('fooBarBaz', camel_case('foo-bar_baz'));
     }
-
 
     public function testStudlyCase()
     {
@@ -275,20 +251,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('FooBarBaz', studly_case('foo-bar_baz'));
     }
 
-
     public function testClassBasename()
     {
         $this->assertEquals('Baz', class_basename('Foo\Bar\Baz'));
         $this->assertEquals('Baz', class_basename('Baz'));
     }
 
-
     public function testValue()
     {
         $this->assertEquals('foo', value('foo'));
         $this->assertEquals('foo', value(function () { return 'foo'; }));
     }
-
 
     public function testObjectGet()
     {
@@ -299,12 +272,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', object_get($class, 'name.first'));
     }
 
-
     public function testDataGet()
     {
-        $object = (object) array('users' => array('name' => array('Taylor', 'Otwell')));
-        $array = array((object) array('users' => array((object) array('name' => 'Taylor'))));
-        $dottedArray = array('users' => array('first.name' => 'Taylor'));
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
+        $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
+        $dottedArray = ['users' => ['first.name' => 'Taylor']];
         $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John'])]);
 
         $this->assertEquals('Taylor', data_get($object, 'users.name.0'));
@@ -322,22 +294,20 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
     }
 
-
     public function testArraySort()
     {
-        $array = array(
-            array('name' => 'baz'),
-            array('name' => 'foo'),
-            array('name' => 'bar'),
-        );
+        $array = [
+            ['name' => 'baz'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ];
 
-        $this->assertEquals(array(
-            array('name' => 'bar'),
-            array('name' => 'baz'),
-            array('name' => 'foo')),
+        $this->assertEquals([
+            ['name' => 'bar'],
+            ['name' => 'baz'],
+            ['name' => 'foo'], ],
         array_values(array_sort($array, function ($v) { return $v['name']; })));
     }
-
 
     public function testArrayWhere()
     {
@@ -350,20 +320,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         ));
     }
 
-
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
         $this->assertEquals('a', head($array));
     }
 
-
     public function testLast()
     {
         $array = ['a', 'b', 'c'];
         $this->assertEquals('c', last($array));
     }
-
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
@@ -374,19 +341,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         class_uses_recursive('SupportTestClassTwo'));
     }
 
-
     public function testArrayAdd()
     {
-        $this->assertEquals(array('surname' => 'Mövsümov'), array_add(array(), 'surname', 'Mövsümov'));
-        $this->assertEquals(array('developer' => array('name' => 'Ferid')), array_add(array(), 'developer.name', 'Ferid'));
+        $this->assertEquals(['surname' => 'Mövsümov'], array_add([], 'surname', 'Mövsümov'));
+        $this->assertEquals(['developer' => ['name' => 'Ferid']], array_add([], 'developer.name', 'Ferid'));
     }
-
 
     public function testArrayPull()
     {
-        $developer = array('firstname' => 'Ferid', 'surname' => 'Mövsümov');
+        $developer = ['firstname' => 'Ferid', 'surname' => 'Mövsümov'];
         $this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
-        $this->assertEquals(array('firstname' => 'Ferid'), $developer);
+        $this->assertEquals(['firstname' => 'Ferid'], $developer);
     }
 }
 

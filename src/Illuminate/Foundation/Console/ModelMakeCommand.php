@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -70,8 +72,8 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return array(
-            array('migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'),
-        );
+        return [
+            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+        ];
     }
 }

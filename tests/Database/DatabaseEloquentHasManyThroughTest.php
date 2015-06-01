@@ -12,30 +12,27 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = array()) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) { return new Collection($array); });
         $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
-        $models = $relation->initRelation(array($model), 'foo');
+        $models = $relation->initRelation([$model], 'foo');
 
-        $this->assertEquals(array($model), $models);
+        $this->assertEquals([$model], $models);
     }
-
 
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('users.country_id', array(1, 2));
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('users.country_id', [1, 2]);
         $model1 = new EloquentHasManyThroughModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasManyThroughModelStub;
         $model2->id = 2;
-        $relation->addEagerConstraints(array($model1, $model2));
+        $relation->addEagerConstraints([$model1, $model2]);
     }
-
 
     public function testModelsAreProperlyMatchedToParents()
     {
@@ -56,7 +53,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $model3->id = 3;
 
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
-        $models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
+        $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
         $this->assertEquals(1, count($models[0]->foo));
@@ -85,7 +82,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $model3->id = 3;
 
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
-        $models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
+        $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
         $this->assertEquals(1, count($models[0]->foo));
@@ -95,10 +92,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($models[2]->foo));
     }
 
-
     public function testAllColumnsAreSelectedByDefault()
     {
-        $select = array('posts.*', 'users.country_id');
+        $select = ['posts.*', 'users.country_id'];
 
         $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
 
@@ -108,18 +104,17 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $builder = $relation->getQuery();
         $builder->shouldReceive('getQuery')->andReturn($baseBuilder);
         $builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
-        $builder->shouldReceive('getModels')->once()->andReturn(array());
+        $builder->shouldReceive('getModels')->once()->andReturn([]);
 
         $relation->get();
     }
-
 
     public function testOnlyProperColumnsAreSelectedIfProvided()
     {
-        $select = array('users.country_id');
+        $select = ['users.country_id'];
 
         $baseBuilder = m::mock('Illuminate\Database\Query\Builder');
-        $baseBuilder->columns = array('foo', 'bar');
+        $baseBuilder->columns = ['foo', 'bar'];
 
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('newCollection')->once();
@@ -127,11 +122,10 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $builder = $relation->getQuery();
         $builder->shouldReceive('getQuery')->andReturn($baseBuilder);
         $builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
-        $builder->shouldReceive('getModels')->once()->andReturn(array());
+        $builder->shouldReceive('getModels')->once()->andReturn([]);
 
         $relation->get();
     }
-
 
     public function testFirstMethod()
     {
@@ -141,7 +135,6 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('first', $relation->first());
     }
-
 
     public function testFindMethod()
     {
@@ -155,7 +148,6 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->find('foo');
     }
 
-
     public function testFindManyMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
@@ -168,7 +160,6 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->findMany(['foo', 'bar']);
     }
 
-
     public function testIgnoreSoftDeletingParent()
     {
         list($builder, $country, , $firstKey, $secondKey) = $this->getRelationArguments();
@@ -178,7 +169,6 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
 
         $relation = new HasManyThrough($builder, $country, $user, $firstKey, $secondKey, 'id');
     }
-
 
     protected function getRelation()
     {

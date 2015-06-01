@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
@@ -69,11 +71,11 @@ class SqsJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->sqs->deleteMessage(array(
+        $this->sqs->deleteMessage([
 
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
 
-        ));
+        ]);
     }
 
     /**

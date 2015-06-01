@@ -9,7 +9,6 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testBasicEventBroadcastParameterFormatting()
     {
         $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
@@ -27,7 +26,6 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
 
         (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
     }
-
 
     public function testManualParameterSpecification()
     {
@@ -48,7 +46,6 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
 class TestBroadcastEvent
 {
     public $firstName = 'Taylor';
@@ -64,7 +61,6 @@ class TestBroadcastEvent
         return ['test-channel'];
     }
 }
-
 
 class TestBroadcastEventWithManualData extends TestBroadcastEvent
 {

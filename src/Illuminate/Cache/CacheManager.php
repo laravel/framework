@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 use Closure;
 use InvalidArgumentException;
@@ -91,7 +93,7 @@ class CacheManager implements FactoryContract
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         } else {
-            return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
+            return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
         }
     }
 
@@ -304,6 +306,6 @@ class CacheManager implements FactoryContract
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->store(), $method), $parameters);
+        return call_user_func_array([$this->store(), $method], $parameters);
     }
 }

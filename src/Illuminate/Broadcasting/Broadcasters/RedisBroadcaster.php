@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Broadcasting\Broadcasters;
+<?php
+
+namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
@@ -35,7 +37,7 @@ class RedisBroadcaster implements Broadcaster
     /**
      * {@inheritdoc}
      */
-    public function broadcast(array $channels, $event, array $payload = array())
+    public function broadcast(array $channels, $event, array $payload = [])
     {
         $connection = $this->redis->connection($this->connection);
 

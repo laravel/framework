@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Http\Middleware;
+<?php
+
+namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;
@@ -24,11 +26,11 @@ class VerifyPostSize implements Middleware
         return $next($request);
     }
 
-    /**
-     * Determine the server 'post_max_size' as bytes.
-     *
-     * @return int
-     */
+       /**
+        * Determine the server 'post_max_size' as bytes.
+        *
+        * @return int
+        */
        protected function getPostMaxSize()
        {
            $postMaxSize = ini_get('post_max_size');

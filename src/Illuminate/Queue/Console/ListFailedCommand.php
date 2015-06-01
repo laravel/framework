@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 
@@ -18,14 +20,12 @@ class ListFailedCommand extends Command
      */
     protected $description = 'List all of the failed queue jobs';
 
-
     /**
      * The table headers for the command.
      *
      * @var array
      */
     protected $headers = ['ID', 'Connection', 'Queue', 'Class', 'Failed At'];
-
 
     /**
      * Execute the console command.
@@ -67,7 +67,7 @@ class ListFailedCommand extends Command
      */
     protected function parseFailedJob(array $failed)
     {
-        $row = array_values(array_except($failed, array('payload')));
+        $row = array_values(array_except($failed, ['payload']));
 
         array_splice($row, 3, 0, array_get(json_decode($failed['payload'], true), 'job'));
 

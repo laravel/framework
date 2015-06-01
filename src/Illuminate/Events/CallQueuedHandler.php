@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Events;
+<?php
+
+namespace Illuminate\Events;
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
@@ -40,7 +42,7 @@ class CallQueuedHandler
             [$handler, $data['method']], unserialize($data['data'])
         );
 
-        if (! $job->isDeletedOrReleased()) {
+        if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }
     }

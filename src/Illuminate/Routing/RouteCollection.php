@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Countable;
 use ArrayIterator;
@@ -15,28 +17,28 @@ class RouteCollection implements Countable, IteratorAggregate
      *
      * @var array
      */
-    protected $routes = array();
+    protected $routes = [];
 
     /**
      * An flattened array of all of the routes.
      *
      * @var array
      */
-    protected $allRoutes = array();
+    protected $allRoutes = [];
 
     /**
      * A look-up table of routes by their names.
      *
      * @var array
      */
-    protected $nameList = array();
+    protected $nameList = [];
 
     /**
      * A look-up table of routes by controller action.
      *
      * @var array
      */
-    protected $actionList = array();
+    protected $actionList = [];
 
     /**
      * Add a Route instance to the collection.
@@ -124,7 +126,7 @@ class RouteCollection implements Countable, IteratorAggregate
         // by the consumer. Otherwise we will check for routes with another verb.
         $route = $this->check($routes, $request);
 
-        if (! is_null($route)) {
+        if (!is_null($route)) {
             return $route->bind($request);
         }
 
@@ -148,15 +150,15 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function checkForAlternateVerbs($request)
     {
-        $methods = array_diff(Router::$verbs, array($request->getMethod()));
+        $methods = array_diff(Router::$verbs, [$request->getMethod()]);
 
         // Here we will spin through all verbs except for the current request verb and
         // check to see if any routes respond to them. If they do, we will return a
         // proper error response with the correct headers on the response string.
-        $others = array();
+        $others = [];
 
         foreach ($methods as $method) {
-            if (! is_null($this->check($this->get($method), $request, false))) {
+            if (!is_null($this->check($this->get($method), $request, false))) {
                 $others[] = $method;
             }
         }
@@ -177,7 +179,7 @@ class RouteCollection implements Countable, IteratorAggregate
     {
         if ($request->method() == 'OPTIONS') {
             return (new Route('OPTIONS', $request->path(), function () use ($methods) {
-                return new Response('', 200, array('Allow' => implode(',', $methods)));
+                return new Response('', 200, ['Allow' => implode(',', $methods)]);
 
             }))->bind($request);
         }
@@ -225,7 +227,7 @@ class RouteCollection implements Countable, IteratorAggregate
             return $this->getRoutes();
         }
 
-        return array_get($this->routes, $method, array());
+        return array_get($this->routes, $method, []);
     }
 
     /**
@@ -236,7 +238,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function hasNamedRoute($name)
     {
-        return ! is_null($this->getByName($name));
+        return !is_null($this->getByName($name));
     }
 
     /**

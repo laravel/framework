@@ -9,7 +9,6 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);
@@ -20,7 +19,6 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($command, $result);
     }
-
 
     public function testLaravelNotSetOnSymfonyCommands()
     {
@@ -33,7 +31,6 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($command, $result);
     }
 
-
     public function testResolveAddsCommandViaApplicationResolution()
     {
         $app = $this->getMockConsole(['addToParent']);
@@ -45,14 +42,13 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($command, $result);
     }
 
-
     protected function getMockConsole(array $methods)
     {
         $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.1']);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['fire' => null]);
 
         $console = $this->getMock('Illuminate\Console\Application', $methods, [
-            $app, $events, 'test-version'
+            $app, $events, 'test-version',
         ]);
 
         return $console;

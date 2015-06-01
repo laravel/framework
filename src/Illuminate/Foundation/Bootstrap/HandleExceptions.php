@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
@@ -32,7 +34,7 @@ class HandleExceptions
 
         register_shutdown_function([$this, 'handleShutdown']);
 
-        if (! $app->environment('testing')) {
+        if (!$app->environment('testing')) {
             ini_set('display_errors', 'Off');
         }
     }
@@ -49,7 +51,7 @@ class HandleExceptions
      *
      * @throws \ErrorException
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = array())
+    public function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
         if (error_reporting() & $level) {
             throw new ErrorException($message, 0, $level, $file, $line);
@@ -106,7 +108,7 @@ class HandleExceptions
      */
     public function handleShutdown()
     {
-        if (! is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
+        if (!is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
             $this->handleException($this->fatalExceptionFromError($error, 0));
         }
     }

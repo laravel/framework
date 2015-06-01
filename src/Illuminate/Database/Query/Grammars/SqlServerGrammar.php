@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Query\Grammars;
+<?php
+
+namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 
@@ -9,11 +11,11 @@ class SqlServerGrammar extends Grammar
      *
      * @var array
      */
-    protected $operators = array(
+    protected $operators = [
         '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
         'like', 'not like', 'between', 'ilike',
         '&', '&=', '|', '|=', '^', '^=',
-    );
+    ];
 
     /**
      * Compile a select query into SQL.
@@ -44,7 +46,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileColumns(Builder $query, $columns)
     {
-        if (! is_null($query->aggregate)) {
+        if (!is_null($query->aggregate)) {
             return;
         }
 
@@ -75,7 +77,7 @@ class SqlServerGrammar extends Grammar
             return $from.' '.$query->lock;
         }
 
-        if (! is_null($query->lock)) {
+        if (!is_null($query->lock)) {
             return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
         }
 
@@ -94,7 +96,7 @@ class SqlServerGrammar extends Grammar
         // An ORDER BY clause is required to make this offset query work, so if one does
         // not exist we'll just create a dummy clause to trick the database and so it
         // does not complain about the queries for not having an "order by" clause.
-        if (! isset($components['orders'])) {
+        if (!isset($components['orders'])) {
             $components['orders'] = 'order by (select 0)';
         }
 
@@ -194,7 +196,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        return array('truncate table '.$this->wrapTable($query->from) => array());
+        return ['truncate table '.$this->wrapTable($query->from) => []];
     }
 
     /**

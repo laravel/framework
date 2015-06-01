@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -63,42 +65,42 @@ class Router implements RegistrarContract
      *
      * @var array
      */
-    protected $patternFilters = array();
+    protected $patternFilters = [];
 
     /**
      * The registered regular expression based filters.
      *
      * @var array
      */
-    protected $regexFilters = array();
+    protected $regexFilters = [];
 
     /**
      * The registered route value binders.
      *
      * @var array
      */
-    protected $binders = array();
+    protected $binders = [];
 
     /**
      * The globally available parameter patterns.
      *
      * @var array
      */
-    protected $patterns = array();
+    protected $patterns = [];
 
     /**
      * The route group attribute stack.
      *
      * @var array
      */
-    protected $groupStack = array();
+    protected $groupStack = [];
 
     /**
      * All of the verbs supported by the router.
      *
      * @var array
      */
-    public static $verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS');
+    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
      * Create a new Router instance.
@@ -195,7 +197,7 @@ class Router implements RegistrarContract
      */
     public function any($uri, $action)
     {
-        $verbs = array('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE');
+        $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
         return $this->addRoute($verbs, $uri, $action);
     }
@@ -234,14 +236,14 @@ class Router implements RegistrarContract
      * @param  array   $names
      * @return void
      */
-    public function controller($uri, $controller, $names = array())
+    public function controller($uri, $controller, $names = [])
     {
         $prepended = $controller;
 
         // First, we will check to see if a controller prefix has been registered in
         // the route group. If it has, we will need to prefix it before trying to
         // reflect into the class instance and pull out the method for routing.
-        if (! empty($this->groupStack)) {
+        if (!empty($this->groupStack)) {
             $prepended = $this->prependGroupUses($controller);
         }
 
@@ -271,7 +273,7 @@ class Router implements RegistrarContract
      */
     protected function registerInspected($route, $controller, $method, &$names)
     {
-        $action = array('uses' => $controller.'@'.$method);
+        $action = ['uses' => $controller.'@'.$method];
 
         // If a given controller method has been named, we will assign the name to the
         // controller action array, which provides for a short-cut to method naming
@@ -316,7 +318,7 @@ class Router implements RegistrarContract
      * @param  array   $options
      * @return void
      */
-    public function resource($name, $controller, array $options = array())
+    public function resource($name, $controller, array $options = [])
     {
         if ($this->container && $this->container->bound('Illuminate\Routing\ResourceRegistrar')) {
             $registrar = $this->container->make('Illuminate\Routing\ResourceRegistrar');
@@ -354,7 +356,7 @@ class Router implements RegistrarContract
      */
     protected function updateGroupStack(array $attributes)
     {
-        if (! empty($this->groupStack)) {
+        if (!empty($this->groupStack)) {
             $attributes = $this->mergeGroup($attributes, last($this->groupStack));
         }
 
@@ -391,7 +393,7 @@ class Router implements RegistrarContract
 
         $new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
 
-        return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'where')), $new);
+        return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where']), $new);
     }
 
     /**
@@ -435,7 +437,7 @@ class Router implements RegistrarContract
      */
     public function getLastGroupPrefix()
     {
-        if (! empty($this->groupStack)) {
+        if (!empty($this->groupStack)) {
             $last = end($this->groupStack);
 
             return isset($last['prefix']) ? $last['prefix'] : '';
@@ -566,13 +568,13 @@ class Router implements RegistrarContract
     protected function convertToControllerAction($action)
     {
         if (is_string($action)) {
-            $action = array('uses' => $action);
+            $action = ['uses' => $action];
         }
 
         // Here we'll merge any group "uses" statement if necessary so that the action
         // has the proper clause for this property. Then we can simply set the name
         // of the controller on the action and return the action array for usage.
-        if (! empty($this->groupStack)) {
+        if (!empty($this->groupStack)) {
             $action['uses'] = $this->prependGroupUses($action['uses']);
         }
 
@@ -706,7 +708,7 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Resolve the middleware name to a class name preserving passed parameters
+     * Resolve the middleware name to a class name preserving passed parameters.
      *
      * @param $name
      * @return string
@@ -854,7 +856,7 @@ class Router implements RegistrarContract
      */
     protected function parseFilter($callback)
     {
-        if (is_string($callback) && ! str_contains($callback, '@')) {
+        if (is_string($callback) && !str_contains($callback, '@')) {
             return $callback.'@filter';
         }
 
@@ -871,7 +873,7 @@ class Router implements RegistrarContract
      */
     public function when($pattern, $name, $methods = null)
     {
-        if (! is_null($methods)) {
+        if (!is_null($methods)) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
@@ -888,7 +890,7 @@ class Router implements RegistrarContract
      */
     public function whenRegex($pattern, $name, $methods = null)
     {
-        if (! is_null($methods)) {
+        if (!is_null($methods)) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
@@ -1005,7 +1007,7 @@ class Router implements RegistrarContract
      */
     protected function callFilter($filter, $request, $response = null)
     {
-        return $this->events->until('router.'.$filter, array($request, $response));
+        return $this->events->until('router.'.$filter, [$request, $response]);
     }
 
     /**
@@ -1034,7 +1036,7 @@ class Router implements RegistrarContract
         foreach ($this->findPatternFilters($request) as $filter => $parameters) {
             $response = $this->callRouteFilter($filter, $parameters, $route, $request);
 
-            if (! is_null($response)) {
+            if (!is_null($response)) {
                 return $response;
             }
         }
@@ -1048,9 +1050,9 @@ class Router implements RegistrarContract
      */
     public function findPatternFilters($request)
     {
-        $results = array();
+        $results = [];
 
-        list($path, $method) = array($request->path(), $request->getMethod());
+        list($path, $method) = [$request->path(), $request->getMethod()];
 
         foreach ($this->patternFilters as $pattern => $filters) {
             // To find the patterned middlewares for a request, we just need to check these
@@ -1086,7 +1088,7 @@ class Router implements RegistrarContract
      */
     protected function patternsByMethod($method, $filters)
     {
-        $results = array();
+        $results = [];
 
         foreach ($filters as $filter) {
             // The idea here is to check and see if the pattern filter applies to this HTTP
@@ -1128,7 +1130,7 @@ class Router implements RegistrarContract
         foreach ($route->beforeFilters() as $filter => $parameters) {
             $response = $this->callRouteFilter($filter, $parameters, $route, $request);
 
-            if (! is_null($response)) {
+            if (!is_null($response)) {
                 return $response;
             }
         }
@@ -1161,7 +1163,7 @@ class Router implements RegistrarContract
      */
     public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
     {
-        $data = array_merge(array($route, $request, $response), $parameters);
+        $data = array_merge([$route, $request, $response], $parameters);
 
         return $this->events->until('router.filter: '.$filter, $this->cleanFilterParameters($data));
     }
@@ -1175,7 +1177,7 @@ class Router implements RegistrarContract
     protected function cleanFilterParameters(array $parameters)
     {
         return array_filter($parameters, function ($p) {
-            return ! is_null($p) && $p !== '';
+            return !is_null($p) && $p !== '';
         });
     }
 
@@ -1188,7 +1190,7 @@ class Router implements RegistrarContract
      */
     public function prepareResponse($request, $response)
     {
-        if (! $response instanceof SymfonyResponse) {
+        if (!$response instanceof SymfonyResponse) {
             $response = new Response($response);
         }
 
@@ -1202,7 +1204,7 @@ class Router implements RegistrarContract
      */
     public function hasGroupStack()
     {
-        return ! empty($this->groupStack);
+        return !empty($this->groupStack);
     }
 
     /**
@@ -1303,7 +1305,7 @@ class Router implements RegistrarContract
      */
     public function currentRouteAction()
     {
-        if (! $this->current()) {
+        if (!$this->current()) {
             return;
         }
 

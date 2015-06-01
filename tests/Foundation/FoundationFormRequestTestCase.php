@@ -11,7 +11,6 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
         unset($_SERVER['__request.validated']);
     }
 
-
     public function testValidateFunctionRunsValidatorOnSpecifiedRules()
     {
         $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail']);
@@ -26,7 +25,6 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($_SERVER['__request.validated']);
     }
-
 
     /**
      * @expectedException \Illuminate\Http\Exception\HttpResponseException
@@ -45,10 +43,8 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
         $messages->shouldReceive('all')->once()->andReturn([]);
         $request->shouldReceive('response')->once()->andReturn(new Illuminate\Http\Response);
 
-
         $request->validate($factory);
     }
-
 
     /**
      * @expectedException \Illuminate\Http\Exception\HttpResponseException
@@ -67,7 +63,6 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
 
         $request->validate($factory);
     }
-
 
     public function testRedirectResponseIsProperlyCreatedWithGivenErrors()
     {

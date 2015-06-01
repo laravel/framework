@@ -9,7 +9,6 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testBasicCount()
     {
         $verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -17,7 +16,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
-        $extra = array('foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true);
+        $extra = ['foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true];
         $builder->shouldReceive('whereNull')->with('foo');
         $builder->shouldReceive('whereNotNull')->with('bar');
         $builder->shouldReceive('where')->with('baz', 'taylor');

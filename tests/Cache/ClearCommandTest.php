@@ -11,7 +11,6 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testClearWithNoStoreOption()
     {
         $command = new ClearCommandTestStub(
@@ -29,7 +28,6 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command);
     }
 
-
     public function testClearWithStoreOption()
     {
         $command = new ClearCommandTestStub(
@@ -46,7 +44,6 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
 
         $this->runCommand($command, ['store' => 'foo']);
     }
-
 
     public function testClearWithInvalidStoreOption()
     {
@@ -66,8 +63,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command, ['store' => 'bar']);
     }
 
-
-    protected function runCommand($command, $input = array())
+    protected function runCommand($command, $input = [])
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
@@ -75,7 +71,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
 
 class ClearCommandTestStub extends ClearCommand
 {
-    public function call($command, array $arguments = array())
+    public function call($command, array $arguments = [])
     {
         //
     }

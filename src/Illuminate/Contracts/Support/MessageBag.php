@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Support;
+<?php
+
+namespace Illuminate\Contracts\Support;
 
 interface MessageBag
 {

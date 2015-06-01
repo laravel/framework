@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -68,7 +70,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @var array
      */
-    protected $dontEncode = array(
+    protected $dontEncode = [
         '%2F' => '/',
         '%40' => '@',
         '%3A' => ':',
@@ -83,7 +85,7 @@ class UrlGenerator implements UrlGeneratorContract
         '%26' => '&',
         '%23' => '#',
         '%25' => '%',
-    );
+    ];
 
     /**
      * Create a new URL Generator instance.
@@ -141,7 +143,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function to($path, $extra = array(), $secure = null)
+    public function to($path, $extra = [], $secure = null)
     {
         // First we will check if the URL is already a valid URL. If it is we will not
         // try to generate a new one but will simply return the URL as is, which is
@@ -173,7 +175,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  array   $parameters
      * @return string
      */
-    public function secure($path, $parameters = array())
+    public function secure($path, $parameters = [])
     {
         return $this->to($path, $parameters, true);
     }
@@ -265,9 +267,9 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @throws \InvalidArgumentException
      */
-    public function route($name, $parameters = array(), $absolute = true)
+    public function route($name, $parameters = [], $absolute = true)
     {
-        if (! is_null($route = $this->routes->getByName($name))) {
+        if (!is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 
@@ -354,7 +356,7 @@ class UrlGenerator implements UrlGeneratorContract
         // If the URI has a fragment, we will move it to the end of the URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
-        if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
+        if (!is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
             $uri = preg_replace('/#.*/', '', $uri);
         }
 
@@ -380,9 +382,9 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  array  $parameters
      * @return array
      */
-    protected function replaceRoutableParameters($parameters = array())
+    protected function replaceRoutableParameters($parameters = [])
     {
-        $parameters = is_array($parameters) ? $parameters : array($parameters);
+        $parameters = is_array($parameters) ? $parameters : [$parameters];
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter instanceof UrlRoutable) {
@@ -489,7 +491,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addPortToDomain($domain)
     {
-        if (in_array($this->request->getPort(), array('80', '443'))) {
+        if (in_array($this->request->getPort(), ['80', '443'])) {
             return $domain;
         }
 
@@ -535,15 +537,15 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @throws \InvalidArgumentException
      */
-    public function action($action, $parameters = array(), $absolute = true)
+    public function action($action, $parameters = [], $absolute = true)
     {
-        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
+        if ($this->rootNamespace && !(strpos($action, '\\') === 0)) {
             $action = $this->rootNamespace.'\\'.$action;
         } else {
             $action = trim($action, '\\');
         }
 
-        if (! is_null($route = $this->routes->getByAction($action))) {
+        if (!is_null($route = $this->routes->getByAction($action))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 

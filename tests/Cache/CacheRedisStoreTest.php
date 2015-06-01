@@ -9,7 +9,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testGetReturnsNullWhenNotFound()
     {
         $redis = $this->getRedis();
@@ -17,7 +16,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(null);
         $this->assertNull($redis->get('foo'));
     }
-
 
     public function testRedisValueIsReturned()
     {
@@ -27,7 +25,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $redis->get('foo'));
     }
 
-
     public function testRedisValueIsReturnedForNumerics()
     {
         $redis = $this->getRedis();
@@ -35,7 +32,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(1);
         $this->assertEquals(1, $redis->get('foo'));
     }
-
 
     public function testSetMethodProperlyCallsRedis()
     {
@@ -45,7 +41,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->put('foo', 'foo', 60);
     }
 
-
     public function testSetMethodProperlyCallsRedisForNumerics()
     {
         $redis = $this->getRedis();
@@ -53,7 +48,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, 1);
         $redis->put('foo', 1, 60);
     }
-
 
     public function testIncrementMethodProperlyCallsRedis()
     {
@@ -63,7 +57,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->increment('foo', 5);
     }
 
-
     public function testDecrementMethodProperlyCallsRedis()
     {
         $redis = $this->getRedis();
@@ -71,7 +64,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('decrby')->once()->with('prefix:foo', 5);
         $redis->decrement('foo', 5);
     }
-
 
     public function testStoreItemForeverProperlyCallsRedis()
     {
@@ -81,7 +73,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->forever('foo', 'foo', 60);
     }
 
-
     public function testForgetMethodProperlyCallsRedis()
     {
         $redis = $this->getRedis();
@@ -89,7 +80,6 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('del')->once()->with('prefix:foo');
         $redis->forget('foo');
     }
-
 
     protected function getRedis()
     {

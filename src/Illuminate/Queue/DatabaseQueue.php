@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use DateTime;
 use Carbon\Carbon;
@@ -10,8 +12,8 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 class DatabaseQueue extends Queue implements QueueContract
 {
     /**
-    * The database connection instance.
-    *
+     * The database connection instance.
+     *
      * @var \Illuminate\Database\Connection
      */
     protected $database;
@@ -75,7 +77,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  array   $options
      * @return mixed
      */
-    public function pushRaw($payload, $queue = null, array $options = array())
+    public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->pushToDatabase(0, $queue, $payload);
     }
@@ -158,7 +160,7 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        if (! is_null($this->expire)) {
+        if (!is_null($this->expire)) {
             $this->releaseJobsThatHaveBeenReservedTooLong($queue);
         }
 

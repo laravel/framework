@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php
+
+namespace Illuminate\Auth;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Console\ClearResetsCommand;

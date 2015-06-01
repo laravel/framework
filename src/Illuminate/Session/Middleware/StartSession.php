@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Session\Middleware;
+<?php
+
+namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Carbon\Carbon;
@@ -82,7 +84,7 @@ class StartSession implements TerminableMiddleware
      */
     public function terminate($request, $response)
     {
-        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
+        if ($this->sessionHandled && $this->sessionConfigured() && !$this->usingCookieSessions()) {
             $this->manager->driver()->save();
         }
     }
@@ -126,7 +128,7 @@ class StartSession implements TerminableMiddleware
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+        if ($request->method() === 'GET' && $request->route() && !$request->ajax()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
@@ -210,7 +212,7 @@ class StartSession implements TerminableMiddleware
      */
     protected function sessionConfigured()
     {
-        return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+        return !is_null(array_get($this->manager->getSessionConfig(), 'driver'));
     }
 
     /**
@@ -223,7 +225,7 @@ class StartSession implements TerminableMiddleware
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! in_array($config['driver'], array(null, 'array'));
+        return !in_array($config['driver'], [null, 'array']);
     }
 
     /**
@@ -233,7 +235,7 @@ class StartSession implements TerminableMiddleware
      */
     protected function usingCookieSessions()
     {
-        if (! $this->sessionConfigured()) {
+        if (!$this->sessionConfigured()) {
             return false;
         }
 

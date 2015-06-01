@@ -10,7 +10,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint('users');
@@ -89,7 +88,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
-
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');
@@ -99,7 +97,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('drop table `users`', $statements[0]);
     }
-
 
     public function testDropTableIfExists()
     {
@@ -111,7 +108,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('drop table if exists `users`', $statements[0]);
     }
 
-
     public function testDropColumn()
     {
         $blueprint = new Blueprint('users');
@@ -122,7 +118,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` drop `foo`', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->dropColumn(array('foo', 'bar'));
+        $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
@@ -136,7 +132,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` drop `foo`, drop `bar`', $statements[0]);
     }
 
-
     public function testDropPrimary()
     {
         $blueprint = new Blueprint('users');
@@ -146,7 +141,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` drop primary key', $statements[0]);
     }
-
 
     public function testDropUnique()
     {
@@ -158,7 +152,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` drop index foo', $statements[0]);
     }
 
-
     public function testDropIndex()
     {
         $blueprint = new Blueprint('users');
@@ -168,7 +161,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` drop index foo', $statements[0]);
     }
-
 
     public function testDropForeign()
     {
@@ -180,7 +172,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` drop foreign key foo', $statements[0]);
     }
 
-
     public function testDropTimestamps()
     {
         $blueprint = new Blueprint('users');
@@ -190,7 +181,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
-
 
     public function testRenameTable()
     {
@@ -202,7 +192,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('rename table `users` to `foo`', $statements[0]);
     }
 
-
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');
@@ -212,7 +201,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add primary key bar(`foo`)', $statements[0]);
     }
-
 
     public function testAddingUniqueKey()
     {
@@ -224,17 +212,15 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add unique bar(`foo`)', $statements[0]);
     }
 
-
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->index(array('foo', 'bar'), 'baz');
+        $blueprint->index(['foo', 'bar'], 'baz');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add index baz(`foo`, `bar`)', $statements[0]);
     }
-
 
     public function testAddingForeignKey()
     {
@@ -246,7 +232,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add constraint users_foo_id_foreign foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
     }
 
-
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -256,7 +241,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
     }
-
 
     public function testAddingBigIncrementingID()
     {
@@ -268,7 +252,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
-
     public function testAddingColumnAfterAnotherColumn()
     {
         $blueprint = new Blueprint('users');
@@ -278,7 +261,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
     }
-
 
     public function testAddingString()
     {
@@ -311,7 +293,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
     }
 
-
     public function testAddingText()
     {
         $blueprint = new Blueprint('users');
@@ -321,7 +302,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
     }
-
 
     public function testAddingBigInteger()
     {
@@ -340,7 +320,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` bigint not null auto_increment primary key', $statements[0]);
     }
 
-
     public function testAddingInteger()
     {
         $blueprint = new Blueprint('users');
@@ -357,7 +336,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);
     }
-
 
     public function testAddingMediumInteger()
     {
@@ -376,7 +354,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` mediumint not null auto_increment primary key', $statements[0]);
     }
 
-
     public function testAddingSmallInteger()
     {
         $blueprint = new Blueprint('users');
@@ -393,7 +370,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` smallint not null auto_increment primary key', $statements[0]);
     }
-
 
     public function testAddingTinyInteger()
     {
@@ -412,7 +388,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` tinyint not null auto_increment primary key', $statements[0]);
     }
 
-
     public function testAddingFloat()
     {
         $blueprint = new Blueprint('users');
@@ -422,7 +397,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` double(5, 2) not null', $statements[0]);
     }
-
 
     public function testAddingDouble()
     {
@@ -434,7 +408,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` double not null', $statements[0]);
     }
 
-
     public function testAddingDoubleSpecifyingPrecision()
     {
         $blueprint = new Blueprint('users');
@@ -444,7 +417,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` double(15, 8) not null', $statements[0]);
     }
-
 
     public function testAddingDecimal()
     {
@@ -456,7 +428,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` decimal(5, 2) not null', $statements[0]);
     }
 
-
     public function testAddingBoolean()
     {
         $blueprint = new Blueprint('users');
@@ -467,17 +438,15 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` tinyint(1) not null', $statements[0]);
     }
 
-
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', array('bar', 'baz'));
+        $blueprint->enum('foo', ['bar', 'baz']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` enum(\'bar\', \'baz\') not null', $statements[0]);
     }
-
 
     public function testAddingJson()
     {
@@ -489,7 +458,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
     }
 
-
     public function testAddingJsonb()
     {
         $blueprint = new Blueprint('users');
@@ -500,7 +468,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
     }
 
-
     public function testAddingDate()
     {
         $blueprint = new Blueprint('users');
@@ -510,7 +477,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` date not null', $statements[0]);
     }
-
 
     public function testAddingDateTime()
     {
@@ -531,7 +497,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
     }
-
 
     public function testAddingTime()
     {
@@ -583,7 +548,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `created_at` timestamp default 0 not null, add `updated_at` timestamp default 0 not null', $statements[0]);
     }
 
-
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');
@@ -593,7 +557,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `remember_token` varchar(100) null', $statements[0]);
     }
-
 
     public function testAddingBinary()
     {
@@ -605,12 +568,10 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` blob not null', $statements[0]);
     }
 
-
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
     }
-
 
     public function getGrammar()
     {

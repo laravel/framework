@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth;
+<?php
+
+namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
@@ -89,7 +91,7 @@ class EloquentUserProvider implements UserProvider
         $query = $this->createModel()->newQuery();
 
         foreach ($credentials as $key => $value) {
-            if (! str_contains($key, 'password')) {
+            if (!str_contains($key, 'password')) {
                 $query->where($key, $value);
             }
         }
