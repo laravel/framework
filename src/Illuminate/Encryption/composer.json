@@ -18,7 +18,7 @@
         "ext-openssl": "*",
         "illuminate/contracts": "5.1.*",
         "illuminate/support": "5.1.*",
-        "symfony/security-core": "2.7.*"
+        "symfony/security-core": "2.8.*"
     },
     "autoload": {
         "psr-4": {
