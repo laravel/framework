@@ -37,6 +37,7 @@
         "symfony/http-foundation": "2.7.*",
         "symfony/http-kernel": "2.7.*",
         "symfony/process": "2.7.*",
+        "symfony/psr-http-message-bridge": "0.1.x",
         "symfony/routing": "2.7.*",
         "symfony/security-core": "2.7.*",
         "symfony/translation": "2.7.*",
@@ -109,7 +110,8 @@
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
+        "zendframework/zend-diactoros": "Required to use the PSR-7 Http Message Factory"
     },
     "minimum-stability": "dev"
 }
