@@ -307,13 +307,16 @@ abstract class AbstractPaginator {
 	 *
 	 * @param  string  $pageName
 	 * @param  int  $default
+	 * @param  int  $lastPage
 	 * @return int
 	 */
-	public static function resolveCurrentPage($pageName = 'page', $default = 1)
+	public static function resolveCurrentPage($pageName = 'page', $default = 1, $lastPage = 1)
 	{
 		if (isset(static::$currentPageResolver))
 		{
-			return call_user_func(static::$currentPageResolver, $pageName);
+			$page = call_user_func(static::$currentPageResolver, $pageName);
+
+			return ($page > $lastPage) ? $lastPage : $page;
 		}
 
 		return $default;
