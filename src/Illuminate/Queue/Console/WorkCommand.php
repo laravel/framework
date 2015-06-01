@@ -51,8 +51,7 @@ class WorkCommand extends Command {
 	{
 		if ($this->downForMaintenance() && ! $this->option('daemon'))
 		{
-			$this->worker->sleep($this->option('sleep'));
-			return;
+			return $this->worker->sleep($this->option('sleep'));
 		}
 
 		$queue = $this->option('queue');
