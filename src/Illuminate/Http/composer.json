@@ -17,8 +17,8 @@
         "php": ">=5.5.9",
         "illuminate/session": "5.1.*",
         "illuminate/support": "5.1.*",
-        "symfony/http-foundation": "2.7.*",
-        "symfony/http-kernel": "2.7.*"
+        "symfony/http-foundation": "2.8.*",
+        "symfony/http-kernel": "2.8.*"
     },
     "autoload": {
         "psr-4": {
