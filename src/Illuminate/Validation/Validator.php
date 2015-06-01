@@ -1437,7 +1437,7 @@ class Validator implements ValidatorContract
         try {
             return new DateTime($value);
         } catch (Exception $e) {
-            return;
+            //
         }
     }
 
