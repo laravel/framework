@@ -1,3 +1,7 @@
-<?php namespace Illuminate\Contracts\Queue;
+<?php
 
-interface ShouldBeQueued {}
+namespace Illuminate\Contracts\Queue;
+
+interface ShouldBeQueued
+{
+}

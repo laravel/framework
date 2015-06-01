@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,7 +17,7 @@ class Parser
     public static function parse($expression)
     {
         if (trim($expression) === '') {
-            throw new InvalidArgumentException("Console command definition is empty.");
+            throw new InvalidArgumentException('Console command definition is empty.');
         }
 
         $tokens = array_values(array_filter(
@@ -36,7 +38,7 @@ class Parser
     protected static function arguments(array $tokens)
     {
         return array_filter(array_map(function ($token) {
-            if (starts_with($token, '{') && ! starts_with($token, '{--')) {
+            if (starts_with($token, '{') && !starts_with($token, '{--')) {
                 return static::parseArgument(trim($token, '{}'));
             }
         }, $tokens));

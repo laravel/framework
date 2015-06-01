@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 use Faker\Factory as Faker;
 use InvalidArgumentException;
@@ -75,7 +77,7 @@ class FactoryBuilder
      * @param  array  $attributes
      * @return mixed
      */
-    public function create(array $attributes = array())
+    public function create(array $attributes = [])
     {
         $results = $this->make($attributes);
 
@@ -96,7 +98,7 @@ class FactoryBuilder
      * @param  array  $attributes
      * @return mixed
      */
-    public function make(array $attributes = array())
+    public function make(array $attributes = [])
     {
         if ($this->amount === 1) {
             return $this->makeInstance($attributes);
@@ -117,10 +119,10 @@ class FactoryBuilder
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function makeInstance(array $attributes = array())
+    protected function makeInstance(array $attributes = [])
     {
         return Model::unguarded(function () use ($attributes) {
-            if (! isset($this->definitions[$this->class][$this->name])) {
+            if (!isset($this->definitions[$this->class][$this->name])) {
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}].");
             }
 

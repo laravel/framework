@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 trait DatabaseTransactions
 {

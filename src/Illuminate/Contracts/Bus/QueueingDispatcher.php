@@ -1,13 +1,14 @@
-<?php namespace Illuminate\Contracts\Bus;
+<?php
 
-interface QueueingDispatcher extends Dispatcher {
+namespace Illuminate\Contracts\Bus;
 
-	/**
-	 * Dispatch a command to its appropriate handler behind a queue.
-	 *
-	 * @param  mixed  $command
-	 * @return mixed
-	 */
-	public function dispatchToQueue($command);
-
+interface QueueingDispatcher extends Dispatcher
+{
+    /**
+     * Dispatch a command to its appropriate handler behind a queue.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function dispatchToQueue($command);
 }

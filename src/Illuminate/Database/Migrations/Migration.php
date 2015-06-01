@@ -1,22 +1,23 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php
 
-abstract class Migration {
+namespace Illuminate\Database\Migrations;
 
-	/**
-	 * The name of the database connection to use.
-	 *
-	 * @var string
-	 */
-	protected $connection;
+abstract class Migration
+{
+    /**
+     * The name of the database connection to use.
+     *
+     * @var string
+     */
+    protected $connection;
 
-	/**
-	 * Get the migration connection name.
-	 *
-	 * @return string
-	 */
-	public function getConnection()
-	{
-		return $this->connection;
-	}
-
+    /**
+     * Get the migration connection name.
+     *
+     * @return string
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
 }

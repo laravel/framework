@@ -1,12 +1,13 @@
-<?php namespace Illuminate\Contracts\Queue;
+<?php
 
-interface QueueableEntity {
+namespace Illuminate\Contracts\Queue;
 
-	/**
-	 * Get the queueable identity for the entity.
-	 *
-	 * @return mixed
-	 */
-	public function getQueueableId();
-
+interface QueueableEntity
+{
+    /**
+     * Get the queueable identity for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableId();
 }

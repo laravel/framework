@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Mockery;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
@@ -148,7 +150,7 @@ trait ApplicationTrait
      */
     protected function startSession()
     {
-        if (! $this->app['session']->isStarted()) {
+        if (!$this->app['session']->isStarted()) {
             $this->app['session']->start();
         }
     }
@@ -203,7 +205,7 @@ trait ApplicationTrait
         $count = $this->app->make('db')->table($table)->where($data)->count();
 
         $this->assertGreaterThan(0, $count, sprintf(
-            "Unable to find row in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+            'Unable to find row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
         ));
 
         return $this;
@@ -233,7 +235,7 @@ trait ApplicationTrait
         $count = $this->app->make('db')->table($table)->where($data)->count();
 
         $this->assertEquals(0, $count, sprintf(
-            "Found unexpected records in database table [%s] that matched attributes [%s].", $table, json_encode($data)
+            'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
         ));
 
         return $this;
