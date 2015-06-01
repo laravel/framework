@@ -463,6 +463,8 @@ return $obj; });
         $this->assertEquals(2, count($container->tagged('foo')));
         $this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
         $this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+
+        $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
     }
 }
 
