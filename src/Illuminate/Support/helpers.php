@@ -718,8 +718,7 @@ if (!function_exists('studly_case')) {
     }
 }
 
-if ( ! function_exists('title_case'))
-{
+if (!function_exists('title_case')) {
 	/**
 	 * Convert a value to title case.
 	 *
