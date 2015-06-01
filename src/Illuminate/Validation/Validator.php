@@ -1256,7 +1256,18 @@ class Validator implements ValidatorContract {
 			return false;
 		}
 
-		return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+		// If the parameters contain a slash, we assume it's a proper mime type,
+		// and do a comparison with the real mime type of the file.
+		if (count($parameters) > 0 && strpos($parameters[0], '/') !== false)
+		{
+			$data = $value->getMimeType();
+		}
+		else
+		{
+			$data = $value->guessExtension();
+		}
+
+		return $value->getPath() != '' && in_array($data, $parameters);
 	}
 
 	/**
