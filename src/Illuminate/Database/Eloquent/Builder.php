@@ -710,6 +710,86 @@ class Builder {
 	}
 
 	/**
+	 * Add a polymorphic relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  string  $model
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @param  string  $boolean
+	 * @param  \Closure|null  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function hasMorph($relation, $model, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+	{
+		$relation = $this->getHasRelationQuery($relation);
+
+		$query = $relation->getRelationCountQuery((new $model)->newQuery(), $this);
+
+		if ($callback) call_user_func($callback, $query);
+
+		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+	}
+
+	/**
+	 * Add a polymorphic relationship count condition to the query.
+	 *
+	 * @param  string  $relation
+	 * @param  string  $model
+	 * @param  string  $boolean
+	 * @param  \Closure|null  $callback
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function doesntHaveMorph($relation, $model, $boolean = 'and', Closure $callback = null)
+	{
+		return $this->hasMorph($relation, $model, '<', 1, $boolean, $callback);
+	}
+
+	/**
+	 * Add a polymorphic relationship count condition to the query with where clauses.
+	 *
+	 * @param  string    $relation
+	 * @param  string    $model
+	 * @param  \Closure  $callback
+	 * @param  string    $operator
+	 * @param  int       $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function whereHasMorph($relation, $model, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->hasMorph($relation, $model, $operator, $count, 'and', $callback);
+	}
+
+	/**
+	 * Add a polymorphic relationship count condition to the query with an "or".
+	 *
+	 * @param  string  $relation
+	 * @param  string  $model
+	 * @param  string  $operator
+	 * @param  int     $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orHasMorph($relation, $model, $operator = '>=', $count = 1)
+	{
+		return $this->hasMorph($relation, $model, $operator, $count, 'or');
+	}
+
+	/**
+	 * Add a polymorphic relationship count condition to the query with where clauses and an "or".
+	 *
+	 * @param  string    $relation
+	 * @param  string    $model
+	 * @param  \Closure  $callback
+	 * @param  string    $operator
+	 * @param  int       $count
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orWhereHasMorph($relation, $model, Closure $callback, $operator = '>=', $count = 1)
+	{
+		return $this->hasMorph($relation, $model, $operator, $count, 'or', $callback);
+	}
+
+	/**
 	 * Add the "has" condition where clause to the query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
