@@ -9,7 +9,6 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testCreateInsertsNewRecordIntoTable()
     {
         $repo = $this->getRepo();
@@ -26,7 +25,6 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(1, strlen($results));
     }
 
-
     public function testExistReturnsFalseIfNoRowFoundForUser()
     {
         $repo = $this->getRepo();
@@ -40,7 +38,6 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($repo->exists($user, 'token'));
     }
 
-
     public function testExistReturnsFalseIfRecordIsExpired()
     {
         $repo = $this->getRepo();
@@ -48,13 +45,12 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
         $date = date('Y-m-d H:i:s', time() - 300000);
-        $query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
+        $query->shouldReceive('first')->andReturn((object) ['created_at' => $date]);
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertFalse($repo->exists($user, 'token'));
     }
-
 
     public function testExistReturnsTrueIfValidRecordExists()
     {
@@ -63,13 +59,12 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
         $query->shouldReceive('where')->once()->with('token', 'token')->andReturn($query);
         $date = date('Y-m-d H:i:s', time() - 600);
-        $query->shouldReceive('first')->andReturn((object) array('created_at' => $date));
+        $query->shouldReceive('first')->andReturn((object) ['created_at' => $date]);
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $user->shouldReceive('getEmailForPasswordReset')->andReturn('email');
 
         $this->assertTrue($repo->exists($user, 'token'));
     }
-
 
     public function testDeleteMethodDeletesByToken()
     {
@@ -81,7 +76,6 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->delete('token');
     }
 
-
     public function testDeleteExpiredMethodDeletesExpiredTokens()
     {
         $repo = $this->getRepo();
@@ -91,7 +85,6 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
 
         $repo->deleteExpired();
     }
-
 
     protected function getRepo()
     {

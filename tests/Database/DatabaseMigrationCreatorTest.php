@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Migrations\MigrationCreator;
 
 class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
 {
@@ -9,7 +8,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
     {
         m::close();
     }
-
 
     public function testBasicCreateMethodStoresMigrationFile()
     {
@@ -27,7 +25,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
         unset($_SERVER['__migration.creator']);
     }
 
-
     public function testTableUpdateMigrationStoresMigrationFile()
     {
         $creator = $this->getCreator();
@@ -37,7 +34,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
 
         $creator->create('create_bar', 'foo', 'baz');
     }
-
 
     public function testTableCreationMigrationStoresMigrationFile()
     {
@@ -49,11 +45,10 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
-
     protected function getCreator()
     {
         $files = m::mock('Illuminate\Filesystem\Filesystem');
 
-        return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', array('getDatePrefix'), array($files));
+        return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', ['getDatePrefix'], [$files]);
     }
 }

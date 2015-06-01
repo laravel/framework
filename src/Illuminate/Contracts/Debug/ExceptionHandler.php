@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Debug;
+<?php
+
+namespace Illuminate\Contracts\Debug;
 
 use Exception;
 

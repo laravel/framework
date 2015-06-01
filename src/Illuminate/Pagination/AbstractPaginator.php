@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pagination;
+<?php
+
+namespace Illuminate\Pagination;
 
 use Closure;
 use ArrayIterator;
@@ -273,7 +275,7 @@ abstract class AbstractPaginator
      */
     public function hasPages()
     {
-        return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
+        return !($this->currentPage() == 1 && !$this->hasMorePages());
     }
 
     /**

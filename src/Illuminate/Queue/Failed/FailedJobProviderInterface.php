@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Failed;
+<?php
+
+namespace Illuminate\Queue\Failed;
 
 interface FailedJobProviderInterface
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use Closure;
 use InvalidArgumentException;
@@ -17,14 +19,14 @@ abstract class Manager
      *
      * @var array
      */
-    protected $customCreators = array();
+    protected $customCreators = [];
 
     /**
      * The array of created "drivers".
      *
      * @var array
      */
-    protected $drivers = array();
+    protected $drivers = [];
 
     /**
      * Create a new manager instance.
@@ -57,7 +59,7 @@ abstract class Manager
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
-        if (! isset($this->drivers[$driver])) {
+        if (!isset($this->drivers[$driver])) {
             $this->drivers[$driver] = $this->createDriver($driver);
         }
 
@@ -132,6 +134,6 @@ abstract class Manager
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->driver(), $method), $parameters);
+        return call_user_func_array([$this->driver(), $method], $parameters);
     }
 }

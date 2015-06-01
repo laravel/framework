@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Faker\Factory as Faker;
@@ -67,7 +69,7 @@ class Factory implements ArrayAccess
      * @param  array  $attributes
      * @return mixed
      */
-    public function create($class, array $attributes = array())
+    public function create($class, array $attributes = [])
     {
         return $this->of($class)->create($attributes);
     }
@@ -80,7 +82,7 @@ class Factory implements ArrayAccess
      * @param  array  $attributes
      * @return mixed
      */
-    public function createAs($class, $name, array $attributes = array())
+    public function createAs($class, $name, array $attributes = [])
     {
         return $this->of($class, $name)->create($attributes);
     }
@@ -92,7 +94,7 @@ class Factory implements ArrayAccess
      * @param  array  $attributes
      * @return mixed
      */
-    public function make($class, array $attributes = array())
+    public function make($class, array $attributes = [])
     {
         return $this->of($class)->make($attributes);
     }
@@ -105,7 +107,7 @@ class Factory implements ArrayAccess
      * @param  array  $attributes
      * @return mixed
      */
-    public function makeAs($class, $name, array $attributes = array())
+    public function makeAs($class, $name, array $attributes = [])
     {
         return $this->of($class, $name)->make($attributes);
     }
@@ -118,7 +120,7 @@ class Factory implements ArrayAccess
      * @param  array  $attributes
      * @return array
      */
-    public function rawOf($class, $name, array $attributes = array())
+    public function rawOf($class, $name, array $attributes = [])
     {
         return $this->raw($class, $attributes, $name);
     }
@@ -131,7 +133,7 @@ class Factory implements ArrayAccess
      * @param  string  $name
      * @return array
      */
-    public function raw($class, array $attributes = array(), $name = 'default')
+    public function raw($class, array $attributes = [], $name = 'default')
     {
         return call_user_func($this->definitions[$class][$name], Faker::create());
     }

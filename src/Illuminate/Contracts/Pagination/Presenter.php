@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Pagination;
+<?php
+
+namespace Illuminate\Contracts\Pagination;
 
 interface Presenter
 {

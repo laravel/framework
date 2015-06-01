@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 
-if (! function_exists('abort')) {
+if (!function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
      *
@@ -15,13 +15,13 @@ if (! function_exists('abort')) {
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    function abort($code, $message = '', array $headers = array())
+    function abort($code, $message = '', array $headers = [])
     {
         return app()->abort($code, $message, $headers);
     }
 }
 
-if (! function_exists('action')) {
+if (!function_exists('action')) {
     /**
      * Generate a URL to a controller action.
      *
@@ -30,13 +30,13 @@ if (! function_exists('action')) {
      * @param  bool    $absolute
      * @return string
      */
-    function action($name, $parameters = array(), $absolute = true)
+    function action($name, $parameters = [], $absolute = true)
     {
         return app('url')->action($name, $parameters, $absolute);
     }
 }
 
-if (! function_exists('app')) {
+if (!function_exists('app')) {
     /**
      * Get the available container instance.
      *
@@ -54,7 +54,7 @@ if (! function_exists('app')) {
     }
 }
 
-if (! function_exists('app_path')) {
+if (!function_exists('app_path')) {
     /**
      * Get the path to the application folder.
      *
@@ -67,7 +67,7 @@ if (! function_exists('app_path')) {
     }
 }
 
-if (! function_exists('asset')) {
+if (!function_exists('asset')) {
     /**
      * Generate an asset path for the application.
      *
@@ -81,7 +81,7 @@ if (! function_exists('asset')) {
     }
 }
 
-if (! function_exists('auth')) {
+if (!function_exists('auth')) {
     /**
      * Get the available auth instance.
      *
@@ -93,7 +93,7 @@ if (! function_exists('auth')) {
     }
 }
 
-if (! function_exists('base_path')) {
+if (!function_exists('base_path')) {
     /**
      * Get the path to the base of the install.
      *
@@ -106,7 +106,7 @@ if (! function_exists('base_path')) {
     }
 }
 
-if (! function_exists('back')) {
+if (!function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
      *
@@ -114,13 +114,13 @@ if (! function_exists('back')) {
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    function back($status = 302, $headers = array())
+    function back($status = 302, $headers = [])
     {
         return app('redirect')->back($status, $headers);
     }
 }
 
-if (! function_exists('bcrypt')) {
+if (!function_exists('bcrypt')) {
     /**
      * Hash the given value.
      *
@@ -128,13 +128,13 @@ if (! function_exists('bcrypt')) {
      * @param  array   $options
      * @return string
      */
-    function bcrypt($value, $options = array())
+    function bcrypt($value, $options = [])
     {
         return app('hash')->make($value, $options);
     }
 }
 
-if (! function_exists('config')) {
+if (!function_exists('config')) {
     /**
      * Get / set the specified configuration value.
      *
@@ -158,7 +158,7 @@ if (! function_exists('config')) {
     }
 }
 
-if (! function_exists('config_path')) {
+if (!function_exists('config_path')) {
     /**
      * Get the configuration path.
      *
@@ -171,7 +171,7 @@ if (! function_exists('config_path')) {
     }
 }
 
-if (! function_exists('cookie')) {
+if (!function_exists('cookie')) {
     /**
      * Create a new cookie instance.
      *
@@ -196,7 +196,7 @@ if (! function_exists('cookie')) {
     }
 }
 
-if (! function_exists('csrf_field')) {
+if (!function_exists('csrf_field')) {
     /**
      * Generate a CSRF token form field.
      *
@@ -208,7 +208,7 @@ if (! function_exists('csrf_field')) {
     }
 }
 
-if (! function_exists('csrf_token')) {
+if (!function_exists('csrf_token')) {
     /**
      * Get the CSRF token value.
      *
@@ -224,11 +224,11 @@ if (! function_exists('csrf_token')) {
             return $session->getToken();
         }
 
-        throw new RuntimeException("Application session store not set.");
+        throw new RuntimeException('Application session store not set.');
     }
 }
 
-if (! function_exists('database_path')) {
+if (!function_exists('database_path')) {
     /**
      * Get the database path.
      *
@@ -241,7 +241,7 @@ if (! function_exists('database_path')) {
     }
 }
 
-if (! function_exists('delete')) {
+if (!function_exists('delete')) {
     /**
      * Register a new DELETE route with the router.
      *
@@ -255,7 +255,7 @@ if (! function_exists('delete')) {
     }
 }
 
-if (! function_exists('factory')) {
+if (!function_exists('factory')) {
     /**
      * Create a model factory builder for a given class, name, and amount.
      *
@@ -278,7 +278,7 @@ if (! function_exists('factory')) {
     }
 }
 
-if (! function_exists('get')) {
+if (!function_exists('get')) {
     /**
      * Register a new GET route with the router.
      *
@@ -292,7 +292,7 @@ if (! function_exists('get')) {
     }
 }
 
-if (! function_exists('info')) {
+if (!function_exists('info')) {
     /**
      * Write some information to the log.
      *
@@ -300,13 +300,13 @@ if (! function_exists('info')) {
      * @param  array   $context
      * @return void
      */
-    function info($message, $context = array())
+    function info($message, $context = [])
     {
         return app('log')->info($message, $context);
     }
 }
 
-if (! function_exists('logger')) {
+if (!function_exists('logger')) {
     /**
      * Log a debug message to the logs.
      *
@@ -314,7 +314,7 @@ if (! function_exists('logger')) {
      * @param  array  $context
      * @return null|\Illuminate\Contracts\Logging\Log
      */
-    function logger($message = null, array $context = array())
+    function logger($message = null, array $context = [])
     {
         if (is_null($message)) {
             return app('log');
@@ -324,7 +324,7 @@ if (! function_exists('logger')) {
     }
 }
 
-if (! function_exists('old')) {
+if (!function_exists('old')) {
     /**
      * Retrieve an old input item.
      *
@@ -338,7 +338,7 @@ if (! function_exists('old')) {
     }
 }
 
-if (! function_exists('patch')) {
+if (!function_exists('patch')) {
     /**
      * Register a new PATCH route with the router.
      *
@@ -352,7 +352,7 @@ if (! function_exists('patch')) {
     }
 }
 
-if (! function_exists('post')) {
+if (!function_exists('post')) {
     /**
      * Register a new POST route with the router.
      *
@@ -366,7 +366,7 @@ if (! function_exists('post')) {
     }
 }
 
-if (! function_exists('put')) {
+if (!function_exists('put')) {
     /**
      * Register a new PUT route with the router.
      *
@@ -380,7 +380,7 @@ if (! function_exists('put')) {
     }
 }
 
-if (! function_exists('public_path')) {
+if (!function_exists('public_path')) {
     /**
      * Get the path to the public folder.
      *
@@ -393,7 +393,7 @@ if (! function_exists('public_path')) {
     }
 }
 
-if (! function_exists('redirect')) {
+if (!function_exists('redirect')) {
     /**
      * Get an instance of the redirector.
      *
@@ -403,7 +403,7 @@ if (! function_exists('redirect')) {
      * @param  bool    $secure
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
-    function redirect($to = null, $status = 302, $headers = array(), $secure = null)
+    function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
         if (is_null($to)) {
             return app('redirect');
@@ -413,7 +413,7 @@ if (! function_exists('redirect')) {
     }
 }
 
-if (! function_exists('resource')) {
+if (!function_exists('resource')) {
     /**
      * Route a resource to a controller.
      *
@@ -428,7 +428,7 @@ if (! function_exists('resource')) {
     }
 }
 
-if (! function_exists('response')) {
+if (!function_exists('response')) {
     /**
      * Return a new response from the application.
      *
@@ -437,7 +437,7 @@ if (! function_exists('response')) {
      * @param  array   $headers
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
      */
-    function response($content = '', $status = 200, array $headers = array())
+    function response($content = '', $status = 200, array $headers = [])
     {
         $factory = app('Illuminate\Contracts\Routing\ResponseFactory');
 
@@ -449,7 +449,7 @@ if (! function_exists('response')) {
     }
 }
 
-if (! function_exists('route')) {
+if (!function_exists('route')) {
     /**
      * Generate a URL to a named route.
      *
@@ -459,13 +459,13 @@ if (! function_exists('route')) {
      * @param  \Illuminate\Routing\Route  $route
      * @return string
      */
-    function route($name, $parameters = array(), $absolute = true, $route = null)
+    function route($name, $parameters = [], $absolute = true, $route = null)
     {
         return app('url')->route($name, $parameters, $absolute, $route);
     }
 }
 
-if (! function_exists('secure_asset')) {
+if (!function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
      *
@@ -478,7 +478,7 @@ if (! function_exists('secure_asset')) {
     }
 }
 
-if (! function_exists('secure_url')) {
+if (!function_exists('secure_url')) {
     /**
      * Generate a HTTPS url for the application.
      *
@@ -486,13 +486,13 @@ if (! function_exists('secure_url')) {
      * @param  mixed   $parameters
      * @return string
      */
-    function secure_url($path, $parameters = array())
+    function secure_url($path, $parameters = [])
     {
         return url($path, $parameters, true);
     }
 }
 
-if (! function_exists('session')) {
+if (!function_exists('session')) {
     /**
      * Get / set the specified session value.
      *
@@ -516,7 +516,7 @@ if (! function_exists('session')) {
     }
 }
 
-if (! function_exists('storage_path')) {
+if (!function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
      *
@@ -529,7 +529,7 @@ if (! function_exists('storage_path')) {
     }
 }
 
-if (! function_exists('trans')) {
+if (!function_exists('trans')) {
     /**
      * Translate the given message.
      *
@@ -539,7 +539,7 @@ if (! function_exists('trans')) {
      * @param  string  $locale
      * @return string
      */
-    function trans($id = null, $parameters = array(), $domain = 'messages', $locale = null)
+    function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
         if (is_null($id)) {
             return app('translator');
@@ -549,7 +549,7 @@ if (! function_exists('trans')) {
     }
 }
 
-if (! function_exists('trans_choice')) {
+if (!function_exists('trans_choice')) {
     /**
      * Translates the given message based on a count.
      *
@@ -560,13 +560,13 @@ if (! function_exists('trans_choice')) {
      * @param  string  $locale
      * @return string
      */
-    function trans_choice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
         return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
     }
 }
 
-if (! function_exists('url')) {
+if (!function_exists('url')) {
     /**
      * Generate a url for the application.
      *
@@ -575,13 +575,13 @@ if (! function_exists('url')) {
      * @param  bool    $secure
      * @return string
      */
-    function url($path = null, $parameters = array(), $secure = null)
+    function url($path = null, $parameters = [], $secure = null)
     {
         return app('Illuminate\Contracts\Routing\UrlGenerator')->to($path, $parameters, $secure);
     }
 }
 
-if (! function_exists('view')) {
+if (!function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
      *
@@ -590,7 +590,7 @@ if (! function_exists('view')) {
      * @param  array   $mergeData
      * @return \Illuminate\View\View
      */
-    function view($view = null, $data = array(), $mergeData = array())
+    function view($view = null, $data = [], $mergeData = [])
     {
         $factory = app('Illuminate\Contracts\View\Factory');
 
@@ -602,7 +602,7 @@ if (! function_exists('view')) {
     }
 }
 
-if (! function_exists('env')) {
+if (!function_exists('env')) {
     /**
      * Gets the value of an environment variable. Supports boolean, empty and null.
      *
@@ -644,7 +644,7 @@ if (! function_exists('env')) {
     }
 }
 
-if (! function_exists('event')) {
+if (!function_exists('event')) {
     /**
      * Fire an event and call the listeners.
      *
@@ -653,19 +653,19 @@ if (! function_exists('event')) {
      * @param  bool    $halt
      * @return array|null
      */
-    function event($event, $payload = array(), $halt = false)
+    function event($event, $payload = [], $halt = false)
     {
         return app('events')->fire($event, $payload, $halt);
     }
 }
 
-if (! function_exists('elixir')) {
+if (!function_exists('elixir')) {
     /**
-    * Get the path to a versioned Elixir file.
-    *
-    * @param  string  $file
-    * @return string
-    */
+     * Get the path to a versioned Elixir file.
+     *
+     * @param  string  $file
+     * @return string
+     */
     function elixir($file)
     {
         static $manifest = null;

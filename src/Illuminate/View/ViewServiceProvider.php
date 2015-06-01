@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
@@ -35,7 +37,7 @@ class ViewServiceProvider extends ServiceProvider
             // Next we will register the various engines with the resolver so that the
             // environment can resolve the engines it needs for various views based
             // on the extension of view files. We call a method for each engines.
-            foreach (array('php', 'blade') as $engine) {
+            foreach (['php', 'blade'] as $engine) {
                 $this->{'register'.ucfirst($engine).'Engine'}($resolver);
             }
 

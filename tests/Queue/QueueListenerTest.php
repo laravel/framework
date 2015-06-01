@@ -9,7 +9,6 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testRunProcessCallsProcess()
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();
@@ -19,7 +18,6 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
 
         $listener->runProcess($process, 1);
     }
-
 
     public function testListenerStopsWhenMemoryIsExceeded()
     {
@@ -31,7 +29,6 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
 
         $listener->runProcess($process, 1);
     }
-
 
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {

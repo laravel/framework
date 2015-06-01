@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth\Console;
+<?php
+
+namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
 

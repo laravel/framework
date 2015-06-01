@@ -1,4 +1,6 @@
-<?php namespace DummyNamespace;
+<?php
+
+namespace DummyNamespace;
 
 use DummyRootNamespaceJobs\Job;
 use Illuminate\Queue\SerializesModels;

@@ -10,7 +10,6 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testSectionCanBeFlushed()
     {
         $store = new ArrayStore;
@@ -21,39 +20,35 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('boom', $store->section('zap')->get('baz'));
     }
 
-
     public function testCacheCanBeSavedWithMultipleTags()
     {
         $store = new ArrayStore;
-        $tags = array('bop', 'zap');
+        $tags = ['bop', 'zap'];
         $store->tags($tags)->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-
     public function testCacheCanBeSetWithDatetimeArgument()
     {
         $store = new ArrayStore;
-        $tags = array('bop', 'zap');
+        $tags = ['bop', 'zap'];
         $duration = new DateTime();
-        $duration->add(new DateInterval("PT10M"));
+        $duration->add(new DateInterval('PT10M'));
         $store->tags($tags)->put('foo', 'bar', $duration);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-
     public function testCacheSavedWithMultipleTagsCanBeFlushed()
     {
         $store = new ArrayStore;
-        $tags1 = array('bop', 'zap');
+        $tags1 = ['bop', 'zap'];
         $store->tags($tags1)->put('foo', 'bar', 10);
-        $tags2 = array('bam', 'pow');
+        $tags2 = ['bam', 'pow'];
         $store->tags($tags2)->put('foo', 'bar', 10);
         $store->tags('zap')->flush();
         $this->assertNull($store->tags($tags1)->get('foo'));
         $this->assertEquals('bar', $store->tags($tags2)->get('foo'));
     }
-
 
     public function testTagsWithStringArgument()
     {
@@ -62,20 +57,18 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $store->tags('bop')->get('foo'));
     }
 
-
     public function testTagsCacheForever()
     {
         $store = new ArrayStore;
-        $tags = array('bop', 'zap');
+        $tags = ['bop', 'zap'];
         $store->tags($tags)->forever('foo', 'bar');
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-
     public function testRedisCacheTagsPushForeverKeysCorrectly()
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', array($store, array('foo', 'bar')));
+        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
@@ -87,17 +80,16 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $redis->forever('key1', 'key1:value');
     }
 
-
     public function testRedisCacheForeverTagsCanBeFlushed()
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', array($store, array('foo', 'bar')));
+        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
-        $conn->shouldReceive('lrange')->once()->with('prefix:foo:forever', 0, -1)->andReturn(array('key1', 'key2'));
-        $conn->shouldReceive('lrange')->once()->with('prefix:bar:forever', 0, -1)->andReturn(array('key3'));
+        $conn->shouldReceive('lrange')->once()->with('prefix:foo:forever', 0, -1)->andReturn(['key1', 'key2']);
+        $conn->shouldReceive('lrange')->once()->with('prefix:bar:forever', 0, -1)->andReturn(['key3']);
         $conn->shouldReceive('del')->once()->with('key1', 'key2');
         $conn->shouldReceive('del')->once()->with('key3');
         $conn->shouldReceive('del')->once()->with('prefix:foo:forever');

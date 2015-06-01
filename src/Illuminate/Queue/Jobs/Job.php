@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use DateTime;
 
@@ -136,7 +138,7 @@ abstract class Job
     {
         $segments = explode('@', $job);
 
-        return count($segments) > 1 ? $segments : array($segments[0], 'fire');
+        return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
     }
 
     /**

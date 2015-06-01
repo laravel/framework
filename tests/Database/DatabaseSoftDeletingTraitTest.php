@@ -9,7 +9,6 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = m::mock('DatabaseSoftDeletingTraitStub');
@@ -21,7 +20,6 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
     }
-
 
     public function testRestore()
     {
@@ -36,7 +34,6 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
         $this->assertNull($model->deleted_at);
     }
 
-
     public function testRestoreCancel()
     {
         $model = m::mock('DatabaseSoftDeletingTraitStub');
@@ -47,7 +44,6 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->restore());
     }
 }
-
 
 class DatabaseSoftDeletingTraitStub
 {

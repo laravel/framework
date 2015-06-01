@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Query\Grammars;
+<?php
+
+namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Grammar as BaseGrammar;
@@ -10,7 +12,7 @@ class Grammar extends BaseGrammar
      *
      * @var array
      */
-    protected $selectComponents = array(
+    protected $selectComponents = [
         'aggregate',
         'columns',
         'from',
@@ -23,7 +25,7 @@ class Grammar extends BaseGrammar
         'offset',
         'unions',
         'lock',
-    );
+    ];
 
     /**
      * Compile a select query into SQL.
@@ -34,7 +36,7 @@ class Grammar extends BaseGrammar
     public function compileSelect(Builder $query)
     {
         if (is_null($query->columns)) {
-            $query->columns = array('*');
+            $query->columns = ['*'];
         }
 
         return trim($this->concatenate($this->compileComponents($query)));
@@ -48,13 +50,13 @@ class Grammar extends BaseGrammar
      */
     protected function compileComponents(Builder $query)
     {
-        $sql = array();
+        $sql = [];
 
         foreach ($this->selectComponents as $component) {
             // To compile the query, we'll spin through each component of the query and
             // see if that component exists. If it does we'll just call the compiler
             // function for the component which is responsible for making the SQL.
-            if (! is_null($query->$component)) {
+            if (!is_null($query->$component)) {
                 $method = 'compile'.ucfirst($component);
 
                 $sql[$component] = $this->$method($query, $query->$component);
@@ -97,7 +99,7 @@ class Grammar extends BaseGrammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
+        if (!is_null($query->aggregate)) {
             return;
         }
 
@@ -127,9 +129,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        $sql = array();
+        $sql = [];
 
-        $query->setBindings(array(), 'join');
+        $query->setBindings([], 'join');
 
         foreach ($joins as $join) {
             $table = $this->wrapTable($join->table);
@@ -137,7 +139,7 @@ class Grammar extends BaseGrammar
             // First we need to build all of the "on" clauses for the join. There may be many
             // of these clauses so we will need to iterate through each one and build them
             // separately, then we'll join them up into a single string when we're done.
-            $clauses = array();
+            $clauses = [];
 
             foreach ($join->clauses as $clause) {
                 $clauses[] = $this->compileJoinConstraint($clause);
@@ -188,7 +190,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheres(Builder $query)
     {
-        $sql = array();
+        $sql = [];
 
         if (is_null($query->wheres)) {
             return '';
@@ -479,7 +481,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileHavings(Builder $query, $havings)
     {
-        $sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
+        $sql = implode(' ', array_map([$this, 'compileHaving'], $havings));
 
         return 'having '.$this->removeLeadingBoolean($sql);
     }
@@ -615,8 +617,8 @@ class Grammar extends BaseGrammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
-            $values = array($values);
+        if (!is_array(reset($values))) {
+            $values = [$values];
         }
 
         $columns = $this->columnize(array_keys(reset($values)));
@@ -624,7 +626,7 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = array();
+        $parameters = [];
 
         foreach ($values as $record) {
             $parameters[] = '('.$this->parameterize($record).')';
@@ -662,7 +664,7 @@ class Grammar extends BaseGrammar
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = array();
+        $columns = [];
 
         foreach ($values as $key => $value) {
             $columns[] = $this->wrap($key).' = '.$this->parameter($value);
@@ -710,7 +712,7 @@ class Grammar extends BaseGrammar
      */
     public function compileTruncate(Builder $query)
     {
-        return array('truncate '.$this->wrapTable($query->from) => array());
+        return ['truncate '.$this->wrapTable($query->from) => []];
     }
 
     /**

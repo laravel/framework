@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -96,14 +98,14 @@ class RouteListCommand extends Command
      */
     protected function getRouteInformation(Route $route)
     {
-        return $this->filterRoute(array(
+        return $this->filterRoute([
             'host'   => $route->domain(),
             'method' => implode('|', $route->methods()),
             'uri'    => $route->uri(),
             'name'   => $route->getName(),
             'action' => $route->getActionName(),
             'middleware' => $this->getMiddleware($route),
-        ));
+        ]);
     }
 
     /**
@@ -133,7 +135,7 @@ class RouteListCommand extends Command
 
         $actionName = $route->getActionName();
 
-        if (! empty($actionName) && $actionName !== 'Closure') {
+        if (!empty($actionName) && $actionName !== 'Closure') {
             $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
         }
 
@@ -171,7 +173,7 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($controller->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
+            if (!$this->methodExcludedByOptions($method, $options)) {
                 $results[] = array_get($middleware, $name, $name);
             }
         }
@@ -188,8 +190,8 @@ class RouteListCommand extends Command
      */
     protected function methodExcludedByOptions($method, array $options)
     {
-        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
+        return (!empty($options['only']) && !in_array($method, (array) $options['only'])) ||
+            (!empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -200,7 +202,7 @@ class RouteListCommand extends Command
      */
     protected function getPatternFilters($route)
     {
-        $patterns = array();
+        $patterns = [];
 
         foreach ($route->methods() as $method) {
             // For each method supported by the route we will need to gather up the patterned
@@ -236,8 +238,8 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! str_contains($route['uri'], $this->option('path'))) {
+        if (($this->option('name') && !str_contains($route['name'], $this->option('name'))) ||
+             $this->option('path') && !str_contains($route['uri'], $this->option('path'))) {
             return;
         }
 
@@ -251,10 +253,10 @@ class RouteListCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'),
+        return [
+            ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
-            array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
-        );
+            ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+        ];
     }
 }

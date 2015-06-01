@@ -8,6 +8,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase
     {
         $pipeTwo = function ($piped, $next) {
             $_SERVER['__test.pipe.two'] = $piped;
+
             return $next($piped);
         };
 
@@ -49,6 +50,7 @@ class PipelineTestPipeOne
     public function handle($piped, $next)
     {
         $_SERVER['__test.pipe.one'] = $piped;
+
         return $next($piped);
     }
 }
@@ -58,6 +60,7 @@ class PipelineTestParameterPipe
     public function handle($piped, $next, $parameter1 = null, $parameter2 = null)
     {
         $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2];
+
         return $next($piped);
     }
 }

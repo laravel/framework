@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -21,7 +23,7 @@ class FreshCommand extends Command
      *
      * @var string
      */
-    protected $description = "Remove the scaffolding included with the framework";
+    protected $description = 'Remove the scaffolding included with the framework';
 
     /**
      * Execute the console command.
@@ -30,7 +32,7 @@ class FreshCommand extends Command
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -65,8 +67,8 @@ class FreshCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
-        );
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+        ];
     }
 }

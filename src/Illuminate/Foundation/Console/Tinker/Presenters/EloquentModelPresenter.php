@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console\Tinker\Presenters;
+<?php
+
+namespace Illuminate\Foundation\Console\Tinker\Presenters;
 
 use ReflectionClass;
 use ReflectionProperty;
@@ -36,14 +38,14 @@ class EloquentModelPresenter extends ObjectPresenter
             $visible = array_diff(array_keys($attributes), $value->getHidden());
         }
 
-        if (! $this->showHidden($propertyFilter)) {
+        if (!$this->showHidden($propertyFilter)) {
             return array_intersect_key($attributes, array_flip($visible));
         }
 
         $properties = [];
 
         foreach ($attributes as $key => $value) {
-            if (! in_array($key, $visible)) {
+            if (!in_array($key, $visible)) {
                 $key = sprintf('<protected>%s</protected>', $key);
             }
 

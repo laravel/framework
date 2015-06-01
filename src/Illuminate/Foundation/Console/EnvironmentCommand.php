@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 
@@ -16,7 +18,7 @@ class EnvironmentCommand extends Command
      *
      * @var string
      */
-    protected $description = "Display the current framework environment";
+    protected $description = 'Display the current framework environment';
 
     /**
      * Execute the console command.

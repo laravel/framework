@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Mail\Transport;
+<?php
+
+namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
 use Swift_Mime_Message;
@@ -113,7 +115,6 @@ class MandrillTransport implements Swift_Transport
     {
         //
     }
-
 
     /**
      * Get the API key being used by the transport.

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Closure;
 use DateTime;
@@ -51,7 +53,7 @@ abstract class Queue
      */
     public function marshal()
     {
-        throw new RuntimeException("Push queues only supported by Iron.");
+        throw new RuntimeException('Push queues only supported by Iron.');
     }
 
     /**

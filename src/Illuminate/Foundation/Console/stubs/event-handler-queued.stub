@@ -1,6 +1,7 @@
-<?php namespace DummyNamespace;
+<?php
 
-use DummyFullEvent;
+namespace DummyNamespace;
+
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 

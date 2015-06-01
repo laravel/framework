@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Redis;
+<?php
+
+namespace Illuminate\Redis;
 
 use Closure;
 use Predis\Client;
@@ -19,7 +21,7 @@ class Database implements DatabaseContract
      * @param  array  $servers
      * @return void
      */
-    public function __construct(array $servers = array())
+    public function __construct(array $servers = [])
     {
         $cluster = array_pull($servers, 'cluster');
 
@@ -41,7 +43,7 @@ class Database implements DatabaseContract
      */
     protected function createAggregateClient(array $servers, array $options = [])
     {
-        return array('default' => new Client(array_values($servers), $options));
+        return ['default' => new Client(array_values($servers), $options)];
     }
 
     /**
@@ -53,7 +55,7 @@ class Database implements DatabaseContract
      */
     protected function createSingleClients(array $servers, array $options = [])
     {
-        $clients = array();
+        $clients = [];
 
         foreach ($servers as $key => $server) {
             $clients[$key] = new Client($server, $options);
@@ -80,9 +82,9 @@ class Database implements DatabaseContract
      * @param  array   $parameters
      * @return mixed
      */
-    public function command($method, array $parameters = array())
+    public function command($method, array $parameters = [])
     {
-        return call_user_func_array(array($this->clients['default'], $method), $parameters);
+        return call_user_func_array([$this->clients['default'], $method], $parameters);
     }
 
     /**

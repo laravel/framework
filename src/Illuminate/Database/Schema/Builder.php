@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema;
+<?php
+
+namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;
@@ -50,7 +52,7 @@ class Builder
 
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->select($sql, array($table))) > 0;
+        return count($this->connection->select($sql, [$table])) > 0;
     }
 
     /**
@@ -79,7 +81,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
+            if (!in_array(strtolower($column), $tableColumns)) {
                 return false;
             }
         }

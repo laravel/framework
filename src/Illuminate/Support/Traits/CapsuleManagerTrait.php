@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support\Traits;
+<?php
+
+namespace Illuminate\Support\Traits;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Contracts\Container\Container;
@@ -29,7 +31,7 @@ trait CapsuleManagerTrait
     {
         $this->container = $container;
 
-        if (! $this->container->bound('config')) {
+        if (!$this->container->bound('config')) {
             $this->container->instance('config', new Fluent);
         }
     }

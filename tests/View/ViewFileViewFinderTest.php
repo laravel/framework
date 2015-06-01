@@ -9,7 +9,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testBasicViewFinding()
     {
         $finder = $this->getFinder();
@@ -17,7 +16,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(__DIR__.'/foo.blade.php', $finder->find('foo'));
     }
-
 
     public function testCascadingFileLoading()
     {
@@ -27,7 +25,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(__DIR__.'/foo.php', $finder->find('foo'));
     }
-
 
     public function testDirectoryCascadingFileLoading()
     {
@@ -40,7 +37,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
     }
 
-
     public function testNamespacedBasicFileLoading()
     {
         $finder = $this->getFinder();
@@ -49,7 +45,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(__DIR__.'/foo/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
-
 
     public function testCascadingNamespacedFileLoading()
     {
@@ -61,18 +56,16 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(__DIR__.'/foo/bar/baz.php', $finder->find('foo::bar.baz'));
     }
 
-
     public function testDirectoryCascadingNamespacedFileLoading()
     {
         $finder = $this->getFinder();
-        $finder->addNamespace('foo', array(__DIR__.'/foo', __DIR__.'/bar'));
+        $finder->addNamespace('foo', [__DIR__.'/foo', __DIR__.'/bar']);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/bar/bar/baz.blade.php')->andReturn(true);
 
         $this->assertEquals(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
-
 
     /**
      * @expectedException InvalidArgumentException
@@ -86,7 +79,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder->find('foo');
     }
 
-
     /**
      * @expectedException InvalidArgumentException
      */
@@ -95,7 +87,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder = $this->getFinder();
         $finder->find('name::');
     }
-
 
     /**
      * @expectedException InvalidArgumentException
@@ -106,7 +97,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $finder->find('name::foo');
     }
 
-
     public function testAddingExtensionPrependsNotAppends()
     {
         $finder = $this->getFinder();
@@ -114,7 +104,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $extensions = $finder->getExtensions();
         $this->assertEquals('baz', reset($extensions));
     }
-
 
     public function testAddingExtensionsReplacesOldOnes()
     {
@@ -125,14 +114,12 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $this->assertCount(3, $finder->getExtensions());
     }
 
-
     public function testPassingViewWithHintReturnsTrue()
     {
         $finder = $this->getFinder();
 
         $this->assertTrue($finder->hasHintInformation('hint::foo.bar'));
     }
-
 
     public function testPassingViewWithoutHintReturnsFalse()
     {
@@ -141,7 +128,6 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($finder->hasHintInformation('foo.bar'));
     }
 
-
     public function testPassingViewWithFalseHintReturnsFalse()
     {
         $finder = $this->getFinder();
@@ -149,9 +135,8 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($finder->hasHintInformation('::foo.bar'));
     }
 
-
     protected function getFinder()
     {
-        return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));
+        return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), [__DIR__]);
     }
 }

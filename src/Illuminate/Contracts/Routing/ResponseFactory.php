@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Routing;
+<?php
+
+namespace Illuminate\Contracts\Routing;
 
 interface ResponseFactory
 {
@@ -10,7 +12,7 @@ interface ResponseFactory
      * @param  array   $headers
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function make($content = '', $status = 200, array $headers = array());
+    public function make($content = '', $status = 200, array $headers = []);
 
     /**
      * Return a new view response from the application.
@@ -21,7 +23,7 @@ interface ResponseFactory
      * @param  array   $headers
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function view($view, $data = array(), $status = 200, array $headers = array());
+    public function view($view, $data = [], $status = 200, array $headers = []);
 
     /**
      * Return a new JSON response from the application.
@@ -32,7 +34,7 @@ interface ResponseFactory
      * @param  int    $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function json($data = array(), $status = 200, array $headers = array(), $options = 0);
+    public function json($data = [], $status = 200, array $headers = [], $options = 0);
 
     /**
      * Return a new JSONP response from the application.
@@ -44,7 +46,7 @@ interface ResponseFactory
      * @param  int    $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function jsonp($callback, $data = array(), $status = 200, array $headers = array(), $options = 0);
+    public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0);
 
     /**
      * Return a new streamed response from the application.
@@ -54,7 +56,7 @@ interface ResponseFactory
      * @param  array    $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function stream($callback, $status = 200, array $headers = array());
+    public function stream($callback, $status = 200, array $headers = []);
 
     /**
      * Create a new file download response.
@@ -65,7 +67,7 @@ interface ResponseFactory
      * @param  null|string  $disposition
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download($file, $name = null, array $headers = array(), $disposition = 'attachment');
+    public function download($file, $name = null, array $headers = [], $disposition = 'attachment');
 
     /**
      * Create a new redirect response to the given path.
@@ -76,7 +78,7 @@ interface ResponseFactory
      * @param  bool    $secure
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function redirectTo($path, $status = 302, $headers = array(), $secure = null);
+    public function redirectTo($path, $status = 302, $headers = [], $secure = null);
 
     /**
      * Create a new redirect response to a named route.
@@ -87,7 +89,7 @@ interface ResponseFactory
      * @param  array   $headers
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function redirectToRoute($route, $parameters = array(), $status = 302, $headers = array());
+    public function redirectToRoute($route, $parameters = [], $status = 302, $headers = []);
 
     /**
      * Create a new redirect response to a controller action.
@@ -98,7 +100,7 @@ interface ResponseFactory
      * @param  array   $headers
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function redirectToAction($action, $parameters = array(), $status = 302, $headers = array());
+    public function redirectToAction($action, $parameters = [], $status = 302, $headers = []);
 
     /**
      * Create a new redirect response, while putting the current URL in the session.
@@ -109,7 +111,7 @@ interface ResponseFactory
      * @param  bool    $secure
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function redirectGuest($path, $status = 302, $headers = array(), $secure = null);
+    public function redirectGuest($path, $status = 302, $headers = [], $secure = null);
 
     /**
      * Create a new redirect response to the previously intended location.
@@ -120,5 +122,5 @@ interface ResponseFactory
      * @param  bool    $secure
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function redirectToIntended($default = '/', $status = 302, $headers = array(), $secure = null);
+    public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null);
 }

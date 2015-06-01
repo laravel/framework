@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pagination;
+<?php
+
+namespace Illuminate\Pagination;
 
 use Countable;
 use ArrayAccess;

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Http\Middleware;
+<?php
+
+namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;
@@ -79,7 +81,7 @@ class VerifyCsrfToken implements Middleware
     {
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
-        if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
+        if (!$token && $header = $request->header('X-XSRF-TOKEN')) {
             $token = $this->encrypter->decrypt($header);
         }
 

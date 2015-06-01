@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Broadcasting;
+<?php
+
+namespace Illuminate\Broadcasting;
 
 use Pusher;
 use Closure;
@@ -94,7 +96,7 @@ class BroadcastManager implements FactoryContract
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         } else {
-            return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
+            return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
         }
     }
 
@@ -203,6 +205,6 @@ class BroadcastManager implements FactoryContract
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->driver(), $method), $parameters);
+        return call_user_func_array([$this->driver(), $method], $parameters);
     }
 }

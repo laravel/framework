@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use Countable;
 use ArrayAccess;
@@ -17,7 +19,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @var array
      */
-    protected $items = array();
+    protected $items = [];
 
     /**
      * Create a new collection.
@@ -77,7 +79,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            return !is_null($this->first($key));
         }
 
         return in_array($key, $this->items);
@@ -244,7 +246,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         foreach ($this->items as $key => $value) {
             $groupKey = $groupBy($value, $key);
 
-            if (! array_key_exists($groupKey, $results)) {
+            if (!array_key_exists($groupKey, $results)) {
                 $results[$groupKey] = new static;
             }
 
@@ -305,7 +307,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Intersect the collection with the given items.
      *
-      * @param  mixed  $items
+     * @param  mixed  $items
      * @return static
      */
     public function intersect($items)
@@ -331,7 +333,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function useAsCallable($value)
     {
-        return ! is_string($value) && is_callable($value);
+        return !is_string($value) && is_callable($value);
     }
 
     /**
@@ -529,7 +531,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($this->useAsCallable($callback)) {
             return $this->filter(function ($item) use ($callback) {
-                return ! $callback($item);
+                return !$callback($item);
             });
         }
 
@@ -557,7 +559,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function search($value, $strict = false)
     {
-        if (! $this->useAsCallable($value)) {
+        if (!$this->useAsCallable($value)) {
             return array_search($value, $this->items, $strict);
         }
 
@@ -803,7 +805,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Zip the collection together with one or more arrays
+     * Zip the collection together with one or more arrays.
      *
      * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
      *      => [[1, 4], [2, 5], [3, 6]]
@@ -951,7 +953,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Results array of items from Collection or Arrayable.
      *
-       * @param  mixed  $items
+     * @param  mixed  $items
      * @return array
      */
     protected function getArrayableItems($items)

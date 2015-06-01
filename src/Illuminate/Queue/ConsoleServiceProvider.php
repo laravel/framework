@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
@@ -61,9 +63,9 @@ class ConsoleServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
+        return [
             'command.queue.table', 'command.queue.failed', 'command.queue.retry',
             'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
-        );
+        ];
     }
 }

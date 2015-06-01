@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support\Facades;
+<?php
+
+namespace Illuminate\Support\Facades;
 
 use Mockery;
 use RuntimeException;
@@ -49,7 +51,7 @@ abstract class Facade
             $mock = static::createFreshMockInstance($name);
         }
 
-        return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
+        return call_user_func_array([$mock, 'shouldReceive'], func_get_args());
     }
 
     /**
@@ -125,7 +127,7 @@ abstract class Facade
      */
     protected static function getFacadeAccessor()
     {
-        throw new RuntimeException("Facade does not implement getFacadeAccessor method.");
+        throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
     }
 
     /**
@@ -165,7 +167,7 @@ abstract class Facade
      */
     public static function clearResolvedInstances()
     {
-        static::$resolvedInstance = array();
+        static::$resolvedInstance = [];
     }
 
     /**
@@ -217,7 +219,7 @@ abstract class Facade
                 return $instance->$method($args[0], $args[1], $args[2], $args[3]);
 
             default:
-                return call_user_func_array(array($instance, $method), $args);
+                return call_user_func_array([$instance, $method], $args);
         }
     }
 }

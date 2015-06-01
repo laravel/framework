@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Config;
+<?php
+
+namespace Illuminate\Contracts\Config;
 
 interface Repository
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Jobs;
+<?php
+
+namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;

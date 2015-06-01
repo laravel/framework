@@ -10,38 +10,34 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase
         FacadeStub::setFacadeApplication(null);
     }
 
-
     public function tearDown()
     {
         m::close();
     }
 
-
     public function testFacadeCallsUnderlyingApplication()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(array('foo' => $mock = m::mock('StdClass')));
+        $app->setAttributes(['foo' => $mock = m::mock('StdClass')]);
         $mock->shouldReceive('bar')->once()->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
         $this->assertEquals('baz', FacadeStub::bar());
     }
 
-
     public function testShouldReceiveReturnsAMockeryMock()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(array('foo' => new StdClass));
+        $app->setAttributes(['foo' => new StdClass]);
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
         $this->assertEquals('baz', $app['foo']->foo('bar'));
     }
 
-
     public function testShouldReceiveCanBeCalledTwice()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(array('foo' => new StdClass));
+        $app->setAttributes(['foo' => new StdClass]);
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
@@ -49,7 +45,6 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $app['foo']->foo('bar'));
         $this->assertEquals('baz2', $app['foo']->foo2('bar2'));
     }
-
 
     public function testCanBeMockedWithoutUnderlyingInstance()
     {
@@ -68,7 +63,7 @@ class FacadeStub extends Illuminate\Support\Facades\Facade
 
 class ApplicationStub implements ArrayAccess
 {
-    protected $attributes = array();
+    protected $attributes = [];
 
     public function setAttributes($attributes)
     {

@@ -10,28 +10,24 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testAddingItemsToCollection()
     {
-        $c = new Collection(array('foo'));
+        $c = new Collection(['foo']);
         $c->add('bar')->add('baz');
-        $this->assertEquals(array('foo', 'bar', 'baz'), $c->all());
+        $this->assertEquals(['foo', 'bar', 'baz'], $c->all());
     }
-
 
     public function testGettingMaxItemsFromCollection()
     {
-        $c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
         $this->assertEquals(20, $c->max('foo'));
     }
 
-
     public function testGettingMinItemsFromCollection()
     {
-        $c = new Collection(array((object) array('foo' => 10), (object) array('foo' => 20)));
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
     }
-
 
     public function testContainsIndicatesIfModelInArray()
     {
@@ -41,19 +37,18 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $mockModel3 = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel3->shouldReceive('getKey')->andReturn(3);
-        $c = new Collection(array($mockModel, $mockModel2));
+        $c = new Collection([$mockModel, $mockModel2]);
 
         $this->assertTrue($c->contains($mockModel));
         $this->assertTrue($c->contains($mockModel2));
         $this->assertFalse($c->contains($mockModel3));
     }
 
-
     public function testContainsIndicatesIfKeyedModelInArray()
     {
         $mockModel = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel->shouldReceive('getKey')->andReturn('1');
-        $c = new Collection(array($mockModel));
+        $c = new Collection([$mockModel]);
         $mockModel2 = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel2->shouldReceive('getKey')->andReturn('2');
         $c->add($mockModel2);
@@ -78,7 +73,6 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->contains('name', 'Dayle'));
     }
 
-
     public function testContainsClosureIndicatesIfModelInArray()
     {
         $mockModel1 = m::mock('Illuminate\Database\Eloquent\Model');
@@ -91,31 +85,28 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($c->contains(function ($k, $m) { return $m->getKey() > 2; }));
     }
 
-
     public function testFindMethodFindsModelById()
     {
         $mockModel = m::mock('Illuminate\Database\Eloquent\Model');
         $mockModel->shouldReceive('getKey')->andReturn(1);
-        $c = new Collection(array($mockModel));
+        $c = new Collection([$mockModel]);
 
         $this->assertSame($mockModel, $c->find(1));
         $this->assertSame('taylor', $c->find(2, 'taylor'));
     }
 
-
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('first'), array(array('foo')));
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [['foo']]);
         $mockItem = m::mock('StdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
-        $mockItem->shouldReceive('with')->with(array('bar', 'baz'))->andReturn($mockItem);
-        $mockItem->shouldReceive('eagerLoadRelations')->once()->with(array('foo'))->andReturn(array('results'));
+        $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
+        $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);
         $c->load('bar', 'baz');
 
-        $this->assertEquals(array('results'), $c->all());
+        $this->assertEquals(['results'], $c->all());
     }
-
 
     public function testCollectionDictionaryReturnsModelKeys()
     {
@@ -128,11 +119,10 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c = new Collection(array($one, $two, $three));
+        $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals(array(1, 2, 3), $c->modelKeys());
+        $this->assertEquals([1, 2, 3], $c->modelKeys());
     }
-
 
     public function testCollectionMergesWithGivenCollection()
     {
@@ -145,12 +135,11 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c1 = new Collection(array($one, $two));
-        $c2 = new Collection(array($two, $three));
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$two, $three]);
 
-        $this->assertEquals(new Collection(array($one, $two, $three)), $c1->merge($c2));
+        $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
     }
-
 
     public function testCollectionDiffsWithGivenCollection()
     {
@@ -163,12 +152,11 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c1 = new Collection(array($one, $two));
-        $c2 = new Collection(array($two, $three));
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$two, $three]);
 
-        $this->assertEquals(new Collection(array($one)), $c1->diff($c2));
+        $this->assertEquals(new Collection([$one]), $c1->diff($c2));
     }
-
 
     public function testCollectionIntersectsWithGivenCollection()
     {
@@ -181,12 +169,11 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c1 = new Collection(array($one, $two));
-        $c2 = new Collection(array($two, $three));
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$two, $three]);
 
-        $this->assertEquals(new Collection(array($two)), $c1->intersect($c2));
+        $this->assertEquals(new Collection([$two]), $c1->intersect($c2));
     }
-
 
     public function testCollectionReturnsUniqueItems()
     {
@@ -196,11 +183,10 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $two = m::mock('Illuminate\Database\Eloquent\Model');
         $two->shouldReceive('getKey')->andReturn(2);
 
-        $c = new Collection(array($one, $two, $two));
+        $c = new Collection([$one, $two, $two]);
 
-        $this->assertEquals(new Collection(array($one, $two)), $c->unique());
+        $this->assertEquals(new Collection([$one, $two]), $c->unique());
     }
-
 
     public function testOnlyReturnsCollectionWithGivenModelKeys()
     {
@@ -213,12 +199,11 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c = new Collection(array($one, $two, $three));
+        $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals(new Collection(array($one)), $c->only(1));
-        $this->assertEquals(new Collection(array($two, $three)), $c->only(array(2, 3)));
+        $this->assertEquals(new Collection([$one]), $c->only(1));
+        $this->assertEquals(new Collection([$two, $three]), $c->only([2, 3]));
     }
-
 
     public function testExceptReturnsCollectionWithoutGivenModelKeys()
     {
@@ -231,9 +216,9 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $three = m::mock('Illuminate\Database\Eloquent\Model');
         $three->shouldReceive('getKey')->andReturn(3);
 
-        $c = new Collection(array($one, $two, $three));
+        $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals(new Collection(array($one, $three)), $c->except(2));
-        $this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
+        $this->assertEquals(new Collection([$one, $three]), $c->except(2));
+        $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
 }

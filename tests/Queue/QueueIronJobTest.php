@@ -9,16 +9,14 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('StdClass'));
-        $handler->shouldReceive('fire')->once()->with($job, array('data'));
+        $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
         $job->fire();
     }
-
 
     public function testDeleteRemovesTheJobFromIron()
     {
@@ -28,13 +26,12 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase
         $job->delete();
     }
 
-
     public function testDeleteNoopsOnPushedQueues()
     {
         $job = new Illuminate\Queue\Jobs\IronJob(
             m::mock('Illuminate\Container\Container'),
             m::mock('Illuminate\Queue\IronQueue'),
-            (object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
+            (object) ['id' => 1, 'body' => json_encode(['job' => 'foo', 'data' => ['data']]), 'timeout' => 60, 'pushed' => true],
             'default'
         );
         $job->getIron()->shouldReceive('deleteMessage')->never();
@@ -42,23 +39,21 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase
         $job->delete();
     }
 
-
     public function testReleaseProperlyReleasesJobOntoIron()
     {
         $job = $this->getJob();
         $job->getIron()->shouldReceive('deleteMessage')->once();
-        $job->getIron()->shouldReceive('recreate')->once()->with(json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 2, 'queue' => 'default')), 'default', 5);
+        $job->getIron()->shouldReceive('recreate')->once()->with(json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2, 'queue' => 'default']), 'default', 5);
 
         $job->release(5);
     }
-
 
     protected function getJob()
     {
         return new Illuminate\Queue\Jobs\IronJob(
             m::mock('Illuminate\Container\Container'),
             m::mock('Illuminate\Queue\IronQueue'),
-            (object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
+            (object) ['id' => 1, 'body' => json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1, 'queue' => 'default']), 'timeout' => 60]
         );
     }
 }

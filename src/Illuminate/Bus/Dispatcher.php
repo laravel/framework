@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Bus;
+<?php
+
+namespace Illuminate\Bus;
 
 use Closure;
 use ArrayAccess;
@@ -145,7 +147,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      * @return mixed
      */
     protected function getParameterValueForCommand($command, ArrayAccess $source,
-        ReflectionParameter $parameter, array $extras = array())
+        ReflectionParameter $parameter, array $extras = [])
     {
         if (array_key_exists($parameter->name, $extras)) {
             return $extras[$parameter->name];
@@ -233,8 +235,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     {
         $queue = call_user_func($this->queueResolver);
 
-        if (! $queue instanceof Queue) {
-            throw new RuntimeException("Queue resolver did not return a Queue implementation.");
+        if (!$queue instanceof Queue) {
+            throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
 
         if (method_exists($command, 'queue')) {

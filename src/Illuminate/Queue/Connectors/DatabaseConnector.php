@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php
+
+namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\ConnectionResolverInterface;

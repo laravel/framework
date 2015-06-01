@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,7 +20,7 @@ class ConsoleMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = "Create a new Artisan command";
+    protected $description = 'Create a new Artisan command';
 
     /**
      * The type of class being generated.
@@ -69,9 +71,9 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getArguments()
     {
-        return array(
-            array('name', InputArgument::REQUIRED, 'The name of the command.'),
-        );
+        return [
+            ['name', InputArgument::REQUIRED, 'The name of the command.'],
+        ];
     }
 
     /**
@@ -81,8 +83,8 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getOptions()
     {
-        return array(
-            array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'),
-        );
+        return [
+            ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'],
+        ];
     }
 }

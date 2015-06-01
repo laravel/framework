@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use Countable;
 use JsonSerializable;
@@ -14,7 +16,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @var array
      */
-    protected $messages = array();
+    protected $messages = [];
 
     /**
      * Default format for message output.
@@ -29,7 +31,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      * @param  array  $messages
      * @return void
      */
-    public function __construct(array $messages = array())
+    public function __construct(array $messages = [])
     {
         foreach ($messages as $key => $value) {
             $this->messages[$key] = (array) $value;
@@ -90,7 +92,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+        return !isset($messages[$key]) || !in_array($message, $messages[$key]);
     }
 
     /**
@@ -134,7 +136,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
             return $this->transform($this->messages[$key], $this->checkFormat($format), $key);
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -147,7 +149,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $format = $this->checkFormat($format);
 
-        $all = array();
+        $all = [];
 
         foreach ($this->messages as $key => $messages) {
             $all = array_merge($all, $this->transform($messages, $format, $key));
@@ -171,10 +173,10 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         // We will simply spin through the given messages and transform each one
         // replacing the :message place holder with the real message allowing
         // the messages to be easily formatted to each developer's desires.
-        $replace = array(':message', ':key');
+        $replace = [':message', ':key'];
 
         foreach ($messages as &$message) {
-            $message = str_replace($replace, array($message, $messageKey), $format);
+            $message = str_replace($replace, [$message, $messageKey], $format);
         }
 
         return $messages;
@@ -241,7 +243,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function isEmpty()
     {
-        return ! $this->any();
+        return !$this->any();
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 class ResourceRegistrar
 {
@@ -14,7 +16,7 @@ class ResourceRegistrar
      *
      * @var array
      */
-    protected $resourceDefaults = array('index', 'create', 'store', 'show', 'edit', 'update', 'destroy');
+    protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
      * Create a new resource registrar instance.
@@ -35,7 +37,7 @@ class ResourceRegistrar
      * @param  array   $options
      * @return void
      */
-    public function register($name, $controller, array $options = array())
+    public function register($name, $controller, array $options = [])
     {
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
@@ -95,7 +97,7 @@ class ResourceRegistrar
         // last segment, which will be considered the final resources name we use.
         $prefix = implode('/', array_slice($segments, 0, -1));
 
-        return array(end($segments), $prefix);
+        return [end($segments), $prefix];
     }
 
     /**
@@ -124,7 +126,7 @@ class ResourceRegistrar
      */
     public function getResourceUri($resource)
     {
-        if (! str_contains($resource, '.')) {
+        if (!str_contains($resource, '.')) {
             return $resource;
         }
 
@@ -168,7 +170,7 @@ class ResourceRegistrar
     {
         $name = $this->getResourceName($resource, $method, $options);
 
-        return array('as' => $name, 'uses' => $controller.'@'.$method);
+        return ['as' => $name, 'uses' => $controller.'@'.$method];
     }
 
     /**
@@ -190,7 +192,7 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-        if (! $this->router->hasGroupStack()) {
+        if (!$this->router->hasGroupStack()) {
             return $prefix.$resource.'.'.$method;
         }
 

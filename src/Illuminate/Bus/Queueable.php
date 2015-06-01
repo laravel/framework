@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Bus;
+<?php
+
+namespace Illuminate\Bus;
 
 trait Queueable
 {

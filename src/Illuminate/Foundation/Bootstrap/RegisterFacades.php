@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;

@@ -23,7 +23,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
         $composer->shouldReceive('dumpAutoloads')->once();
 
-        $this->runCommand($command, array('name' => 'create_foo'));
+        $this->runCommand($command, ['name' => 'create_foo']);
     }
 
     public function testBasicCreateGivesCreatorProperArguments()
@@ -38,9 +38,8 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', null, false);
 
-        $this->runCommand($command, array('name' => 'create_foo'));
+        $this->runCommand($command, ['name' => 'create_foo']);
     }
-
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
@@ -54,11 +53,10 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.'/migrations', 'users', true);
 
-        $this->runCommand($command, array('name' => 'create_foo', '--create' => 'users'));
+        $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
 
-
-    protected function runCommand($command, $input = array())
+    protected function runCommand($command, $input = [])
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }

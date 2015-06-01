@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -25,14 +27,14 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @var array
      */
-    protected $connections = array();
+    protected $connections = [];
 
     /**
      * The custom connection resolvers.
      *
      * @var array
      */
-    protected $extensions = array();
+    protected $extensions = [];
 
     /**
      * Create a new database manager instance.
@@ -60,7 +62,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
         // set the "fetch mode" for PDO which determines the query return types.
-        if (! isset($this->connections[$name])) {
+        if (!isset($this->connections[$name])) {
             $connection = $this->makeConnection($name);
 
             $this->setPdoForType($connection, $type);
@@ -121,7 +123,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $this->disconnect($name = $name ?: $this->getDefaultConnection());
 
-        if (! isset($this->connections[$name])) {
+        if (!isset($this->connections[$name])) {
             return $this->connection($name);
         }
 
@@ -290,6 +292,6 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->connection(), $method), $parameters);
+        return call_user_func_array([$this->connection(), $method], $parameters);
     }
 }

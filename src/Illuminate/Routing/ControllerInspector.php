@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use ReflectionClass;
 use ReflectionMethod;
@@ -10,10 +12,10 @@ class ControllerInspector
      *
      * @var array
      */
-    protected $verbs = array(
+    protected $verbs = [
         'any', 'get', 'post', 'put', 'patch',
         'delete', 'head', 'options',
-    );
+    ];
 
     /**
      * Get the routable methods for a controller.
@@ -24,7 +26,7 @@ class ControllerInspector
      */
     public function getRoutable($controller, $prefix)
     {
-        $routable = array();
+        $routable = [];
 
         $reflection = new ReflectionClass($controller);
 
@@ -91,7 +93,7 @@ class ControllerInspector
      */
     protected function getIndexData($data, $prefix)
     {
-        return array('verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix);
+        return ['verb' => $data['verb'], 'plain' => $prefix, 'uri' => $prefix];
     }
 
     /**

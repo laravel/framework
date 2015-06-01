@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Queue\Worker;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
@@ -10,10 +9,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testJobIsPoppedOffQueueAndProcessed()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
+        $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
@@ -23,10 +21,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $worker->pop('connection', 'queue');
     }
 
-
     public function testJobIsPoppedOffFirstQueueInListAndProcessed()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', array('process'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
+        $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
@@ -37,10 +34,9 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $worker->pop('connection', 'queue1,queue2');
     }
 
-
     public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', array('process', 'sleep'), array($manager = m::mock('Illuminate\Queue\QueueManager')));
+        $worker = $this->getMock('Illuminate\Queue\Worker', ['process', 'sleep'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $connection->shouldReceive('pop')->once()->with('queue')->andReturn(null);
         $worker->expects($this->never())->method('process');
@@ -48,7 +44,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
         $worker->pop('connection', 'queue', 0, 3);
     }
-
 
     public function testWorkerLogsJobToFailedQueueIfMaxTriesHasBeenExceeded()
     {
@@ -64,7 +59,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $worker->process('connection', $job, 3, 0);
     }
 
-
     /**
      * @expectedException RuntimeException
      */
@@ -78,7 +72,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
         $worker->process('connection', $job, 0, 5);
     }
-
 
     /**
      * @expectedException RuntimeException

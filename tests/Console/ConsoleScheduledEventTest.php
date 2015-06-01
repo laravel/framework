@@ -7,12 +7,11 @@ use Illuminate\Console\Scheduling\Event;
 class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * The default configuration timezone
+     * The default configuration timezone.
      *
      * @var string
      */
     protected $defaultTimezone;
-
 
     public function setUp()
     {
@@ -20,14 +19,12 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         date_default_timezone_set('UTC');
     }
 
-
     public function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
         Carbon::setTestNow(null);
         m::close();
     }
-
 
     public function testBasicCronCompilation()
     {
@@ -60,7 +57,6 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         $event = new Event('php foo');
         $this->assertEquals('0 * * * * *', $event->everyFiveMinutes()->hourly()->getExpression());
     }
-
 
     public function testEventIsDueCheck()
     {

@@ -10,14 +10,12 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testFileHandlerCanBeAdded()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
         $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\StreamHandler'));
         $writer->useFiles(__DIR__);
     }
-
 
     public function testRotatingFileHandlerCanBeAdded()
     {
@@ -26,14 +24,12 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer->useDailyFiles(__DIR__, 5);
     }
 
-
     public function testErrorLogHandlerCanBeAdded()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
         $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\ErrorLogHandler'));
         $writer->useErrorLog();
     }
-
 
     public function testMethodsPassErrorAdditionsToMonolog()
     {
@@ -43,14 +39,13 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer->error('foo');
     }
 
-
     public function testWriterFiresEventsDispatcher()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
-        $monolog->shouldReceive('error')->once()->with('foo', array());
+        $monolog->shouldReceive('error')->once()->with('foo', []);
 
-        $events->listen('illuminate.log', function ($level, $message, array $context = array()) {
-            $_SERVER['__log.level']   = $level;
+        $events->listen('illuminate.log', function ($level, $message, array $context = []) {
+            $_SERVER['__log.level'] = $level;
             $_SERVER['__log.message'] = $message;
             $_SERVER['__log.context'] = $context;
         });
@@ -63,10 +58,9 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
         $this->assertTrue(isset($_SERVER['__log.context']));
-        $this->assertEquals(array(), $_SERVER['__log.context']);
+        $this->assertEquals([], $_SERVER['__log.context']);
         unset($_SERVER['__log.context']);
     }
-
 
     /**
      * @expectedException RuntimeException
@@ -76,7 +70,6 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
         $writer->listen(function () {});
     }
-
 
     public function testListenShortcut()
     {

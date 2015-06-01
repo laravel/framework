@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 
@@ -16,7 +18,7 @@ class DownCommand extends Command
      *
      * @var string
      */
-    protected $description = "Put the application into maintenance mode";
+    protected $description = 'Put the application into maintenance mode';
 
     /**
      * Execute the console command.

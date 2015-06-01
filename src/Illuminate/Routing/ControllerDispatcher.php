@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -123,7 +125,7 @@ class ControllerDispatcher
         $results = [];
 
         foreach ($instance->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
+            if (!$this->methodExcludedByOptions($method, $options)) {
                 $results[] = $this->router->resolveMiddlewareClassName($name);
             }
         }
@@ -140,8 +142,8 @@ class ControllerDispatcher
      */
     public function methodExcludedByOptions($method, array $options)
     {
-        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
+        return (!empty($options['only']) && !in_array($method, (array) $options['only'])) ||
+            (!empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -179,7 +181,7 @@ class ControllerDispatcher
                 // them until we get a response or are finished iterating through this filters.
                 $response = $this->callFilter($filter, $route, $request);
 
-                if (! is_null($response)) {
+                if (!is_null($response)) {
                     return $response;
                 }
             }
@@ -232,7 +234,7 @@ class ControllerDispatcher
      */
     protected function filterApplies($filter, $request, $method)
     {
-        foreach (array('Method', 'On') as $type) {
+        foreach (['Method', 'On'] as $type) {
             if ($this->{"filterFails{$type}"}($filter, $request, $method)) {
                 return false;
             }
@@ -277,7 +279,7 @@ class ControllerDispatcher
             $on = explode('|', $on);
         }
 
-        return ! in_array(strtolower($request->getMethod()), $on);
+        return !in_array(strtolower($request->getMethod()), $on);
     }
 
     /**

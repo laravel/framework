@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Schema\Grammars;
+<?php
+
+namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,14 +12,14 @@ class SqlServerGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = array('Increment', 'Nullable', 'Default');
+    protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
     /**
      * The columns available as serials.
      *
      * @var array
      */
-    protected $serials = array('bigInteger', 'integer');
+    protected $serials = ['bigInteger', 'integer'];
 
     /**
      * Compile the query to determine if a table exists.
@@ -528,8 +530,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
-            return " default ".$this->getDefaultValue($column->default);
+        if (!is_null($column->default)) {
+            return ' default '.$this->getDefaultValue($column->default);
         }
     }
 

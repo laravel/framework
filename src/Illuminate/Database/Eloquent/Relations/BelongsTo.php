@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -148,13 +150,13 @@ class BelongsTo extends Relation
      */
     protected function getEagerModelKeys(array $models)
     {
-        $keys = array();
+        $keys = [];
 
         // First we need to gather all of the keys from the parent models so we know what
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
         foreach ($models as $model) {
-            if (! is_null($value = $model->{$this->foreignKey})) {
+            if (!is_null($value = $model->{$this->foreignKey})) {
                 $keys[] = $value;
             }
         }
@@ -163,7 +165,7 @@ class BelongsTo extends Relation
         // it so the query doesn't fail, but will not return any results, which should
         // be what this developer is expecting in a case where this happens to them.
         if (count($keys) == 0) {
-            return array(0);
+            return [0];
         }
 
         return array_values(array_unique($keys));
@@ -202,7 +204,7 @@ class BelongsTo extends Relation
         // First we will get to build a dictionary of the child models by their primary
         // key of the relationship, then we can easily match the children back onto
         // the parents using that dictionary and the primary key of the children.
-        $dictionary = array();
+        $dictionary = [];
 
         foreach ($results as $result) {
             $dictionary[$result->getAttribute($other)] = $result;

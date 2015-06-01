@@ -7,12 +7,10 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('child', str_singular('children'));
     }
 
-
     public function testBasicPlural()
     {
         $this->assertEquals('children', str_plural('child'));
     }
-
 
     public function testCaseSensitiveSingularUsage()
     {
@@ -21,14 +19,12 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Test', str_singular('Tests'));
     }
 
-
     public function testCaseSensitiveSingularPlural()
     {
         $this->assertEquals('Children', str_plural('Child'));
         $this->assertEquals('CHILDREN', str_plural('CHILD'));
         $this->assertEquals('Tests', str_plural('Test'));
     }
-
 
     public function testIfEndOfWordPlural()
     {

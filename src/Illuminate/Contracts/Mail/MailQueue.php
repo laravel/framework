@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Mail;
+<?php
+
+namespace Illuminate\Contracts\Mail;
 
 interface MailQueue
 {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View\Engines;
+<?php
+
+namespace Illuminate\View\Engines;
 
 interface EngineInterface
 {
@@ -9,5 +11,5 @@ interface EngineInterface
      * @param  array   $data
      * @return string
      */
-    public function get($path, array $data = array());
+    public function get($path, array $data = []);
 }

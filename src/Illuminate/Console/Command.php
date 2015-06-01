@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
@@ -74,7 +76,7 @@ class Command extends SymfonyCommand
 
         $this->setDescription($this->description);
 
-        if (! isset($this->signature)) {
+        if (!isset($this->signature)) {
             $this->specifyParameters();
         }
     }
@@ -110,11 +112,11 @@ class Command extends SymfonyCommand
         // set them all on the base command instance. This specifies what can get
         // passed into these commands as "parameters" to control the execution.
         foreach ($this->getArguments() as $arguments) {
-            call_user_func_array(array($this, 'addArgument'), $arguments);
+            call_user_func_array([$this, 'addArgument'], $arguments);
         }
 
         foreach ($this->getOptions() as $options) {
-            call_user_func_array(array($this, 'addOption'), $options);
+            call_user_func_array([$this, 'addOption'], $options);
         }
     }
 
@@ -155,7 +157,7 @@ class Command extends SymfonyCommand
      * @param  array   $arguments
      * @return int
      */
-    public function call($command, array $arguments = array())
+    public function call($command, array $arguments = [])
     {
         $instance = $this->getApplication()->find($command);
 
@@ -171,7 +173,7 @@ class Command extends SymfonyCommand
      * @param  array   $arguments
      * @return int
      */
-    public function callSilent($command, array $arguments = array())
+    public function callSilent($command, array $arguments = [])
     {
         $instance = $this->getApplication()->find($command);
 
@@ -380,7 +382,7 @@ class Command extends SymfonyCommand
      */
     protected function getArguments()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -390,7 +392,7 @@ class Command extends SymfonyCommand
      */
     protected function getOptions()
     {
-        return array();
+        return [];
     }
 
     /**

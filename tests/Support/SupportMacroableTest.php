@@ -12,9 +12,9 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
     private function createObjectForTrait()
     {
         $traitName = 'Illuminate\Support\Traits\Macroable';
+
         return $this->getObjectForTrait($traitName);
     }
-
 
     public function testRegisterMacro()
     {
@@ -23,14 +23,12 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', $macroable::{__CLASS__}());
     }
 
-
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
         $macroable::macro(__CLASS__, function () { return 'Taylor'; });
         $this->assertEquals('Taylor', $macroable->{__CLASS__}());
     }
-
 
     public function testWhenCallingMacroClosureIsBoundToObject()
     {

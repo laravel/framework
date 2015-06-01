@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache\Console;
+<?php
+
+namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
@@ -18,7 +20,7 @@ class ClearCommand extends Command
      *
      * @var string
      */
-    protected $description = "Flush the application cache";
+    protected $description = 'Flush the application cache';
 
     /**
      * The cache manager instance.

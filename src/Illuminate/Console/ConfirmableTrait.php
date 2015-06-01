@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Closure;
 
@@ -27,7 +29,7 @@ trait ConfirmableTrait
 
             $confirmed = $this->confirm('Do you really wish to run this command? [y/N]');
 
-            if (! $confirmed) {
+            if (!$confirmed) {
                 $this->comment('Command Cancelled!');
 
                 return false;

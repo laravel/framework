@@ -9,7 +9,6 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testRetrieveByIDReturnsUser()
     {
         $provider = $this->getProviderMock();
@@ -22,7 +21,6 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $user);
     }
 
-
     public function testRetrieveByCredentialsReturnsUser()
     {
         $provider = $this->getProviderMock();
@@ -31,11 +29,10 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
         $mock->shouldReceive('first')->once()->andReturn('bar');
         $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
-        $user = $provider->retrieveByCredentials(array('username' => 'dayle', 'password' => 'foo'));
+        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo']);
 
         $this->assertEquals('bar', $user);
     }
-
 
     public function testCredentialValidation()
     {
@@ -45,11 +42,10 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
         $provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'foo');
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
-        $result = $provider->validateCredentials($user, array('password' => 'plain'));
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);
     }
-
 
     public function testModelsCanBeCreated()
     {
@@ -61,11 +57,11 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('EloquentProviderUserStub', $model);
     }
 
-
     protected function getProviderMock()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        return $this->getMock('Illuminate\Auth\EloquentUserProvider', array('createModel'), array($hasher, 'foo'));
+
+        return $this->getMock('Illuminate\Auth\EloquentUserProvider', ['createModel'], [$hasher, 'foo']);
     }
 }
 

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue;
+<?php
+
+namespace Illuminate\Queue;
 
 use Illuminate\Redis\Database;
 use Illuminate\Queue\Jobs\RedisJob;
@@ -7,8 +9,8 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 class RedisQueue extends Queue implements QueueContract
 {
     /**
-    * The Redis database instance.
-    *
+     * The Redis database instance.
+     *
      * @var \Illuminate\Redis\Database
      */
     protected $redis;
@@ -70,7 +72,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  array   $options
      * @return mixed
      */
-    public function pushRaw($payload, $queue = null, array $options = array())
+    public function pushRaw($payload, $queue = null, array $options = [])
     {
         $this->getConnection()->rpush($this->getQueue($queue), $payload);
 
@@ -125,13 +127,13 @@ class RedisQueue extends Queue implements QueueContract
 
         $queue = $this->getQueue($queue);
 
-        if (! is_null($this->expire)) {
+        if (!is_null($this->expire)) {
             $this->migrateAllExpiredJobs($queue);
         }
 
         $job = $this->getConnection()->lpop($queue);
 
-        if (! is_null($job)) {
+        if (!is_null($job)) {
             $this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
 
             return new RedisJob($this->container, $this, $job, $original);

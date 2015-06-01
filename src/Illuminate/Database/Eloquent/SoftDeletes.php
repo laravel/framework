@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 trait SoftDeletes
 {
@@ -58,7 +60,7 @@ trait SoftDeletes
 
         $this->{$this->getDeletedAtColumn()} = $time = $this->freshTimestamp();
 
-        $query->update(array($this->getDeletedAtColumn() => $this->fromDateTime($time)));
+        $query->update([$this->getDeletedAtColumn() => $this->fromDateTime($time)]);
     }
 
     /**
@@ -96,7 +98,7 @@ trait SoftDeletes
      */
     public function trashed()
     {
-        return ! is_null($this->{$this->getDeletedAtColumn()});
+        return !is_null($this->{$this->getDeletedAtColumn()});
     }
 
     /**

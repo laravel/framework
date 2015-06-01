@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Auth\Passwords;
+<?php
+
+namespace Illuminate\Auth\Passwords;
 
 use Carbon\Carbon;
 use Illuminate\Database\ConnectionInterface;
@@ -109,7 +111,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
 
         $token = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
-        return $token && ! $this->tokenExpired($token);
+        return $token && !$this->tokenExpired($token);
     }
 
     /**

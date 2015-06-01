@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Mail;
+<?php
+
+namespace Illuminate\Mail;
 
 use Closure;
 use Swift_Mailer;
@@ -76,14 +78,14 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @var array
      */
-    protected $failedRecipients = array();
+    protected $failedRecipients = [];
 
     /**
      * Array of parsed views containing html and text view name.
      *
      * @var array
      */
-    protected $parsedViews = array();
+    protected $parsedViews = [];
 
     /**
      * Create a new Mailer instance.
@@ -121,7 +123,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function raw($text, $callback)
     {
-        return $this->send(array('raw' => $text), [], $callback);
+        return $this->send(['raw' => $text], [], $callback);
     }
 
     /**
@@ -134,7 +136,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function plain($view, array $data, $callback)
     {
-        return $this->send(array('text' => $view), $data, $callback);
+        return $this->send(['text' => $view], $data, $callback);
     }
 
     /**
@@ -238,7 +240,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function buildQueueCallable($callback)
     {
-        if (! $callback instanceof Closure) {
+        if (!$callback instanceof Closure) {
             return $callback;
         }
 
@@ -343,7 +345,7 @@ class Mailer implements MailerContract, MailQueueContract
             ];
         }
 
-        throw new InvalidArgumentException("Invalid view.");
+        throw new InvalidArgumentException('Invalid view.');
     }
 
     /**
@@ -355,10 +357,10 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendSwiftMessage($message)
     {
         if ($this->events) {
-            $this->events->fire('mailer.sending', array($message));
+            $this->events->fire('mailer.sending', [$message]);
         }
 
-        if (! $this->pretending) {
+        if (!$this->pretending) {
             return $this->swift->send($message, $this->failedRecipients);
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
@@ -395,7 +397,7 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->container->make($callback)->mail($message);
         }
 
-        throw new InvalidArgumentException("Callback is not valid.");
+        throw new InvalidArgumentException('Callback is not valid.');
     }
 
     /**
@@ -410,7 +412,7 @@ class Mailer implements MailerContract, MailQueueContract
         // If a global from address has been specified we will set it on every message
         // instances so the developer does not have to repeat themselves every time
         // they create a new message. We will just go ahead and push the address.
-        if (! empty($this->from['address'])) {
+        if (!empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 

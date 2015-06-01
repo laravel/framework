@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pipeline;
+<?php
+
+namespace Illuminate\Pipeline;
 
 use Closure;
 use Illuminate\Contracts\Container\Container;
@@ -25,7 +27,7 @@ class Pipeline implements PipelineContract
      *
      * @var array
      */
-    protected $pipes = array();
+    protected $pipes = [];
 
     /**
      * The method to call on each pipe.

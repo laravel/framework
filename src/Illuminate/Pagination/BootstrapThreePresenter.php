@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Pagination;
+<?php
+
+namespace Illuminate\Pagination;
 
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
@@ -107,7 +109,7 @@ class BootstrapThreePresenter implements PresenterContract
      */
     protected function getDots()
     {
-        return $this->getDisabledTextWrapper("...");
+        return $this->getDisabledTextWrapper('...');
     }
 
     /**

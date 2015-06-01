@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Bootstrap;
+<?php
+
+namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Log\Writer;
 use Monolog\Logger as Monolog;
@@ -59,7 +61,7 @@ class ConfigureLogging
      */
     protected function configureHandlers(Application $app, Writer $log)
     {
-        $method = "configure".ucfirst($app['config']['app.log'])."Handler";
+        $method = 'configure'.ucfirst($app['config']['app.log']).'Handler';
 
         $this->{$method}($app, $log);
     }

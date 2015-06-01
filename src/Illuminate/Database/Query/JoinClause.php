@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Query;
+<?php
+
+namespace Illuminate\Database\Query;
 
 class JoinClause
 {
@@ -21,14 +23,14 @@ class JoinClause
      *
      * @var array
      */
-    public $clauses = array();
+    public $clauses = [];
 
     /**
-    * The "on" bindings for the join.
-    *
-    * @var array
-    */
-    public $bindings = array();
+     * The "on" bindings for the join.
+     *
+     * @var array
+     */
+    public $bindings = [];
 
     /**
      * Create a new join clause instance.

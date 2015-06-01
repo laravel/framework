@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Query\Grammars;
+<?php
+
+namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 
@@ -9,11 +11,11 @@ class SQLiteGrammar extends Grammar
      *
      * @var array
      */
-    protected $operators = array(
+    protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'not like', 'between', 'ilike',
         '&', '|', '<<', '>>',
-    );
+    ];
 
     /**
      * Compile an insert statement into SQL.
@@ -29,8 +31,8 @@ class SQLiteGrammar extends Grammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
-            $values = array($values);
+        if (!is_array(reset($values))) {
+            $values = [$values];
         }
 
         // If there is only one record being inserted, we will just use the usual query
@@ -42,7 +44,7 @@ class SQLiteGrammar extends Grammar
 
         $names = $this->columnize(array_keys(reset($values)));
 
-        $columns = array();
+        $columns = [];
 
         // SQLite requires us to build the multi-row insert as a listing of select with
         // unions joining them together. So we'll build out this list of columns and
@@ -64,9 +66,9 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        $sql = array('delete from sqlite_sequence where name = ?' => array($query->from));
+        $sql = ['delete from sqlite_sequence where name = ?' => [$query->from]];
 
-        $sql['delete from '.$this->wrapTable($query->from)] = array();
+        $sql['delete from '.$this->wrapTable($query->from)] = [];
 
         return $sql;
     }

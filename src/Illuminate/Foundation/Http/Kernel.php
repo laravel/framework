@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Http;
+<?php
+
+namespace Illuminate\Foundation\Http;
 
 use Exception;
 use RuntimeException;
@@ -212,7 +214,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (! $this->app->hasBeenBootstrapped()) {
+        if (!$this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
     }
@@ -260,8 +262,8 @@ class Kernel implements KernelContract
     protected function verifySessionConfigurationIsValid()
     {
         if ($this->app['config']['session.driver'] === 'cookie' &&
-            ! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
-            throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
+            !$this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
+            throw new RuntimeException('Cookie encryption must be enabled to use cookie sessions.');
         }
     }
 

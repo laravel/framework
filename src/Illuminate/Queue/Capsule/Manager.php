@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Capsule;
+<?php
+
+namespace Illuminate\Queue\Capsule;
 
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
@@ -164,7 +166,7 @@ class Manager
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->manager, $method), $parameters);
+        return call_user_func_array([$this->manager, $method], $parameters);
     }
 
     /**
@@ -176,6 +178,6 @@ class Manager
      */
     public static function __callStatic($method, $parameters)
     {
-        return call_user_func_array(array(static::connection(), $method), $parameters);
+        return call_user_func_array([static::connection(), $method], $parameters);
     }
 }

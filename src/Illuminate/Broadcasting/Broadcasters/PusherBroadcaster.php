@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Broadcasting\Broadcasters;
+<?php
+
+namespace Illuminate\Broadcasting\Broadcasters;
 
 use Pusher;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
@@ -26,7 +28,7 @@ class PusherBroadcaster implements Broadcaster
     /**
      * {@inheritdoc}
      */
-    public function broadcast(array $channels, $event, array $payload = array())
+    public function broadcast(array $channels, $event, array $payload = [])
     {
         $this->pusher->trigger($channels, $event, $payload);
     }

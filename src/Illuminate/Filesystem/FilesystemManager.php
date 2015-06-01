@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Filesystem;
+<?php
+
+namespace Illuminate\Filesystem;
 
 use Closure;
 use Aws\S3\S3Client;
@@ -94,7 +96,7 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
+        return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
     }
 
     /**
@@ -246,6 +248,6 @@ class FilesystemManager implements FactoryContract
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(array($this->disk(), $method), $parameters);
+        return call_user_func_array([$this->disk(), $method], $parameters);
     }
 }

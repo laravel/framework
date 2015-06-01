@@ -17,8 +17,8 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
                     'key'    => 'foo',
                     'secret' => 'bar',
                     'region' => 'us-east-1',
-                ]
-            ])
+                ],
+            ]),
         ];
 
         $manager = new TransportManager($app);

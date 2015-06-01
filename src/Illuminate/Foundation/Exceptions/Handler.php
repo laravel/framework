@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Exceptions;
+<?php
+
+namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -56,7 +58,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function shouldReport(Exception $e)
     {
-        return ! $this->shouldntReport($e);
+        return !$this->shouldntReport($e);
     }
 
     /**

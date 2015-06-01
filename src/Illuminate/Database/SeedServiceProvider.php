@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database;
+<?php
+
+namespace Illuminate\Database;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Console\Seeds\SeedCommand;
@@ -62,6 +64,6 @@ class SeedServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('seeder', 'command.seed', 'command.seeder.make');
+        return ['seeder', 'command.seed', 'command.seeder.make'];
     }
 }

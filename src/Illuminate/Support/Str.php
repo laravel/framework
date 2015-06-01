@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use RuntimeException;
 use Stringy\StaticStringy;
@@ -179,7 +181,7 @@ class Str
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if (! isset($matches[0]) || strlen($value) === strlen($matches[0])) {
+        if (!isset($matches[0]) || strlen($value) === strlen($matches[0])) {
             return $value;
         }
 
@@ -195,7 +197,7 @@ class Str
      */
     public static function parseCallback($callback, $default)
     {
-        return static::contains($callback, '@') ? explode('@', $callback, 2) : array($callback, $default);
+        return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
     }
 
     /**
@@ -232,7 +234,7 @@ class Str
             throw new RuntimeException('Unable to generate random string.');
         }
 
-        return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+        return substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
     }
 
     /**
@@ -323,7 +325,7 @@ class Str
             return static::$snakeCache[$key];
         }
 
-        if (! ctype_lower($value)) {
+        if (!ctype_lower($value)) {
             $value = strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
         }
 
@@ -362,7 +364,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $value = ucwords(str_replace(array('-', '_'), ' ', $value));
+        $value = ucwords(str_replace(['-', '_'], ' ', $value));
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }

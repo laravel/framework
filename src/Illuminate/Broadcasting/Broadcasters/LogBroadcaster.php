@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Broadcasting\Broadcasters;
+<?php
+
+namespace Illuminate\Broadcasting\Broadcasters;
 
 use Psr\Log\LoggerInterface;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
@@ -26,7 +28,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * {@inheritdoc}
      */
-    public function broadcast(array $channels, $event, array $payload = array())
+    public function broadcast(array $channels, $event, array $payload = [])
     {
         $channels = implode(', ', $channels);
 

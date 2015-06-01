@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +27,7 @@ class MorphTo extends BelongsTo
      *
      * @var array
      */
-    protected $dictionary = array();
+    protected $dictionary = [];
 
     /*
      * Indicates if soft-deleted model instances should be fetched.
@@ -59,7 +61,7 @@ class MorphTo extends BelongsTo
      */
     public function getResults()
     {
-        if (! $this->otherKey) {
+        if (!$this->otherKey) {
             return;
         }
 

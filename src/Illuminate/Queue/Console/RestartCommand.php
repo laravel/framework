@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 
@@ -16,7 +18,7 @@ class RestartCommand extends Command
      *
      * @var string
      */
-    protected $description = "Restart queue worker daemons after their current job";
+    protected $description = 'Restart queue worker daemons after their current job';
 
     /**
      * Execute the console command.

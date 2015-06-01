@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Routing;
+<?php
+
+namespace Illuminate\Routing;
 
 use ReflectionMethod;
 use ReflectionFunctionAbstract;
@@ -29,7 +31,7 @@ trait RouteDependencyResolverTrait
      */
     protected function resolveClassMethodDependencies(array $parameters, $instance, $method)
     {
-        if (! method_exists($instance, $method)) {
+        if (!method_exists($instance, $method)) {
             return $parameters;
         }
 
@@ -53,7 +55,7 @@ trait RouteDependencyResolverTrait
             // binding and we do not want to mess with those; otherwise, we resolve it here.
             $class = $parameter->getClass();
 
-            if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
+            if ($class && !$this->alreadyInParameters($class->name, $parameters)) {
                 array_splice(
                     $parameters, $key, 0, [$this->container->make($class->name)]
                 );
@@ -72,7 +74,7 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return ! is_null(array_first($parameters, function ($key, $value) use ($class) {
+        return !is_null(array_first($parameters, function ($key, $value) use ($class) {
             return $value instanceof $class;
         }));
     }

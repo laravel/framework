@@ -12,7 +12,6 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->decrypt($encrypted));
     }
 
-
     public function testEncryptionWithCustomCipher()
     {
         $e = $this->getEncrypter();
@@ -32,7 +31,6 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $payload = str_shuffle($payload);
         $e->decrypt($payload);
     }
-
 
     protected function getEncrypter()
     {

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,7 +33,7 @@ class Pivot extends Model
      *
      * @var array
      */
-    protected $guarded = array();
+    protected $guarded = [];
 
     /**
      * Create a new pivot model instance.

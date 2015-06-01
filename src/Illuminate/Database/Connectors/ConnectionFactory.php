@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Database\Connectors;
+<?php
+
+namespace Illuminate\Database\Connectors;
 
 use PDO;
 use InvalidArgumentException;
@@ -136,7 +138,7 @@ class ConnectionFactory
      */
     protected function mergeReadWriteConfig(array $config, array $merge)
     {
-        return array_except(array_merge($config, $merge), array('read', 'write'));
+        return array_except(array_merge($config, $merge), ['read', 'write']);
     }
 
     /**
@@ -161,8 +163,8 @@ class ConnectionFactory
      */
     public function createConnector(array $config)
     {
-        if (! isset($config['driver'])) {
-            throw new InvalidArgumentException("A driver must be specified.");
+        if (!isset($config['driver'])) {
+            throw new InvalidArgumentException('A driver must be specified.');
         }
 
         if ($this->container->bound($key = "db.connector.{$config['driver']}")) {
@@ -198,10 +200,10 @@ class ConnectionFactory
      *
      * @throws \InvalidArgumentException
      */
-    protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = array())
+    protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = [])
     {
         if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, array($connection, $database, $prefix, $config));
+            return $this->container->make($key, [$connection, $database, $prefix, $config]);
         }
 
         switch ($driver) {

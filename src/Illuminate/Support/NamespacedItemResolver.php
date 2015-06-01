@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 class NamespacedItemResolver
 {
@@ -7,7 +9,7 @@ class NamespacedItemResolver
      *
      * @var array
      */
-    protected $parsed = array();
+    protected $parsed = [];
 
     /**
      * Parse a key into namespace, group, and item.
@@ -55,7 +57,7 @@ class NamespacedItemResolver
         $group = $segments[0];
 
         if (count($segments) == 1) {
-            return array(null, $group, null);
+            return [null, $group, null];
         }
 
         // If there is more than one segment in this group, it means we are pulling
@@ -64,7 +66,7 @@ class NamespacedItemResolver
         else {
             $item = implode('.', array_slice($segments, 1));
 
-            return array(null, $group, $item);
+            return [null, $group, $item];
         }
     }
 
@@ -85,7 +87,7 @@ class NamespacedItemResolver
 
         $groupAndItem = array_slice($this->parseBasicSegments($itemSegments), 1);
 
-        return array_merge(array($namespace), $groupAndItem);
+        return array_merge([$namespace], $groupAndItem);
     }
 
     /**

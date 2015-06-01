@@ -12,7 +12,6 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Illuminate\Http\Response(new JsonableStub);
@@ -20,11 +19,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
         $response = new Illuminate\Http\Response();
-        $response->setContent(array('foo' => 'bar'));
+        $response->setContent(['foo' => 'bar']);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
-
 
     public function testRenderablesAreRendered()
     {
@@ -33,7 +31,6 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response = new Illuminate\Http\Response($mock);
         $this->assertEquals('foo', $response->getContent());
     }
-
 
     public function testHeader()
     {
@@ -47,7 +44,6 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $response->headers->get('foo'));
     }
 
-
     public function testWithCookie()
     {
         $response = new Illuminate\Http\Response();
@@ -59,15 +55,13 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
 
-
     public function testGetOriginalContent()
     {
-        $arr = array('foo' => 'bar');
+        $arr = ['foo' => 'bar'];
         $response = new Illuminate\Http\Response();
         $response->setContent($arr);
         $this->assertSame($arr, $response->getOriginalContent());
     }
-
 
     public function testSetAndRetrieveStatusCode()
     {
@@ -76,31 +70,28 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-
     public function testOnlyInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
-        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('flashInput')->once()->with(array('name' => 'Taylor'));
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $response->onlyInput('name');
     }
-
 
     public function testExceptInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
-        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('flashInput')->once()->with(array('name' => 'Taylor'));
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $response->exceptInput('age');
     }
-
 
     public function testFlashingErrorsOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
-        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
         $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
@@ -108,7 +99,6 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $provider->shouldReceive('getMessageBag')->once()->andReturn(new Illuminate\Support\MessageBag);
         $response->withErrors($provider);
     }
-
 
     public function testSettersGettersOnRequest()
     {
@@ -124,28 +114,25 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame($session, $response->getSession());
     }
 
-
     public function testRedirectWithErrorsArrayConvertsToMessageBag()
     {
         $response = new RedirectResponse('foo.bar');
-        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
         $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new Illuminate\Support\ViewErrorBag);
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
-        $provider = array('foo' => 'bar');
+        $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
     }
-
 
     public function testMagicCall()
     {
         $response = new RedirectResponse('foo.bar');
-        $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
         $session->shouldReceive('flash')->once()->with('foo', 'bar');
         $response->withFoo('bar');
     }
-
 
     public function testMagicCallException()
     {

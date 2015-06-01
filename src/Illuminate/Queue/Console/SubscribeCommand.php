@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Exception;
 use RuntimeException;
@@ -41,8 +43,8 @@ class SubscribeCommand extends Command
     {
         $iron = $this->laravel['queue']->connection();
 
-        if (! $iron instanceof IronQueue) {
-            throw new RuntimeException("Iron.io based queue must be default.");
+        if (!$iron instanceof IronQueue) {
+            throw new RuntimeException('Iron.io based queue must be default.');
         }
 
         $iron->getIron()->updateQueue($this->argument('queue'), $this->getQueueOptions());
@@ -57,9 +59,9 @@ class SubscribeCommand extends Command
      */
     protected function getQueueOptions()
     {
-        return array(
+        return [
             'push_type' => $this->getPushType(), 'subscribers' => $this->getSubscriberList(),
-        );
+        ];
     }
 
     /**
@@ -91,11 +93,11 @@ class SubscribeCommand extends Command
 
         $url = $this->argument('url');
 
-        if (! starts_with($url, ['http://', 'https://'])) {
+        if (!starts_with($url, ['http://', 'https://'])) {
             $url = $this->laravel['url']->to($url);
         }
 
-        $subscribers[] = array('url' => $url);
+        $subscribers[] = ['url' => $url];
 
         return $subscribers;
     }
@@ -110,7 +112,7 @@ class SubscribeCommand extends Command
         try {
             return $this->getQueue()->subscribers;
         } catch (Exception $e) {
-            return array();
+            return [];
         }
     }
 
@@ -135,11 +137,11 @@ class SubscribeCommand extends Command
      */
     protected function getArguments()
     {
-        return array(
-            array('queue', InputArgument::REQUIRED, 'The name of Iron.io queue.'),
+        return [
+            ['queue', InputArgument::REQUIRED, 'The name of Iron.io queue.'],
 
-            array('url', InputArgument::REQUIRED, 'The URL to be subscribed.'),
-        );
+            ['url', InputArgument::REQUIRED, 'The URL to be subscribed.'],
+        ];
     }
 
     /**
@@ -149,8 +151,8 @@ class SubscribeCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'),
-        );
+        return [
+            ['type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'],
+        ];
     }
 }

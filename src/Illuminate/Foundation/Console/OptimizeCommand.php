@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
@@ -19,7 +21,7 @@ class OptimizeCommand extends Command
      *
      * @var string
      */
-    protected $description = "Optimize the framework for better performance";
+    protected $description = 'Optimize the framework for better performance';
 
     /**
      * The composer instance.
@@ -56,7 +58,7 @@ class OptimizeCommand extends Command
             $this->composer->dumpOptimized();
         }
 
-        if ($this->option('force') || ! $this->laravel['config']['app.debug']) {
+        if ($this->option('force') || !$this->laravel['config']['app.debug']) {
             $this->info('Compiling common classes');
 
             $this->compileClasses();
@@ -74,11 +76,11 @@ class OptimizeCommand extends Command
     {
         $this->registerClassPreloaderCommand();
 
-        $this->callSilent('compile', array(
+        $this->callSilent('compile', [
             '--config' => implode(',', $this->getClassFiles()),
             '--output' => $this->laravel->getCachedCompilePath(),
             '--strip_comments' => 1,
-        ));
+        ]);
     }
 
     /**
@@ -118,10 +120,10 @@ class OptimizeCommand extends Command
      */
     protected function getOptions()
     {
-        return array(
-            array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'],
 
-            array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
-        );
+            ['psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'],
+        ];
     }
 }

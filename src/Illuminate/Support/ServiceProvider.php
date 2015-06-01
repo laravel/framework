@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Support;
+<?php
+
+namespace Illuminate\Support;
 
 use BadMethodCallException;
 
@@ -103,14 +105,14 @@ abstract class ServiceProvider
     {
         $class = get_class($this);
 
-        if (! array_key_exists($class, static::$publishes)) {
+        if (!array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
         }
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
         if ($group) {
-            if (! array_key_exists($group, static::$publishGroups)) {
+            if (!array_key_exists($group, static::$publishGroups)) {
                 static::$publishGroups[$group] = [];
             }
 

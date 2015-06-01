@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use Closure;
 use InvalidArgumentException;
@@ -43,49 +45,49 @@ class Factory implements FactoryContract
      *
      * @var array
      */
-    protected $shared = array();
+    protected $shared = [];
 
     /**
      * Array of registered view name aliases.
      *
      * @var array
      */
-    protected $aliases = array();
+    protected $aliases = [];
 
     /**
      * All of the registered view names.
      *
      * @var array
      */
-    protected $names = array();
+    protected $names = [];
 
     /**
      * The extension to engine bindings.
      *
      * @var array
      */
-    protected $extensions = array('blade.php' => 'blade', 'php' => 'php');
+    protected $extensions = ['blade.php' => 'blade', 'php' => 'php'];
 
     /**
      * The view composer events.
      *
      * @var array
      */
-    protected $composers = array();
+    protected $composers = [];
 
     /**
      * All of the finished, captured sections.
      *
      * @var array
      */
-    protected $sections = array();
+    protected $sections = [];
 
     /**
      * The stack of in-progress sections.
      *
      * @var array
      */
-    protected $sectionStack = array();
+    protected $sectionStack = [];
 
     /**
      * The number of active rendering operations.
@@ -119,7 +121,7 @@ class Factory implements FactoryContract
      * @param  array   $mergeData
      * @return \Illuminate\View\View
      */
-    public function file($path, $data = array(), $mergeData = array())
+    public function file($path, $data = [], $mergeData = [])
     {
         $data = array_merge($mergeData, $this->parseData($data));
 
@@ -136,7 +138,7 @@ class Factory implements FactoryContract
      * @param  array   $mergeData
      * @return \Illuminate\View\View
      */
-    public function make($view, $data = array(), $mergeData = array())
+    public function make($view, $data = [], $mergeData = [])
     {
         if (isset($this->aliases[$view])) {
             $view = $this->aliases[$view];
@@ -170,7 +172,7 @@ class Factory implements FactoryContract
 
         list($namespace, $name) = explode($delimiter, $name);
 
-        return $namespace . $delimiter . str_replace('/', '.', $name);
+        return $namespace.$delimiter.str_replace('/', '.', $name);
     }
 
     /**
@@ -191,7 +193,7 @@ class Factory implements FactoryContract
      * @param  mixed   $data
      * @return \Illuminate\View\View
      */
-    public function of($view, $data = array())
+    public function of($view, $data = [])
     {
         return $this->make($this->names[$view], $data);
     }
@@ -255,7 +257,7 @@ class Factory implements FactoryContract
         // iterated value of this data array, allowing the views to access them.
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
-                $data = array('key' => $key, $iterator => $value);
+                $data = ['key' => $key, $iterator => $value];
 
                 $result .= $this->make($view, $data)->render();
             }
@@ -285,7 +287,7 @@ class Factory implements FactoryContract
      */
     public function getEngineFromPath($path)
     {
-        if (! $extension = $this->getExtension($path)) {
+        if (!$extension = $this->getExtension($path)) {
             throw new InvalidArgumentException("Unrecognized extension in file: $path");
         }
 
@@ -318,7 +320,7 @@ class Factory implements FactoryContract
      */
     public function share($key, $value = null)
     {
-        if (! is_array($key)) {
+        if (!is_array($key)) {
             return $this->shared[$key] = $value;
         }
 
@@ -336,7 +338,7 @@ class Factory implements FactoryContract
      */
     public function creator($views, $callback)
     {
-        $creators = array();
+        $creators = [];
 
         foreach ((array) $views as $view) {
             $creators[] = $this->addViewEvent($view, $callback, 'creating: ');
@@ -353,7 +355,7 @@ class Factory implements FactoryContract
      */
     public function composers(array $composers)
     {
-        $registered = array();
+        $registered = [];
 
         foreach ($composers as $callback => $views) {
             $registered = array_merge($registered, $this->composer($views, $callback));
@@ -372,7 +374,7 @@ class Factory implements FactoryContract
      */
     public function composer($views, $callback, $priority = null)
     {
-        $composers = array();
+        $composers = [];
 
         foreach ((array) $views as $view) {
             $composers[] = $this->addViewEvent($view, $callback, 'composing: ', $priority);
@@ -458,7 +460,7 @@ class Factory implements FactoryContract
         // the instance out of the IoC container and call the method on it with the
         // given arguments that are passed to the Closure as the composer's data.
         return function () use ($class, $method) {
-            $callable = array($this->container->make($class), $method);
+            $callable = [$this->container->make($class), $method];
 
             return call_user_func_array($callable, func_get_args());
         };
@@ -479,7 +481,7 @@ class Factory implements FactoryContract
 
         $method = str_contains($prefix, 'composing') ? 'compose' : 'create';
 
-        return array($class, $method);
+        return [$class, $method];
     }
 
     /**
@@ -490,7 +492,7 @@ class Factory implements FactoryContract
      */
     public function callComposer(View $view)
     {
-        $this->events->fire('composing: '.$view->getName(), array($view));
+        $this->events->fire('composing: '.$view->getName(), [$view]);
     }
 
     /**
@@ -501,7 +503,7 @@ class Factory implements FactoryContract
      */
     public function callCreator(View $view)
     {
-        $this->events->fire('creating: '.$view->getName(), array($view));
+        $this->events->fire('creating: '.$view->getName(), [$view]);
     }
 
     /**
@@ -626,9 +628,9 @@ class Factory implements FactoryContract
      */
     public function flushSections()
     {
-        $this->sections = array();
+        $this->sections = [];
 
-        $this->sectionStack = array();
+        $this->sectionStack = [];
     }
 
     /**
@@ -726,7 +728,7 @@ class Factory implements FactoryContract
 
         unset($this->extensions[$extension]);
 
-        $this->extensions = array_merge(array($extension => $engine), $this->extensions);
+        $this->extensions = array_merge([$extension => $engine], $this->extensions);
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Console;
+<?php
+
+namespace Illuminate\Console;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
@@ -51,7 +53,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  array  $parameters
      * @return int
      */
-    public function call($command, array $parameters = array())
+    public function call($command, array $parameters = [])
     {
         $parameters['command'] = $command;
 

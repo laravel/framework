@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Psy\Shell;
 use Psy\Configuration;
@@ -31,7 +33,7 @@ class TinkerCommand extends Command
      *
      * @var string
      */
-    protected $description = "Interact with your application";
+    protected $description = 'Interact with your application';
 
     /**
      * Execute the console command.

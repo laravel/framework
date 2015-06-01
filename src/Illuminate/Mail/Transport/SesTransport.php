@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Mail\Transport;
+<?php
+
+namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
 use Aws\Ses\SesClient;

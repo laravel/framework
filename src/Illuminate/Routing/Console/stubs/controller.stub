@@ -1,8 +1,8 @@
-<?php namespace DummyNamespace;
+<?php
 
-use DummyRootNamespaceHttp\Requests;
+namespace DummyNamespace;
+
 use DummyRootNamespaceHttp\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class DummyClass extends Controller
 {

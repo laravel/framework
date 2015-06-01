@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Cache;
+<?php
+
+namespace Illuminate\Cache;
 
 use Exception;
 use Illuminate\Filesystem\Filesystem;
@@ -60,7 +62,7 @@ class FileStore implements Store
         try {
             $expire = substr($contents = $this->files->get($path), 0, 10);
         } catch (Exception $e) {
-            return array('data' => null, 'time' => null);
+            return ['data' => null, 'time' => null];
         }
 
         // If the current time is greater than expiration timestamps we will delete
@@ -69,7 +71,7 @@ class FileStore implements Store
         if (time() >= $expire) {
             $this->forget($key);
 
-            return array('data' => null, 'time' => null);
+            return ['data' => null, 'time' => null];
         }
 
         $data = unserialize(substr($contents, 10));
