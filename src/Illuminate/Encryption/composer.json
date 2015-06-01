@@ -16,9 +16,9 @@
     "require": {
         "php": ">=5.5.9",
         "ext-openssl": "*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "symfony/security-core": "2.7.*"
+        "illuminate/contracts": "5.2.*",
+        "illuminate/support": "5.2.*",
+        "symfony/security-core": "2.8.*"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "minimum-stability": "dev"
