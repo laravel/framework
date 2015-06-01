@@ -364,7 +364,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		if (is_null($callback))
 		{
-			return count($this->items) > 0 ? end($this->items) : null;
+			return count($this->items) > 0 ? end($this->items) : value($default);
 		}
 
 		return array_last($this->items, $callback, $default);
