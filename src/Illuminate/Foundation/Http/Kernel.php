@@ -11,304 +11,304 @@ use Illuminate\Contracts\Http\Kernel as KernelContract;
 
 class Kernel implements KernelContract {
 
-	/**
-	 * The application implementation.
-	 *
-	 * @var \Illuminate\Contracts\Foundation\Application
-	 */
-	protected $app;
+    /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
 
-	/**
-	 * The router instance.
-	 *
-	 * @var \Illuminate\Routing\Router
-	 */
-	protected $router;
+    /**
+     * The router instance.
+     *
+     * @var \Illuminate\Routing\Router
+     */
+    protected $router;
 
-	/**
-	 * The bootstrap classes for the application.
-	 *
-	 * @var array
-	 */
-	protected $bootstrappers = [
-		'Illuminate\Foundation\Bootstrap\DetectEnvironment',
-		'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-		'Illuminate\Foundation\Bootstrap\ConfigureLogging',
-		'Illuminate\Foundation\Bootstrap\HandleExceptions',
-		'Illuminate\Foundation\Bootstrap\RegisterFacades',
-		'Illuminate\Foundation\Bootstrap\RegisterProviders',
-		'Illuminate\Foundation\Bootstrap\BootProviders',
-	];
+    /**
+     * The bootstrap classes for the application.
+     *
+     * @var array
+     */
+    protected $bootstrappers = [
+        'Illuminate\Foundation\Bootstrap\DetectEnvironment',
+        'Illuminate\Foundation\Bootstrap\LoadConfiguration',
+        'Illuminate\Foundation\Bootstrap\ConfigureLogging',
+        'Illuminate\Foundation\Bootstrap\HandleExceptions',
+        'Illuminate\Foundation\Bootstrap\RegisterFacades',
+        'Illuminate\Foundation\Bootstrap\RegisterProviders',
+        'Illuminate\Foundation\Bootstrap\BootProviders',
+    ];
 
-	/**
-	 * The application's middleware stack.
-	 *
-	 * @var array
-	 */
-	protected $middleware = [];
+    /**
+     * The application's middleware stack.
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
-	/**
-	 * The application's route middleware.
-	 *
-	 * @var array
-	 */
-	protected $routeMiddleware = [];
+    /**
+     * The application's route middleware.
+     *
+     * @var array
+     */
+    protected $routeMiddleware = [];
 
-	/**
-	 * Create a new HTTP kernel instance.
-	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $app
-	 * @param  \Illuminate\Routing\Router  $router
-	 * @return void
-	 */
-	public function __construct(Application $app, Router $router)
-	{
-		$this->app = $app;
-		$this->router = $router;
+    /**
+     * Create a new HTTP kernel instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Routing\Router  $router
+     * @return void
+     */
+    public function __construct(Application $app, Router $router)
+    {
+        $this->app = $app;
+        $this->router = $router;
 
-		foreach ($this->routeMiddleware as $key => $middleware)
-		{
-			$router->middleware($key, $middleware);
-		}
-	}
+        foreach ($this->routeMiddleware as $key => $middleware)
+        {
+            $router->middleware($key, $middleware);
+        }
+    }
 
-	/**
-	 * Handle an incoming HTTP request.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
-	public function handle($request)
-	{
-		try
-		{
-			$request->enableHttpMethodParameterOverride();
+    /**
+     * Handle an incoming HTTP request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function handle($request)
+    {
+        try
+        {
+            $request->enableHttpMethodParameterOverride();
 
-			$response = $this->sendRequestThroughRouter($request);
-		}
-		catch (Exception $e)
-		{
-			$this->reportException($e);
+            $response = $this->sendRequestThroughRouter($request);
+        }
+        catch (Exception $e)
+        {
+            $this->reportException($e);
 
-			$response = $this->renderException($request, $e);
-		}
+            $response = $this->renderException($request, $e);
+        }
 
-		$this->app['events']->fire('kernel.handled', [$request, $response]);
+        $this->app['events']->fire('kernel.handled', [$request, $response]);
 
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * Send the given request through the middleware / router.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
-	 */
-	protected function sendRequestThroughRouter($request)
-	{
-		$this->app->instance('request', $request);
+    /**
+     * Send the given request through the middleware / router.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    protected function sendRequestThroughRouter($request)
+    {
+        $this->app->instance('request', $request);
 
-		Facade::clearResolvedInstance('request');
+        Facade::clearResolvedInstance('request');
 
-		$this->bootstrap();
+        $this->bootstrap();
 
-		$this->verifySessionConfigurationIsValid();
+        $this->verifySessionConfigurationIsValid();
 
-		$shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
-		                        $this->app->make('middleware.disable') === true;
+        $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
+                                $this->app->make('middleware.disable') === true;
 
-		return (new Pipeline($this->app))
-		            ->send($request)
-		            ->through($shouldSkipMiddleware ? [] : $this->middleware)
-		            ->then($this->dispatchToRouter());
-	}
+        return (new Pipeline($this->app))
+                    ->send($request)
+                    ->through($shouldSkipMiddleware ? [] : $this->middleware)
+                    ->then($this->dispatchToRouter());
+    }
 
-	/**
-	 * Call the terminate method on any terminable middleware.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Http\Response  $response
-	 * @return void
-	 */
-	public function terminate($request, $response)
-	{
-		$routeMiddlewares = $this->gatherRouteMiddlewares($request);
+    /**
+     * Call the terminate method on any terminable middleware.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Response  $response
+     * @return void
+     */
+    public function terminate($request, $response)
+    {
+        $routeMiddlewares = $this->gatherRouteMiddlewares($request);
 
-		foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
-		{
-			list($name, $parameters) = $this->parseMiddleware($middleware);
+        foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
+        {
+            list($name, $parameters) = $this->parseMiddleware($middleware);
 
-			$instance = $this->app->make($name);
+            $instance = $this->app->make($name);
 
-			if ($instance instanceof TerminableMiddleware)
-			{
-				$instance->terminate($request, $response);
-			}
-		}
+            if ($instance instanceof TerminableMiddleware)
+            {
+                $instance->terminate($request, $response);
+            }
+        }
 
-		$this->app->terminate();
-	}
+        $this->app->terminate();
+    }
 
-	/**
-	 * Gather the route middleware for the given request.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return array
-	 */
-	protected function gatherRouteMiddlewares($request)
-	{
-		if ($request->route())
-		{
-			return $this->router->gatherRouteMiddlewares($request->route());
-		}
+    /**
+     * Gather the route middleware for the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function gatherRouteMiddlewares($request)
+    {
+        if ($request->route())
+        {
+            return $this->router->gatherRouteMiddlewares($request->route());
+        }
 
-		return [];
-	}
+        return [];
+    }
 
-	/**
-	 * Parse a middleware string to get the name and parameters.
-	 *
-	 * @param  string  $middleware
-	 * @return array
-	 */
-	protected function parseMiddleware($middleware)
-	{
-		list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+    /**
+     * Parse a middleware string to get the name and parameters.
+     *
+     * @param  string  $middleware
+     * @return array
+     */
+    protected function parseMiddleware($middleware)
+    {
+        list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
 
-		if (is_string($parameters))
-		{
-			$parameters = explode(',', $parameters);
-		}
+        if (is_string($parameters))
+        {
+            $parameters = explode(',', $parameters);
+        }
 
-		return [$name, $parameters];
-	}
+        return [$name, $parameters];
+    }
 
-	/**
-	 * Add a new middleware to beginning of the stack if it does not already exist.
-	 *
-	 * @param  string  $middleware
-	 * @return $this
-	 */
-	public function prependMiddleware($middleware)
-	{
-		if (array_search($middleware, $this->middleware) === false)
-		{
-			array_unshift($this->middleware, $middleware);
-		}
+    /**
+     * Add a new middleware to beginning of the stack if it does not already exist.
+     *
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function prependMiddleware($middleware)
+    {
+        if (array_search($middleware, $this->middleware) === false)
+        {
+            array_unshift($this->middleware, $middleware);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Add a new middleware to end of the stack if it does not already exist.
-	 *
-	 * @param  string  $middleware
-	 * @return $this
-	 */
-	public function pushMiddleware($middleware)
-	{
-		if (array_search($middleware, $this->middleware) === false)
-		{
-			$this->middleware[] = $middleware;
-		}
+    /**
+     * Add a new middleware to end of the stack if it does not already exist.
+     *
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function pushMiddleware($middleware)
+    {
+        if (array_search($middleware, $this->middleware) === false)
+        {
+            $this->middleware[] = $middleware;
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Bootstrap the application for HTTP requests.
-	 *
-	 * @return void
-	 */
-	public function bootstrap()
-	{
-		if ( ! $this->app->hasBeenBootstrapped())
-		{
-			$this->app->bootstrapWith($this->bootstrappers());
-		}
-	}
+    /**
+     * Bootstrap the application for HTTP requests.
+     *
+     * @return void
+     */
+    public function bootstrap()
+    {
+        if ( ! $this->app->hasBeenBootstrapped())
+        {
+            $this->app->bootstrapWith($this->bootstrappers());
+        }
+    }
 
-	/**
-	 * Get the route dispatcher callback.
-	 *
-	 * @return \Closure
-	 */
-	protected function dispatchToRouter()
-	{
-		return function($request)
-		{
-			$this->app->instance('request', $request);
+    /**
+     * Get the route dispatcher callback.
+     *
+     * @return \Closure
+     */
+    protected function dispatchToRouter()
+    {
+        return function($request)
+        {
+            $this->app->instance('request', $request);
 
-			return $this->router->dispatch($request);
-		};
-	}
+            return $this->router->dispatch($request);
+        };
+    }
 
-	/**
-	 * Determine if the kernel has a given middleware.
-	 *
-	 * @param  string  $middleware
-	 * @return bool
-	 */
-	public function hasMiddleware($middleware)
-	{
-		return array_key_exists($middleware, array_flip($this->middleware));
-	}
+    /**
+     * Determine if the kernel has a given middleware.
+     *
+     * @param  string  $middleware
+     * @return bool
+     */
+    public function hasMiddleware($middleware)
+    {
+        return array_key_exists($middleware, array_flip($this->middleware));
+    }
 
-	/**
-	 * Get the bootstrap classes for the application.
-	 *
-	 * @return array
-	 */
-	protected function bootstrappers()
-	{
-		return $this->bootstrappers;
-	}
+    /**
+     * Get the bootstrap classes for the application.
+     *
+     * @return array
+     */
+    protected function bootstrappers()
+    {
+        return $this->bootstrappers;
+    }
 
-	/**
-	 * Verify that the session configuration is valid.
-	 *
-	 * @return void
-	 */
-	protected function verifySessionConfigurationIsValid()
-	{
-		if ($this->app['config']['session.driver'] === 'cookie' &&
-			! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
+    /**
+     * Verify that the session configuration is valid.
+     *
+     * @return void
+     */
+    protected function verifySessionConfigurationIsValid()
+    {
+        if ($this->app['config']['session.driver'] === 'cookie' &&
+            ! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
 
-			throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
-		}
-	}
+            throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
+        }
+    }
 
-	/**
-	 * Report the exception to the exception handler.
-	 *
-	 * @param  \Exception  $e
-	 * @return void
-	 */
-	protected function reportException(Exception $e)
-	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
-	}
+    /**
+     * Report the exception to the exception handler.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function reportException(Exception $e)
+    {
+        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+    }
 
-	/**
-	 * Render the exception to a response.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Exception  $e
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	protected function renderException($request, Exception $e)
-	{
-		return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
-	}
+    /**
+     * Render the exception to a response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderException($request, Exception $e)
+    {
+        return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
+    }
 
-	/**
-	 * Get the Laravel application instance.
-	 *
-	 * @return \Illuminate\Contracts\Foundation\Application
-	 */
-	public function getApplication()
-	{
-		return $this->app;
-	}
+    /**
+     * Get the Laravel application instance.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function getApplication()
+    {
+        return $this->app;
+    }
 
 }

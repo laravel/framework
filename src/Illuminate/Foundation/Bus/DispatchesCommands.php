@@ -5,6 +5,6 @@
  */
 trait DispatchesCommands {
 
-	use DispatchesJobs;
+    use DispatchesJobs;
 
 }

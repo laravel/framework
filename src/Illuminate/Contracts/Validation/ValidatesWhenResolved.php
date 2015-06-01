@@ -2,11 +2,11 @@
 
 interface ValidatesWhenResolved {
 
-	/**
-	 * Validate the given class instance.
-	 *
-	 * @return void
-	 */
-	public function validate();
+    /**
+     * Validate the given class instance.
+     *
+     * @return void
+     */
+    public function validate();
 
 }

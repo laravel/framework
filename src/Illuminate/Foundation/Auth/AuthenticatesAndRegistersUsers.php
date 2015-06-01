@@ -2,8 +2,8 @@
 
 trait AuthenticatesAndRegistersUsers {
 
-	use AuthenticatesUsers, RegistersUsers {
-		AuthenticatesUsers::redirectPath insteadof RegistersUsers;
-	}
+    use AuthenticatesUsers, RegistersUsers {
+        AuthenticatesUsers::redirectPath insteadof RegistersUsers;
+    }
 
 }
