@@ -2,6 +2,8 @@
 
 use Mockery as m;
 use Illuminate\Cache\DatabaseStore;
+use Illuminate\Database\Connection;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
@@ -25,7 +27,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('forget'), $this->getMocks());
+		$store = $this->getMock(DatabaseStore::class, array('forget'), $this->getMocks());
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
@@ -51,7 +53,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testEncryptedValueIsInsertedWhenNoExceptionsAreThrown()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('getTime'), $this->getMocks());
+		$store = $this->getMock(DatabaseStore::class, array('getTime'), $this->getMocks());
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
 		$store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
@@ -64,7 +66,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testEncryptedValueIsUpdatedWhenInsertThrowsException()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('getTime'), $this->getMocks());
+		$store = $this->getMock(DatabaseStore::class, array('getTime'), $this->getMocks());
 		$table = m::mock('StdClass');
 		$store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
 		$store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
@@ -82,7 +84,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testForeverCallsStoreItemWithReallyLongTime()
 	{
-		$store = $this->getMock('Illuminate\Cache\DatabaseStore', array('put'), $this->getMocks());
+		$store = $this->getMock(DatabaseStore::class, array('put'), $this->getMocks());
 		$store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000));
 		$store->forever('foo', 'bar');
 	}
@@ -113,13 +115,13 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getStore()
 	{
-		return new DatabaseStore(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), 'table', 'prefix');
+		return new DatabaseStore(m::mock(Connection::class), m::mock(Encrypter::class), 'table', 'prefix');
 	}
 
 
 	protected function getMocks()
 	{
-		return array(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), 'table', 'prefix');
+		return array(m::mock(Connection::class), m::mock(Encrypter::class), 'table', 'prefix');
 	}
 
 }

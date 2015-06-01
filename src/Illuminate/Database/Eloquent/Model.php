@@ -2630,8 +2630,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
 		if ( ! $relations instanceof Relation)
 		{
-			throw new LogicException('Relationship method must return an object of type '
-				. 'Illuminate\Database\Eloquent\Relations\Relation');
+			throw new LogicException(
+				'Relationship method must return an object of type '.Relation::class);
 		}
 
 		return $this->relations[$method] = $relations->getResults();

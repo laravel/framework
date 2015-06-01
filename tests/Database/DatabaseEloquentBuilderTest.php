@@ -1,8 +1,15 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
@@ -14,7 +21,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindMethod()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn('baz');
@@ -29,7 +36,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$model = $this->getMockModel();
 		$model->shouldReceive('findOrNew')->once()->andReturn('baz');
 
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($model);
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn('baz');
@@ -43,9 +50,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testFindOrNewMethodModelNotFound()
 	{
 		$model = $this->getMockModel();
-		$model->shouldReceive('findOrNew')->once()->andReturn(m::mock('Illuminate\Database\Eloquent\Model'));
+		$model->shouldReceive('findOrNew')->once()->andReturn(m::mock(Model::class));
 
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($model);
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
@@ -53,7 +60,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$result = $model->findOrNew('bar', array('column'));
 		$findResult = $builder->find('bar', array('column'));
 		$this->assertNull($findResult);
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $result);
+		$this->assertInstanceOf(Model::class, $result);
 	}
 
 	/**
@@ -61,7 +68,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindOrFailMethodThrowsModelNotFoundException()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
 		$builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
@@ -73,7 +80,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[get]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
 		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
 		$builder->shouldReceive('get')->with(array('column'))->andReturn(new Collection([1]));
@@ -85,7 +92,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testFirstOrFailMethodThrowsModelNotFoundException()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->setModel($this->getMockModel());
 		$builder->shouldReceive('first')->with(array('column'))->andReturn(null);
 		$result = $builder->firstOrFail(array('column'));
@@ -94,7 +101,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindWithMany()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[get]', array($this->getMockQueryBuilder()));
 		$builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', array(1, 2));
 		$builder->setModel($this->getMockModel());
 		$builder->shouldReceive('get')->with(array('column'))->andReturn('baz');
@@ -106,7 +113,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFirstMethod()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get,take]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[get,take]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('take')->with(1)->andReturn($builder);
 		$builder->shouldReceive('get')->with(array('*'))->andReturn(new Collection(array('bar')));
 
@@ -117,7 +124,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMethodLoadsModelsAndHydratesEagerRelations()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(array('bar'));
 		$builder->shouldReceive('eagerLoadRelations')->with(array('bar'))->andReturn(array('bar', 'baz'));
 		$builder->setModel($this->getMockModel());
@@ -130,7 +137,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[getModels,eagerLoadRelations]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('getModels')->with(array('foo'))->andReturn(array());
 		$builder->shouldReceive('eagerLoadRelations')->never();
 		$builder->setModel($this->getMockModel());
@@ -143,7 +150,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testValueMethodWithModelFound()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$mockModel = new StdClass;
 		$mockModel->name = 'foo';
 		$builder->shouldReceive('first')->with(array('name'))->andReturn($mockModel);
@@ -154,7 +161,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testValueMethodWithModelNotFound()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[first]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('first')->with(array('name'))->andReturn(null);
 
 		$this->assertNull($builder->value('name'));
@@ -163,7 +170,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testChunkExecuteCallbackOverPaginatedRequest()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[forPage,get]', array($this->getMockQueryBuilder()));
 		$builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
 		$builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
 		$builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
@@ -209,10 +216,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 	public function testMacrosAreCalledOnBuilder()
 	{
 		unset($_SERVER['__test.builder']);
-		$builder = new Illuminate\Database\Eloquent\Builder(new Illuminate\Database\Query\Builder(
-			m::mock('Illuminate\Database\ConnectionInterface'),
-			m::mock('Illuminate\Database\Query\Grammars\Grammar'),
-			m::mock('Illuminate\Database\Query\Processors\Processor')
+		$builder = new EloquentBuilder(new Builder(
+			m::mock(ConnectionInterface::class),
+			m::mock(Grammar::class),
+			m::mock(Processor::class)
 		));
 		$builder->macro('fooBar', function($builder)
 		{
@@ -230,11 +237,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetModelsProperlyHydratesModels()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[get]', array($this->getMockQueryBuilder()));
 		$records[] = array('name' => 'taylor', 'age' => 26);
 		$records[] = array('name' => 'dayle', 'age' => 28);
 		$builder->getQuery()->shouldReceive('get')->once()->with(array('foo'))->andReturn($records);
-		$model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,hydrate]');
+		$model = m::mock(Model::class.'[getTable,getConnectionName,hydrate]');
 		$model->shouldReceive('getTable')->once()->andReturn('foo_table');
 		$builder->setModel($model);
 		$model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
@@ -247,7 +254,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testEagerLoadRelationsLoadTopLevelRelationships()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[loadRelation]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[loadRelation]', array($this->getMockQueryBuilder()));
 		$nop1 = function() {};
 		$nop2 = function() {};
 		$builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
@@ -260,7 +267,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testRelationshipEagerLoadProcess()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder[getRelation]', array($this->getMockQueryBuilder()));
+		$builder = m::mock(EloquentBuilder::class.'[getRelation]', array($this->getMockQueryBuilder()));
 		$builder->setEagerLoads(array('orders' => function($query) { $_SERVER['__eloquent.constrain'] = $query; }));
 		$relation = m::mock('stdClass');
 		$relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
@@ -358,7 +365,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('foobar')->once()->andReturn('foo');
 
-		$this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $builder->foobar());
+		$this->assertInstanceOf(EloquentBuilder::class, $builder->foobar());
 
 		$builder = $this->getBuilder();
 		$builder->getQuery()->shouldReceive('insert')->once()->with(array('bar'))->andReturn('foo');
@@ -381,7 +388,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testNestedWhere()
 	{
-		$nestedQuery = m::mock('Illuminate\Database\Eloquent\Builder');
+		$nestedQuery = m::mock(EloquentBuilder::class);
 		$nestedRawQuery = $this->getMockQueryBuilder();
 		$nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
 		$model = $this->getMockModel()->makePartial();
@@ -481,8 +488,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 		$processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
 		$grammar = new $grammarClass;
 		$processor = new $processorClass;
-		$connection = m::mock('Illuminate\Database\ConnectionInterface', array('getQueryGrammar' => $grammar, 'getPostProcessor' => $processor));
-		$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface', array('connection' => $connection));
+		$connection = m::mock(ConnectionInterface::class, array('getQueryGrammar' => $grammar, 'getPostProcessor' => $processor));
+		$resolver = m::mock(ConnectionResolverInterface::class, array('connection' => $connection));
 		$class = get_class($model);
 		$class::setConnectionResolver($resolver);
 	}
@@ -490,13 +497,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getBuilder()
 	{
-		return new Builder($this->getMockQueryBuilder());
+		return new EloquentBuilder($this->getMockQueryBuilder());
 	}
 
 
 	protected function getMockModel()
 	{
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock(Model::class);
 		$model->shouldReceive('getKeyName')->andReturn('foo');
 		$model->shouldReceive('getTable')->andReturn('foo_table');
 		$model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
@@ -506,23 +513,23 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getMockQueryBuilder()
 	{
-		$query = m::mock('Illuminate\Database\Query\Builder');
+		$query = m::mock(Builder::class);
 		$query->shouldReceive('from')->with('foo_table');
 		return $query;
 	}
 
 }
 
-class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestScopeStub extends Model {
 	public function scopeApproved($query)
 	{
 		$query->where('foo', 'bar');
 	}
 }
 
-class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestNestedStub extends Model {
 	protected $table = 'table';
-	use Illuminate\Database\Eloquent\SoftDeletes;
+	use SoftDeletes;
 }
 
 class EloquentBuilderTestListsStub {
@@ -537,14 +544,14 @@ class EloquentBuilderTestListsStub {
 	}
 }
 
-class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestModelParentStub extends Model {
 	public function foo()
 	{
 		return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
 	}
 }
 
-class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestModelCloseRelatedStub extends Model {
 	public function bar()
 	{
 		return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
@@ -555,4 +562,4 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
 	}
 }
 
-class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model {}
+class EloquentBuilderTestModelFarRelatedStub extends Model {}

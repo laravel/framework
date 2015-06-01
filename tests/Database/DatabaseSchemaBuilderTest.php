@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 
 class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
@@ -13,7 +14,7 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testHasTableCorrectlyCallsGrammar()
 	{
-		$connection = m::mock('Illuminate\Database\Connection');
+		$connection = m::mock(Connection::class);
 		$grammar = m::mock('StdClass');
 		$connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
 		$builder = new Builder($connection);
@@ -27,10 +28,10 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 
 	public function testTableHasColumns()
     	{
-        	$connection = m::mock('Illuminate\Database\Connection');
+        	$connection = m::mock(Connection::class);
         	$grammar = m::mock('StdClass');
         	$connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        	$builder = m::mock('Illuminate\Database\Schema\Builder[getColumnListing]', array($connection));
+        	$builder = m::mock(Builder::class.'[getColumnListing]', array($connection));
         	$builder->shouldReceive('getColumnListing')->with('users')->twice()->andReturn(array('id', 'firstname'));
 
         	$this->assertTrue($builder->hasColumns('users', array('id', 'firstname')));

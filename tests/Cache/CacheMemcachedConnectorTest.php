@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Cache\MemcachedConnector;
 
 class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 
@@ -12,7 +13,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 
 	public function testServersAreAddedCorrectly()
 	{
-		$connector = $this->getMock('Illuminate\Cache\MemcachedConnector', array('getMemcached'));
+		$connector = $this->getMock(MemcachedConnector::class, array('getMemcached'));
 		$memcached = m::mock('stdClass');
 		$memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
 		$memcached->shouldReceive('getVersion')->once()->andReturn([]);
@@ -28,7 +29,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExceptionThrownOnBadConnection()
 	{
-		$connector = $this->getMock('Illuminate\Cache\MemcachedConnector', array('getMemcached'));
+		$connector = $this->getMock(MemcachedConnector::class, array('getMemcached'));
 		$memcached = m::mock('stdClass');
 		$memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
 		$memcached->shouldReceive('getVersion')->once()->andReturn(['255.255.255']);

@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Carbon\Carbon;
+use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Event;
 
 class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
@@ -31,7 +32,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicCronCompilation()
 	{
-		$app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+		$app = m::mock(Application::class.'[isDownForMaintenance,environment]');
 		$app->shouldReceive('isDownForMaintenance')->andReturn(false);
 		$app->shouldReceive('environment')->andReturn('production');
 
@@ -64,7 +65,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
 
 	public function testEventIsDueCheck()
 	{
-		$app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+		$app = m::mock(Application::class.'[isDownForMaintenance,environment]');
 		$app->shouldReceive('isDownForMaintenance')->andReturn(false);
 		$app->shouldReceive('environment')->andReturn('production');
 		Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));

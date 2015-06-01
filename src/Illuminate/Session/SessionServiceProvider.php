@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Session\Middleware\StartSession;
 
 class SessionServiceProvider extends ServiceProvider {
 
@@ -15,7 +16,7 @@ class SessionServiceProvider extends ServiceProvider {
 
 		$this->registerSessionDriver();
 
-		$this->app->singleton('Illuminate\Session\Middleware\StartSession');
+		$this->app->singleton(StartSession::class);
 	}
 
 	/**

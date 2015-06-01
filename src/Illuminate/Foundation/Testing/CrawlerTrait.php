@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait CrawlerTrait
@@ -587,7 +588,7 @@ trait CrawlerTrait
             $cookies, $files, $server, $content
         );
 
-        return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
+        return $this->response = $this->app->make(HttpKernel::class)->handle($request);
     }
 
     /**

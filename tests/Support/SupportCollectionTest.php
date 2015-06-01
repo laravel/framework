@@ -4,6 +4,7 @@ use Mockery as m;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
@@ -111,9 +112,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToArrayCallsToArrayOnEachItemInCollection()
 	{
-		$item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
+		$item1 = m::mock(Arrayable::class);
 		$item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-		$item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+		$item2 = m::mock(Arrayable::class);
 		$item2->shouldReceive('toArray')->once()->andReturn('bar.array');
 		$c = new Collection(array($item1, $item2));
 		$results = $c->toArray();
@@ -124,7 +125,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testToJsonEncodesTheToArrayResult()
 	{
-		$c = $this->getMock('Illuminate\Support\Collection', array('toArray'));
+		$c = $this->getMock(Collection::class, array('toArray'));
 		$c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
 		$results = $c->toJson();
 
@@ -134,7 +135,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 
 	public function testCastingToStringJsonEncodesTheToArrayResult()
 	{
-		$c = $this->getMock('Illuminate\Database\Eloquent\Collection', array('toArray'));
+		$c = $this->getMock(EloquentCollection::class, array('toArray'));
 		$c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
 
 		$this->assertEquals(json_encode('foo'), (string) $c);
@@ -390,8 +391,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$data = new Collection(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		$data = $data->chunk(3);
 
-		$this->assertInstanceOf('Illuminate\Support\Collection', $data);
-		$this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
+		$this->assertInstanceOf(Collection::class, $data);
+		$this->assertInstanceOf(Collection::class, $data[0]);
 		$this->assertEquals(4, $data->count());
 		$this->assertEquals(array(1, 2, 3), $data[0]->toArray());
 		$this->assertEquals(array(10), $data[3]->toArray());
@@ -447,7 +448,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertContains($random, $data->all());
 
 		$random = $data->random(3);
-		$this->assertInstanceOf('Illuminate\Support\Collection', $random);
+		$this->assertInstanceOf(Collection::class, $random);
 		$this->assertCount(3, $random);
 	}
 
@@ -795,10 +796,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$c = new Collection([1, 2, 3]);
 		$c = $c->zip(new Collection([4, 5, 6]));
-		$this->assertInstanceOf('Illuminate\Support\Collection', $c);
-		$this->assertInstanceOf('Illuminate\Support\Collection', $c[0]);
-		$this->assertInstanceOf('Illuminate\Support\Collection', $c[1]);
-		$this->assertInstanceOf('Illuminate\Support\Collection', $c[2]);
+		$this->assertInstanceOf(Collection::class, $c);
+		$this->assertInstanceOf(Collection::class, $c[0]);
+		$this->assertInstanceOf(Collection::class, $c[1]);
+		$this->assertInstanceOf(Collection::class, $c[2]);
 		$this->assertEquals(3, $c->count());
 		$this->assertEquals([1, 4], $c[0]->all());
 		$this->assertEquals([2, 5], $c[1]->all());

@@ -2,7 +2,11 @@
 
 use Mockery as m;
 use Illuminate\View\View;
+use Illuminate\View\Factory;
+use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\View\Engines\EngineInterface;
 
 class ViewTest extends PHPUnit_Framework_TestCase {
 
@@ -14,13 +18,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testDataCanBeSetOnView()
 	{
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock(Factory::class), m::mock(EngineInterface::class), 'view', 'path', array());
 		$view->with('foo', 'bar');
 		$view->with(array('baz' => 'boom'));
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 
 
-		$view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', array());
+		$view = new View(m::mock(Factory::class), m::mock(EngineInterface::class), 'view', 'path', array());
 		$view->withFoo('bar')->withBaz('boom');
 		$this->assertEquals(array('foo' => 'bar', 'baz' => 'boom'), $view->getData());
 	}
@@ -49,9 +53,9 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testRenderSectionsReturnsEnvironmentSections()
 	{
-		$view = m::mock('Illuminate\View\View[render]', array(
-			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+		$view = m::mock(View::class.'[render]', array(
+			m::mock(Factory::class),
+			m::mock(EngineInterface::class),
 			'view',
 			'path',
 			array(),
@@ -84,18 +88,18 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('make')->once()->with('foo', array('data'));
 		$result = $view->nest('key', 'foo', array('data'));
 
-		$this->assertInstanceOf('Illuminate\View\View', $result);
+		$this->assertInstanceOf(View::class, $result);
 	}
 
 
 	public function testViewAcceptsArrayableImplementations()
 	{
-		$arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
+		$arrayable = m::mock(Arrayable::class);
 		$arrayable->shouldReceive('toArray')->once()->andReturn(array('foo' => 'bar', 'baz' => array('qux', 'corge')));
 
 		$view = new View(
-			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+			m::mock(Factory::class),
+			m::mock(EngineInterface::class),
 			'view',
 			'path',
 			$arrayable
@@ -163,7 +167,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
 		$view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-		$view->renderable = m::mock('Illuminate\Contracts\Support\Renderable');
+		$view->renderable = m::mock(Renderable::class);
 		$view->renderable->shouldReceive('render')->once()->andReturn('text');
 		$this->assertEquals('contents', $view->render());
 	}
@@ -191,13 +195,13 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 		$view = $this->getView();
 		$errors = array('foo' => 'bar', 'qu' => 'ux');
 		$this->assertSame($view, $view->withErrors($errors));
-		$this->assertInstanceOf('Illuminate\Support\MessageBag', $view->errors);
+		$this->assertInstanceOf(MessageBag::class, $view->errors);
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'bar');
 		$qu = $view->errors->get('qu');
 		$this->assertEquals($qu[0], 'ux');
 		$data = array('foo' => 'baz');
-		$this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
+		$this->assertSame($view, $view->withErrors(new MessageBag($data)));
 		$foo = $view->errors->get('foo');
 		$this->assertEquals($foo[0], 'baz');
 	}
@@ -206,8 +210,8 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 	protected function getView()
 	{
 		return new View(
-			m::mock('Illuminate\View\Factory'),
-			m::mock('Illuminate\View\Engines\EngineInterface'),
+			m::mock(Factory::class),
+			m::mock(EngineInterface::class),
 			'view',
 			'path',
 			array('foo' => 'bar')

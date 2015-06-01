@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\View\FileViewFinder;
+use Illuminate\Filesystem\Filesystem;
 
 class ViewFinderTest extends PHPUnit_Framework_TestCase {
 
@@ -152,7 +154,7 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase {
 
 	protected function getFinder()
 	{
-		return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));
+		return new FileViewFinder(m::mock(Filesystem::class), array(__DIR__));
 	}
 
 }

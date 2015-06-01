@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Redis\Database;
+use Illuminate\Cache\RedisStore;
 
 class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
 
@@ -93,7 +95,7 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRedis()
 	{
-		return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Redis\Database'), 'prefix');
+		return new RedisStore(m::mock(Database::class), 'prefix');
 	}
 
 }

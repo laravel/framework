@@ -1,7 +1,11 @@
 <?php namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Illuminate\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcherContract;
 
 trait ApplicationTrait
 {
@@ -57,7 +61,7 @@ trait ApplicationTrait
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::mock(EventDispatcherContract::class);
 
         $mock->shouldIgnoreMissing();
 
@@ -78,7 +82,7 @@ trait ApplicationTrait
      */
     protected function withoutEvents()
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::mock(EventDispatcherContract::class);
 
         $mock->shouldReceive('fire');
 
@@ -99,16 +103,14 @@ trait ApplicationTrait
     {
         $jobs = is_array($jobs) ? $jobs : func_get_args();
 
-        $mock = Mockery::mock('Illuminate\Bus\Dispatcher[dispatch]', [$this->app]);
+        $mock = Mockery::mock(BusDispatcher::class.'[dispatch]', [$this->app]);
 
         foreach ($jobs as $job) {
             $mock->shouldReceive('dispatch')->atLeast()->once()
                 ->with(Mockery::type($job));
         }
 
-        $this->app->instance(
-            'Illuminate\Contracts\Bus\Dispatcher', $mock
-        );
+        $this->app->instance(BusDispatcherContract::class, $mock);
 
         return $this;
     }
@@ -259,6 +261,6 @@ trait ApplicationTrait
      */
     public function artisan($command, $parameters = [])
     {
-        return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
+        return $this->code = $this->app[ConsoleKernel::class]->call($command, $parameters);
     }
 }

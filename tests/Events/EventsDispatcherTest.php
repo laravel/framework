@@ -2,6 +2,10 @@
 
 use Mockery as m;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedHandler;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
 
 class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 
@@ -23,7 +27,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testContainerResolutionOfEventHandlers()
 	{
-		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
+		$d = new Dispatcher($container = m::mock(Container::class));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
 		$handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
 		$d->listen('foo', 'FooHandler@onFooEvent');
@@ -33,7 +37,7 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 
 	public function testContainerResolutionOfEventHandlersWithDefaultMethods()
 	{
-		$d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
+		$d = new Dispatcher($container = m::mock(Container::class));
 		$container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
 		$handler->shouldReceive('handle')->once()->with('foo', 'bar');
 		$d->listen('foo', 'FooHandler');
@@ -113,8 +117,8 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testQueuedEventHandlersAreQueued()
 	{
 		$d = new Dispatcher;
-		$queue = m::mock('Illuminate\Contracts\Queue\Queue');
-		$queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+		$queue = m::mock(Queue::class);
+		$queue->shouldReceive('push')->once()->with(CallQueuedHandler::class.'@call', [
 			'class' => 'TestDispatcherQueuedHandler',
 			'method' => 'someMethod',
 			'data' => serialize(['foo', 'bar']),
@@ -129,8 +133,8 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 	public function testQueuedEventHandlersAreQueuedWithCustomHandlers()
 	{
 		$d = new Dispatcher;
-		$queue = m::mock('Illuminate\Contracts\Queue\Queue');
-		$queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
+		$queue = m::mock(Queue::class);
+		$queue->shouldReceive('push')->once()->with(CallQueuedHandler::class.'@call', [
 			'class' => 'TestDispatcherQueuedHandlerCustomQueue',
 			'method' => 'someMethod',
 			'data' => serialize(['foo', 'bar']),
@@ -143,11 +147,11 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
+class TestDispatcherQueuedHandler implements ShouldBeQueued {
 	public function handle() {}
 }
 
-class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Queue\ShouldBeQueued {
+class TestDispatcherQueuedHandlerCustomQueue implements ShouldBeQueued {
 	public function handle() {}
 	public function queue($queue, $handler, array $payload)
 	{

@@ -1,6 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Processors\Processor;
 
 class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
 
@@ -14,13 +17,12 @@ class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
 	{
 		$pdo = $this->getMock('ProcessorTestPDOStub');
 		$pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));
-		$connection = m::mock('Illuminate\Database\Connection');
+		$connection = m::mock(Connection::class);
 		$connection->shouldReceive('insert')->once()->with('sql', array('foo'));
 		$connection->shouldReceive('getPdo')->once()->andReturn($pdo);
-		$builder = m::mock('Illuminate\Database\Query\Builder');
+		$builder = m::mock(Builder::class);
 		$builder->shouldReceive('getConnection')->andReturn($connection);
-		$processor = new Illuminate\Database\Query\Processors\Processor;
-		$result = $processor->processInsertGetId($builder, 'sql', array('foo'), 'id');
+		$result = (new Processor)->processInsertGetId($builder, 'sql', array('foo'), 'id');
 		$this->assertSame(1, $result);
 	}
 

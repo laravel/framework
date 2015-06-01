@@ -1,6 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Queue\IronQueue;
+use Illuminate\Queue\Jobs\IronJob;
+use Illuminate\Container\Container;
 
 class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 
@@ -31,9 +34,9 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 
 	public function testDeleteNoopsOnPushedQueues()
 	{
-		$job = new Illuminate\Queue\Jobs\IronJob(
-			m::mock('Illuminate\Container\Container'),
-			m::mock('Illuminate\Queue\IronQueue'),
+		$job = new IronJob(
+			m::mock(Container::class),
+			m::mock(IronQueue::class),
 			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'))), 'timeout' => 60, 'pushed' => true),
 			'default'
 		);
@@ -55,9 +58,9 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
 
 	protected function getJob()
 	{
-		return new Illuminate\Queue\Jobs\IronJob(
-			m::mock('Illuminate\Container\Container'),
-			m::mock('Illuminate\Queue\IronQueue'),
+		return new IronJob(
+			m::mock(Container::class),
+			m::mock(IronQueue::class),
 			(object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
 		);
 	}

@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
+
 /**
  * @see \Illuminate\Foundation\Artisan
  */
@@ -12,7 +14,7 @@ class Artisan extends Facade {
 	 */
 	protected static function getFacadeAccessor()
 	{
-		return 'Illuminate\Contracts\Console\Kernel';
+		return ConsoleKernel::class;
 	}
 
 }

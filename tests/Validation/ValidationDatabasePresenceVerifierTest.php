@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Database\ConnectionResolverInterface;
 
 class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase {
 
@@ -12,7 +14,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase 
 
 	public function testBasicCount()
 	{
-		$verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+		$verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));
 		$verifier->setConnection('connection');
 		$db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
 		$conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));

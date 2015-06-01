@@ -1,7 +1,15 @@
 <?php
 
 use Mockery as m;
+use Carbon\Carbon;
+use IronMQ\IronMQ;
+use Illuminate\Http\Request;
 use SuperClosure\Serializer;
+use Illuminate\Http\Response;
+use Illuminate\Queue\IronQueue;
+use Illuminate\Queue\Jobs\IronJob;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
@@ -13,8 +21,8 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushProperlyPushesJobOntoIron()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true);
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default', true);
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array(1, 2, 3), 'attempts' => 1, 'queue' => 'default')))->andReturn('encrypted');
 		$iron->shouldReceive('postMessage')->once()->with('default', 'encrypted', array())->andReturn((object) array('id' => 1));
@@ -24,8 +32,8 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushProperlyPushesJobOntoIronWithoutEncryption()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default');
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default');
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$crypt->shouldReceive('encrypt')->never();
 		$iron->shouldReceive('postMessage')->once()->with('default', json_encode(['job' => 'foo', 'data' => [1, 2, 3], 'attempts' => 1, 'queue' => 'default']), array())->andReturn((object) array('id' => 1));
@@ -35,8 +43,8 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPushProperlyPushesJobOntoIronWithClosures()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true);
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default', true);
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$name = 'Foo';
 		$closure = (new Serializer)->serialize($innerClosure = function() use ($name) { return $name; });
@@ -51,8 +59,8 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushProperlyPushesJobOntoIron()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true);
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default', true);
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array(
 			'job' => 'foo', 'data' => array(1, 2, 3), 'attempts' => 1, 'queue' => 'default',
@@ -64,9 +72,9 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testDelayedPushProperlyPushesJobOntoIronWithTimestamp()
 	{
-		$now = Carbon\Carbon::now();
-		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('getTime'), array($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true));
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$now = Carbon::now();
+		$queue = $this->getMock(IronQueue::class, array('getTime'), array($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default', true));
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$queue->expects($this->once())->method('getTime')->will($this->returnValue($now->getTimestamp()));
 		$crypt->shouldReceive('encrypt')->once()->with(json_encode(array('job' => 'foo', 'data' => array(1, 2, 3), 'attempts' => 1, 'queue' => 'default')))->andReturn('encrypted');
@@ -77,38 +85,38 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 	public function testPopProperlyPopsJobOffOfIron()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true);
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default', true);
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
-		$queue->setContainer(m::mock('Illuminate\Container\Container'));
+		$queue->setContainer(m::mock(Container::class));
 		$iron->shouldReceive('getMessage')->once()->with('default')->andReturn($job = m::mock('IronMQ_Message'));
 		$job->body = 'foo';
 		$crypt->shouldReceive('decrypt')->once()->with('foo')->andReturn('foo');
 		$result = $queue->pop();
 
-		$this->assertInstanceOf('Illuminate\Queue\Jobs\IronJob', $result);
+		$this->assertInstanceOf(IronJob::class, $result);
 	}
 
 
 	public function testPopProperlyPopsJobOffOfIronWithoutEncryption()
 	{
-		$queue = new Illuminate\Queue\IronQueue($iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default');
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = new IronQueue($iron = m::mock(IronMQ::class), m::mock(Request::class), 'default');
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
-		$queue->setContainer(m::mock('Illuminate\Container\Container'));
+		$queue->setContainer(m::mock(Container::class));
 		$iron->shouldReceive('getMessage')->once()->with('default')->andReturn($job = m::mock('IronMQ_Message'));
 		$job->body = 'foo';
 		$crypt->shouldReceive('decrypt')->never();
 		$result = $queue->pop();
 
-		$this->assertInstanceOf('Illuminate\Queue\Jobs\IronJob', $result);
+		$this->assertInstanceOf(IronJob::class, $result);
 	}
 
 
 	public function testPushedJobsCanBeMarshaled()
 	{
-		$queue = $this->getMock('Illuminate\Queue\IronQueue', array('createPushedIronJob'), array($iron = m::mock('IronMQ\IronMQ'), $request = m::mock('Illuminate\Http\Request'), 'default', true));
-		$crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
+		$queue = $this->getMock(IronQueue::class, array('createPushedIronJob'), array($iron = m::mock(IronMQ::class), $request = m::mock(Request::class), 'default', true));
+		$crypt = m::mock(Encrypter::class);
 		$queue->setEncrypter($crypt);
 		$request->shouldReceive('header')->once()->with('iron-message-id')->andReturn('message-id');
 		$request->shouldReceive('getContent')->once()->andReturn($content = json_encode(array('foo' => 'bar')));
@@ -119,7 +127,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase {
 
 		$response = $queue->marshal();
 
-		$this->assertInstanceOf('Illuminate\Http\Response', $response);
+		$this->assertInstanceOf(Response::class, $response);
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 

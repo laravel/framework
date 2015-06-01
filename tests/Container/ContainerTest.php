@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Container\Container;
+use Illuminate\Container\BindingResolutionException;
 
 class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
@@ -347,7 +348,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 	public function testInternalClassWithDefaultParameters()
 	{
-		$this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
+		$this->setExpectedException(BindingResolutionException::class, 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
 		$container = new Container;
 		$parameters = array();
 		$container->make('ContainerMixedPrimitiveStub', $parameters);

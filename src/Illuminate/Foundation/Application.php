@@ -7,7 +7,10 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Illuminate\Foundation\Bootstrap\DetectEnvironment;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -158,7 +161,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
 		$this->instance('app', $this);
 
-		$this->instance('Illuminate\Container\Container', $this);
+		$this->instance(Container::class, $this);
 	}
 
 	/**
@@ -201,9 +204,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function afterLoadingEnvironment(Closure $callback)
 	{
-		return $this->afterBootstrapping(
-			'Illuminate\Foundation\Bootstrap\DetectEnvironment', $callback
-		);
+		return $this->afterBootstrapping(DetectEnvironment::class, $callback);
 	}
 
 	/**
@@ -754,7 +755,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
 	{
-		return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
+		return $this[HttpKernel::class]->handle(Request::createFromBase($request));
 	}
 
 	/**
@@ -1055,11 +1056,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	protected function getKernel()
 	{
-		$kernelContract = $this->runningInConsole()
-					? 'Illuminate\Contracts\Console\Kernel'
-					: 'Illuminate\Contracts\Http\Kernel';
+		$kernel = $this->runningInConsole() ? ConsoleKernel::class : HttpKernel::class;
 
-		return $this->make($kernelContract);
+		return $this->make($kernel);
 	}
 
 	/**

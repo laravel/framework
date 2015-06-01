@@ -1,6 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Queue\RedisQueue;
+use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\RedisJob;
 
 class QueueRedisJobTest extends PHPUnit_Framework_TestCase {
 
@@ -41,9 +44,9 @@ class QueueRedisJobTest extends PHPUnit_Framework_TestCase {
 
 	protected function getJob()
 	{
-		return new Illuminate\Queue\Jobs\RedisJob(
-			m::mock('Illuminate\Container\Container'),
-			m::mock('Illuminate\Queue\RedisQueue'),
+		return new RedisJob(
+			m::mock(Container::class),
+			m::mock(RedisQueue::class),
 			json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1)),
 			'default'
 		);

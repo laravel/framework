@@ -1,9 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
@@ -16,9 +19,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	public function testRelationIsProperlyInitialized()
 	{
 		$relation = $this->getRelation();
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock(Model::class);
 		$relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
-		$model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
+		$model->shouldReceive('setRelation')->once()->with('foo', m::type(Collection::class));
 		$models = $relation->initRelation(array($model), 'foo');
 
 		$this->assertEquals(array($model), $models);
@@ -100,7 +103,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	{
 		$select = array('posts.*', 'users.country_id');
 
-		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+		$baseBuilder = m::mock(Builder::class);
 
 		$relation = $this->getRelation();
 		$relation->getRelated()->shouldReceive('newCollection')->once();
@@ -118,7 +121,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 	{
 		$select = array('users.country_id');
 
-		$baseBuilder = m::mock('Illuminate\Database\Query\Builder');
+		$baseBuilder = m::mock(Builder::class);
 		$baseBuilder->columns = array('foo', 'bar');
 
 		$relation = $this->getRelation();
@@ -135,8 +138,8 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 	public function testFirstMethod()
 	{
-		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
-		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+		$relation = m::mock(HasManyThrough::class.'[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Collection(['first', 'second']));
 		$relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
 
 		$this->assertEquals('first', $relation->first());
@@ -145,7 +148,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindMethod()
 	{
-		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[first]', $this->getRelationArguments());
+		$relation = m::mock(HasManyThrough::class.'[first]', $this->getRelationArguments());
 		$relation->shouldReceive('where')->with('posts.id', '=', 'foo')->once()->andReturn($relation);
 		$relation->shouldReceive('first')->once()->andReturn(new StdClass);
 
@@ -158,8 +161,8 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindManyMethod()
 	{
-		$relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
-		$relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+		$relation = m::mock(HasManyThrough::class.'[get]', $this->getRelationArguments());
+		$relation->shouldReceive('get')->once()->andReturn(new Collection(['first', 'second']));
 		$relation->shouldReceive('whereIn')->with('posts.id', ['foo', 'bar'])->once()->andReturn($relation);
 
 		$related = $relation->getRelated();
@@ -196,18 +199,18 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRelationArguments()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(EloquentBuilder::class);
 		$builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
 		$builder->shouldReceive('where')->with('users.country_id', '=', 1);
 
-		$country = m::mock('Illuminate\Database\Eloquent\Model');
+		$country = m::mock(Model::class);
 		$country->shouldReceive('getKeyName')->andReturn('id');
 		$country->shouldReceive('offsetGet')->andReturn(1);
 		$country->shouldReceive('getForeignKey')->andReturn('country_id');
-		$user = m::mock('Illuminate\Database\Eloquent\Model');
+		$user = m::mock(Model::class);
 		$user->shouldReceive('getTable')->andReturn('users');
 		$user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
-		$post = m::mock('Illuminate\Database\Eloquent\Model');
+		$post = m::mock(Model::class);
 		$post->shouldReceive('getTable')->andReturn('posts');
 
 		$builder->shouldReceive('getModel')->andReturn($post);
@@ -221,17 +224,17 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRelationArgumentsForNonPrimaryKey()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(EloquentBuilder::class);
 		$builder->shouldReceive('join')->once()->with('users', 'users.id', '=', 'posts.user_id');
 		$builder->shouldReceive('where')->with('users.country_id', '=', 1);
 
-		$country = m::mock('Illuminate\Database\Eloquent\Model');
+		$country = m::mock(Model::class);
 		$country->shouldReceive('offsetGet')->andReturn(1);
 		$country->shouldReceive('getForeignKey')->andReturn('country_id');
-		$user = m::mock('Illuminate\Database\Eloquent\Model');
+		$user = m::mock(Model::class);
 		$user->shouldReceive('getTable')->andReturn('users');
 		$user->shouldReceive('getQualifiedKeyName')->andReturn('users.id');
-		$post = m::mock('Illuminate\Database\Eloquent\Model');
+		$post = m::mock(Model::class);
 		$post->shouldReceive('getTable')->andReturn('posts');
 
 		$builder->shouldReceive('getModel')->andReturn($post);
@@ -245,11 +248,11 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentHasManyThroughModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasManyThroughModelStub extends Model {
 	public $country_id = 'foreign.value';
 }
 
-class EloquentHasManyThroughSoftDeletingModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasManyThroughSoftDeletingModelStub extends Model {
 	use SoftDeletes;
 	public $table = 'users';
 }

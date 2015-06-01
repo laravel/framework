@@ -1,6 +1,10 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 
 class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
@@ -12,10 +16,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testMigrationAreRunUpWhenOutstandingMigrationsExist()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
 			__DIR__.'/2_bar.php',
@@ -46,10 +50,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpMigrationCanBePretended()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
 			__DIR__.'/2_bar.php',
@@ -94,10 +98,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testNothingIsDoneWhenNoMigrationsAreOutstanding()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn(array(
 			__DIR__.'/1_foo.php',
@@ -113,10 +117,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testLastBatchOfMigrationsCanBeRolledBack()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array(
 			$fooMigration = new MigratorTestMigrationStub('foo'),
@@ -141,10 +145,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testRollbackMigrationsCanBePretended()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array(
 			$fooMigration = new MigratorTestMigrationStub('foo'),
@@ -181,10 +185,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testNothingIsRolledBackWhenNothingInRepository()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', array('resolve'), array(
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, array('resolve'), array(
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		));
 		$migrator->getRepository()->shouldReceive('getLast')->once()->andReturn(array());
 
@@ -194,10 +198,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testResettingMigrationsRollsBackAllMigrations()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, ['resolve'], [
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		]);
 
 		$fooMigration = (object) ['migration' => 'foo'];
@@ -233,10 +237,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testResetMigrationsCanBePretended()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, ['resolve'], [
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		]);
 
 		$fooMigration = (object) ['migration' => 'foo'];
@@ -289,10 +293,10 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testNothingIsResetBackWhenNothingInRepository()
 	{
-		$migrator = $this->getMock('Illuminate\Database\Migrations\Migrator', ['resolve'], [
-			m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'),
-			$resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
-			m::mock('Illuminate\Filesystem\Filesystem'),
+		$migrator = $this->getMock(Migrator::class, ['resolve'], [
+			m::mock(MigrationRepositoryInterface::class),
+			$resolver = m::mock(ConnectionResolverInterface::class),
+			m::mock(Filesystem::class),
 		]);
 		$migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([]);
 

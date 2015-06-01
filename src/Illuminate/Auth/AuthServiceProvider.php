@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthServiceProvider extends ServiceProvider {
 
@@ -48,7 +49,7 @@ class AuthServiceProvider extends ServiceProvider {
 	 */
 	protected function registerUserResolver()
 	{
-		$this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function($app)
+		$this->app->bind(Authenticatable::class, function($app)
 		{
 			return $app['auth']->user();
 		});

@@ -2,6 +2,7 @@
 
 use Mockery;
 use PHPUnit_Framework_TestCase;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
@@ -43,7 +44,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         }
 
         if (! $this->factory) {
-            $this->factory = $this->app->make('Illuminate\Database\Eloquent\Factory');
+            $this->factory = $this->app->make(EloquentFactory::class);
         }
     }
 

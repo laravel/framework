@@ -2,6 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Foundation\Application;
+use Illuminate\Database\Migrations\Migrator;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 
 class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
@@ -14,7 +17,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testBasicMigrationsCallMigratorWithProperArguments()
 	{
-		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+		$command = new MigrateCommand($migrator = m::mock(Migrator::class), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
 		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
@@ -29,8 +32,8 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testMigrationRepositoryCreatedWhenNecessary()
 	{
-		$params = array($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
-		$command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', array('call'), $params);
+		$params = array($migrator = m::mock(Migrator::class), __DIR__.'/vendor');
+		$command = $this->getMock(MigrateCommand::class, array('call'), $params);
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
 		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
@@ -46,7 +49,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testTheCommandMayBePretended()
 	{
-		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+		$command = new MigrateCommand($migrator = m::mock(Migrator::class), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
 		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
@@ -61,7 +64,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testTheDatabaseMayBeSet()
 	{
-		$command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+		$command = new MigrateCommand($migrator = m::mock(Migrator::class), __DIR__.'/vendor');
 		$app = new ApplicationDatabaseMigrationStub(array('path.database' => __DIR__));
 		$app->useDatabasePath(__DIR__);
 		$command->setLaravel($app);
@@ -76,7 +79,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function runCommand($command, $input = array())
 	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+		return $command->run(new ArrayInput($input), new NullOutput);
 	}
 
 }

@@ -3,6 +3,8 @@
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
 
 class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 
@@ -30,12 +32,12 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$dispatcher = new Dispatcher($container, function() {
-			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock = m::mock(Queue::class);
 			$mock->shouldReceive('push')->once();
 			return $mock;
 		});
 
-		$dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
+		$dispatcher->dispatch(m::mock(ShouldBeQueued::class));
 	}
 
 
@@ -43,7 +45,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$dispatcher = new Dispatcher($container, function() {
-			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock = m::mock(Queue::class);
 			$mock->shouldReceive('push')->once();
 			return $mock;
 		});
@@ -56,7 +58,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$dispatcher = new Dispatcher($container, function() {
-			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock = m::mock(Queue::class);
 			$mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('BusDispatcherTestSpecificQueueAndDelayCommand'));
 			return $mock;
 		});
@@ -69,7 +71,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 	{
 		$container = new Container;
 		$dispatcher = new Dispatcher($container, function() {
-			$mock = m::mock('Illuminate\Contracts\Queue\Queue');
+			$mock = m::mock(Queue::class);
 			$mock->shouldReceive('push')->once();
 			return $mock;
 		});
@@ -88,7 +90,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
 		$dispatcher = new Dispatcher($container);
 		$dispatcher->mapUsing(function() { return 'Handler@handle'; });
 
-		$result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
+		$result = $dispatcher->dispatch(m::mock(ShouldBeQueued::class));
 		$this->assertEquals('foo', $result);
 	}
 

@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+
 /**
  * @see \Illuminate\Bus\Dispatcher
  */
@@ -12,7 +14,7 @@ class Bus extends Facade {
 	 */
 	protected static function getFacadeAccessor()
 	{
-		return 'Illuminate\Contracts\Bus\Dispatcher';
+		return BusDispatcher::class;
 	}
 
 }

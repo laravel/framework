@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Cookie\CookieJar;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends PHPUnit_Framework_TestCase {
@@ -57,11 +58,11 @@ class CookieTest extends PHPUnit_Framework_TestCase {
 		$cookie->queue($cookie->make('foo','bar'));
 		$this->assertArrayHasKey('foo', $cookie->getQueuedCookies());
 		$this->assertTrue($cookie->hasQueued('foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('foo'));
+		$this->assertInstanceOf(Cookie::class, $cookie->queued('foo'));
 		$cookie->queue('qu','ux');
 		$this->assertArrayHasKey('qu', $cookie->getQueuedCookies());
 		$this->assertTrue($cookie->hasQueued('qu'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('qu'));
+		$this->assertInstanceOf(Cookie::class, $cookie->queued('qu'));
 	}
 
 

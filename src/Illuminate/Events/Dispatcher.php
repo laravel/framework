@@ -3,6 +3,9 @@
 use Exception;
 use ReflectionClass;
 use Illuminate\Container\Container;
+use Illuminate\Events\CallQueuedHandler;
+use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -259,7 +262,7 @@ class Dispatcher implements DispatcherContract {
 		{
 			$connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
 
-			$this->resolveQueue()->connection($connection)->push('Illuminate\Broadcasting\BroadcastEvent', [
+			$this->resolveQueue()->connection($connection)->push(BroadcastEvent::class, [
 				'event' => serialize($event)
 			]);
 		}
@@ -397,9 +400,7 @@ class Dispatcher implements DispatcherContract {
 	{
 		try
 		{
-			return (new ReflectionClass($class))->implementsInterface(
-				'Illuminate\Contracts\Queue\ShouldBeQueued'
-			);
+			return (new ReflectionClass($class))->implementsInterface(ShouldBeQueued::class);
 		}
 		catch (Exception $e)
 		{
@@ -426,7 +427,7 @@ class Dispatcher implements DispatcherContract {
 			}
 			else
 			{
-				$this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
+				$this->resolveQueue()->push(CallQueuedHandler::class.'@call', [
 					'class' => $class, 'method' => $method, 'data' => serialize($arguments),
 				]);
 			}
@@ -456,7 +457,7 @@ class Dispatcher implements DispatcherContract {
 	{
 		$handler = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-		$handler->queue($this->resolveQueue(), 'Illuminate\Events\CallQueuedHandler@call', [
+		$handler->queue($this->resolveQueue(), CallQueuedHandler::class.'@call', [
 			'class' => $class, 'method' => $method, 'data' => serialize($arguments),
 		]);
 	}

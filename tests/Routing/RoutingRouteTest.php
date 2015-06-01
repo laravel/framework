@@ -1,9 +1,15 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Routing\Controller;
+use Illuminate\Container\Container;
+use Illuminate\Routing\ControllerDispatcher;
+use Illuminate\Http\Exception\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
@@ -14,7 +20,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
-		$router->get('foo/bar', function() { throw new Illuminate\Http\Exception\HttpResponseException(new Response('hello')); });
+		$router->get('foo/bar', function() { throw new HttpResponseException(new SymfonyResponse('hello')); });
 		$this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
 		$router = $this->getRouter();
@@ -765,7 +771,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 	public function testRouterFiresRoutedEvent()
 	{
-		$events = new Illuminate\Events\Dispatcher();
+		$events = new Dispatcher;
 		$router = new Router($events);
 		$router->get('foo/bar', function() { return ''; });
 
@@ -782,11 +788,11 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$router->dispatchToRoute($request);
 
-		$this->assertInstanceOf('Illuminate\Http\Request', $_SERVER['__router.request']);
+		$this->assertInstanceOf(Request::class, $_SERVER['__router.request']);
 		$this->assertEquals($_SERVER['__router.request'], $request);
 		unset($_SERVER['__router.request']);
 
-		$this->assertInstanceOf('Illuminate\Routing\Route', $_SERVER['__router.route']);
+		$this->assertInstanceOf(Route::class, $_SERVER['__router.route']);
 		$this->assertEquals($_SERVER['__router.route']->getUri(), $route->getUri());
 		unset($_SERVER['__router.route']);
 	}
@@ -812,7 +818,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 			$_SERVER['route.test.controller.middleware.class'],
 			$_SERVER['route.test.controller.middleware.parameters']
 		);
-		$router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
+		$router = new Router(new Dispatcher, $container = new Container);
 
 		$router->filter('route.test.controller.before.filter', function()
 		{
@@ -826,7 +832,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 		$container->singleton('illuminate.route.dispatcher', function($container) use ($router)
 		{
-			return new Illuminate\Routing\ControllerDispatcher($router, $container);
+			return new ControllerDispatcher($router, $container);
 		});
 
 		$router->get('foo/bar', 'RouteTestControllerStub@index');
@@ -835,7 +841,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($_SERVER['route.test.controller.before.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.after.filter']);
 		$this->assertTrue($_SERVER['route.test.controller.middleware']);
-		$this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
+		$this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
 		$this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters']);
 		$this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
 	}
@@ -851,12 +857,12 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRouter()
 	{
-		return new Router(new Illuminate\Events\Dispatcher);
+		return new Router(new Dispatcher);
 	}
 
 }
 
-class RouteTestControllerStub extends Illuminate\Routing\Controller {
+class RouteTestControllerStub extends Controller {
 	public function __construct()
 	{
 		$this->middleware('RouteTestControllerMiddleware');
@@ -889,7 +895,7 @@ class RouteTestControllerParameterizedMiddleware {
 	}
 }
 
-class RouteTestInspectedControllerStub extends Illuminate\Routing\Controller {
+class RouteTestInspectedControllerStub extends Controller {
 	public function getFoo()
 	{
 		return 'hello';

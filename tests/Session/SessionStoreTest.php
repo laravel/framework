@@ -1,6 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Session\Store;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Session\CookieSessionHandler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 class SessionStoreTest extends PHPUnit_Framework_TestCase {
 
@@ -14,7 +20,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$session = $this->getSession();
 		$session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(array('foo' => 'bar', 'bagged' => array('name' => 'taylor'))));
-		$session->registerBag(new Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag('bagged'));
+		$session->registerBag(new AttributeBag('bagged'));
 		$session->start();
 
 		$this->assertEquals('bar', $session->get('foo'));
@@ -22,7 +28,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($session->has('foo'));
 		$this->assertFalse($session->has('bar'));
 		$this->assertEquals('taylor', $session->getBag('bagged')->get('name'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $session->getMetadataBag());
+		$this->assertInstanceOf(MetadataBag::class, $session->getMetadataBag());
 		$this->assertTrue($session->isStarted());
 
 		$session->put('baz', 'boom');
@@ -222,7 +228,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$session = $this->getSession();
 		$session->set('foo', 'bar');
 
-		$bag = new Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag('bagged');
+		$bag = new AttributeBag('bagged');
 		$bag->set('qu', 'ux');
 		$session->registerBag($bag);
 
@@ -256,10 +262,10 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($session->handlerNeedsRequest());
 		$session->getHandler()->shouldReceive('setRequest')->never();
 
-		$session = new \Illuminate\Session\Store('test', m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar(), 60)));
+		$session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60)));
 		$this->assertTrue($session->handlerNeedsRequest());
 		$session->getHandler()->shouldReceive('setRequest')->once();
-		$request = new \Symfony\Component\HttpFoundation\Request();
+		$request = new Request;
 		$session->setRequestOnHandler($request);
 	}
 
@@ -291,7 +297,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function getSession()
 	{
-		$reflection = new ReflectionClass('Illuminate\Session\Store');
+		$reflection = new ReflectionClass(Store::class);
 		return $reflection->newInstanceArgs($this->getMocks());
 	}
 

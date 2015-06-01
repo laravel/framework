@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
 
@@ -19,7 +21,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
 		$query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
 		$model->delete();
 
-		$this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
+		$this->assertInstanceOf(Carbon::class, $model->deleted_at);
 	}
 
 
@@ -51,7 +53,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
 
 
 class DatabaseSoftDeletingTraitStub {
-	use Illuminate\Database\Eloquent\SoftDeletes;
+	use SoftDeletes;
 	public $deleted_at;
 	public function newQuery()
 	{
@@ -79,7 +81,7 @@ class DatabaseSoftDeletingTraitStub {
 	}
 	public function freshTimestamp()
 	{
-		return Carbon\Carbon::now();
+		return Carbon::now();
 	}
 	public function fromDateTime()
 	{

@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Events;
 
+use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider {
@@ -15,7 +16,7 @@ class EventServiceProvider extends ServiceProvider {
 		{
 			return (new Dispatcher($app))->setQueueResolver(function() use ($app)
 			{
-				return $app->make('Illuminate\Contracts\Queue\Factory');
+				return $app->make(Factory::class);
 			});
 		});
 	}

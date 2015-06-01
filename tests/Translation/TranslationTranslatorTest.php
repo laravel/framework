@@ -2,6 +2,8 @@
 
 use Mockery as m;
 use Illuminate\Translation\Translator;
+use Illuminate\Translation\LoaderInterface;
+use Symfony\Component\Translation\MessageSelector;
 
 class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
@@ -13,11 +15,11 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
 	{
-		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en'));
+		$t = $this->getMock(Translator::class, array('get'), array($this->getLoader(), 'en'));
 		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array()), $this->equalTo('bar'))->will($this->returnValue('foo'));
 		$this->assertFalse($t->has('foo', 'bar'));
 
-		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en', 'sp'));
+		$t = $this->getMock(Translator::class, array('get'), array($this->getLoader(), 'en', 'sp'));
 		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array()), $this->equalTo('bar'))->will($this->returnValue('bar'));
 		$this->assertTrue($t->has('foo', 'bar'));
 	}
@@ -25,7 +27,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMethodProperlyLoadsAndRetrievesItem()
 	{
-		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
+		$t = $this->getMock(Translator::class, null, array($this->getLoader(), 'en'));
 		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(array('foo' => 'foo', 'baz' => 'breeze :foo'));
 		$this->assertEquals('breeze bar', $t->get('foo::bar.baz', array('foo' => 'bar'), 'en'));
 		$this->assertEquals('foo', $t->get('foo::bar.foo'));
@@ -34,7 +36,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMethodProperlyLoadsAndRetrievesItemWithLongestReplacementsFirst()
 	{
-		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
+		$t = $this->getMock(Translator::class, null, array($this->getLoader(), 'en'));
 		$t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(array('foo' => 'foo', 'baz' => 'breeze :foo :foobar'));
 		$this->assertEquals('breeze bar taylor', $t->get('foo::bar.baz', array('foo' => 'bar', 'foobar' => 'taylor'), 'en'));
 		$this->assertEquals('breeze foo bar baz taylor', $t->get('foo::bar.baz', array('foo' => 'foo bar baz', 'foobar' => 'taylor'), 'en'));
@@ -44,7 +46,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
 	{
-		$t = $this->getMock('Illuminate\Translation\Translator', null, array($this->getLoader(), 'en'));
+		$t = $this->getMock(Translator::class, null, array($this->getLoader(), 'en'));
 		$t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(array('bar' => 'breeze :foo'));
 		$this->assertEquals('breeze bar', $t->get('foo.bar', array('foo' => 'bar')));
 	}
@@ -52,9 +54,9 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testChoiceMethodProperlyLoadsAndRetrievesItem()
 	{
-		$t = $this->getMock('Illuminate\Translation\Translator', array('get'), array($this->getLoader(), 'en'));
+		$t = $this->getMock(Translator::class, array('get'), array($this->getLoader(), 'en'));
 		$t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(array('replace')), $this->equalTo('en'))->will($this->returnValue('line'));
-		$t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+		$t->setSelector($selector = m::mock(MessageSelector::class));
 		$selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
 		$t->choice('foo', 10, array('replace'));
@@ -63,7 +65,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
 
 	protected function getLoader()
 	{
-		return m::mock('Illuminate\Translation\LoaderInterface');
+		return m::mock(LoaderInterface::class);
 	}
 
 }

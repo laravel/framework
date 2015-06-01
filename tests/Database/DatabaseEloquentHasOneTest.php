@@ -1,8 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 
@@ -15,7 +19,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testSaveMethodSetsForeignKeyOnModel()
 	{
 		$relation = $this->getRelation();
-		$mockModel = $this->getMock('Illuminate\Database\Eloquent\Model', array('save'));
+		$mockModel = $this->getMock(Model::class, array('save'));
 		$mockModel->expects($this->once())->method('save')->will($this->returnValue(true));
 		$result = $relation->save($mockModel);
 
@@ -27,7 +31,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testCreateMethodProperlyCreatesNewModel()
 	{
 		$relation = $this->getRelation();
-		$created = $this->getMock('Illuminate\Database\Eloquent\Model', array('save', 'getKey', 'setAttribute'));
+		$created = $this->getMock(Model::class, array('save', 'getKey', 'setAttribute'));
 		$created->expects($this->once())->method('save')->will($this->returnValue(true));
 		$relation->getRelated()->shouldReceive('newInstance')->once()->with(array('name' => 'taylor'))->andReturn($created);
 		$created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
@@ -51,7 +55,7 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testRelationIsProperlyInitialized()
 	{
 		$relation = $this->getRelation();
-		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model = m::mock(Model::class);
 		$model->shouldReceive('setRelation')->once()->with('foo', null);
 		$models = $relation->initRelation(array($model), 'foo');
 
@@ -98,19 +102,19 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 	public function testRelationCountQueryCanBeBuilt()
 	{
 		$relation = $this->getRelation();
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(EloquentBuilder::class);
 
-		$baseQuery = m::mock('Illuminate\Database\Query\Builder');
+		$baseQuery = m::mock(Builder::class);
 		$baseQuery->from = 'one';
-		$parentQuery = m::mock('Illuminate\Database\Query\Builder');
+		$parentQuery = m::mock(Builder::class);
 		$parentQuery->from = 'two';
 
 		$builder->shouldReceive('getQuery')->once()->andReturn($baseQuery);
 		$builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
 
-		$builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'));
+		$builder->shouldReceive('select')->once()->with(m::type(Expression::class));
 		$relation->getParent()->shouldReceive('getTable')->andReturn('table');
-		$builder->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type('Illuminate\Database\Query\Expression'));
+		$builder->shouldReceive('where')->once()->with('table.foreign_key', '=', m::type(Expression::class));
 		$relation->getQuery()->shouldReceive('getQuery')->andReturn($parentQuery = m::mock('StdClass'));
 		$parentQuery->shouldReceive('getGrammar')->once()->andReturn($grammar = m::mock('StdClass'));
 		$grammar->shouldReceive('wrap')->once()->with('table.id');
@@ -121,12 +125,12 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 
 	protected function getRelation()
 	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
+		$builder = m::mock(EloquentBuilder::class);
 		$builder->shouldReceive('whereNotNull')->with('table.foreign_key');
 		$builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-		$related = m::mock('Illuminate\Database\Eloquent\Model');
+		$related = m::mock(Model::class);
 		$builder->shouldReceive('getModel')->andReturn($related);
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
+		$parent = m::mock(Model::class);
 		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 		$parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
 		$parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
@@ -136,6 +140,6 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
 
 }
 
-class EloquentHasOneModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasOneModelStub extends Model {
 	public $foreign_key = 'foreign.value';
 }

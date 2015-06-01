@@ -1,7 +1,9 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
@@ -479,13 +481,13 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 	protected function getConnection()
 	{
-		return m::mock('Illuminate\Database\Connection');
+		return m::mock(Connection::class);
 	}
 
 
 	public function getGrammar()
 	{
-		return new Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+		return new SqlServerGrammar;
 	}
 
 }

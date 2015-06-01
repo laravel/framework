@@ -1,7 +1,10 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
+use Illuminate\Container\Container;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 
@@ -14,10 +17,10 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 	public function testCallResolveTheClassAndCallsRun()
 	{
 		$seeder = new Seeder;
-		$seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
-		$output = m::mock('Symfony\Component\Console\Output\OutputInterface');
+		$seeder->setContainer($container = m::mock(Container::class));
+		$output = m::mock(OutputInterface::class);
 		$output->shouldReceive('writeln')->once()->andReturn('foo');
-		$command = m::mock('Illuminate\Console\Command');
+		$command = m::mock(Command::class);
 		$command->shouldReceive('getOutput')->once()->andReturn($output);
 		$seeder->setCommand($command);
 		$container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock('StdClass'));
@@ -32,7 +35,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 	public function testSetContainer()
 	{
 		$seeder = new Seeder;
-		$container = m::mock('Illuminate\Container\Container');
+		$container = m::mock(Container::class);
 		$this->assertEquals($seeder->setContainer($container), $seeder);
 	}
 
@@ -40,7 +43,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
 	public function testSetCommand()
 	{
 		$seeder = new Seeder;
-		$command = m::mock('Illuminate\Console\Command');
+		$command = m::mock(Command::class);
 		$this->assertEquals($seeder->setCommand($command), $seeder);
 	}
 

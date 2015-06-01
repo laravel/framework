@@ -1,10 +1,13 @@
 <?php namespace Illuminate\Foundation\Console;
 
 use Exception;
+use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\QueuedJob;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 
 class Kernel implements KernelContract {
@@ -71,9 +74,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function defineConsoleSchedule()
 	{
-		$this->app->instance(
-			'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
-		);
+		$this->app->instance(Schedule::class, $schedule = new Schedule);
 
 		$this->schedule($schedule);
 	}
@@ -154,9 +155,7 @@ class Kernel implements KernelContract {
 	 */
 	public function queue($command, array $parameters = array())
 	{
-		$this->app['Illuminate\Contracts\Queue\Queue']->push(
-			'Illuminate\Foundation\Console\QueuedJob', func_get_args()
-		);
+		$this->app[Queue::class]->push(QueuedJob::class, func_get_args());
 	}
 
 	/**
@@ -232,7 +231,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function reportException(Exception $e)
 	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+		$this->app[ExceptionHandler::class]->report($e);
 	}
 
 	/**
@@ -244,7 +243,7 @@ class Kernel implements KernelContract {
 	 */
 	protected function renderException($output, Exception $e)
 	{
-		$this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+		$this->app[ExceptionHandler::class]->renderForConsole($output, $e);
 	}
 
 }

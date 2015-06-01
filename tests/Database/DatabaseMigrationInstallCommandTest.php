@@ -1,6 +1,11 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\Database\Console\Migrations\InstallCommand;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 
 class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
 
@@ -12,8 +17,8 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
 
 	public function testFireCallsRepositoryToInstall()
 	{
-		$command = new Illuminate\Database\Console\Migrations\InstallCommand($repo = m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'));
-		$command->setLaravel(new Illuminate\Foundation\Application);
+		$command = new InstallCommand($repo = m::mock(MigrationRepositoryInterface::class));
+		$command->setLaravel(new Application);
 		$repo->shouldReceive('setSource')->once()->with('foo');
 		$repo->shouldReceive('createRepository')->once();
 
@@ -23,7 +28,7 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
 
 	protected function runCommand($command, $options = array())
 	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($options), new Symfony\Component\Console\Output\NullOutput);
+		return $command->run(new ArrayInput($options), new NullOutput);
 	}
 
 }

@@ -1,6 +1,12 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 
@@ -126,7 +132,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
 		$connection = $this->getMockConnection(array('getName'), $pdo);
 		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
-		$connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$connection->setEventDispatcher($events = m::mock(EventDispatcher::class));
 		$events->shouldReceive('fire')->once()->with('connection.name.beganTransaction', $connection);
 		$connection->beginTransaction();
 	}
@@ -137,7 +143,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
 		$connection = $this->getMockConnection(array('getName'), $pdo);
 		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
-		$connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$connection->setEventDispatcher($events = m::mock(EventDispatcher::class));
 		$events->shouldReceive('fire')->once()->with('connection.name.committed', $connection);
 		$connection->commit();
 	}
@@ -148,7 +154,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$pdo = $this->getMock('DatabaseConnectionTestMockPDO');
 		$connection = $this->getMockConnection(array('getName'), $pdo);
 		$connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
-		$connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$connection->setEventDispatcher($events = m::mock(EventDispatcher::class));
 		$events->shouldReceive('fire')->once()->with('connection.name.rollingBack', $connection);
 		$connection->rollBack();
 	}
@@ -206,10 +212,10 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	public function testFromCreatesNewQueryBuilder()
 	{
 		$conn = $this->getMockConnection();
-		$conn->setQueryGrammar(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
-		$conn->setPostProcessor(m::mock('Illuminate\Database\Query\Processors\Processor'));
+		$conn->setQueryGrammar(m::mock(Grammar::class));
+		$conn->setPostProcessor(m::mock(Processor::class));
 		$builder = $conn->table('users');
-		$this->assertInstanceOf('Illuminate\Database\Query\Builder', $builder);
+		$this->assertInstanceOf(QueryBuilder::class, $builder);
 		$this->assertEquals('users', $builder->from);
 	}
 
@@ -220,7 +226,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 		$date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
 		$bindings = array('test' => $date);
 		$conn = $this->getMockConnection();
-		$grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+		$grammar = m::mock(Grammar::class);
 		$grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
 		$conn->setQueryGrammar($grammar);
 		$result = $conn->prepareBindings($bindings);
@@ -232,7 +238,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$connection = $this->getMockConnection();
 		$connection->logQuery('foo', array(), time());
-		$connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$connection->setEventDispatcher($events = m::mock(EventDispatcher::class));
 		$events->shouldReceive('fire')->once()->with('illuminate.query', array('foo', array(), null, null));
 		$connection->logQuery('foo', array(), null);
 	}
@@ -254,7 +260,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$connection = $this->getMockConnection();
 		$schema = $connection->getSchemaBuilder();
-		$this->assertInstanceOf('Illuminate\Database\Schema\Builder', $schema);
+		$this->assertInstanceOf(SchemaBuilder::class, $schema);
 		$this->assertSame($connection, $schema->getConnection());
 	}
 
@@ -264,7 +270,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 	{
 		$pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
 		$defaults = array('getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar');
-		$connection = $this->getMock('Illuminate\Database\Connection', array_merge($defaults, $methods), array($pdo));
+		$connection = $this->getMock(Connection::class, array_merge($defaults, $methods), array($pdo));
 		$connection->enableQueryLog();
 		return $connection;
 	}
