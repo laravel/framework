@@ -29,6 +29,7 @@
         }
     },
     "suggest": {
+        "pubnub/pubnub": "Required to use the PubNub broadcast driver (~3.7).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
     },
     "minimum-stability": "dev"
