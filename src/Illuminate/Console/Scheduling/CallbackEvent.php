@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Console\Scheduling;
 
-use Exception;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -58,13 +57,9 @@ class CallbackEvent extends Event {
 
 		try {
 			$response = $container->call($this->callback, $this->parameters);
-		} catch (Exception $e) {
+		} finally {
 			$this->removeMutex();
-
-			throw $e;
 		}
-
-		$this->removeMutex();
 
 		parent::callAfterCallbacks($container);
 
