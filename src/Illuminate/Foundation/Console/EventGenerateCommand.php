@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class EventGenerateCommand extends Command {
-
+class EventGenerateCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,20 +29,18 @@ class EventGenerateCommand extends Command {
             'Illuminate\Foundation\Support\Providers\EventServiceProvider'
         );
 
-        foreach ($provider->listens() as $event => $listeners)
-        {
-            if ( ! str_contains($event, '\\'))
+        foreach ($provider->listens() as $event => $listeners) {
+            if (! str_contains($event, '\\')) {
                 continue;
+            }
 
             $this->callSilent('make:event', ['name' => $event]);
 
-            foreach ($listeners as $listener)
-            {
+            foreach ($listeners as $listener) {
                 $this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
             }
         }
 
         $this->info('Events and listeners generated successfully!');
     }
-
 }

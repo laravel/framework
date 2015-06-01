@@ -6,8 +6,8 @@ use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 
-class MySqlConnection extends Connection {
-
+class MySqlConnection extends Connection
+{
     /**
      * Get a schema builder instance for the connection.
      *
@@ -15,7 +15,9 @@ class MySqlConnection extends Connection {
      */
     public function getSchemaBuilder()
     {
-        if (is_null($this->schemaGrammar)) { $this->useDefaultSchemaGrammar(); }
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
 
         return new MySqlBuilder($this);
     }
@@ -59,5 +61,4 @@ class MySqlConnection extends Connection {
     {
         return new DoctrineDriver;
     }
-
 }

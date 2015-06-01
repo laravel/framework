@@ -5,8 +5,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ListenCommand extends Command {
-
+class ListenCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -79,8 +79,7 @@ class ListenCommand extends Command {
      */
     protected function getQueue($connection)
     {
-        if (is_null($connection))
-        {
+        if (is_null($connection)) {
             $connection = $this->laravel['config']['queue.default'];
         }
 
@@ -102,8 +101,7 @@ class ListenCommand extends Command {
 
         $this->listener->setMaxTries($this->option('tries'));
 
-        $this->listener->setOutputHandler(function($type, $line)
-        {
+        $this->listener->setOutputHandler(function ($type, $line) {
             $this->output->write($line);
         });
     }
@@ -141,5 +139,4 @@ class ListenCommand extends Command {
             array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
         );
     }
-
 }

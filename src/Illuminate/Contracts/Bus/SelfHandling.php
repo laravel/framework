@@ -1,3 +1,5 @@
 <?php namespace Illuminate\Contracts\Bus;
 
-interface SelfHandling {}
+interface SelfHandling
+{
+}

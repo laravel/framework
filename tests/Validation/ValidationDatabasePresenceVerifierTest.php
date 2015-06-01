@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase {
-
+class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -26,5 +26,4 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase 
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
     }
-
 }

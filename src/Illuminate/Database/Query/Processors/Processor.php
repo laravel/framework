@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Query\Builder;
 
-class Processor {
-
+class Processor
+{
     /**
      * Process the results of a "select" query.
      *
@@ -44,5 +44,4 @@ class Processor {
     {
         return $results;
     }
-
 }

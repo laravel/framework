@@ -1,7 +1,7 @@
 <?php
 
-class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
+{
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMock('StdClass', array('get', 'getResultCode'));
@@ -65,5 +65,4 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase {
         $store = new Illuminate\Cache\MemcachedStore($memcache);
         $store->forget('foo');
     }
-
 }

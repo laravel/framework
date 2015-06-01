@@ -5,8 +5,8 @@ use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-class SeedCommand extends Command {
-
+class SeedCommand extends Command
+{
     use ConfirmableTrait;
 
     /**
@@ -50,7 +50,9 @@ class SeedCommand extends Command {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
@@ -96,5 +98,4 @@ class SeedCommand extends Command {
             array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
         );
     }
-
 }

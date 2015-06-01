@@ -5,8 +5,8 @@ use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class CheckForMaintenanceMode implements Middleware {
-
+class CheckForMaintenanceMode implements Middleware
+{
     /**
      * The application implementation.
      *
@@ -34,12 +34,10 @@ class CheckForMaintenanceMode implements Middleware {
      */
     public function handle($request, Closure $next)
     {
-        if ($this->app->isDownForMaintenance())
-        {
+        if ($this->app->isDownForMaintenance()) {
             throw new HttpException(503);
         }
 
         return $next($request);
     }
-
 }

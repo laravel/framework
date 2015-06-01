@@ -3,8 +3,8 @@
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 
-class CookieJar implements JarContract {
-
+class CookieJar implements JarContract
+{
     /**
      * The default path (if specified).
      *
@@ -107,12 +107,9 @@ class CookieJar implements JarContract {
      */
     public function queue()
     {
-        if (head(func_get_args()) instanceof Cookie)
-        {
+        if (head(func_get_args()) instanceof Cookie) {
             $cookie = head(func_get_args());
-        }
-        else
-        {
+        } else {
             $cookie = call_user_func_array(array($this, 'make'), func_get_args());
         }
 
@@ -164,5 +161,4 @@ class CookieJar implements JarContract {
     {
         return $this->queued;
     }
-
 }

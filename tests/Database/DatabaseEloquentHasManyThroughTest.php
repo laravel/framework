@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -17,7 +17,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = array()) { return new Collection($array); });
         $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
         $models = $relation->initRelation(array($model), 'foo');
 
@@ -55,7 +55,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
         $model3 = new EloquentHasManyThroughModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
         $models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
@@ -84,7 +84,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
         $model3 = new EloquentHasManyThroughModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
         $models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
@@ -171,7 +171,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
     public function testIgnoreSoftDeletingParent()
     {
-        list($builder, $country,, $firstKey, $secondKey) = $this->getRelationArguments();
+        list($builder, $country, , $firstKey, $secondKey) = $this->getRelationArguments();
         $user = new EloquentHasManyThroughSoftDeletingModelStub;
 
         $builder->shouldReceive('whereNull')->with('users.deleted_at')->once()->andReturn($builder);
@@ -242,14 +242,15 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase {
 
         return [$builder, $country, $user, 'country_id', 'user_id', 'other_id'];
     }
-
 }
 
-class EloquentHasManyThroughModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasManyThroughModelStub extends Illuminate\Database\Eloquent\Model
+{
     public $country_id = 'foreign.value';
 }
 
-class EloquentHasManyThroughSoftDeletingModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasManyThroughSoftDeletingModelStub extends Illuminate\Database\Eloquent\Model
+{
     use SoftDeletes;
     public $table = 'users';
 }

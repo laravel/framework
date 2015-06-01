@@ -10,8 +10,8 @@ use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
-class FormRequest extends Request implements ValidatesWhenResolved {
-
+class FormRequest extends Request implements ValidatesWhenResolved
+{
     use ValidatesWhenResolvedTrait;
 
     /**
@@ -72,8 +72,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
     {
         $factory = $this->container->make('Illuminate\Validation\Factory');
 
-        if (method_exists($this, 'validator'))
-        {
+        if (method_exists($this, 'validator')) {
             return $this->container->call([$this, 'validator'], compact('factory'));
         }
 
@@ -102,8 +101,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
      */
     protected function passesAuthorization()
     {
-        if (method_exists($this, 'authorize'))
-        {
+        if (method_exists($this, 'authorize')) {
             return $this->container->call([$this, 'authorize']);
         }
 
@@ -128,8 +126,7 @@ class FormRequest extends Request implements ValidatesWhenResolved {
      */
     public function response(array $errors)
     {
-        if ($this->ajax() || $this->wantsJson())
-        {
+        if ($this->ajax() || $this->wantsJson()) {
             return new JsonResponse($errors, 422);
         }
 
@@ -168,16 +165,11 @@ class FormRequest extends Request implements ValidatesWhenResolved {
     {
         $url = $this->redirector->getUrlGenerator();
 
-        if ($this->redirect)
-        {
+        if ($this->redirect) {
             return $url->to($this->redirect);
-        }
-        elseif ($this->redirectRoute)
-        {
+        } elseif ($this->redirectRoute) {
             return $url->route($this->redirectRoute);
-        }
-        elseif ($this->redirectAction)
-        {
+        } elseif ($this->redirectAction) {
             return $url->action($this->redirectAction);
         }
 
@@ -229,5 +221,4 @@ class FormRequest extends Request implements ValidatesWhenResolved {
     {
         return [];
     }
-
 }

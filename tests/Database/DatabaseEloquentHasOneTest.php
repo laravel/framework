@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -133,9 +133,9 @@ class DatabaseEloquentHasOneTest extends PHPUnit_Framework_TestCase {
         $parent->shouldReceive('newQueryWithoutScopes')->andReturn($builder);
         return new HasOne($builder, $parent, 'table.foreign_key', 'id');
     }
-
 }
 
-class EloquentHasOneModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasOneModelStub extends Illuminate\Database\Eloquent\Model
+{
     public $foreign_key = 'foreign.value';
 }

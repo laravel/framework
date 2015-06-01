@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -160,7 +160,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
         $mock = $this->getMockConnection(array(), $pdo);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('commit');
-        $result = $mock->transaction(function($db) { return $db; });
+        $result = $mock->transaction(function ($db) { return $db; });
         $this->assertEquals($mock, $result);
     }
 
@@ -172,12 +172,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('rollBack');
         $pdo->expects($this->never())->method('commit');
-        try
-        {
-            $mock->transaction(function() { throw new Exception('foo'); });
-        }
-        catch (Exception $e)
-        {
+        try {
+            $mock->transaction(function () { throw new Exception('foo'); });
+        } catch (Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
     }
@@ -194,8 +191,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
 
         $mock = $this->getMockConnection(array(), $pdo);
 
-        $mock->setReconnector(function ($connection)
-        {
+        $mock->setReconnector(function ($connection) {
             $connection->setPDO(null);
         });
 
@@ -241,8 +237,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
     public function testPretendOnlyLogsQueries()
     {
         $connection = $this->getMockConnection();
-        $queries = $connection->pretend(function($connection)
-        {
+        $queries = $connection->pretend(function ($connection) {
             $connection->select('foo bar', array('baz'));
         });
         $this->assertEquals('foo bar', $queries[0]['query']);
@@ -268,7 +263,11 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase {
         $connection->enableQueryLog();
         return $connection;
     }
-
 }
 
-class DatabaseConnectionTestMockPDO extends PDO { public function __construct() {} }
+class DatabaseConnectionTestMockPDO extends PDO
+{
+    public function __construct()
+    {
+    }
+}

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Migrations;
 
-interface MigrationRepositoryInterface {
-
+interface MigrationRepositoryInterface
+{
     /**
      * Get the ran migrations for a given package.
      *
@@ -61,5 +61,4 @@ interface MigrationRepositoryInterface {
      * @return void
      */
     public function setSource($name);
-
 }

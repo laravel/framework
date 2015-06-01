@@ -3,8 +3,8 @@
 use Illuminate\Support\MessageBag;
 use Mockery as m;
 
-class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
-
+class SupportMessageBagTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -161,5 +161,4 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase {
         $messageBag = new MessageBag(array('country' => 'Azerbaijan', 'capital' => 'Baku'));
         $this->assertEquals(array('country' => array('Azerbaijan'), 'capital' => array('Baku')), $messageBag->getMessages());
     }
-
 }

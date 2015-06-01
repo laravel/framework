@@ -5,8 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
 
-class HttpResponseTest extends PHPUnit_Framework_TestCase {
-
+class HttpResponseTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -153,9 +153,12 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
-
 }
 
-class JsonableStub implements Jsonable {
-    public function toJson($options = 0) { return 'foo'; }
+class JsonableStub implements Jsonable
+{
+    public function toJson($options = 0)
+    {
+        return 'foo';
+    }
 }

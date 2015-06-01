@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class XCacheStore extends TaggableStore implements Store {
-
+class XCacheStore extends TaggableStore implements Store
+{
     /**
      * A string that should be prepended to keys.
      *
@@ -32,8 +32,7 @@ class XCacheStore extends TaggableStore implements Store {
     {
         $value = xcache_get($this->prefix.$key);
 
-        if (isset($value))
-        {
+        if (isset($value)) {
             return $value;
         }
     }
@@ -117,5 +116,4 @@ class XCacheStore extends TaggableStore implements Store {
     {
         return $this->prefix;
     }
-
 }

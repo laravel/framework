@@ -4,8 +4,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
-class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
+{
     /**
      * Bootstrap Eloquent.
      *
@@ -40,25 +40,25 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
      */
     public function setUp()
     {
-        $this->schema()->create('users', function($table) {
+        $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
             $table->timestamps();
         });
 
-        $this->schema()->create('friends', function($table) {
+        $this->schema()->create('friends', function ($table) {
             $table->integer('user_id');
             $table->integer('friend_id');
         });
 
-        $this->schema()->create('posts', function($table) {
+        $this->schema()->create('posts', function ($table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('name');
             $table->timestamps();
         });
 
-        $this->schema()->create('photos', function($table) {
+        $this->schema()->create('photos', function ($table) {
             $table->increments('id');
             $table->morphs('imageable');
             $table->string('name');
@@ -284,7 +284,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
-        EloquentTestUser::first()->friends()->chunk(2, function($friends) use ($user, $friend){
+        EloquentTestUser::first()->friends()->chunk(2, function ($friends) use ($user, $friend) {
             $this->assertEquals(1, count($friends));
             $this->assertEquals('abigailotwell@gmail.com', $friends->first()->email);
             $this->assertEquals($user->id, $friends->first()->pivot->user_id);
@@ -429,45 +429,54 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase {
     {
         return $this->connection()->getSchemaBuilder();
     }
-
 }
 
 /**
  * Eloquent Models...
  */
 
-class EloquentTestUser extends Eloquent {
+class EloquentTestUser extends Eloquent
+{
     protected $table = 'users';
     protected $guarded = [];
-    public function friends() {
+    public function friends()
+    {
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
     }
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany('EloquentTestPost', 'user_id');
     }
-    public function post() {
+    public function post()
+    {
         return $this->hasOne('EloquentTestPost', 'user_id');
     }
-    public function photos() {
+    public function photos()
+    {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
 }
 
-class EloquentTestPost extends Eloquent {
+class EloquentTestPost extends Eloquent
+{
     protected $table = 'posts';
     protected $guarded = [];
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo('EloquentTestUser', 'user_id');
     }
-    public function photos() {
+    public function photos()
+    {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
 }
 
-class EloquentTestPhoto extends Eloquent {
+class EloquentTestPhoto extends Eloquent
+{
     protected $table = 'photos';
     protected $guarded = [];
-    public function imageable(){
+    public function imageable()
+    {
         return $this->morphTo();
     }
 }
@@ -476,13 +485,15 @@ class EloquentTestPhoto extends Eloquent {
  * Connection Resolver
  */
 
-class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface {
-
+class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
+{
     protected $connection;
 
     public function connection($name = null)
     {
-        if (isset($this->connection)) return $this->connection;
+        if (isset($this->connection)) {
+            return $this->connection;
+        }
         return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
     }
     public function getDefaultConnection()

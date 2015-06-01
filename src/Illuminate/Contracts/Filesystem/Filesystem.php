@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Filesystem;
 
-interface Filesystem {
-
+interface Filesystem
+{
     /**
      * The public visibility setting.
      *
@@ -170,5 +170,4 @@ interface Filesystem {
      * @return bool
      */
     public function deleteDirectory($directory);
-
 }

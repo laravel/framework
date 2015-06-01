@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
 
-class CallQueuedHandler {
-
+class CallQueuedHandler
+{
     /**
      * The container instance.
      *
@@ -40,8 +40,7 @@ class CallQueuedHandler {
             [$handler, $data['method']], unserialize($data['data'])
         );
 
-        if ( ! $job->isDeletedOrReleased())
-        {
+        if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
     }
@@ -55,8 +54,7 @@ class CallQueuedHandler {
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance))))
-        {
+        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance)))) {
             $instance->setJob($job);
         }
 
@@ -73,10 +71,8 @@ class CallQueuedHandler {
     {
         $handler = $this->container->make($data['class']);
 
-        if (method_exists($handler, 'failed'))
-        {
+        if (method_exists($handler, 'failed')) {
             call_user_func_array([$handler, 'failed'], unserialize($data['data']));
         }
     }
-
 }

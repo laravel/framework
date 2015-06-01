@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Database;
 
-class ModelIdentifier {
-
+class ModelIdentifier
+{
     /**
      * The class name of the model.
      *
@@ -28,5 +28,4 @@ class ModelIdentifier {
         $this->id = $id;
         $this->class = $class;
     }
-
 }

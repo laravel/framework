@@ -11,8 +11,8 @@ use Illuminate\Mail\Transport\MandrillTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
-class TransportManager extends Manager {
-
+class TransportManager extends Manager
+{
     /**
      * Create an instance of the SMTP Swift Transport driver.
      *
@@ -29,16 +29,14 @@ class TransportManager extends Manager {
             $config['host'], $config['port']
         );
 
-        if (isset($config['encryption']))
-        {
+        if (isset($config['encryption'])) {
             $transport->setEncryption($config['encryption']);
         }
 
         // Once we have the transport we will check for the presence of a username
         // and password. If we have it we will set the credentials on the Swift
         // transporter instance so that we'll properly authenticate delivery.
-        if (isset($config['username']))
-        {
+        if (isset($config['username'])) {
             $transport->setUsername($config['username']);
 
             $transport->setPassword($config['password']);
@@ -148,5 +146,4 @@ class TransportManager extends Manager {
     {
         $this->app['config']['mail.driver'] = $name;
     }
-
 }

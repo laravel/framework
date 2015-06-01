@@ -10,8 +10,8 @@ use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class Guard implements GuardContract {
-
+class Guard implements GuardContract
+{
     /**
      * The currently authenticated user.
      *
@@ -126,13 +126,14 @@ class Guard implements GuardContract {
      */
     public function user()
     {
-        if ($this->loggedOut) return;
+        if ($this->loggedOut) {
+            return;
+        }
 
         // If we have already retrieved the user for the current request we can just
         // return it back immediately. We do not want to pull the user data every
         // request into the method because that would tremendously slow an app.
-        if ( ! is_null($this->user))
-        {
+        if (! is_null($this->user)) {
             return $this->user;
         }
 
@@ -143,8 +144,7 @@ class Guard implements GuardContract {
         // request, and if one exists, attempt to retrieve the user using that.
         $user = null;
 
-        if ( ! is_null($id))
-        {
+        if (! is_null($id)) {
             $user = $this->provider->retrieveById($id);
         }
 
@@ -153,12 +153,10 @@ class Guard implements GuardContract {
         // the application. Once we have a user we can return it to the caller.
         $recaller = $this->getRecaller();
 
-        if (is_null($user) && ! is_null($recaller))
-        {
+        if (is_null($user) && ! is_null($recaller)) {
             $user = $this->getUserByRecaller($recaller);
 
-            if ($user)
-            {
+            if ($user) {
                 $this->updateSession($user->getAuthIdentifier());
 
                 $this->fireLoginEvent($user, true);
@@ -175,15 +173,13 @@ class Guard implements GuardContract {
      */
     public function id()
     {
-        if ($this->loggedOut)
-        {
+        if ($this->loggedOut) {
             return;
         }
 
         $id = $this->session->get($this->getName(), $this->getRecallerId());
 
-        if (is_null($id) && $this->user())
-        {
+        if (is_null($id) && $this->user()) {
             $id = $this->user()->getAuthIdentifier();
         }
 
@@ -198,8 +194,7 @@ class Guard implements GuardContract {
      */
     protected function getUserByRecaller($recaller)
     {
-        if ($this->validRecaller($recaller) && ! $this->tokenRetrievalAttempted)
-        {
+        if ($this->validRecaller($recaller) && ! $this->tokenRetrievalAttempted) {
             $this->tokenRetrievalAttempted = true;
 
             list($id, $token) = explode('|', $recaller, 2);
@@ -227,8 +222,7 @@ class Guard implements GuardContract {
      */
     protected function getRecallerId()
     {
-        if ($this->validRecaller($recaller = $this->getRecaller()))
-        {
+        if ($this->validRecaller($recaller = $this->getRecaller())) {
             return head(explode('|', $recaller));
         }
     }
@@ -241,7 +235,9 @@ class Guard implements GuardContract {
      */
     protected function validRecaller($recaller)
     {
-        if ( ! is_string($recaller) || ! str_contains($recaller, '|')) return false;
+        if (! is_string($recaller) || ! str_contains($recaller, '|')) {
+            return false;
+        }
 
         $segments = explode('|', $recaller);
 
@@ -256,8 +252,7 @@ class Guard implements GuardContract {
      */
     public function once(array $credentials = [])
     {
-        if ($this->validate($credentials))
-        {
+        if ($this->validate($credentials)) {
             $this->setUser($this->lastAttempted);
 
             return true;
@@ -285,16 +280,14 @@ class Guard implements GuardContract {
      */
     public function basic($field = 'email')
     {
-        if ($this->check())
-        {
+        if ($this->check()) {
             return;
         }
 
         // If a username is set on the HTTP basic request, we will return out without
         // interrupting the request lifecycle. Otherwise, we'll need to generate a
         // request indicating that the given credentials were invalid for login.
-        if ($this->attemptBasic($this->getRequest(), $field))
-        {
+        if ($this->attemptBasic($this->getRequest(), $field)) {
             return;
         }
 
@@ -309,8 +302,7 @@ class Guard implements GuardContract {
      */
     public function onceBasic($field = 'email')
     {
-        if ( ! $this->once($this->getBasicCredentials($this->getRequest(), $field)))
-        {
+        if (! $this->once($this->getBasicCredentials($this->getRequest(), $field))) {
             return $this->getBasicResponse();
         }
     }
@@ -324,8 +316,7 @@ class Guard implements GuardContract {
      */
     protected function attemptBasic(Request $request, $field)
     {
-        if ( ! $request->getUser())
-        {
+        if (! $request->getUser()) {
             return false;
         }
 
@@ -373,9 +364,10 @@ class Guard implements GuardContract {
         // If an implementation of UserInterface was returned, we'll ask the provider
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials))
-        {
-            if ($login) $this->login($user, $remember);
+        if ($this->hasValidCredentials($user, $credentials)) {
+            if ($login) {
+                $this->login($user, $remember);
+            }
             {
                 return true;
 
@@ -407,8 +399,7 @@ class Guard implements GuardContract {
      */
     protected function fireAttemptEvent(array $credentials, $remember, $login)
     {
-        if ($this->events)
-        {
+        if ($this->events) {
             $payload = [$credentials, $remember, $login];
 
             $this->events->fire('auth.attempt', $payload);
@@ -423,8 +414,7 @@ class Guard implements GuardContract {
      */
     public function attempting($callback)
     {
-        if ($this->events)
-        {
+        if ($this->events) {
             $this->events->listen('auth.attempt', $callback);
         }
     }
@@ -443,8 +433,7 @@ class Guard implements GuardContract {
         // If the user should be permanently "remembered" by the application we will
         // queue a permanent cookie that contains the encrypted copy of the user
         // identifier. We will then decrypt this later to retrieve the users.
-        if ($remember)
-        {
+        if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
 
             $this->queueRecallerCookie($user);
@@ -467,8 +456,7 @@ class Guard implements GuardContract {
      */
     protected function fireLoginEvent($user, $remember = false)
     {
-        if (isset($this->events))
-        {
+        if (isset($this->events)) {
             $this->events->fire('auth.login', [$user, $remember]);
         }
     }
@@ -510,8 +498,7 @@ class Guard implements GuardContract {
      */
     public function onceUsingId($id)
     {
-        if ( ! is_null($user = $this->provider->retrieveById($id)))
-        {
+        if (! is_null($user = $this->provider->retrieveById($id))) {
             $this->setUser($user);
 
             return true;
@@ -558,13 +545,11 @@ class Guard implements GuardContract {
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if ( ! is_null($this->user))
-        {
+        if (! is_null($this->user)) {
             $this->refreshRememberToken($user);
         }
 
-        if (isset($this->events))
-        {
+        if (isset($this->events)) {
             $this->events->fire('auth.logout', [$user]);
         }
 
@@ -611,8 +596,7 @@ class Guard implements GuardContract {
      */
     protected function createRememberTokenIfDoesntExist(UserContract $user)
     {
-        if (empty($user->getRememberToken()))
-        {
+        if (empty($user->getRememberToken())) {
             $this->refreshRememberToken($user);
         }
     }
@@ -626,8 +610,7 @@ class Guard implements GuardContract {
      */
     public function getCookieJar()
     {
-        if ( ! isset($this->cookie))
-        {
+        if (! isset($this->cookie)) {
             throw new RuntimeException("Cookie jar has not been set.");
         }
 
@@ -782,5 +765,4 @@ class Guard implements GuardContract {
     {
         return $this->viaRemember;
     }
-
 }

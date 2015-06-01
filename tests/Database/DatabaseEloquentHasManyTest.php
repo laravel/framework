@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -96,7 +96,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
         $model->shouldReceive('fill')->once()->with(array('bar'));
         $model->shouldReceive('save')->once();
 
-        $this->assertTrue($relation->updateOrCreate(array('foo'),array('bar')) instanceof StdClass);
+        $this->assertTrue($relation->updateOrCreate(array('foo'), array('bar')) instanceof StdClass);
     }
 
     public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()
@@ -109,7 +109,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
         $model->shouldReceive('fill')->once()->with(array('bar'));
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertTrue($relation->updateOrCreate(array('foo'),array('bar')) instanceof StdClass);
+        $this->assertTrue($relation->updateOrCreate(array('foo'), array('bar')) instanceof StdClass);
     }
 
     public function testUpdateMethodUpdatesModelsWithTimestamps()
@@ -128,7 +128,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array = array()) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = array()) { return new Collection($array); });
         $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
         $models = $relation->initRelation(array($model), 'foo');
 
@@ -166,7 +166,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
         $model3 = new EloquentHasManyModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
         $models = $relation->match(array($model1, $model2, $model3), new Collection(array($result1, $result2, $result3)), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->foreign_key);
@@ -191,9 +191,9 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase {
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
     }
-
 }
 
-class EloquentHasManyModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentHasManyModelStub extends Illuminate\Database\Eloquent\Model
+{
     public $foreign_key = 'foreign.value';
 }

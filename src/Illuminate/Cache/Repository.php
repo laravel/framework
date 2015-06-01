@@ -9,8 +9,8 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
-class Repository implements CacheContract, ArrayAccess {
-
+class Repository implements CacheContract, ArrayAccess
+{
     use Macroable {
         __call as macroCall;
     }
@@ -66,8 +66,7 @@ class Repository implements CacheContract, ArrayAccess {
      */
     protected function fireCacheEvent($event, $payload)
     {
-        if (isset($this->events))
-        {
+        if (isset($this->events)) {
             $this->events->fire('cache.'.$event, $payload);
         }
     }
@@ -94,14 +93,11 @@ class Repository implements CacheContract, ArrayAccess {
     {
         $value = $this->store->get($key);
 
-        if (is_null($value))
-        {
+        if (is_null($value)) {
             $this->fireCacheEvent('missed', [$key]);
 
             $value = value($default);
-        }
-        else
-        {
+        } else {
             $this->fireCacheEvent('hit', [$key, $value]);
         }
 
@@ -136,8 +132,7 @@ class Repository implements CacheContract, ArrayAccess {
     {
         $minutes = $this->getMinutes($minutes);
 
-        if ( ! is_null($minutes))
-        {
+        if (! is_null($minutes)) {
             $this->store->put($key, $value, $minutes);
 
             $this->fireCacheEvent('write', [$key, $value, $minutes]);
@@ -154,13 +149,11 @@ class Repository implements CacheContract, ArrayAccess {
      */
     public function add($key, $value, $minutes)
     {
-        if (method_exists($this->store, 'add'))
-        {
+        if (method_exists($this->store, 'add')) {
             return $this->store->add($key, $value, $minutes);
         }
 
-        if (is_null($this->get($key)))
-        {
+        if (is_null($this->get($key))) {
             $this->put($key, $value, $minutes);
 
             return true;
@@ -196,8 +189,7 @@ class Repository implements CacheContract, ArrayAccess {
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes in storage.
-        if ( ! is_null($value = $this->get($key)))
-        {
+        if (! is_null($value = $this->get($key))) {
             return $value;
         }
 
@@ -230,8 +222,7 @@ class Repository implements CacheContract, ArrayAccess {
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes. It's easy.
-        if ( ! is_null($value = $this->get($key)))
-        {
+        if (! is_null($value = $this->get($key))) {
             return $value;
         }
 
@@ -339,8 +330,7 @@ class Repository implements CacheContract, ArrayAccess {
      */
     protected function getMinutes($duration)
     {
-        if ($duration instanceof DateTime)
-        {
+        if ($duration instanceof DateTime) {
             $fromNow = Carbon::instance($duration)->diffInMinutes();
 
             return $fromNow > 0 ? $fromNow : null;
@@ -358,12 +348,10 @@ class Repository implements CacheContract, ArrayAccess {
      */
     public function __call($method, $parameters)
     {
-        if (static::hasMacro($method))
-        {
+        if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
         }
 
         return call_user_func_array(array($this->store, $method), $parameters);
     }
-
 }

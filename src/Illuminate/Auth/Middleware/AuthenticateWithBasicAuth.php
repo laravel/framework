@@ -4,8 +4,8 @@ use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Routing\Middleware;
 
-class AuthenticateWithBasicAuth implements Middleware {
-
+class AuthenticateWithBasicAuth implements Middleware
+{
     /**
      * The Guard implementation.
      *
@@ -35,5 +35,4 @@ class AuthenticateWithBasicAuth implements Middleware {
     {
         return $this->auth->basic() ?: $next($request);
     }
-
 }

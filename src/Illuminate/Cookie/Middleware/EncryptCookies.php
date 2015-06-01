@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class EncryptCookies implements Middleware {
-
+class EncryptCookies implements Middleware
+{
     /**
      * The encrypter instance.
      *
@@ -48,14 +48,10 @@ class EncryptCookies implements Middleware {
      */
     protected function decrypt(Request $request)
     {
-        foreach ($request->cookies as $key => $c)
-        {
-            try
-            {
+        foreach ($request->cookies as $key => $c) {
+            try {
                 $request->cookies->set($key, $this->decryptCookie($c));
-            }
-            catch (DecryptException $e)
-            {
+            } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
             }
         }
@@ -86,8 +82,7 @@ class EncryptCookies implements Middleware {
     {
         $decrypted = array();
 
-        foreach ($cookie as $key => $value)
-        {
+        foreach ($cookie as $key => $value) {
             $decrypted[$key] = $this->encrypter->decrypt($value);
         }
 
@@ -102,8 +97,7 @@ class EncryptCookies implements Middleware {
      */
     protected function encrypt(Response $response)
     {
-        foreach ($response->headers->getCookies() as $key => $cookie)
-        {
+        foreach ($response->headers->getCookies() as $key => $cookie) {
             $response->headers->setCookie($this->duplicate(
                 $cookie, $this->encrypter->encrypt($cookie->getValue())
             ));
@@ -126,5 +120,4 @@ class EncryptCookies implements Middleware {
             $c->getDomain(), $c->isSecure(), $c->isHttpOnly()
         );
     }
-
 }

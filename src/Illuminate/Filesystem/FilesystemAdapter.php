@@ -9,8 +9,8 @@ use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 
-class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
-
+class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
+{
     /**
      * The Flysystem filesystem implementation.
      *
@@ -50,12 +50,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
      */
     public function get($path)
     {
-        try
-        {
+        try {
             return $this->driver->read($path);
-        }
-        catch (FileNotFoundException $e)
-        {
+        } catch (FileNotFoundException $e) {
             throw new ContractFileNotFoundException($path, $e->getCode(), $e);
         }
     }
@@ -72,12 +69,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
     {
         $config = ['visibility' => $this->parseVisibility($visibility)];
 
-        if (is_resource($contents))
-        {
+        if (is_resource($contents)) {
             return $this->driver->putStream($path, $contents, $config);
-        }
-        else
-        {
+        } else {
             return $this->driver->put($path, $contents, $config);
         }
     }
@@ -90,8 +84,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
      */
     public function getVisibility($path)
     {
-        if ($this->driver->getVisibility($path) == AdapterInterface::VISIBILITY_PUBLIC)
-        {
+        if ($this->driver->getVisibility($path) == AdapterInterface::VISIBILITY_PUBLIC) {
             return FilesystemContract::VISIBILITY_PUBLIC;
         }
 
@@ -144,8 +137,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
     {
         $paths = is_array($paths) ? $paths : func_get_args();
 
-        foreach ($paths as $path)
-        {
+        foreach ($paths as $path) {
             $this->driver->delete($path);
         }
 
@@ -315,10 +307,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
      */
     protected function parseVisibility($visibility)
     {
-        if (is_null($visibility)) return;
+        if (is_null($visibility)) {
+            return;
+        }
 
-        switch ($visibility)
-        {
+        switch ($visibility) {
             case FilesystemContract::VISIBILITY_PUBLIC:
                 return AdapterInterface::VISIBILITY_PUBLIC;
 
@@ -342,5 +335,4 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
     {
         return call_user_func_array([$this->driver, $method], $parameters);
     }
-
 }

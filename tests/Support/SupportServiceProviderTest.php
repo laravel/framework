@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 
-class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
-
+class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
+{
     public function setUp()
     {
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
@@ -87,11 +87,10 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase {
 }
 
 
-class ServiceProviderForTestingOne extends ServiceProvider {
-
+class ServiceProviderForTestingOne extends ServiceProvider
+{
     public function register()
     {
-
     }
 
 
@@ -103,11 +102,10 @@ class ServiceProviderForTestingOne extends ServiceProvider {
 }
 
 
-class ServiceProviderForTestingTwo extends ServiceProvider {
-
+class ServiceProviderForTestingTwo extends ServiceProvider
+{
     public function register()
     {
-
     }
 
 

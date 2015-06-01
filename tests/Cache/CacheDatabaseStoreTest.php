@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Cache\DatabaseStore;
 
-class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -69,8 +69,7 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $table->shouldReceive('insert')->once()->with(array('key' => 'prefixfoo', 'value' => 'bar', 'expiration' => 61))->andReturnUsing(function()
-        {
+        $table->shouldReceive('insert')->once()->with(array('key' => 'prefixfoo', 'value' => 'bar', 'expiration' => 61))->andReturnUsing(function () {
             throw new Exception;
         });
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
@@ -121,5 +120,4 @@ class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
     {
         return array(m::mock('Illuminate\Database\Connection'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), 'table', 'prefix');
     }
-
 }

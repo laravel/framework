@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository as DbRepository;
 
-class PasswordResetServiceProvider extends ServiceProvider {
-
+class PasswordResetServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -31,8 +31,7 @@ class PasswordResetServiceProvider extends ServiceProvider {
      */
     protected function registerPasswordBroker()
     {
-        $this->app->singleton('auth.password', function($app)
-        {
+        $this->app->singleton('auth.password', function ($app) {
             // The password token repository is responsible for storing the email addresses
             // and password reset tokens. It will be used to verify the tokens are valid
             // for the given e-mail addresses. We will resolve an implementation here.
@@ -58,8 +57,7 @@ class PasswordResetServiceProvider extends ServiceProvider {
      */
     protected function registerTokenRepository()
     {
-        $this->app->singleton('auth.password.tokens', function($app)
-        {
+        $this->app->singleton('auth.password.tokens', function ($app) {
             $connection = $app['db']->connection();
 
             // The database token repository is an implementation of the token repository
@@ -84,5 +82,4 @@ class PasswordResetServiceProvider extends ServiceProvider {
     {
         return ['auth.password', 'auth.password.tokens'];
     }
-
 }

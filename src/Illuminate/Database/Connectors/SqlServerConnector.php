@@ -2,8 +2,8 @@
 
 use PDO;
 
-class SqlServerConnector extends Connector implements ConnectorInterface {
-
+class SqlServerConnector extends Connector implements ConnectorInterface
+{
     /**
      * The PDO connection options.
      *
@@ -40,12 +40,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will
         // need to establish the PDO connections and return them back for use.
-        if (in_array('dblib', $this->getAvailableDrivers()))
-        {
+        if (in_array('dblib', $this->getAvailableDrivers())) {
             return $this->getDblibDsn($config);
-        }
-        else
-        {
+        } else {
             return $this->getSqlSrvDsn($config);
         }
     }
@@ -102,8 +99,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
      */
     protected function buildConnectString($driver, array $arguments)
     {
-        $options = array_map(function($key) use ($arguments)
-        {
+        $options = array_map(function ($key) use ($arguments) {
             return sprintf("%s=%s", $key, $arguments[$key]);
         }, array_keys($arguments));
 
@@ -119,12 +115,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
      */
     protected function buildHostString(array $config, $separator)
     {
-        if(isset($config['port']))
-        {
+        if (isset($config['port'])) {
             return $config['host'].$separator.$config['port'];
-        }
-        else
-        {
+        } else {
             return $config['host'];
         }
     }
@@ -138,5 +131,4 @@ class SqlServerConnector extends Connector implements ConnectorInterface {
     {
         return PDO::getAvailableDrivers();
     }
-
 }

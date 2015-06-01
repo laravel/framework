@@ -4,8 +4,8 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
-class DatabaseManager implements ConnectionResolverInterface {
-
+class DatabaseManager implements ConnectionResolverInterface
+{
     /**
      * The application instance.
      *
@@ -60,8 +60,7 @@ class DatabaseManager implements ConnectionResolverInterface {
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
         // set the "fetch mode" for PDO which determines the query return types.
-        if ( ! isset($this->connections[$name]))
-        {
+        if (! isset($this->connections[$name])) {
             $connection = $this->makeConnection($name);
 
             $this->setPdoForType($connection, $type);
@@ -107,8 +106,7 @@ class DatabaseManager implements ConnectionResolverInterface {
      */
     public function disconnect($name = null)
     {
-        if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()]))
-        {
+        if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
             $this->connections[$name]->disconnect();
         }
     }
@@ -123,8 +121,7 @@ class DatabaseManager implements ConnectionResolverInterface {
     {
         $this->disconnect($name = $name ?: $this->getDefaultConnection());
 
-        if ( ! isset($this->connections[$name]))
-        {
+        if (! isset($this->connections[$name])) {
             return $this->connection($name);
         }
 
@@ -159,8 +156,7 @@ class DatabaseManager implements ConnectionResolverInterface {
         // First we will check by the connection name to see if an extension has been
         // registered specifically for that connection. If it has we will call the
         // Closure and pass it the config allowing it to resolve the connection.
-        if (isset($this->extensions[$name]))
-        {
+        if (isset($this->extensions[$name])) {
             return call_user_func($this->extensions[$name], $config, $name);
         }
 
@@ -169,8 +165,7 @@ class DatabaseManager implements ConnectionResolverInterface {
         // Next we will check to see if an extension has been registered for a driver
         // and will call the Closure if so, which allows us to have a more generic
         // resolver for the drivers themselves which applies to all connections.
-        if (isset($this->extensions[$driver]))
-        {
+        if (isset($this->extensions[$driver])) {
             return call_user_func($this->extensions[$driver], $config, $name);
         }
 
@@ -187,16 +182,14 @@ class DatabaseManager implements ConnectionResolverInterface {
     {
         $connection->setFetchMode($this->app['config']['database.fetch']);
 
-        if ($this->app->bound('events'))
-        {
+        if ($this->app->bound('events')) {
             $connection->setEventDispatcher($this->app['events']);
         }
 
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
-        $connection->setReconnector(function($connection)
-        {
+        $connection->setReconnector(function ($connection) {
             $this->reconnect($connection->getName());
         });
 
@@ -212,12 +205,9 @@ class DatabaseManager implements ConnectionResolverInterface {
      */
     protected function setPdoForType(Connection $connection, $type = null)
     {
-        if ($type == 'read')
-        {
+        if ($type == 'read') {
             $connection->setPdo($connection->getReadPdo());
-        }
-        elseif ($type == 'write')
-        {
+        } elseif ($type == 'write') {
             $connection->setReadPdo($connection->getPdo());
         }
 
@@ -241,8 +231,7 @@ class DatabaseManager implements ConnectionResolverInterface {
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = array_get($connections, $name)))
-        {
+        if (is_null($config = array_get($connections, $name))) {
             throw new InvalidArgumentException("Database [$name] not configured.");
         }
 
@@ -303,5 +292,4 @@ class DatabaseManager implements ConnectionResolverInterface {
     {
         return call_user_func_array(array($this->connection(), $method), $parameters);
     }
-
 }

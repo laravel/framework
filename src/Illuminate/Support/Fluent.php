@@ -5,8 +5,8 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
-
+class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
+{
     /**
      * All of the attributes set on the container.
      *
@@ -22,8 +22,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
      */
     public function __construct($attributes = array())
     {
-        foreach ($attributes as $key => $value)
-        {
+        foreach ($attributes as $key => $value) {
             $this->attributes[$key] = $value;
         }
     }
@@ -37,8 +36,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
      */
     public function get($key, $default = null)
     {
-        if (array_key_exists($key, $this->attributes))
-        {
+        if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
 
@@ -189,5 +187,4 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
     {
         unset($this->attributes[$key]);
     }
-
 }

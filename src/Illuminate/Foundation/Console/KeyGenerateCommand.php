@@ -4,8 +4,8 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
-class KeyGenerateCommand extends Command {
-
+class KeyGenerateCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,15 +29,13 @@ class KeyGenerateCommand extends Command {
     {
         $key = $this->getRandomKey();
 
-        if ($this->option('show'))
-        {
+        if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
         }
 
         $path = base_path('.env');
 
-        if (file_exists($path))
-        {
+        if (file_exists($path)) {
             file_put_contents($path, str_replace(
                 $this->laravel['config']['app.key'], $key, file_get_contents($path)
             ));
@@ -69,5 +67,4 @@ class KeyGenerateCommand extends Command {
             array('show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'),
         );
     }
-
 }

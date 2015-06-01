@@ -1,7 +1,7 @@
 <?php
 
-class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase
+{
     public function testProcessColumnListing()
     {
         $processor = new Illuminate\Database\Query\Processors\SQLiteProcessor;
@@ -12,12 +12,10 @@ class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $processor->processColumnListing($listing));
 
         // convert listing to objects to simulate PDO::FETCH_CLASS
-        foreach($listing as &$row)
-        {
+        foreach ($listing as &$row) {
             $row = (object) $row;
         }
 
         $this->assertEquals($expected, $processor->processColumnListing($listing));
     }
-
 }

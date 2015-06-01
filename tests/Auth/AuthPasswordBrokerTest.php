@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
-
+class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -48,7 +48,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getMock('Illuminate\Auth\Passwords\PasswordBroker', array('emailResetLink', 'getUri'), array_values($mocks));
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('foo'))->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
-        $callback = function() {};
+        $callback = function () {};
         $broker->expects($this->once())->method('emailResetLink')->with($this->equalTo($user), $this->equalTo('token'), $this->equalTo($callback));
 
         $this->assertEquals(PasswordBroker::RESET_LINK_SENT, $broker->sendResetLink(array('foo'), $callback));
@@ -59,10 +59,9 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
     {
         unset($_SERVER['__password.reset.test']);
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $callback = function($message, $user) { $_SERVER['__password.reset.test'] = true; };
+        $callback = function ($message, $user) { $_SERVER['__password.reset.test'] = true; };
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
-        $mocks['mailer']->shouldReceive('send')->once()->with('resetLinkView', array('token' => 'token', 'user' => $user), m::type('Closure'))->andReturnUsing(function($view, $data, $callback)
-        {
+        $mocks['mailer']->shouldReceive('send')->once()->with('resetLinkView', array('token' => 'token', 'user' => $user), m::type('Closure'))->andReturnUsing(function ($view, $data, $callback) {
             return $callback;
         });
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
@@ -80,7 +79,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array('creds'))->andReturn(null);
 
-        $this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(array('creds'), function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(array('creds'), function () {}));
     }
 
 
@@ -90,7 +89,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
     }
 
 
@@ -100,7 +99,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
     }
 
 
@@ -110,7 +109,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
     }
 
 
@@ -118,10 +117,10 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
     {
         $creds = array('password' => 'abcdef', 'password_confirmation' => 'abcdef');
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $broker->validator(function($credentials) { return strlen($credentials['password']) >= 7; });
+        $broker->validator(function ($credentials) { return strlen($credentials['password']) >= 7; });
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
     }
 
 
@@ -133,7 +132,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
-        $this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function() {}));
+        $this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function () {}));
     }
 
 
@@ -143,8 +142,7 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
         $broker = $this->getMock('Illuminate\Auth\Passwords\PasswordBroker', array('validateReset', 'getPassword', 'getToken'), array_values($mocks = $this->getMocks()));
         $broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword')));
         $mocks['tokens']->shouldReceive('delete')->once()->with('token');
-        $callback = function($user, $password)
-        {
+        $callback = function ($user, $password) {
             $_SERVER['__password.reset.test'] = compact('user', 'password');
             return 'foo';
         };
@@ -171,5 +169,4 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 
         return $mocks;
     }
-
 }

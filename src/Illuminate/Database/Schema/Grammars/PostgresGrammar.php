@@ -3,8 +3,8 @@
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
-class PostgresGrammar extends Grammar {
-
+class PostgresGrammar extends Grammar
+{
     /**
      * The possible column modifiers.
      *
@@ -384,7 +384,7 @@ class PostgresGrammar extends Grammar {
      */
     protected function typeEnum(Fluent $column)
     {
-        $allowed = array_map(function($a) { return "'".$a."'"; }, $column->allowed);
+        $allowed = array_map(function ($a) { return "'".$a."'"; }, $column->allowed);
 
         return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed)."))";
     }
@@ -520,8 +520,7 @@ class PostgresGrammar extends Grammar {
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->default))
-        {
+        if (! is_null($column->default)) {
             return " default ".$this->getDefaultValue($column->default);
         }
     }
@@ -535,10 +534,8 @@ class PostgresGrammar extends Grammar {
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement)
-        {
+        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key';
         }
     }
-
 }

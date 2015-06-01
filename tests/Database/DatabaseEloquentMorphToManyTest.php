@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -103,9 +103,9 @@ class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase {
 
         return array($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'relation_name', false);
     }
-
 }
 
-class EloquentMorphToManyModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentMorphToManyModelStub extends Illuminate\Database\Eloquent\Model
+{
     protected $guarded = array();
 }

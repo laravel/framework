@@ -5,7 +5,6 @@ use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class PusherBroadcaster implements Broadcaster
 {
-
     /**
      * The Pusher SDK instance.
      *

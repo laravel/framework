@@ -2,8 +2,8 @@
 
 use Symfony\Component\HttpFoundation\Cookie;
 
-trait ResponseTrait {
-
+trait ResponseTrait
+{
     /**
      * Get the status code for the response.
      *
@@ -51,5 +51,4 @@ trait ResponseTrait {
 
         return $this;
     }
-
 }

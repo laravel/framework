@@ -4,8 +4,8 @@ use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Cache\Store;
 
-class FileStore implements Store {
-
+class FileStore implements Store
+{
     /**
      * The Illuminate Filesystem instance.
      *
@@ -57,20 +57,16 @@ class FileStore implements Store {
         // If the file doesn't exists, we obviously can't return the cache so we will
         // just return null. Otherwise, we'll get the contents of the file and get
         // the expiration UNIX timestamps from the start of the file's contents.
-        try
-        {
+        try {
             $expire = substr($contents = $this->files->get($path), 0, 10);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             return array('data' => null, 'time' => null);
         }
 
         // If the current time is greater than expiration timestamps we will delete
         // the file and return null. This helps clean up the old files and keeps
         // this directory much cleaner for us as old files aren't hanging out.
-        if (time() >= $expire)
-        {
+        if (time() >= $expire) {
             $this->forget($key);
 
             return array('data' => null, 'time' => null);
@@ -111,12 +107,9 @@ class FileStore implements Store {
      */
     protected function createCacheDirectory($path)
     {
-        try
-        {
+        try {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             //
         }
     }
@@ -173,8 +166,7 @@ class FileStore implements Store {
     {
         $file = $this->path($key);
 
-        if ($this->files->exists($file))
-        {
+        if ($this->files->exists($file)) {
             return $this->files->delete($file);
         }
 
@@ -188,10 +180,8 @@ class FileStore implements Store {
      */
     public function flush()
     {
-        if ($this->files->isDirectory($this->directory))
-        {
-            foreach ($this->files->directories($this->directory) as $directory)
-            {
+        if ($this->files->isDirectory($this->directory)) {
+            foreach ($this->files->directories($this->directory) as $directory) {
                 $this->files->deleteDirectory($directory);
             }
         }
@@ -218,7 +208,9 @@ class FileStore implements Store {
      */
     protected function expiration($minutes)
     {
-        if ($minutes === 0) return 9999999999;
+        if ($minutes === 0) {
+            return 9999999999;
+        }
 
         return time() + ($minutes * 60);
     }
@@ -252,5 +244,4 @@ class FileStore implements Store {
     {
         return '';
     }
-
 }

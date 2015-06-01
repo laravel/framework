@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Queue\Job as JobContract;
 
-trait InteractsWithQueue {
-
+trait InteractsWithQueue
+{
     /**
      * The underlying queue job instance.
      *
@@ -18,8 +18,7 @@ trait InteractsWithQueue {
      */
     public function delete()
     {
-        if ($this->job)
-        {
+        if ($this->job) {
             return $this->job->delete();
         }
     }
@@ -32,8 +31,7 @@ trait InteractsWithQueue {
      */
     public function release($delay = 0)
     {
-        if ($this->job)
-        {
+        if ($this->job) {
             return $this->job->release($delay);
         }
     }
@@ -60,5 +58,4 @@ trait InteractsWithQueue {
 
         return $this;
     }
-
 }

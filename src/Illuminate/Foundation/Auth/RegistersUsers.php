@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-trait RegistersUsers {
-
+trait RegistersUsers
+{
     use RedirectsUsers;
 
     /**
@@ -27,8 +27,7 @@ trait RegistersUsers {
     {
         $validator = $this->validator($request->all());
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             $this->throwValidationException(
                 $request, $validator
             );
@@ -38,5 +37,4 @@ trait RegistersUsers {
 
         return redirect($this->redirectPath());
     }
-
 }

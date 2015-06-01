@@ -1,7 +1,7 @@
 <?php namespace Illuminate\View\Engines;
 
-interface EngineInterface {
-
+interface EngineInterface
+{
     /**
      * Get the evaluated contents of the view.
      *
@@ -10,5 +10,4 @@ interface EngineInterface {
      * @return string
      */
     public function get($path, array $data = array());
-
 }

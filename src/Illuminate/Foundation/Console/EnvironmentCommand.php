@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class EnvironmentCommand extends Command {
-
+class EnvironmentCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -27,5 +27,4 @@ class EnvironmentCommand extends Command {
     {
         $this->line('<info>Current application environment:</info> <comment>'.$this->laravel['env'].'</comment>');
     }
-
 }

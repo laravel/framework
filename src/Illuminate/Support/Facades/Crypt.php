@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Encryption\Encrypter
  */
-class Crypt extends Facade {
-
+class Crypt extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Crypt extends Facade {
     {
         return 'encrypter';
     }
-
 }

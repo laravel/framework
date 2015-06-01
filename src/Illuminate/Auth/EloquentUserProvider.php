@@ -4,8 +4,8 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class EloquentUserProvider implements UserProvider {
-
+class EloquentUserProvider implements UserProvider
+{
     /**
      * The hasher implementation.
      *
@@ -88,10 +88,8 @@ class EloquentUserProvider implements UserProvider {
         // Eloquent User "model" that will be utilized by the Guard instances.
         $query = $this->createModel()->newQuery();
 
-        foreach ($credentials as $key => $value)
-        {
-            if ( ! str_contains($key, 'password'))
-            {
+        foreach ($credentials as $key => $value) {
+            if (! str_contains($key, 'password')) {
                 $query->where($key, $value);
             }
         }
@@ -124,5 +122,4 @@ class EloquentUserProvider implements UserProvider {
 
         return new $class;
     }
-
 }

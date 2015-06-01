@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Config\Repository
  */
-class Config extends Facade {
-
+class Config extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Config extends Facade {
     {
         return 'config';
     }
-
 }

@@ -1,7 +1,7 @@
 <?php
 
-class RedisConnectionTest extends PHPUnit_Framework_TestCase {
-
+class RedisConnectionTest extends PHPUnit_Framework_TestCase
+{
     public function testRedisNotCreateClusterAndOptionsServer()
     {
         $redis = $this->getRedis(false);
@@ -39,5 +39,4 @@ class RedisConnectionTest extends PHPUnit_Framework_TestCase {
 
         return new Illuminate\Redis\Database($servers);
     }
-
 }

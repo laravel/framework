@@ -8,8 +8,8 @@ use Illuminate\Queue\Console\FlushFailedCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
 
-class ConsoleServiceProvider extends ServiceProvider {
-
+class ConsoleServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -24,33 +24,27 @@ class ConsoleServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('command.queue.table', function($app)
-        {
+        $this->app->singleton('command.queue.table', function ($app) {
             return new TableCommand($app['files'], $app['composer']);
         });
 
-        $this->app->singleton('command.queue.failed', function()
-        {
+        $this->app->singleton('command.queue.failed', function () {
             return new ListFailedCommand;
         });
 
-        $this->app->singleton('command.queue.retry', function()
-        {
+        $this->app->singleton('command.queue.retry', function () {
             return new RetryCommand;
         });
 
-        $this->app->singleton('command.queue.forget', function()
-        {
+        $this->app->singleton('command.queue.forget', function () {
             return new ForgetFailedCommand;
         });
 
-        $this->app->singleton('command.queue.flush', function()
-        {
+        $this->app->singleton('command.queue.flush', function () {
             return new FlushFailedCommand;
         });
 
-        $this->app->singleton('command.queue.failed-table', function($app)
-        {
+        $this->app->singleton('command.queue.failed-table', function ($app) {
             return new FailedTableCommand($app['files'], $app['composer']);
         });
 
@@ -72,5 +66,4 @@ class ConsoleServiceProvider extends ServiceProvider {
             'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
         );
     }
-
 }

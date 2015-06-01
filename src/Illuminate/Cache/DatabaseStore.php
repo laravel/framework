@@ -8,7 +8,6 @@ use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements Store
 {
-
     /**
      * The database connection instance.
      *

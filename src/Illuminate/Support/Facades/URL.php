@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Routing\UrlGenerator
  */
-class URL extends Facade {
-
+class URL extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class URL extends Facade {
     {
         return 'url';
     }
-
 }

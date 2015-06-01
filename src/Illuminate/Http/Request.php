@@ -7,8 +7,8 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class Request extends SymfonyRequest implements ArrayAccess {
-
+class Request extends SymfonyRequest implements ArrayAccess
+{
     /**
      * The decoded JSON content for the request.
      *
@@ -144,7 +144,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
     {
         $segments = explode('/', $this->path());
 
-        return array_values(array_filter($segments, function($v) { return $v != ''; }));
+        return array_values(array_filter($segments, function ($v) { return $v != ''; }));
     }
 
     /**
@@ -155,10 +155,8 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function is()
     {
-        foreach (func_get_args() as $pattern)
-        {
-            if (str_is($pattern, urldecode($this->path())))
-            {
+        foreach (func_get_args() as $pattern) {
+            if (str_is($pattern, urldecode($this->path()))) {
                 return true;
             }
         }
@@ -228,9 +226,10 @@ class Request extends SymfonyRequest implements ArrayAccess {
 
         $input = $this->all();
 
-        foreach ($keys as $value)
-        {
-            if ( ! array_key_exists($value, $input)) return false;
+        foreach ($keys as $value) {
+            if (! array_key_exists($value, $input)) {
+                return false;
+            }
         }
 
         return true;
@@ -246,9 +245,10 @@ class Request extends SymfonyRequest implements ArrayAccess {
     {
         $keys = is_array($key) ? $key : func_get_args();
 
-        foreach ($keys as $value)
-        {
-            if ($this->isEmptyString($value)) return false;
+        foreach ($keys as $value) {
+            if ($this->isEmptyString($value)) {
+                return false;
+            }
         }
 
         return true;
@@ -305,8 +305,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 
         $input = $this->all();
 
-        foreach ($keys as $key)
-        {
+        foreach ($keys as $key) {
             array_set($results, $key, array_get($input, $key));
         }
 
@@ -385,11 +384,14 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function hasFile($key)
     {
-        if ( ! is_array($files = $this->file($key))) $files = array($files);
+        if (! is_array($files = $this->file($key))) {
+            $files = array($files);
+        }
 
-        foreach ($files as $file)
-        {
-            if ($this->isValidFile($file)) return true;
+        foreach ($files as $file) {
+            if ($this->isValidFile($file)) {
+                return true;
+            }
         }
 
         return false;
@@ -451,7 +453,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function flash($filter = null, $keys = array())
     {
-        $flash = ( ! is_null($filter)) ? $this->$filter($keys) : $this->input();
+        $flash = (! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
         $this->session()->flashInput($flash);
     }
@@ -502,8 +504,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     protected function retrieveItem($source, $key, $default)
     {
-        if (is_null($key))
-        {
+        if (is_null($key)) {
             return $this->$source->all();
         }
 
@@ -541,12 +542,13 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function json($key = null, $default = null)
     {
-        if ( ! isset($this->json))
-        {
+        if (! isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
         }
 
-        if (is_null($key)) return $this->json;
+        if (is_null($key)) {
+            return $this->json;
+        }
 
         return array_get($this->json->all(), $key, $default);
     }
@@ -558,7 +560,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     protected function getInputSource()
     {
-        if ($this->isJson()) return $this->json();
+        if ($this->isJson()) {
+            return $this->json();
+        }
 
         return $this->getMethod() == 'GET' ? $this->query : $this->request;
     }
@@ -595,24 +599,19 @@ class Request extends SymfonyRequest implements ArrayAccess {
     {
         $accepts = $this->getAcceptableContentTypes();
 
-        foreach ($accepts as $accept)
-        {
-            if ($accept === '*/*')
-            {
+        foreach ($accepts as $accept) {
+            if ($accept === '*/*') {
                 return true;
             }
 
-            foreach ((array) $contentTypes as $type)
-            {
-                if ($accept === $type || $accept === strtok('/', $type).'/*')
-                {
+            foreach ((array) $contentTypes as $type) {
+                if ($accept === $type || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
 
                 $split = explode('/', $accept);
 
-                if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type))
-                {
+                if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
                     return true;
                 }
             }
@@ -649,9 +648,10 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function format($default = 'html')
     {
-        foreach ($this->getAcceptableContentTypes() as $type)
-        {
-            if ($format = $this->getFormat($type)) return $format;
+        foreach ($this->getAcceptableContentTypes() as $type) {
+            if ($format = $this->getFormat($type)) {
+                return $format;
+            }
         }
 
         return $default;
@@ -665,7 +665,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public static function createFromBase(SymfonyRequest $request)
     {
-        if ($request instanceof static) return $request;
+        if ($request instanceof static) {
+            return $request;
+        }
 
         $content = $request->content;
 
@@ -700,8 +702,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function session()
     {
-        if ( ! $this->hasSession())
-        {
+        if (! $this->hasSession()) {
             throw new RuntimeException("Session store not set on request.");
         }
 
@@ -725,12 +726,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function route()
     {
-        if (func_num_args() == 1)
-        {
+        if (func_num_args() == 1) {
             return $this->route()->parameter(func_get_arg(0));
-        }
-        else
-        {
+        } else {
             return call_user_func($this->getRouteResolver());
         }
     }
@@ -742,7 +740,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function getUserResolver()
     {
-        return $this->userResolver ?: function() {};
+        return $this->userResolver ?: function () {};
     }
 
     /**
@@ -765,7 +763,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
      */
     public function getRouteResolver()
     {
-        return $this->routeResolver ?: function() {};
+        return $this->routeResolver ?: function () {};
     }
 
     /**
@@ -836,14 +834,10 @@ class Request extends SymfonyRequest implements ArrayAccess {
     {
         $all = $this->all();
 
-        if (array_key_exists($key, $all))
-        {
+        if (array_key_exists($key, $all)) {
             return $all[$key];
-        }
-        elseif ( ! is_null($this->route()))
-        {
+        } elseif (! is_null($this->route())) {
             return $this->route()->parameter($key);
         }
     }
-
 }

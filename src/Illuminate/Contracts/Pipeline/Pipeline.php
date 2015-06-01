@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface Pipeline {
-
+interface Pipeline
+{
     /**
      * Set the traveler object being sent on the pipeline.
      *
@@ -35,5 +35,4 @@ interface Pipeline {
      * @return mixed
      */
     public function then(Closure $destination);
-
 }

@@ -4,8 +4,8 @@ use RuntimeException;
 use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
-class Str {
-
+class Str
+{
     use Macroable;
 
     /**
@@ -48,8 +48,7 @@ class Str {
      */
     public static function camel($value)
     {
-        if (isset(static::$camelCache[$value]))
-        {
+        if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
         }
 
@@ -65,9 +64,10 @@ class Str {
      */
     public static function contains($haystack, $needles)
     {
-        foreach ((array) $needles as $needle)
-        {
-            if ($needle != '' && strpos($haystack, $needle) !== false) return true;
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) !== false) {
+                return true;
+            }
         }
 
         return false;
@@ -82,9 +82,10 @@ class Str {
      */
     public static function endsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle)
-        {
-            if ((string) $needle === substr($haystack, -strlen($needle))) return true;
+        foreach ((array) $needles as $needle) {
+            if ((string) $needle === substr($haystack, -strlen($needle))) {
+                return true;
+            }
         }
 
         return false;
@@ -113,7 +114,9 @@ class Str {
      */
     public static function is($pattern, $value)
     {
-        if ($pattern == $value) return true;
+        if ($pattern == $value) {
+            return true;
+        }
 
         $pattern = preg_quote($pattern, '#');
 
@@ -146,7 +149,9 @@ class Str {
      */
     public static function limit($value, $limit = 100, $end = '...')
     {
-        if (mb_strwidth($value, 'UTF-8') <= $limit) return $value;
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
 
         return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
     }
@@ -174,7 +179,9 @@ class Str {
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if ( ! isset($matches[0]) || strlen($value) === strlen($matches[0])) return $value;
+        if (! isset($matches[0]) || strlen($value) === strlen($matches[0])) {
+            return $value;
+        }
 
         return rtrim($matches[0]).$end;
     }
@@ -213,21 +220,15 @@ class Str {
      */
     public static function random($length = 16)
     {
-        if (function_exists('random_bytes'))
-        {
+        if (function_exists('random_bytes')) {
             $bytes = random_bytes($length * 2);
-        }
-        elseif (function_exists('openssl_random_pseudo_bytes'))
-        {
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes($length * 2);
-        }
-        else
-        {
+        } else {
             throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
         }
 
-        if ($bytes === false)
-        {
+        if ($bytes === false) {
             throw new RuntimeException('Unable to generate random string.');
         }
 
@@ -318,13 +319,11 @@ class Str {
     {
         $key = $value.$delimiter;
 
-        if (isset(static::$snakeCache[$key]))
-        {
+        if (isset(static::$snakeCache[$key])) {
             return static::$snakeCache[$key];
         }
 
-        if ( ! ctype_lower($value))
-        {
+        if (! ctype_lower($value)) {
             $value = strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
         }
 
@@ -340,9 +339,10 @@ class Str {
      */
     public static function startsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle)
-        {
-            if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) === 0) {
+                return true;
+            }
         }
 
         return false;
@@ -358,8 +358,7 @@ class Str {
     {
         $key = $value;
 
-        if (isset(static::$studlyCache[$key]))
-        {
+        if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
 
@@ -367,5 +366,4 @@ class Str {
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }
-
 }

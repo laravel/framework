@@ -1,7 +1,7 @@
 <?php namespace Illuminate\View\Compilers;
 
-class BladeCompiler extends Compiler implements CompilerInterface {
-
+class BladeCompiler extends Compiler implements CompilerInterface
+{
     /**
      * All of the registered extensions.
      *
@@ -87,15 +87,13 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     public function compile($path = null)
     {
-        if ($path)
-        {
+        if ($path) {
             $this->setPath($path);
         }
 
         $contents = $this->compileString($this->files->get($this->getPath()));
 
-        if ( ! is_null($this->cachePath))
-        {
+        if (! is_null($this->cachePath)) {
             $this->files->put($this->getCompiledPath($this->getPath()), $contents);
         }
     }
@@ -136,16 +134,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
-        foreach (token_get_all($value) as $token)
-        {
+        foreach (token_get_all($value) as $token) {
             $result .= is_array($token) ? $this->parseToken($token) : $token;
         }
 
         // If there are any footer lines that need to get added to a template we will
         // add them here at the end of the template. This gets used mainly for the
         // template inheritance via the extends keyword that should be appended.
-        if (count($this->footer) > 0)
-        {
+        if (count($this->footer) > 0) {
             $result = ltrim($result, PHP_EOL)
                     .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
         }
@@ -163,10 +159,8 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     {
         list($id, $content) = $token;
 
-        if ($id == T_INLINE_HTML)
-        {
-            foreach ($this->compilers as $type)
-            {
+        if ($id == T_INLINE_HTML) {
+            foreach ($this->compilers as $type) {
                 $content = $this->{"compile{$type}"}($content);
             }
         }
@@ -182,8 +176,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     protected function compileExtensions($value)
     {
-        foreach ($this->extensions as $compiler)
-        {
+        foreach ($this->extensions as $compiler) {
             $value = call_user_func($compiler, $value, $this);
         }
 
@@ -211,8 +204,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     protected function compileEchos($value)
     {
-        foreach ($this->getEchoMethods() as $method => $length)
-        {
+        foreach ($this->getEchoMethods() as $method => $length) {
             $value = $this->$method($value);
         }
 
@@ -232,18 +224,29 @@ class BladeCompiler extends Compiler implements CompilerInterface {
             "compileRegularEchos" => strlen(stripcslashes($this->contentTags[0])),
         ];
 
-        uksort($methods, function($method1, $method2) use ($methods)
-        {
+        uksort($methods, function ($method1, $method2) use ($methods) {
             // Ensure the longest tags are processed first
-            if ($methods[$method1] > $methods[$method2]) return -1;
-            if ($methods[$method1] < $methods[$method2]) return 1;
+            if ($methods[$method1] > $methods[$method2]) {
+                return -1;
+            }
+            if ($methods[$method1] < $methods[$method2]) {
+                return 1;
+            }
 
             // Otherwise give preference to raw tags (assuming they've overridden)
-            if ($method1 === "compileRawEchos") return -1;
-            if ($method2 === "compileRawEchos") return 1;
+            if ($method1 === "compileRawEchos") {
+                return -1;
+            }
+            if ($method2 === "compileRawEchos") {
+                return 1;
+            }
 
-            if ($method1 === "compileEscapedEchos") return -1;
-            if ($method2 === "compileEscapedEchos") return 1;
+            if ($method1 === "compileEscapedEchos") {
+                return -1;
+            }
+            if ($method2 === "compileEscapedEchos") {
+                return 1;
+            }
         });
 
         return $methods;
@@ -257,14 +260,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     protected function compileStatements($value)
     {
-        $callback = function($match)
-        {
-            if (method_exists($this, $method = 'compile'.ucfirst($match[1])))
-            {
+        $callback = function ($match) {
+            if (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
                 $match[0] = $this->$method(array_get($match, 3));
-            }
-            elseif (isset($this->customDirectives[$match[1]]))
-            {
+            } elseif (isset($this->customDirectives[$match[1]])) {
                 $match[0] = call_user_func($this->customDirectives[$match[1]], array_get($match, 3));
             }
 
@@ -284,8 +283,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     {
         $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->rawTags[0], $this->rawTags[1]);
 
-        $callback = function($matches)
-        {
+        $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
             return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
@@ -304,8 +302,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     {
         $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
 
-        $callback = function($matches)
-        {
+        $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
             $wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
@@ -326,8 +323,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     {
         $pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
-        $callback = function($matches)
-        {
+        $callback = function ($matches) {
             $whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
 
             return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
@@ -647,8 +643,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     protected function compileExtends($expression)
     {
-        if (starts_with($expression, '('))
-        {
+        if (starts_with($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -667,8 +662,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
      */
     protected function compileInclude($expression)
     {
-        if (starts_with($expression, '('))
-        {
+        if (starts_with($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -813,5 +807,4 @@ class BladeCompiler extends Compiler implements CompilerInterface {
     {
         $this->echoFormat = $format;
     }
-
 }

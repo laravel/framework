@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class TagSet {
-
+class TagSet
+{
     /**
      * The cache store implementation.
      *
@@ -95,5 +95,4 @@ class TagSet {
     {
         return 'tag:'.$name.':key';
     }
-
 }

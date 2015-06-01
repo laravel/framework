@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseProcessorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -23,12 +23,14 @@ class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
         $result = $processor->processInsertGetId($builder, 'sql', array('foo'), 'id');
         $this->assertSame(1, $result);
     }
-
 }
 
-class ProcessorTestPDOStub extends PDO {
-
-    public function __construct() {}
-    public function lastInsertId($sequence = null) {}
-
+class ProcessorTestPDOStub extends PDO
+{
+    public function __construct()
+    {
+    }
+    public function lastInsertId($sequence = null)
+    {
+    }
 }

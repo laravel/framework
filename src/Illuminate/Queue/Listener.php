@@ -3,8 +3,8 @@
 use Closure;
 use Symfony\Component\Process\Process;
 
-class Listener {
-
+class Listener
+{
     /**
      * The command working path.
      *
@@ -73,8 +73,7 @@ class Listener {
     {
         $process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
 
-        while (true)
-        {
+        while (true) {
             $this->runProcess($process, $memory);
         }
     }
@@ -88,16 +87,14 @@ class Listener {
      */
     public function runProcess(Process $process, $memory)
     {
-        $process->run(function($type, $line)
-        {
+        $process->run(function ($type, $line) {
             $this->handleWorkerOutput($type, $line);
         });
 
         // Once we have run the job we'll go check if the memory limit has been
         // exceeded for the script. If it has, we will kill this script so a
         // process manager will restart this with a clean slate of memory.
-        if ($this->memoryExceeded($memory))
-        {
+        if ($this->memoryExceeded($memory)) {
             $this->stop();
         }
     }
@@ -119,8 +116,7 @@ class Listener {
         // If the environment is set, we will append it to the command string so the
         // workers will run under the specified environment. Otherwise, they will
         // just run under the production environment which is not always right.
-        if (isset($this->environment))
-        {
+        if (isset($this->environment)) {
             $string .= ' --env='.$this->environment;
         }
 
@@ -144,8 +140,7 @@ class Listener {
      */
     protected function handleWorkerOutput($type, $line)
     {
-        if (isset($this->outputHandler))
-        {
+        if (isset($this->outputHandler)) {
             call_user_func($this->outputHandler, $type, $line);
         }
     }
@@ -234,5 +229,4 @@ class Listener {
     {
         $this->maxTries = $tries;
     }
-
 }

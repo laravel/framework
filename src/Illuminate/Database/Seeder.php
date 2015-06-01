@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 
-class Seeder {
-
+class Seeder
+{
     /**
      * The container instance.
      *
@@ -39,8 +39,7 @@ class Seeder {
     {
         $this->resolve($class)->run();
 
-        if (isset($this->command))
-        {
+        if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
         }
     }
@@ -53,19 +52,15 @@ class Seeder {
      */
     protected function resolve($class)
     {
-        if (isset($this->container))
-        {
+        if (isset($this->container)) {
             $instance = $this->container->make($class);
 
             $instance->setContainer($this->container);
-        }
-        else
-        {
+        } else {
             $instance = new $class;
         }
 
-        if (isset($this->command))
-        {
+        if (isset($this->command)) {
             $instance->setCommand($this->command);
         }
 
@@ -97,5 +92,4 @@ class Seeder {
 
         return $this;
     }
-
 }

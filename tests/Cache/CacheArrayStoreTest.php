@@ -2,8 +2,8 @@
 
 use Illuminate\Cache\ArrayStore;
 
-class CacheArrayStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
+{
     public function testItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;
@@ -63,5 +63,4 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase {
         $store = new ArrayStore;
         $this->assertEquals('', $store->getPrefix());
     }
-
 }

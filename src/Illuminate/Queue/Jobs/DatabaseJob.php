@@ -4,8 +4,8 @@ use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
-class DatabaseJob extends Job implements JobContract {
-
+class DatabaseJob extends Job implements JobContract
+{
     /**
      * The database queue instance.
      *
@@ -134,5 +134,4 @@ class DatabaseJob extends Job implements JobContract {
     {
         return $this->job;
     }
-
 }

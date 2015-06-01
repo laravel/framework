@@ -4,8 +4,8 @@ use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 
-class SQLiteGrammar extends Grammar {
-
+class SQLiteGrammar extends Grammar
+{
     /**
      * The possible column modifiers.
      *
@@ -79,17 +79,14 @@ class SQLiteGrammar extends Grammar {
         // Once we have all the foreign key commands for the table creation statement
         // we'll loop through each of them and add them to the create table SQL we
         // are building, since SQLite needs foreign keys on the tables creation.
-        foreach ($foreigns as $foreign)
-        {
+        foreach ($foreigns as $foreign) {
             $sql .= $this->getForeignKey($foreign);
 
-            if ( ! is_null($foreign->onDelete))
-            {
+            if (! is_null($foreign->onDelete)) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
-            if ( ! is_null($foreign->onUpdate))
-            {
+            if (! is_null($foreign->onUpdate)) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
         }
@@ -127,8 +124,7 @@ class SQLiteGrammar extends Grammar {
     {
         $primary = $this->getCommandByName($blueprint, 'primary');
 
-        if ( ! is_null($primary))
-        {
+        if (! is_null($primary)) {
             $columns = $this->columnize($primary->columns);
 
             return ", primary key ({$columns})";
@@ -150,8 +146,7 @@ class SQLiteGrammar extends Grammar {
 
         $statements = array();
 
-        foreach ($columns as $column)
-        {
+        foreach ($columns as $column) {
             $statements[] = 'alter table '.$table.' '.$column;
         }
 
@@ -240,8 +235,7 @@ class SQLiteGrammar extends Grammar {
 
         $tableDiff = $this->getDoctrineTableDiff($blueprint, $schema);
 
-        foreach ($command->columns as $name)
-        {
+        foreach ($command->columns as $name) {
             $column = $connection->getDoctrineColumn($blueprint->getTable(), $name);
 
             $tableDiff->removedColumns[$name] = $column;
@@ -587,8 +581,7 @@ class SQLiteGrammar extends Grammar {
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->default))
-        {
+        if (! is_null($column->default)) {
             return " default ".$this->getDefaultValue($column->default);
         }
     }
@@ -602,10 +595,8 @@ class SQLiteGrammar extends Grammar {
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement)
-        {
+        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
         }
     }
-
 }

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Foundation;
 
-class AliasLoader {
-
+class AliasLoader
+{
     /**
      * The array of class aliases.
      *
@@ -41,7 +41,9 @@ class AliasLoader {
      */
     public static function getInstance(array $aliases = array())
     {
-        if (is_null(static::$instance)) return static::$instance = new static($aliases);
+        if (is_null(static::$instance)) {
+            return static::$instance = new static($aliases);
+        }
 
         $aliases = array_merge(static::$instance->getAliases(), $aliases);
 
@@ -58,8 +60,7 @@ class AliasLoader {
      */
     public function load($alias)
     {
-        if (isset($this->aliases[$alias]))
-        {
+        if (isset($this->aliases[$alias])) {
             return class_alias($this->aliases[$alias], $alias);
         }
     }
@@ -83,8 +84,7 @@ class AliasLoader {
      */
     public function register()
     {
-        if ( ! $this->registered)
-        {
+        if (! $this->registered) {
             $this->prependToLoaderStack();
 
             $this->registered = true;
@@ -163,5 +163,4 @@ class AliasLoader {
     {
         //
     }
-
 }

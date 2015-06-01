@@ -3,8 +3,8 @@
 use Closure;
 use ArrayIterator;
 
-abstract class AbstractPaginator {
-
+abstract class AbstractPaginator
+{
     /**
      * All of the items being paginated.
      *
@@ -97,8 +97,7 @@ abstract class AbstractPaginator {
     {
         $urls = [];
 
-        for ($page = $start; $page <= $end; $page++)
-        {
+        for ($page = $start; $page <= $end; $page++) {
             $urls[$page] = $this->url($page);
         }
 
@@ -113,15 +112,16 @@ abstract class AbstractPaginator {
      */
     public function url($page)
     {
-        if ($page <= 0) $page = 1;
+        if ($page <= 0) {
+            $page = 1;
+        }
 
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
         // to the URL. This allows for extra information like sortings storage.
         $parameters = [$this->pageName => $page];
 
-        if (count($this->query) > 0)
-        {
+        if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
         }
 
@@ -137,8 +137,7 @@ abstract class AbstractPaginator {
      */
     public function previousPageUrl()
     {
-        if ($this->currentPage() > 1)
-        {
+        if ($this->currentPage() > 1) {
             return $this->url($this->currentPage() - 1);
         }
     }
@@ -151,7 +150,9 @@ abstract class AbstractPaginator {
      */
     public function fragment($fragment = null)
     {
-        if (is_null($fragment)) return $this->fragment;
+        if (is_null($fragment)) {
+            return $this->fragment;
+        }
 
         $this->fragment = $fragment;
 
@@ -167,7 +168,9 @@ abstract class AbstractPaginator {
      */
     public function appends($key, $value = null)
     {
-        if (is_array($key)) return $this->appendArray($key);
+        if (is_array($key)) {
+            return $this->appendArray($key);
+        }
 
         return $this->addQuery($key, $value);
     }
@@ -180,8 +183,7 @@ abstract class AbstractPaginator {
      */
     protected function appendArray(array $keys)
     {
-        foreach ($keys as $key => $value)
-        {
+        foreach ($keys as $key => $value) {
             $this->addQuery($key, $value);
         }
 
@@ -197,8 +199,7 @@ abstract class AbstractPaginator {
      */
     public function addQuery($key, $value)
     {
-        if ($key !== $this->pageName)
-        {
+        if ($key !== $this->pageName) {
             $this->query[$key] = $value;
         }
 
@@ -283,8 +284,7 @@ abstract class AbstractPaginator {
      */
     public static function resolveCurrentPath($default = '/')
     {
-        if (isset(static::$currentPathResolver))
-        {
+        if (isset(static::$currentPathResolver)) {
             return call_user_func(static::$currentPathResolver);
         }
 
@@ -311,8 +311,7 @@ abstract class AbstractPaginator {
      */
     public static function resolveCurrentPage($pageName = 'page', $default = 1)
     {
-        if (isset(static::$currentPageResolver))
-        {
+        if (isset(static::$currentPageResolver)) {
             return call_user_func(static::$currentPageResolver, $pageName);
         }
 
@@ -473,5 +472,4 @@ abstract class AbstractPaginator {
     {
         return $this->render();
     }
-
 }

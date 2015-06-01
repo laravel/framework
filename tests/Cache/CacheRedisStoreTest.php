@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -95,5 +95,4 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Redis\Database'), 'prefix');
     }
-
 }

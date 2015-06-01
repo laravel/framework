@@ -4,8 +4,8 @@ use Dotenv;
 use InvalidArgumentException;
 use Illuminate\Contracts\Foundation\Application;
 
-class DetectEnvironment {
-
+class DetectEnvironment
+{
     /**
      * Bootstrap the given application.
      *
@@ -14,19 +14,14 @@ class DetectEnvironment {
      */
     public function bootstrap(Application $app)
     {
-        try
-        {
+        try {
             Dotenv::load($app->basePath(), $app->environmentFile());
-        }
-        catch (InvalidArgumentException $e)
-        {
+        } catch (InvalidArgumentException $e) {
             //
         }
 
-        $app->detectEnvironment(function()
-        {
+        $app->detectEnvironment(function () {
             return env('APP_ENV', 'production');
         });
     }
-
 }

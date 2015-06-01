@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
-class DatabaseServiceProvider extends ServiceProvider {
-
+class DatabaseServiceProvider extends ServiceProvider
+{
     /**
      * Bootstrap the application events.
      *
@@ -34,16 +34,14 @@ class DatabaseServiceProvider extends ServiceProvider {
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
         // make the connections while they are actually needed and not of before.
-        $this->app->singleton('db.factory', function($app)
-        {
+        $this->app->singleton('db.factory', function ($app) {
             return new ConnectionFactory($app);
         });
 
         // The database manager is used to resolve various connections, since multiple
         // connections might be managed. It also implements the connection resolver
         // interface which may be used by other components requiring connections.
-        $this->app->singleton('db', function($app)
-        {
+        $this->app->singleton('db', function ($app) {
             return new DatabaseManager($app, $app['db.factory']);
         });
     }
@@ -55,8 +53,7 @@ class DatabaseServiceProvider extends ServiceProvider {
      */
     protected function registerEloquentFactory()
     {
-        $this->app->singleton('Illuminate\Database\Eloquent\Factory', function()
-        {
+        $this->app->singleton('Illuminate\Database\Eloquent\Factory', function () {
             return EloquentFactory::construct(database_path('factories'));
         });
     }
@@ -68,10 +65,8 @@ class DatabaseServiceProvider extends ServiceProvider {
      */
     protected function registerQueueableEntityResolver()
     {
-        $this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function()
-        {
+        $this->app->singleton('Illuminate\Contracts\Queue\EntityResolver', function () {
             return new QueueEntityResolver;
         });
     }
-
 }

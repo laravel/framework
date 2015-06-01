@@ -2,8 +2,8 @@
 
 use Illuminate\Database\ConnectionResolverInterface;
 
-class DatabasePresenceVerifier implements PresenceVerifierInterface {
-
+class DatabasePresenceVerifier implements PresenceVerifierInterface
+{
     /**
      * The database connection instance.
      *
@@ -44,13 +44,11 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
     {
         $query = $this->table($collection)->where($column, '=', $value);
 
-        if ( ! is_null($excludeId) && $excludeId != 'NULL')
-        {
+        if (! is_null($excludeId) && $excludeId != 'NULL') {
             $query->where($idColumn ?: 'id', '<>', $excludeId);
         }
 
-        foreach ($extra as $key => $extraValue)
-        {
+        foreach ($extra as $key => $extraValue) {
             $this->addWhere($query, $key, $extraValue);
         }
 
@@ -70,8 +68,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
     {
         $query = $this->table($collection)->whereIn($column, $values);
 
-        foreach ($extra as $key => $extraValue)
-        {
+        foreach ($extra as $key => $extraValue) {
             $this->addWhere($query, $key, $extraValue);
         }
 
@@ -88,16 +85,11 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
      */
     protected function addWhere($query, $key, $extraValue)
     {
-        if ($extraValue === 'NULL')
-        {
+        if ($extraValue === 'NULL') {
             $query->whereNull($key);
-        }
-        elseif ($extraValue === 'NOT_NULL')
-        {
+        } elseif ($extraValue === 'NOT_NULL') {
             $query->whereNotNull($key);
-        }
-        else
-        {
+        } else {
             $query->where($key, $extraValue);
         }
     }
@@ -123,5 +115,4 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface {
     {
         $this->connection = $connection;
     }
-
 }

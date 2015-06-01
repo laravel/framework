@@ -3,8 +3,8 @@
 use SessionHandlerInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
-class CacheBasedSessionHandler implements SessionHandlerInterface {
-
+class CacheBasedSessionHandler implements SessionHandlerInterface
+{
     /**
      * The cache repository instance.
      *
@@ -89,5 +89,4 @@ class CacheBasedSessionHandler implements SessionHandlerInterface {
     {
         return $this->cache;
     }
-
 }

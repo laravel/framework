@@ -8,8 +8,8 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyDisplayer;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
-class Handler implements ExceptionHandlerContract {
-
+class Handler implements ExceptionHandlerContract
+{
     /**
      * The log implementation.
      *
@@ -43,8 +43,7 @@ class Handler implements ExceptionHandlerContract {
      */
     public function report(Exception $e)
     {
-        if ($this->shouldReport($e))
-        {
+        if ($this->shouldReport($e)) {
             $this->log->error($e);
         }
     }
@@ -68,9 +67,10 @@ class Handler implements ExceptionHandlerContract {
      */
     protected function shouldntReport(Exception $e)
     {
-        foreach ($this->dontReport as $type)
-        {
-            if ($e instanceof $type) return true;
+        foreach ($this->dontReport as $type) {
+            if ($e instanceof $type) {
+                return true;
+            }
         }
 
         return false;
@@ -85,12 +85,9 @@ class Handler implements ExceptionHandlerContract {
      */
     public function render($request, Exception $e)
     {
-        if ($this->isHttpException($e))
-        {
+        if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
-        }
-        else
-        {
+        } else {
             return $this->toIlluminateResponse((new SymfonyDisplayer(config('app.debug')))->createResponse($e), $e);
         }
     }
@@ -133,12 +130,9 @@ class Handler implements ExceptionHandlerContract {
     {
         $status = $e->getStatusCode();
 
-        if (view()->exists("errors.{$status}"))
-        {
+        if (view()->exists("errors.{$status}")) {
             return response()->view("errors.{$status}", ['exception' => $e], $status);
-        }
-        else
-        {
+        } else {
             return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
         }
     }
@@ -153,5 +147,4 @@ class Handler implements ExceptionHandlerContract {
     {
         return $e instanceof HttpException;
     }
-
 }

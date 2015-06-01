@@ -9,8 +9,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
-class Kernel implements KernelContract {
-
+class Kernel implements KernelContract
+{
     /**
      * The application implementation.
      *
@@ -66,8 +66,7 @@ class Kernel implements KernelContract {
         $this->app = $app;
         $this->router = $router;
 
-        foreach ($this->routeMiddleware as $key => $middleware)
-        {
+        foreach ($this->routeMiddleware as $key => $middleware) {
             $router->middleware($key, $middleware);
         }
     }
@@ -80,14 +79,11 @@ class Kernel implements KernelContract {
      */
     public function handle($request)
     {
-        try
-        {
+        try {
             $request->enableHttpMethodParameterOverride();
 
             $response = $this->sendRequestThroughRouter($request);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
@@ -134,14 +130,12 @@ class Kernel implements KernelContract {
     {
         $routeMiddlewares = $this->gatherRouteMiddlewares($request);
 
-        foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware)
-        {
+        foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware) {
             list($name, $parameters) = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
 
-            if ($instance instanceof TerminableMiddleware)
-            {
+            if ($instance instanceof TerminableMiddleware) {
                 $instance->terminate($request, $response);
             }
         }
@@ -157,8 +151,7 @@ class Kernel implements KernelContract {
      */
     protected function gatherRouteMiddlewares($request)
     {
-        if ($request->route())
-        {
+        if ($request->route()) {
             return $this->router->gatherRouteMiddlewares($request->route());
         }
 
@@ -175,8 +168,7 @@ class Kernel implements KernelContract {
     {
         list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
 
-        if (is_string($parameters))
-        {
+        if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
         }
 
@@ -191,8 +183,7 @@ class Kernel implements KernelContract {
      */
     public function prependMiddleware($middleware)
     {
-        if (array_search($middleware, $this->middleware) === false)
-        {
+        if (array_search($middleware, $this->middleware) === false) {
             array_unshift($this->middleware, $middleware);
         }
 
@@ -207,8 +198,7 @@ class Kernel implements KernelContract {
      */
     public function pushMiddleware($middleware)
     {
-        if (array_search($middleware, $this->middleware) === false)
-        {
+        if (array_search($middleware, $this->middleware) === false) {
             $this->middleware[] = $middleware;
         }
 
@@ -222,8 +212,7 @@ class Kernel implements KernelContract {
      */
     public function bootstrap()
     {
-        if ( ! $this->app->hasBeenBootstrapped())
-        {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
     }
@@ -235,8 +224,7 @@ class Kernel implements KernelContract {
      */
     protected function dispatchToRouter()
     {
-        return function($request)
-        {
+        return function ($request) {
             $this->app->instance('request', $request);
 
             return $this->router->dispatch($request);
@@ -273,7 +261,6 @@ class Kernel implements KernelContract {
     {
         if ($this->app['config']['session.driver'] === 'cookie' &&
             ! $this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
-
             throw new RuntimeException("Cookie encryption must be enabled to use cookie sessions.");
         }
     }
@@ -310,5 +297,4 @@ class Kernel implements KernelContract {
     {
         return $this->app;
     }
-
 }

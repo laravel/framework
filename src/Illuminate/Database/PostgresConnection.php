@@ -5,8 +5,8 @@ use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;
 
-class PostgresConnection extends Connection {
-
+class PostgresConnection extends Connection
+{
     /**
      * Get the default query grammar instance.
      *
@@ -46,5 +46,4 @@ class PostgresConnection extends Connection {
     {
         return new DoctrineDriver;
     }
-
 }

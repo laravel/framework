@@ -9,8 +9,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
-class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, LengthAwarePaginatorContract {
-
+class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, LengthAwarePaginatorContract
+{
     /**
      * The total number of items before slicing.
      *
@@ -37,8 +37,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
     {
-        foreach ($options as $key => $value)
-        {
+        foreach ($options as $key => $value) {
             $this->{$key} = $value;
         }
 
@@ -64,8 +63,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         // The page number will get validated and adjusted if it either less than one
         // or greater than the last page available based on the count of the given
         // items array. If it's greater than the last, we'll give back the last.
-        if (is_numeric($currentPage) && $currentPage > $lastPage)
-        {
+        if (is_numeric($currentPage) && $currentPage > $lastPage) {
             return $lastPage > 0 ? $lastPage : 1;
         }
 
@@ -79,8 +77,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function nextPageUrl()
     {
-        if ($this->lastPage() > $this->currentPage())
-        {
+        if ($this->lastPage() > $this->currentPage()) {
             return $this->url($this->currentPage() + 1);
         }
     }
@@ -123,8 +120,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function render(Presenter $presenter = null)
     {
-        if (is_null($presenter) && static::$presenterResolver)
-        {
+        if (is_null($presenter) && static::$presenterResolver) {
             $presenter = call_user_func(static::$presenterResolver, $this);
         }
 
@@ -163,5 +159,4 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     {
         return json_encode($this->toArray(), $options);
     }
-
 }

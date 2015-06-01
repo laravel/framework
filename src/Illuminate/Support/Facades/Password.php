@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Auth\Passwords\PasswordBroker
  */
-class Password extends Facade {
-
+class Password extends Facade
+{
     /**
      * Constant representing a successfully sent reminder.
      *
@@ -49,5 +49,4 @@ class Password extends Facade {
     {
         return 'auth.password';
     }
-
 }

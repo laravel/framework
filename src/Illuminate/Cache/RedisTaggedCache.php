@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Cache;
 
-class RedisTaggedCache extends TaggedCache {
-
+class RedisTaggedCache extends TaggedCache
+{
     /**
      * Store an item in the cache indefinitely.
      *
@@ -39,8 +39,7 @@ class RedisTaggedCache extends TaggedCache {
     {
         $fullKey = $this->getPrefix().sha1($namespace).':'.$key;
 
-        foreach (explode('|', $namespace) as $segment)
-        {
+        foreach (explode('|', $namespace) as $segment) {
             $this->store->connection()->lpush($this->foreverKey($segment), $fullKey);
         }
     }
@@ -52,8 +51,7 @@ class RedisTaggedCache extends TaggedCache {
      */
     protected function deleteForeverKeys()
     {
-        foreach (explode('|', $this->tags->getNamespace()) as $segment)
-        {
+        foreach (explode('|', $this->tags->getNamespace()) as $segment) {
             $this->deleteForeverValues($segment = $this->foreverKey($segment));
 
             $this->store->connection()->del($segment);
@@ -70,8 +68,7 @@ class RedisTaggedCache extends TaggedCache {
     {
         $forever = array_unique($this->store->connection()->lrange($foreverKey, 0, -1));
 
-        if (count($forever) > 0)
-        {
+        if (count($forever) > 0) {
             call_user_func_array(array($this->store->connection(), 'del'), $forever);
         }
     }
@@ -86,5 +83,4 @@ class RedisTaggedCache extends TaggedCache {
     {
         return $this->getPrefix().$segment.':forever';
     }
-
 }

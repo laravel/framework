@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
-class ResponseFactory implements FactoryContract {
-
+class ResponseFactory implements FactoryContract
+{
     use Macroable;
 
     /**
@@ -80,8 +80,7 @@ class ResponseFactory implements FactoryContract {
      */
     public function json($data = array(), $status = 200, array $headers = array(), $options = 0)
     {
-        if ($data instanceof Arrayable && ! $data instanceof JsonSerializable)
-        {
+        if ($data instanceof Arrayable && ! $data instanceof JsonSerializable) {
             $data = $data->toArray();
         }
 
@@ -129,8 +128,7 @@ class ResponseFactory implements FactoryContract {
     {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
-        if ( ! is_null($name))
-        {
+        if (! is_null($name)) {
             return $response->setContentDisposition($disposition, $name, str_replace('%', '', Str::ascii($name)));
         }
 
@@ -206,5 +204,4 @@ class ResponseFactory implements FactoryContract {
     {
         return $this->redirector->intended($default, $status, $headers, $secure);
     }
-
 }

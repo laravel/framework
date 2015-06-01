@@ -2,8 +2,8 @@
 
 use Illuminate\Support\AggregateServiceProvider;
 
-class ConsoleSupportServiceProvider extends AggregateServiceProvider {
-
+class ConsoleSupportServiceProvider extends AggregateServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -26,5 +26,4 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider {
         'Illuminate\Routing\GeneratorServiceProvider',
         'Illuminate\Session\CommandsServiceProvider',
     ];
-
 }

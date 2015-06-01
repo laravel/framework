@@ -2,12 +2,15 @@
 
 use Mockery as m;
 
-class DatabaseConnectionFactoryPDOStub extends PDO {
-    public function __construct() {}
+class DatabaseConnectionFactoryPDOStub extends PDO
+{
+    public function __construct()
+    {
+    }
 }
 
-class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -116,5 +119,4 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals('connector', $factory->createConnector(array('driver' => 'foo')));
     }
-
 }

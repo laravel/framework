@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Support\MessageProvider;
 
-interface Validator extends MessageProvider {
-
+interface Validator extends MessageProvider
+{
     /**
      * Determine if the data fails the validation rules.
      *
@@ -35,5 +35,4 @@ interface Validator extends MessageProvider {
      * @return $this
      */
     public function after($callback);
-
 }

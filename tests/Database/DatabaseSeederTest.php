@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSeederTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -43,5 +43,4 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase {
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
-
 }

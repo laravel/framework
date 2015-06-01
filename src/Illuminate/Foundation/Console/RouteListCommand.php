@@ -7,8 +7,8 @@ use Illuminate\Console\Command;
 use Illuminate\Routing\Controller;
 use Symfony\Component\Console\Input\InputOption;
 
-class RouteListCommand extends Command {
-
+class RouteListCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -65,8 +65,7 @@ class RouteListCommand extends Command {
      */
     public function fire()
     {
-        if (count($this->routes) == 0)
-        {
+        if (count($this->routes) == 0) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -82,8 +81,7 @@ class RouteListCommand extends Command {
     {
         $results = [];
 
-        foreach ($this->routes as $route)
-        {
+        foreach ($this->routes as $route) {
             $results[] = $this->getRouteInformation($route);
         }
 
@@ -135,8 +133,7 @@ class RouteListCommand extends Command {
 
         $actionName = $route->getActionName();
 
-        if ( ! empty($actionName) && $actionName !== 'Closure')
-        {
+        if (! empty($actionName) && $actionName !== 'Closure') {
             $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
         }
 
@@ -173,10 +170,8 @@ class RouteListCommand extends Command {
 
         $results = [];
 
-        foreach ($controller->getMiddleware() as $name => $options)
-        {
-            if ( ! $this->methodExcludedByOptions($method, $options))
-            {
+        foreach ($controller->getMiddleware() as $name => $options) {
+            if (! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = array_get($middleware, $name, $name);
             }
         }
@@ -193,8 +188,8 @@ class RouteListCommand extends Command {
      */
     protected function methodExcludedByOptions($method, array $options)
     {
-        return ( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            ( ! empty($options['except']) && in_array($method, (array) $options['except']));
+        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+            (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -207,8 +202,7 @@ class RouteListCommand extends Command {
     {
         $patterns = array();
 
-        foreach ($route->methods() as $method)
-        {
+        foreach ($route->methods() as $method) {
             // For each method supported by the route we will need to gather up the patterned
             // filters for that method. We will then merge these in with the other filters
             // we have already gathered up then return them back out to these consumers.
@@ -243,8 +237,7 @@ class RouteListCommand extends Command {
     protected function filterRoute(array $route)
     {
         if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! str_contains($route['uri'], $this->option('path')))
-        {
+             $this->option('path') && ! str_contains($route['uri'], $this->option('path'))) {
             return;
         }
 
@@ -264,5 +257,4 @@ class RouteListCommand extends Command {
             array('path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'),
         );
     }
-
 }

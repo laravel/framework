@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Fluent;
 
-class SupportFluentTest extends PHPUnit_Framework_TestCase {
-
+class SupportFluentTest extends PHPUnit_Framework_TestCase
+{
     public function testAttributesAreSetByConstructor()
     {
         $array  = array('name' => 'Taylor', 'age' => 25);
@@ -102,11 +102,11 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(json_encode('foo'), $results);
     }
-
 }
 
 
-class FluentArrayIteratorStub implements \IteratorAggregate {
+class FluentArrayIteratorStub implements \IteratorAggregate
+{
     protected $items = array();
 
     public function __construct(array $items = array())

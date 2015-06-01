@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -174,7 +174,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
         $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
         $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->once();
 
-        $builder->chunk(2, function($results) use($callbackExecutionAssertor) {
+        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
             foreach ($results as $result) {
                 $callbackExecutionAssertor->doSomething($result);
             }
@@ -214,8 +214,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
         ));
-        $builder->macro('fooBar', function($builder)
-        {
+        $builder->macro('fooBar', function ($builder) {
             $_SERVER['__test.builder'] = $builder;
 
             return $builder;
@@ -248,8 +247,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[loadRelation]', array($this->getMockQueryBuilder()));
-        $nop1 = function() {};
-        $nop2 = function() {};
+        $nop1 = function () {};
+        $nop2 = function () {};
         $builder->setEagerLoads(array('foo' => $nop1, 'foo.bar' => $nop2));
         $builder->shouldAllowMockingProtectedMethods()->shouldReceive('loadRelation')->with(array('models'), 'foo', $nop1)->andReturn(array('foo'));
 
@@ -261,7 +260,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getRelation]', array($this->getMockQueryBuilder()));
-        $builder->setEagerLoads(array('orders' => function($query) { $_SERVER['__eloquent.constrain'] = $query; }));
+        $builder->setEagerLoads(array('orders' => function ($query) { $_SERVER['__eloquent.constrain'] = $query; }));
         $relation = m::mock('stdClass');
         $relation->shouldReceive('addEagerConstraints')->once()->with(array('models'));
         $relation->shouldReceive('initRelation')->once()->with(array('models'), 'orders')->andReturn(array('models'));
@@ -338,13 +337,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('Closure', $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
-        $builder->with(array('orders' => function() { return 'foo'; }));
+        $builder->with(array('orders' => function () { return 'foo'; }));
         $eagers = $builder->getEagerLoads();
 
         $this->assertEquals('foo', $eagers['orders']());
 
         $builder = $this->getBuilder();
-        $builder->with(array('orders.lines' => function() { return 'foo'; }));
+        $builder->with(array('orders.lines' => function () { return 'foo'; }));
         $eagers = $builder->getEagerLoads();
 
         $this->assertInstanceOf('Closure', $eagers['orders']);
@@ -392,7 +391,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
         $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and');
         $nestedQuery->shouldReceive('foo')->once();
 
-        $result = $builder->where(function($query) { $query->foo(); });
+        $result = $builder->where(function ($query) { $query->foo(); });
         $this->assertEquals($builder, $result);
     }
 
@@ -401,7 +400,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
     {
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function($query) { $query->where('baz', '>', 9000); });
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
         $this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
         $this->assertEquals(array('bar', 9000), $query->getBindings());
     }
@@ -419,8 +418,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
-        $builder->onDelete(function($builder)
-        {
+        $builder->onDelete(function ($builder) {
             return ['foo' => $builder];
         });
         $this->assertEquals(['foo' => $builder], $builder->delete());
@@ -510,22 +508,24 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
         $query->shouldReceive('from')->with('foo_table');
         return $query;
     }
-
 }
 
-class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestScopeStub extends Illuminate\Database\Eloquent\Model
+{
     public function scopeApproved($query)
     {
         $query->where('foo', 'bar');
     }
 }
 
-class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
+{
     protected $table = 'table';
     use Illuminate\Database\Eloquent\SoftDeletes;
 }
 
-class EloquentBuilderTestListsStub {
+class EloquentBuilderTestListsStub
+{
     protected $attributes;
     public function __construct($attributes)
     {
@@ -537,14 +537,16 @@ class EloquentBuilderTestListsStub {
     }
 }
 
-class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model
+{
     public function foo()
     {
         return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
     }
 }
 
-class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model {
+class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model
+{
     public function bar()
     {
         return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
@@ -555,4 +557,6 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
     }
 }
 
-class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model {}
+class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model
+{
+}

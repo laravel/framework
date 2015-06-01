@@ -6,10 +6,10 @@ use Guzzle\Common\Collection;
 use Aws\Common\Signature\SignatureV4;
 use Aws\Common\Credentials\Credentials;
 
-class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-
+class QueueSqsJobTest extends PHPUnit_Framework_TestCase
+{
+    public function setUp()
+    {
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
         $this->service = 'sqs';
@@ -42,7 +42,6 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
                          'ReceiptHandle' => $this->mockedReceiptHandle,
                          'MessageId' => $this->mockedMessageId,
                          'Attributes' => array('ApproximateReceiveCount' => 1));
-
     }
 
 
@@ -99,5 +98,4 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
             $this->mockedJobData
         );
     }
-
 }

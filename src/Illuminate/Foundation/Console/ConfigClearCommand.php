@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ConfigClearCommand extends Command {
-
+class ConfigClearCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -50,5 +50,4 @@ class ConfigClearCommand extends Command {
 
         $this->info('Configuration cache cleared!');
     }
-
 }

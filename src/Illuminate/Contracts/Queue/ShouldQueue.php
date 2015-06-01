@@ -3,4 +3,6 @@
 /**
  * This interface is primarily to "rename" ShouldBeQueued.
  */
-interface ShouldQueue extends ShouldBeQueued {}
+interface ShouldQueue extends ShouldBeQueued
+{
+}

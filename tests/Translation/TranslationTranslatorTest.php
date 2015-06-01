@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Translation\Translator;
 
-class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
-
+class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -65,5 +65,4 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase {
     {
         return m::mock('Illuminate\Translation\LoaderInterface');
     }
-
 }

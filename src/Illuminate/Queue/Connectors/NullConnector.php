@@ -2,8 +2,8 @@
 
 use Illuminate\Queue\NullQueue;
 
-class NullConnector implements ConnectorInterface {
-
+class NullConnector implements ConnectorInterface
+{
     /**
      * Establish a queue connection.
      *
@@ -14,5 +14,4 @@ class NullConnector implements ConnectorInterface {
     {
         return new NullQueue;
     }
-
 }

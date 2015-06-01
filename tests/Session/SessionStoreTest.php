@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class SessionStoreTest extends PHPUnit_Framework_TestCase {
-
+class SessionStoreTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -85,7 +85,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
         $session = $this->getSession();
         $oldId = $session->getId();
 
-        $session->set('foo','bar');
+        $session->set('foo', 'bar');
         $this->assertGreaterThan(0, count($session->all()));
 
         $session->flash('name', 'Taylor');
@@ -177,7 +177,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
         $session->set('flash.old', array('qu'));
         $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
         $this->assertFalse(array_search('fu', $session->get('flash.new')));
-        $session->keep(array('fu','qu'));
+        $session->keep(array('fu', 'qu'));
         $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
         $this->assertNotFalse(array_search('fu', $session->get('flash.new')));
         $this->assertNotFalse(array_search('qu', $session->get('flash.new')));
@@ -316,5 +316,4 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase {
     {
         return 'name';
     }
-
 }

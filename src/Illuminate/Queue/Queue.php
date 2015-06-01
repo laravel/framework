@@ -8,8 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-abstract class Queue {
-
+abstract class Queue
+{
     /**
      * The IoC container instance.
      *
@@ -64,8 +64,7 @@ abstract class Queue {
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        foreach ((array) $jobs as $job)
-        {
+        foreach ((array) $jobs as $job) {
             $this->push($job, $data, $queue);
         }
     }
@@ -80,12 +79,9 @@ abstract class Queue {
      */
     protected function createPayload($job, $data = '', $queue = null)
     {
-        if ($job instanceof Closure)
-        {
+        if ($job instanceof Closure) {
             return json_encode($this->createClosurePayload($job, $data));
-        }
-        elseif (is_object($job))
-        {
+        } elseif (is_object($job)) {
             return json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => ['command' => serialize(clone $job)],
@@ -115,14 +111,12 @@ abstract class Queue {
      */
     protected function prepareQueueableEntities($data)
     {
-        if ($data instanceof QueueableEntity)
-        {
+        if ($data instanceof QueueableEntity) {
             return $this->prepareQueueableEntity($data);
         }
 
-        if (is_array($data))
-        {
-            array_walk($data, function(&$d) { $d = $this->prepareQueueableEntity($d); });
+        if (is_array($data)) {
+            array_walk($data, function (&$d) { $d = $this->prepareQueueableEntity($d); });
         }
 
         return $data;
@@ -136,8 +130,7 @@ abstract class Queue {
      */
     protected function prepareQueueableEntity($value)
     {
-        if ($value instanceof QueueableEntity)
-        {
+        if ($value instanceof QueueableEntity) {
             return '::entity::|'.get_class($value).'|'.$value->getQueueableId();
         }
 
@@ -181,8 +174,7 @@ abstract class Queue {
      */
     protected function getSeconds($delay)
     {
-        if ($delay instanceof DateTime)
-        {
+        if ($delay instanceof DateTime) {
             return max(0, $delay->getTimestamp() - $this->getTime());
         }
 
@@ -220,5 +212,4 @@ abstract class Queue {
     {
         $this->crypt = $crypt;
     }
-
 }

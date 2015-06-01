@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\View\Compilers\BladeCompiler
  */
-class Blade extends Facade {
-
+class Blade extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Blade extends Facade {
     {
         return static::$app['view']->getEngineResolver()->resolve('blade')->getCompiler();
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class RoutingServiceProvider extends ServiceProvider {
-
+class RoutingServiceProvider extends ServiceProvider
+{
     /**
      * Register the service provider.
      *
@@ -27,8 +27,7 @@ class RoutingServiceProvider extends ServiceProvider {
      */
     protected function registerRouter()
     {
-        $this->app['router'] = $this->app->share(function($app)
-        {
+        $this->app['router'] = $this->app->share(function ($app) {
             return new Router($app['events'], $app);
         });
     }
@@ -40,8 +39,7 @@ class RoutingServiceProvider extends ServiceProvider {
      */
     protected function registerUrlGenerator()
     {
-        $this->app['url'] = $this->app->share(function($app)
-        {
+        $this->app['url'] = $this->app->share(function ($app) {
             $routes = $app['router']->getRoutes();
 
             // The URL generator needs the route collection that exists on the router.
@@ -55,16 +53,14 @@ class RoutingServiceProvider extends ServiceProvider {
                 )
             );
 
-            $url->setSessionResolver(function()
-            {
+            $url->setSessionResolver(function () {
                 return $this->app['session'];
             });
 
             // If the route collection is "rebound", for example, when the routes stay
             // cached for the application, we will need to rebind the routes on the
             // URL generator instance so it has the latest version of the routes.
-            $app->rebinding('routes', function($app, $routes)
-            {
+            $app->rebinding('routes', function ($app, $routes) {
                 $app['url']->setRoutes($routes);
             });
 
@@ -79,8 +75,7 @@ class RoutingServiceProvider extends ServiceProvider {
      */
     protected function requestRebinder()
     {
-        return function($app, $request)
-        {
+        return function ($app, $request) {
             $app['url']->setRequest($request);
         };
     }
@@ -92,15 +87,13 @@ class RoutingServiceProvider extends ServiceProvider {
      */
     protected function registerRedirector()
     {
-        $this->app['redirect'] = $this->app->share(function($app)
-        {
+        $this->app['redirect'] = $this->app->share(function ($app) {
             $redirector = new Redirector($app['url']);
 
             // If the session is set on the application instance, we'll inject it into
             // the redirector instance. This allows the redirect responses to allow
             // for the quite convenient "with" methods that flash to the session.
-            if (isset($app['session.store']))
-            {
+            if (isset($app['session.store'])) {
                 $redirector->setSession($app['session.store']);
             }
 
@@ -115,10 +108,8 @@ class RoutingServiceProvider extends ServiceProvider {
      */
     protected function registerResponseFactory()
     {
-        $this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function($app)
-        {
+        $this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app) {
             return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
         });
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Console\GeneratorCommand;
 
-class ProviderMakeCommand extends GeneratorCommand {
-
+class ProviderMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -45,5 +45,4 @@ class ProviderMakeCommand extends GeneratorCommand {
     {
         return $rootNamespace.'\Providers';
     }
-
 }

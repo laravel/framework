@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Console\Scheduling\Schedule;
 
-class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase {
-
+class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -43,5 +43,4 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(PHP_BINARY.' artisan queue:listen --tries="3"', $events[1]->command);
         $this->assertEquals(PHP_BINARY.' artisan queue:listen --tries="3"', $events[2]->command);
     }
-
 }

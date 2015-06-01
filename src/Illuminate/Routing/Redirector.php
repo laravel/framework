@@ -3,8 +3,8 @@
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
 
-class Redirector {
-
+class Redirector
+{
     /**
      * The URL generator instance.
      *
@@ -185,8 +185,7 @@ class Redirector {
     {
         $redirect = new RedirectResponse($path, $status, $headers);
 
-        if (isset($this->session))
-        {
+        if (isset($this->session)) {
             $redirect->setSession($this->session);
         }
 
@@ -215,5 +214,4 @@ class Redirector {
     {
         $this->session = $session;
     }
-
 }

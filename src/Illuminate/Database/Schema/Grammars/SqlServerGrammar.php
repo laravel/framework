@@ -3,8 +3,8 @@
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
-class SqlServerGrammar extends Grammar {
-
+class SqlServerGrammar extends Grammar
+{
     /**
      * The possible column modifiers.
      *
@@ -528,8 +528,7 @@ class SqlServerGrammar extends Grammar {
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->default))
-        {
+        if (! is_null($column->default)) {
             return " default ".$this->getDefaultValue($column->default);
         }
     }
@@ -543,10 +542,8 @@ class SqlServerGrammar extends Grammar {
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement)
-        {
+        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' identity primary key';
         }
     }
-
 }

@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 
-class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -78,14 +78,18 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class ApplicationDatabaseMigrationStub extends Application {
-    public function __construct(array $data = array()) {
+class ApplicationDatabaseMigrationStub extends Application
+{
+    public function __construct(array $data = array())
+    {
         foreach ($data as $abstract => $instance) {
             $this->instance($abstract, $instance);
         }
     }
-    public function environment() { return 'development'; }
+    public function environment()
+    {
+        return 'development';
+    }
 }

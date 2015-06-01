@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
-class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
-
+class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -25,7 +25,7 @@ class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
 
 
     public function testWithOnRedirect()
-{
+    {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', array('name' => 'Taylor', 'age' => 26)));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
@@ -132,5 +132,4 @@ class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
-
 }

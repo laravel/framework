@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\View\View;
 use Illuminate\Contracts\Support\Arrayable;
 
-class ViewTest extends PHPUnit_Framework_TestCase {
-
+class ViewTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -37,8 +37,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
         $me = $this;
-        $callback = function(View $rendered, $contents) use ($me, $view)
-        {
+        $callback = function (View $rendered, $contents) use ($me, $view) {
             $me->assertEquals($view, $rendered);
             $me->assertEquals('contents', $contents);
         };
@@ -124,7 +123,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('ArrayAccess', $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');
-        $view->offsetSet('foo','baz');
+        $view->offsetSet('foo', 'baz');
         $this->assertEquals($view->offsetGet('foo'), 'baz');
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
@@ -179,7 +178,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-        $view->getFactory()->shouldReceive('getSections')->once()->andReturn(array('foo','bar'));
+        $view->getFactory()->shouldReceive('getSections')->once()->andReturn(array('foo', 'bar'));
         $sections = $view->renderSections();
         $this->assertEquals($sections[0], 'foo');
         $this->assertEquals($sections[1], 'bar');
@@ -213,5 +212,4 @@ class ViewTest extends PHPUnit_Framework_TestCase {
             array('foo' => 'bar')
         );
     }
-
 }

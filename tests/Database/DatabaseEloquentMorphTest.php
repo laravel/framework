@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -153,7 +153,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
         $model->shouldReceive('fill')->once()->with(array('bar'));
         $model->shouldReceive('save')->once();
 
-        $this->assertTrue($relation->updateOrCreate(array('foo'),array('bar')) instanceof Model);
+        $this->assertTrue($relation->updateOrCreate(array('foo'), array('bar')) instanceof Model);
     }
 
     public function testUpdateOrCreateMethodCreatesNewMorphModel()
@@ -167,7 +167,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
         $model->shouldReceive('save')->once()->andReturn(true);
         $model->shouldReceive('fill')->once()->with(array('bar'));
 
-        $this->assertTrue($relation->updateOrCreate(array('foo'),array('bar')) instanceof Model);
+        $this->assertTrue($relation->updateOrCreate(array('foo'), array('bar')) instanceof Model);
     }
 
     protected function getOneRelation()
@@ -198,13 +198,17 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
         return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
-
 }
 
 
-class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model {}
+class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model
+{
+}
 
 
-class EloquentMorphQueryStub extends Illuminate\Database\Query\Builder {
-    public function __construct() {}
+class EloquentMorphQueryStub extends Illuminate\Database\Query\Builder
+{
+    public function __construct()
+    {
+    }
 }

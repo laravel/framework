@@ -3,8 +3,8 @@
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
-abstract class GeneratorCommand extends Command {
-
+abstract class GeneratorCommand extends Command
+{
     /**
      * The filesystem instance.
      *
@@ -48,8 +48,7 @@ abstract class GeneratorCommand extends Command {
     {
         $name = $this->parseName($this->getNameInput());
 
-        if ($this->files->exists($path = $this->getPath($name)))
-        {
+        if ($this->files->exists($path = $this->getPath($name))) {
             $this->error($this->type.' already exists!');
 
             return false;
@@ -85,13 +84,11 @@ abstract class GeneratorCommand extends Command {
     {
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (starts_with($name, $rootNamespace))
-        {
+        if (starts_with($name, $rootNamespace)) {
             return $name;
         }
 
-        if (str_contains($name, '/'))
-        {
+        if (str_contains($name, '/')) {
             $name = str_replace('/', '\\', $name);
         }
 
@@ -117,8 +114,7 @@ abstract class GeneratorCommand extends Command {
      */
     protected function makeDirectory($path)
     {
-        if ( ! $this->files->isDirectory(dirname($path)))
-        {
+        if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
     }
@@ -202,5 +198,4 @@ abstract class GeneratorCommand extends Command {
             array('name', InputArgument::REQUIRED, 'The name of the class'),
         );
     }
-
 }

@@ -10,8 +10,8 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
 
-class Builder {
-
+class Builder
+{
     /**
      * The database connection instance.
      *
@@ -227,8 +227,7 @@ class Builder {
     {
         $this->addSelect(new Expression($expression));
 
-        if ($bindings)
-        {
+        if ($bindings) {
             $this->addBinding($bindings, 'select');
         }
 
@@ -244,25 +243,19 @@ class Builder {
      */
     public function selectSub($query, $as)
     {
-        if ($query instanceof Closure)
-        {
+        if ($query instanceof Closure) {
             $callback = $query;
 
             $callback($query = $this->newQuery());
         }
 
-        if ($query instanceof self)
-        {
+        if ($query instanceof self) {
             $bindings = $query->getBindings();
 
             $query = $query->toSql();
-        }
-        elseif (is_string($query))
-        {
+        } elseif (is_string($query)) {
             $bindings = [];
-        }
-        else
-        {
+        } else {
             throw new InvalidArgumentException;
         }
 
@@ -325,8 +318,7 @@ class Builder {
         // If the first "column" of the join is really a Closure instance the developer
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
-        if ($one instanceof Closure)
-        {
+        if ($one instanceof Closure) {
             $this->joins[] = new JoinClause($type, $table);
 
             call_user_func($one, end($this->joins));
@@ -335,8 +327,7 @@ class Builder {
         // If the column is simply a string, we can assume the join simply has a basic
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
-        else
-        {
+        else {
             $join = new JoinClause($type, $table);
 
             $this->joins[] = $join->on(
@@ -434,12 +425,9 @@ class Builder {
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
-        if (is_array($column))
-        {
-            return $this->whereNested(function($query) use ($column)
-            {
-                foreach ($column as $key => $value)
-                {
+        if (is_array($column)) {
+            return $this->whereNested(function ($query) use ($column) {
+                foreach ($column as $key => $value) {
                     $query->where($key, '=', $value);
                 }
             }, $boolean);
@@ -448,44 +436,37 @@ class Builder {
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        if (func_num_args() == 2)
-        {
+        if (func_num_args() == 2) {
             list($value, $operator) = array($operator, '=');
-        }
-        elseif ($this->invalidOperatorAndValue($operator, $value))
-        {
+        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException("Illegal operator and value combination.");
         }
 
         // If the columns is actually a Closure instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
         // We'll add that Closure to the query then return back out immediately.
-        if ($column instanceof Closure)
-        {
+        if ($column instanceof Closure) {
             return $this->whereNested($column, $boolean);
         }
 
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
-        if ( ! in_array(strtolower($operator), $this->operators, true))
-        {
+        if (! in_array(strtolower($operator), $this->operators, true)) {
             list($value, $operator) = array($operator, '=');
         }
 
         // If the value is a Closure, it means the developer is performing an entire
         // sub-select within the query and we will need to compile the sub-select
         // within the where clause to get the appropriate query record results.
-        if ($value instanceof Closure)
-        {
+        if ($value instanceof Closure) {
             return $this->whereSub($column, $operator, $value, $boolean);
         }
 
         // If the value is "null", we will just assume the developer wants to add a
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
-        if (is_null($value))
-        {
+        if (is_null($value)) {
             return $this->whereNull($column, $boolean, $operator != '=');
         }
 
@@ -496,8 +477,7 @@ class Builder {
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if ( ! $value instanceof Expression)
-        {
+        if (! $value instanceof Expression) {
             $this->addBinding($value, 'where');
         }
 
@@ -649,8 +629,7 @@ class Builder {
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
-        if (count($query->wheres))
-        {
+        if (count($query->wheres)) {
             $type = 'Nested';
 
             $this->wheres[] = compact('type', 'query', 'boolean');
@@ -765,8 +744,7 @@ class Builder {
         // If the value of the where in clause is actually a Closure, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
         // execute those Closures, then we can re-construct the entire sub-selects.
-        if ($values instanceof Closure)
-        {
+        if ($values instanceof Closure) {
             return $this->whereInSub($column, $values, $boolean, $not);
         }
 
@@ -985,13 +963,11 @@ class Builder {
 
         $index = 0;
 
-        foreach ($segments as $segment)
-        {
+        foreach ($segments as $segment) {
             // If the segment is not a boolean connector, we can assume it is a column's name
             // and we will add it to the query as a new constraint as a where clause, then
             // we can keep iterating through the dynamic method string's segments again.
-            if ($segment != 'And' && $segment != 'Or')
-            {
+            if ($segment != 'And' && $segment != 'Or') {
                 $this->addDynamic($segment, $connector, $parameters, $index);
 
                 $index++;
@@ -1000,8 +976,7 @@ class Builder {
             // Otherwise, we will store the connector so we know how the next where clause we
             // find in the query should be connected to the previous ones, meaning we will
             // have the proper boolean connector to connect the next where clause found.
-            else
-            {
+            else {
                 $connector = $segment;
             }
         }
@@ -1036,8 +1011,7 @@ class Builder {
      */
     public function groupBy()
     {
-        foreach (func_get_args() as $arg)
-        {
+        foreach (func_get_args() as $arg) {
             $this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
         }
 
@@ -1059,8 +1033,7 @@ class Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if ( ! $value instanceof Expression)
-        {
+        if (! $value instanceof Expression) {
             $this->addBinding($value, 'having');
         }
 
@@ -1204,7 +1177,9 @@ class Builder {
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
-        if ($value > 0) $this->$property = $value;
+        if ($value > 0) {
+            $this->$property = $value;
+        }
 
         return $this;
     }
@@ -1241,8 +1216,7 @@ class Builder {
      */
     public function union($query, $all = false)
     {
-        if ($query instanceof Closure)
-        {
+        if ($query instanceof Closure) {
             call_user_func($query, $query = $this->newQuery());
         }
 
@@ -1375,7 +1349,9 @@ class Builder {
      */
     public function getFresh($columns = array('*'))
     {
-        if (is_null($this->columns)) $this->columns = $columns;
+        if (is_null($this->columns)) {
+            $this->columns = $columns;
+        }
 
         return $this->processor->processSelect($this, $this->runSelect());
     }
@@ -1452,7 +1428,9 @@ class Builder {
 
         $this->restoreFieldsForCount();
 
-        if (isset($this->groups)) return count($results);
+        if (isset($this->groups)) {
+            return count($results);
+        }
 
         return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
     }
@@ -1464,8 +1442,7 @@ class Builder {
      */
     protected function backupFieldsForCount()
     {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field)
-        {
+        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
             $this->backups[$field] = $this->{$field};
 
             $this->{$field} = null;
@@ -1479,8 +1456,7 @@ class Builder {
      */
     protected function restoreFieldsForCount()
     {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field)
-        {
+        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
             $this->{$field} = $this->backups[$field];
         }
 
@@ -1498,13 +1474,11 @@ class Builder {
     {
         $results = $this->forPage($page = 1, $count)->get();
 
-        while (count($results) > 0)
-        {
+        while (count($results) > 0) {
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $results) === false)
-            {
+            if (call_user_func($callback, $results) === false) {
                 break;
             }
 
@@ -1544,8 +1518,7 @@ class Builder {
         // If the selected column contains a "dot", we will remove it so that the list
         // operation can run normally. Specifying the table is not needed, since we
         // really want the names of the columns as it is in this resulting array.
-        return array_map(function($column)
-        {
+        return array_map(function ($column) {
             $dot = strpos($column, '.');
 
             return $dot === false ? $column : substr($column, $dot + 1);
@@ -1561,7 +1534,9 @@ class Builder {
      */
     public function implode($column, $glue = null)
     {
-        if (is_null($glue)) return implode($this->lists($column));
+        if (is_null($glue)) {
+            return implode($this->lists($column));
+        }
 
         return implode($glue, $this->lists($column));
     }
@@ -1590,8 +1565,7 @@ class Builder {
      */
     public function count($columns = '*')
     {
-        if ( ! is_array($columns))
-        {
+        if (! is_array($columns)) {
             $columns = array($columns);
         }
 
@@ -1666,8 +1640,7 @@ class Builder {
 
         $this->columns = $previousColumns;
 
-        if (isset($results[0]))
-        {
+        if (isset($results[0])) {
             $result = array_change_key_case((array) $results[0]);
 
             return $result['aggregate'];
@@ -1682,24 +1655,24 @@ class Builder {
      */
     public function insert(array $values)
     {
-        if (empty($values)) return true;
+        if (empty($values)) {
+            return true;
+        }
 
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
-        if ( ! is_array(reset($values)))
-        {
+        if (! is_array(reset($values))) {
             $values = array($values);
         }
 
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
-        else
-        {
-            foreach ($values as $key => $value)
-            {
-                ksort($value); $values[$key] = $value;
+        else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+                $values[$key] = $value;
             }
         }
 
@@ -1708,10 +1681,8 @@ class Builder {
         // easier on the grammars to just handle one type of record insertion.
         $bindings = array();
 
-        foreach ($values as $record)
-        {
-            foreach ($record as $value)
-            {
+        foreach ($values as $record) {
+            foreach ($record as $value) {
                 $bindings[] = $value;
             }
         }
@@ -1802,7 +1773,9 @@ class Builder {
         // If an ID is passed to the method, we will set the where clause to check
         // the ID to allow developers to simply and quickly remove a single row
         // from their database without manually specifying the where clauses.
-        if ( ! is_null($id)) $this->where('id', '=', $id);
+        if (! is_null($id)) {
+            $this->where('id', '=', $id);
+        }
 
         $sql = $this->grammar->compileDelete($this);
 
@@ -1816,8 +1789,7 @@ class Builder {
      */
     public function truncate()
     {
-        foreach ($this->grammar->compileTruncate($this) as $sql => $bindings)
-        {
+        foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->connection->statement($sql, $bindings);
         }
     }
@@ -1854,8 +1826,7 @@ class Builder {
      */
     protected function cleanBindings(array $bindings)
     {
-        return array_values(array_filter($bindings, function($binding)
-        {
+        return array_values(array_filter($bindings, function ($binding) {
             return ! $binding instanceof Expression;
         }));
     }
@@ -1902,8 +1873,7 @@ class Builder {
      */
     public function setBindings(array $bindings, $type = 'where')
     {
-        if ( ! array_key_exists($type, $this->bindings))
-        {
+        if (! array_key_exists($type, $this->bindings)) {
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
@@ -1923,17 +1893,13 @@ class Builder {
      */
     public function addBinding($value, $type = 'where')
     {
-        if ( ! array_key_exists($type, $this->bindings))
-        {
+        if (! array_key_exists($type, $this->bindings)) {
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
-        }
-        else
-        {
+        } else {
             $this->bindings[$type][] = $value;
         }
 
@@ -2006,8 +1972,7 @@ class Builder {
      */
     public function __call($method, $parameters)
     {
-        if (starts_with($method, 'where'))
-        {
+        if (starts_with($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
         }
 
@@ -2015,5 +1980,4 @@ class Builder {
 
         throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
     }
-
 }

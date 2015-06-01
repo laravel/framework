@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Translation\Translator
  */
-class Lang extends Facade {
-
+class Lang extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Lang extends Facade {
     {
         return 'translator';
     }
-
 }

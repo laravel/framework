@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Cookie;
 
-interface QueueingFactory extends Factory {
-
+interface QueueingFactory extends Factory
+{
     /**
      * Queue a cookie to send with the next response.
      *
@@ -23,5 +23,4 @@ interface QueueingFactory extends Factory {
      * @return array
      */
     public function getQueuedCookies();
-
 }

@@ -8,8 +8,8 @@ use Illuminate\Foundation\Console\Tinker\Presenters\EloquentModelPresenter;
 use Illuminate\Foundation\Console\Tinker\Presenters\IlluminateCollectionPresenter;
 use Illuminate\Foundation\Console\Tinker\Presenters\IlluminateApplicationPresenter;
 
-class TinkerCommand extends Command {
-
+class TinkerCommand extends Command
+{
     /**
      * artisan commands to include in the tinker shell.
      *
@@ -64,9 +64,10 @@ class TinkerCommand extends Command {
     {
         $commands = [];
 
-        foreach ($this->getApplication()->all() as $name => $command)
-        {
-            if (in_array($name, $this->commandWhitelist)) $commands[] = $command;
+        foreach ($this->getApplication()->all() as $name => $command) {
+            if (in_array($name, $this->commandWhitelist)) {
+                $commands[] = $command;
+            }
         }
 
         return $commands;
@@ -97,5 +98,4 @@ class TinkerCommand extends Command {
             ['include', InputArgument::IS_ARRAY, 'Include file(s) before starting tinker'],
         ];
     }
-
 }

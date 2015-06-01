@@ -3,8 +3,8 @@
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 
-class AuthGuardTest extends PHPUnit_Framework_TestCase {
-
+class AuthGuardTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -295,5 +295,4 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Cookie\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Contracts\Encryption\Encrypter'), array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
     }
-
 }

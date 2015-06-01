@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class ListenerMakeCommand extends GeneratorCommand {
-
+class ListenerMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -38,8 +38,7 @@ class ListenerMakeCommand extends GeneratorCommand {
 
         $event = $this->option('event');
 
-        if ( ! starts_with($event, $this->laravel->getNamespace()))
-        {
+        if (! starts_with($event, $this->laravel->getNamespace())) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
@@ -61,12 +60,9 @@ class ListenerMakeCommand extends GeneratorCommand {
      */
     protected function getStub()
     {
-        if ($this->option('queued'))
-        {
+        if ($this->option('queued')) {
             return __DIR__.'/stubs/listener-queued.stub';
-        }
-        else
-        {
+        } else {
             return __DIR__.'/stubs/listener.stub';
         }
     }
@@ -95,5 +91,4 @@ class ListenerMakeCommand extends GeneratorCommand {
             array('queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'),
         );
     }
-
 }

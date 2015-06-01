@@ -2,4 +2,6 @@
 
 use Exception;
 
-class TokenMismatchException extends Exception {}
+class TokenMismatchException extends Exception
+{
+}

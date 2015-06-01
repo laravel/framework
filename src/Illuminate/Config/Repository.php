@@ -3,8 +3,8 @@
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
-class Repository implements ArrayAccess, ConfigContract {
-
+class Repository implements ArrayAccess, ConfigContract
+{
     /**
      * All of the configuration items.
      *
@@ -55,15 +55,11 @@ class Repository implements ArrayAccess, ConfigContract {
      */
     public function set($key, $value = null)
     {
-        if (is_array($key))
-        {
-            foreach ($key as $innerKey => $innerValue)
-            {
+        if (is_array($key)) {
+            foreach ($key as $innerKey => $innerValue) {
                 array_set($this->items, $innerKey, $innerValue);
             }
-        }
-        else
-        {
+        } else {
             array_set($this->items, $key, $value);
         }
     }
@@ -154,5 +150,4 @@ class Repository implements ArrayAccess, ConfigContract {
     {
         $this->set($key, null);
     }
-
 }

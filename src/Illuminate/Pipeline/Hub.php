@@ -4,8 +4,8 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
 
-class Hub implements HubContract {
-
+class Hub implements HubContract
+{
     /**
      * The container implementation.
      *
@@ -69,5 +69,4 @@ class Hub implements HubContract {
             $this->pipelines[$pipeline], new Pipeline($this->container), $object
         );
     }
-
 }

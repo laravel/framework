@@ -2,8 +2,8 @@
 
 use Illuminate\Support\NamespacedItemResolver;
 
-class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase {
-
+class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase
+{
     public function testResolution()
     {
         $r = new NamespacedItemResolver;
@@ -24,5 +24,4 @@ class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(array('foo'), $r->parseKey('foo.bar'));
     }
-
 }

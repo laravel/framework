@@ -2,8 +2,8 @@
 
 use Illuminate\Console\GeneratorCommand;
 
-class MiddlewareMakeCommand extends GeneratorCommand {
-
+class MiddlewareMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -45,5 +45,4 @@ class MiddlewareMakeCommand extends GeneratorCommand {
     {
         return $rootNamespace.'\Http\Middleware';
     }
-
 }

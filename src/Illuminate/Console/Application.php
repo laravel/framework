@@ -9,8 +9,8 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 
-class Application extends SymfonyApplication implements ApplicationContract {
-
+class Application extends SymfonyApplication implements ApplicationContract
+{
     /**
      * The Laravel application instance.
      *
@@ -78,8 +78,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
      */
     public function add(SymfonyCommand $command)
     {
-        if ($command instanceof Command)
-        {
+        if ($command instanceof Command) {
             $command->setLaravel($this->laravel);
         }
 
@@ -118,8 +117,7 @@ class Application extends SymfonyApplication implements ApplicationContract {
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        foreach ($commands as $command)
-        {
+        foreach ($commands as $command) {
             $this->resolve($command);
         }
 
@@ -163,5 +161,4 @@ class Application extends SymfonyApplication implements ApplicationContract {
     {
         return $this->laravel;
     }
-
 }

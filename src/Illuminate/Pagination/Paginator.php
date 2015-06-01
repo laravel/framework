@@ -9,8 +9,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
-class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, PaginatorContract {
-
+class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, PaginatorContract
+{
     /**
      * Determine if there are more items in the data source.
      *
@@ -29,8 +29,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function __construct($items, $perPage, $currentPage = null, array $options = [])
     {
-        foreach ($options as $key => $value)
-        {
+        foreach ($options as $key => $value) {
             $this->{$key} = $value;
         }
 
@@ -74,8 +73,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function nextPageUrl()
     {
-        if ($this->hasMore)
-        {
+        if ($this->hasMore) {
             return $this->url($this->currentPage() + 1);
         }
     }
@@ -98,8 +96,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function render(Presenter $presenter = null)
     {
-        if (is_null($presenter) && static::$presenterResolver)
-        {
+        if (is_null($presenter) && static::$presenterResolver) {
             $presenter = call_user_func(static::$presenterResolver, $this);
         }
 
@@ -133,5 +130,4 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     {
         return json_encode($this->toArray(), $options);
     }
-
 }

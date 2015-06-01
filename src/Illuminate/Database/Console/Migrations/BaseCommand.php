@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class BaseCommand extends Command {
-
+class BaseCommand extends Command
+{
     /**
      * Get the path to the migration directory.
      *
@@ -13,5 +13,4 @@ class BaseCommand extends Command {
     {
         return $this->laravel->databasePath().'/migrations';
     }
-
 }

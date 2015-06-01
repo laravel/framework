@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Validation\Factory
  */
-class Validator extends Facade {
-
+class Validator extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Validator extends Facade {
     {
         return 'validator';
     }
-
 }

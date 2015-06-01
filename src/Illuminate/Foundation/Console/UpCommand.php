@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class UpCommand extends Command {
-
+class UpCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,5 +29,4 @@ class UpCommand extends Command {
 
         $this->info('Application is now live.');
     }
-
 }

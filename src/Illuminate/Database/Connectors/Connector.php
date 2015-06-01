@@ -2,8 +2,8 @@
 
 use PDO;
 
-class Connector {
-
+class Connector
+{
     /**
      * The default PDO connection options.
      *
@@ -67,5 +67,4 @@ class Connector {
     {
         $this->options = $options;
     }
-
 }

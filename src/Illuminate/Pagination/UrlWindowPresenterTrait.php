@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Pagination;
 
-trait UrlWindowPresenterTrait {
-
+trait UrlWindowPresenterTrait
+{
     /**
      * Render the actual link slider.
      *
@@ -11,19 +11,16 @@ trait UrlWindowPresenterTrait {
     {
         $html = '';
 
-        if (is_array($this->window['first']))
-        {
+        if (is_array($this->window['first'])) {
             $html .= $this->getUrlLinks($this->window['first']);
         }
 
-        if (is_array($this->window['slider']))
-        {
+        if (is_array($this->window['slider'])) {
             $html .= $this->getDots();
             $html .= $this->getUrlLinks($this->window['slider']);
         }
 
-        if (is_array($this->window['last']))
-        {
+        if (is_array($this->window['last'])) {
             $html .= $this->getDots();
             $html .= $this->getUrlLinks($this->window['last']);
         }
@@ -41,8 +38,7 @@ trait UrlWindowPresenterTrait {
     {
         $html = '';
 
-        foreach ($urls as $page => $url)
-        {
+        foreach ($urls as $page => $url) {
             $html .= $this->getPageLinkWrapper($url, $page);
         }
 
@@ -59,12 +55,10 @@ trait UrlWindowPresenterTrait {
      */
     protected function getPageLinkWrapper($url, $page, $rel = null)
     {
-        if ($page == $this->paginator->currentPage())
-        {
+        if ($page == $this->paginator->currentPage()) {
             return $this->getActivePageWrapper($page);
         }
 
         return $this->getAvailablePageWrapper($url, $page, $rel);
     }
-
 }

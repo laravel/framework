@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 
-class MethodValidator implements ValidatorInterface {
-
+class MethodValidator implements ValidatorInterface
+{
     /**
      * Validate a given rule against a route and request.
      *
@@ -16,5 +16,4 @@ class MethodValidator implements ValidatorInterface {
     {
         return in_array($request->getMethod(), $route->methods());
     }
-
 }

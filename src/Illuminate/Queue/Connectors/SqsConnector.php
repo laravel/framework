@@ -3,8 +3,8 @@
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 
-class SqsConnector implements ConnectorInterface {
-
+class SqsConnector implements ConnectorInterface
+{
     /**
      * Establish a queue connection.
      *
@@ -25,5 +25,4 @@ class SqsConnector implements ConnectorInterface {
 
         return new SqsQueue(new SqsClient($config), $config['queue']);
     }
-
 }

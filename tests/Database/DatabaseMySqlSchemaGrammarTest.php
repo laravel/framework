@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -69,7 +69,6 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
-
     }
 
     public function testBasicCreateTableWithPrefix()
@@ -617,5 +616,4 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Database\Schema\Grammars\MySqlGrammar;
     }
-
 }

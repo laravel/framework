@@ -2,8 +2,8 @@
 
 use ArrayAccess;
 
-trait DispatchesJobs {
-
+trait DispatchesJobs
+{
     /**
      * Dispatch a job to its appropriate handler.
      *
@@ -39,5 +39,4 @@ trait DispatchesJobs {
     {
         return app('Illuminate\Contracts\Bus\Dispatcher')->dispatchFrom($job, $source, $extras);
     }
-
 }

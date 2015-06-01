@@ -5,8 +5,8 @@ use Swift_Mime_Message;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
-class MandrillTransport implements Swift_Transport {
-
+class MandrillTransport implements Swift_Transport
+{
     /**
      * Guzzle client instance.
      *
@@ -91,18 +91,15 @@ class MandrillTransport implements Swift_Transport {
     {
         $to = [];
 
-        if ($message->getTo())
-        {
+        if ($message->getTo()) {
             $to = array_merge($to, array_keys($message->getTo()));
         }
 
-        if ($message->getCc())
-        {
+        if ($message->getCc()) {
             $to = array_merge($to, array_keys($message->getCc()));
         }
 
-        if ($message->getBcc())
-        {
+        if ($message->getBcc()) {
             $to = array_merge($to, array_keys($message->getBcc()));
         }
 
@@ -138,5 +135,4 @@ class MandrillTransport implements Swift_Transport {
     {
         return $this->key = $key;
     }
-
 }

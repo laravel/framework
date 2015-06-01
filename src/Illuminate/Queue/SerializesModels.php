@@ -5,8 +5,8 @@ use ReflectionProperty;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Database\ModelIdentifier;
 
-trait SerializesModels {
-
+trait SerializesModels
+{
     /**
      * Prepare the instance for serialization.
      *
@@ -16,14 +16,13 @@ trait SerializesModels {
     {
         $properties = (new ReflectionClass($this))->getProperties();
 
-        foreach ($properties as $property)
-        {
+        foreach ($properties as $property) {
             $property->setValue($this, $this->getSerializedPropertyValue(
                 $this->getPropertyValue($property)
             ));
         }
 
-        return array_map(function($p) { return $p->getName(); }, $properties);
+        return array_map(function ($p) { return $p->getName(); }, $properties);
     }
 
     /**
@@ -33,8 +32,7 @@ trait SerializesModels {
      */
     public function __wakeup()
     {
-        foreach ((new ReflectionClass($this))->getProperties() as $property)
-        {
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
             $property->setValue($this, $this->getRestoredPropertyValue(
                 $this->getPropertyValue($property)
             ));
@@ -77,5 +75,4 @@ trait SerializesModels {
 
         return $property->getValue($this);
     }
-
 }

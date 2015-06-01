@@ -7,8 +7,8 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 
-class Kernel implements KernelContract {
-
+class Kernel implements KernelContract
+{
     /**
      * The application implementation.
      *
@@ -58,8 +58,7 @@ class Kernel implements KernelContract {
         $this->app = $app;
         $this->events = $events;
 
-        $this->app->booted(function()
-        {
+        $this->app->booted(function () {
             $this->defineConsoleSchedule();
         });
     }
@@ -87,14 +86,11 @@ class Kernel implements KernelContract {
      */
     public function handle($input, $output = null)
     {
-        try
-        {
+        try {
             $this->bootstrap();
 
             return $this->getArtisan()->run($input, $output);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
@@ -190,8 +186,7 @@ class Kernel implements KernelContract {
      */
     public function bootstrap()
     {
-        if ( ! $this->app->hasBeenBootstrapped())
-        {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
@@ -205,8 +200,7 @@ class Kernel implements KernelContract {
      */
     protected function getArtisan()
     {
-        if (is_null($this->artisan))
-        {
+        if (is_null($this->artisan)) {
             return $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
                                 ->resolveCommands($this->commands);
         }
@@ -246,5 +240,4 @@ class Kernel implements KernelContract {
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
     }
-
 }

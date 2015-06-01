@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -111,5 +111,4 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase {
     {
         return new DatabaseMigrationRepository(m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations');
     }
-
 }

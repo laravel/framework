@@ -2,8 +2,8 @@
 
 use Exception;
 
-class PhpEngine implements EngineInterface {
-
+class PhpEngine implements EngineInterface
+{
     /**
      * Get the evaluated contents of the view.
      *
@@ -34,12 +34,9 @@ class PhpEngine implements EngineInterface {
         // We'll evaluate the contents of the view inside a try/catch block so we can
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
-        try
-        {
+        try {
             include $__path;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
         }
 
@@ -57,12 +54,10 @@ class PhpEngine implements EngineInterface {
      */
     protected function handleViewException($e, $obLevel)
     {
-        while (ob_get_level() > $obLevel)
-        {
+        while (ob_get_level() > $obLevel) {
             ob_end_clean();
         }
 
         throw $e;
     }
-
 }

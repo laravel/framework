@@ -12,8 +12,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 
-abstract class Grammar extends BaseGrammar {
-
+abstract class Grammar extends BaseGrammar
+{
     /**
      * Compile a rename column command.
      *
@@ -95,13 +95,11 @@ abstract class Grammar extends BaseGrammar {
         // Once we have the basic foreign key creation statement constructed we can
         // build out the syntax for what should happen on an update or delete of
         // the affected columns, which will get something like "cascade", etc.
-        if ( ! is_null($command->onDelete))
-        {
+        if (! is_null($command->onDelete)) {
             $sql .= " on delete {$command->onDelete}";
         }
 
-        if ( ! is_null($command->onUpdate))
-        {
+        if (! is_null($command->onUpdate)) {
             $sql .= " on update {$command->onUpdate}";
         }
 
@@ -118,8 +116,7 @@ abstract class Grammar extends BaseGrammar {
     {
         $columns = array();
 
-        foreach ($blueprint->getAddedColumns() as $column)
-        {
+        foreach ($blueprint->getAddedColumns() as $column) {
             // Each of the column types have their own compiler functions which are tasked
             // with turning the column definition into its SQL format for this platform
             // used by the connection. The column's modifiers are compiled and added.
@@ -141,10 +138,8 @@ abstract class Grammar extends BaseGrammar {
      */
     protected function addModifiers($sql, Blueprint $blueprint, Fluent $column)
     {
-        foreach ($this->modifiers as $modifier)
-        {
-            if (method_exists($this, $method = "modify{$modifier}"))
-            {
+        foreach ($this->modifiers as $modifier) {
+            if (method_exists($this, $method = "modify{$modifier}")) {
                 $sql .= $this->{$method}($blueprint, $column);
             }
         }
@@ -163,8 +158,7 @@ abstract class Grammar extends BaseGrammar {
     {
         $commands = $this->getCommandsByName($blueprint, $name);
 
-        if (count($commands) > 0)
-        {
+        if (count($commands) > 0) {
             return reset($commands);
         }
     }
@@ -178,8 +172,7 @@ abstract class Grammar extends BaseGrammar {
      */
     protected function getCommandsByName(Blueprint $blueprint, $name)
     {
-        return array_filter($blueprint->getCommands(), function($value) use ($name)
-        {
+        return array_filter($blueprint->getCommands(), function ($value) use ($name) {
             return $value->name == $name;
         });
     }
@@ -204,8 +197,7 @@ abstract class Grammar extends BaseGrammar {
      */
     public function prefixArray($prefix, array $values)
     {
-        return array_map(function($value) use ($prefix)
-        {
+        return array_map(function ($value) use ($prefix) {
             return $prefix.' '.$value;
 
         }, $values);
@@ -219,7 +211,9 @@ abstract class Grammar extends BaseGrammar {
      */
     public function wrapTable($table)
     {
-        if ($table instanceof Blueprint) $table = $table->getTable();
+        if ($table instanceof Blueprint) {
+            $table = $table->getTable();
+        }
 
         return parent::wrapTable($table);
     }
@@ -229,7 +223,9 @@ abstract class Grammar extends BaseGrammar {
      */
     public function wrap($value, $prefixAlias = false)
     {
-        if ($value instanceof Fluent) $value = $value->name;
+        if ($value instanceof Fluent) {
+            $value = $value->name;
+        }
 
         return parent::wrap($value, $prefixAlias);
     }
@@ -242,9 +238,13 @@ abstract class Grammar extends BaseGrammar {
      */
     protected function getDefaultValue($value)
     {
-        if ($value instanceof Expression) return $value;
+        if ($value instanceof Expression) {
+            return $value;
+        }
 
-        if (is_bool($value)) return "'".(int) $value."'";
+        if (is_bool($value)) {
+            return "'".(int) $value."'";
+        }
 
         return "'".strval($value)."'";
     }
@@ -281,8 +281,7 @@ abstract class Grammar extends BaseGrammar {
 
         $tableDiff = $this->getChangedDiff($blueprint, $schema);
 
-        if ($tableDiff !== false)
-        {
+        if ($tableDiff !== false) {
             return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
         }
 
@@ -314,19 +313,15 @@ abstract class Grammar extends BaseGrammar {
     {
         $table = clone $table;
 
-        foreach($blueprint->getChangedColumns() as $fluent)
-        {
+        foreach ($blueprint->getChangedColumns() as $fluent) {
             $column = $this->getDoctrineColumnForChange($table, $fluent);
 
             // Here we will spin through each fluent column definition and map it to the proper
             // Doctrine column definitions, which is necessasry because Laravel and Doctrine
             // use some different terminology for various column attributes on the tables.
-            foreach ($fluent->getAttributes() as $key => $value)
-            {
-                if ( ! is_null($option = $this->mapFluentOptionToDoctrine($key)))
-                {
-                    if (method_exists($column, $method = 'set'.ucfirst($option)))
-                    {
+            foreach ($fluent->getAttributes() as $key => $value) {
+                if (! is_null($option = $this->mapFluentOptionToDoctrine($key))) {
+                    if (method_exists($column, $method = 'set'.ucfirst($option))) {
                         $column->{$method}($this->mapFluentValueToDoctrine($option, $value));
                     }
                 }
@@ -360,8 +355,7 @@ abstract class Grammar extends BaseGrammar {
     {
         $options = ['type' => $this->getDoctrineColumnType($fluent['type'])];
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
-        {
+        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
             $options['length'] = $this->calculateDoctrineTextLength($fluent['type']);
         }
 
@@ -402,8 +396,7 @@ abstract class Grammar extends BaseGrammar {
      */
     protected function calculateDoctrineTextLength($type)
     {
-        switch ($type)
-        {
+        switch ($type) {
             case 'mediumText':
                 return 65535 + 1;
 
@@ -423,8 +416,7 @@ abstract class Grammar extends BaseGrammar {
      */
     protected function mapFluentOptionToDoctrine($attribute)
     {
-        switch($attribute)
-        {
+        switch ($attribute) {
             case 'type':
             case 'name':
                 return;
@@ -454,5 +446,4 @@ abstract class Grammar extends BaseGrammar {
     {
         return $option == 'notnull' ? ! $value : $value;
     }
-
 }

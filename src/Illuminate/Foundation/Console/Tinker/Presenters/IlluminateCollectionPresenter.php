@@ -3,8 +3,8 @@
 use Psy\Presenter\ArrayPresenter;
 use Illuminate\Support\Collection;
 
-class IlluminateCollectionPresenter extends ArrayPresenter {
-
+class IlluminateCollectionPresenter extends ArrayPresenter
+{
     /**
      * Determine if the presenter can present the given value.
      *
@@ -37,5 +37,4 @@ class IlluminateCollectionPresenter extends ArrayPresenter {
     {
         return $value->all();
     }
-
 }

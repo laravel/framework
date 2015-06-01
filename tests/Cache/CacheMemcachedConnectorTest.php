@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
-
+class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -35,5 +35,4 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase {
         $connector->expects($this->once())->method('getMemcached')->will($this->returnValue($memcached));
         $result = $connector->connect(array(array('host' => 'localhost', 'port' => 11211, 'weight' => 100)));
     }
-
 }

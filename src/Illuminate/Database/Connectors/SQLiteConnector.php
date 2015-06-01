@@ -2,8 +2,8 @@
 
 use InvalidArgumentException;
 
-class SQLiteConnector extends Connector implements ConnectorInterface {
-
+class SQLiteConnector extends Connector implements ConnectorInterface
+{
     /**
      * Establish a database connection.
      *
@@ -19,8 +19,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface {
         // SQLite supports "in-memory" databases that only last as long as the owning
         // connection does. These are useful for tests or for short lifetime store
         // querying. In-memory databases may only have a single open connection.
-        if ($config['database'] == ':memory:')
-        {
+        if ($config['database'] == ':memory:') {
             return $this->createConnection('sqlite::memory:', $config, $options);
         }
 
@@ -29,12 +28,10 @@ class SQLiteConnector extends Connector implements ConnectorInterface {
         // Here we'll verify that the SQLite database exists before going any further
         // as the developer probably wants to know if the database exists and this
         // SQLite driver will not throw any exception if it does not by default.
-        if ($path === false)
-        {
+        if ($path === false) {
             throw new InvalidArgumentException("Database does not exist.");
         }
 
         return $this->createConnection("sqlite:{$path}", $config, $options);
     }
-
 }

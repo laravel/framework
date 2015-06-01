@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Query\Builder;
 
-class PostgresProcessor extends Processor {
-
+class PostgresProcessor extends Processor
+{
     /**
      * Process an "insert get ID" query.
      *
@@ -34,8 +34,7 @@ class PostgresProcessor extends Processor {
      */
     public function processColumnListing($results)
     {
-        $mapping = function($r)
-        {
+        $mapping = function ($r) {
             $r = (object) $r;
 
             return $r->column_name;
@@ -43,5 +42,4 @@ class PostgresProcessor extends Processor {
 
         return array_map($mapping, $results);
     }
-
 }

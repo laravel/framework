@@ -5,8 +5,8 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 
-class Manager {
-
+class Manager
+{
     use CapsuleManagerTrait;
 
     /**
@@ -178,5 +178,4 @@ class Manager {
     {
         return call_user_func_array(array(static::connection(), $method), $parameters);
     }
-
 }

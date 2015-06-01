@@ -5,8 +5,8 @@ use DateTime;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Store;
 
-class TaggedCache implements Store {
-
+class TaggedCache implements Store
+{
     /**
      * The cache store implementation.
      *
@@ -71,8 +71,7 @@ class TaggedCache implements Store {
     {
         $minutes = $this->getMinutes($minutes);
 
-        if ( ! is_null($minutes))
-        {
+        if (! is_null($minutes)) {
             $this->store->put($this->taggedItemKey($key), $value, $minutes);
         }
     }
@@ -87,8 +86,7 @@ class TaggedCache implements Store {
      */
     public function add($key, $value, $minutes)
     {
-        if (is_null($this->get($key)))
-        {
+        if (is_null($this->get($key))) {
             $this->put($key, $value, $minutes);
 
             return true;
@@ -167,7 +165,9 @@ class TaggedCache implements Store {
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes in storage.
-        if ( ! is_null($value = $this->get($key))) return $value;
+        if (! is_null($value = $this->get($key))) {
+            return $value;
+        }
 
         $this->put($key, $value = $callback(), $minutes);
 
@@ -198,7 +198,9 @@ class TaggedCache implements Store {
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes. It's easy.
-        if ( ! is_null($value = $this->get($key))) return $value;
+        if (! is_null($value = $this->get($key))) {
+            return $value;
+        }
 
         $this->forever($key, $value = $callback());
 
@@ -234,8 +236,7 @@ class TaggedCache implements Store {
      */
     protected function getMinutes($duration)
     {
-        if ($duration instanceof DateTime)
-        {
+        if ($duration instanceof DateTime) {
             $fromNow = Carbon::instance($duration)->diffInMinutes();
 
             return $fromNow > 0 ? $fromNow : null;
@@ -243,5 +244,4 @@ class TaggedCache implements Store {
 
         return is_string($duration) ? (int) $duration : $duration;
     }
-
 }

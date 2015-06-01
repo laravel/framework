@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class IlluminateQueueClosure {
-
+class IlluminateQueueClosure
+{
     /**
      * The encrypter instance.
      *
@@ -35,5 +35,4 @@ class IlluminateQueueClosure {
 
         $closure($job);
     }
-
 }

@@ -4,8 +4,8 @@ use Mockery;
 use RuntimeException;
 use Mockery\MockInterface;
 
-abstract class Facade {
-
+abstract class Facade
+{
     /**
      * The application instance being facaded.
      *
@@ -43,12 +43,9 @@ abstract class Facade {
     {
         $name = static::getFacadeAccessor();
 
-        if (static::isMock())
-        {
+        if (static::isMock()) {
             $mock = static::$resolvedInstance[$name];
-        }
-        else
-        {
+        } else {
             $mock = static::createFreshMockInstance($name);
         }
 
@@ -65,8 +62,7 @@ abstract class Facade {
     {
         static::$resolvedInstance[$name] = $mock = static::createMockByName($name);
 
-        if (isset(static::$app))
-        {
+        if (isset(static::$app)) {
             static::$app->instance($name, $mock);
         }
 
@@ -105,7 +101,9 @@ abstract class Facade {
      */
     protected static function getMockableClass()
     {
-        if ($root = static::getFacadeRoot()) return get_class($root);
+        if ($root = static::getFacadeRoot()) {
+            return get_class($root);
+        }
     }
 
     /**
@@ -138,10 +136,11 @@ abstract class Facade {
      */
     protected static function resolveFacadeInstance($name)
     {
-        if (is_object($name)) return $name;
+        if (is_object($name)) {
+            return $name;
+        }
 
-        if (isset(static::$resolvedInstance[$name]))
-        {
+        if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }
 
@@ -201,8 +200,7 @@ abstract class Facade {
     {
         $instance = static::getFacadeRoot();
 
-        switch (count($args))
-        {
+        switch (count($args)) {
             case 0:
                 return $instance->$method();
 
@@ -222,5 +220,4 @@ abstract class Facade {
                 return call_user_func_array(array($instance, $method), $args);
         }
     }
-
 }

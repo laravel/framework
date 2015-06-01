@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Contracts\Foundation\Application;
 
-class RegisterFacades {
-
+class RegisterFacades
+{
     /**
      * Bootstrap the given application.
      *
@@ -20,5 +20,4 @@ class RegisterFacades {
 
         AliasLoader::getInstance($app['config']['app.aliases'])->register();
     }
-
 }

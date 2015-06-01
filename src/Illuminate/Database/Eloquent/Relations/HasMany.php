@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Eloquent\Collection;
 
-class HasMany extends HasOneOrMany {
-
+class HasMany extends HasOneOrMany
+{
     /**
      * Get the results of the relationship.
      *
@@ -23,8 +23,7 @@ class HasMany extends HasOneOrMany {
      */
     public function initRelation(array $models, $relation)
     {
-        foreach ($models as $model)
-        {
+        foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
 
@@ -43,5 +42,4 @@ class HasMany extends HasOneOrMany {
     {
         return $this->matchMany($models, $results, $relation);
     }
-
 }

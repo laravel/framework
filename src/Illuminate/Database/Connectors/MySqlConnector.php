@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Connectors;
 
-class MySqlConnector extends Connector implements ConnectorInterface {
-
+class MySqlConnector extends Connector implements ConnectorInterface
+{
     /**
      * Establish a database connection.
      *
@@ -19,8 +19,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        if (isset($config['unix_socket']))
-        {
+        if (isset($config['unix_socket'])) {
             $connection->exec("use `{$config['database']}`;");
         }
 
@@ -32,15 +31,14 @@ class MySqlConnector extends Connector implements ConnectorInterface {
         $charset = $config['charset'];
 
         $names = "set names '$charset'".
-            ( ! is_null($collation) ? " collate '$collation'" : '');
+            (! is_null($collation) ? " collate '$collation'" : '');
 
         $connection->prepare($names)->execute();
 
         // Next, we will check to see if a timezone has been specified in this config
         // and if it has we will issue a statement to modify the timezone with the
         // database. Setting this DB timezone is an optional configuration item.
-        if (isset($config['timezone']))
-        {
+        if (isset($config['timezone'])) {
             $connection->prepare(
                 'set time_zone="'.$config['timezone'].'"'
             )->execute();
@@ -49,8 +47,7 @@ class MySqlConnector extends Connector implements ConnectorInterface {
         // If the "strict" option has been configured for the connection we'll enable
         // strict mode on all of these tables. This enforces some extra rules when
         // using the MySQL database system and is a quicker way to enforce them.
-        if (isset($config['strict']) && $config['strict'])
-        {
+        if (isset($config['strict']) && $config['strict']) {
             $connection->prepare("set session sql_mode='STRICT_ALL_TABLES'")->execute();
         }
 
@@ -106,5 +103,4 @@ class MySqlConnector extends Connector implements ConnectorInterface {
                         ? "mysql:host={$host};port={$port};dbname={$database}"
                         : "mysql:host={$host};dbname={$database}";
     }
-
 }

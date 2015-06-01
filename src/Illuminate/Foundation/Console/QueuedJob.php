@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 
-class QueuedJob {
-
+class QueuedJob
+{
     /**
      * The kernel instance.
      *
@@ -35,5 +35,4 @@ class QueuedJob {
 
         $job->delete();
     }
-
 }

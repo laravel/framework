@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -46,11 +46,11 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase {
 
         $this->assertFalse($model->restore());
     }
-
 }
 
 
-class DatabaseSoftDeletingTraitStub {
+class DatabaseSoftDeletingTraitStub
+{
     use Illuminate\Database\Eloquent\SoftDeletes;
     public $deleted_at;
     public function newQuery()

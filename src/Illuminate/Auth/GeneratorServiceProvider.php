@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Console\ClearResetsCommand;
 
-class GeneratorServiceProvider extends ServiceProvider {
-
+class GeneratorServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -28,8 +28,7 @@ class GeneratorServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        foreach ($this->commands as $command)
-        {
+        foreach ($this->commands as $command) {
             $this->{"register{$command}Command"}();
         }
 
@@ -45,8 +44,7 @@ class GeneratorServiceProvider extends ServiceProvider {
      */
     protected function registerClearResetsCommand()
     {
-        $this->app->singleton('command.auth.resets.clear', function()
-        {
+        $this->app->singleton('command.auth.resets.clear', function () {
             return new ClearResetsCommand;
         });
     }
@@ -62,5 +60,4 @@ class GeneratorServiceProvider extends ServiceProvider {
             'command.auth.resets.clear',
         ];
     }
-
 }

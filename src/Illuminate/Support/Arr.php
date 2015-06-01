@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Traits\Macroable;
 
-class Arr {
-
+class Arr
+{
     use Macroable;
 
     /**
@@ -16,8 +16,7 @@ class Arr {
      */
     public static function add($array, $key, $value)
     {
-        if (is_null(static::get($array, $key)))
-        {
+        if (is_null(static::get($array, $key))) {
             static::set($array, $key, $value);
         }
 
@@ -35,8 +34,7 @@ class Arr {
     {
         $results = [];
 
-        foreach ($array as $key => $value)
-        {
+        foreach ($array as $key => $value) {
             list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
 
             $results[$innerKey] = $innerValue;
@@ -55,9 +53,10 @@ class Arr {
     {
         $results = [];
 
-        foreach ($array as $values)
-        {
-            if ($values instanceof Collection) $values = $values->all();
+        foreach ($array as $values) {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            }
 
             $results = array_merge($results, $values);
         }
@@ -87,14 +86,10 @@ class Arr {
     {
         $results = [];
 
-        foreach ($array as $key => $value)
-        {
-            if (is_array($value))
-            {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
                 $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
-            }
-            else
-            {
+            } else {
                 $results[$prepend.$key] = $value;
             }
         }
@@ -127,14 +122,11 @@ class Arr {
      */
     public static function fetch($array, $key)
     {
-        foreach (explode('.', $key) as $segment)
-        {
+        foreach (explode('.', $key) as $segment) {
             $results = [];
 
-            foreach ($array as $value)
-            {
-                if (array_key_exists($segment, $value = (array) $value))
-                {
+            foreach ($array as $value) {
+                if (array_key_exists($segment, $value = (array) $value)) {
                     $results[] = $value[$segment];
                 }
             }
@@ -155,9 +147,10 @@ class Arr {
      */
     public static function first($array, callable $callback, $default = null)
     {
-        foreach ($array as $key => $value)
-        {
-            if (call_user_func($callback, $key, $value)) return $value;
+        foreach ($array as $key => $value) {
+            if (call_user_func($callback, $key, $value)) {
+                return $value;
+            }
         }
 
         return value($default);
@@ -186,7 +179,7 @@ class Arr {
     {
         $return = [];
 
-        array_walk_recursive($array, function($x) use (&$return) { $return[] = $x; });
+        array_walk_recursive($array, function ($x) use (&$return) { $return[] = $x; });
 
         return $return;
     }
@@ -202,16 +195,13 @@ class Arr {
     {
         $original =& $array;
 
-        foreach ((array) $keys as $key)
-        {
+        foreach ((array) $keys as $key) {
             $parts = explode('.', $key);
 
-            while (count($parts) > 1)
-            {
+            while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part]))
-                {
+                if (isset($array[$part]) && is_array($array[$part])) {
                     $array =& $array[$part];
                 }
             }
@@ -233,14 +223,16 @@ class Arr {
      */
     public static function get($array, $key, $default = null)
     {
-        if (is_null($key)) return $array;
+        if (is_null($key)) {
+            return $array;
+        }
 
-        if (isset($array[$key])) return $array[$key];
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
 
-        foreach (explode('.', $key) as $segment)
-        {
-            if ( ! is_array($array) || ! array_key_exists($segment, $array))
-            {
+        foreach (explode('.', $key) as $segment) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
                 return value($default);
             }
 
@@ -259,14 +251,16 @@ class Arr {
      */
     public static function has($array, $key)
     {
-        if (empty($array) || is_null($key)) return false;
+        if (empty($array) || is_null($key)) {
+            return false;
+        }
 
-        if (array_key_exists($key, $array)) return true;
+        if (array_key_exists($key, $array)) {
+            return true;
+        }
 
-        foreach (explode('.', $key) as $segment)
-        {
-            if ( ! is_array($array) || ! array_key_exists($segment, $array))
-            {
+        foreach (explode('.', $key) as $segment) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
                 return false;
             }
 
@@ -302,19 +296,15 @@ class Arr {
 
         list($value, $key) = static::explodePluckParameters($value, $key);
 
-        foreach ($array as $item)
-        {
+        foreach ($array as $item) {
             $itemValue = data_get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
             // received from the developer. Then we'll return the final array form.
-            if (is_null($key))
-            {
+            if (is_null($key)) {
                 $results[] = $itemValue;
-            }
-            else
-            {
+            } else {
                 $itemKey = data_get($item, $key);
 
                 $results[$itemKey] = $itemValue;
@@ -369,19 +359,19 @@ class Arr {
      */
     public static function set(&$array, $key, $value)
     {
-        if (is_null($key)) return $array = $value;
+        if (is_null($key)) {
+            return $array = $value;
+        }
 
         $keys = explode('.', $key);
 
-        while (count($keys) > 1)
-        {
+        while (count($keys) > 1) {
             $key = array_shift($keys);
 
             // If the key doesn't exist at this depth, we will just create an empty array
             // to hold the next value, allowing us to create the arrays to hold final
             // values at the correct depth. Then we'll keep digging into the array.
-            if ( ! isset($array[$key]) || ! is_array($array[$key]))
-            {
+            if (! isset($array[$key]) || ! is_array($array[$key])) {
                 $array[$key] = [];
             }
 
@@ -416,12 +406,12 @@ class Arr {
     {
         $filtered = [];
 
-        foreach ($array as $key => $value)
-        {
-            if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+        foreach ($array as $key => $value) {
+            if (call_user_func($callback, $key, $value)) {
+                $filtered[$key] = $value;
+            }
         }
 
         return $filtered;
     }
-
 }

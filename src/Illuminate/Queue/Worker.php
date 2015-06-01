@@ -7,8 +7,8 @@ use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-class Worker {
-
+class Worker
+{
     /**
      * The queue manager instance.
      *
@@ -76,21 +76,16 @@ class Worker {
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
-        while (true)
-        {
-            if ($this->daemonShouldRun())
-            {
+        while (true) {
+            if ($this->daemonShouldRun()) {
                 $this->runNextJobForDaemon(
                     $connectionName, $queue, $delay, $sleep, $maxTries
                 );
-            }
-            else
-            {
+            } else {
                 $this->sleep($sleep);
             }
 
-            if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart))
-            {
+            if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart)) {
                 $this->stop();
             }
         }
@@ -108,13 +103,12 @@ class Worker {
      */
     protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
     {
-        try
-        {
+        try {
             $this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
-        }
-        catch (Exception $e)
-        {
-            if ($this->exceptions) $this->exceptions->report($e);
+        } catch (Exception $e) {
+            if ($this->exceptions) {
+                $this->exceptions->report($e);
+            }
         }
     }
 
@@ -125,8 +119,7 @@ class Worker {
      */
     protected function daemonShouldRun()
     {
-        if ($this->manager->isDownForMaintenance())
-        {
+        if ($this->manager->isDownForMaintenance()) {
             return false;
         }
 
@@ -152,8 +145,7 @@ class Worker {
         // If we're able to pull a job off of the stack, we will process it and
         // then immediately return back out. If there is no job on the queue
         // we will "sleep" the worker for the specified number of seconds.
-        if ( ! is_null($job))
-        {
+        if (! is_null($job)) {
             return $this->process(
                 $this->manager->getName($connectionName), $job, $maxTries, $delay
             );
@@ -173,11 +165,14 @@ class Worker {
      */
     protected function getNextJob($connection, $queue)
     {
-        if (is_null($queue)) return $connection->pop();
+        if (is_null($queue)) {
+            return $connection->pop();
+        }
 
-        foreach (explode(',', $queue) as $queue)
-        {
-            if ( ! is_null($job = $connection->pop($queue))) return $job;
+        foreach (explode(',', $queue) as $queue) {
+            if (! is_null($job = $connection->pop($queue))) {
+                return $job;
+            }
         }
     }
 
@@ -194,27 +189,24 @@ class Worker {
      */
     public function process($connection, Job $job, $maxTries = 0, $delay = 0)
     {
-        if ($maxTries > 0 && $job->attempts() > $maxTries)
-        {
+        if ($maxTries > 0 && $job->attempts() > $maxTries) {
             return $this->logFailedJob($connection, $job);
         }
 
-        try
-        {
+        try {
             // First we will fire off the job. Once it is done we will see if it will
             // be auto-deleted after processing and if so we will go ahead and run
             // the delete method on the job. Otherwise we will just keep moving.
             $job->fire();
 
             return ['job' => $job, 'failed' => false];
-        }
-
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             // If we catch an exception, we will attempt to release the job back onto
             // the queue so it is not lost. This will let is be retried at a later
             // time by another listener (or the same one). We will do that here.
-            if ( ! $job->isDeleted()) $job->release($delay);
+            if (! $job->isDeleted()) {
+                $job->release($delay);
+            }
 
             throw $e;
         }
@@ -229,8 +221,7 @@ class Worker {
      */
     protected function logFailedJob($connection, Job $job)
     {
-        if ($this->failer)
-        {
+        if ($this->failer) {
             $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 
             $job->delete();
@@ -252,8 +243,7 @@ class Worker {
      */
     protected function raiseFailedJobEvent($connection, Job $job)
     {
-        if ($this->events)
-        {
+        if ($this->events) {
             $data = json_decode($job->getRawBody(), true);
 
             $this->events->fire('illuminate.queue.failed', array($connection, $job, $data));
@@ -301,8 +291,7 @@ class Worker {
      */
     protected function getTimestampOfLastQueueRestart()
     {
-        if ($this->cache)
-        {
+        if ($this->cache) {
             return $this->cache->get('illuminate:queue:restart');
         }
     }
@@ -360,5 +349,4 @@ class Worker {
     {
         $this->manager = $manager;
     }
-
 }

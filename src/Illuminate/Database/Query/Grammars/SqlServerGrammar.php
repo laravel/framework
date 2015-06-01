@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Query\Builder;
 
-class SqlServerGrammar extends Grammar {
-
+class SqlServerGrammar extends Grammar
+{
     /**
      * All of the available clause operators.
      *
@@ -28,8 +28,7 @@ class SqlServerGrammar extends Grammar {
         // If an offset is present on the query, we will need to wrap the query in
         // a big "ANSI" offset syntax block. This is very nasty compared to the
         // other database systems but is necessary for implementing features.
-        if ($query->offset > 0)
-        {
+        if ($query->offset > 0) {
             return $this->compileAnsiOffset($query, $components);
         }
 
@@ -45,15 +44,16 @@ class SqlServerGrammar extends Grammar {
      */
     protected function compileColumns(Builder $query, $columns)
     {
-        if ( ! is_null($query->aggregate)) return;
+        if (! is_null($query->aggregate)) {
+            return;
+        }
 
         $select = $query->distinct ? 'select distinct ' : 'select ';
 
         // If there is a limit on the query, but not an offset, we will add the top
         // clause to the query, which serves as a "limit" type clause within the
         // SQL Server system similar to the limit keywords available in MySQL.
-        if ($query->limit > 0 && $query->offset <= 0)
-        {
+        if ($query->limit > 0 && $query->offset <= 0) {
             $select .= 'top '.$query->limit.' ';
         }
 
@@ -71,10 +71,11 @@ class SqlServerGrammar extends Grammar {
     {
         $from = parent::compileFrom($query, $table);
 
-        if (is_string($query->lock)) return $from.' '.$query->lock;
+        if (is_string($query->lock)) {
+            return $from.' '.$query->lock;
+        }
 
-        if ( ! is_null($query->lock))
-        {
+        if (! is_null($query->lock)) {
             return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
         }
 
@@ -93,8 +94,7 @@ class SqlServerGrammar extends Grammar {
         // An ORDER BY clause is required to make this offset query work, so if one does
         // not exist we'll just create a dummy clause to trick the database and so it
         // does not complain about the queries for not having an "order by" clause.
-        if ( ! isset($components['orders']))
-        {
+        if (! isset($components['orders'])) {
             $components['orders'] = 'order by (select 0)';
         }
 
@@ -141,8 +141,7 @@ class SqlServerGrammar extends Grammar {
     {
         $start = $query->offset + 1;
 
-        if ($query->limit > 0)
-        {
+        if ($query->limit > 0) {
             $finish = $query->offset + $query->limit;
 
             return "between {$start} and {$finish}";
@@ -216,9 +215,10 @@ class SqlServerGrammar extends Grammar {
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') return $value;
+        if ($value === '*') {
+            return $value;
+        }
 
         return '['.str_replace(']', ']]', $value).']';
     }
-
 }

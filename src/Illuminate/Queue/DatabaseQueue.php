@@ -7,8 +7,8 @@ use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class DatabaseQueue extends Queue implements QueueContract {
-
+class DatabaseQueue extends Queue implements QueueContract
+{
     /**
     * The database connection instance.
     *
@@ -108,7 +108,7 @@ class DatabaseQueue extends Queue implements QueueContract {
 
         $availableAt = $this->getAvailableAt(0);
 
-        $records = array_map(function($job) use ($queue, $data, $availableAt) {
+        $records = array_map(function ($job) use ($queue, $data, $availableAt) {
             return $this->buildDatabaseRecord(
                 $queue, $this->createPayload($job, $data), $availableAt
             );
@@ -158,13 +158,11 @@ class DatabaseQueue extends Queue implements QueueContract {
     {
         $queue = $this->getQueue($queue);
 
-        if ( ! is_null($this->expire))
-        {
+        if (! is_null($this->expire)) {
             $this->releaseJobsThatHaveBeenReservedTooLong($queue);
         }
 
-        if ($job = $this->getNextAvailableJob($queue))
-        {
+        if ($job = $this->getNextAvailableJob($queue)) {
             $this->markJobAsReserved($job->id);
 
             $this->database->commit();
@@ -320,5 +318,4 @@ class DatabaseQueue extends Queue implements QueueContract {
     {
         $this->expire = $seconds;
     }
-
 }

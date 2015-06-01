@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Pagination;
 
-interface LengthAwarePaginator extends Paginator {
-
+interface LengthAwarePaginator extends Paginator
+{
     /**
      * Determine the total number of items in the data store.
      *
@@ -15,5 +15,4 @@ interface LengthAwarePaginator extends Paginator {
      * @return int
      */
     public function lastPage();
-
 }

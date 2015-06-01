@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 
-class ClearCommandTest extends PHPUnit_Framework_TestCase {
-
+class ClearCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -71,14 +71,12 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class ClearCommandTestStub extends ClearCommand {
-
+class ClearCommandTestStub extends ClearCommand
+{
     public function call($command, array $arguments = array())
     {
         //
     }
-
 }

@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Builder;
 
-class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -26,14 +26,14 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase {
 
 
     public function testTableHasColumns()
-        {
-            $connection = m::mock('Illuminate\Database\Connection');
-            $grammar = m::mock('StdClass');
-            $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-            $builder = m::mock('Illuminate\Database\Schema\Builder[getColumnListing]', array($connection));
-            $builder->shouldReceive('getColumnListing')->with('users')->twice()->andReturn(array('id', 'firstname'));
+    {
+        $connection = m::mock('Illuminate\Database\Connection');
+        $grammar = m::mock('StdClass');
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = m::mock('Illuminate\Database\Schema\Builder[getColumnListing]', array($connection));
+        $builder->shouldReceive('getColumnListing')->with('users')->twice()->andReturn(array('id', 'firstname'));
 
-            $this->assertTrue($builder->hasColumns('users', array('id', 'firstname')));
-            $this->assertFalse($builder->hasColumns('users', array('id', 'address')));
-        }
+        $this->assertTrue($builder->hasColumns('users', array('id', 'firstname')));
+        $this->assertFalse($builder->hasColumns('users', array('id', 'address')));
+    }
 }

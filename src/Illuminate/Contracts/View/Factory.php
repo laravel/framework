@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\View;
 
-interface Factory {
-
+interface Factory
+{
     /**
      * Determine if a given view exists.
      *
@@ -66,5 +66,4 @@ interface Factory {
      * @return void
      */
     public function addNamespace($namespace, $hints);
-
 }

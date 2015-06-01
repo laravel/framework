@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Routing;
 
-interface ResponseFactory {
-
+interface ResponseFactory
+{
     /**
      * Return a new response from the application.
      *
@@ -121,5 +121,4 @@ interface ResponseFactory {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function redirectToIntended($default = '/', $status = 302, $headers = array(), $secure = null);
-
 }

@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Cookie\CookieJar
  */
-class Cookie extends Facade {
-
+class Cookie extends Facade
+{
     /**
      * Determine if a cookie exists on the request.
      *
@@ -37,5 +37,4 @@ class Cookie extends Facade {
     {
         return 'cookie';
     }
-
 }

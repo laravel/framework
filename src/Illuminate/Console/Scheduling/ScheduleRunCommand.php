@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class ScheduleRunCommand extends Command {
-
+class ScheduleRunCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -47,17 +47,14 @@ class ScheduleRunCommand extends Command {
     {
         $events = $this->schedule->dueEvents($this->laravel);
 
-        foreach ($events as $event)
-        {
+        foreach ($events as $event) {
             $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
             $event->run($this->laravel);
         }
 
-        if (count($events) === 0)
-        {
+        if (count($events) === 0) {
             $this->info('No scheduled commands are ready to run.');
         }
     }
-
 }

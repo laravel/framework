@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Query\Builder;
 
-class SqlServerProcessor extends Processor {
-
+class SqlServerProcessor extends Processor
+{
     /**
      * Process an "insert get ID" query.
      *
@@ -30,12 +30,10 @@ class SqlServerProcessor extends Processor {
      */
     public function processColumnListing($results)
     {
-        $mapping = function($r)
-        {
+        $mapping = function ($r) {
             return $r->name;
         };
 
         return array_map($mapping, $results);
     }
-
 }

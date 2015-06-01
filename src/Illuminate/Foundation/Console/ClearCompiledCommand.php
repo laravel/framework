@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class ClearCompiledCommand extends Command {
-
+class ClearCompiledCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -28,15 +28,12 @@ class ClearCompiledCommand extends Command {
         $compiledPath = $this->laravel->getCachedCompilePath();
         $servicesPath = $this->laravel->getCachedServicesPath();
 
-        if (file_exists($compiledPath))
-        {
+        if (file_exists($compiledPath)) {
             @unlink($compiledPath);
         }
 
-        if (file_exists($servicesPath))
-        {
+        if (file_exists($servicesPath)) {
             @unlink($servicesPath);
         }
     }
-
 }

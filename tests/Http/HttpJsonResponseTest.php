@@ -1,7 +1,7 @@
 <?php
 
-class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
-
+class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
+{
     public function testSetAndRetrieveData()
     {
         $response = new Illuminate\Http\JsonResponse(array('foo' => 'bar'));
@@ -28,5 +28,4 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase {
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
     }
-
 }

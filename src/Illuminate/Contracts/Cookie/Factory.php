@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Cookie;
 
-interface Factory {
-
+interface Factory
+{
     /**
      * Create a new cookie instance.
      *
@@ -38,5 +38,4 @@ interface Factory {
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null);
-
 }

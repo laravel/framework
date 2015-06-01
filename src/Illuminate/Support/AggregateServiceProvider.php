@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support;
 
-class AggregateServiceProvider extends ServiceProvider {
-
+class AggregateServiceProvider extends ServiceProvider
+{
     /**
      * The provider class names.
      *
@@ -25,8 +25,7 @@ class AggregateServiceProvider extends ServiceProvider {
     {
         $this->instances = [];
 
-        foreach ($this->providers as $provider)
-        {
+        foreach ($this->providers as $provider) {
             $this->instances[] = $this->app->register($provider);
         }
     }
@@ -40,8 +39,7 @@ class AggregateServiceProvider extends ServiceProvider {
     {
         $provides = [];
 
-        foreach ($this->providers as $provider)
-        {
+        foreach ($this->providers as $provider) {
             $instance = $this->app->resolveProviderClass($provider);
 
             $provides = array_merge($provides, $instance->provides());
@@ -49,5 +47,4 @@ class AggregateServiceProvider extends ServiceProvider {
 
         return $provides;
     }
-
 }

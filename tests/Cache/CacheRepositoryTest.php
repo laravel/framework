@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
-
+class CacheRepositoryTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -23,7 +23,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $this->assertEquals('bar', $repo->get('foo', 'bar'));
-        $this->assertEquals('baz', $repo->get('boom', function() { return 'baz'; }));
+        $this->assertEquals('baz', $repo->get('boom', function () { return 'baz'; }));
     }
 
 
@@ -51,7 +51,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
-        $result = $repo->remember('foo', 10, function() { return 'bar'; });
+        $result = $repo->remember('foo', 10, function () { return 'bar'; });
         $this->assertEquals('bar', $result);
 
         /**
@@ -70,7 +70,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
-        $result = $repo->rememberForever('foo', function() { return 'bar'; });
+        $result = $repo->rememberForever('foo', function () { return 'bar'; });
         $this->assertEquals('bar', $result);
     }
 
@@ -78,7 +78,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();
-        $repo::macro(__CLASS__, function() { return 'Taylor'; });
+        $repo::macro(__CLASS__, function () { return 'Taylor'; });
         $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
     }
 
@@ -92,5 +92,4 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase {
 
         return $repository;
     }
-
 }

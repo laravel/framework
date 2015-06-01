@@ -8,8 +8,8 @@ use League\Flysystem\Filesystem as Flysystem;
 use Symfony\Component\Console\Input\InputOption;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 
-class VendorPublishCommand extends Command {
-
+class VendorPublishCommand extends Command
+{
     /**
      * The filesystem instance.
      *
@@ -55,23 +55,16 @@ class VendorPublishCommand extends Command {
             $this->option('provider'), $this->option('tag')
         );
 
-        if (empty($paths))
-        {
+        if (empty($paths)) {
             return $this->comment("Nothing to publish.");
         }
 
-        foreach ($paths as $from => $to)
-        {
-            if ($this->files->isFile($from))
-            {
+        foreach ($paths as $from => $to) {
+            if ($this->files->isFile($from)) {
                 $this->publishFile($from, $to);
-            }
-            elseif ($this->files->isDirectory($from))
-            {
+            } elseif ($this->files->isDirectory($from)) {
                 $this->publishDirectory($from, $to);
-            }
-            else
-            {
+            } else {
                 $this->error("Can't locate path: <{$from}>");
             }
         }
@@ -88,8 +81,7 @@ class VendorPublishCommand extends Command {
      */
     protected function publishFile($from, $to)
     {
-        if ($this->files->exists($to) && ! $this->option('force'))
-        {
+        if ($this->files->exists($to) && ! $this->option('force')) {
             return;
         }
 
@@ -114,10 +106,8 @@ class VendorPublishCommand extends Command {
             'to' => new Flysystem(new LocalAdapter($to)),
         ]);
 
-        foreach ($manager->listContents('from://', true) as $file)
-        {
-            if ($file['type'] === 'file' && ( ! $manager->has('to://'.$file['path']) || $this->option('force')))
-            {
+        foreach ($manager->listContents('from://', true) as $file) {
+            if ($file['type'] === 'file' && (! $manager->has('to://'.$file['path']) || $this->option('force'))) {
                 $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
             }
         }
@@ -133,8 +123,7 @@ class VendorPublishCommand extends Command {
      */
     protected function createParentDirectory($directory)
     {
-        if ( ! $this->files->isDirectory($directory))
-        {
+        if (! $this->files->isDirectory($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
     }
@@ -171,5 +160,4 @@ class VendorPublishCommand extends Command {
             array('tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'),
         );
     }
-
 }

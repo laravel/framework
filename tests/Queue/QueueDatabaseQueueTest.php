@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
-
+class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -15,7 +15,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
         $queue = $this->getMock('Illuminate\Queue\DatabaseQueue', array('getTime'), array($database = m::mock('Illuminate\Database\Connection'), 'table', 'default'));
         $queue->expects($this->any())->method('getTime')->will($this->returnValue('time'));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function($array) {
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(array('job' => 'foo', 'data' => array('data'))), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
@@ -37,7 +37,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
         );
         $queue->expects($this->any())->method('getTime')->will($this->returnValue('time'));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function($array) {
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
             $this->assertEquals(json_encode(array('job' => 'foo', 'data' => array('data'))), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
@@ -57,7 +57,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
         $queue->expects($this->any())->method('getTime')->will($this->returnValue('created'));
         $queue->expects($this->any())->method('getAvailableAt')->will($this->returnValue('available'));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
-        $query->shouldReceive('insert')->once()->andReturnUsing(function($records) {
+        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
                 'queue' => 'queue',
                 'payload' => json_encode(['job' => 'foo', 'data' => ['data']]),
@@ -66,7 +66,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
-            ],[
+            ], [
                 'queue' => 'queue',
                 'payload' => json_encode(['job' => 'bar', 'data' => ['data']]),
                 'attempts' => 0,
@@ -79,5 +79,4 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase {
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
     }
-
 }

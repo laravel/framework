@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Foundation\Application;
 
-class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
-
+class FoundationApplicationTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -51,7 +51,8 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
         $app = new Application;
         $app->setDeferredServices(array('foo' => 'ApplicationDeferredSharedServiceProviderStub'));
         $this->assertTrue($app->bound('foo'));
-        $one = $app->make('foo'); $two = $app->make('foo');
+        $one = $app->make('foo');
+        $two = $app->make('foo');
         $this->assertInstanceOf('StdClass', $one);
         $this->assertInstanceOf('StdClass', $two);
         $this->assertSame($one, $two);
@@ -62,7 +63,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
     {
         $app = new Application;
         $app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
-        $app->extend('foo', function($instance, $container) { return $instance.'bar'; });
+        $app->extend('foo', function ($instance, $container) { return $instance.'bar'; });
         $this->assertEquals('foobar', $app->make('foo'));
     }
 
@@ -85,7 +86,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
         $app->setDeferredServices(array('foo' => 'ApplicationDeferredServiceProviderStub'));
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
-        $app->extend('foo', function($instance, $container) { return $instance.'bar'; });
+        $app->extend('foo', function ($instance, $container) { return $instance.'bar'; });
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
         $this->assertEquals('foobar', $app->make('foo'));
         $this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
@@ -132,20 +133,21 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($app->environment('qux', 'bar'));
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
-
 }
 
-class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider
+{
     protected $defer = true;
     public function register()
     {
-        $this->app->singleton('foo', function() {
+        $this->app->singleton('foo', function () {
             return new StdClass;
         });
     }
 }
 
-class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\ServiceProvider
+{
     public static $count = 0;
     protected $defer = true;
     public function register()
@@ -155,7 +157,8 @@ class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\Ser
     }
 }
 
-class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceProvider
+{
     public static $initialized = false;
     protected $defer = true;
     public function register()
@@ -165,22 +168,24 @@ class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceP
     }
 }
 
-class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider
+{
     protected $defer = true;
     public function register()
     {
-        $this->app->bind('foo', function() {
+        $this->app->bind('foo', function () {
             static $count = 0;
             return ++$count;
         });
     }
 }
 
-class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider {
+class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider
+{
     protected $defer = true;
     public function register()
     {
-        $this->app->singleton('foo', function() { return 'foo'; });
-        $this->app->singleton('bar', function($app) { return $app['foo'].'bar'; });
+        $this->app->singleton('foo', function () { return 'foo'; });
+        $this->app->singleton('bar', function ($app) { return $app['foo'].'bar'; });
     }
 }

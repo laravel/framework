@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
 
-class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -423,16 +423,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testSubSelectWhereIns()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereIn('id', function($q)
-        {
+        $builder->select('*')->from('users')->whereIn('id', function ($q) {
             $q->select('id')->from('users')->where('age', '>', 25)->take(3);
         });
         $this->assertEquals('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
         $this->assertEquals(array(25), $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereNotIn('id', function($q)
-        {
+        $builder->select('*')->from('users')->whereNotIn('id', function ($q) {
             $q->select('id')->from('users')->where('age', '>', 25)->take(3);
         });
         $this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
@@ -528,7 +526,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, array("popular", 3), true)->andReturn(array(array('category' => 'rock', 'total' => 5)));
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('item');
         $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3)->get();
         $this->assertEquals(array(array('category' => 'rock', 'total' => 5)), $result);
@@ -537,7 +535,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, array("popular"), true)->andReturn(array(array('category' => 'rock', 'total' => 5)));
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('item');
         $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'))->get();
         $this->assertEquals(array(array('category' => 'rock', 'total' => 5)), $result);
@@ -592,8 +590,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testNestedWheres()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere(function($q)
-        {
+        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere(function ($q) {
             $q->where('name', '=', 'bar')->where('age', '=', 25);
         });
         $this->assertEquals('select * from "users" where "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
@@ -604,8 +601,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere('id', '=', function($q)
-        {
+        $builder->select('*')->from('users')->where('email', '=', 'foo')->orWhere('id', '=', function ($q) {
             $q->select(new Raw('max(id)'))->from('users')->where('email', '=', 'bar');
         });
 
@@ -617,29 +613,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testWhereExists()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->whereExists(function($q)
-        {
+        $builder->select('*')->from('orders')->whereExists(function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertEquals('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->whereNotExists(function($q)
-        {
+        $builder->select('*')->from('orders')->whereNotExists(function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertEquals('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(function($q)
-        {
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertEquals('select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(function($q)
-        {
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertEquals('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
@@ -662,15 +654,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testComplexJoin()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orOn('users.name', '=', 'contacts.name');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
@@ -685,15 +675,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testJoinWhereNull()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereNull('contacts.deleted_at');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereNull('contacts.deleted_at');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is null', $builder->toSql());
@@ -703,15 +691,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     public function testJoinWhereNotNull()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->on('users.id', '=', 'contacts.id')->whereNotNull('contacts.deleted_at');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."deleted_at" is not null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('contacts', function($j)
-        {
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->on('users.id', '=', 'contacts.id')->orWhereNotNull('contacts.deleted_at');
         });
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."deleted_at" is not null', $builder->toSql());
@@ -730,7 +716,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', array(1), true)->andReturn(array(array('foo' => 'bar')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function($query, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function ($query, $results) { return $results; });
         $results = $builder->from('users')->find(1);
         $this->assertEquals(array('foo' => 'bar'), $results);
     }
@@ -740,7 +726,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', array(1), true)->andReturn(array(array('foo' => 'bar')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function($query, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar')))->andReturnUsing(function ($query, $results) { return $results; });
         $results = $builder->from('users')->where('id', '=', 1)->first();
         $this->assertEquals(array('foo' => 'bar'), $results);
     }
@@ -750,8 +736,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
-        {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->lists('foo');
@@ -759,8 +744,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')))->andReturnUsing(function($query, $results)
-        {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('id' => 1, 'foo' => 'bar'), array('id' => 10, 'foo' => 'baz')))->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->lists('foo', 'id');
@@ -773,8 +757,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         // Test without glue.
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
-        {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo');
@@ -783,8 +766,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         // Test with glue.
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(array(array('foo' => 'bar'), array('foo' => 'baz')));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function($query, $results)
-        {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, array(array('foo' => 'bar'), array('foo' => 'baz')))->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo', ',');
@@ -806,31 +788,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->count();
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users" limit 1', array(), true)->andReturn(array(array('aggregate' => 1)));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->exists();
         $this->assertTrue($results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->max('id');
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->min('id');
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->sum('id');
         $this->assertEquals(1, $results);
     }
@@ -842,7 +824,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 2)));
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', array(), true)->andReturn(array(array('column1' => 'foo', 'column2' => 'bar')));
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('users')->select('column1', 'column2');
         $count = $builder->count();
         $this->assertEquals(1, $count);
@@ -858,7 +840,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array(), true)->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('users');
         $count = $builder->count('column1');
         $this->assertEquals(1, $count);
@@ -872,7 +854,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', array(), true)->andReturn(array(array('aggregate' => 1)));
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', array(), true)->andReturn(array(array('column2' => 'foo', 'column3' => 'bar')));
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function($builder, $results) { return $results; });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('users');
         $count = $builder->count('column1');
         $this->assertEquals(1, $count);
@@ -1203,13 +1185,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $expectedBindings = array('foo', 1, 3, 'bar');
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('othertable', function($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
+        $builder->select('*')->from('users')->join('othertable', function ($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', array('bar'));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
 
         // order of statements reversed
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function($join) { $join->where('bar', '=', 'foo'); });
+        $builder->select('*')->from('users')->orderByRaw('match ("foo") against(?)', array('bar'))->having('population', '>', 3)->groupBy('city')->where('registered', 1)->join('othertable', function ($join) { $join->where('bar', '=', 'foo'); });
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
@@ -1263,7 +1245,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
 
         $builder = $this->getPostgresBuilder();
         $builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
-        $builder->selectSub(function($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
+        $builder->selectSub(function ($query) { $query->from('two')->select('baz')->where('subkey', '=', 'subval'); }, 'sub');
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
 
@@ -1323,5 +1305,4 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase {
         $processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
     }
-
 }

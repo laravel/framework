@@ -4,8 +4,8 @@
  * @see \Illuminate\Session\SessionManager
  * @see \Illuminate\Session\Store
  */
-class Session extends Facade {
-
+class Session extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -15,5 +15,4 @@ class Session extends Facade {
     {
         return 'session';
     }
-
 }

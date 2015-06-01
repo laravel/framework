@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class NullQueue extends Queue implements QueueContract {
-
+class NullQueue extends Queue implements QueueContract
+{
     /**
      * Push a new job onto the queue.
      *
@@ -54,5 +54,4 @@ class NullQueue extends Queue implements QueueContract {
     {
         //
     }
-
 }

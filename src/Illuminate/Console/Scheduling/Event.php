@@ -10,8 +10,8 @@ use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 
-class Event {
-
+class Event
+{
     /**
      * The command string.
      *
@@ -115,12 +115,9 @@ class Event {
      */
     public function run(Container $container)
     {
-        if (count($this->afterCallbacks) > 0)
-        {
+        if (count($this->afterCallbacks) > 0) {
             $this->runCommandInForeground($container);
-        }
-        else
-        {
+        } else {
             $this->runCommandInBackground();
         }
     }
@@ -160,8 +157,7 @@ class Event {
      */
     protected function callAfterCallbacks(Container $container)
     {
-        foreach ($this->afterCallbacks as $callback)
-        {
+        foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
         }
     }
@@ -173,12 +169,9 @@ class Event {
      */
     public function buildCommand()
     {
-        if ($this->withoutOverlapping)
-        {
+        if ($this->withoutOverlapping) {
             $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().') > '.$this->output.' 2>&1 &';
-        }
-        else
-        {
+        } else {
             $command = $this->command.' > '.$this->output.' 2>&1 &';
         }
 
@@ -203,8 +196,7 @@ class Event {
      */
     public function isDue(Application $app)
     {
-        if ( ! $this->runsInMaintenanceMode() && $app->isDownForMaintenance())
-        {
+        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
         }
 
@@ -222,8 +214,7 @@ class Event {
     {
         $date = Carbon::now();
 
-        if ($this->timezone)
-        {
+        if ($this->timezone) {
             $date->setTimezone($this->timezone);
         }
 
@@ -239,8 +230,7 @@ class Event {
     protected function filtersPass(Application $app)
     {
         if (($this->filter && ! $app->call($this->filter)) ||
-             $this->reject && $app->call($this->reject))
-        {
+             $this->reject && $app->call($this->reject)) {
             return false;
         }
 
@@ -573,8 +563,7 @@ class Event {
     {
         $this->withoutOverlapping = true;
 
-        return $this->skip(function()
-        {
+        return $this->skip(function () {
             return file_exists($this->mutexPath());
         });
     }
@@ -628,15 +617,13 @@ class Event {
      */
     public function emailOutputTo($addresses)
     {
-        if (is_null($this->output) || $this->output == '/dev/null')
-        {
+        if (is_null($this->output) || $this->output == '/dev/null') {
             throw new LogicException("Must direct output to a file in order to e-mail results.");
         }
 
         $addresses = is_array($addresses) ? $addresses : func_get_args();
 
-        return $this->then(function(Mailer $mailer) use ($addresses)
-        {
+        return $this->then(function (Mailer $mailer) use ($addresses) {
             $this->emailOutput($mailer, $addresses);
         });
     }
@@ -650,12 +637,10 @@ class Event {
      */
     protected function emailOutput(Mailer $mailer, $addresses)
     {
-        $mailer->raw(file_get_contents($this->output), function($m) use ($addresses)
-        {
+        $mailer->raw(file_get_contents($this->output), function ($m) use ($addresses) {
             $m->subject($this->getEmailSubject());
 
-            foreach ($addresses as $address)
-            {
+            foreach ($addresses as $address) {
                 $m->to($address);
             }
         });
@@ -668,8 +653,7 @@ class Event {
      */
     protected function getEmailSubject()
     {
-        if ($this->description)
-        {
+        if ($this->description) {
             return 'Scheduled Job Output ('.$this->description.')';
         }
 
@@ -684,7 +668,7 @@ class Event {
      */
     public function thenPing($url)
     {
-        return $this->then(function() use ($url) { (new HttpClient)->get($url); });
+        return $this->then(function () use ($url) { (new HttpClient)->get($url); });
     }
 
     /**
@@ -747,7 +731,9 @@ class Event {
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) return $this->description;
+        if (is_string($this->description)) {
+            return $this->description;
+        }
 
         return $this->buildCommand();
     }
@@ -761,5 +747,4 @@ class Event {
     {
         return $this->expression;
     }
-
 }

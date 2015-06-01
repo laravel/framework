@@ -3,8 +3,8 @@
 use RuntimeException;
 use Illuminate\Contracts\Support\MessageProvider;
 
-class ValidationException extends RuntimeException {
-
+class ValidationException extends RuntimeException
+{
     /**
      * The message provider implementation.
      *
@@ -42,5 +42,4 @@ class ValidationException extends RuntimeException {
     {
         return $this->provider;
     }
-
 }

@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Contracts\Routing\ResponseFactory
  */
-class Response extends Facade {
-
+class Response extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Response extends Facade {
     {
         return 'Illuminate\Contracts\Routing\ResponseFactory';
     }
-
 }

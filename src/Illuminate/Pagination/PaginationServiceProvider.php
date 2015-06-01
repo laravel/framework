@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class PaginationServiceProvider extends ServiceProvider {
-
+class PaginationServiceProvider extends ServiceProvider
+{
     /**
      * Register the service provider.
      *
@@ -11,15 +11,12 @@ class PaginationServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        Paginator::currentPathResolver(function()
-        {
+        Paginator::currentPathResolver(function () {
             return $this->app['request']->url();
         });
 
-        Paginator::currentPageResolver(function($pageName = 'page')
-        {
+        Paginator::currentPageResolver(function ($pageName = 'page') {
             return $this->app['request']->input($pageName);
         });
     }
-
 }

@@ -16,8 +16,8 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 
-class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver {
-
+class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver
+{
     /**
      * The container implementation.
      *
@@ -125,10 +125,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
         $reflection = new ReflectionClass($command);
 
-        if ($constructor = $reflection->getConstructor())
-        {
-            $injected = array_map(function($parameter) use ($command, $source, $extras)
-            {
+        if ($constructor = $reflection->getConstructor()) {
+            $injected = array_map(function ($parameter) use ($command, $source, $extras) {
                 return $this->getParameterValueForCommand($command, $source, $parameter, $extras);
 
             }, $constructor->getParameters());
@@ -149,18 +147,15 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     protected function getParameterValueForCommand($command, ArrayAccess $source,
         ReflectionParameter $parameter, array $extras = array())
     {
-        if (array_key_exists($parameter->name, $extras))
-        {
+        if (array_key_exists($parameter->name, $extras)) {
             return $extras[$parameter->name];
         }
 
-        if (isset($source[$parameter->name]))
-        {
+        if (isset($source[$parameter->name])) {
             return $source[$parameter->name];
         }
 
-        if ($parameter->isDefaultValueAvailable())
-        {
+        if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
 
@@ -176,12 +171,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatch($command, Closure $afterResolving = null)
     {
-        if ($this->queueResolver && $this->commandShouldBeQueued($command))
-        {
+        if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
-        }
-        else
-        {
+        } else {
             return $this->dispatchNow($command, $afterResolving);
         }
     }
@@ -195,17 +187,14 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatchNow($command, Closure $afterResolving = null)
     {
-        return $this->pipeline->send($command)->through($this->pipes)->then(function($command) use ($afterResolving)
-        {
-            if ($command instanceof SelfHandling)
-            {
+        return $this->pipeline->send($command)->through($this->pipes)->then(function ($command) use ($afterResolving) {
+            if ($command instanceof SelfHandling) {
                 return $this->container->call([$command, 'handle']);
             }
 
             $handler = $this->resolveHandler($command);
 
-            if ($afterResolving)
-            {
+            if ($afterResolving) {
                 call_user_func($afterResolving, $handler);
             }
 
@@ -213,7 +202,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
                 [$handler, $this->getHandlerMethod($command)], $command
             );
         });
-
     }
 
     /**
@@ -224,8 +212,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     protected function commandShouldBeQueued($command)
     {
-        if ($command instanceof ShouldBeQueued)
-        {
+        if ($command instanceof ShouldBeQueued) {
             return true;
         }
 
@@ -246,17 +233,13 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     {
         $queue = call_user_func($this->queueResolver);
 
-        if ( ! $queue instanceof Queue)
-        {
+        if (! $queue instanceof Queue) {
             throw new RuntimeException("Queue resolver did not return a Queue implementation.");
         }
 
-        if (method_exists($command, 'queue'))
-        {
+        if (method_exists($command, 'queue')) {
             $command->queue($queue, $command);
-        }
-        else
-        {
+        } else {
             $this->pushCommandToQueue($queue, $command);
         }
     }
@@ -293,8 +276,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function resolveHandler($command)
     {
-        if ($command instanceof SelfHandling)
-        {
+        if ($command instanceof SelfHandling) {
             return $command;
         }
 
@@ -309,8 +291,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function getHandlerClass($command)
     {
-        if ($command instanceof SelfHandling)
-        {
+        if ($command instanceof SelfHandling) {
             return get_class($command);
         }
 
@@ -325,8 +306,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function getHandlerMethod($command)
     {
-        if ($command instanceof SelfHandling)
-        {
+        if ($command instanceof SelfHandling) {
             return 'handle';
         }
 
@@ -344,12 +324,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     {
         $className = get_class($command);
 
-        if (isset($this->mappings[$className]))
-        {
+        if (isset($this->mappings[$className])) {
             return $this->getMappingSegment($className, $segment);
-        }
-        elseif ($this->mapper)
-        {
+        } elseif ($this->mapper) {
             return $this->getMapperSegment($command, $segment);
         }
 
@@ -429,5 +406,4 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
         return $this;
     }
-
 }

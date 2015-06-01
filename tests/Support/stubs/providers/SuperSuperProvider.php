@@ -1,5 +1,8 @@
 <?php
 
-class SuperSuperProvider extends Illuminate\Support\ServiceProvider {
-    public function register() {}
+class SuperSuperProvider extends Illuminate\Support\ServiceProvider
+{
+    public function register()
+    {
+    }
 }

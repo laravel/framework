@@ -5,8 +5,8 @@ use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class SyncQueue extends Queue implements QueueContract {
-
+class SyncQueue extends Queue implements QueueContract
+{
     /**
      * Push a new job onto the queue.
      *
@@ -20,12 +20,9 @@ class SyncQueue extends Queue implements QueueContract {
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $data, $queue));
 
-        try
-        {
+        try {
             $queueJob->fire();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $this->handleFailedJob($queueJob);
 
             throw $e;
@@ -106,10 +103,8 @@ class SyncQueue extends Queue implements QueueContract {
     {
         $data = json_decode($job->getRawBody(), true);
 
-        if($this->container->bound('events'))
-        {
+        if ($this->container->bound('events')) {
             $this->container['events']->fire('illuminate.queue.failed', array('sync', $job, $data));
         }
     }
-
 }

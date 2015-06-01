@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Redis;
 
-interface Database {
-
+interface Database
+{
     /**
      * Run a command against the Redis database.
      *
@@ -10,5 +10,4 @@ interface Database {
      * @return mixed
      */
     public function command($method, array $parameters = array());
-
 }

@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
-
+class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -60,5 +60,4 @@ class QueueBeanstalkdQueueTest extends PHPUnit_Framework_TestCase {
 
         $queue->deleteMessage('default', 1);
     }
-
 }

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Session;
 
-interface ExistenceAwareInterface {
-
+interface ExistenceAwareInterface
+{
     /**
      * Set the existence state for the session.
      *
@@ -9,5 +9,4 @@ interface ExistenceAwareInterface {
      * @return \SessionHandlerInterface
      */
     public function setExists($value);
-
 }

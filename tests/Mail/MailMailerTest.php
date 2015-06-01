@@ -3,8 +3,8 @@
 use Mockery as m;
 use SuperClosure\Serializer;
 
-class MailMailerTest extends PHPUnit_Framework_TestCase {
-
+class MailMailerTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -25,7 +25,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, array());
-        $mailer->send('foo', array('data'), function($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send('foo', array('data'), function ($m) { $_SERVER['__mailer.test'] = $m; });
         unset($_SERVER['__mailer.test']);
     }
 
@@ -46,7 +46,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, array());
-        $mailer->send(array('foo', 'bar'), array('data'), function($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send(array('foo', 'bar'), array('data'), function ($m) { $_SERVER['__mailer.test'] = $m; });
         unset($_SERVER['__mailer.test']);
     }
 
@@ -67,7 +67,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $this->setSwiftMailer($mailer);
         $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, array());
-        $mailer->send(array('html' => 'foo', 'text' => 'bar'), array('data'), function($m) { $_SERVER['__mailer.test'] = $m; });
+        $mailer->send(array('html' => 'foo', 'text' => 'bar'), array('data'), function ($m) { $_SERVER['__mailer.test'] = $m; });
         unset($_SERVER['__mailer.test']);
     }
 
@@ -99,7 +99,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $serialized = (new Serializer)->serialize($closure = function() {});
+        $serialized = (new Serializer)->serialize($closure = function () {});
         $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', array('view' => 'foo', 'data' => array(1), 'callback' => $serialized), null);
 
         $mailer->queue('foo', array(1), $closure);
@@ -147,7 +147,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $mailer->setLogger($logger);
         $mailer->pretend();
 
-        $mailer->send('foo', array('data'), function($m) {});
+        $mailer->send('foo', array('data'), function ($m) {});
     }
 
 
@@ -160,8 +160,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $container = new Illuminate\Container\Container;
         $mailer->setContainer($container);
         $mockMailer = m::mock('StdClass');
-        $container['FooMailer'] = $container->share(function() use ($mockMailer)
-        {
+        $container['FooMailer'] = $container->share(function () use ($mockMailer) {
             return $mockMailer;
         });
         $mockMailer->shouldReceive('mail')->once()->with($message);
@@ -186,11 +185,10 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $this->setSwiftMailer($mailer);
         $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
         $me = $this;
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), array())->andReturnUsing(function($message) use ($me)
-        {
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), array())->andReturnUsing(function ($message) use ($me) {
             $me->assertEquals(array('taylorotwell@gmail.com' => 'Taylor Otwell'), $message->getFrom());
         });
-        $mailer->send('foo', array('data'), function($m) {});
+        $mailer->send('foo', array('data'), function ($m) {});
     }
 
 
@@ -206,7 +204,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
         $swift = new FailingSwiftMailerStub;
         $mailer->setSwiftMailer($swift);
 
-        $mailer->send('foo', array('data'), function($m) {});
+        $mailer->send('foo', array('data'), function ($m) {});
 
         $this->assertEquals(array('taylorotwell@gmail.com'), $mailer->failures());
     }
@@ -232,7 +230,6 @@ class MailMailerTest extends PHPUnit_Framework_TestCase {
     {
         return array(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
     }
-
 }
 
 class FailingSwiftMailerStub

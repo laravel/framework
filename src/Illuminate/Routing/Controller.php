@@ -5,8 +5,8 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class Controller {
-
+abstract class Controller
+{
     /**
      * The middleware registered on the controller.
      *
@@ -84,16 +84,11 @@ abstract class Controller {
 
         $original = $filter;
 
-        if ($filter instanceof Closure)
-        {
+        if ($filter instanceof Closure) {
             $filter = $this->registerClosureFilter($filter);
-        }
-        elseif ($this->isInstanceFilter($filter))
-        {
+        } elseif ($this->isInstanceFilter($filter)) {
             $filter = $this->registerInstanceFilter($filter);
-        }
-        else
-        {
+        } else {
             list($filter, $parameters) = Route::parseFilter($filter);
         }
 
@@ -136,9 +131,10 @@ abstract class Controller {
      */
     protected function isInstanceFilter($filter)
     {
-        if (is_string($filter) && starts_with($filter, '@'))
-        {
-            if (method_exists($this, substr($filter, 1))) return true;
+        if (is_string($filter) && starts_with($filter, '@')) {
+            if (method_exists($this, substr($filter, 1))) {
+                return true;
+            }
 
             throw new InvalidArgumentException("Filter method [$filter] does not exist.");
         }
@@ -177,8 +173,7 @@ abstract class Controller {
      */
     protected function removeFilter($removing, $current)
     {
-        return array_filter($current, function($filter) use ($removing)
-        {
+        return array_filter($current, function ($filter) use ($removing) {
             return $filter['original'] != $removing;
         });
     }
@@ -272,5 +267,4 @@ abstract class Controller {
     {
         throw new BadMethodCallException("Method [$method] does not exist.");
     }
-
 }

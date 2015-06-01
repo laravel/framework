@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ViewClearCommand extends Command {
-
+class ViewClearCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -48,12 +48,10 @@ class ViewClearCommand extends Command {
     {
         $views = $this->files->glob($this->laravel['config']['view.compiled'].'/*');
 
-        foreach ($views as $view)
-        {
+        foreach ($views as $view) {
             $this->files->delete($view);
         }
 
         $this->info('Compiled views cleared!');
     }
-
 }

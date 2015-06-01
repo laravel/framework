@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class GenericUser implements UserContract {
-
+class GenericUser implements UserContract
+{
     /**
      * All of the user's attributes.
      *
@@ -117,5 +117,4 @@ class GenericUser implements UserContract {
     {
         unset($this->attributes[$key]);
     }
-
 }

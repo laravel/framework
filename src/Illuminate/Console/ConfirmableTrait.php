@@ -2,8 +2,8 @@
 
 use Closure;
 
-trait ConfirmableTrait {
-
+trait ConfirmableTrait
+{
     /**
      * Confirm before proceeding with the action.
      *
@@ -15,9 +15,10 @@ trait ConfirmableTrait {
     {
         $shouldConfirm = $callback ?: $this->getDefaultConfirmCallback();
 
-        if (call_user_func($shouldConfirm))
-        {
-            if ($this->option('force')) return true;
+        if (call_user_func($shouldConfirm)) {
+            if ($this->option('force')) {
+                return true;
+            }
 
             $this->comment(str_repeat('*', strlen($warning) + 12));
             $this->comment('*     '.$warning.'     *');
@@ -26,8 +27,7 @@ trait ConfirmableTrait {
 
             $confirmed = $this->confirm('Do you really wish to run this command? [y/N]');
 
-            if ( ! $confirmed)
-            {
+            if (! $confirmed) {
                 $this->comment('Command Cancelled!');
 
                 return false;
@@ -44,7 +44,6 @@ trait ConfirmableTrait {
      */
     protected function getDefaultConfirmCallback()
     {
-        return function() { return $this->getLaravel()->environment() == 'production'; };
+        return function () { return $this->getLaravel()->environment() == 'production'; };
     }
-
 }

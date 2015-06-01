@@ -5,8 +5,8 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
-class DatabaseUserProvider implements UserProvider {
-
+class DatabaseUserProvider implements UserProvider
+{
     /**
      * The active database connection.
      *
@@ -100,10 +100,8 @@ class DatabaseUserProvider implements UserProvider {
         // generic "user" object that will be utilized by the Guard instances.
         $query = $this->conn->table($this->table);
 
-        foreach ($credentials as $key => $value)
-        {
-            if ( ! str_contains($key, 'password'))
-            {
+        foreach ($credentials as $key => $value) {
+            if (! str_contains($key, 'password')) {
                 $query->where($key, $value);
             }
         }
@@ -124,8 +122,7 @@ class DatabaseUserProvider implements UserProvider {
      */
     protected function getGenericUser($user)
     {
-        if ($user !== null)
-        {
+        if ($user !== null) {
             return new GenericUser((array) $user);
         }
     }
@@ -143,5 +140,4 @@ class DatabaseUserProvider implements UserProvider {
 
         return $this->hasher->check($plain, $user->getAuthPassword());
     }
-
 }

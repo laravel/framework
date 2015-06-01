@@ -10,8 +10,8 @@ use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\TerminableMiddleware;
 
-class StartSession implements TerminableMiddleware {
-
+class StartSession implements TerminableMiddleware
+{
     /**
      * The session manager.
      *
@@ -51,8 +51,7 @@ class StartSession implements TerminableMiddleware {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
-        if ($this->sessionConfigured())
-        {
+        if ($this->sessionConfigured()) {
             $session = $this->startSession($request);
 
             $request->setSession($session);
@@ -63,8 +62,7 @@ class StartSession implements TerminableMiddleware {
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
         // add the session identifier cookie to the application response headers now.
-        if ($this->sessionConfigured())
-        {
+        if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
 
             $this->collectGarbage($session);
@@ -84,8 +82,7 @@ class StartSession implements TerminableMiddleware {
      */
     public function terminate($request, $response)
     {
-        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions())
-        {
+        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
             $this->manager->driver()->save();
         }
     }
@@ -129,8 +126,7 @@ class StartSession implements TerminableMiddleware {
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax())
-        {
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
@@ -148,8 +144,7 @@ class StartSession implements TerminableMiddleware {
         // Here we will see if this request hits the garbage collection lottery by hitting
         // the odds needed to perform garbage collection on any given request. If we do
         // hit it, we'll call this handler to let it delete all the expired sessions.
-        if ($this->configHitsLottery($config))
-        {
+        if ($this->configHitsLottery($config)) {
             $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
         }
     }
@@ -174,13 +169,11 @@ class StartSession implements TerminableMiddleware {
      */
     protected function addCookieToResponse(Response $response, SessionInterface $session)
     {
-        if ($this->usingCookieSessions())
-        {
+        if ($this->usingCookieSessions()) {
             $this->manager->driver()->save();
         }
 
-        if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig()))
-        {
+        if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
                 $config['path'], $config['domain'], array_get($config, 'secure', false)
@@ -240,9 +233,10 @@ class StartSession implements TerminableMiddleware {
      */
     protected function usingCookieSessions()
     {
-        if ( ! $this->sessionConfigured()) return false;
+        if (! $this->sessionConfigured()) {
+            return false;
+        }
 
         return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
     }
-
 }

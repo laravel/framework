@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Query;
 
-class Expression {
-
+class Expression
+{
     /**
      * The value of the expression.
      *
@@ -39,5 +39,4 @@ class Expression {
     {
         return (string) $this->getValue();
     }
-
 }

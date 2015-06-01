@@ -4,8 +4,8 @@ use Closure;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Http\Exception\PostTooLargeException;
 
-class VerifyPostSize implements Middleware {
-
+class VerifyPostSize implements Middleware
+{
     /**
      * Handle an incoming request.
      *
@@ -17,8 +17,7 @@ class VerifyPostSize implements Middleware {
      */
     public function handle($request, Closure $next)
     {
-        if ($request->server('CONTENT_LENGTH') > $this->getPostMaxSize())
-        {
+        if ($request->server('CONTENT_LENGTH') > $this->getPostMaxSize()) {
             throw new PostTooLargeException;
         }
 
@@ -32,10 +31,9 @@ class VerifyPostSize implements Middleware {
      */
        protected function getPostMaxSize()
        {
-        $postMaxSize = ini_get('post_max_size');
+           $postMaxSize = ini_get('post_max_size');
 
-        switch (substr($postMaxSize, -1))
-        {
+           switch (substr($postMaxSize, -1)) {
             case 'M':
             case 'm':
                 return (int) $postMaxSize * 1048576;
@@ -47,7 +45,6 @@ class VerifyPostSize implements Middleware {
                 return (int) $postMaxSize * 1073741824;
         }
 
-        return (int) $postMaxSize;
-    }
-
+           return (int) $postMaxSize;
+       }
 }

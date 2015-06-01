@@ -7,8 +7,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class SubscribeCommand extends Command {
-
+class SubscribeCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -41,8 +41,7 @@ class SubscribeCommand extends Command {
     {
         $iron = $this->laravel['queue']->connection();
 
-        if ( ! $iron instanceof IronQueue)
-        {
+        if (! $iron instanceof IronQueue) {
             throw new RuntimeException("Iron.io based queue must be default.");
         }
 
@@ -70,14 +69,13 @@ class SubscribeCommand extends Command {
      */
     protected function getPushType()
     {
-        if ($this->option('type')) return $this->option('type');
-
-        try
-        {
-            return $this->getQueue()->push_type;
+        if ($this->option('type')) {
+            return $this->option('type');
         }
-        catch (Exception $e)
-        {
+
+        try {
+            return $this->getQueue()->push_type;
+        } catch (Exception $e) {
             return 'multicast';
         }
     }
@@ -93,8 +91,7 @@ class SubscribeCommand extends Command {
 
         $url = $this->argument('url');
 
-        if ( ! starts_with($url, ['http://', 'https://']))
-        {
+        if (! starts_with($url, ['http://', 'https://'])) {
             $url = $this->laravel['url']->to($url);
         }
 
@@ -110,12 +107,9 @@ class SubscribeCommand extends Command {
      */
     protected function getCurrentSubscribers()
     {
-        try
-        {
+        try {
             return $this->getQueue()->subscribers;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             return array();
         }
     }
@@ -127,7 +121,9 @@ class SubscribeCommand extends Command {
      */
     protected function getQueue()
     {
-        if (isset($this->meta)) return $this->meta;
+        if (isset($this->meta)) {
+            return $this->meta;
+        }
 
         return $this->meta = $this->laravel['queue']->getIron()->getQueue($this->argument('queue'));
     }
@@ -157,5 +153,4 @@ class SubscribeCommand extends Command {
             array('type', null, InputOption::VALUE_OPTIONAL, 'The push type for the queue.'),
         );
     }
-
 }

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database;
 
-interface ConnectionResolverInterface {
-
+interface ConnectionResolverInterface
+{
     /**
      * Get a database connection instance.
      *
@@ -24,5 +24,4 @@ interface ConnectionResolverInterface {
      * @return void
      */
     public function setDefaultConnection($name);
-
 }

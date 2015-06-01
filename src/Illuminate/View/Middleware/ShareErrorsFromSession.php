@@ -5,8 +5,8 @@ use Illuminate\Support\ViewErrorBag;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class ShareErrorsFromSession implements Middleware {
-
+class ShareErrorsFromSession implements Middleware
+{
     /**
      * The view factory implementation.
      *
@@ -37,8 +37,7 @@ class ShareErrorsFromSession implements Middleware {
         // If the current session has an "errors" variable bound to it, we will share
         // its value with all view instances so the views can easily access errors
         // without having to bind. An empty bag is set when there aren't errors.
-        if ($request->session()->has('errors'))
-        {
+        if ($request->session()->has('errors')) {
             $this->view->share(
                 'errors', $request->session()->get('errors')
             );
@@ -47,12 +46,10 @@ class ShareErrorsFromSession implements Middleware {
         // Putting the errors in the view for every view allows the developer to just
         // assume that some errors are always available, which is convenient since
         // they don't have to continually run checks for the presence of errors.
-        else
-        {
+        else {
             $this->view->share('errors', new ViewErrorBag);
         }
 
         return $next($request);
     }
-
 }

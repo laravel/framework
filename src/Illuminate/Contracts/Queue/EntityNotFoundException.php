@@ -2,8 +2,8 @@
 
 use InvalidArgumentException;
 
-class EntityNotFoundException extends InvalidArgumentException {
-
+class EntityNotFoundException extends InvalidArgumentException
+{
     /**
      * Create a new exception instance.
      *
@@ -17,5 +17,4 @@ class EntityNotFoundException extends InvalidArgumentException {
 
         parent::__construct("Queueable entity [{$type}] not found for ID [{$id}].");
     }
-
 }

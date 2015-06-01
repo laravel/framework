@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-trait AuthenticatesUsers {
-
+trait AuthenticatesUsers
+{
     use RedirectsUsers;
 
     /**
@@ -31,8 +31,7 @@ trait AuthenticatesUsers {
 
         $credentials = $this->getCredentials($request);
 
-        if (Auth::attempt($credentials, $request->has('remember')))
-        {
+        if (Auth::attempt($credentials, $request->has('remember'))) {
             return redirect()->intended($this->redirectPath());
         }
 
@@ -85,5 +84,4 @@ trait AuthenticatesUsers {
     {
         return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
     }
-
 }

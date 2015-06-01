@@ -6,8 +6,8 @@ use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class IronQueue extends Queue implements QueueContract {
-
+class IronQueue extends Queue implements QueueContract
+{
     /**
      * The IronMQ instance.
      *
@@ -76,7 +76,9 @@ class IronQueue extends Queue implements QueueContract {
      */
     public function pushRaw($payload, $queue = null, array $options = array())
     {
-        if ($this->shouldEncrypt) $payload = $this->crypt->encrypt($payload);
+        if ($this->shouldEncrypt) {
+            $payload = $this->crypt->encrypt($payload);
+        }
 
         return $this->iron->postMessage($this->getQueue($queue), $payload, $options)->id;
     }
@@ -129,8 +131,7 @@ class IronQueue extends Queue implements QueueContract {
         // If we were able to pop a message off of the queue, we will need to decrypt
         // the message body, as all Iron.io messages are encrypted, since the push
         // queues will be a security hazard to unsuspecting developers using it.
-        if ( ! is_null($job))
-        {
+        if (! is_null($job)) {
             $job->body = $this->parseJobBody($job->body);
 
             return new IronJob($this->container, $this, $job);
@@ -255,5 +256,4 @@ class IronQueue extends Queue implements QueueContract {
     {
         $this->request = $request;
     }
-
 }

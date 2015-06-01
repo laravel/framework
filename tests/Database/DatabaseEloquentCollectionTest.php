@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 
-class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -87,8 +87,8 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function($k, $m){ return $m->getKey() < 2; }));
-        $this->assertFalse($c->contains(function($k, $m){ return $m->getKey() > 2; }));
+        $this->assertTrue($c->contains(function ($k, $m) { return $m->getKey() < 2; }));
+        $this->assertFalse($c->contains(function ($k, $m) { return $m->getKey() > 2; }));
     }
 
 
@@ -130,7 +130,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
 
         $c = new Collection(array($one, $two, $three));
 
-        $this->assertEquals(array(1,2,3), $c->modelKeys());
+        $this->assertEquals(array(1, 2, 3), $c->modelKeys());
     }
 
 
@@ -236,5 +236,4 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(new Collection(array($one, $three)), $c->except(2));
         $this->assertEquals(new Collection(array($one)), $c->except(array(2, 3)));
     }
-
 }

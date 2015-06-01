@@ -6,8 +6,8 @@ use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
-class MailgunTransport implements Swift_Transport {
-
+class MailgunTransport implements Swift_Transport
+{
     /**
      * Guzzle client instance.
      *
@@ -119,8 +119,7 @@ class MailgunTransport implements Swift_Transport {
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
         );
 
-        foreach ($contacts as $address => $display)
-        {
+        foreach ($contacts as $address => $display) {
             $formatted[] = $display ? $display." <$address>" : $address;
         }
 
@@ -170,5 +169,4 @@ class MailgunTransport implements Swift_Transport {
 
         return $this->domain = $domain;
     }
-
 }

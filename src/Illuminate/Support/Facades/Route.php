@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Routing\Router
  */
-class Route extends Facade {
-
+class Route extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Route extends Facade {
     {
         return 'router';
     }
-
 }

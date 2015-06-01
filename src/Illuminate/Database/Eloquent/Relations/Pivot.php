@@ -3,8 +3,8 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class Pivot extends Model {
-
+class Pivot extends Model
+{
     /**
      * The parent model of the relationship.
      *
@@ -169,5 +169,4 @@ class Pivot extends Model {
     {
         return $this->parent->getUpdatedAtColumn();
     }
-
 }

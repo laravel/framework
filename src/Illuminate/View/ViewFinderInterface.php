@@ -1,7 +1,7 @@
 <?php namespace Illuminate\View;
 
-interface ViewFinderInterface {
-
+interface ViewFinderInterface
+{
     /**
      * Hint path delimiter value.
      *
@@ -50,5 +50,4 @@ interface ViewFinderInterface {
      * @return void
      */
     public function addExtension($extension);
-
 }

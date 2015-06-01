@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Routing\Redirector;
 
-class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
-
+class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
+{
     protected $headers;
     protected $request;
     protected $url;
@@ -148,5 +148,4 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase {
         $response = $this->redirect->home();
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
     }
-
 }

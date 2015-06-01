@@ -15,8 +15,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Writer implements LogContract, PsrLoggerInterface {
-
+class Writer implements LogContract, PsrLoggerInterface
+{
     /**
      * The Monolog logger instance.
      *
@@ -58,8 +58,7 @@ class Writer implements LogContract, PsrLoggerInterface {
     {
         $this->monolog = $monolog;
 
-        if (isset($dispatcher))
-        {
+        if (isset($dispatcher)) {
             $this->dispatcher = $dispatcher;
         }
     }
@@ -270,8 +269,7 @@ class Writer implements LogContract, PsrLoggerInterface {
      */
     public function listen(Closure $callback)
     {
-        if ( ! isset($this->dispatcher))
-        {
+        if (! isset($this->dispatcher)) {
             throw new RuntimeException("Events dispatcher has not been set.");
         }
 
@@ -291,8 +289,7 @@ class Writer implements LogContract, PsrLoggerInterface {
         // If the event dispatcher is set, we will pass along the parameters to the
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
-        if (isset($this->dispatcher))
-        {
+        if (isset($this->dispatcher)) {
             $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
         }
     }
@@ -305,16 +302,11 @@ class Writer implements LogContract, PsrLoggerInterface {
      */
     protected function formatMessage($message)
     {
-        if (is_array($message))
-        {
+        if (is_array($message)) {
             return var_export($message, true);
-        }
-        elseif ($message instanceof Jsonable)
-        {
+        } elseif ($message instanceof Jsonable) {
             return $message->toJson();
-        }
-        elseif ($message instanceof Arrayable)
-        {
+        } elseif ($message instanceof Arrayable) {
             return var_export($message->toArray(), true);
         }
 
@@ -331,8 +323,7 @@ class Writer implements LogContract, PsrLoggerInterface {
      */
     protected function parseLevel($level)
     {
-        if (isset($this->levels[$level]))
-        {
+        if (isset($this->levels[$level])) {
             return $this->levels[$level];
         }
 
@@ -379,5 +370,4 @@ class Writer implements LogContract, PsrLoggerInterface {
     {
         $this->dispatcher = $dispatcher;
     }
-
 }

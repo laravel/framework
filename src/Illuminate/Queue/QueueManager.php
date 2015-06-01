@@ -5,8 +5,8 @@ use InvalidArgumentException;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
-class QueueManager implements FactoryContract, MonitorContract {
-
+class QueueManager implements FactoryContract, MonitorContract
+{
     /**
      * The application instance.
      *
@@ -89,8 +89,7 @@ class QueueManager implements FactoryContract, MonitorContract {
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
         // not make any unnecessary connection to the various queue end-points.
-        if ( ! isset($this->connections[$name]))
-        {
+        if (! isset($this->connections[$name])) {
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
@@ -124,8 +123,7 @@ class QueueManager implements FactoryContract, MonitorContract {
      */
     protected function getConnector($driver)
     {
-        if (isset($this->connectors[$driver]))
-        {
+        if (isset($this->connectors[$driver])) {
             return call_user_func($this->connectors[$driver]);
         }
 
@@ -222,5 +220,4 @@ class QueueManager implements FactoryContract, MonitorContract {
 
         return call_user_func_array($callable, $parameters);
     }
-
 }

@@ -4,8 +4,8 @@ use Carbon\Carbon;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-class DatabaseTokenRepository implements TokenRepositoryInterface {
-
+class DatabaseTokenRepository implements TokenRepositoryInterface
+{
     /**
      * The database connection instance.
      *
@@ -187,5 +187,4 @@ class DatabaseTokenRepository implements TokenRepositoryInterface {
     {
         return $this->connection;
     }
-
 }

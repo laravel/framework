@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -50,6 +50,4 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase {
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
     }
-
-
 }

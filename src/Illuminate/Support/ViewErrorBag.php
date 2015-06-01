@@ -3,8 +3,8 @@
 use Countable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
-class ViewErrorBag implements Countable {
-
+class ViewErrorBag implements Countable
+{
     /**
      * The array of the view error bags.
      *
@@ -102,5 +102,4 @@ class ViewErrorBag implements Countable {
     {
         array_set($this->bags, $key, $value);
     }
-
 }

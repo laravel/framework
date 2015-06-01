@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\View\Engines\PhpEngine;
 
-class ViewPhpEngineTest extends PHPUnit_Framework_TestCase {
-
+class ViewPhpEngineTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -17,5 +17,4 @@ class ViewPhpEngineTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals("Hello World
 ", $engine->get(__DIR__.'/fixtures/basic.php'));
     }
-
 }

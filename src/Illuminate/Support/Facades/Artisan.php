@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Foundation\Artisan
  */
-class Artisan extends Facade {
-
+class Artisan extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Artisan extends Facade {
     {
         return 'Illuminate\Contracts\Console\Kernel';
     }
-
 }

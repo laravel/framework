@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class HandlerCommandCommand extends GeneratorCommand {
-
+class HandlerCommandCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -79,5 +79,4 @@ class HandlerCommandCommand extends GeneratorCommand {
             array('command', null, InputOption::VALUE_REQUIRED, 'The command class the handler handles.'),
         );
     }
-
 }

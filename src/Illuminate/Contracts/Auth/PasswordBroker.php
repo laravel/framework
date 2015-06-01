@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface PasswordBroker {
-
+interface PasswordBroker
+{
     /**
      * Constant representing a successfully sent reminder.
      *
@@ -72,5 +72,4 @@ interface PasswordBroker {
      * @return bool
      */
     public function validateNewPassword(array $credentials);
-
 }

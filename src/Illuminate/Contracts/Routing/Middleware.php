@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface Middleware {
-
+interface Middleware
+{
     /**
      * Handle an incoming request.
      *
@@ -12,5 +12,4 @@ interface Middleware {
      * @return mixed
      */
     public function handle($request, Closure $next);
-
 }

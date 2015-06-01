@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Foundation\Application;
 
-class SetRequestForConsole {
-
+class SetRequestForConsole
+{
     /**
      * Bootstrap the given application.
      *
@@ -17,5 +17,4 @@ class SetRequestForConsole {
 
         $app->instance('request', Request::create($url, 'GET', [], [], [], $_SERVER));
     }
-
 }

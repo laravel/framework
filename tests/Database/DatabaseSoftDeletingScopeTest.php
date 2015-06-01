@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -105,5 +105,4 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($givenBuilder, $result);
     }
-
 }

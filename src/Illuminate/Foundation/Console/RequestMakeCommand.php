@@ -2,8 +2,8 @@
 
 use Illuminate\Console\GeneratorCommand;
 
-class RequestMakeCommand extends GeneratorCommand {
-
+class RequestMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -45,5 +45,4 @@ class RequestMakeCommand extends GeneratorCommand {
     {
         return $rootNamespace.'\Http\Requests';
     }
-
 }
