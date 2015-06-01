@@ -1,65 +1,66 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php
 
-interface MigrationRepositoryInterface {
+namespace Illuminate\Database\Migrations;
 
-	/**
-	 * Get the ran migrations for a given package.
-	 *
-	 * @return array
-	 */
-	public function getRan();
+interface MigrationRepositoryInterface
+{
+    /**
+     * Get the ran migrations for a given package.
+     *
+     * @return array
+     */
+    public function getRan();
 
-	/**
-	 * Get the last migration batch.
-	 *
-	 * @return array
-	 */
-	public function getLast();
+    /**
+     * Get the last migration batch.
+     *
+     * @return array
+     */
+    public function getLast();
 
-	/**
-	 * Log that a migration was run.
-	 *
-	 * @param  string  $file
-	 * @param  int     $batch
-	 * @return void
-	 */
-	public function log($file, $batch);
+    /**
+     * Log that a migration was run.
+     *
+     * @param  string  $file
+     * @param  int     $batch
+     * @return void
+     */
+    public function log($file, $batch);
 
-	/**
-	 * Remove a migration from the log.
-	 *
-	 * @param  object  $migration
-	 * @return void
-	 */
-	public function delete($migration);
+    /**
+     * Remove a migration from the log.
+     *
+     * @param  object  $migration
+     * @return void
+     */
+    public function delete($migration);
 
-	/**
-	 * Get the next migration batch number.
-	 *
-	 * @return int
-	 */
-	public function getNextBatchNumber();
+    /**
+     * Get the next migration batch number.
+     *
+     * @return int
+     */
+    public function getNextBatchNumber();
 
-	/**
-	 * Create the migration repository data store.
-	 *
-	 * @return void
-	 */
-	public function createRepository();
+    /**
+     * Create the migration repository data store.
+     *
+     * @return void
+     */
+    public function createRepository();
 
-	/**
-	 * Determine if the migration repository exists.
-	 *
-	 * @return bool
-	 */
-	public function repositoryExists();
+    /**
+     * Determine if the migration repository exists.
+     *
+     * @return bool
+     */
+    public function repositoryExists();
 
-	/**
-	 * Set the information source to gather data.
-	 *
-	 * @param  string  $name
-	 * @return void
-	 */
-	public function setSource($name);
-
+    /**
+     * Set the information source to gather data.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setSource($name);
 }

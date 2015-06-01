@@ -1,7 +1,6 @@
-<?php namespace DummyNamespace;
+<?php
 
-use DummyFullCommand;
-use Illuminate\Queue\InteractsWithQueue;
+namespace DummyNamespace;
 
 class DummyClass
 {

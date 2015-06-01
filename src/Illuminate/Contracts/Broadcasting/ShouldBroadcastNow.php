@@ -1,6 +1,8 @@
-<?php namespace Illuminate\Contracts\Broadcasting;
+<?php
+
+namespace Illuminate\Contracts\Broadcasting;
 
 interface ShouldBroadcastNow extends ShouldBroadcast
 {
-	//
+    //
 }

@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 use Exception;
 
@@ -12,7 +14,7 @@ trait WithoutMiddleware
         if (method_exists($this, 'withoutMiddleware')) {
             $this->withoutMiddleware();
         } else {
-            throw new Exception("Unable to disable middleware. CrawlerTrait not used.");
+            throw new Exception('Unable to disable middleware. CrawlerTrait not used.');
         }
     }
 }

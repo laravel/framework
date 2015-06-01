@@ -2,74 +2,70 @@
 
 use Mockery as m;
 
-class BroadcastEventTest extends PHPUnit_Framework_TestCase {
+class BroadcastEventTest extends PHPUnit_Framework_TestCase
+{
+    public function tearDown()
+    {
+        m::close();
+    }
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    public function testBasicEventBroadcastParameterFormatting()
+    {
+        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+        );
 
-	public function testBasicEventBroadcastParameterFormatting()
-	{
-		$broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $event = new TestBroadcastEvent;
+        $serializedEvent = serialize($event);
+        $jobData = ['event' => $serializedEvent];
 
-		$broadcaster->shouldReceive('broadcast')->once()->with(
-			['test-channel'], 'TestBroadcastEvent', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
-		);
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
 
-		$event = new TestBroadcastEvent;
-		$serializedEvent = serialize($event);
-		$jobData = ['event' => $serializedEvent];
+        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+    }
 
-		$job = m::mock('Illuminate\Contracts\Queue\Job');
-		$job->shouldReceive('delete')->once();
+    public function testManualParameterSpecification()
+    {
+        $broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
 
-		(new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
-	}
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
+        );
 
+        $event = new TestBroadcastEventWithManualData;
+        $serializedEvent = serialize($event);
+        $jobData = ['event' => $serializedEvent];
 
-	public function testManualParameterSpecification()
-	{
-		$broadcaster = m::mock('Illuminate\Contracts\Broadcasting\Broadcaster');
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
 
-		$broadcaster->shouldReceive('broadcast')->once()->with(
-			['test-channel'], 'TestBroadcastEventWithManualData', ['name' => 'Taylor']
-		);
-
-		$event = new TestBroadcastEventWithManualData;
-		$serializedEvent = serialize($event);
-		$jobData = ['event' => $serializedEvent];
-
-		$job = m::mock('Illuminate\Contracts\Queue\Job');
-		$job->shouldReceive('delete')->once();
-
-		(new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
-	}
-
+        (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
+    }
 }
 
-
-class TestBroadcastEvent {
-	public $firstName = 'Taylor';
-	public $lastName = 'Otwell';
-	public $collection;
-	private $title = 'Developer';
-	public function __construct()
-	{
-		$this->collection = collect(['foo' => 'bar']);
-	}
-	public function broadcastOn()
-	{
-		return ['test-channel'];
-	}
+class TestBroadcastEvent
+{
+    public $firstName = 'Taylor';
+    public $lastName = 'Otwell';
+    public $collection;
+    private $title = 'Developer';
+    public function __construct()
+    {
+        $this->collection = collect(['foo' => 'bar']);
+    }
+    public function broadcastOn()
+    {
+        return ['test-channel'];
+    }
 }
 
-
-class TestBroadcastEventWithManualData extends TestBroadcastEvent {
-	public function broadcastWith()
-	{
-		return ['name' => 'Taylor'];
-	}
+class TestBroadcastEventWithManualData extends TestBroadcastEvent
+{
+    public function broadcastWith()
+    {
+        return ['name' => 'Taylor'];
+    }
 }
-

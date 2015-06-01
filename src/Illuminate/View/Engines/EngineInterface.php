@@ -1,14 +1,15 @@
-<?php namespace Illuminate\View\Engines;
+<?php
 
-interface EngineInterface {
+namespace Illuminate\View\Engines;
 
-	/**
-	 * Get the evaluated contents of the view.
-	 *
-	 * @param  string  $path
-	 * @param  array   $data
-	 * @return string
-	 */
-	public function get($path, array $data = array());
-
+interface EngineInterface
+{
+    /**
+     * Get the evaluated contents of the view.
+     *
+     * @param  string  $path
+     * @param  array   $data
+     * @return string
+     */
+    public function get($path, array $data = []);
 }

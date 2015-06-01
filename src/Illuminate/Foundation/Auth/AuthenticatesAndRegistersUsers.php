@@ -1,9 +1,10 @@
-<?php namespace Illuminate\Foundation\Auth;
+<?php
 
-trait AuthenticatesAndRegistersUsers {
+namespace Illuminate\Foundation\Auth;
 
-	use AuthenticatesUsers, RegistersUsers {
-		AuthenticatesUsers::redirectPath insteadof RegistersUsers;
-	}
-
+trait AuthenticatesAndRegistersUsers
+{
+    use AuthenticatesUsers, RegistersUsers {
+        AuthenticatesUsers::redirectPath insteadof RegistersUsers;
+    }
 }

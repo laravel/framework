@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
+
+namespace Illuminate\Foundation\Testing;
 
 trait DatabaseMigrations
 {
@@ -9,7 +11,7 @@ trait DatabaseMigrations
     {
         $this->artisan('migrate');
 
-        $this->beforeApplicationDestroyed(function() {
+        $this->beforeApplicationDestroyed(function () {
             $this->artisan('migrate:rollback');
         });
     }
