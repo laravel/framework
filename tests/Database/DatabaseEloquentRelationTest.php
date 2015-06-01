@@ -5,81 +5,81 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    public function tearDown()
+    {
+        m::close();
+    }
 
 
-	public function testSetRelationFail()
-	{
-		$parent = new EloquentRelationResetModelStub;
-		$relation = new EloquentRelationResetModelStub;
-		$parent->setRelation('test', $relation);
-		$parent->setRelation('foo', 'bar');
-		$this->assertArrayNotHasKey('foo', $parent->toArray());
-	}
+    public function testSetRelationFail()
+    {
+        $parent = new EloquentRelationResetModelStub;
+        $relation = new EloquentRelationResetModelStub;
+        $parent->setRelation('test', $relation);
+        $parent->setRelation('foo', 'bar');
+        $this->assertArrayNotHasKey('foo', $parent->toArray());
+    }
 
 
-	public function testTouchMethodUpdatesRelatedTimestamps()
-	{
-		$builder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$parent = m::mock('Illuminate\Database\Eloquent\Model');
-		$parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-		$builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
-		$builder->shouldReceive('whereNotNull');
-		$builder->shouldReceive('where');
-		$relation = new HasOne($builder, $parent, 'foreign_key', 'id');
-		$related->shouldReceive('getTable')->andReturn('table');
-		$related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-		$related->shouldReceive('freshTimestampString')->andReturn(Carbon\Carbon::now());
-		$builder->shouldReceive('update')->once()->with(array('updated_at' => Carbon\Carbon::now()));
+    public function testTouchMethodUpdatesRelatedTimestamps()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+        $builder->shouldReceive('whereNotNull');
+        $builder->shouldReceive('where');
+        $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+        $related->shouldReceive('getTable')->andReturn('table');
+        $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $related->shouldReceive('freshTimestampString')->andReturn(Carbon\Carbon::now());
+        $builder->shouldReceive('update')->once()->with(array('updated_at' => Carbon\Carbon::now()));
 
-		$relation->touch();
-	}
+        $relation->touch();
+    }
 
-	/**
-	 * Testing to ensure loop does not occur during relational queries in global scopes
-	 *
-	 * Executing parent model's global scopes could result in an infinite loop when the
-	 * parent model's global scope utilizes a relation in a query like has or whereHas
-	 */
-	public function testDonNotRunParentModelGlobalScopes()
-	{
-		/** @var Mockery\MockInterface $parent */
-		$eloquentBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-		$queryBuilder = m::mock('Illuminate\Database\Query\Builder');
-		$parent = m::mock('EloquentRelationResetModelStub')->makePartial();
-		$grammar = m::mock('\Illuminate\Database\Grammar');
+    /**
+     * Testing to ensure loop does not occur during relational queries in global scopes
+     *
+     * Executing parent model's global scopes could result in an infinite loop when the
+     * parent model's global scope utilizes a relation in a query like has or whereHas
+     */
+    public function testDonNotRunParentModelGlobalScopes()
+    {
+        /** @var Mockery\MockInterface $parent */
+        $eloquentBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $queryBuilder = m::mock('Illuminate\Database\Query\Builder');
+        $parent = m::mock('EloquentRelationResetModelStub')->makePartial();
+        $grammar = m::mock('\Illuminate\Database\Grammar');
 
-		$eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
-		$eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
-		$queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
-		$grammar->shouldReceive('wrap');
-		$parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
+        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+        $eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
+        $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
+        $grammar->shouldReceive('wrap');
+        $parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
 
-		//Test Condition
-		$parent->shouldReceive('applyGlobalScopes')->andReturn($eloquentBuilder)->never();
+        //Test Condition
+        $parent->shouldReceive('applyGlobalScopes')->andReturn($eloquentBuilder)->never();
 
-		$relation = new EloquentRelationStub($eloquentBuilder, $parent);
-		$relation->wrap('test');
-	}
+        $relation = new EloquentRelationStub($eloquentBuilder, $parent);
+        $relation->wrap('test');
+    }
 
 }
 
 class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model {
-	//Override method call which would normally go through __call()
-	public function getQuery()
-	{
-		return $this->newQuery()->getQuery();
-	}
+    //Override method call which would normally go through __call()
+    public function getQuery()
+    {
+        return $this->newQuery()->getQuery();
+    }
 }
 
 
 class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relation {
-	public function addConstraints() {}
-	public function addEagerConstraints(array $models) {}
-	public function initRelation(array $models, $relation) {}
-	public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation) {}
-	public function getResults() {}
+    public function addConstraints() {}
+    public function addEagerConstraints(array $models) {}
+    public function initRelation(array $models, $relation) {}
+    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation) {}
+    public function getResults() {}
 }

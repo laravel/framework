@@ -2,5 +2,5 @@
 
 interface ShouldBroadcastNow extends ShouldBroadcast
 {
-	//
+    //
 }

@@ -10,67 +10,67 @@ use Illuminate\Queue\Console\ForgetFailedCommand;
 
 class ConsoleServiceProvider extends ServiceProvider {
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = true;
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = true;
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->app->singleton('command.queue.table', function($app)
-		{
-			return new TableCommand($app['files'], $app['composer']);
-		});
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->singleton('command.queue.table', function($app)
+        {
+            return new TableCommand($app['files'], $app['composer']);
+        });
 
-		$this->app->singleton('command.queue.failed', function()
-		{
-			return new ListFailedCommand;
-		});
+        $this->app->singleton('command.queue.failed', function()
+        {
+            return new ListFailedCommand;
+        });
 
-		$this->app->singleton('command.queue.retry', function()
-		{
-			return new RetryCommand;
-		});
+        $this->app->singleton('command.queue.retry', function()
+        {
+            return new RetryCommand;
+        });
 
-		$this->app->singleton('command.queue.forget', function()
-		{
-			return new ForgetFailedCommand;
-		});
+        $this->app->singleton('command.queue.forget', function()
+        {
+            return new ForgetFailedCommand;
+        });
 
-		$this->app->singleton('command.queue.flush', function()
-		{
-			return new FlushFailedCommand;
-		});
+        $this->app->singleton('command.queue.flush', function()
+        {
+            return new FlushFailedCommand;
+        });
 
-		$this->app->singleton('command.queue.failed-table', function($app)
-		{
-			return new FailedTableCommand($app['files'], $app['composer']);
-		});
+        $this->app->singleton('command.queue.failed-table', function($app)
+        {
+            return new FailedTableCommand($app['files'], $app['composer']);
+        });
 
-		$this->commands(
-			'command.queue.table', 'command.queue.failed', 'command.queue.retry',
-			'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table'
-		);
-	}
+        $this->commands(
+            'command.queue.table', 'command.queue.failed', 'command.queue.retry',
+            'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table'
+        );
+    }
 
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array(
-			'command.queue.table', 'command.queue.failed', 'command.queue.retry',
-			'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
-		);
-	}
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return array(
+            'command.queue.table', 'command.queue.failed', 'command.queue.retry',
+            'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
+        );
+    }
 
 }

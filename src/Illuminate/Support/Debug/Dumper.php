@@ -5,17 +5,17 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class Dumper {
 
-	/**
-	 * Dump a value with elegance.
-	 *
-	 * @param  mixed  $value
-	 * @return void
-	 */
-	public function dump($value)
-	{
-		$dumper = 'cli' === PHP_SAPI ? new CliDumper : new HtmlDumper;
+    /**
+     * Dump a value with elegance.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function dump($value)
+    {
+        $dumper = 'cli' === PHP_SAPI ? new CliDumper : new HtmlDumper;
 
-		$dumper->dump((new VarCloner)->cloneVar($value));
-	}
+        $dumper->dump((new VarCloner)->cloneVar($value));
+    }
 
 }

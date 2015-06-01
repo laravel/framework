@@ -13,140 +13,140 @@ use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager {
 
-	/**
-	 * Create an instance of the SMTP Swift Transport driver.
-	 *
-	 * @return \Swift_SmtpTransport
-	 */
-	protected function createSmtpDriver()
-	{
-		$config = $this->app['config']['mail'];
+    /**
+     * Create an instance of the SMTP Swift Transport driver.
+     *
+     * @return \Swift_SmtpTransport
+     */
+    protected function createSmtpDriver()
+    {
+        $config = $this->app['config']['mail'];
 
-		// The Swift SMTP transport instance will allow us to use any SMTP backend
-		// for delivering mail such as Sendgrid, Amazon SES, or a custom server
-		// a developer has available. We will just pass this configured host.
-		$transport = SmtpTransport::newInstance(
-			$config['host'], $config['port']
-		);
+        // The Swift SMTP transport instance will allow us to use any SMTP backend
+        // for delivering mail such as Sendgrid, Amazon SES, or a custom server
+        // a developer has available. We will just pass this configured host.
+        $transport = SmtpTransport::newInstance(
+            $config['host'], $config['port']
+        );
 
-		if (isset($config['encryption']))
-		{
-			$transport->setEncryption($config['encryption']);
-		}
+        if (isset($config['encryption']))
+        {
+            $transport->setEncryption($config['encryption']);
+        }
 
-		// Once we have the transport we will check for the presence of a username
-		// and password. If we have it we will set the credentials on the Swift
-		// transporter instance so that we'll properly authenticate delivery.
-		if (isset($config['username']))
-		{
-			$transport->setUsername($config['username']);
+        // Once we have the transport we will check for the presence of a username
+        // and password. If we have it we will set the credentials on the Swift
+        // transporter instance so that we'll properly authenticate delivery.
+        if (isset($config['username']))
+        {
+            $transport->setUsername($config['username']);
 
-			$transport->setPassword($config['password']);
-		}
+            $transport->setPassword($config['password']);
+        }
 
-		return $transport;
-	}
+        return $transport;
+    }
 
-	/**
-	 * Create an instance of the Sendmail Swift Transport driver.
-	 *
-	 * @return \Swift_SendmailTransport
-	 */
-	protected function createSendmailDriver()
-	{
-		$command = $this->app['config']['mail']['sendmail'];
+    /**
+     * Create an instance of the Sendmail Swift Transport driver.
+     *
+     * @return \Swift_SendmailTransport
+     */
+    protected function createSendmailDriver()
+    {
+        $command = $this->app['config']['mail']['sendmail'];
 
-		return SendmailTransport::newInstance($command);
-	}
+        return SendmailTransport::newInstance($command);
+    }
 
-	/**
-	 * Create an instance of the Amazon SES Swift Transport driver.
-	 *
-	 * @return \Swift_SendmailTransport
-	 */
-	protected function createSesDriver()
-	{
-		$config = $this->app['config']->get('services.ses', []);
+    /**
+     * Create an instance of the Amazon SES Swift Transport driver.
+     *
+     * @return \Swift_SendmailTransport
+     */
+    protected function createSesDriver()
+    {
+        $config = $this->app['config']->get('services.ses', []);
 
-		$config += [
-			'version' => 'latest',
-			'service' => 'email',
-			'credentials' => [
-				'key'    => $config['key'],
-				'secret' => $config['secret'],
-			],
-		];
+        $config += [
+            'version' => 'latest',
+            'service' => 'email',
+            'credentials' => [
+                'key'    => $config['key'],
+                'secret' => $config['secret'],
+            ],
+        ];
 
-		unset($config['key'], $config['secret']);
+        unset($config['key'], $config['secret']);
 
-		return new SesTransport(new SesClient($config));
-	}
+        return new SesTransport(new SesClient($config));
+    }
 
-	/**
-	 * Create an instance of the Mail Swift Transport driver.
-	 *
-	 * @return \Swift_MailTransport
-	 */
-	protected function createMailDriver()
-	{
-		return MailTransport::newInstance();
-	}
+    /**
+     * Create an instance of the Mail Swift Transport driver.
+     *
+     * @return \Swift_MailTransport
+     */
+    protected function createMailDriver()
+    {
+        return MailTransport::newInstance();
+    }
 
-	/**
-	 * Create an instance of the Mailgun Swift Transport driver.
-	 *
-	 * @return \Illuminate\Mail\Transport\MailgunTransport
-	 */
-	protected function createMailgunDriver()
-	{
-		$client = new HttpClient;
-		$config = $this->app['config']->get('services.mailgun', []);
+    /**
+     * Create an instance of the Mailgun Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\MailgunTransport
+     */
+    protected function createMailgunDriver()
+    {
+        $client = new HttpClient;
+        $config = $this->app['config']->get('services.mailgun', []);
 
-		return new MailgunTransport($client, $config['secret'], $config['domain']);
-	}
+        return new MailgunTransport($client, $config['secret'], $config['domain']);
+    }
 
-	/**
-	 * Create an instance of the Mandrill Swift Transport driver.
-	 *
-	 * @return \Illuminate\Mail\Transport\MandrillTransport
-	 */
-	protected function createMandrillDriver()
-	{
-		$client = new HttpClient;
-		$config = $this->app['config']->get('services.mandrill', []);
+    /**
+     * Create an instance of the Mandrill Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\MandrillTransport
+     */
+    protected function createMandrillDriver()
+    {
+        $client = new HttpClient;
+        $config = $this->app['config']->get('services.mandrill', []);
 
-		return new MandrillTransport($client, $config['secret']);
-	}
+        return new MandrillTransport($client, $config['secret']);
+    }
 
-	/**
-	 * Create an instance of the Log Swift Transport driver.
-	 *
-	 * @return \Illuminate\Mail\Transport\LogTransport
-	 */
-	protected function createLogDriver()
-	{
-		return new LogTransport($this->app->make('Psr\Log\LoggerInterface'));
-	}
+    /**
+     * Create an instance of the Log Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\LogTransport
+     */
+    protected function createLogDriver()
+    {
+        return new LogTransport($this->app->make('Psr\Log\LoggerInterface'));
+    }
 
-	/**
-	 * Get the default cache driver name.
-	 *
-	 * @return string
-	 */
-	public function getDefaultDriver()
-	{
-		return $this->app['config']['mail.driver'];
-	}
+    /**
+     * Get the default cache driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver()
+    {
+        return $this->app['config']['mail.driver'];
+    }
 
-	/**
-	 * Set the default cache driver name.
-	 *
-	 * @param  string  $name
-	 * @return void
-	 */
-	public function setDefaultDriver($name)
-	{
-		$this->app['config']['mail.driver'] = $name;
-	}
+    /**
+     * Set the default cache driver name.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setDefaultDriver($name)
+    {
+        $this->app['config']['mail.driver'] = $name;
+    }
 
 }
