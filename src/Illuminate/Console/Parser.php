@@ -84,7 +84,7 @@ class Parser
     }
 
     /**
-     * Parse an optino expression.
+     * Parse an option expression.
      *
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputOption
