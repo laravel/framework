@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 
-class RouteCacheCommand extends Command {
-
+class RouteCacheCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -51,13 +51,11 @@ class RouteCacheCommand extends Command {
 
         $routes = $this->getFreshApplicationRoutes();
 
-        if (count($routes) == 0)
-        {
+        if (count($routes) == 0) {
             return $this->error("Your application doesn't have any routes.");
         }
 
-        foreach ($routes as $route)
-        {
+        foreach ($routes as $route) {
             $route->prepareForSerialization();
         }
 
@@ -94,5 +92,4 @@ class RouteCacheCommand extends Command {
 
         return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
     }
-
 }

@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
 
-class CacheTableCommand extends Command {
-
+class CacheTableCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -76,5 +76,4 @@ class CacheTableCommand extends Command {
 
         return $this->laravel['migration.creator']->create($name, $path);
     }
-
 }

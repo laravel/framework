@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Validation;
 
-interface Factory {
-
+interface Factory
+{
     /**
      * Create a new Validator instance.
      *
@@ -41,5 +41,4 @@ interface Factory {
      * @return void
      */
     public function replacer($rule, $replacer);
-
 }

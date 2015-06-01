@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Mail;
 
-interface Mailer {
-
+interface Mailer
+{
     /**
      * Send a new message when only a raw text part.
      *
@@ -27,5 +27,4 @@ interface Mailer {
      * @return array
      */
     public function failures();
-
 }

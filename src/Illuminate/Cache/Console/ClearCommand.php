@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ClearCommand extends Command {
-
+class ClearCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -69,5 +69,4 @@ class ClearCommand extends Command {
             ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
         ];
     }
-
 }

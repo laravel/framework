@@ -6,8 +6,8 @@ use Illuminate\Mail\TransportManager;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Collection;
 
-class MailSesTransportTest extends PHPUnit_Framework_TestCase {
-
+class MailSesTransportTest extends PHPUnit_Framework_TestCase
+{
     public function testGetTransport()
     {
         /** @var Application $app */

@@ -2,8 +2,8 @@
 
 use BadMethodCallException;
 
-abstract class ServiceProvider {
-
+abstract class ServiceProvider
+{
     /**
      * The application instance.
      *
@@ -73,8 +73,7 @@ abstract class ServiceProvider {
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace))
-        {
+        if (is_dir($appPath = $this->app->basePath().'/resources/views/vendor/'.$namespace)) {
             $this->app['view']->addNamespace($namespace, $appPath);
         }
 
@@ -104,17 +103,14 @@ abstract class ServiceProvider {
     {
         $class = get_class($this);
 
-        if ( ! array_key_exists($class, static::$publishes))
-        {
+        if (! array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
         }
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-        if ($group)
-        {
-            if ( ! array_key_exists($group, static::$publishGroups))
-            {
+        if ($group) {
+            if (! array_key_exists($group, static::$publishGroups)) {
                 static::$publishGroups[$group] = [];
             }
 
@@ -131,35 +127,29 @@ abstract class ServiceProvider {
      */
     public static function pathsToPublish($provider = null, $group = null)
     {
-        if ($provider && $group)
-        {
-            if (empty(static::$publishes[$provider]) || empty(static::$publishGroups[$group]))
-            {
+        if ($provider && $group) {
+            if (empty(static::$publishes[$provider]) || empty(static::$publishGroups[$group])) {
                 return [];
             }
 
             return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
-        if ($group && array_key_exists($group, static::$publishGroups))
-        {
+        if ($group && array_key_exists($group, static::$publishGroups)) {
             return static::$publishGroups[$group];
         }
 
-        if ($provider && array_key_exists($provider, static::$publishes))
-        {
+        if ($provider && array_key_exists($provider, static::$publishes)) {
             return static::$publishes[$provider];
         }
 
-        if ($group || $provider)
-        {
+        if ($group || $provider) {
             return [];
         }
 
         $paths = [];
 
-        foreach (static::$publishes as $class => $publish)
-        {
+        foreach (static::$publishes as $class => $publish) {
             $paths = array_merge($paths, $publish);
         }
 
@@ -181,8 +171,7 @@ abstract class ServiceProvider {
         // give us the Artisan console instance which we will give commands to.
         $events = $this->app['events'];
 
-        $events->listen('artisan.start', function($artisan) use ($commands)
-        {
+        $events->listen('artisan.start', function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
     }
@@ -236,9 +225,10 @@ abstract class ServiceProvider {
      */
     public function __call($method, $parameters)
     {
-        if ($method == 'boot') return;
+        if ($method == 'boot') {
+            return;
+        }
 
         throw new BadMethodCallException("Call to undefined method [{$method}]");
     }
-
 }

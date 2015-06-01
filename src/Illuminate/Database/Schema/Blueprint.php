@@ -5,8 +5,8 @@ use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
 
-class Blueprint {
-
+class Blueprint
+{
     /**
      * The table the blueprint describes.
      *
@@ -56,7 +56,9 @@ class Blueprint {
     {
         $this->table = $table;
 
-        if ( ! is_null($callback)) $callback($this);
+        if (! is_null($callback)) {
+            $callback($this);
+        }
     }
 
     /**
@@ -68,8 +70,7 @@ class Blueprint {
      */
     public function build(Connection $connection, Grammar $grammar)
     {
-        foreach ($this->toSql($connection, $grammar) as $statement)
-        {
+        foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->statement($statement);
         }
     }
@@ -90,14 +91,11 @@ class Blueprint {
         // Each type of command has a corresponding compiler function on the schema
         // grammar which is used to build the necessary SQL statements to build
         // the blueprint element, so we'll just call that compilers function.
-        foreach ($this->commands as $command)
-        {
+        foreach ($this->commands as $command) {
             $method = 'compile'.ucfirst($command->name);
 
-            if (method_exists($grammar, $method))
-            {
-                if ( ! is_null($sql = $grammar->$method($this, $command, $connection)))
-                {
+            if (method_exists($grammar, $method)) {
+                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -113,13 +111,11 @@ class Blueprint {
      */
     protected function addImpliedCommands()
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating())
-        {
+        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating())
-        {
+        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -133,15 +129,12 @@ class Blueprint {
      */
     protected function addFluentIndexes()
     {
-        foreach ($this->columns as $column)
-        {
-            foreach (array('primary', 'unique', 'index') as $index)
-            {
+        foreach ($this->columns as $column) {
+            foreach (array('primary', 'unique', 'index') as $index) {
                 // If the index has been specified on the given column, but is simply
                 // equal to "true" (boolean), no name has been specified for this
                 // index, so we will simply call the index methods without one.
-                if ($column->$index === true)
-                {
+                if ($column->$index === true) {
                     $this->$index($column->name);
 
                     continue 2;
@@ -150,8 +143,7 @@ class Blueprint {
                 // If the index has been specified on the column and it is something
                 // other than boolean true, we will assume a name was provided on
                 // the index specification, and pass in the name to the method.
-                elseif (isset($column->$index))
-                {
+                elseif (isset($column->$index)) {
                     $this->$index($column->name, $column->$index);
 
                     continue 2;
@@ -167,9 +159,10 @@ class Blueprint {
      */
     protected function creating()
     {
-        foreach ($this->commands as $command)
-        {
-            if ($command->name == 'create') return true;
+        foreach ($this->commands as $command) {
+            if ($command->name == 'create') {
+                return true;
+            }
         }
 
         return false;
@@ -768,8 +761,7 @@ class Blueprint {
         // If the given "index" is actually an array of columns, the developer means
         // to drop an index merely by specifying the columns involved without the
         // conventional name, so we will build the index name from the columns.
-        if (is_array($index))
-        {
+        if (is_array($index)) {
             $columns = $index;
 
             $index = $this->createIndexName($type, $columns);
@@ -793,8 +785,7 @@ class Blueprint {
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
         // index type, such as primary or index, which makes the index unique.
-        if (is_null($index))
-        {
+        if (is_null($index)) {
             $index = $this->createIndexName($type, $columns);
         }
 
@@ -840,8 +831,7 @@ class Blueprint {
      */
     public function removeColumn($name)
     {
-        $this->columns = array_values(array_filter($this->columns, function($c) use ($name)
-        {
+        $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
             return $c['attributes']['name'] != $name;
         }));
 
@@ -911,8 +901,7 @@ class Blueprint {
      */
     public function getAddedColumns()
     {
-        return array_filter($this->columns, function($column)
-        {
+        return array_filter($this->columns, function ($column) {
             return !$column->change;
         });
     }
@@ -924,10 +913,8 @@ class Blueprint {
      */
     public function getChangedColumns()
     {
-        return array_filter($this->columns, function($column)
-        {
+        return array_filter($this->columns, function ($column) {
             return !!$column->change;
         });
     }
-
 }

@@ -4,8 +4,8 @@ use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ConsoleMakeCommand extends GeneratorCommand {
-
+class ConsoleMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -85,5 +85,4 @@ class ConsoleMakeCommand extends GeneratorCommand {
             array('command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'),
         );
     }
-
 }

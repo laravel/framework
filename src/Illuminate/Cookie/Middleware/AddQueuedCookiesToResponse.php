@@ -4,8 +4,8 @@ use Closure;
 use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class AddQueuedCookiesToResponse implements Middleware {
-
+class AddQueuedCookiesToResponse implements Middleware
+{
     /**
      * The cookie jar instance.
      *
@@ -35,12 +35,10 @@ class AddQueuedCookiesToResponse implements Middleware {
     {
         $response = $next($request);
 
-        foreach ($this->cookies->getQueuedCookies() as $cookie)
-        {
+        foreach ($this->cookies->getQueuedCookies() as $cookie) {
             $response->headers->setCookie($cookie);
         }
 
         return $response;
     }
-
 }

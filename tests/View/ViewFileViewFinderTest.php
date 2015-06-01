@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class ViewFinderTest extends PHPUnit_Framework_TestCase {
-
+class ViewFinderTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -154,5 +154,4 @@ class ViewFinderTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\View\FileViewFinder(m::mock('Illuminate\Filesystem\Filesystem'), array(__DIR__));
     }
-
 }

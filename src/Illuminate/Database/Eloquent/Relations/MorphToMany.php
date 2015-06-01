@@ -3,8 +3,8 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class MorphToMany extends BelongsToMany {
-
+class MorphToMany extends BelongsToMany
+{
     /**
      * The type of the polymorphic relation.
      *
@@ -154,5 +154,4 @@ class MorphToMany extends BelongsToMany {
     {
         return $this->morphClass;
     }
-
 }

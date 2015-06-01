@@ -3,8 +3,8 @@
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\ConnectionResolverInterface;
 
-class DatabaseConnector implements ConnectorInterface {
-
+class DatabaseConnector implements ConnectorInterface
+{
     /**
      * Database connections.
      *
@@ -38,5 +38,4 @@ class DatabaseConnector implements ConnectorInterface {
             array_get($config, 'expire', 60)
         );
     }
-
 }

@@ -8,8 +8,8 @@ use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class RouteCollection implements Countable, IteratorAggregate {
-
+class RouteCollection implements Countable, IteratorAggregate
+{
     /**
      * An array of the routes keyed by method.
      *
@@ -63,8 +63,7 @@ class RouteCollection implements Countable, IteratorAggregate {
     {
         $domainAndUri = $route->domain().$route->getUri();
 
-        foreach ($route->methods() as $method)
-        {
+        foreach ($route->methods() as $method) {
             $this->routes[$method][$domainAndUri] = $route;
         }
 
@@ -84,16 +83,14 @@ class RouteCollection implements Countable, IteratorAggregate {
         // to iterate through every route every time we need to perform a look-up.
         $action = $route->getAction();
 
-        if (isset($action['as']))
-        {
+        if (isset($action['as'])) {
             $this->nameList[$action['as']] = $route;
         }
 
         // When the route is routing to a controller we will also store the action that
         // is used by the route. This will let us reverse route to controllers while
         // processing a request and easily generate URLs to the given controllers.
-        if (isset($action['controller']))
-        {
+        if (isset($action['controller'])) {
             $this->addToActionList($action, $route);
         }
     }
@@ -127,8 +124,7 @@ class RouteCollection implements Countable, IteratorAggregate {
         // by the consumer. Otherwise we will check for routes with another verb.
         $route = $this->check($routes, $request);
 
-        if ( ! is_null($route))
-        {
+        if (! is_null($route)) {
             return $route->bind($request);
         }
 
@@ -137,8 +133,7 @@ class RouteCollection implements Countable, IteratorAggregate {
         // inform the user agent of which HTTP verb it should use for this route.
         $others = $this->checkForAlternateVerbs($request);
 
-        if (count($others) > 0)
-        {
+        if (count($others) > 0) {
             return $this->getRouteForMethods($request, $others);
         }
 
@@ -160,10 +155,8 @@ class RouteCollection implements Countable, IteratorAggregate {
         // proper error response with the correct headers on the response string.
         $others = array();
 
-        foreach ($methods as $method)
-        {
-            if ( ! is_null($this->check($this->get($method), $request, false)))
-            {
+        foreach ($methods as $method) {
+            if (! is_null($this->check($this->get($method), $request, false))) {
                 $others[] = $method;
             }
         }
@@ -182,10 +175,8 @@ class RouteCollection implements Countable, IteratorAggregate {
      */
     protected function getRouteForMethods($request, array $methods)
     {
-        if ($request->method() == 'OPTIONS')
-        {
-            return (new Route('OPTIONS', $request->path(), function() use ($methods)
-            {
+        if ($request->method() == 'OPTIONS') {
+            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
                 return new Response('', 200, array('Allow' => implode(',', $methods)));
 
             }))->bind($request);
@@ -217,8 +208,7 @@ class RouteCollection implements Countable, IteratorAggregate {
      */
     protected function check(array $routes, $request, $includingMethod = true)
     {
-        return array_first($routes, function($key, $value) use ($request, $includingMethod)
-        {
+        return array_first($routes, function ($key, $value) use ($request, $includingMethod) {
             return $value->matches($request, $includingMethod);
         });
     }
@@ -231,7 +221,9 @@ class RouteCollection implements Countable, IteratorAggregate {
      */
     protected function get($method = null)
     {
-        if (is_null($method)) return $this->getRoutes();
+        if (is_null($method)) {
+            return $this->getRoutes();
+        }
 
         return array_get($this->routes, $method, array());
     }
@@ -298,5 +290,4 @@ class RouteCollection implements Countable, IteratorAggregate {
     {
         return count($this->getRoutes());
     }
-
 }

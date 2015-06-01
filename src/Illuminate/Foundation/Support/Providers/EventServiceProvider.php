@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-class EventServiceProvider extends ServiceProvider {
-
+class EventServiceProvider extends ServiceProvider
+{
     /**
      * The event handler mappings for the application.
      *
@@ -27,16 +27,13 @@ class EventServiceProvider extends ServiceProvider {
      */
     public function boot(DispatcherContract $events)
     {
-        foreach ($this->listen as $event => $listeners)
-        {
-            foreach ($listeners as $listener)
-            {
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
                 $events->listen($event, $listener);
             }
         }
 
-        foreach ($this->subscribe as $subscriber)
-        {
+        foreach ($this->subscribe as $subscriber) {
             $events->subscribe($subscriber);
         }
     }
@@ -58,5 +55,4 @@ class EventServiceProvider extends ServiceProvider {
     {
         return $this->listen;
     }
-
 }

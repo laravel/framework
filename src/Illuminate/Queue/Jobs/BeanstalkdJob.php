@@ -5,8 +5,8 @@ use Illuminate\Container\Container;
 use Pheanstalk\Job as PheanstalkJob;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
-class BeanstalkdJob extends Job implements JobContract {
-
+class BeanstalkdJob extends Job implements JobContract
+{
     /**
      * The Pheanstalk instance.
      *
@@ -149,5 +149,4 @@ class BeanstalkdJob extends Job implements JobContract {
     {
         return $this->job;
     }
-
 }

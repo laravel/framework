@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Collection;
 
-class Inspiring {
-
+class Inspiring
+{
     /**
      * Get an inspiring quote.
      *
@@ -24,5 +24,4 @@ class Inspiring {
 
         ])->random();
     }
-
 }

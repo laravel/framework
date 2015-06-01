@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class PipelineServiceProvider extends ServiceProvider {
-
+class PipelineServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -34,5 +34,4 @@ class PipelineServiceProvider extends ServiceProvider {
             'Illuminate\Contracts\Pipeline\Hub',
         ];
     }
-
 }

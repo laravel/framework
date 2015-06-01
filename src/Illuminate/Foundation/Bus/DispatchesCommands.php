@@ -3,8 +3,7 @@
 /**
  * @deprecated since version 5.1. Use the DispatchesJobs trait directly.
  */
-trait DispatchesCommands {
-
+trait DispatchesCommands
+{
     use DispatchesJobs;
-
 }

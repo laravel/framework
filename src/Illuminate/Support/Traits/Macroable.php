@@ -3,8 +3,8 @@
 use Closure;
 use BadMethodCallException;
 
-trait Macroable {
-
+trait Macroable
+{
     /**
      * The registered string macros.
      *
@@ -46,14 +46,10 @@ trait Macroable {
      */
     public static function __callStatic($method, $parameters)
     {
-        if (static::hasMacro($method))
-        {
-            if (static::$macros[$method] instanceof Closure)
-            {
+        if (static::hasMacro($method)) {
+            if (static::$macros[$method] instanceof Closure) {
                 return call_user_func_array(Closure::bind(static::$macros[$method], null, get_called_class()), $parameters);
-            }
-            else
-            {
+            } else {
                 return call_user_func_array(static::$macros[$method], $parameters);
             }
         }
@@ -72,19 +68,14 @@ trait Macroable {
      */
     public function __call($method, $parameters)
     {
-        if (static::hasMacro($method))
-        {
-            if (static::$macros[$method] instanceof Closure)
-            {
+        if (static::hasMacro($method)) {
+            if (static::$macros[$method] instanceof Closure) {
                 return call_user_func_array(static::$macros[$method]->bindTo($this, get_class($this)), $parameters);
-            }
-            else
-            {
+            } else {
                 return call_user_func_array(static::$macros[$method], $parameters);
             }
         }
 
         throw new BadMethodCallException("Method {$method} does not exist.");
     }
-
 }

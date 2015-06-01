@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class MailMessageTest extends PHPUnit_Framework_TestCase {
-
+class MailMessageTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -33,5 +33,4 @@ class MailMessageTest extends PHPUnit_Framework_TestCase {
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
         $message->attachData('foo', 'name', array('mime' => 'image/jpeg'));
     }
-
 }

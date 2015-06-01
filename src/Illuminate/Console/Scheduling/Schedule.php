@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Foundation\Application;
 
-class Schedule {
-
+class Schedule
+{
     /**
      * All of the events on the schedule.
      *
@@ -46,8 +46,7 @@ class Schedule {
      */
     public function exec($command, array $parameters = [])
     {
-        if (count($parameters))
-        {
+        if (count($parameters)) {
             $command .= ' '.$this->compileParameters($parameters);
         }
 
@@ -64,8 +63,7 @@ class Schedule {
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function($value, $key)
-        {
+        return collect($parameters)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key.'="'.addslashes($value).'"';
         })->implode(' ');
     }
@@ -88,10 +86,8 @@ class Schedule {
      */
     public function dueEvents(Application $app)
     {
-        return array_filter($this->events, function($event) use ($app)
-        {
+        return array_filter($this->events, function ($event) use ($app) {
             return $event->isDue($app);
         });
     }
-
 }

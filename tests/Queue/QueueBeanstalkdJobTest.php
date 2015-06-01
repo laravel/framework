@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
-
+class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -68,10 +68,10 @@ class QueueBeanstalkdJobTest extends PHPUnit_Framework_TestCase {
             'default'
         );
     }
-
 }
 
-class BeanstalkdJobTestFailedTest {
+class BeanstalkdJobTestFailedTest
+{
     public function failed(array $data)
     {
         //

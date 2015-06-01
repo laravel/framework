@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Queue;
 
-interface Factory {
-
+interface Factory
+{
     /**
      * Resolve a queue connection instance.
      *
@@ -9,5 +9,4 @@ interface Factory {
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($name = null);
-
 }

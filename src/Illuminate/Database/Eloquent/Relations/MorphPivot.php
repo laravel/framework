@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Eloquent\Builder;
 
-class MorphPivot extends Pivot {
-
+class MorphPivot extends Pivot
+{
     /**
      * The type of the polymorphic relation.
      *
@@ -74,5 +74,4 @@ class MorphPivot extends Pivot {
 
         return $this;
     }
-
 }

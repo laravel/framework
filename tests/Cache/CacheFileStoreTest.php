@@ -3,8 +3,8 @@
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
-class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheFileStoreTest extends PHPUnit_Framework_TestCase
+{
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
@@ -124,5 +124,4 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
     {
         return $this->getMock('Illuminate\Filesystem\Filesystem');
     }
-
 }

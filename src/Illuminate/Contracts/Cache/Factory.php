@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Cache;
 
-interface Factory {
-
+interface Factory
+{
     /**
      * Get a cache store instance by name.
      *
@@ -9,5 +9,4 @@ interface Factory {
      * @return mixed
      */
     public function store($name = null);
-
 }

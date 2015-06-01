@@ -10,7 +10,6 @@ use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
 class BroadcastManager implements FactoryContract
 {
-
     /**
      * The application instance.
      *

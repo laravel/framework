@@ -6,8 +6,8 @@ use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
-class AppNameCommand extends Command {
-
+class AppNameCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -95,8 +95,7 @@ class AppNameCommand extends Command {
                             ->in($this->laravel['path'])
                             ->name('*.php');
 
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $this->replaceNamespace($file->getRealPath());
         }
     }
@@ -220,8 +219,7 @@ class AppNameCommand extends Command {
      */
     protected function setPhpSpecNamespace()
     {
-        if ($this->files->exists($path = $this->getPhpSpecConfigPath()))
-        {
+        if ($this->files->exists($path = $this->getPhpSpecConfigPath())) {
             $this->replaceIn($path, $this->currentRoot, $this->argument('name'));
         }
     }
@@ -321,5 +319,4 @@ class AppNameCommand extends Command {
             array('name', InputArgument::REQUIRED, 'The desired namespace.'),
         );
     }
-
 }

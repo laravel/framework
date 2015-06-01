@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class BroadcastEventTest extends PHPUnit_Framework_TestCase {
-
+class BroadcastEventTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -46,11 +46,11 @@ class BroadcastEventTest extends PHPUnit_Framework_TestCase {
 
         (new Illuminate\Broadcasting\BroadcastEvent($broadcaster))->fire($job, $jobData);
     }
-
 }
 
 
-class TestBroadcastEvent {
+class TestBroadcastEvent
+{
     public $firstName = 'Taylor';
     public $lastName = 'Otwell';
     public $collection;
@@ -66,10 +66,10 @@ class TestBroadcastEvent {
 }
 
 
-class TestBroadcastEventWithManualData extends TestBroadcastEvent {
+class TestBroadcastEventWithManualData extends TestBroadcastEvent
+{
     public function broadcastWith()
     {
         return ['name' => 'Taylor'];
     }
 }
-

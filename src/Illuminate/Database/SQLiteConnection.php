@@ -5,8 +5,8 @@ use Doctrine\DBAL\Driver\PDOSqlite\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 
-class SQLiteConnection extends Connection {
-
+class SQLiteConnection extends Connection
+{
     /**
      * Get the default query grammar instance.
      *
@@ -46,5 +46,4 @@ class SQLiteConnection extends Connection {
     {
         return new DoctrineDriver;
     }
-
 }

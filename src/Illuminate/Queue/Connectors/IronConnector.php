@@ -5,8 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class IronConnector implements ConnectorInterface {
-
+class IronConnector implements ConnectorInterface
+{
     /**
      * The encrypter instance.
      *
@@ -44,16 +44,16 @@ class IronConnector implements ConnectorInterface {
     {
         $ironConfig = array('token' => $config['token'], 'project_id' => $config['project']);
 
-        if (isset($config['host'])) $ironConfig['host'] = $config['host'];
+        if (isset($config['host'])) {
+            $ironConfig['host'] = $config['host'];
+        }
 
         $iron = new IronMQ($ironConfig);
 
-        if (isset($config['ssl_verifypeer']))
-        {
+        if (isset($config['ssl_verifypeer'])) {
             $iron->ssl_verifypeer = $config['ssl_verifypeer'];
         }
 
         return new IronQueue($iron, $this->request, $config['queue'], $config['encrypt']);
     }
-
 }

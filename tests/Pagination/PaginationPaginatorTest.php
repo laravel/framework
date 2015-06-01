@@ -6,8 +6,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
 use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
 
-class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
-
+class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -55,13 +55,15 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testPresenterCanGetAUrlRangeForAWindowOfLinks()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 7);
         $window = new UrlWindow($p);
         $slider = [];
-        for ($i = 4; $i <= 10; $i++)
+        for ($i = 4; $i <= 10; $i++) {
             $slider[$i] = '/?page='.$i;
+        }
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
 
@@ -71,8 +73,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
         $p = new LengthAwarePaginator($array, count($array), 1, 8);
         $window = new UrlWindow($p);
         $last = [];
-        for ($i = 5; $i <= 13; $i++)
+        for ($i = 5; $i <= 13; $i++) {
             $last[$i] = '/?page='.$i;
+        }
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
     }
@@ -81,8 +84,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testBootstrapPresenterCanGeneratorLinksForSlider()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 7);
         $presenter = new BootstrapPresenter($p);
 
@@ -94,14 +98,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     {
         $p = new LengthAwarePaginator([], 1, 1, 1);
         $presenter = m::mock('StdClass');
-        \Illuminate\Pagination\AbstractPaginator::presenter(function() use ($presenter) {
+        \Illuminate\Pagination\AbstractPaginator::presenter(function () use ($presenter) {
             return $presenter;
         });
         $presenter->shouldReceive('render')->andReturn('presenter');
 
         $this->assertEquals('presenter', $p->render());
 
-        \Illuminate\Pagination\AbstractPaginator::presenter(function() {
+        \Illuminate\Pagination\AbstractPaginator::presenter(function () {
             return;
         });
     }
@@ -110,8 +114,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testBootstrapPresenterCanGeneratorLinksForTooCloseToBeginning()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 2);
         $presenter = new BootstrapPresenter($p);
 
@@ -122,8 +127,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testBootstrapPresenterCanGeneratorLinksForTooCloseToEnding()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 12);
         $presenter = new BootstrapPresenter($p);
 
@@ -134,8 +140,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnLastPage()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 13);
         $presenter = new BootstrapPresenter($p);
 
@@ -146,8 +153,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnFirstPage()
     {
         $array = [];
-        for ($i = 1; $i <= 13; $i++)
+        for ($i = 1; $i <= 13; $i++) {
             $array[$i] = 'item'.$i;
+        }
         $p = new LengthAwarePaginator($array, count($array), 1, 1);
         $presenter = new BootstrapPresenter($p);
 
@@ -169,5 +177,4 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
             'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4']
         ], $p->toArray());
     }
-
 }

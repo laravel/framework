@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
-
+class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -506,5 +506,4 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Database\Schema\Grammars\PostgresGrammar;
     }
-
 }

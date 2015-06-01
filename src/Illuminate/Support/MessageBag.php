@@ -7,8 +7,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
-class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, MessageBagContract, MessageProvider  {
-
+class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, MessageBagContract, MessageProvider
+{
     /**
      * All of the registered messages.
      *
@@ -31,8 +31,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function __construct(array $messages = array())
     {
-        foreach ($messages as $key => $value)
-        {
+        foreach ($messages as $key => $value) {
             $this->messages[$key] = (array) $value;
         }
     }
@@ -56,8 +55,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function add($key, $message)
     {
-        if ($this->isUnique($key, $message))
-        {
+        if ($this->isUnique($key, $message)) {
             $this->messages[$key][] = $message;
         }
 
@@ -72,8 +70,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function merge($messages)
     {
-        if ($messages instanceof MessageProvider)
-        {
+        if ($messages instanceof MessageProvider) {
             $messages = $messages->getMessageBag()->getMessages();
         }
 
@@ -133,8 +130,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         // If the message exists in the container, we will transform it and return
         // the message. Otherwise, we'll return an empty array since the entire
         // methods is to return back an array of messages in the first place.
-        if (array_key_exists($key, $this->messages))
-        {
+        if (array_key_exists($key, $this->messages)) {
             return $this->transform($this->messages[$key], $this->checkFormat($format), $key);
         }
 
@@ -153,8 +149,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 
         $all = array();
 
-        foreach ($this->messages as $key => $messages)
-        {
+        foreach ($this->messages as $key => $messages) {
             $all = array_merge($all, $this->transform($messages, $format, $key));
         }
 
@@ -178,8 +173,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         // the messages to be easily formatted to each developer's desires.
         $replace = array(':message', ':key');
 
-        foreach ($messages as &$message)
-        {
+        foreach ($messages as &$message) {
             $message = str_replace($replace, array($message, $messageKey), $format);
         }
 
@@ -310,5 +304,4 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         return $this->toJson();
     }
-
 }

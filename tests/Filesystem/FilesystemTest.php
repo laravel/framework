@@ -2,8 +2,8 @@
 
 use Illuminate\Filesystem\Filesystem;
 
-class FilesystemTest extends PHPUnit_Framework_TestCase {
-
+class FilesystemTest extends PHPUnit_Framework_TestCase
+{
     public function testGetRetrievesFiles()
     {
         file_put_contents(__DIR__.'/file.txt', 'Hello World');
@@ -265,8 +265,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
         file_put_contents(__DIR__.'/bar.txt', 'bar');
         $files = new Filesystem;
         $allFiles = [];
-        foreach ($files->allFiles(__DIR__) as $file)
-        {
+        foreach ($files->allFiles(__DIR__) as $file) {
             $allFiles[] = $file->getFilename();
         }
         $this->assertContains('foo.txt', $allFiles);
@@ -295,6 +294,4 @@ class FilesystemTest extends PHPUnit_Framework_TestCase {
         $this->assertFileExists(__DIR__.'/foo');
         @rmdir(__DIR__.'/foo');
     }
-
-
 }

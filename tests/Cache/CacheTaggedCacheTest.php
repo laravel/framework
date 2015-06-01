@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Cache\ArrayStore;
 
-class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
-
+class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -106,5 +106,4 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase {
 
         $redis->flush();
     }
-
 }

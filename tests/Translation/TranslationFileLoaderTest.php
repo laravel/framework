@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
 
-class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
-
+class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -64,5 +64,4 @@ class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(array(), $loader->load('en', 'foo', 'bar'));
     }
-
 }

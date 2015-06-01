@@ -1,7 +1,7 @@
 <?php
 
-class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
-
+class CacheApcStoreTest extends PHPUnit_Framework_TestCase
+{
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMock('Illuminate\Cache\ApcWrapper', array('get'));
@@ -63,5 +63,4 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase {
         $store = new Illuminate\Cache\ApcStore($apc);
         $store->forget('foo');
     }
-
 }

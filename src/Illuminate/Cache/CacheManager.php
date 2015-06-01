@@ -5,8 +5,8 @@ use InvalidArgumentException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 
-class CacheManager implements FactoryContract {
-
+class CacheManager implements FactoryContract
+{
     /**
      * The application instance.
      *
@@ -84,17 +84,13 @@ class CacheManager implements FactoryContract {
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config))
-        {
+        if (is_null($config)) {
             throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
         }
 
-        if (isset($this->customCreators[$config['driver']]))
-        {
+        if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        }
-        else
-        {
+        } else {
             return $this->{"create".ucfirst($config['driver'])."Driver"}($config);
         }
     }
@@ -233,8 +229,7 @@ class CacheManager implements FactoryContract {
     {
         $repository = new Repository($store);
 
-        if ($this->app->bound('Illuminate\Contracts\Events\Dispatcher'))
-        {
+        if ($this->app->bound('Illuminate\Contracts\Events\Dispatcher')) {
             $repository->setEventDispatcher(
                 $this->app['Illuminate\Contracts\Events\Dispatcher']
             );
@@ -311,5 +306,4 @@ class CacheManager implements FactoryContract {
     {
         return call_user_func_array(array($this->store(), $method), $parameters);
     }
-
 }

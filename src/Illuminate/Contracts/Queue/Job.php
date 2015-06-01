@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Queue;
 
-interface Job {
-
+interface Job
+{
     /**
      * Fire the job.
      *
@@ -44,5 +44,4 @@ interface Job {
      * @return string
      */
     public function getQueue();
-
 }

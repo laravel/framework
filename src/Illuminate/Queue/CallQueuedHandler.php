@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
 
-class CallQueuedHandler {
-
+class CallQueuedHandler
+{
     /**
      * The bus dispatcher implementation.
      *
@@ -36,13 +36,11 @@ class CallQueuedHandler {
             $job, unserialize($data['command'])
         );
 
-        $this->dispatcher->dispatchNow($command, function($handler) use ($job)
-        {
+        $this->dispatcher->dispatchNow($command, function ($handler) use ($job) {
             $this->setJobInstanceIfNecessary($job, $handler);
         });
 
-        if ( ! $job->isDeletedOrReleased())
-        {
+        if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
     }
@@ -56,8 +54,7 @@ class CallQueuedHandler {
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance))))
-        {
+        if (in_array('Illuminate\Queue\InteractsWithQueue', class_uses_recursive(get_class($instance)))) {
             $instance->setJob($job);
         }
 
@@ -74,10 +71,8 @@ class CallQueuedHandler {
     {
         $handler = $this->dispatcher->resolveHandler($command = unserialize($data['command']));
 
-        if (method_exists($handler, 'failed'))
-        {
+        if (method_exists($handler, 'failed')) {
             call_user_func([$handler, 'failed'], $command);
         }
     }
-
 }

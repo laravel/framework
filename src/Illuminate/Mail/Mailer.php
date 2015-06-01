@@ -13,8 +13,8 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
-class Mailer implements MailerContract, MailQueueContract {
-
+class Mailer implements MailerContract, MailQueueContract
+{
     /**
      * The view factory instance.
      *
@@ -238,7 +238,9 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function buildQueueCallable($callback)
     {
-        if ( ! $callback instanceof Closure) return $callback;
+        if (! $callback instanceof Closure) {
+            return $callback;
+        }
 
         return (new Serializer)->serialize($callback);
     }
@@ -265,8 +267,7 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function getQueuedCallable(array $data)
     {
-        if (str_contains($data['callback'], 'SerializableClosure'))
-        {
+        if (str_contains($data['callback'], 'SerializableClosure')) {
             return unserialize($data['callback'])->getClosure();
         }
 
@@ -297,18 +298,15 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function addContent($message, $view, $plain, $raw, $data)
     {
-        if (isset($view))
-        {
+        if (isset($view)) {
             $message->setBody($this->getView($view, $data), 'text/html');
         }
 
-        if (isset($plain))
-        {
+        if (isset($plain)) {
             $message->addPart($this->getView($plain, $data), 'text/plain');
         }
 
-        if (isset($raw))
-        {
+        if (isset($raw)) {
             $message->addPart($raw, 'text/plain');
         }
     }
@@ -323,21 +321,21 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function parseView($view)
     {
-        if (is_string($view)) return [$view, null, null];
+        if (is_string($view)) {
+            return [$view, null, null];
+        }
 
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
         // array as is, since must should contain both views with numeric keys.
-        if (is_array($view) && isset($view[0]))
-        {
+        if (is_array($view) && isset($view[0])) {
             return [$view[0], $view[1], null];
         }
 
         // If the view is an array, but doesn't contain numeric keys, we will assume
         // the the views are being explicitly specified and will extract them via
         // named keys instead, allowing the developers to use one or the other.
-        elseif (is_array($view))
-        {
+        elseif (is_array($view)) {
             return [
                 array_get($view, 'html'),
                 array_get($view, 'text'),
@@ -356,17 +354,13 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function sendSwiftMessage($message)
     {
-        if ($this->events)
-        {
+        if ($this->events) {
             $this->events->fire('mailer.sending', array($message));
         }
 
-        if ( ! $this->pretending)
-        {
+        if (! $this->pretending) {
             return $this->swift->send($message, $this->failedRecipients);
-        }
-        elseif (isset($this->logger))
-        {
+        } elseif (isset($this->logger)) {
             $this->logMessage($message);
         }
     }
@@ -395,12 +389,9 @@ class Mailer implements MailerContract, MailQueueContract {
      */
     protected function callMessageBuilder($callback, $message)
     {
-        if ($callback instanceof Closure)
-        {
+        if ($callback instanceof Closure) {
             return call_user_func($callback, $message);
-        }
-        elseif (is_string($callback))
-        {
+        } elseif (is_string($callback)) {
             return $this->container->make($callback)->mail($message);
         }
 
@@ -419,8 +410,7 @@ class Mailer implements MailerContract, MailQueueContract {
         // If a global from address has been specified we will set it on every message
         // instances so the developer does not have to repeat themselves every time
         // they create a new message. We will just go ahead and push the address.
-        if (! empty($this->from['address']))
-        {
+        if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 
@@ -537,5 +527,4 @@ class Mailer implements MailerContract, MailQueueContract {
     {
         $this->container = $container;
     }
-
 }

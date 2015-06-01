@@ -3,8 +3,8 @@
 use Carbon\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
 
-class DatabaseFailedJobProvider implements FailedJobProviderInterface {
-
+class DatabaseFailedJobProvider implements FailedJobProviderInterface
+{
     /**
      * The connection resolver implementation.
      *
@@ -107,5 +107,4 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface {
     {
         return $this->resolver->connection($this->database)->table($this->table);
     }
-
 }

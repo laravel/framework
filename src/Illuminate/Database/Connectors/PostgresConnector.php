@@ -2,8 +2,8 @@
 
 use PDO;
 
-class PostgresConnector extends Connector implements ConnectorInterface {
-
+class PostgresConnector extends Connector implements ConnectorInterface
+{
     /**
      * The default PDO connection options.
      *
@@ -40,8 +40,7 @@ class PostgresConnector extends Connector implements ConnectorInterface {
         // Next, we will check to see if a timezone has been specified in this config
         // and if it has we will issue a statement to modify the timezone with the
         // database. Setting this DB timezone is an optional configuration item.
-        if (isset($config['timezone']))
-        {
+        if (isset($config['timezone'])) {
             $timezone = $config['timezone'];
 
             $connection->prepare("set time zone '$timezone'")->execute();
@@ -50,8 +49,7 @@ class PostgresConnector extends Connector implements ConnectorInterface {
         // Unlike MySQL, Postgres allows the concept of "schema" and a default schema
         // may have been specified on the connections. If that is the case we will
         // set the default schema search paths to the specified database schema.
-        if (isset($config['schema']))
-        {
+        if (isset($config['schema'])) {
             $schema = $config['schema'];
 
             $connection->prepare("set search_path to \"{$schema}\"")->execute();
@@ -80,17 +78,14 @@ class PostgresConnector extends Connector implements ConnectorInterface {
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
-        if (isset($config['port']))
-        {
+        if (isset($config['port'])) {
             $dsn .= ";port={$port}";
         }
 
-        if (isset($config['sslmode']))
-        {
+        if (isset($config['sslmode'])) {
             $dsn .= ";sslmode={$sslmode}";
         }
 
         return $dsn;
     }
-
 }

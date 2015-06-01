@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -131,28 +131,23 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
-
     }
 
     protected function getDsn(array $config)
     {
         extract($config);
 
-        if (in_array('dblib', PDO::getAvailableDrivers()))
-        {
+        if (in_array('dblib', PDO::getAvailableDrivers())) {
             $port = isset($config['port']) ? ':'.$port : '';
             $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
             $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
 
             return "dblib:host={$host}{$port};dbname={$database}{$appname}{$charset}";
-        }
-        else
-        {
+        } else {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}";
         }
     }
-
 }

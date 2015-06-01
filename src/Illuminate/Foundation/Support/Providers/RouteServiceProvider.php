@@ -3,8 +3,8 @@
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
-class RouteServiceProvider extends ServiceProvider {
-
+class RouteServiceProvider extends ServiceProvider
+{
     /**
      * The controller namespace for the application.
      *
@@ -22,12 +22,9 @@ class RouteServiceProvider extends ServiceProvider {
     {
         $this->setRootControllerNamespace();
 
-        if ($this->app->routesAreCached())
-        {
+        if ($this->app->routesAreCached()) {
             $this->loadCachedRoutes();
-        }
-        else
-        {
+        } else {
             $this->loadRoutes();
         }
     }
@@ -39,7 +36,9 @@ class RouteServiceProvider extends ServiceProvider {
      */
     protected function setRootControllerNamespace()
     {
-        if (is_null($this->namespace)) return;
+        if (is_null($this->namespace)) {
+            return;
+        }
 
         $this->app['Illuminate\Contracts\Routing\UrlGenerator']
                         ->setRootControllerNamespace($this->namespace);
@@ -52,8 +51,7 @@ class RouteServiceProvider extends ServiceProvider {
      */
     protected function loadCachedRoutes()
     {
-        $this->app->booted(function()
-        {
+        $this->app->booted(function () {
             require $this->app->getCachedRoutesPath();
         });
     }
@@ -78,10 +76,11 @@ class RouteServiceProvider extends ServiceProvider {
     {
         $router = $this->app['Illuminate\Routing\Router'];
 
-        if (is_null($this->namespace)) return require $path;
+        if (is_null($this->namespace)) {
+            return require $path;
+        }
 
-        $router->group(['namespace' => $this->namespace], function($router) use ($path)
-        {
+        $router->group(['namespace' => $this->namespace], function ($router) use ($path) {
             require $path;
         });
     }
@@ -107,5 +106,4 @@ class RouteServiceProvider extends ServiceProvider {
     {
         return call_user_func_array([$this->app['router'], $method], $parameters);
     }
-
 }

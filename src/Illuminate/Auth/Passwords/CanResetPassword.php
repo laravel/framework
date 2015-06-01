@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Auth\Passwords;
 
-trait CanResetPassword {
-
+trait CanResetPassword
+{
     /**
      * Get the e-mail address where password reset links are sent.
      *
@@ -11,5 +11,4 @@ trait CanResetPassword {
     {
         return $this->email;
     }
-
 }

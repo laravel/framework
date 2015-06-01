@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 
-class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -40,9 +40,12 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class AppDatabaseMigrationRollbackStub extends Application {
-    public function environment() { return 'development'; }
+class AppDatabaseMigrationRollbackStub extends Application
+{
+    public function environment()
+    {
+        return 'development';
+    }
 }

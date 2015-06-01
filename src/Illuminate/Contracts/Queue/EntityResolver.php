@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Queue;
 
-interface EntityResolver {
-
+interface EntityResolver
+{
     /**
      * Resolve the entity for the given ID.
      *
@@ -10,5 +10,4 @@ interface EntityResolver {
      * @return mixed
      */
     public function resolve($type, $id);
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Foundation\AliasLoader;
 
-class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase {
-
+class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase
+{
     public function testLoaderCanBeCreatedAndRegisteredOnce()
     {
         $loader = AliasLoader::getInstance(array('foo' => 'bar'));
@@ -21,5 +21,4 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase {
         $loader = AliasLoader::getInstance(array('foo' => 'bar'));
         $this->assertEquals($loader, AliasLoader::getInstance());
     }
-
 }

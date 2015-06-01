@@ -3,8 +3,8 @@
 use Closure;
 use Illuminate\Contracts\Routing\Middleware;
 
-class FrameGuard implements Middleware {
-
+class FrameGuard implements Middleware
+{
     /**
      * Handle the given request and get the response.
      *
@@ -20,5 +20,4 @@ class FrameGuard implements Middleware {
 
         return $response;
     }
-
 }

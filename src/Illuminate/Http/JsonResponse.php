@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
-class JsonResponse extends BaseJsonResponse {
-
+class JsonResponse extends BaseJsonResponse
+{
     use ResponseTrait;
 
     /**
@@ -75,5 +75,4 @@ class JsonResponse extends BaseJsonResponse {
 
         return $this->setData($this->getData());
     }
-
 }

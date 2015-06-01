@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Eloquent\Collection;
 
-class MorphMany extends MorphOneOrMany {
-
+class MorphMany extends MorphOneOrMany
+{
     /**
      * Get the results of the relationship.
      *
@@ -23,8 +23,7 @@ class MorphMany extends MorphOneOrMany {
      */
     public function initRelation(array $models, $relation)
     {
-        foreach ($models as $model)
-        {
+        foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
 
@@ -43,5 +42,4 @@ class MorphMany extends MorphOneOrMany {
     {
         return $this->matchMany($models, $results, $relation);
     }
-
 }

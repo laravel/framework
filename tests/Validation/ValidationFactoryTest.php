@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Validation\Factory;
 
-class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
-
+class ValidationFactoryTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -21,9 +21,9 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('baz' => array('boom')), $validator->getRules());
 
         $presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $noop1 = function() {};
-        $noop2 = function() {};
-        $noop3 = function() {};
+        $noop1 = function () {};
+        $noop2 = function () {};
+        $noop3 = function () {};
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);
         $factory->replacer('replacer', $noop3);
@@ -49,8 +49,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
         unset($_SERVER['__validator.factory']);
         $translator = m::mock('Symfony\Component\Translation\TranslatorInterface');
         $factory = new Factory($translator);
-        $factory->resolver(function($translator, $data, $rules)
-        {
+        $factory->resolver(function ($translator, $data, $rules) {
             $_SERVER['__validator.factory'] = true;
             return new Illuminate\Validation\Validator($translator, $data, $rules);
         });
@@ -62,5 +61,4 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('baz' => array('boom')), $validator->getRules());
         unset($_SERVER['__validator.factory']);
     }
-
 }

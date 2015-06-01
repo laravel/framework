@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Foundation\Application;
 
-class RegisterProviders {
-
+class RegisterProviders
+{
     /**
      * Bootstrap the given application.
      *
@@ -14,5 +14,4 @@ class RegisterProviders {
     {
         $app->registerConfiguredProviders();
     }
-
 }

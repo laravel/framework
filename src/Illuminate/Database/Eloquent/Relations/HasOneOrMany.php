@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
-abstract class HasOneOrMany extends Relation {
-
+abstract class HasOneOrMany extends Relation
+{
     /**
      * The foreign key of the parent model.
      *
@@ -45,8 +45,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function addConstraints()
     {
-        if (static::$constraints)
-        {
+        if (static::$constraints) {
             $this->query->where($this->foreignKey, '=', $this->getParentKey());
 
             $this->query->whereNotNull($this->foreignKey);
@@ -62,8 +61,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function getRelationCountQuery(Builder $query, Builder $parent)
     {
-        if ($parent->getQuery()->from == $query->getQuery()->from)
-        {
+        if ($parent->getQuery()->from == $query->getQuery()->from) {
             return $this->getRelationCountQueryForSelfRelation($query, $parent);
         }
 
@@ -153,12 +151,10 @@ abstract class HasOneOrMany extends Relation {
         // Once we have the dictionary we can simply spin through the parent models to
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
-        foreach ($models as $model)
-        {
+        foreach ($models as $model) {
             $key = $model->getAttribute($this->localKey);
 
-            if (isset($dictionary[$key]))
-            {
+            if (isset($dictionary[$key])) {
                 $value = $this->getRelationValue($dictionary, $key, $type);
 
                 $model->setRelation($relation, $value);
@@ -198,8 +194,7 @@ abstract class HasOneOrMany extends Relation {
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
-        foreach ($results as $result)
-        {
+        foreach ($results as $result) {
             $dictionary[$result->{$foreign}][] = $result;
         }
 
@@ -241,8 +236,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (is_null($instance = $this->find($id, $columns)))
-        {
+        if (is_null($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
 
             $instance->setAttribute($this->getPlainForeignKey(), $this->getParentKey());
@@ -259,8 +253,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function firstOrNew(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first()))
-        {
+        if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
 
             $instance->setAttribute($this->getPlainForeignKey(), $this->getParentKey());
@@ -277,8 +270,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function firstOrCreate(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first()))
-        {
+        if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes);
         }
 
@@ -333,8 +325,7 @@ abstract class HasOneOrMany extends Relation {
     {
         $instances = array();
 
-        foreach ($records as $record)
-        {
+        foreach ($records as $record) {
             $instances[] = $this->create($record);
         }
 
@@ -349,8 +340,7 @@ abstract class HasOneOrMany extends Relation {
      */
     public function update(array $attributes)
     {
-        if ($this->related->usesTimestamps())
-        {
+        if ($this->related->usesTimestamps()) {
             $attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();
         }
 
@@ -408,5 +398,4 @@ abstract class HasOneOrMany extends Relation {
     {
         return $this->parent->getTable().'.'.$this->localKey;
     }
-
 }

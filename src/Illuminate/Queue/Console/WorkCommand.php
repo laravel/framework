@@ -6,8 +6,8 @@ use Illuminate\Contracts\Queue\Job;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class WorkCommand extends Command {
-
+class WorkCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -49,7 +49,9 @@ class WorkCommand extends Command {
      */
     public function fire()
     {
-        if ($this->downForMaintenance() && ! $this->option('daemon')) return;
+        if ($this->downForMaintenance() && ! $this->option('daemon')) {
+            return;
+        }
 
         $queue = $this->option('queue');
 
@@ -69,8 +71,7 @@ class WorkCommand extends Command {
         // If a job was fired by the worker, we'll write the output out to the console
         // so that the developer can watch live while the queue runs in the console
         // window, which will also of get logged if stdout is logged out to disk.
-        if ( ! is_null($response['job']))
-        {
+        if (! is_null($response['job'])) {
             $this->writeOutput($response['job'], $response['failed']);
         }
     }
@@ -87,8 +88,7 @@ class WorkCommand extends Command {
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
-        if ($daemon)
-        {
+        if ($daemon) {
             $this->worker->setCache($this->laravel['cache']->driver());
 
             $this->worker->setDaemonExceptionHandler(
@@ -116,12 +116,9 @@ class WorkCommand extends Command {
      */
     protected function writeOutput(Job $job, $failed)
     {
-        if ($failed)
-        {
+        if ($failed) {
             $this->output->writeln('<error>Failed:</error> '.$job->getName());
-        }
-        else
-        {
+        } else {
             $this->output->writeln('<info>Processed:</info> '.$job->getName());
         }
     }
@@ -133,7 +130,9 @@ class WorkCommand extends Command {
      */
     protected function downForMaintenance()
     {
-        if ($this->option('force')) return false;
+        if ($this->option('force')) {
+            return false;
+        }
 
         return $this->laravel->isDownForMaintenance();
     }
@@ -173,5 +172,4 @@ class WorkCommand extends Command {
             array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
         );
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueIronJobTest extends PHPUnit_Framework_TestCase {
-
+class QueueIronJobTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -61,5 +61,4 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase {
             (object) array('id' => 1, 'body' => json_encode(array('job' => 'foo', 'data' => array('data'), 'attempts' => 1, 'queue' => 'default')), 'timeout' => 60)
         );
     }
-
 }

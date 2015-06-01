@@ -5,8 +5,8 @@ use InvalidArgumentException;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
-class UrlGenerator implements UrlGeneratorContract {
-
+class UrlGenerator implements UrlGeneratorContract
+{
     /**
      * The route collection.
      *
@@ -146,7 +146,9 @@ class UrlGenerator implements UrlGeneratorContract {
         // First we will check if the URL is already a valid URL. If it is we will not
         // try to generate a new one but will simply return the URL as is, which is
         // convenient since developers do not always have to check if it's valid.
-        if ($this->isValidUrl($path)) return $path;
+        if ($this->isValidUrl($path)) {
+            return $path;
+        }
 
         $scheme = $this->getScheme($secure);
 
@@ -185,7 +187,9 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     public function asset($path, $secure = null)
     {
-        if ($this->isValidUrl($path)) return $path;
+        if ($this->isValidUrl($path)) {
+            return $path;
+        }
 
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
@@ -227,10 +231,8 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getScheme($secure)
     {
-        if (is_null($secure))
-        {
-            if (is_null($this->cachedSchema))
-            {
+        if (is_null($secure)) {
+            if (is_null($this->cachedSchema)) {
                 $this->cachedSchema = $this->forceSchema ?: $this->request->getScheme().'://';
             }
 
@@ -265,8 +267,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     public function route($name, $parameters = array(), $absolute = true)
     {
-        if ( ! is_null($route = $this->routes->getByName($name)))
-        {
+        if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 
@@ -317,8 +318,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function replaceRouteParameters($path, array &$parameters)
     {
-        if (count($parameters))
-        {
+        if (count($parameters)) {
             $path = preg_replace_sub(
                 '/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
             );
@@ -336,8 +336,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function replaceNamedParameters($path, &$parameters)
     {
-        return preg_replace_callback('/\{(.*?)\??\}/', function($m) use (&$parameters)
-        {
+        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
             return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
 
         }, $path);
@@ -355,8 +354,7 @@ class UrlGenerator implements UrlGeneratorContract {
         // If the URI has a fragment, we will move it to the end of the URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
-        if ( ! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT)))
-        {
+        if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
             $uri = preg_replace('/#.*/', '', $uri);
         }
 
@@ -386,10 +384,8 @@ class UrlGenerator implements UrlGeneratorContract {
     {
         $parameters = is_array($parameters) ? $parameters : array($parameters);
 
-        foreach ($parameters as $key => $parameter)
-        {
-            if ($parameter instanceof UrlRoutable)
-            {
+        foreach ($parameters as $key => $parameter) {
+            if ($parameter instanceof UrlRoutable) {
                 $parameters[$key] = $parameter->getRouteKey();
             }
         }
@@ -408,7 +404,9 @@ class UrlGenerator implements UrlGeneratorContract {
         // First we will get all of the string parameters that are remaining after we
         // have replaced the route wildcards. We'll then build a query string from
         // these string parameters then use it as a starting point for the rest.
-        if (count($parameters) == 0) return '';
+        if (count($parameters) == 0) {
+            return '';
+        }
 
         $query = http_build_query(
             $keyed = $this->getStringParameters($parameters)
@@ -417,8 +415,7 @@ class UrlGenerator implements UrlGeneratorContract {
         // Lastly, if there are still parameters remaining, we will fetch the numeric
         // parameters that are in the array and add them to the query string or we
         // will make the initial query string if it wasn't started with strings.
-        if (count($keyed) < count($parameters))
-        {
+        if (count($keyed) < count($parameters)) {
             $query .= '&'.implode(
                 '&', $this->getNumericParameters($parameters)
             );
@@ -435,7 +432,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getStringParameters(array $parameters)
     {
-        return array_where($parameters, function($k, $v) { return is_string($k); });
+        return array_where($parameters, function ($k, $v) { return is_string($k); });
     }
 
     /**
@@ -446,7 +443,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getNumericParameters(array $parameters)
     {
-        return array_where($parameters, function($k, $v) { return is_numeric($k); });
+        return array_where($parameters, function ($k, $v) { return is_numeric($k); });
     }
 
     /**
@@ -492,8 +489,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function addPortToDomain($domain)
     {
-        if (in_array($this->request->getPort(), array('80', '443')))
-        {
+        if (in_array($this->request->getPort(), array('80', '443'))) {
             return $domain;
         }
 
@@ -520,12 +516,9 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getRouteScheme($route)
     {
-        if ($route->httpOnly())
-        {
+        if ($route->httpOnly()) {
             return $this->getScheme(false);
-        }
-        elseif ($route->httpsOnly())
-        {
+        } elseif ($route->httpsOnly()) {
             return $this->getScheme(true);
         }
 
@@ -544,18 +537,14 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     public function action($action, $parameters = array(), $absolute = true)
     {
-        if ($this->rootNamespace && ! (strpos($action, '\\') === 0))
-        {
+        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
             $action = $this->rootNamespace.'\\'.$action;
-        }
-        else
-        {
+        } else {
             $action = trim($action, '\\');
         }
 
-        if ( ! is_null($route = $this->routes->getByAction($action)))
-        {
-             return $this->toRoute($route, $parameters, $absolute);
+        if (! is_null($route = $this->routes->getByAction($action))) {
+            return $this->toRoute($route, $parameters, $absolute);
         }
 
         throw new InvalidArgumentException("Action {$action} not defined.");
@@ -570,10 +559,8 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getRootUrl($scheme, $root = null)
     {
-        if (is_null($root))
-        {
-            if (is_null($this->cachedRoot))
-            {
+        if (is_null($root)) {
+            if (is_null($this->cachedRoot)) {
                 $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
             }
 
@@ -605,7 +592,9 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     public function isValidUrl($path)
     {
-        if (starts_with($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) return true;
+        if (starts_with($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) {
+            return true;
+        }
 
         return filter_var($path, FILTER_VALIDATE_URL) !== false;
     }
@@ -679,7 +668,7 @@ class UrlGenerator implements UrlGeneratorContract {
      */
     protected function getSession()
     {
-        return call_user_func($this->sessionResolver ?: function() {});
+        return call_user_func($this->sessionResolver ?: function () {});
     }
 
     /**
@@ -707,5 +696,4 @@ class UrlGenerator implements UrlGeneratorContract {
 
         return $this;
     }
-
 }

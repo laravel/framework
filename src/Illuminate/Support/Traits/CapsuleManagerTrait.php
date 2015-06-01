@@ -3,8 +3,8 @@
 use Illuminate\Support\Fluent;
 use Illuminate\Contracts\Container\Container;
 
-trait CapsuleManagerTrait {
-
+trait CapsuleManagerTrait
+{
     /**
      * The current globally used instance.
      *
@@ -29,8 +29,7 @@ trait CapsuleManagerTrait {
     {
         $this->container = $container;
 
-        if ( ! $this->container->bound('config'))
-        {
+        if (! $this->container->bound('config')) {
             $this->container->instance('config', new Fluent);
         }
     }
@@ -65,5 +64,4 @@ trait CapsuleManagerTrait {
     {
         $this->container = $container;
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class BusServiceProvider extends ServiceProvider {
-
+class BusServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -18,10 +18,8 @@ class BusServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('Illuminate\Bus\Dispatcher', function($app)
-        {
-            return new Dispatcher($app, function() use ($app)
-            {
+        $this->app->singleton('Illuminate\Bus\Dispatcher', function ($app) {
+            return new Dispatcher($app, function () use ($app) {
                 return $app['Illuminate\Contracts\Queue\Queue'];
             });
         });
@@ -48,5 +46,4 @@ class BusServiceProvider extends ServiceProvider {
             'Illuminate\Contracts\Bus\QueueingDispatcher',
         ];
     }
-
 }

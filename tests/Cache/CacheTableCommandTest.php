@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\CacheTableCommand;
 
-class CacheTableCommandTest extends PHPUnit_Framework_TestCase {
-
+class CacheTableCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -38,14 +38,12 @@ class CacheTableCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class CacheTableCommandTestStub extends CacheTableCommand {
-
+class CacheTableCommandTestStub extends CacheTableCommand
+{
     public function call($command, array $arguments = array())
     {
         //
     }
-
 }

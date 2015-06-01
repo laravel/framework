@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Encryption;
 
-interface Encrypter {
-
+interface Encrypter
+{
     /**
      * Encrypt the given value.
      *
@@ -33,5 +33,4 @@ interface Encrypter {
      * @return void
      */
     public function setCipher($cipher);
-
 }

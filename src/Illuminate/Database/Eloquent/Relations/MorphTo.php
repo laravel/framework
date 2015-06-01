@@ -4,8 +4,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-class MorphTo extends BelongsTo {
-
+class MorphTo extends BelongsTo
+{
     /**
      * The type of the polymorphic relation.
      *
@@ -59,7 +59,9 @@ class MorphTo extends BelongsTo {
      */
     public function getResults()
     {
-        if ( ! $this->otherKey) return;
+        if (! $this->otherKey) {
+            return;
+        }
 
         return $this->query->first();
     }
@@ -83,10 +85,8 @@ class MorphTo extends BelongsTo {
      */
     protected function buildDictionary(Collection $models)
     {
-        foreach ($models as $model)
-        {
-            if ($model->{$this->morphType})
-            {
+        foreach ($models as $model) {
+            if ($model->{$this->morphType}) {
                 $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
             }
         }
@@ -143,8 +143,7 @@ class MorphTo extends BelongsTo {
      */
     public function getEager()
     {
-        foreach (array_keys($this->dictionary) as $type)
-        {
+        foreach (array_keys($this->dictionary) as $type) {
             $this->matchToMorphParents($type, $this->getResultsByType($type));
         }
 
@@ -160,12 +159,9 @@ class MorphTo extends BelongsTo {
      */
     protected function matchToMorphParents($type, Collection $results)
     {
-        foreach ($results as $result)
-        {
-            if (isset($this->dictionary[$type][$result->getKey()]))
-            {
-                foreach ($this->dictionary[$type][$result->getKey()] as $model)
-                {
+        foreach ($results as $result) {
+            if (isset($this->dictionary[$type][$result->getKey()])) {
+                foreach ($this->dictionary[$type][$result->getKey()] as $model) {
                     $model->setRelation($this->relation, $result);
                 }
             }
@@ -201,8 +197,7 @@ class MorphTo extends BelongsTo {
     {
         $foreign = $this->foreignKey;
 
-        return collect($this->dictionary[$type])->map(function($models) use ($foreign)
-        {
+        return collect($this->dictionary[$type])->map(function ($models) use ($foreign) {
             return head($models)->{$foreign};
 
         })->values()->unique();
@@ -261,12 +256,10 @@ class MorphTo extends BelongsTo {
      */
     protected function useWithTrashed(Builder $query)
     {
-        if ($this->withTrashed && $query->getMacro('withTrashed') !== null)
-        {
+        if ($this->withTrashed && $query->getMacro('withTrashed') !== null) {
             return $query->withTrashed();
         }
 
         return $query;
     }
-
 }

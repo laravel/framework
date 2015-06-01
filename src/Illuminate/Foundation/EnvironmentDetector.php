@@ -2,8 +2,8 @@
 
 use Closure;
 
-class EnvironmentDetector {
-
+class EnvironmentDetector
+{
     /**
      * Detect the application's current environment.
      *
@@ -13,8 +13,7 @@ class EnvironmentDetector {
      */
     public function detect(Closure $callback, $consoleArgs = null)
     {
-        if ($consoleArgs)
-        {
+        if ($consoleArgs) {
             return $this->detectConsoleEnvironment($callback, $consoleArgs);
         }
 
@@ -44,8 +43,7 @@ class EnvironmentDetector {
         // First we will check if an environment argument was passed via console arguments
         // and if it was that automatically overrides as the environment. Otherwise, we
         // will check the environment as a "web" request like a typical HTTP request.
-        if ( ! is_null($value = $this->getEnvironmentArgument($args)))
-        {
+        if (! is_null($value = $this->getEnvironmentArgument($args))) {
             return head(array_slice(explode('=', $value), 1));
         }
 
@@ -60,10 +58,8 @@ class EnvironmentDetector {
      */
     protected function getEnvironmentArgument(array $args)
     {
-        return array_first($args, function($k, $v)
-        {
+        return array_first($args, function ($k, $v) {
             return starts_with($v, '--env');
         });
     }
-
 }

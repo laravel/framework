@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class ControllerServiceProvider extends ServiceProvider {
-
+class ControllerServiceProvider extends ServiceProvider
+{
     /**
      * Register the service provider.
      *
@@ -11,10 +11,8 @@ class ControllerServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('illuminate.route.dispatcher', function($app)
-        {
+        $this->app->singleton('illuminate.route.dispatcher', function ($app) {
             return new ControllerDispatcher($app['router'], $app);
         });
     }
-
 }

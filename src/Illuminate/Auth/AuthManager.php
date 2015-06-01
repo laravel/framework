@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Manager;
 
-class AuthManager extends Manager {
-
+class AuthManager extends Manager
+{
     /**
      * Create a new driver instance.
      *
@@ -34,8 +34,7 @@ class AuthManager extends Manager {
     {
         $custom = parent::callCustomCreator($driver);
 
-        if ($custom instanceof Guard)
-        {
+        if ($custom instanceof Guard) {
             return $custom;
         }
 
@@ -115,5 +114,4 @@ class AuthManager extends Manager {
     {
         $this->app['config']['auth.driver'] = $name;
     }
-
 }

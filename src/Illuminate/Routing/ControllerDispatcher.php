@@ -5,8 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
 
-class ControllerDispatcher {
-
+class ControllerDispatcher
+{
     use RouteDependencyResolverTrait;
 
     /**
@@ -60,8 +60,7 @@ class ControllerDispatcher {
         // If no before filters returned a response we'll call the method on the controller
         // to get the response to be returned to the router. We will then return it back
         // out for processing by this router and the after filters can be called then.
-        if (is_null($response))
-        {
+        if (is_null($response)) {
             $response = $this->callWithinStack(
                 $instance, $route, $request, $method
             );
@@ -105,8 +104,7 @@ class ControllerDispatcher {
         return (new Pipeline($this->container))
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $middleware)
-                    ->then(function($request) use ($instance, $route, $method)
-                    {
+                    ->then(function ($request) use ($instance, $route, $method) {
                         return $this->router->prepareResponse(
                             $request, $this->call($instance, $route, $method)
                         );
@@ -124,10 +122,8 @@ class ControllerDispatcher {
     {
         $results = [];
 
-        foreach ($instance->getMiddleware() as $name => $options)
-        {
-            if ( ! $this->methodExcludedByOptions($method, $options))
-            {
+        foreach ($instance->getMiddleware() as $name => $options) {
+            if (! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = $this->router->resolveMiddlewareClassName($name);
             }
         }
@@ -144,8 +140,8 @@ class ControllerDispatcher {
      */
     public function methodExcludedByOptions($method, array $options)
     {
-        return ( ! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            ( ! empty($options['except']) && in_array($method, (array) $options['except']));
+        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+            (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -176,16 +172,16 @@ class ControllerDispatcher {
      */
     protected function before($instance, $route, $request, $method)
     {
-        foreach ($instance->getBeforeFilters() as $filter)
-        {
-            if ($this->filterApplies($filter, $request, $method))
-            {
+        foreach ($instance->getBeforeFilters() as $filter) {
+            if ($this->filterApplies($filter, $request, $method)) {
                 // Here we will just check if the filter applies. If it does we will call the filter
                 // and return the responses if it isn't null. If it is null, we will keep hitting
                 // them until we get a response or are finished iterating through this filters.
                 $response = $this->callFilter($filter, $route, $request);
 
-                if ( ! is_null($response)) return $response;
+                if (! is_null($response)) {
+                    return $response;
+                }
             }
         }
     }
@@ -201,13 +197,11 @@ class ControllerDispatcher {
      */
     protected function assignAfter($instance, $route, $request, $method)
     {
-        foreach ($instance->getAfterFilters() as $filter)
-        {
+        foreach ($instance->getAfterFilters() as $filter) {
             // If the filter applies, we will add it to the route, since it has already been
             // registered with the router by the controller, and will just let the normal
             // router take care of calling these filters so we do not duplicate logics.
-            if ($this->filterApplies($filter, $request, $method))
-            {
+            if ($this->filterApplies($filter, $request, $method)) {
                 $route->after($this->getAssignableAfter($filter));
             }
         }
@@ -221,7 +215,9 @@ class ControllerDispatcher {
      */
     protected function getAssignableAfter($filter)
     {
-        if ($filter['original'] instanceof Closure) return $filter['filter'];
+        if ($filter['original'] instanceof Closure) {
+            return $filter['filter'];
+        }
 
         return $filter['original'];
     }
@@ -236,10 +232,8 @@ class ControllerDispatcher {
      */
     protected function filterApplies($filter, $request, $method)
     {
-        foreach (array('Method', 'On') as $type)
-        {
-            if ($this->{"filterFails{$type}"}($filter, $request, $method))
-            {
+        foreach (array('Method', 'On') as $type) {
+            if ($this->{"filterFails{$type}"}($filter, $request, $method)) {
                 return false;
             }
         }
@@ -272,12 +266,16 @@ class ControllerDispatcher {
     {
         $on = array_get($filter, 'options.on');
 
-        if (is_null($on)) return false;
+        if (is_null($on)) {
+            return false;
+        }
 
         // If the "on" is a string, we will explode it on the pipe so you can set any
         // amount of methods on the filter constraints and it will still work like
         // you specified an array. Then we will check if the method is in array.
-        if (is_string($on)) $on = explode('|', $on);
+        if (is_string($on)) {
+            $on = explode('|', $on);
+        }
 
         return ! in_array(strtolower($request->getMethod()), $on);
     }
@@ -296,5 +294,4 @@ class ControllerDispatcher {
             $filter['filter'], $filter['parameters'], $route, $request
         );
     }
-
 }

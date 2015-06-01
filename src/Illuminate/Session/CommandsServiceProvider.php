@@ -3,8 +3,8 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\Console\SessionTableCommand;
 
-class CommandsServiceProvider extends ServiceProvider {
-
+class CommandsServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -19,8 +19,7 @@ class CommandsServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('command.session.database', function($app)
-        {
+        $this->app->singleton('command.session.database', function ($app) {
             return new SessionTableCommand($app['files'], $app['composer']);
         });
 
@@ -36,5 +35,4 @@ class CommandsServiceProvider extends ServiceProvider {
     {
         return array('command.session.database');
     }
-
 }

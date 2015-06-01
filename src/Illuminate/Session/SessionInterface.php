@@ -3,8 +3,8 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface as BaseSessionInterface;
 
-interface SessionInterface extends BaseSessionInterface {
-
+interface SessionInterface extends BaseSessionInterface
+{
     /**
      * Get the session handler instance.
      *
@@ -26,5 +26,4 @@ interface SessionInterface extends BaseSessionInterface {
      * @return void
      */
     public function setRequestOnHandler(Request $request);
-
 }

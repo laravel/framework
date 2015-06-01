@@ -4,8 +4,8 @@ use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
-class IronJob extends Job implements JobContract {
-
+class IronJob extends Job implements JobContract
+{
     /**
      * The Iron queue instance.
      *
@@ -76,7 +76,9 @@ class IronJob extends Job implements JobContract {
     {
         parent::delete();
 
-        if (isset($this->job->pushed)) return;
+        if (isset($this->job->pushed)) {
+            return;
+        }
 
         $this->iron->deleteMessage($this->getQueue(), $this->job->id);
     }
@@ -91,7 +93,9 @@ class IronJob extends Job implements JobContract {
     {
         parent::release($delay);
 
-        if ( ! $this->pushed) $this->delete();
+        if (! $this->pushed) {
+            $this->delete();
+        }
 
         $this->recreateJob($delay);
     }
@@ -170,5 +174,4 @@ class IronJob extends Job implements JobContract {
     {
         return array_get(json_decode($this->job->body, true), 'queue');
     }
-
 }

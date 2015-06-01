@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Routing;
 
-interface UrlGenerator {
-
+interface UrlGenerator
+{
     /**
      * Generate a absolute URL to the given path.
      *
@@ -59,5 +59,4 @@ interface UrlGenerator {
      * @return $this
      */
     public function setRootControllerNamespace($rootNamespace);
-
 }

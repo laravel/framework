@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Filesystem\FilesystemManager
  */
-class Storage extends Facade {
-
+class Storage extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Storage extends Facade {
     {
         return 'filesystem';
     }
-
 }

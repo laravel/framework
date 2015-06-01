@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database;
 
-class ConnectionResolver implements ConnectionResolverInterface {
-
+class ConnectionResolver implements ConnectionResolverInterface
+{
     /**
      * All of the registered connections.
      *
@@ -24,8 +24,7 @@ class ConnectionResolver implements ConnectionResolverInterface {
      */
     public function __construct(array $connections = array())
     {
-        foreach ($connections as $name => $connection)
-        {
+        foreach ($connections as $name => $connection) {
             $this->addConnection($name, $connection);
         }
     }
@@ -38,7 +37,9 @@ class ConnectionResolver implements ConnectionResolverInterface {
      */
     public function connection($name = null)
     {
-        if (is_null($name)) $name = $this->getDefaultConnection();
+        if (is_null($name)) {
+            $name = $this->getDefaultConnection();
+        }
 
         return $this->connections[$name];
     }
@@ -86,5 +87,4 @@ class ConnectionResolver implements ConnectionResolverInterface {
     {
         $this->default = $name;
     }
-
 }

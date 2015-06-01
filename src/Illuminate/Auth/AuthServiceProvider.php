@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class AuthServiceProvider extends ServiceProvider {
-
+class AuthServiceProvider extends ServiceProvider
+{
     /**
      * Register the service provider.
      *
@@ -25,8 +25,7 @@ class AuthServiceProvider extends ServiceProvider {
      */
     protected function registerAuthenticator()
     {
-        $this->app->singleton('auth', function($app)
-        {
+        $this->app->singleton('auth', function ($app) {
             // Once the authentication service has actually been requested by the developer
             // we will set a variable in the application indicating such. This helps us
             // know that we need to set any queued cookies in the after event later.
@@ -35,8 +34,7 @@ class AuthServiceProvider extends ServiceProvider {
             return new AuthManager($app);
         });
 
-        $this->app->singleton('auth.driver', function($app)
-        {
+        $this->app->singleton('auth.driver', function ($app) {
             return $app['auth']->driver();
         });
     }
@@ -48,8 +46,7 @@ class AuthServiceProvider extends ServiceProvider {
      */
     protected function registerUserResolver()
     {
-        $this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function($app)
-        {
+        $this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function ($app) {
             return $app['auth']->user();
         });
     }
@@ -61,13 +58,10 @@ class AuthServiceProvider extends ServiceProvider {
      */
     protected function registerRequestRebindHandler()
     {
-        $this->app->rebinding('request', function($app, $request)
-        {
-            $request->setUserResolver(function() use ($app)
-            {
+        $this->app->rebinding('request', function ($app, $request) {
+            $request->setUserResolver(function () use ($app) {
                 return $app['auth']->user();
             });
         });
     }
-
 }

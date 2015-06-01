@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class ControllerMakeCommand extends GeneratorCommand {
-
+class ControllerMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -33,8 +33,7 @@ class ControllerMakeCommand extends GeneratorCommand {
      */
     protected function getStub()
     {
-        if ($this->option('plain'))
-        {
+        if ($this->option('plain')) {
             return __DIR__.'/stubs/controller.plain.stub';
         }
 
@@ -63,5 +62,4 @@ class ControllerMakeCommand extends GeneratorCommand {
             array('plain', null, InputOption::VALUE_NONE, 'Generate an empty controller class.'),
         );
     }
-
 }

@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class RouteClearCommand extends Command {
-
+class RouteClearCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -50,5 +50,4 @@ class RouteClearCommand extends Command {
 
         $this->info('Route cache cleared!');
     }
-
 }

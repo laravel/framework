@@ -4,8 +4,8 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class MigrateCommand extends BaseCommand {
-
+class MigrateCommand extends BaseCommand
+{
     use ConfirmableTrait;
 
     /**
@@ -49,7 +49,9 @@ class MigrateCommand extends BaseCommand {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $this->prepareDatabase();
 
@@ -61,12 +63,9 @@ class MigrateCommand extends BaseCommand {
         // Next, we will check to see if a path option has been defined. If it has
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
-        if ( ! is_null($path = $this->input->getOption('path')))
-        {
+        if (! is_null($path = $this->input->getOption('path'))) {
             $path = $this->laravel->basePath().'/'.$path;
-        }
-        else
-        {
+        } else {
             $path = $this->getMigrationPath();
         }
 
@@ -75,16 +74,14 @@ class MigrateCommand extends BaseCommand {
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
         // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note)
-        {
+        foreach ($this->migrator->getNotes() as $note) {
             $this->output->writeln($note);
         }
 
         // Finally, if the "seed" option has been given, we will re-run the database
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
-        if ($this->input->getOption('seed'))
-        {
+        if ($this->input->getOption('seed')) {
             $this->call('db:seed', ['--force' => true]);
         }
     }
@@ -98,8 +95,7 @@ class MigrateCommand extends BaseCommand {
     {
         $this->migrator->setConnection($this->input->getOption('database'));
 
-        if ( ! $this->migrator->repositoryExists())
-        {
+        if (! $this->migrator->repositoryExists()) {
             $options = array('--database' => $this->input->getOption('database'));
 
             $this->call('migrate:install', $options);
@@ -125,5 +121,4 @@ class MigrateCommand extends BaseCommand {
             array('seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'),
         );
     }
-
 }

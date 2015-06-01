@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
-interface ScopeInterface {
-
+interface ScopeInterface
+{
     /**
      * Apply the scope to a given Eloquent query builder.
      *
@@ -20,5 +20,4 @@ interface ScopeInterface {
      * @return void
      */
     public function remove(Builder $builder, Model $model);
-
 }

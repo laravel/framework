@@ -11,8 +11,8 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
-class FilesystemManager implements FactoryContract {
-
+class FilesystemManager implements FactoryContract
+{
     /**
      * The application instance.
      *
@@ -90,8 +90,7 @@ class FilesystemManager implements FactoryContract {
     {
         $config = $this->getConfig($name);
 
-        if (isset($this->customCreators[$config['driver']]))
-        {
+        if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }
 
@@ -108,8 +107,7 @@ class FilesystemManager implements FactoryContract {
     {
         $driver = $this->customCreators[$config['driver']]($this->app, $config);
 
-        if ($driver instanceof FilesystemInterface)
-        {
+        if ($driver instanceof FilesystemInterface) {
             return $this->adapt($driver);
         }
 
@@ -250,5 +248,4 @@ class FilesystemManager implements FactoryContract {
     {
         return call_user_func_array(array($this->disk(), $method), $parameters);
     }
-
 }

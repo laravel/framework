@@ -5,8 +5,8 @@ use Illuminate\Foundation\Composer;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class OptimizeCommand extends Command {
-
+class OptimizeCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -50,23 +50,17 @@ class OptimizeCommand extends Command {
     {
         $this->info('Generating optimized class loader');
 
-        if ($this->option('psr'))
-        {
+        if ($this->option('psr')) {
             $this->composer->dumpAutoloads();
-        }
-        else
-        {
+        } else {
             $this->composer->dumpOptimized();
         }
 
-        if ($this->option('force') || ! $this->laravel['config']['app.debug'])
-        {
+        if ($this->option('force') || ! $this->laravel['config']['app.debug']) {
             $this->info('Compiling common classes');
 
             $this->compileClasses();
-        }
-        else
-        {
+        } else {
             $this->call('clear-compiled');
         }
     }
@@ -100,8 +94,7 @@ class OptimizeCommand extends Command {
 
         $files = array_merge($core, $this->laravel['config']->get('compile.files', []));
 
-        foreach ($this->laravel['config']->get('compile.providers', []) as $provider)
-        {
+        foreach ($this->laravel['config']->get('compile.providers', []) as $provider) {
             $files = array_merge($files, forward_static_call([$provider, 'compiles']));
         }
 
@@ -131,5 +124,4 @@ class OptimizeCommand extends Command {
             array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
         );
     }
-
 }

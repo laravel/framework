@@ -3,8 +3,8 @@
 use RuntimeException;
 use ReflectionParameter;
 
-class MarshalException extends RuntimeException {
-
+class MarshalException extends RuntimeException
+{
     /**
      * Throw new a new exception.
      *
@@ -16,5 +16,4 @@ class MarshalException extends RuntimeException {
     {
         throw new static("Unable to map parameter [{$parameter->name}] to command [{$command}]");
     }
-
 }

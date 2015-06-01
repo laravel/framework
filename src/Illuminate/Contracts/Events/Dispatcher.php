@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Events;
 
-interface Dispatcher {
-
+interface Dispatcher
+{
     /**
      * Register an event listener with the dispatcher.
      *
@@ -60,5 +60,4 @@ interface Dispatcher {
      * @return void
      */
     public function forgetPushed();
-
 }

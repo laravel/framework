@@ -7,8 +7,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
-class Builder {
-
+class Builder
+{
     /**
      * The base query builder instance.
      *
@@ -74,8 +74,7 @@ class Builder {
      */
     public function find($id, $columns = array('*'))
     {
-        if (is_array($id))
-        {
+        if (is_array($id)) {
             return $this->findMany($id, $columns);
         }
 
@@ -93,7 +92,9 @@ class Builder {
      */
     public function findMany($ids, $columns = array('*'))
     {
-        if (empty($ids)) return $this->model->newCollection();
+        if (empty($ids)) {
+            return $this->model->newCollection();
+        }
 
         $this->query->whereIn($this->model->getQualifiedKeyName(), $ids);
 
@@ -113,12 +114,11 @@ class Builder {
     {
         $result = $this->find($id, $columns);
 
-        if (is_array($id))
-        {
-            if (count($result) == count(array_unique($id))) return $result;
-        }
-        elseif ( ! is_null($result))
-        {
+        if (is_array($id)) {
+            if (count($result) == count(array_unique($id))) {
+                return $result;
+            }
+        } elseif (! is_null($result)) {
             return $result;
         }
 
@@ -146,7 +146,9 @@ class Builder {
      */
     public function firstOrFail($columns = array('*'))
     {
-        if ( ! is_null($model = $this->first($columns))) return $model;
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
     }
@@ -164,8 +166,7 @@ class Builder {
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
-        if (count($models) > 0)
-        {
+        if (count($models) > 0) {
             $models = $this->eagerLoadRelations($models);
         }
 
@@ -182,7 +183,9 @@ class Builder {
     {
         $result = $this->first(array($column));
 
-        if ($result) return $result->{$column};
+        if ($result) {
+            return $result->{$column};
+        }
     }
 
     /**
@@ -209,8 +212,7 @@ class Builder {
     {
         $results = $this->forPage($page = 1, $count)->get();
 
-        while (count($results) > 0)
-        {
+        while (count($results) > 0) {
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
@@ -236,10 +238,8 @@ class Builder {
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if ($this->model->hasGetMutator($column))
-        {
-            foreach ($results as $key => &$value)
-            {
+        if ($this->model->hasGetMutator($column)) {
+            foreach ($results as $key => &$value) {
                 $fill = array($column => $value);
 
                 $value = $this->model->newFromBuilder($fill)->$column;
@@ -343,7 +343,9 @@ class Builder {
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if ( ! $this->model->usesTimestamps()) return $values;
+        if (! $this->model->usesTimestamps()) {
+            return $values;
+        }
 
         $column = $this->model->getUpdatedAtColumn();
 
@@ -357,8 +359,7 @@ class Builder {
      */
     public function delete()
     {
-        if (isset($this->onDelete))
-        {
+        if (isset($this->onDelete)) {
             return call_user_func($this->onDelete, $this);
         }
 
@@ -409,13 +410,11 @@ class Builder {
      */
     public function eagerLoadRelations(array $models)
     {
-        foreach ($this->eagerLoad as $name => $constraints)
-        {
+        foreach ($this->eagerLoad as $name => $constraints) {
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
-            if (strpos($name, '.') === false)
-            {
+            if (strpos($name, '.') === false) {
                 $models = $this->loadRelation($models, $name, $constraints);
             }
         }
@@ -463,8 +462,7 @@ class Builder {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and is error prone while we remove the developer's own where clauses.
-        $query = Relation::noConstraints(function() use ($relation)
-        {
+        $query = Relation::noConstraints(function () use ($relation) {
             return $this->getModel()->$relation();
         });
 
@@ -473,8 +471,7 @@ class Builder {
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
         // is loaded. In this way they will all trickle down as they are loaded.
-        if (count($nested) > 0)
-        {
+        if (count($nested) > 0) {
             $query->getQuery()->with($nested);
         }
 
@@ -494,10 +491,8 @@ class Builder {
         // We are basically looking for any relationships that are nested deeper than
         // the given top-level relationship. We will just check for any relations
         // that start with the given top relations and adds them to our arrays.
-        foreach ($this->eagerLoad as $name => $constraints)
-        {
-            if ($this->isNested($name, $relation))
-            {
+        foreach ($this->eagerLoad as $name => $constraints) {
+            if ($this->isNested($name, $relation)) {
                 $nested[substr($name, strlen($relation.'.'))] = $constraints;
             }
         }
@@ -530,16 +525,13 @@ class Builder {
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if ($column instanceof Closure)
-        {
+        if ($column instanceof Closure) {
             $query = $this->model->newQueryWithoutScopes();
 
             call_user_func($column, $query);
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
-        }
-        else
-        {
+        } else {
             call_user_func_array(array($this->query, 'where'), func_get_args());
         }
 
@@ -571,8 +563,7 @@ class Builder {
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
-        if (strpos($relation, '.') !== false)
-        {
+        if (strpos($relation, '.') !== false) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
         }
 
@@ -580,7 +571,9 @@ class Builder {
 
         $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
-        if ($callback) call_user_func($callback, $query);
+        if ($callback) {
+            call_user_func($callback, $query);
+        }
 
         return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
     }
@@ -602,14 +595,10 @@ class Builder {
         // In order to nest "has", we need to add count relation constraints on the
         // callback Closure. We'll do this by simply passing the Closure its own
         // reference to itself so it calls itself recursively on each segment.
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback)
-        {
-            if (count($relations) > 1)
-            {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback) {
+            if (count($relations) > 1) {
                 $q->whereHas(array_shift($relations), $closure);
-            }
-            else
-            {
+            } else {
                 $q->has(array_shift($relations), $operator, $count, 'and', $callback);
             }
         };
@@ -697,8 +686,7 @@ class Builder {
     {
         $this->mergeWheresToHas($hasQuery, $relation);
 
-        if (is_numeric($count))
-        {
+        if (is_numeric($count)) {
             $count = new Expression($count);
         }
 
@@ -736,8 +724,7 @@ class Builder {
      */
     protected function getHasRelationQuery($relation)
     {
-        return Relation::noConstraints(function() use ($relation)
-        {
+        return Relation::noConstraints(function () use ($relation) {
             return $this->getModel()->$relation();
         });
     }
@@ -750,7 +737,9 @@ class Builder {
      */
     public function with($relations)
     {
-        if (is_string($relations)) $relations = func_get_args();
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
 
         $eagers = $this->parseRelations($relations);
 
@@ -769,14 +758,12 @@ class Builder {
     {
         $results = array();
 
-        foreach ($relations as $name => $constraints)
-        {
+        foreach ($relations as $name => $constraints) {
             // If the "relation" value is actually a numeric key, we can assume that no
             // constraints have been specified for the eager load and we'll just put
             // an empty Closure with the loader so that we can treat all the same.
-            if (is_numeric($name))
-            {
-                $f = function() {};
+            if (is_numeric($name)) {
+                $f = function () {};
 
                 list($name, $constraints) = array($constraints, $f);
             }
@@ -806,13 +793,11 @@ class Builder {
         // If the relation has already been set on the result array, we will not set it
         // again, since that would override any constraints that were already placed
         // on the relationships. We will only set the ones that are not specified.
-        foreach (explode('.', $name) as $segment)
-        {
+        foreach (explode('.', $name) as $segment) {
             $progress[] = $segment;
 
-            if ( ! isset($results[$last = implode('.', $progress)]))
-            {
-                $results[$last] = function() {};
+            if (! isset($results[$last = implode('.', $progress)])) {
+                $results[$last] = function () {};
             }
         }
 
@@ -936,14 +921,11 @@ class Builder {
      */
     public function __call($method, $parameters)
     {
-        if (isset($this->macros[$method]))
-        {
+        if (isset($this->macros[$method])) {
             array_unshift($parameters, $this);
 
             return call_user_func_array($this->macros[$method], $parameters);
-        }
-        elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
-        {
+        } elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
             return $this->callScope($scope, $parameters);
         }
 
@@ -961,5 +943,4 @@ class Builder {
     {
         $this->query = clone $this->query;
     }
-
 }

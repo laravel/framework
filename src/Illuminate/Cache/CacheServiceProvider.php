@@ -4,8 +4,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\Console\ClearCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 
-class CacheServiceProvider extends ServiceProvider {
-
+class CacheServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -20,18 +20,15 @@ class CacheServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('cache', function($app)
-        {
+        $this->app->singleton('cache', function ($app) {
             return new CacheManager($app);
         });
 
-        $this->app->singleton('cache.store', function($app)
-        {
+        $this->app->singleton('cache.store', function ($app) {
             return $app['cache']->driver();
         });
 
-        $this->app->singleton('memcached.connector', function()
-        {
+        $this->app->singleton('memcached.connector', function () {
             return new MemcachedConnector;
         });
 
@@ -45,13 +42,11 @@ class CacheServiceProvider extends ServiceProvider {
      */
     public function registerCommands()
     {
-        $this->app->singleton('command.cache.clear', function($app)
-        {
+        $this->app->singleton('command.cache.clear', function ($app) {
             return new ClearCommand($app['cache']);
         });
 
-        $this->app->singleton('command.cache.table', function($app)
-        {
+        $this->app->singleton('command.cache.table', function ($app) {
             return new CacheTableCommand($app['files'], $app['composer']);
         });
 
@@ -69,5 +64,4 @@ class CacheServiceProvider extends ServiceProvider {
             'cache', 'cache.store', 'memcached.connector', 'command.cache.clear', 'command.cache.table',
         ];
     }
-
 }

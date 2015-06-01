@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Validation;
 
-interface PresenceVerifierInterface {
-
+interface PresenceVerifierInterface
+{
     /**
      * Count the number of objects in a collection having the given value.
      *
@@ -25,5 +25,4 @@ interface PresenceVerifierInterface {
      * @return int
      */
     public function getMultiCount($collection, $column, array $values, array $extra = array());
-
 }

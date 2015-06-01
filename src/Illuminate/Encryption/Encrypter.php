@@ -6,8 +6,8 @@ use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class Encrypter implements EncrypterContract {
-
+class Encrypter implements EncrypterContract
+{
     /**
      * The encryption key.
      *
@@ -112,12 +112,9 @@ class Encrypter implements EncrypterContract {
      */
     protected function mcryptDecrypt($value, $iv)
     {
-        try
-        {
+        try {
             return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             throw new DecryptException($e->getMessage());
         }
     }
@@ -137,13 +134,11 @@ class Encrypter implements EncrypterContract {
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
-        if ( ! $payload || $this->invalidPayload($payload))
-        {
+        if (! $payload || $this->invalidPayload($payload)) {
             throw new DecryptException('Invalid data.');
         }
 
-        if ( ! $this->validMac($payload))
-        {
+        if (! $this->validMac($payload)) {
             throw new DecryptException('MAC is invalid.');
         }
 
@@ -247,9 +242,13 @@ class Encrypter implements EncrypterContract {
      */
     protected function getRandomizer()
     {
-        if (defined('MCRYPT_DEV_URANDOM')) return MCRYPT_DEV_URANDOM;
+        if (defined('MCRYPT_DEV_URANDOM')) {
+            return MCRYPT_DEV_URANDOM;
+        }
 
-        if (defined('MCRYPT_DEV_RANDOM')) return MCRYPT_DEV_RANDOM;
+        if (defined('MCRYPT_DEV_RANDOM')) {
+            return MCRYPT_DEV_RANDOM;
+        }
 
         mt_srand();
 
@@ -302,5 +301,4 @@ class Encrypter implements EncrypterContract {
     {
         $this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
     }
-
 }

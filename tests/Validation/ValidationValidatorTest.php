@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\File\File;
 
-class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
-
+class ValidationValidatorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -30,8 +30,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('foo' => 'bar', 'baz' => 'boom'), array('foo' => 'Same:baz'));
         $v->setContainer(new Illuminate\Container\Container);
-        $v->after(function($validator)
-        {
+        $v->after(function ($validator) {
             $_SERVER['__validator.after.test'] = true;
         });
 
@@ -109,7 +108,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans = $this->getRealTranslator();
         $trans->addResource('array', array('validation.required' => 'foo bar'), 'en', 'messages');
         $v = new Validator($trans, array('name' => ''), array('name' => 'Required'));
-        $v->addReplacer('required', function($message, $attribute, $rule, $parameters) { return str_replace('bar', 'taylor', $message); });
+        $v->addReplacer('required', function ($message, $attribute, $rule, $parameters) { return str_replace('bar', 'taylor', $message); });
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('foo taylor', $v->messages()->first('name'));
@@ -1105,7 +1104,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
         $v = new Validator($trans, array('x' => '❤'), array('x' => 'Alpha'));
         $this->assertFalse($v->passes());
-
     }
 
 
@@ -1143,7 +1141,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
         $v = new Validator($trans, array('x' => '٧٨٩'), array('x' => 'AlphaDash'));//eastern arabic numerals
         $this->assertTrue($v->passes());
-
     }
 
 
@@ -1293,22 +1290,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
-        $v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'foo'; });
+        $v->sometimes('x', 'Confirmed', function ($i) { return $i->x == 'foo'; });
         $this->assertEquals(array('x' => array('Required', 'Confirmed')), $v->getRules());
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
-        $v->sometimes('x', 'Confirmed', function($i) { return $i->x == 'bar'; });
+        $v->sometimes('x', 'Confirmed', function ($i) { return $i->x == 'bar'; });
         $this->assertEquals(array('x' => array('Required')), $v->getRules());
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
-        $v->sometimes('x', 'Foo|Bar', function($i) { return $i->x == 'foo'; });
+        $v->sometimes('x', 'Foo|Bar', function ($i) { return $i->x == 'foo'; });
         $this->assertEquals(array('x' => array('Required', 'Foo', 'Bar')), $v->getRules());
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('x' => 'foo'), array('x' => 'Required'));
-        $v->sometimes('x', array('Foo', 'Bar:Baz'), function($i) { return $i->x == 'foo'; });
+        $v->sometimes('x', array('Foo', 'Bar:Baz'), function ($i) { return $i->x == 'foo'; });
         $this->assertEquals(array('x' => array('Required', 'Foo', 'Bar:Baz')), $v->getRules());
     }
 
@@ -1318,7 +1315,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans = $this->getRealTranslator();
         $trans->addResource('array', array('validation.foo' => 'foo!'), 'en', 'messages');
         $v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo'));
-        $v->addExtension('foo', function() { return false; });
+        $v->addExtension('foo', function () { return false; });
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('foo!', $v->messages()->first('name'));
@@ -1326,14 +1323,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans = $this->getRealTranslator();
         $trans->addResource('array', array('validation.foo_bar' => 'foo!'), 'en', 'messages');
         $v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
-        $v->addExtension('FooBar', function() { return false; });
+        $v->addExtension('FooBar', function () { return false; });
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('foo!', $v->messages()->first('name'));
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
-        $v->addExtension('FooBar', function() { return false; });
+        $v->addExtension('FooBar', function () { return false; });
         $v->setFallbackMessages(array('foo_bar' => 'foo!'));
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -1341,7 +1338,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array('name' => 'taylor'), array('name' => 'foo_bar'));
-        $v->addExtensions(array('FooBar' => function() { return false; }));
+        $v->addExtensions(array('FooBar' => function () { return false; }));
         $v->setFallbackMessages(array('foo_bar' => 'foo!'));
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -1368,7 +1365,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, array(), array('implicit_rule' => 'foo'));
-        $v->addImplicitExtension('implicit_rule', function() { return true; });
+        $v->addImplicitExtension('implicit_rule', function () { return true; });
         $this->assertTrue($v->passes());
     }
 
@@ -1449,5 +1446,4 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
         $trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
         return $trans;
     }
-
 }

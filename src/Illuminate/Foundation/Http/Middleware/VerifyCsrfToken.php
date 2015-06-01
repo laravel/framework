@@ -7,8 +7,8 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
-class VerifyCsrfToken implements Middleware {
-
+class VerifyCsrfToken implements Middleware
+{
     /**
      * The encrypter implementation.
      *
@@ -45,8 +45,7 @@ class VerifyCsrfToken implements Middleware {
      */
     public function handle($request, Closure $next)
     {
-        if ($this->isReading($request) || $this->shouldPassThrough($request) || $this->tokensMatch($request))
-        {
+        if ($this->isReading($request) || $this->shouldPassThrough($request) || $this->tokensMatch($request)) {
             return $this->addCookieToResponse($request, $next($request));
         }
 
@@ -61,10 +60,8 @@ class VerifyCsrfToken implements Middleware {
      */
     protected function shouldPassThrough($request)
     {
-        foreach ($this->except as $except)
-        {
-            if ($request->is($except))
-            {
+        foreach ($this->except as $except) {
+            if ($request->is($except)) {
                 return true;
             }
         }
@@ -82,8 +79,7 @@ class VerifyCsrfToken implements Middleware {
     {
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
-        if ( ! $token && $header = $request->header('X-XSRF-TOKEN'))
-        {
+        if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
             $token = $this->encrypter->decrypt($header);
         }
 
@@ -116,5 +112,4 @@ class VerifyCsrfToken implements Middleware {
     {
         return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
     }
-
 }

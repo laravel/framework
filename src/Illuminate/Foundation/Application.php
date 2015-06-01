@@ -13,8 +13,8 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements ApplicationContract, HttpKernelInterface {
-
+class Application extends Container implements ApplicationContract, HttpKernelInterface
+{
     /**
      * The Laravel framework version.
      *
@@ -134,7 +134,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->registerCoreContainerAliases();
 
-        if ($basePath) $this->setBasePath($basePath);
+        if ($basePath) {
+            $this->setBasePath($basePath);
+        }
     }
 
     /**
@@ -183,8 +185,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->hasBeenBootstrapped = true;
 
-        foreach ($bootstrappers as $bootstrapper)
-        {
+        foreach ($bootstrappers as $bootstrapper) {
             $this['events']->fire('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
@@ -264,8 +265,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->instance('path', $this->path());
 
-        foreach (['base', 'config', 'database', 'lang', 'public', 'storage'] as $path)
-        {
+        foreach (['base', 'config', 'database', 'lang', 'public', 'storage'] as $path) {
             $this->instance('path.'.$path, $this->{$path.'Path'}());
         }
     }
@@ -401,14 +401,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function environment()
     {
-        if (func_num_args() > 0)
-        {
+        if (func_num_args() > 0) {
             $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
-            foreach ($patterns as $pattern)
-            {
-                if (str_is($pattern, $this['env']))
-                {
+            foreach ($patterns as $pattern) {
+                if (str_is($pattern, $this['env'])) {
                     return true;
                 }
             }
@@ -485,16 +482,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function register($provider, $options = array(), $force = false)
     {
-        if ($registered = $this->getProvider($provider) && ! $force)
-        {
+        if ($registered = $this->getProvider($provider) && ! $force) {
             return $registered;
         }
 
         // If the given "provider" is a string, we will resolve it, passing in the
         // application instance automatically for the developer. This is simply
         // a more convenient way of specifying your service provider classes.
-        if (is_string($provider))
-        {
+        if (is_string($provider)) {
             $provider = $this->resolveProviderClass($provider);
         }
 
@@ -503,8 +498,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // Once we have registered the service we will iterate through the options
         // and set each of them on the application so they will be available on
         // the actual loading of the service objects and for developer usage.
-        foreach ($options as $key => $value)
-        {
+        foreach ($options as $key => $value) {
             $this[$key] = $value;
         }
 
@@ -513,8 +507,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
         // will be ready for any usage by the developer's application logics.
-        if ($this->booted)
-        {
+        if ($this->booted) {
             $this->bootProvider($provider);
         }
 
@@ -531,8 +524,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return array_first($this->serviceProviders, function($key, $value) use ($name)
-        {
+        return array_first($this->serviceProviders, function ($key, $value) use ($name) {
             return $value instanceof $name;
         });
     }
@@ -573,8 +565,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // We will simply spin through each of the deferred providers and register each
         // one and boot them if the application has booted. This should make each of
         // the remaining services available to this application for immediate use.
-        foreach ($this->deferredServices as $service => $provider)
-        {
+        foreach ($this->deferredServices as $service => $provider) {
             $this->loadDeferredProvider($service);
         }
 
@@ -589,8 +580,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function loadDeferredProvider($service)
     {
-        if ( ! isset($this->deferredServices[$service]))
-        {
+        if (! isset($this->deferredServices[$service])) {
             return;
         }
 
@@ -599,8 +589,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if ( ! isset($this->loadedProviders[$provider]))
-        {
+        if (! isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -617,14 +606,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // Once the provider that provides the deferred service has been registered we
         // will remove it from our local list of the deferred services with related
         // providers so that this container does not try to resolve it out again.
-        if ($service) unset($this->deferredServices[$service]);
+        if ($service) {
+            unset($this->deferredServices[$service]);
+        }
 
         $this->register($instance = new $provider($this));
 
-        if ( ! $this->booted)
-        {
-            $this->booting(function() use ($instance)
-            {
+        if (! $this->booted) {
+            $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
         }
@@ -643,8 +632,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $abstract = $this->getAlias($abstract);
 
-        if (isset($this->deferredServices[$abstract]))
-        {
+        if (isset($this->deferredServices[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
 
@@ -681,14 +669,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function boot()
     {
-        if ($this->booted) return;
+        if ($this->booted) {
+            return;
+        }
 
         // Once the application has booted we will also fire some "booted" callbacks
         // for any listeners that need to do work after this initial booting gets
         // finished. This is useful when ordering the boot-up processes we run.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        array_walk($this->serviceProviders, function($p) {
+        array_walk($this->serviceProviders, function ($p) {
             $this->bootProvider($p);
         });
 
@@ -705,8 +695,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function bootProvider(ServiceProvider $provider)
     {
-        if (method_exists($provider, 'boot'))
-        {
+        if (method_exists($provider, 'boot')) {
             return $this->call([$provider, 'boot']);
         }
     }
@@ -732,7 +721,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->bootedCallbacks[] = $callback;
 
-        if ($this->isBooted()) $this->fireAppCallbacks(array($callback));
+        if ($this->isBooted()) {
+            $this->fireAppCallbacks(array($callback));
+        }
     }
 
     /**
@@ -743,8 +734,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function fireAppCallbacks(array $callbacks)
     {
-        foreach ($callbacks as $callback)
-        {
+        foreach ($callbacks as $callback) {
             call_user_func($callback, $this);
         }
     }
@@ -839,8 +829,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function abort($code, $message = '', array $headers = array())
     {
-        if ($code == 404)
-        {
+        if ($code == 404) {
             throw new NotFoundHttpException($message);
         }
 
@@ -867,8 +856,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function terminate()
     {
-        foreach ($this->terminatingCallbacks as $terminating)
-        {
+        foreach ($this->terminatingCallbacks as $terminating) {
             $this->call($terminating);
         }
     }
@@ -1027,10 +1015,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'view'                 => ['Illuminate\View\Factory', 'Illuminate\Contracts\View\Factory'],
         );
 
-        foreach ($aliases as $key => $aliases)
-        {
-            foreach ((array) $aliases as $alias)
-            {
+        foreach ($aliases as $key => $aliases) {
+            foreach ((array) $aliases as $alias) {
                 $this->alias($key, $alias);
             }
         }
@@ -1069,11 +1055,12 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getNamespace()
     {
-        if ( ! is_null($this->namespace)) return $this->namespace;
+        if (! is_null($this->namespace)) {
+            return $this->namespace;
+        }
 
         $this->namespace = strtok(get_class($this->getKernel()), '\\').'\\';
 
         return $this->namespace;
     }
-
 }

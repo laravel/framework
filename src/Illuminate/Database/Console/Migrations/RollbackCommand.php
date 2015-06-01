@@ -5,8 +5,8 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends Command {
-
+class RollbackCommand extends Command
+{
     use ConfirmableTrait;
 
     /**
@@ -50,7 +50,9 @@ class RollbackCommand extends Command {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $this->migrator->setConnection($this->input->getOption('database'));
 
@@ -61,8 +63,7 @@ class RollbackCommand extends Command {
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
         // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note)
-        {
+        foreach ($this->migrator->getNotes() as $note) {
             $this->output->writeln($note);
         }
     }
@@ -82,5 +83,4 @@ class RollbackCommand extends Command {
             array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
         );
     }
-
 }

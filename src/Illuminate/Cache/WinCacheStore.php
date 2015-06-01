@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class WinCacheStore extends TaggableStore implements Store {
-
+class WinCacheStore extends TaggableStore implements Store
+{
     /**
      * A string that should be prepended to keys.
      *
@@ -32,8 +32,7 @@ class WinCacheStore extends TaggableStore implements Store {
     {
         $value = wincache_ucache_get($this->prefix.$key);
 
-        if ($value !== false)
-        {
+        if ($value !== false) {
             return $value;
         }
     }
@@ -117,5 +116,4 @@ class WinCacheStore extends TaggableStore implements Store {
     {
         return $this->prefix;
     }
-
 }

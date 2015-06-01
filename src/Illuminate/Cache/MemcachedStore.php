@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class MemcachedStore extends TaggableStore implements Store {
-
+class MemcachedStore extends TaggableStore implements Store
+{
     /**
      * The Memcached instance.
      *
@@ -41,8 +41,7 @@ class MemcachedStore extends TaggableStore implements Store {
     {
         $value = $this->memcached->get($this->prefix.$key);
 
-        if ($this->memcached->getResultCode() == 0)
-        {
+        if ($this->memcached->getResultCode() == 0) {
             return $value;
         }
     }
@@ -149,5 +148,4 @@ class MemcachedStore extends TaggableStore implements Store {
     {
         return $this->prefix;
     }
-
 }

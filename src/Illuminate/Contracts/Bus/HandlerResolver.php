@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface HandlerResolver {
-
+interface HandlerResolver
+{
     /**
      * Get the handler instance for the given command.
      *
@@ -43,5 +43,4 @@ interface HandlerResolver {
      * @return void
      */
     public function mapUsing(Closure $mapper);
-
 }

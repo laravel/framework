@@ -3,8 +3,8 @@
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
-class HttpResponseException extends RuntimeException {
-
+class HttpResponseException extends RuntimeException
+{
     /**
      * The underlying response instance.
      *
@@ -32,5 +32,4 @@ class HttpResponseException extends RuntimeException {
     {
         return $this->response;
     }
-
 }

@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Hashing\BcryptHasher
  */
-class Hash extends Facade {
-
+class Hash extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Hash extends Facade {
     {
         return 'hash';
     }
-
 }

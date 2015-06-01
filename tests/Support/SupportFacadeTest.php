@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class SupportFacadeTest extends PHPUnit_Framework_TestCase {
-
+class SupportFacadeTest extends PHPUnit_Framework_TestCase
+{
     public function setUp()
     {
         Illuminate\Support\Facades\Facade::clearResolvedInstances();
@@ -56,27 +56,42 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
         FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals('bar', FacadeStub::foo());
     }
-
 }
 
-class FacadeStub extends Illuminate\Support\Facades\Facade {
-
+class FacadeStub extends Illuminate\Support\Facades\Facade
+{
     protected static function getFacadeAccessor()
     {
         return 'foo';
     }
-
 }
 
-class ApplicationStub implements ArrayAccess {
-
+class ApplicationStub implements ArrayAccess
+{
     protected $attributes = array();
 
-    public function setAttributes($attributes) { $this->attributes = $attributes; }
-    public function instance($key, $instance) { $this->attributes[$key] = $instance; }
-    public function offsetExists($offset) { return isset($this->attributes[$offset]); }
-    public function offsetGet($key) { return $this->attributes[$key]; }
-    public function offsetSet($key, $value) { $this->attributes[$key] = $value; }
-    public function offsetUnset($key) { unset($this->attributes[$key]); }
-
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+    }
+    public function instance($key, $instance)
+    {
+        $this->attributes[$key] = $instance;
+    }
+    public function offsetExists($offset)
+    {
+        return isset($this->attributes[$offset]);
+    }
+    public function offsetGet($key)
+    {
+        return $this->attributes[$key];
+    }
+    public function offsetSet($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+    public function offsetUnset($key)
+    {
+        unset($this->attributes[$key]);
+    }
 }

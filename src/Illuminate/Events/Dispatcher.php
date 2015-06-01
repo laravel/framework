@@ -8,8 +8,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Dispatcher implements DispatcherContract {
-
+class Dispatcher implements DispatcherContract
+{
     /**
      * The IoC container instance.
      *
@@ -73,14 +73,10 @@ class Dispatcher implements DispatcherContract {
      */
     public function listen($events, $listener, $priority = 0)
     {
-        foreach ((array) $events as $event)
-        {
-            if (str_contains($event, '*'))
-            {
+        foreach ((array) $events as $event) {
+            if (str_contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
-            }
-            else
-            {
+            } else {
                 $this->listeners[$event][$priority][] = $this->makeListener($listener);
 
                 unset($this->sorted[$event]);
@@ -120,8 +116,7 @@ class Dispatcher implements DispatcherContract {
      */
     public function push($event, $payload = array())
     {
-        $this->listen($event.'_pushed', function() use ($event, $payload)
-        {
+        $this->listen($event.'_pushed', function () use ($event, $payload) {
             $this->fire($event, $payload);
         });
     }
@@ -147,8 +142,7 @@ class Dispatcher implements DispatcherContract {
      */
     protected function resolveSubscriber($subscriber)
     {
-        if (is_string($subscriber))
-        {
+        if (is_string($subscriber)) {
             return $this->container->make($subscriber);
         }
 
@@ -201,8 +195,7 @@ class Dispatcher implements DispatcherContract {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        if (is_object($event))
-        {
+        if (is_object($event)) {
             list($payload, $event) = [[$event], get_class($event)];
         }
 
@@ -211,24 +204,23 @@ class Dispatcher implements DispatcherContract {
         // If an array is not given to us as the payload, we will turn it into one so
         // we can easily use call_user_func_array on the listeners, passing in the
         // payload to each of them so that they receive each of these arguments.
-        if ( ! is_array($payload)) $payload = array($payload);
+        if (! is_array($payload)) {
+            $payload = array($payload);
+        }
 
         $this->firing[] = $event;
 
-        if (isset($payload[0]) && $payload[0] instanceof ShouldBroadcast)
-        {
+        if (isset($payload[0]) && $payload[0] instanceof ShouldBroadcast) {
             $this->broadcastEvent($payload[0]);
         }
 
-        foreach ($this->getListeners($event) as $listener)
-        {
+        foreach ($this->getListeners($event) as $listener) {
             $response = call_user_func_array($listener, $payload);
 
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ( ! is_null($response) && $halt)
-            {
+            if (! is_null($response) && $halt) {
                 array_pop($this->firing);
 
                 return $response;
@@ -237,7 +229,9 @@ class Dispatcher implements DispatcherContract {
             // If a boolean false is returned from a listener, we will stop propagating
             // the event to any further listeners down in the chain, else we keep on
             // looping through the listeners and firing every one in our sequence.
-            if ($response === false) break;
+            if ($response === false) {
+                break;
+            }
 
             $responses[] = $response;
         }
@@ -255,8 +249,7 @@ class Dispatcher implements DispatcherContract {
      */
     protected function broadcastEvent($event)
     {
-        if ($this->queueResolver)
-        {
+        if ($this->queueResolver) {
             $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
 
             $this->resolveQueue()->connection($connection)->push('Illuminate\Broadcasting\BroadcastEvent', [
@@ -275,8 +268,7 @@ class Dispatcher implements DispatcherContract {
     {
         $wildcards = $this->getWildcardListeners($eventName);
 
-        if ( ! isset($this->sorted[$eventName]))
-        {
+        if (! isset($this->sorted[$eventName])) {
             $this->sortListeners($eventName);
         }
 
@@ -293,9 +285,10 @@ class Dispatcher implements DispatcherContract {
     {
         $wildcards = array();
 
-        foreach ($this->wildcards as $key => $listeners)
-        {
-            if (str_is($key, $eventName)) $wildcards = array_merge($wildcards, $listeners);
+        foreach ($this->wildcards as $key => $listeners) {
+            if (str_is($key, $eventName)) {
+                $wildcards = array_merge($wildcards, $listeners);
+            }
         }
 
         return $wildcards;
@@ -314,8 +307,7 @@ class Dispatcher implements DispatcherContract {
         // If listeners exist for the given event, we will sort them by the priority
         // so that we can call them in the correct order. We will cache off these
         // sorted event listeners so we do not have to re-sort on every events.
-        if (isset($this->listeners[$eventName]))
-        {
+        if (isset($this->listeners[$eventName])) {
             krsort($this->listeners[$eventName]);
 
             $this->sorted[$eventName] = call_user_func_array(
@@ -345,8 +337,7 @@ class Dispatcher implements DispatcherContract {
     {
         $container = $this->container;
 
-        return function() use ($listener, $container)
-        {
+        return function () use ($listener, $container) {
             return call_user_func_array(
                 $this->createClassCallable($listener, $container), func_get_args()
             );
@@ -364,12 +355,9 @@ class Dispatcher implements DispatcherContract {
     {
         list($class, $method) = $this->parseClassCallable($listener);
 
-        if ($this->handlerShouldBeQueued($class))
-        {
+        if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
-        }
-        else
-        {
+        } else {
             return array($container->make($class), $method);
         }
     }
@@ -395,14 +383,11 @@ class Dispatcher implements DispatcherContract {
      */
     protected function handlerShouldBeQueued($class)
     {
-        try
-        {
+        try {
             return (new ReflectionClass($class))->implementsInterface(
                 'Illuminate\Contracts\Queue\ShouldBeQueued'
             );
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -416,16 +401,12 @@ class Dispatcher implements DispatcherContract {
      */
     protected function createQueuedHandlerCallable($class, $method)
     {
-        return function() use ($class, $method)
-        {
+        return function () use ($class, $method) {
             $arguments = $this->cloneArgumentsForQueueing(func_get_args());
 
-            if (method_exists($class, 'queue'))
-            {
+            if (method_exists($class, 'queue')) {
                 $this->callQueueMethodOnHandler($class, $method, $arguments);
-            }
-            else
-            {
+            } else {
                 $this->resolveQueue()->push('Illuminate\Events\CallQueuedHandler@call', [
                     'class' => $class, 'method' => $method, 'data' => serialize($arguments),
                 ]);
@@ -441,7 +422,7 @@ class Dispatcher implements DispatcherContract {
      */
     protected function cloneArgumentsForQueueing(array $arguments)
     {
-        return array_map(function($a) { return is_object($a) ? clone $a : $a; }, $arguments);
+        return array_map(function ($a) { return is_object($a) ? clone $a : $a; }, $arguments);
     }
 
     /**
@@ -479,9 +460,10 @@ class Dispatcher implements DispatcherContract {
      */
     public function forgetPushed()
     {
-        foreach ($this->listeners as $key => $value)
-        {
-            if (ends_with($key, '_pushed')) $this->forget($key);
+        foreach ($this->listeners as $key => $value) {
+            if (ends_with($key, '_pushed')) {
+                $this->forget($key);
+            }
         }
     }
 
@@ -507,5 +489,4 @@ class Dispatcher implements DispatcherContract {
 
         return $this;
     }
-
 }

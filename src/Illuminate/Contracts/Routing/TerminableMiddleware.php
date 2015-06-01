@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Routing;
 
-interface TerminableMiddleware extends Middleware {
-
+interface TerminableMiddleware extends Middleware
+{
     /**
      * Perform any final actions for the request lifecycle.
      *
@@ -10,5 +10,4 @@ interface TerminableMiddleware extends Middleware {
      * @return void
      */
     public function terminate($request, $response);
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Queue\SyncQueue;
 
-class SyncConnector implements ConnectorInterface {
-
+class SyncConnector implements ConnectorInterface
+{
     /**
      * Establish a queue connection.
      *
@@ -14,5 +14,4 @@ class SyncConnector implements ConnectorInterface {
     {
         return new SyncQueue;
     }
-
 }

@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ConfigCacheCommand extends Command {
-
+class ConfigCacheCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -70,5 +70,4 @@ class ConfigCacheCommand extends Command {
 
         return $app['config']->all();
     }
-
 }

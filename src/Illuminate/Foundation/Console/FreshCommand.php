@@ -5,8 +5,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 
-class FreshCommand extends Command {
-
+class FreshCommand extends Command
+{
     use ConfirmableTrait;
 
     /**
@@ -30,7 +30,9 @@ class FreshCommand extends Command {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $files = new Filesystem;
 
@@ -67,5 +69,4 @@ class FreshCommand extends Command {
             array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
         );
     }
-
 }

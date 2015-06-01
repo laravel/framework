@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 
-class RefreshCommand extends Command {
-
+class RefreshCommand extends Command
+{
     use ConfirmableTrait;
 
     /**
@@ -29,7 +29,9 @@ class RefreshCommand extends Command {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $database = $this->input->getOption('database');
 
@@ -46,8 +48,7 @@ class RefreshCommand extends Command {
             '--database' => $database, '--force' => $force,
         ));
 
-        if ($this->needsSeeding())
-        {
+        if ($this->needsSeeding()) {
             $this->runSeeder($database);
         }
     }
@@ -96,5 +97,4 @@ class RefreshCommand extends Command {
             array('seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'),
         );
     }
-
 }

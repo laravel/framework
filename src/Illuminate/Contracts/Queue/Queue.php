@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Queue;
 
-interface Queue {
-
+interface Queue
+{
     /**
      * Push a new job onto the queue.
      *
@@ -61,5 +61,4 @@ interface Queue {
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null);
-
 }

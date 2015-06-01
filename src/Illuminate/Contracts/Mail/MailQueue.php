@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Mail;
 
-interface MailQueue {
-
+interface MailQueue
+{
     /**
      * Queue a new e-mail message for sending.
      *
@@ -24,5 +24,4 @@ interface MailQueue {
      * @return mixed
      */
     public function later($delay, $view, array $data, $callback, $queue = null);
-
 }

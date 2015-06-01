@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface Repository {
-
+interface Repository
+{
     /**
      * Determine if an item exists in the cache.
      *
@@ -94,5 +94,4 @@ interface Repository {
      * @return bool
      */
     public function forget($key);
-
 }

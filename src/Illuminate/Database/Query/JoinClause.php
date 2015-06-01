@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Query;
 
-class JoinClause {
-
+class JoinClause
+{
     /**
      * The type of join being performed.
      *
@@ -57,7 +57,9 @@ class JoinClause {
     {
         $this->clauses[] = compact('first', 'operator', 'second', 'boolean', 'where');
 
-        if ($where) $this->bindings[] = $second;
+        if ($where) {
+            $this->bindings[] = $second;
+        }
 
         return $this;
     }
@@ -147,5 +149,4 @@ class JoinClause {
     {
         return $this->whereNotNull($column, 'or');
     }
-
 }

@@ -4,8 +4,8 @@ use Illuminate\Redis\Database;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class RedisQueue extends Queue implements QueueContract {
-
+class RedisQueue extends Queue implements QueueContract
+{
     /**
     * The Redis database instance.
     *
@@ -125,15 +125,13 @@ class RedisQueue extends Queue implements QueueContract {
 
         $queue = $this->getQueue($queue);
 
-        if ( ! is_null($this->expire))
-        {
+        if (! is_null($this->expire)) {
             $this->migrateAllExpiredJobs($queue);
         }
 
         $job = $this->getConnection()->lpop($queue);
 
-        if ( ! is_null($job))
-        {
+        if (! is_null($job)) {
             $this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
 
             return new RedisJob($this->container, $this, $job, $original);
@@ -176,8 +174,7 @@ class RedisQueue extends Queue implements QueueContract {
     {
         $options = ['cas' => true, 'watch' => $from, 'retry' => 10];
 
-        $this->getConnection()->transaction($options, function ($transaction) use ($from, $to)
-        {
+        $this->getConnection()->transaction($options, function ($transaction) use ($from, $to) {
             // First we need to get all of jobs that have expired based on the current time
             // so that we can push them onto the main queue. After we get them we simply
             // remove them from this "delay" queues. All of this within a transaction.
@@ -188,8 +185,7 @@ class RedisQueue extends Queue implements QueueContract {
             // If we actually found any jobs, we will remove them from the old queue and we
             // will insert them onto the new (ready) "queue". This means they will stand
             // ready to be processed by the queue worker whenever their turn comes up.
-            if (count($jobs) > 0)
-            {
+            if (count($jobs) > 0) {
                 $this->removeExpiredJobs($transaction, $from, $time);
 
                 $this->pushExpiredJobsOntoNewQueue($transaction, $to, $jobs);
@@ -316,5 +312,4 @@ class RedisQueue extends Queue implements QueueContract {
     {
         $this->expire = $seconds;
     }
-
 }

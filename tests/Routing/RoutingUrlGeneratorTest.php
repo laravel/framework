@@ -3,8 +3,8 @@
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
-class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
-
+class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
+{
     public function testBasicGeneration()
     {
         $url = new UrlGenerator(
@@ -273,7 +273,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
             $request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
         );
 
-        $route = new Illuminate\Routing\Route(array('GET'), 'foo/{one}/{two?}/{three?}', array('as' => 'foo', function() {}));
+        $route = new Illuminate\Routing\Route(array('GET'), 'foo/{one}/{two?}/{three?}', array('as' => 'foo', function () {}));
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
@@ -326,11 +326,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
         $url->getRequest()->headers->remove('referer');
         $this->assertEquals($url->to('/'), $url->previous());
     }
-
 }
 
-class RoutableInterfaceStub implements UrlRoutable {
+class RoutableInterfaceStub implements UrlRoutable
+{
     public $key;
-    public function getRouteKey() { return $this->{$this->getRouteKeyName()}; }
-    public function getRouteKeyName() { return 'key'; }
+    public function getRouteKey()
+    {
+        return $this->{$this->getRouteKeyName()};
+    }
+    public function getRouteKeyName()
+    {
+        return 'key';
+    }
 }

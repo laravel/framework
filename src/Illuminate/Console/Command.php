@@ -12,8 +12,8 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Foundation\Application as LaravelApplication;
 
-class Command extends SymfonyCommand {
-
+class Command extends SymfonyCommand
+{
     /**
      * The Laravel application instance.
      *
@@ -74,7 +74,7 @@ class Command extends SymfonyCommand {
 
         $this->setDescription($this->description);
 
-        if ( ! isset($this->signature)) {
+        if (! isset($this->signature)) {
             $this->specifyParameters();
         }
     }
@@ -109,13 +109,11 @@ class Command extends SymfonyCommand {
         // We will loop through all of the arguments and options for the command and
         // set them all on the base command instance. This specifies what can get
         // passed into these commands as "parameters" to control the execution.
-        foreach ($this->getArguments() as $arguments)
-        {
+        foreach ($this->getArguments() as $arguments) {
             call_user_func_array(array($this, 'addArgument'), $arguments);
         }
 
-        foreach ($this->getOptions() as $options)
-        {
+        foreach ($this->getOptions() as $options) {
             call_user_func_array(array($this, 'addOption'), $options);
         }
     }
@@ -190,7 +188,9 @@ class Command extends SymfonyCommand {
      */
     public function argument($key = null)
     {
-        if (is_null($key)) return $this->input->getArguments();
+        if (is_null($key)) {
+            return $this->input->getArguments();
+        }
 
         return $this->input->getArgument($key);
     }
@@ -203,7 +203,9 @@ class Command extends SymfonyCommand {
      */
     public function option($key = null)
     {
-        if (is_null($key)) return $this->input->getOptions();
+        if (is_null($key)) {
+            return $this->input->getOptions();
+        }
 
         return $this->input->getOption($key);
     }
@@ -421,5 +423,4 @@ class Command extends SymfonyCommand {
     {
         $this->laravel = $laravel;
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface Registrar {
-
+interface Registrar
+{
     /**
      * Register a new GET route with the router.
      *
@@ -111,5 +111,4 @@ interface Registrar {
      * @return void
      */
     public function filter($name, $callback);
-
 }

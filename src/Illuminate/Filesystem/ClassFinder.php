@@ -2,8 +2,8 @@
 
 use Symfony\Component\Finder\Finder;
 
-class ClassFinder {
-
+class ClassFinder
+{
     /**
      * Find all the class and interface names in a given directory.
      *
@@ -14,8 +14,7 @@ class ClassFinder {
     {
         $classes = [];
 
-        foreach (Finder::create()->in($directory)->name('*.php') as $file)
-        {
+        foreach (Finder::create()->in($directory)->name('*.php') as $file) {
             $classes[] = $this->findClass($file->getRealPath());
         }
 
@@ -34,14 +33,10 @@ class ClassFinder {
 
         $tokens = token_get_all(file_get_contents($path));
 
-        foreach ($tokens as $key => $token)
-        {
-            if ($this->tokenIsNamespace($token))
-            {
+        foreach ($tokens as $key => $token) {
+            if ($this->tokenIsNamespace($token)) {
                 $namespace = $this->getNamespace($key + 2, $tokens);
-            }
-            elseif ($this->tokenIsClassOrInterface($token))
-            {
+            } elseif ($this->tokenIsClassOrInterface($token)) {
                 return ltrim($namespace.'\\'.$this->getClass($key + 2, $tokens), '\\');
             }
         }
@@ -60,14 +55,10 @@ class ClassFinder {
 
         $tokenCount = count($tokens);
 
-        for ($i = $key; $i < $tokenCount; $i++)
-        {
-            if ($this->isPartOfNamespace($tokens[$i]))
-            {
+        for ($i = $key; $i < $tokenCount; $i++) {
+            if ($this->isPartOfNamespace($tokens[$i])) {
                 $namespace .= $tokens[$i][1];
-            }
-            elseif ($tokens[$i] == ';')
-            {
+            } elseif ($tokens[$i] == ';') {
                 return $namespace;
             }
         }
@@ -86,14 +77,10 @@ class ClassFinder {
 
         $tokenCount = count($tokens);
 
-        for ($i = $key; $i < $tokenCount; $i++)
-        {
-            if ($this->isPartOfClass($tokens[$i]))
-            {
+        for ($i = $key; $i < $tokenCount; $i++) {
+            if ($this->isPartOfClass($tokens[$i])) {
                 $class .= $tokens[$i][1];
-            }
-            elseif ($this->isWhitespace($tokens[$i]))
-            {
+            } elseif ($this->isWhitespace($tokens[$i])) {
                 return $class;
             }
         }
@@ -153,5 +140,4 @@ class ClassFinder {
     {
         return is_array($token) && $token[0] == T_WHITESPACE;
     }
-
 }

@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Redis\Database as Redis;
 
-class RedisStore extends TaggableStore implements Store {
-
+class RedisStore extends TaggableStore implements Store
+{
     /**
      * The Redis database connection.
      *
@@ -49,8 +49,7 @@ class RedisStore extends TaggableStore implements Store {
      */
     public function get($key)
     {
-        if ( ! is_null($value = $this->connection()->get($this->prefix.$key)))
-        {
+        if (! is_null($value = $this->connection()->get($this->prefix.$key))) {
             return is_numeric($value) ? $value : unserialize($value);
         }
     }
@@ -182,5 +181,4 @@ class RedisStore extends TaggableStore implements Store {
     {
         return $this->prefix;
     }
-
 }

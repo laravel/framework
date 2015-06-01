@@ -4,8 +4,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 
-class SeedServiceProvider extends ServiceProvider {
-
+class SeedServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -24,8 +24,7 @@ class SeedServiceProvider extends ServiceProvider {
 
         $this->registerMakeCommand();
 
-        $this->app->singleton('seeder', function()
-        {
+        $this->app->singleton('seeder', function () {
             return new Seeder;
         });
 
@@ -39,8 +38,7 @@ class SeedServiceProvider extends ServiceProvider {
      */
     protected function registerSeedCommand()
     {
-        $this->app->singleton('command.seed', function($app)
-        {
+        $this->app->singleton('command.seed', function ($app) {
             return new SeedCommand($app['db']);
         });
     }
@@ -52,8 +50,7 @@ class SeedServiceProvider extends ServiceProvider {
      */
     protected function registerMakeCommand()
     {
-        $this->app->singleton('command.seeder.make', function($app)
-        {
+        $this->app->singleton('command.seeder.make', function ($app) {
             return new SeederMakeCommand($app['files'], $app['composer']);
         });
     }
@@ -67,5 +64,4 @@ class SeedServiceProvider extends ServiceProvider {
     {
         return array('seeder', 'command.seed', 'command.seeder.make');
     }
-
 }

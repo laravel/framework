@@ -2,8 +2,8 @@
 
 use Exception;
 
-interface ExceptionHandler {
-
+interface ExceptionHandler
+{
     /**
      * Report or log an exception.
      *
@@ -29,5 +29,4 @@ interface ExceptionHandler {
      * @return void
      */
     public function renderForConsole($output, Exception $e);
-
 }

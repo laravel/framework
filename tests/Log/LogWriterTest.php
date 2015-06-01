@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Log\Writer;
 
-class LogWriterTest extends PHPUnit_Framework_TestCase {
-
+class LogWriterTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -49,8 +49,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', array());
 
-        $events->listen('illuminate.log', function($level, $message, array $context = array())
-        {
+        $events->listen('illuminate.log', function ($level, $message, array $context = array()) {
             $_SERVER['__log.level']   = $level;
             $_SERVER['__log.message'] = $message;
             $_SERVER['__log.context'] = $context;
@@ -75,7 +74,7 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
     public function testListenShortcutFailsWithNoDispatcher()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
-        $writer->listen(function() {});
+        $writer->listen(function () {});
     }
 
 
@@ -83,10 +82,9 @@ class LogWriterTest extends PHPUnit_Framework_TestCase {
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
-        $callback = function() { return 'success'; };
+        $callback = function () { return 'success'; };
         $events->shouldReceive('listen')->with('illuminate.log', $callback)->once();
 
         $writer->listen($callback);
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -25,5 +25,4 @@ class DatabaseMigrationInstallCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($options), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }

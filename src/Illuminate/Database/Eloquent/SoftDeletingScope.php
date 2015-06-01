@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Eloquent;
 
-class SoftDeletingScope implements ScopeInterface {
-
+class SoftDeletingScope implements ScopeInterface
+{
     /**
      * All of the extensions to be added to the builder.
      *
@@ -36,8 +36,7 @@ class SoftDeletingScope implements ScopeInterface {
 
         $query = $builder->getQuery();
 
-        $query->wheres = collect($query->wheres)->reject(function($where) use ($column)
-        {
+        $query->wheres = collect($query->wheres)->reject(function ($where) use ($column) {
             return $this->isSoftDeleteConstraint($where, $column);
         })->values()->all();
     }
@@ -50,13 +49,11 @@ class SoftDeletingScope implements ScopeInterface {
      */
     public function extend(Builder $builder)
     {
-        foreach ($this->extensions as $extension)
-        {
+        foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
         }
 
-        $builder->onDelete(function(Builder $builder)
-        {
+        $builder->onDelete(function (Builder $builder) {
             $column = $this->getDeletedAtColumn($builder);
 
             return $builder->update(array(
@@ -73,12 +70,9 @@ class SoftDeletingScope implements ScopeInterface {
      */
     protected function getDeletedAtColumn(Builder $builder)
     {
-        if (count($builder->getQuery()->joins) > 0)
-        {
+        if (count($builder->getQuery()->joins) > 0) {
             return $builder->getModel()->getQualifiedDeletedAtColumn();
-        }
-        else
-        {
+        } else {
             return $builder->getModel()->getDeletedAtColumn();
         }
     }
@@ -91,8 +85,7 @@ class SoftDeletingScope implements ScopeInterface {
      */
     protected function addForceDelete(Builder $builder)
     {
-        $builder->macro('forceDelete', function(Builder $builder)
-        {
+        $builder->macro('forceDelete', function (Builder $builder) {
             return $builder->getQuery()->delete();
         });
     }
@@ -105,8 +98,7 @@ class SoftDeletingScope implements ScopeInterface {
      */
     protected function addRestore(Builder $builder)
     {
-        $builder->macro('restore', function(Builder $builder)
-        {
+        $builder->macro('restore', function (Builder $builder) {
             $builder->withTrashed();
 
             return $builder->update(array($builder->getModel()->getDeletedAtColumn() => null));
@@ -121,8 +113,7 @@ class SoftDeletingScope implements ScopeInterface {
      */
     protected function addWithTrashed(Builder $builder)
     {
-        $builder->macro('withTrashed', function(Builder $builder)
-        {
+        $builder->macro('withTrashed', function (Builder $builder) {
             $this->remove($builder, $builder->getModel());
 
             return $builder;
@@ -137,8 +128,7 @@ class SoftDeletingScope implements ScopeInterface {
      */
     protected function addOnlyTrashed(Builder $builder)
     {
-        $builder->macro('onlyTrashed', function(Builder $builder)
-        {
+        $builder->macro('onlyTrashed', function (Builder $builder) {
             $model = $builder->getModel();
 
             $this->remove($builder, $model);
@@ -160,5 +150,4 @@ class SoftDeletingScope implements ScopeInterface {
     {
         return $where['type'] == 'Null' && $where['column'] == $column;
     }
-
 }

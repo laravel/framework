@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class CommandMakeCommand extends GeneratorCommand {
-
+class CommandMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -35,8 +35,7 @@ class CommandMakeCommand extends GeneratorCommand {
     {
         parent::fire();
 
-        if ($this->option('handler'))
-        {
+        if ($this->option('handler')) {
             $this->call('handler:command', [
                 'name' => $this->argument('name').'Handler',
                 '--command' => $this->parseName($this->argument('name')),
@@ -51,20 +50,13 @@ class CommandMakeCommand extends GeneratorCommand {
      */
     protected function getStub()
     {
-        if ($this->option('queued') && $this->option('handler'))
-        {
+        if ($this->option('queued') && $this->option('handler')) {
             return __DIR__.'/stubs/command-queued-with-handler.stub';
-        }
-        elseif ($this->option('queued'))
-        {
+        } elseif ($this->option('queued')) {
             return __DIR__.'/stubs/command-queued.stub';
-        }
-        elseif ($this->option('handler'))
-        {
+        } elseif ($this->option('handler')) {
             return __DIR__.'/stubs/command-with-handler.stub';
-        }
-        else
-        {
+        } else {
             return __DIR__.'/stubs/command.stub';
         }
     }
@@ -93,5 +85,4 @@ class CommandMakeCommand extends GeneratorCommand {
             array('queued', null, InputOption::VALUE_NONE, 'Indicates that command should be queued.'),
         );
     }
-
 }

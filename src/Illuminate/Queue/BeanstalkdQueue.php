@@ -5,8 +5,8 @@ use Pheanstalk\Job as PheanstalkJob;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class BeanstalkdQueue extends Queue implements QueueContract {
-
+class BeanstalkdQueue extends Queue implements QueueContract
+{
     /**
      * The Pheanstalk instance.
      *
@@ -101,8 +101,7 @@ class BeanstalkdQueue extends Queue implements QueueContract {
 
         $job = $this->pheanstalk->watchOnly($queue)->reserve(0);
 
-        if ($job instanceof PheanstalkJob)
-        {
+        if ($job instanceof PheanstalkJob) {
             return new BeanstalkdJob($this->container, $this->pheanstalk, $job, $queue);
         }
     }
@@ -139,5 +138,4 @@ class BeanstalkdQueue extends Queue implements QueueContract {
     {
         return $this->pheanstalk;
     }
-
 }

@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Queue;
 
-interface Monitor {
-
+interface Monitor
+{
     /**
      * Register a callback to be executed on every iteration through the queue loop.
      *
@@ -25,5 +25,4 @@ interface Monitor {
      * @return void
      */
     public function stopping($callback);
-
 }

@@ -28,7 +28,7 @@ class Factory implements ArrayAccess
         if (is_dir($pathToFactories)) {
             foreach (Finder::create()->files()->in($pathToFactories) as $file) {
                 require $file->getRealPath();
-            } 
+            }
         }
 
         return $factory;

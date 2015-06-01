@@ -5,7 +5,6 @@ use Illuminate\Contracts\Redis\Database as RedisDatabase;
 
 class RedisBroadcaster implements Broadcaster
 {
-
     /**
      * The Redis instance.
      *

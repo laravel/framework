@@ -1,8 +1,7 @@
 <?php
 
-class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
-
-
+class SupportPluralizerTest extends PHPUnit_Framework_TestCase
+{
     public function testBasicSingular()
     {
         $this->assertEquals('child', str_singular('children'));
@@ -38,5 +37,4 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('IndexFields', str_plural('IndexField'));
         $this->assertEquals('VertexFields', str_plural('VertexField'));
     }
-
 }

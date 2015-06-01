@@ -8,8 +8,8 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Contracts\Container\Container;
 
-class ConnectionFactory {
-
+class ConnectionFactory
+{
     /**
      * The IoC container instance.
      *
@@ -39,8 +39,7 @@ class ConnectionFactory {
     {
         $config = $this->parseConfig($config, $name);
 
-        if (isset($config['read']))
-        {
+        if (isset($config['read'])) {
             return $this->createReadWriteConnection($config);
         }
 
@@ -121,8 +120,7 @@ class ConnectionFactory {
      */
     protected function getReadWriteConfig(array $config, $type)
     {
-        if (isset($config[$type][0]))
-        {
+        if (isset($config[$type][0])) {
             return $config[$type][array_rand($config[$type])];
         }
 
@@ -163,18 +161,15 @@ class ConnectionFactory {
      */
     public function createConnector(array $config)
     {
-        if ( ! isset($config['driver']))
-        {
+        if (! isset($config['driver'])) {
             throw new InvalidArgumentException("A driver must be specified.");
         }
 
-        if ($this->container->bound($key = "db.connector.{$config['driver']}"))
-        {
+        if ($this->container->bound($key = "db.connector.{$config['driver']}")) {
             return $this->container->make($key);
         }
 
-        switch ($config['driver'])
-        {
+        switch ($config['driver']) {
             case 'mysql':
                 return new MySqlConnector;
 
@@ -205,13 +200,11 @@ class ConnectionFactory {
      */
     protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = array())
     {
-        if ($this->container->bound($key = "db.connection.{$driver}"))
-        {
+        if ($this->container->bound($key = "db.connection.{$driver}")) {
             return $this->container->make($key, array($connection, $database, $prefix, $config));
         }
 
-        switch ($driver)
-        {
+        switch ($driver) {
             case 'mysql':
                 return new MySqlConnection($connection, $database, $prefix, $config);
 
@@ -227,5 +220,4 @@ class ConnectionFactory {
 
         throw new InvalidArgumentException("Unsupported driver [$driver]");
     }
-
 }

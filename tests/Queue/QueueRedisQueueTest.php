@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
-
+class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -94,8 +94,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
         $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
         $transaction = m::mock('StdClass');
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('transaction')->with(m::any(), m::type('Closure'))->andReturnUsing(function($options, $callback) use ($transaction)
-        {
+        $redis->shouldReceive('transaction')->with(m::any(), m::type('Closure'))->andReturnUsing(function ($options, $callback) use ($transaction) {
             $callback($transaction);
         });
         $transaction->shouldReceive('zrangebyscore')->once()->with('from', '-inf', 1)->andReturn(array('foo', 'bar'));
@@ -135,5 +134,4 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase {
 
         $result = $queue->pop();
     }
-
 }

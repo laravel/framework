@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Auth;
 
-trait Authenticatable {
-
+trait Authenticatable
+{
     /**
      * Get the unique identifier for the user.
      *
@@ -52,5 +52,4 @@ trait Authenticatable {
     {
         return 'remember_token';
     }
-
 }

@@ -5,8 +5,8 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class ResetCommand extends Command {
-
+class ResetCommand extends Command
+{
     use ConfirmableTrait;
 
     /**
@@ -50,12 +50,13 @@ class ResetCommand extends Command {
      */
     public function fire()
     {
-        if ( ! $this->confirmToProceed()) return;
+        if (! $this->confirmToProceed()) {
+            return;
+        }
 
         $this->migrator->setConnection($this->input->getOption('database'));
 
-        if ( ! $this->migrator->repositoryExists())
-        {
+        if (! $this->migrator->repositoryExists()) {
             $this->output->writeln('<comment>Migration table not found.</comment>');
 
             return;
@@ -68,8 +69,7 @@ class ResetCommand extends Command {
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
         // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note)
-        {
+        foreach ($this->migrator->getNotes() as $note) {
             $this->output->writeln($note);
         }
     }
@@ -89,5 +89,4 @@ class ResetCommand extends Command {
             array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
         );
     }
-
 }

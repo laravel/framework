@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class ArrayStore extends TaggableStore implements Store {
-
+class ArrayStore extends TaggableStore implements Store
+{
     /**
      * The array of stored values.
      *
@@ -19,8 +19,7 @@ class ArrayStore extends TaggableStore implements Store {
      */
     public function get($key)
     {
-        if (array_key_exists($key, $this->storage))
-        {
+        if (array_key_exists($key, $this->storage)) {
             return $this->storage[$key];
         }
     }
@@ -108,5 +107,4 @@ class ArrayStore extends TaggableStore implements Store {
     {
         return '';
     }
-
 }

@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
-
+class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -548,7 +548,7 @@ empty
     public function testCustomExtensionsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->extend(function($value) { return str_replace('foo', 'bar', $value); });
+        $compiler->extend(function ($value) { return str_replace('foo', 'bar', $value); });
         $this->assertEquals('bar', $compiler->compileString('foo'));
     }
 
@@ -556,7 +556,7 @@ empty
     public function testCustomStatements()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->directive('customControl', function($expression) {
+        $compiler->directive('customControl', function ($expression) {
             return "<?php echo custom_control{$expression}; ?>";
         });
 
@@ -573,7 +573,7 @@ empty
     public function testCustomShortStatements()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->directive('customControl', function($expression) {
+        $compiler->directive('customControl', function ($expression) {
             return '<?php echo custom_control(); ?>';
         });
 
@@ -694,5 +694,4 @@ test';
             ['(((', ')))'],
         ];
     }
-
 }

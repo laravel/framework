@@ -2,8 +2,8 @@
 
 use Illuminate\Container\Container;
 
-trait AppNamespaceDetectorTrait {
-
+trait AppNamespaceDetectorTrait
+{
     /**
      * Get the application namespace.
      *
@@ -13,5 +13,4 @@ trait AppNamespaceDetectorTrait {
     {
         return Container::getInstance()->getNamespace();
     }
-
 }

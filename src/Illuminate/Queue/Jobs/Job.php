@@ -2,8 +2,8 @@
 
 use DateTime;
 
-abstract class Job {
-
+abstract class Job
+{
     /**
      * The job handler instance.
      *
@@ -158,14 +158,12 @@ abstract class Job {
      */
     protected function resolveQueueableEntities($data)
     {
-        if (is_string($data))
-        {
+        if (is_string($data)) {
             return $this->resolveQueueableEntity($data);
         }
 
-        if (is_array($data))
-        {
-            array_walk($data, function(&$d) { $d = $this->resolveQueueableEntity($d); });
+        if (is_array($data)) {
+            array_walk($data, function (&$d) { $d = $this->resolveQueueableEntity($d); });
         }
 
         return $data;
@@ -179,8 +177,7 @@ abstract class Job {
      */
     protected function resolveQueueableEntity($value)
     {
-        if (is_string($value) && starts_with($value, '::entity::'))
-        {
+        if (is_string($value) && starts_with($value, '::entity::')) {
             list($marker, $type, $id) = explode('|', $value, 3);
 
             return $this->getEntityResolver()->resolve($type, $id);
@@ -202,8 +199,7 @@ abstract class Job {
 
         $this->instance = $this->resolve($class);
 
-        if (method_exists($this->instance, 'failed'))
-        {
+        if (method_exists($this->instance, 'failed')) {
             $this->instance->failed($this->resolveQueueableEntities($payload['data']));
         }
     }
@@ -226,8 +222,7 @@ abstract class Job {
      */
     protected function getSeconds($delay)
     {
-        if ($delay instanceof DateTime)
-        {
+        if ($delay instanceof DateTime) {
             return max(0, $delay->getTimestamp() - $this->getTime());
         }
 
@@ -263,5 +258,4 @@ abstract class Job {
     {
         return $this->queue;
     }
-
 }

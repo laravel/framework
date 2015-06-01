@@ -10,8 +10,8 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\View\View as ViewContract;
 
-class View implements ArrayAccess, ViewContract {
-
+class View implements ArrayAccess, ViewContract
+{
     /**
      * The view factory instance.
      *
@@ -120,8 +120,7 @@ class View implements ArrayAccess, ViewContract {
     {
         $env = $this->factory;
 
-        return $this->render(function($view) use ($env)
-        {
+        return $this->render(function ($view) use ($env) {
             return $env->getSections();
         });
     }
@@ -145,10 +144,8 @@ class View implements ArrayAccess, ViewContract {
     {
         $data = array_merge($this->factory->getShared(), $this->data);
 
-        foreach ($data as $key => $value)
-        {
-            if ($value instanceof Renderable)
-            {
+        foreach ($data as $key => $value) {
+            if ($value instanceof Renderable) {
                 $data[$key] = $value->render();
             }
         }
@@ -165,12 +162,9 @@ class View implements ArrayAccess, ViewContract {
      */
     public function with($key, $value = null)
     {
-        if (is_array($key))
-        {
+        if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
-        }
-        else
-        {
+        } else {
             $this->data[$key] = $value;
         }
 
@@ -198,12 +192,9 @@ class View implements ArrayAccess, ViewContract {
      */
     public function withErrors($provider)
     {
-        if ($provider instanceof MessageProvider)
-        {
+        if ($provider instanceof MessageProvider) {
             $this->with('errors', $provider->getMessageBag());
-        }
-        else
-        {
+        } else {
             $this->with('errors', new MessageBag((array) $provider));
         }
 
@@ -382,8 +373,7 @@ class View implements ArrayAccess, ViewContract {
      */
     public function __call($method, $parameters)
     {
-        if (starts_with($method, 'with'))
-        {
+        if (starts_with($method, 'with')) {
             return $this->with(snake_case(substr($method, 4)), $parameters[0]);
         }
 
@@ -399,5 +389,4 @@ class View implements ArrayAccess, ViewContract {
     {
         return $this->render();
     }
-
 }

@@ -4,8 +4,8 @@ use Mockery as m;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event;
 
-class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
-
+class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
+{
     /**
      * The default configuration timezone
      *
@@ -38,7 +38,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
         $event = new Event('php foo');
         $this->assertEquals('* * * * * *', $event->getExpression());
         $this->assertTrue($event->isDue($app));
-        $this->assertFalse($event->skip(function() { return true; })->isDue($app));
+        $this->assertFalse($event->skip(function () { return true; })->isDue($app));
 
         $event = new Event('php foo');
         $this->assertEquals('* * * * * *', $event->getExpression());
@@ -46,7 +46,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
 
         $event = new Event('php foo');
         $this->assertEquals('* * * * * *', $event->getExpression());
-        $this->assertFalse($event->when(function() { return false; })->isDue($app));
+        $this->assertFalse($event->when(function () { return false; })->isDue($app));
 
         $event = new Event('php foo');
         $this->assertEquals('*/5 * * * * *', $event->everyFiveMinutes()->getExpression());
@@ -77,5 +77,4 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('0 19 * * 3 *', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
         $this->assertTrue($event->isDue($app));
     }
-
 }

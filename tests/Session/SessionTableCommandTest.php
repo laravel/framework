@@ -4,8 +4,8 @@ use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Application;
 use Mockery as m;
 
-class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
-
+class SessionTableCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -38,14 +38,12 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class SessionTableCommandTestStub extends SessionTableCommand {
-
+class SessionTableCommandTestStub extends SessionTableCommand
+{
     public function call($command, array $arguments = array())
     {
         //
     }
-
 }

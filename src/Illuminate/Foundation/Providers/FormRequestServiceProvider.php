@@ -4,8 +4,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormRequestServiceProvider extends ServiceProvider {
-
+class FormRequestServiceProvider extends ServiceProvider
+{
     /**
      * Register the service provider.
      *
@@ -23,10 +23,8 @@ class FormRequestServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        $this->app['events']->listen('router.matched', function()
-        {
-            $this->app->resolving(function(FormRequest $request, $app)
-            {
+        $this->app['events']->listen('router.matched', function () {
+            $this->app->resolving(function (FormRequest $request, $app) {
                 $this->initializeRequest($request, $app['request']);
 
                 $request->setContainer($app)
@@ -53,8 +51,7 @@ class FormRequestServiceProvider extends ServiceProvider {
             $current->cookies->all(), $files, $current->server->all(), $current->getContent()
         );
 
-        if ($session = $current->getSession())
-        {
+        if ($session = $current->getSession()) {
             $form->setSession($session);
         }
 
@@ -62,5 +59,4 @@ class FormRequestServiceProvider extends ServiceProvider {
 
         $form->setRouteResolver($current->getRouteResolver());
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase {
-
+class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -97,5 +97,4 @@ class AuthDatabaseTokenRepositoryTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Auth\Passwords\DatabaseTokenRepository(m::mock('Illuminate\Database\Connection'), 'table', 'key');
     }
-
 }

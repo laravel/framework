@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Query\Builder;
 
-class SQLiteGrammar extends Grammar {
-
+class SQLiteGrammar extends Grammar
+{
     /**
      * All of the available clause operators.
      *
@@ -29,16 +29,14 @@ class SQLiteGrammar extends Grammar {
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if ( ! is_array(reset($values)))
-        {
+        if (! is_array(reset($values))) {
             $values = array($values);
         }
 
         // If there is only one record being inserted, we will just use the usual query
         // grammar insert builder because no special syntax is needed for the single
         // row inserts in SQLite. However, if there are multiples, we'll continue.
-        if (count($values) == 1)
-        {
+        if (count($values) == 1) {
             return parent::compileInsert($query, reset($values));
         }
 
@@ -49,8 +47,7 @@ class SQLiteGrammar extends Grammar {
         // SQLite requires us to build the multi-row insert as a listing of select with
         // unions joining them together. So we'll build out this list of columns and
         // then join them all together with select unions to complete the queries.
-        foreach (array_keys(reset($values)) as $column)
-        {
+        foreach (array_keys(reset($values)) as $column) {
             $columns[] = '? as '.$this->wrap($column);
         }
 
@@ -126,5 +123,4 @@ class SQLiteGrammar extends Grammar {
 
         return 'strftime(\''.$type.'\', '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
     }
-
 }

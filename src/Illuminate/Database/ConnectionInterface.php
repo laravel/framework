@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface ConnectionInterface {
-
+interface ConnectionInterface
+{
     /**
      * Begin a fluent query against a database table.
      *
@@ -144,5 +144,4 @@ interface ConnectionInterface {
      * @return array
      */
     public function pretend(Closure $callback);
-
 }

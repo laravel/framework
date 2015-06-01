@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Cache;
 
-class ApcWrapper {
-
+class ApcWrapper
+{
     /**
      * Indicates if APCu is supported.
      *
@@ -87,5 +87,4 @@ class ApcWrapper {
     {
         $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
     }
-
 }

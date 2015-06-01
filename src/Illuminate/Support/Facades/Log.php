@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Log\Writer
  */
-class Log extends Facade {
-
+class Log extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Log extends Facade {
     {
         return 'log';
     }
-
 }

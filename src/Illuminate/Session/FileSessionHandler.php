@@ -4,8 +4,8 @@ use SessionHandlerInterface;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
-class FileSessionHandler implements SessionHandlerInterface {
-
+class FileSessionHandler implements SessionHandlerInterface
+{
     /**
      * The filesystem instance.
      *
@@ -54,8 +54,7 @@ class FileSessionHandler implements SessionHandlerInterface {
      */
     public function read($sessionId)
     {
-        if ($this->files->exists($path = $this->path.'/'.$sessionId))
-        {
+        if ($this->files->exists($path = $this->path.'/'.$sessionId)) {
             return $this->files->get($path);
         }
 
@@ -89,10 +88,8 @@ class FileSessionHandler implements SessionHandlerInterface {
                     ->ignoreDotFiles(true)
                     ->date('<= now - '.$lifetime.' seconds');
 
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $this->files->delete($file->getRealPath());
         }
     }
-
 }

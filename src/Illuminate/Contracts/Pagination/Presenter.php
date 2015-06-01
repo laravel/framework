@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Pagination;
 
-interface Presenter {
-
+interface Presenter
+{
     /**
      * Render the given paginator.
      *
@@ -15,5 +15,4 @@ interface Presenter {
      * @return bool
      */
     public function hasPages();
-
 }

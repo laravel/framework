@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Auth;
 
-interface Authenticatable {
-
+interface Authenticatable
+{
     /**
      * Get the unique identifier for the user.
      *
@@ -37,5 +37,4 @@ interface Authenticatable {
      * @return string
      */
     public function getRememberTokenName();
-
 }

@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -87,7 +87,7 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase {
 
         $relation = $this->getRelation(null, $builder);
 
-        $builder->shouldReceive('getMacro')->once()->with('withTrashed')->andReturn(function() { return true; });
+        $builder->shouldReceive('getMacro')->once()->with('withTrashed')->andReturn(function () { return true; });
         $builder->shouldReceive('withTrashed')->once();
 
         $relation->withTrashed();
@@ -152,10 +152,10 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase {
         $morphTo = m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', array($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation'));
         return $morphTo;
     }
-
 }
 
 
-class EloquentMorphToModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentMorphToModelStub extends Illuminate\Database\Eloquent\Model
+{
     public $foreign_key = 'foreign.value';
 }

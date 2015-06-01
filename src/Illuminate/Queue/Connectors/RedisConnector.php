@@ -3,8 +3,8 @@
 use Illuminate\Redis\Database;
 use Illuminate\Queue\RedisQueue;
 
-class RedisConnector implements ConnectorInterface {
-
+class RedisConnector implements ConnectorInterface
+{
     /**
     * The Redis database instance.
     *
@@ -48,5 +48,4 @@ class RedisConnector implements ConnectorInterface {
 
         return $queue;
     }
-
 }

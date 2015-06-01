@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\View\Factory
  */
-class View extends Facade {
-
+class View extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class View extends Facade {
     {
         return 'view';
     }
-
 }

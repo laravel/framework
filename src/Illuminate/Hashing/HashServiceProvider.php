@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class HashServiceProvider extends ServiceProvider {
-
+class HashServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -18,7 +18,7 @@ class HashServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('hash', function() { return new BcryptHasher; });
+        $this->app->singleton('hash', function () { return new BcryptHasher; });
     }
 
     /**
@@ -30,5 +30,4 @@ class HashServiceProvider extends ServiceProvider {
     {
         return array('hash');
     }
-
 }

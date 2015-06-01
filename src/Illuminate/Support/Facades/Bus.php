@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Bus\Dispatcher
  */
-class Bus extends Facade {
-
+class Bus extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Bus extends Facade {
     {
         return 'Illuminate\Contracts\Bus\Dispatcher';
     }
-
 }

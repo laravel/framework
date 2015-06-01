@@ -8,7 +8,6 @@ use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEvent
 {
-
     /**
      * The broadcaster implementation.
      *

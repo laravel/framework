@@ -4,8 +4,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class SqsQueue extends Queue implements QueueContract {
-
+class SqsQueue extends Queue implements QueueContract
+{
     /**
      * The Amazon SQS instance.
      *
@@ -97,8 +97,7 @@ class SqsQueue extends Queue implements QueueContract {
             array('QueueUrl' => $queue, 'AttributeNames' => array('ApproximateReceiveCount'))
         );
 
-        if (count($response['Messages']) > 0)
-        {
+        if (count($response['Messages']) > 0) {
             return new SqsJob($this->container, $this->sqs, $queue, $response['Messages'][0]);
         }
     }
@@ -123,5 +122,4 @@ class SqsQueue extends Queue implements QueueContract {
     {
         return $this->sqs;
     }
-
 }

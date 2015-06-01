@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Container\Container;
 
-class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
-
+class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -81,28 +81,32 @@ class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase {
 
         $request->response(['errors']);
     }
-
-
-
 }
 
-class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest {
-    public function rules(StdClass $dep) {
+class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
+{
+    public function rules(StdClass $dep)
+    {
         return ['name' => 'required'];
     }
-    public function authorize(StdClass $dep) {
+    public function authorize(StdClass $dep)
+    {
         return true;
     }
-    public function validated(StdClass $dep) {
+    public function validated(StdClass $dep)
+    {
         $_SERVER['__request.validated'] = true;
     }
 }
 
-class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\FormRequest {
-    public function rules() {
+class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\FormRequest
+{
+    public function rules()
+    {
         return ['name' => 'required'];
     }
-    public function authorize() {
+    public function authorize()
+    {
         return false;
     }
 }

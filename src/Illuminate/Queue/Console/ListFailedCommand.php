@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class ListFailedCommand extends Command {
-
+class ListFailedCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -36,8 +36,7 @@ class ListFailedCommand extends Command {
     {
         $jobs = $this->getFailedJobs();
 
-        if (count($jobs) == 0)
-        {
+        if (count($jobs) == 0) {
             return $this->info('No failed jobs!');
         }
 
@@ -53,8 +52,7 @@ class ListFailedCommand extends Command {
     {
         $results = [];
 
-        foreach ($this->laravel['queue.failer']->all() as $failed)
-        {
+        foreach ($this->laravel['queue.failer']->all() as $failed) {
             $results[] = $this->parseFailedJob((array) $failed);
         }
 

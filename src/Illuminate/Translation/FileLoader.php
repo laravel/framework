@@ -2,8 +2,8 @@
 
 use Illuminate\Filesystem\Filesystem;
 
-class FileLoader implements LoaderInterface {
-
+class FileLoader implements LoaderInterface
+{
     /**
      * The filesystem instance.
      *
@@ -48,8 +48,7 @@ class FileLoader implements LoaderInterface {
      */
     public function load($locale, $group, $namespace = null)
     {
-        if (is_null($namespace) || $namespace == '*')
-        {
+        if (is_null($namespace) || $namespace == '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 
@@ -66,8 +65,7 @@ class FileLoader implements LoaderInterface {
      */
     protected function loadNamespaced($locale, $group, $namespace)
     {
-        if (isset($this->hints[$namespace]))
-        {
+        if (isset($this->hints[$namespace])) {
             $lines = $this->loadPath($this->hints[$namespace], $locale, $group);
 
             return $this->loadNamespaceOverrides($lines, $locale, $group, $namespace);
@@ -89,8 +87,7 @@ class FileLoader implements LoaderInterface {
     {
         $file = "{$this->path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
-        if ($this->files->exists($file))
-        {
+        if ($this->files->exists($file)) {
             return array_replace_recursive($lines, $this->files->getRequire($file));
         }
 
@@ -107,8 +104,7 @@ class FileLoader implements LoaderInterface {
      */
     protected function loadPath($path, $locale, $group)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php"))
-        {
+        if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
             return $this->files->getRequire($full);
         }
 
@@ -126,5 +122,4 @@ class FileLoader implements LoaderInterface {
     {
         $this->hints[$namespace] = $hint;
     }
-
 }

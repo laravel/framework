@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Migrations\MigrationCreator;
 
-class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -15,7 +15,7 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
     {
         $creator = $this->getCreator();
         unset($_SERVER['__migration.creator']);
-        $creator->afterCreate(function() { $_SERVER['__migration.creator'] = true; });
+        $creator->afterCreate(function () { $_SERVER['__migration.creator'] = true; });
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
         $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->getStubPath().'/blank.stub')->andReturn('DummyClass');
         $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', 'CreateBar');
@@ -56,5 +56,4 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
 
         return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', array('getDatePrefix'), array($files));
     }
-
 }

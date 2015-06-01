@@ -3,8 +3,8 @@
 use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
 
-class MailServiceProvider extends ServiceProvider {
-
+class MailServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -19,8 +19,7 @@ class MailServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('mailer', function($app)
-        {
+        $this->app->singleton('mailer', function ($app) {
             $this->registerSwiftMailer();
 
             // Once we have create the mailer instance, we will set a container instance
@@ -37,8 +36,7 @@ class MailServiceProvider extends ServiceProvider {
             // on each one, which makes the developer's life a lot more convenient.
             $from = $app['config']['mail.from'];
 
-            if (is_array($from) && isset($from['address']))
-            {
+            if (is_array($from) && isset($from['address'])) {
                 $mailer->alwaysFrom($from['address'], $from['name']);
             }
 
@@ -64,13 +62,11 @@ class MailServiceProvider extends ServiceProvider {
     {
         $mailer->setContainer($app);
 
-        if ($app->bound('Psr\Log\LoggerInterface'))
-        {
+        if ($app->bound('Psr\Log\LoggerInterface')) {
             $mailer->setLogger($app->make('Psr\Log\LoggerInterface'));
         }
 
-        if ($app->bound('queue'))
-        {
+        if ($app->bound('queue')) {
             $mailer->setQueue($app['queue.connection']);
         }
     }
@@ -87,8 +83,7 @@ class MailServiceProvider extends ServiceProvider {
         // Once we have the transporter registered, we will register the actual Swift
         // mailer instance, passing in the transport instances, which allows us to
         // override this transporter instances during app start-up if necessary.
-        $this->app['swift.mailer'] = $this->app->share(function($app)
-        {
+        $this->app['swift.mailer'] = $this->app->share(function ($app) {
             return new Swift_Mailer($app['swift.transport']->driver());
         });
     }
@@ -100,8 +95,7 @@ class MailServiceProvider extends ServiceProvider {
      */
     protected function registerSwiftTransport()
     {
-        $this->app['swift.transport'] = $this->app->share(function($app)
-        {
+        $this->app['swift.transport'] = $this->app->share(function ($app) {
             return new TransportManager($app);
         });
     }
@@ -115,5 +109,4 @@ class MailServiceProvider extends ServiceProvider {
     {
         return ['mailer', 'swift.mailer', 'swift.transport'];
     }
-
 }

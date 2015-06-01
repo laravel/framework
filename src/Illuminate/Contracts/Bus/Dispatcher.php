@@ -3,8 +3,8 @@
 use Closure;
 use ArrayAccess;
 
-interface Dispatcher {
-
+interface Dispatcher
+{
     /**
      * Marshal a command and dispatch it to its appropriate handler.
      *
@@ -49,5 +49,4 @@ interface Dispatcher {
      * @return $this
      */
     public function pipeThrough(array $pipes);
-
 }

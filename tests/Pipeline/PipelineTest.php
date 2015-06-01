@@ -2,11 +2,11 @@
 
 use Illuminate\Pipeline\Pipeline;
 
-class PipelineTest extends PHPUnit_Framework_TestCase {
-
+class PipelineTest extends PHPUnit_Framework_TestCase
+{
     public function testPipelineBasicUsage()
     {
-        $pipeTwo = function($piped, $next) {
+        $pipeTwo = function ($piped, $next) {
             $_SERVER['__test.pipe.two'] = $piped;
             return $next($piped);
         };
@@ -14,7 +14,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase {
         $result = (new Pipeline(new Illuminate\Container\Container))
                     ->send('foo')
                     ->through(['PipelineTestPipeOne', $pipeTwo])
-                    ->then(function($piped) {
+                    ->then(function ($piped) {
                         return $piped;
                     });
 
@@ -33,7 +33,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase {
         $result = (new Pipeline(new Illuminate\Container\Container))
             ->send('foo')
             ->through('PipelineTestParameterPipe:'.implode(',', $parameters))
-            ->then(function($piped) {
+            ->then(function ($piped) {
                 return $piped;
             });
 
@@ -42,17 +42,19 @@ class PipelineTest extends PHPUnit_Framework_TestCase {
 
         unset($_SERVER['__test.pipe.parameters']);
     }
-
 }
 
-class PipelineTestPipeOne {
-    public function handle($piped, $next) {
+class PipelineTestPipeOne
+{
+    public function handle($piped, $next)
+    {
         $_SERVER['__test.pipe.one'] = $piped;
         return $next($piped);
     }
 }
 
-class PipelineTestParameterPipe {
+class PipelineTestParameterPipe
+{
     public function handle($piped, $next, $parameter1 = null, $parameter2 = null)
     {
         $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2];

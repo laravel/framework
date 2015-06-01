@@ -4,8 +4,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 
-class GeneratorServiceProvider extends ServiceProvider {
-
+class GeneratorServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -34,8 +34,7 @@ class GeneratorServiceProvider extends ServiceProvider {
      */
     protected function registerControllerGenerator()
     {
-        $this->app->singleton('command.controller.make', function($app)
-        {
+        $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
         });
     }
@@ -47,8 +46,7 @@ class GeneratorServiceProvider extends ServiceProvider {
      */
     protected function registerMiddlewareGenerator()
     {
-        $this->app->singleton('command.middleware.make', function($app)
-        {
+        $this->app->singleton('command.middleware.make', function ($app) {
             return new MiddlewareMakeCommand($app['files']);
         });
     }
@@ -64,5 +62,4 @@ class GeneratorServiceProvider extends ServiceProvider {
             'command.controller.make', 'command.middleware.make',
         );
     }
-
 }

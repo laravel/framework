@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class DownCommand extends Command {
-
+class DownCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,5 +29,4 @@ class DownCommand extends Command {
 
         $this->comment('Application is now in maintenance mode.');
     }
-
 }

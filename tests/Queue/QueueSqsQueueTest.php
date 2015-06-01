@@ -4,15 +4,16 @@ use Aws\Result;
 use Mockery as m;
 use Aws\Sqs\SqsClient;
 
-class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
-
+class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
     }
 
 
-    public function setUp() {
+    public function setUp()
+    {
 
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock('Aws\Sqs\SqsClient');
@@ -90,5 +91,4 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase {
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
     }
-
 }

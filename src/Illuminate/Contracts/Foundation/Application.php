@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Container\Container;
 
-interface Application extends Container {
-
+interface Application extends Container
+{
     /**
      * Get the version number of the application.
      *
@@ -81,5 +81,4 @@ interface Application extends Container {
      * @return void
      */
     public function booted($callback);
-
 }

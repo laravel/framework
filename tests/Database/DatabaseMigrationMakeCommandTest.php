@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
-class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -62,5 +62,4 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }

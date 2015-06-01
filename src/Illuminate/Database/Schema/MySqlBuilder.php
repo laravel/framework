@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Database\Schema;
 
-class MySqlBuilder extends Builder {
-
+class MySqlBuilder extends Builder
+{
     /**
      * Determine if the given table exists.
      *
@@ -37,5 +37,4 @@ class MySqlBuilder extends Builder {
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
-
 }

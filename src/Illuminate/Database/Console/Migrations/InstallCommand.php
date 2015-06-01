@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 
-class InstallCommand extends Command {
-
+class InstallCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -65,5 +65,4 @@ class InstallCommand extends Command {
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
         );
     }
-
 }

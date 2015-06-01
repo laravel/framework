@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
-abstract class Relation {
-
+abstract class Relation
+{
     /**
      * The Eloquent query builder instance.
      *
@@ -173,8 +173,7 @@ abstract class Relation {
      */
     protected function getKeys(array $models, $key = null)
     {
-        return array_unique(array_values(array_map(function($value) use ($key)
-        {
+        return array_unique(array_values(array_map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
 
         }, $models)));
@@ -282,9 +281,10 @@ abstract class Relation {
     {
         $result = call_user_func_array(array($this->query, $method), $parameters);
 
-        if ($result === $this->query) return $this;
+        if ($result === $this->query) {
+            return $this;
+        }
 
         return $result;
     }
-
 }

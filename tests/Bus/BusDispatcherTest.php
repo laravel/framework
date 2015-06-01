@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 
-class BusDispatcherTest extends PHPUnit_Framework_TestCase {
-
+class BusDispatcherTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -19,7 +19,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
         $handler->shouldReceive('handle')->once()->andReturn('foo');
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function() { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
 
         $result = $dispatcher->dispatch(new BusDispatcherTestBasicCommand);
         $this->assertEquals('foo', $result);
@@ -29,7 +29,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
     public function testCommandsThatShouldBeQueuedAreQueued()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function() {
+        $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
             $mock->shouldReceive('push')->once();
             return $mock;
@@ -42,7 +42,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
     public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomHandler()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function() {
+        $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
             $mock->shouldReceive('push')->once();
             return $mock;
@@ -55,7 +55,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
     public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function() {
+        $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
             $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('BusDispatcherTestSpecificQueueAndDelayCommand'));
             return $mock;
@@ -68,12 +68,12 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
     public function testHandlersThatShouldBeQueuedAreQueued()
     {
         $container = new Container;
-        $dispatcher = new Dispatcher($container, function() {
+        $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
             $mock->shouldReceive('push')->once();
             return $mock;
         });
-        $dispatcher->mapUsing(function() { return 'BusDispatcherTestQueuedHandler@handle'; });
+        $dispatcher->mapUsing(function () { return 'BusDispatcherTestQueuedHandler@handle'; });
 
         $dispatcher->dispatch(new BusDispatcherTestBasicCommand);
     }
@@ -86,7 +86,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
         $handler->shouldReceive('handle')->once()->andReturn('foo');
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function() { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
 
         $result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
         $this->assertEquals('foo', $result);
@@ -100,9 +100,9 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
         $handler->shouldReceive('after')->once();
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function() { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
 
-        $dispatcher->dispatch(new BusDispatcherTestBasicCommand, function($handler) { $handler->after(); });
+        $dispatcher->dispatch(new BusDispatcherTestBasicCommand, function ($handler) { $handler->after(); });
     }
 
 
@@ -122,11 +122,12 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase {
     }
 }
 
-class BusDispatcherTestBasicCommand {
-
+class BusDispatcherTestBasicCommand
+{
 }
 
-class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfHandling {
+class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfHandling
+{
     public $flag, $emptyString;
     public function __construct($flag, $emptyString)
     {
@@ -139,7 +140,8 @@ class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfH
     }
 }
 
-class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling {
+class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling
+{
     public $firstName, $lastName;
     public function __construct($firstName, $lastName)
     {
@@ -152,19 +154,21 @@ class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\S
     }
 }
 
-class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued {
-
+class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued
+{
 }
 
 
-class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldBeQueued {
+class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldBeQueued
+{
     public function queue($queue, $command)
     {
         $queue->push($command);
     }
 }
 
-class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldBeQueued {
+class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldBeQueued
+{
     public $queue = 'foo';
     public $delay = 10;
 }

@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 
-class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -41,9 +41,12 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase {
     {
         return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
     }
-
 }
 
-class AppDatabaseMigrationStub extends \Illuminate\Foundation\Application {
-    public function environment() { return 'development'; }
+class AppDatabaseMigrationStub extends \Illuminate\Foundation\Application
+{
+    public function environment()
+    {
+        return 'development';
+    }
 }

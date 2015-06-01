@@ -5,8 +5,8 @@ use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Translator extends NamespacedItemResolver implements TranslatorInterface {
-
+class Translator extends NamespacedItemResolver implements TranslatorInterface
+{
     /**
      * The loader implementation.
      *
@@ -75,21 +75,24 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
         // Here we will get the locale that should be used for the language line. If one
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
-        foreach ($this->parseLocale($locale) as $locale)
-        {
+        foreach ($this->parseLocale($locale) as $locale) {
             $this->load($namespace, $group, $locale);
 
             $line = $this->getLine(
                 $namespace, $group, $locale, $item, $replace
             );
 
-            if ( ! is_null($line)) break;
+            if (! is_null($line)) {
+                break;
+            }
         }
 
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        if ( ! isset($line)) return $key;
+        if (! isset($line)) {
+            return $key;
+        }
 
         return $line;
     }
@@ -108,12 +111,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
     {
         $line = array_get($this->loaded[$namespace][$group][$locale], $item);
 
-        if (is_string($line))
-        {
+        if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
-        }
-        elseif (is_array($line) && count($line) > 0)
-        {
+        } elseif (is_array($line) && count($line) > 0) {
             return $line;
         }
     }
@@ -129,8 +129,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
     {
         $replace = $this->sortReplacements($replace);
 
-        foreach ($replace as $key => $value)
-        {
+        foreach ($replace as $key => $value) {
             $line = str_replace(':'.$key, $value, $line);
         }
 
@@ -145,8 +144,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
      */
     protected function sortReplacements(array $replace)
     {
-        return (new Collection($replace))->sortBy(function($value, $key)
-        {
+        return (new Collection($replace))->sortBy(function ($value, $key) {
             return mb_strlen($key) * -1;
         });
     }
@@ -208,7 +206,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
      */
     public function load($namespace, $group, $locale)
     {
-        if ($this->isLoaded($namespace, $group, $locale)) return;
+        if ($this->isLoaded($namespace, $group, $locale)) {
+            return;
+        }
 
         // The loader is responsible for returning the array of language lines for the
         // given namespace, group, and locale. We'll set the lines in this array of
@@ -253,7 +253,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
     {
         $segments = parent::parseKey($key);
 
-        if (is_null($segments[0])) $segments[0] = '*';
+        if (is_null($segments[0])) {
+            $segments[0] = '*';
+        }
 
         return $segments;
     }
@@ -266,8 +268,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
      */
     protected function parseLocale($locale)
     {
-        if ( ! is_null($locale))
-        {
+        if (! is_null($locale)) {
             return array_filter(array($locale, $this->fallback));
         }
 
@@ -281,8 +282,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
      */
     public function getSelector()
     {
-        if ( ! isset($this->selector))
-        {
+        if (! isset($this->selector)) {
             $this->selector = new MessageSelector;
         }
 
@@ -361,5 +361,4 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
     {
         $this->fallback = $fallback;
     }
-
 }

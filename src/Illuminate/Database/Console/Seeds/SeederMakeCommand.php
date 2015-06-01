@@ -4,8 +4,8 @@ use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 
-class SeederMakeCommand extends GeneratorCommand {
-
+class SeederMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -91,5 +91,4 @@ class SeederMakeCommand extends GeneratorCommand {
     {
         return $name;
     }
-
 }

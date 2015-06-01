@@ -2,8 +2,8 @@
 
 use Closure;
 
-interface Container {
-
+interface Container
+{
     /**
      * Determine if the given abstract type has been bound.
      *
@@ -139,5 +139,4 @@ interface Container {
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
-
 }

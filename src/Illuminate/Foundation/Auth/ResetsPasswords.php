@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait ResetsPasswords {
-
+trait ResetsPasswords
+{
     /**
      * Display the form to request a password reset link.
      *
@@ -28,13 +28,11 @@ trait ResetsPasswords {
     {
         $this->validate($request, ['email' => 'required|email']);
 
-        $response = Password::sendResetLink($request->only('email'), function(Message $message)
-        {
+        $response = Password::sendResetLink($request->only('email'), function (Message $message) {
             $message->subject($this->getEmailSubject());
         });
 
-        switch ($response)
-        {
+        switch ($response) {
             case Password::RESET_LINK_SENT:
                 return redirect()->back()->with('status', trans($response));
 
@@ -61,8 +59,7 @@ trait ResetsPasswords {
      */
     public function getReset($token = null)
     {
-        if (is_null($token))
-        {
+        if (is_null($token)) {
             throw new NotFoundHttpException;
         }
 
@@ -87,13 +84,11 @@ trait ResetsPasswords {
             'email', 'password', 'password_confirmation', 'token'
         );
 
-        $response = Password::reset($credentials, function($user, $password)
-        {
+        $response = Password::reset($credentials, function ($user, $password) {
             $this->resetPassword($user, $password);
         });
 
-        switch ($response)
-        {
+        switch ($response) {
             case Password::PASSWORD_RESET:
                 return redirect($this->redirectPath());
 
@@ -127,12 +122,10 @@ trait ResetsPasswords {
      */
     public function redirectPath()
     {
-        if (property_exists($this, 'redirectPath'))
-        {
+        if (property_exists($this, 'redirectPath')) {
             return $this->redirectPath;
         }
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
-
 }

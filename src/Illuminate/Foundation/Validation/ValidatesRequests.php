@@ -5,8 +5,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
 
-trait ValidatesRequests {
-
+trait ValidatesRequests
+{
     /**
      * Validate the given request with the given rules.
      *
@@ -20,8 +20,7 @@ trait ValidatesRequests {
     {
         $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             $this->throwValidationException($request, $validator);
         }
     }
@@ -49,8 +48,7 @@ trait ValidatesRequests {
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
     {
-        if ($request->ajax() || $request->wantsJson())
-        {
+        if ($request->ajax() || $request->wantsJson()) {
             return new JsonResponse($errors, 422);
         }
 
@@ -99,5 +97,4 @@ trait ValidatesRequests {
     {
         return 'default';
     }
-
 }

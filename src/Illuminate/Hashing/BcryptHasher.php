@@ -3,8 +3,8 @@
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
-class BcryptHasher implements HasherContract {
-
+class BcryptHasher implements HasherContract
+{
     /**
      * Default crypt cost factor.
      *
@@ -27,8 +27,7 @@ class BcryptHasher implements HasherContract {
 
         $hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
 
-        if ($hash === false)
-        {
+        if ($hash === false) {
             throw new RuntimeException("Bcrypt hashing not supported.");
         }
 
@@ -74,5 +73,4 @@ class BcryptHasher implements HasherContract {
 
         return $this;
     }
-
 }

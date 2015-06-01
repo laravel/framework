@@ -3,8 +3,8 @@
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
-class RetryCommand extends Command {
-
+class RetryCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -28,8 +28,7 @@ class RetryCommand extends Command {
     {
         $failed = $this->laravel['queue.failer']->find($this->argument('id'));
 
-        if ( ! is_null($failed))
-        {
+        if (! is_null($failed)) {
             $failed->payload = $this->resetAttempts($failed->payload);
 
             $this->laravel['queue']->connection($failed->connection)->pushRaw($failed->payload, $failed->queue);
@@ -37,9 +36,7 @@ class RetryCommand extends Command {
             $this->laravel['queue.failer']->forget($failed->id);
 
             $this->info('The failed job has been pushed back onto the queue!');
-        }
-        else
-        {
+        } else {
             $this->error('No failed job matches the given ID.');
         }
     }
@@ -54,7 +51,9 @@ class RetryCommand extends Command {
     {
         $payload = json_decode($payload, true);
 
-        if (isset($payload['attempts'])) $payload['attempts'] = 0;
+        if (isset($payload['attempts'])) {
+            $payload['attempts'] = 0;
+        }
 
         return json_encode($payload);
     }
@@ -70,5 +69,4 @@ class RetryCommand extends Command {
             array('id', InputArgument::REQUIRED, 'The ID of the failed job'),
         );
     }
-
 }

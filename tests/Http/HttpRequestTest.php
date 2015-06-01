@@ -4,8 +4,8 @@ use Mockery as m;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class HttpRequestTest extends PHPUnit_Framework_TestCase {
-
+class HttpRequestTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -513,7 +513,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
     public function testUserResolverMakesUserAvailableAsMagicProperty()
     {
         $request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_ACCEPT' => 'application/json'));
-        $request->setUserResolver(function() { return 'user'; });
+        $request->setUserResolver(function () { return 'user'; });
         $this->assertEquals('user', $request->user());
     }
 
@@ -535,5 +535,4 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($request->request->all(), $body);
     }
-
 }

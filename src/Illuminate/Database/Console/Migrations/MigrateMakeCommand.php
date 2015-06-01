@@ -5,8 +5,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
 
-class MigrateMakeCommand extends BaseCommand {
-
+class MigrateMakeCommand extends BaseCommand
+{
     /**
      * The console command name.
      *
@@ -66,7 +66,9 @@ class MigrateMakeCommand extends BaseCommand {
 
         $create = $this->input->getOption('create');
 
-        if ( ! $table && is_string($create)) $table = $create;
+        if (! $table && is_string($create)) {
+            $table = $create;
+        }
 
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
@@ -118,5 +120,4 @@ class MigrateMakeCommand extends BaseCommand {
             array('table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'),
         );
     }
-
 }

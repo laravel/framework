@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Cache\Store;
 
-class ApcStore extends TaggableStore implements Store {
-
+class ApcStore extends TaggableStore implements Store
+{
     /**
      * The APC wrapper instance.
      *
@@ -41,8 +41,7 @@ class ApcStore extends TaggableStore implements Store {
     {
         $value = $this->apc->get($this->prefix.$key);
 
-        if ($value !== false)
-        {
+        if ($value !== false) {
             return $value;
         }
     }
@@ -126,5 +125,4 @@ class ApcStore extends TaggableStore implements Store {
     {
         return $this->prefix;
     }
-
 }

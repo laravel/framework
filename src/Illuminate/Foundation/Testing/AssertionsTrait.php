@@ -3,8 +3,8 @@
 use Illuminate\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
 
-trait AssertionsTrait {
-
+trait AssertionsTrait
+{
     /**
      * Assert that the client response has an OK status code.
      *
@@ -39,19 +39,17 @@ trait AssertionsTrait {
      */
     public function assertViewHas($key, $value = null)
     {
-        if (is_array($key)) return $this->assertViewHasAll($key);
+        if (is_array($key)) {
+            return $this->assertViewHasAll($key);
+        }
 
-        if ( ! isset($this->response->original) || ! $this->response->original instanceof View)
-        {
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
-        if (is_null($value))
-        {
+        if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->response->original->getData());
-        }
-        else
-        {
+        } else {
             PHPUnit::assertEquals($value, $this->response->original->$key);
         }
     }
@@ -64,14 +62,10 @@ trait AssertionsTrait {
      */
     public function assertViewHasAll(array $bindings)
     {
-        foreach ($bindings as $key => $value)
-        {
-            if (is_int($key))
-            {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
                 $this->assertViewHas($value);
-            }
-            else
-            {
+            } else {
                 $this->assertViewHas($key, $value);
             }
         }
@@ -85,8 +79,7 @@ trait AssertionsTrait {
      */
     public function assertViewMissing($key)
     {
-        if ( ! isset($this->response->original) || ! $this->response->original instanceof View)
-        {
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
@@ -144,14 +137,13 @@ trait AssertionsTrait {
      */
     public function assertSessionHas($key, $value = null)
     {
-        if (is_array($key)) return $this->assertSessionHasAll($key);
-
-        if (is_null($value))
-        {
-            PHPUnit::assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
+        if (is_array($key)) {
+            return $this->assertSessionHasAll($key);
         }
-        else
-        {
+
+        if (is_null($value)) {
+            PHPUnit::assertTrue($this->app['session.store']->has($key), "Session missing key: $key");
+        } else {
             PHPUnit::assertEquals($value, $this->app['session.store']->get($key));
         }
     }
@@ -164,14 +156,10 @@ trait AssertionsTrait {
      */
     public function assertSessionHasAll(array $bindings)
     {
-        foreach ($bindings as $key => $value)
-        {
-            if (is_int($key))
-            {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
                 $this->assertSessionHas($value);
-            }
-            else
-            {
+            } else {
                 $this->assertSessionHas($key, $value);
             }
         }
@@ -192,14 +180,10 @@ trait AssertionsTrait {
 
         $errors = $this->app['session.store']->get('errors');
 
-        foreach ($bindings as $key => $value)
-        {
-            if (is_int($key))
-            {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
                 PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
-            }
-            else
-            {
+            } else {
                 PHPUnit::assertContains($value, $errors->get($key, $format));
             }
         }
@@ -214,5 +198,4 @@ trait AssertionsTrait {
     {
         $this->assertSessionHas('_old_input');
     }
-
 }

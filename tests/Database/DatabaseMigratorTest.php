@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -76,13 +76,11 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
         $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('3_baz'))->will($this->returnValue($bazMock));
 
         $connection = m::mock('stdClass');
-        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function($closure)
-        {
+        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function ($closure) {
             $closure();
             return array(array('query' => 'foo'));
         },
-        function($closure)
-        {
+        function ($closure) {
             $closure();
             return array(array('query' => 'bar'));
         });
@@ -163,13 +161,11 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
         $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('bar'))->will($this->returnValue($fooMock));
 
         $connection = m::mock('stdClass');
-        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function($closure)
-        {
+        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function ($closure) {
             $closure();
             return array(array('query' => 'bar'));
         },
-        function($closure)
-        {
+        function ($closure) {
             $closure();
             return array(array('query' => 'foo'));
         });
@@ -266,18 +262,15 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
         $migrator->expects($this->at(2))->method('resolve')->with($this->equalTo('foo'))->will($this->returnValue($fooMock));
 
         $connection = m::mock('stdClass');
-        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function($closure)
-        {
+        $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function ($closure) {
             $closure();
             return [['query' => 'baz']];
         },
-        function($closure)
-        {
+        function ($closure) {
             $closure();
             return [['query' => 'bar']];
         },
-        function($closure)
-        {
+        function ($closure) {
             $closure();
             return [['query' => 'foo']];
         });
@@ -298,11 +291,14 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase {
 
         $migrator->reset();
     }
-
 }
 
 
-class MigratorTestMigrationStub {
-    public function __construct($migration) { $this->migration = $migration; }
+class MigratorTestMigrationStub
+{
+    public function __construct($migration)
+    {
+        $this->migration = $migration;
+    }
     public $migration;
 }

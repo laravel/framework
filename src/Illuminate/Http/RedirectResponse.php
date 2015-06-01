@@ -8,8 +8,8 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends BaseRedirectResponse {
-
+class RedirectResponse extends BaseRedirectResponse
+{
     use ResponseTrait;
 
     /**
@@ -37,8 +37,7 @@ class RedirectResponse extends BaseRedirectResponse {
     {
         $key = is_array($key) ? $key : [$key => $value];
 
-        foreach ($key as $k => $v)
-        {
+        foreach ($key as $k => $v) {
             $this->session->flash($k, $v);
         }
 
@@ -53,8 +52,7 @@ class RedirectResponse extends BaseRedirectResponse {
      */
     public function withCookies(array $cookies)
     {
-        foreach ($cookies as $cookie)
-        {
+        foreach ($cookies as $cookie) {
             $this->headers->setCookie($cookie);
         }
 
@@ -71,10 +69,8 @@ class RedirectResponse extends BaseRedirectResponse {
     {
         $input = $input ?: $this->request->input();
 
-        $this->session->flashInput($data = array_filter($input, $callback = function (&$value) use (&$callback)
-        {
-            if (is_array($value))
-            {
+        $this->session->flashInput($data = array_filter($input, $callback = function (&$value) use (&$callback) {
+            if (is_array($value)) {
                 $value = array_filter($value, $callback);
             }
 
@@ -132,8 +128,7 @@ class RedirectResponse extends BaseRedirectResponse {
      */
     protected function parseErrors($provider)
     {
-        if ($provider instanceof MessageProvider)
-        {
+        if ($provider instanceof MessageProvider) {
             return $provider->getMessageBag();
         }
 
@@ -193,12 +188,10 @@ class RedirectResponse extends BaseRedirectResponse {
      */
     public function __call($method, $parameters)
     {
-        if (starts_with($method, 'with'))
-        {
+        if (starts_with($method, 'with')) {
             return $this->with(snake_case(substr($method, 4)), $parameters[0]);
         }
 
         throw new BadMethodCallException("Method [$method] does not exist on Redirect.");
     }
-
 }

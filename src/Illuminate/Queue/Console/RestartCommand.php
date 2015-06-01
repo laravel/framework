@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class RestartCommand extends Command {
-
+class RestartCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,5 +29,4 @@ class RestartCommand extends Command {
 
         $this->info('Broadcasting queue restart signal.');
     }
-
 }

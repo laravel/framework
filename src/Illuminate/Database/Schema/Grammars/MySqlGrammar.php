@@ -4,8 +4,8 @@ use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 
-class MySqlGrammar extends Grammar {
-
+class MySqlGrammar extends Grammar
+{
     /**
      * The possible column modifiers.
      *
@@ -59,8 +59,7 @@ class MySqlGrammar extends Grammar {
         // the table. If so, we will add the engine declaration to the SQL query.
         $sql = $this->compileCreateEncoding($sql, $connection, $blueprint);
 
-        if (isset($blueprint->engine))
-        {
+        if (isset($blueprint->engine)) {
             $sql .= ' engine = '.$blueprint->engine;
         }
 
@@ -77,21 +76,15 @@ class MySqlGrammar extends Grammar {
      */
     protected function compileCreateEncoding($sql, Connection $connection, Blueprint $blueprint)
     {
-        if (isset($blueprint->charset))
-        {
+        if (isset($blueprint->charset)) {
             $sql .= ' default character set '.$blueprint->charset;
-        }
-        elseif ( ! is_null($charset = $connection->getConfig('charset')))
-        {
+        } elseif (! is_null($charset = $connection->getConfig('charset'))) {
             $sql .= ' default character set '.$charset;
         }
 
-        if (isset($blueprint->collation))
-        {
+        if (isset($blueprint->collation)) {
             $sql .= ' collate '.$blueprint->collation;
-        }
-        elseif ( ! is_null($collation = $connection->getConfig('collation')))
-        {
+        } elseif (! is_null($collation = $connection->getConfig('collation'))) {
             $sql .= ' collate '.$collation;
         }
 
@@ -406,8 +399,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function typeDouble(Fluent $column)
     {
-        if ($column->total && $column->places)
-        {
+        if ($column->total && $column->places) {
             return "double({$column->total}, {$column->places})";
         }
 
@@ -532,7 +524,9 @@ class MySqlGrammar extends Grammar {
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ( ! $column->nullable) return 'timestamp default 0';
+        if (! $column->nullable) {
+            return 'timestamp default 0';
+        }
 
         return 'timestamp';
     }
@@ -545,7 +539,9 @@ class MySqlGrammar extends Grammar {
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ( ! $column->nullable) return 'timestamp default 0';
+        if (! $column->nullable) {
+            return 'timestamp default 0';
+        }
 
         return 'timestamp';
     }
@@ -570,7 +566,9 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
     {
-        if ($column->unsigned) return ' unsigned';
+        if ($column->unsigned) {
+            return ' unsigned';
+        }
     }
 
     /**
@@ -582,8 +580,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyCharset(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->charset))
-        {
+        if (! is_null($column->charset)) {
             return ' character set '.$column->charset;
         }
     }
@@ -597,8 +594,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->collation))
-        {
+        if (! is_null($column->collation)) {
             return ' collate '.$column->collation;
         }
     }
@@ -624,8 +620,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->default))
-        {
+        if (! is_null($column->default)) {
             return " default ".$this->getDefaultValue($column->default);
         }
     }
@@ -639,8 +634,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement)
-        {
+        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' auto_increment primary key';
         }
     }
@@ -654,8 +648,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyAfter(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->after))
-        {
+        if (! is_null($column->after)) {
             return ' after '.$this->wrap($column->after);
         }
     }
@@ -669,8 +662,7 @@ class MySqlGrammar extends Grammar {
      */
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
-        if ( ! is_null($column->comment))
-        {
+        if (! is_null($column->comment)) {
             return ' comment "'.$column->comment.'"';
         }
     }
@@ -683,9 +675,10 @@ class MySqlGrammar extends Grammar {
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') return $value;
+        if ($value === '*') {
+            return $value;
+        }
 
         return '`'.str_replace('`', '``', $value).'`';
     }
-
 }

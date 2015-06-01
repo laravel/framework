@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class ClearResetsCommand extends Command {
-
+class ClearResetsCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,5 +29,4 @@ class ClearResetsCommand extends Command {
 
         $this->info('Expired reset tokens cleared!');
     }
-
 }

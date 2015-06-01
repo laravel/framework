@@ -4,8 +4,8 @@ use Pheanstalk\Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Illuminate\Queue\BeanstalkdQueue;
 
-class BeanstalkdConnector implements ConnectorInterface {
-
+class BeanstalkdConnector implements ConnectorInterface
+{
     /**
      * Establish a queue connection.
      *
@@ -20,5 +20,4 @@ class BeanstalkdConnector implements ConnectorInterface {
             $pheanstalk, $config['queue'], array_get($config, 'ttr', Pheanstalk::DEFAULT_TTR)
         );
     }
-
 }

@@ -5,8 +5,8 @@ use ReflectionProperty;
 use Psy\Presenter\ObjectPresenter;
 use Illuminate\Database\Eloquent\Model;
 
-class EloquentModelPresenter extends ObjectPresenter {
-
+class EloquentModelPresenter extends ObjectPresenter
+{
     /**
      * Determine if the presenter can present the given value.
      *
@@ -32,22 +32,18 @@ class EloquentModelPresenter extends ObjectPresenter {
 
         $visible = $value->getVisible();
 
-        if (count($visible) === 0)
-        {
+        if (count($visible) === 0) {
             $visible = array_diff(array_keys($attributes), $value->getHidden());
         }
 
-        if ( ! $this->showHidden($propertyFilter))
-        {
+        if (! $this->showHidden($propertyFilter)) {
             return array_intersect_key($attributes, array_flip($visible));
         }
 
         $properties = [];
 
-        foreach ($attributes as $key => $value)
-        {
-            if ( ! in_array($key, $visible))
-            {
+        foreach ($attributes as $key => $value) {
+            if (! in_array($key, $visible)) {
                 $key = sprintf('<protected>%s</protected>', $key);
             }
 
@@ -67,5 +63,4 @@ class EloquentModelPresenter extends ObjectPresenter {
     {
         return $propertyFilter & (ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
     }
-
 }

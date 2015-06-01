@@ -2,8 +2,8 @@
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-class DatabaseMigrationRepository implements MigrationRepositoryInterface {
-
+class DatabaseMigrationRepository implements MigrationRepositoryInterface
+{
     /**
      * The database connection resolver instance.
      *
@@ -114,8 +114,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
     {
         $schema = $this->getConnection()->getSchemaBuilder();
 
-        $schema->create($this->table, function($table)
-        {
+        $schema->create($this->table, function ($table) {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
@@ -177,5 +176,4 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
     {
         $this->connection = $name;
     }
-
 }

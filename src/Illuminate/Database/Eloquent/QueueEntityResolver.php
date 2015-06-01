@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Contracts\Queue\EntityResolver as EntityResolverContract;
 
-class QueueEntityResolver implements EntityResolverContract {
-
+class QueueEntityResolver implements EntityResolverContract
+{
     /**
      * Resolve the entity for the given ID.
      *
@@ -16,12 +16,10 @@ class QueueEntityResolver implements EntityResolverContract {
     {
         $instance = (new $type)->find($id);
 
-        if ($instance)
-        {
+        if ($instance) {
             return $instance;
         }
 
         throw new EntityNotFoundException($type, $id);
     }
-
 }

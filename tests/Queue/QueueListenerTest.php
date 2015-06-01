@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class QueueListenerTest extends PHPUnit_Framework_TestCase {
-
+class QueueListenerTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -43,5 +43,4 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(3, $process->getTimeout());
         $this->assertEquals('"'.PHP_BINARY.'" artisan queue:work connection --queue="queue" --delay=1 --memory=2 --sleep=3 --tries=0', $process->getCommandLine());
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Console\GeneratorCommand;
 
-class EventMakeCommand extends GeneratorCommand {
-
+class EventMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -45,5 +45,4 @@ class EventMakeCommand extends GeneratorCommand {
     {
         return $rootNamespace.'\Events';
     }
-
 }

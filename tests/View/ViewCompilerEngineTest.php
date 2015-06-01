@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\View\Engines\CompilerEngine;
 
-class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
-
+class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -41,5 +41,4 @@ class ViewCompilerEngineTest extends PHPUnit_Framework_TestCase {
     {
         return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
     }
-
 }

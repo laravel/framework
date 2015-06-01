@@ -5,8 +5,8 @@ use Aws\Ses\SesClient;
 use Swift_Mime_Message;
 use Swift_Events_EventListener;
 
-class SesTransport implements Swift_Transport {
-
+class SesTransport implements Swift_Transport
+{
     /**
      * The Amazon SES instance.
      *
@@ -85,12 +85,10 @@ class SesTransport implements Swift_Transport {
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
         );
 
-        foreach ($contacts as $address => $display)
-        {
+        foreach ($contacts as $address => $display) {
             $destinations[] = $address;
         }
 
         return $destinations;
     }
-
 }

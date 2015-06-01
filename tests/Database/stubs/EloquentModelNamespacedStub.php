@@ -2,6 +2,6 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class EloquentModelNamespacedStub extends Model {
-
+class EloquentModelNamespacedStub extends Model
+{
 }

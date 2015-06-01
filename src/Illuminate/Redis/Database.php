@@ -4,8 +4,8 @@ use Closure;
 use Predis\Client;
 use Illuminate\Contracts\Redis\Database as DatabaseContract;
 
-class Database implements DatabaseContract {
-
+class Database implements DatabaseContract
+{
     /**
      * The host address of the database.
      *
@@ -25,12 +25,9 @@ class Database implements DatabaseContract {
 
         $options = (array) array_pull($servers, 'options');
 
-        if ($cluster)
-        {
+        if ($cluster) {
             $this->clients = $this->createAggregateClient($servers, $options);
-        }
-        else
-        {
+        } else {
             $this->clients = $this->createSingleClients($servers, $options);
         }
     }
@@ -58,8 +55,7 @@ class Database implements DatabaseContract {
     {
         $clients = array();
 
-        foreach ($servers as $key => $server)
-        {
+        foreach ($servers as $key => $server) {
             $clients[$key] = new Client($server, $options);
         }
 
@@ -137,5 +133,4 @@ class Database implements DatabaseContract {
     {
         return $this->command($method, $parameters);
     }
-
 }

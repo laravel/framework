@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Redis\Database
  */
-class Redis extends Facade {
-
+class Redis extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class Redis extends Facade {
     {
         return 'redis';
     }
-
 }

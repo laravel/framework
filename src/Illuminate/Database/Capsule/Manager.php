@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 
-class Manager {
-
+class Manager
+{
     use CapsuleManagerTrait;
 
     /**
@@ -134,8 +134,7 @@ class Manager {
         // If we have an event dispatcher instance, we will go ahead and register it
         // with the Eloquent ORM, allowing for model callbacks while creating and
         // updating "model" instances; however, if it not necessary to operate.
-        if ($dispatcher = $this->getEventDispatcher())
-        {
+        if ($dispatcher = $this->getEventDispatcher()) {
             Eloquent::setEventDispatcher($dispatcher);
         }
     }
@@ -170,8 +169,7 @@ class Manager {
      */
     public function getEventDispatcher()
     {
-        if ($this->container->bound('events'))
-        {
+        if ($this->container->bound('events')) {
             return $this->container['events'];
         }
     }
@@ -198,5 +196,4 @@ class Manager {
     {
         return call_user_func_array(array(static::connection(), $method), $parameters);
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-interface TokenRepositoryInterface {
-
+interface TokenRepositoryInterface
+{
     /**
      * Create a new token.
      *
@@ -35,5 +35,4 @@ interface TokenRepositoryInterface {
      * @return void
      */
     public function deleteExpired();
-
 }

@@ -6,8 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
-class Store implements SessionInterface {
-
+class Store implements SessionInterface
+{
     /**
      * The session ID.
      *
@@ -87,7 +87,9 @@ class Store implements SessionInterface {
     {
         $this->loadSession();
 
-        if ( ! $this->has('_token')) $this->regenerateToken();
+        if (! $this->has('_token')) {
+            $this->regenerateToken();
+        }
 
         return $this->started = true;
     }
@@ -101,8 +103,7 @@ class Store implements SessionInterface {
     {
         $this->attributes = array_merge($this->attributes, $this->readFromHandler());
 
-        foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
-        {
+        foreach (array_merge($this->bags, array($this->metaBag)) as $bag) {
             $this->initializeLocalBag($bag);
 
             $bag->initialize($this->bagData[$bag->getStorageKey()]);
@@ -118,11 +119,12 @@ class Store implements SessionInterface {
     {
         $data = $this->handler->read($this->getId());
 
-        if ($data)
-        {
+        if ($data) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
-            if ($data !== false && $data !== null && is_array($data)) return $data;
+            if ($data !== false && $data !== null && is_array($data)) {
+                return $data;
+            }
         }
 
         return [];
@@ -163,8 +165,7 @@ class Store implements SessionInterface {
      */
     public function setId($id)
     {
-        if ( ! $this->isValidId($id))
-        {
+        if (! $this->isValidId($id)) {
             $id = $this->generateSessionId();
         }
 
@@ -223,7 +224,9 @@ class Store implements SessionInterface {
      */
     public function migrate($destroy = false, $lifetime = null)
     {
-        if ($destroy) $this->handler->destroy($this->getId());
+        if ($destroy) {
+            $this->handler->destroy($this->getId());
+        }
 
         $this->setExists(false);
 
@@ -275,8 +278,7 @@ class Store implements SessionInterface {
      */
     protected function addBagDataToSession()
     {
-        foreach (array_merge($this->bags, array($this->metaBag)) as $bag)
-        {
+        foreach (array_merge($this->bags, array($this->metaBag)) as $bag) {
             $this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
         }
     }
@@ -288,7 +290,9 @@ class Store implements SessionInterface {
      */
     public function ageFlashData()
     {
-        foreach ($this->get('flash.old', array()) as $old) { $this->forget($old); }
+        foreach ($this->get('flash.old', array()) as $old) {
+            $this->forget($old);
+        }
 
         $this->put('flash.old', $this->get('flash.new', array()));
 
@@ -370,10 +374,11 @@ class Store implements SessionInterface {
      */
     public function put($key, $value = null)
     {
-        if ( ! is_array($key)) $key = array($key => $value);
+        if (! is_array($key)) {
+            $key = array($key => $value);
+        }
 
-        foreach ($key as $arrayKey => $arrayValue)
-        {
+        foreach ($key as $arrayKey => $arrayValue) {
             $this->set($arrayKey, $arrayValue);
         }
     }
@@ -514,8 +519,7 @@ class Store implements SessionInterface {
     {
         $this->attributes = array();
 
-        foreach ($this->bags as $bag)
-        {
+        foreach ($this->bags as $bag) {
             $bag->clear();
         }
     }
@@ -551,8 +555,7 @@ class Store implements SessionInterface {
      */
     public function getBag($name)
     {
-        return array_get($this->bags, $name, function()
-        {
+        return array_get($this->bags, $name, function () {
             throw new InvalidArgumentException("Bag not registered.");
         });
     }
@@ -635,8 +638,7 @@ class Store implements SessionInterface {
      */
     public function setExists($value)
     {
-        if ($this->handler instanceof ExistenceAwareInterface)
-        {
+        if ($this->handler instanceof ExistenceAwareInterface) {
             $this->handler->setExists($value);
         }
     }
@@ -669,10 +671,8 @@ class Store implements SessionInterface {
      */
     public function setRequestOnHandler(Request $request)
     {
-        if ($this->handlerNeedsRequest())
-        {
+        if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
     }
-
 }

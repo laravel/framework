@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
 
-class ContextualBindingBuilder implements ContextualBindingBuilderContract {
-
+class ContextualBindingBuilder implements ContextualBindingBuilderContract
+{
     /**
      * The underlying container instance.
      *
@@ -54,5 +54,4 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract {
     {
         $this->container->addContextualBinding($this->concrete, $this->needs, $implementation);
     }
-
 }

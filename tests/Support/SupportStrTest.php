@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Str;
 
-class SupportStrTest extends PHPUnit_Framework_TestCase {
-
+class SupportStrTest extends PHPUnit_Framework_TestCase
+{
     /**
     * Test the Str::words method.
     *
@@ -155,5 +155,4 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
         $this->assertEquals('laravel_php_framework', Str::snake('LaravelPhpFramework'));
     }
-
 }

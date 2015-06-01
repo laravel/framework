@@ -5,7 +5,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
 {
-
     /**
      * The console command name.
      *

@@ -2,8 +2,8 @@
 
 use Illuminate\Console\Command;
 
-class FlushFailedCommand extends Command {
-
+class FlushFailedCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -29,5 +29,4 @@ class FlushFailedCommand extends Command {
 
         $this->info('All failed jobs deleted successfully!');
     }
-
 }

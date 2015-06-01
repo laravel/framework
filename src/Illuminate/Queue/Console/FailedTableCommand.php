@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
 
-class FailedTableCommand extends Command {
-
+class FailedTableCommand extends Command
+{
     /**
      * The console command name.
      *
@@ -81,5 +81,4 @@ class FailedTableCommand extends Command {
 
         return $this->laravel['migration.creator']->create($name, $path);
     }
-
 }

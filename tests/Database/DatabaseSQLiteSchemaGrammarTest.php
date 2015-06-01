@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
 
-class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -463,5 +463,4 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase {
     {
         return new Illuminate\Database\Schema\Grammars\SQLiteGrammar;
     }
-
 }

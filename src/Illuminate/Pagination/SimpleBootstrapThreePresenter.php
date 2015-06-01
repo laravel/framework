@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 
-class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
-
+class SimpleBootstrapThreePresenter extends BootstrapThreePresenter
+{
     /**
      * Create a simple Bootstrap 3 presenter.
      *
@@ -32,8 +32,7 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
      */
     public function render()
     {
-        if ($this->hasPages())
-        {
+        if ($this->hasPages()) {
             return sprintf(
                 '<ul class="pager">%s %s</ul>',
                 $this->getPreviousButton(),
@@ -43,5 +42,4 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter {
 
         return '';
     }
-
 }

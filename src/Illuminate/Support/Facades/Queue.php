@@ -4,8 +4,8 @@
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue
  */
-class Queue extends Facade {
-
+class Queue extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -15,5 +15,4 @@ class Queue extends Facade {
     {
         return 'queue';
     }
-
 }

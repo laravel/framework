@@ -2,8 +2,8 @@
 
 use Mockery as m;
 
-class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
-
+class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -57,5 +57,4 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase {
 
         return $console;
     }
-
 }

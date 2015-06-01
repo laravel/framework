@@ -6,8 +6,8 @@ use Swift_Mime_MimeEntity;
 use Psr\Log\LoggerInterface;
 use Swift_Events_EventListener;
 
-class LogTransport implements Swift_Transport {
-
+class LogTransport implements Swift_Transport
+{
     /**
      * The Logger instance.
      *
@@ -68,8 +68,7 @@ class LogTransport implements Swift_Transport {
     {
         $string = (string) $entity->getHeaders().PHP_EOL.$entity->getBody();
 
-        foreach ($entity->getChildren() as $children)
-        {
+        foreach ($entity->getChildren() as $children) {
             $string .= PHP_EOL.PHP_EOL.$this->getMimeEntityString($children);
         }
 
@@ -83,5 +82,4 @@ class LogTransport implements Swift_Transport {
     {
         //
     }
-
 }

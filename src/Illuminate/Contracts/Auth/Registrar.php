@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Auth;
 
-interface Registrar {
-
+interface Registrar
+{
     /**
      * Get a validator for an incoming registration request.
      *
@@ -17,5 +17,4 @@ interface Registrar {
      * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     public function create(array $data);
-
 }

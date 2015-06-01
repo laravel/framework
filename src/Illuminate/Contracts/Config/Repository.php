@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Config;
 
-interface Repository {
-
+interface Repository
+{
     /**
      * Determine if the given configuration value exists.
      *
@@ -45,5 +45,4 @@ interface Repository {
      * @return void
      */
     public function push($key, $value);
-
 }

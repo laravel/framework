@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Support\Renderable;
 
-interface View extends Renderable {
-
+interface View extends Renderable
+{
     /**
      * Get the name of the view.
      *
@@ -19,5 +19,4 @@ interface View extends Renderable {
      * @return $this
      */
     public function with($key, $value = null);
-
 }

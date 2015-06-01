@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class HandlerEventCommand extends GeneratorCommand {
-
+class HandlerEventCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -38,8 +38,7 @@ class HandlerEventCommand extends GeneratorCommand {
 
         $event = $this->option('event');
 
-        if ( ! starts_with($event, $this->laravel->getNamespace()))
-        {
+        if (! starts_with($event, $this->laravel->getNamespace())) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
@@ -61,12 +60,9 @@ class HandlerEventCommand extends GeneratorCommand {
      */
     protected function getStub()
     {
-        if ($this->option('queued'))
-        {
+        if ($this->option('queued')) {
             return __DIR__.'/stubs/event-handler-queued.stub';
-        }
-        else
-        {
+        } else {
             return __DIR__.'/stubs/event-handler.stub';
         }
     }
@@ -95,5 +91,4 @@ class HandlerEventCommand extends GeneratorCommand {
             array('queued', null, InputOption::VALUE_NONE, 'Indicates the event handler should be queued.'),
         );
     }
-
 }

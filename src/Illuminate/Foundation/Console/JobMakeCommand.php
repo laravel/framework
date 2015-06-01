@@ -3,8 +3,8 @@
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class JobMakeCommand extends GeneratorCommand {
-
+class JobMakeCommand extends GeneratorCommand
+{
     /**
      * The console command name.
      *
@@ -33,12 +33,9 @@ class JobMakeCommand extends GeneratorCommand {
      */
     protected function getStub()
     {
-        if ($this->option('queued'))
-        {
+        if ($this->option('queued')) {
             return __DIR__.'/stubs/job-queued.stub';
-        }
-        else
-        {
+        } else {
             return __DIR__.'/stubs/job.stub';
         }
     }
@@ -65,5 +62,4 @@ class JobMakeCommand extends GeneratorCommand {
             array('queued', null, InputOption::VALUE_NONE, 'Indicates that job should be queued.'),
         );
     }
-
 }

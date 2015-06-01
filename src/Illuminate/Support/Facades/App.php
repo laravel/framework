@@ -3,8 +3,8 @@
 /**
  * @see \Illuminate\Foundation\Application
  */
-class App extends Facade {
-
+class App extends Facade
+{
     /**
      * Get the registered name of the component.
      *
@@ -14,5 +14,4 @@ class App extends Facade {
     {
         return 'app';
     }
-
 }

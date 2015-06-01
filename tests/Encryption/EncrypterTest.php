@@ -2,8 +2,8 @@
 
 use Illuminate\Encryption\Encrypter;
 
-class EncrypterTest extends PHPUnit_Framework_TestCase {
-
+class EncrypterTest extends PHPUnit_Framework_TestCase
+{
     public function testEncryption()
     {
         $e = $this->getEncrypter();
@@ -38,5 +38,4 @@ class EncrypterTest extends PHPUnit_Framework_TestCase {
     {
         return new Encrypter(str_repeat('a', 32));
     }
-
 }

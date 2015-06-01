@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Container;
 
-interface ContextualBindingBuilder {
-
+interface ContextualBindingBuilder
+{
     /**
      * Define the abstract target that depends on the context.
      *
@@ -17,5 +17,4 @@ interface ContextualBindingBuilder {
      * @return void
      */
     public function give($implementation);
-
 }

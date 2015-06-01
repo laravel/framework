@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Collection as BaseCollection;
 
-class Collection extends BaseCollection {
-
+class Collection extends BaseCollection
+{
     /**
      * Find a model in the collection by key.
      *
@@ -13,13 +13,11 @@ class Collection extends BaseCollection {
      */
     public function find($key, $default = null)
     {
-        if ($key instanceof Model)
-        {
+        if ($key instanceof Model) {
             $key = $key->getKey();
         }
 
-        return array_first($this->items, function($itemKey, $model) use ($key)
-        {
+        return array_first($this->items, function ($itemKey, $model) use ($key) {
             return $model->getKey() == $key;
 
         }, $default);
@@ -33,9 +31,10 @@ class Collection extends BaseCollection {
      */
     public function load($relations)
     {
-        if (count($this->items) > 0)
-        {
-            if (is_string($relations)) $relations = func_get_args();
+        if (count($this->items) > 0) {
+            if (is_string($relations)) {
+                $relations = func_get_args();
+            }
 
             $query = $this->first()->newQuery()->with($relations);
 
@@ -67,14 +66,17 @@ class Collection extends BaseCollection {
      */
     public function contains($key, $value = null)
     {
-        if (func_num_args() == 2) return parent::contains($key, $value);
+        if (func_num_args() == 2) {
+            return parent::contains($key, $value);
+        }
 
-        if ($this->useAsCallable($key)) return parent::contains($key);
+        if ($this->useAsCallable($key)) {
+            return parent::contains($key);
+        }
 
         $key = $key instanceof Model ? $key->getKey() : $key;
 
-        return parent::contains(function($k, $m) use ($key)
-        {
+        return parent::contains(function ($k, $m) use ($key) {
             return $m->getKey() == $key;
         });
     }
@@ -98,8 +100,7 @@ class Collection extends BaseCollection {
      */
     public function max($key)
     {
-        return $this->reduce(function($result, $item) use ($key)
-        {
+        return $this->reduce(function ($result, $item) use ($key) {
             return is_null($result) || $item->{$key} > $result ? $item->{$key} : $result;
         });
     }
@@ -112,8 +113,7 @@ class Collection extends BaseCollection {
      */
     public function min($key)
     {
-        return $this->reduce(function($result, $item) use ($key)
-        {
+        return $this->reduce(function ($result, $item) use ($key) {
             return is_null($result) || $item->{$key} < $result ? $item->{$key} : $result;
         });
     }
@@ -125,7 +125,7 @@ class Collection extends BaseCollection {
      */
     public function modelKeys()
     {
-        return array_map(function($m) { return $m->getKey(); }, $this->items);
+        return array_map(function ($m) { return $m->getKey(); }, $this->items);
     }
 
     /**
@@ -138,8 +138,7 @@ class Collection extends BaseCollection {
     {
         $dictionary = $this->getDictionary();
 
-        foreach ($items as $item)
-        {
+        foreach ($items as $item) {
             $dictionary[$item->getKey()] = $item;
         }
 
@@ -158,10 +157,8 @@ class Collection extends BaseCollection {
 
         $dictionary = $this->getDictionary($items);
 
-        foreach ($this->items as $item)
-        {
-            if ( ! isset($dictionary[$item->getKey()]))
-            {
+        foreach ($this->items as $item) {
+            if (! isset($dictionary[$item->getKey()])) {
                 $diff->add($item);
             }
         }
@@ -181,10 +178,8 @@ class Collection extends BaseCollection {
 
         $dictionary = $this->getDictionary($items);
 
-        foreach ($this->items as $item)
-        {
-            if (isset($dictionary[$item->getKey()]))
-            {
+        foreach ($this->items as $item) {
+            if (isset($dictionary[$item->getKey()])) {
                 $intersect->add($item);
             }
         }
@@ -200,7 +195,9 @@ class Collection extends BaseCollection {
      */
     public function unique($key = null)
     {
-        if ( ! is_null($key)) return parent::unique($key);
+        if (! is_null($key)) {
+            return parent::unique($key);
+        }
 
         return new static(array_values($this->getDictionary()));
     }
@@ -243,8 +240,7 @@ class Collection extends BaseCollection {
 
         $dictionary = array();
 
-        foreach ($items as $value)
-        {
+        foreach ($items as $value) {
             $dictionary[$value->getKey()] = $value;
         }
 
@@ -260,5 +256,4 @@ class Collection extends BaseCollection {
     {
         return new BaseCollection($this->items);
     }
-
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class ScheduleServiceProvider extends ServiceProvider {
-
+class ScheduleServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -32,5 +32,4 @@ class ScheduleServiceProvider extends ServiceProvider {
             'Illuminate\Console\Scheduling\ScheduleRunCommand',
         ];
     }
-
 }

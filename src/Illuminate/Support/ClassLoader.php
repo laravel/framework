@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Support;
 
-class ClassLoader {
-
+class ClassLoader
+{
     /**
      * The registered directories.
      *
@@ -26,10 +26,8 @@ class ClassLoader {
     {
         $class = static::normalizeClass($class);
 
-        foreach (static::$directories as $directory)
-        {
-            if (file_exists($path = $directory.DIRECTORY_SEPARATOR.$class))
-            {
+        foreach (static::$directories as $directory) {
+            if (file_exists($path = $directory.DIRECTORY_SEPARATOR.$class)) {
                 require_once $path;
 
                 return true;
@@ -47,7 +45,9 @@ class ClassLoader {
      */
     public static function normalizeClass($class)
     {
-        if ($class[0] == '\\') $class = substr($class, 1);
+        if ($class[0] == '\\') {
+            $class = substr($class, 1);
+        }
 
         return str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $class).'.php';
     }
@@ -59,8 +59,7 @@ class ClassLoader {
      */
     public static function register()
     {
-        if ( ! static::$registered)
-        {
+        if (! static::$registered) {
             static::$registered = spl_autoload_register(array('\Illuminate\Support\ClassLoader', 'load'));
         }
     }
@@ -84,12 +83,9 @@ class ClassLoader {
      */
     public static function removeDirectories($directories = null)
     {
-        if (is_null($directories))
-        {
+        if (is_null($directories)) {
             static::$directories = array();
-        }
-        else
-        {
+        } else {
             static::$directories = array_diff(static::$directories, (array) $directories);
         }
     }
@@ -103,5 +99,4 @@ class ClassLoader {
     {
         return static::$directories;
     }
-
 }

@@ -13,8 +13,8 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Route {
-
+class Route
+{
     use RouteDependencyResolverTrait;
 
     /**
@@ -101,13 +101,11 @@ class Route {
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
-        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods))
-        {
+        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
-        if (isset($this->action['prefix']))
-        {
+        if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
     }
@@ -122,22 +120,17 @@ class Route {
     {
         $this->container = $this->container ?: new Container;
 
-        try
-        {
-            if ( ! is_string($this->action['uses']))
-            {
+        try {
+            if (! is_string($this->action['uses'])) {
                 return $this->runCallable($request);
             }
 
-            if ($this->customDispatcherIsBound())
-            {
+            if ($this->customDispatcherIsBound()) {
                 return $this->runWithCustomDispatcher($request);
             }
 
             return $this->runController($request);
-        }
-        catch (HttpResponseException $e)
-        {
+        } catch (HttpResponseException $e) {
             return $e->getResponse();
         }
     }
@@ -171,8 +164,7 @@ class Route {
             $this->parametersWithoutNulls(), $class, $method
         );
 
-        if ( ! method_exists($instance = $this->container->make($class), $method))
-        {
+        if (! method_exists($instance = $this->container->make($class), $method)) {
             throw new NotFoundHttpException;
         }
 
@@ -215,11 +207,14 @@ class Route {
     {
         $this->compileRoute();
 
-        foreach ($this->getValidators() as $validator)
-        {
-            if ( ! $includingMethod && $validator instanceof MethodValidator) continue;
+        foreach ($this->getValidators() as $validator) {
+            if (! $includingMethod && $validator instanceof MethodValidator) {
+                continue;
+            }
 
-            if ( ! $validator->matches($this, $request)) return false;
+            if (! $validator->matches($this, $request)) {
+                return false;
+            }
         }
 
         return true;
@@ -272,7 +267,9 @@ class Route {
      */
     public function beforeFilters()
     {
-        if ( ! isset($this->action['before'])) return array();
+        if (! isset($this->action['before'])) {
+            return array();
+        }
 
         return $this->parseFilters($this->action['before']);
     }
@@ -284,7 +281,9 @@ class Route {
      */
     public function afterFilters()
     {
-        if ( ! isset($this->action['after'])) return array();
+        if (! isset($this->action['after'])) {
+            return array();
+        }
 
         return $this->parseFilters($this->action['after']);
     }
@@ -297,8 +296,7 @@ class Route {
      */
     public static function parseFilters($filters)
     {
-        return array_build(static::explodeFilters($filters), function($key, $value)
-        {
+        return array_build(static::explodeFilters($filters), function ($key, $value) {
             return Route::parseFilter($value);
         });
     }
@@ -311,7 +309,9 @@ class Route {
      */
     protected static function explodeFilters($filters)
     {
-        if (is_array($filters)) return static::explodeArrayFilters($filters);
+        if (is_array($filters)) {
+            return static::explodeArrayFilters($filters);
+        }
 
         return array_map('trim', explode('|', $filters));
     }
@@ -326,8 +326,7 @@ class Route {
     {
         $results = array();
 
-        foreach ($filters as $filter)
-        {
+        foreach ($filters as $filter) {
             $results = array_merge($results, array_map('trim', explode('|', $filter)));
         }
 
@@ -342,7 +341,9 @@ class Route {
      */
     public static function parseFilter($filter)
     {
-        if ( ! str_contains($filter, ':')) return array($filter, array());
+        if (! str_contains($filter, ':')) {
+            return array($filter, array());
+        }
 
         return static::parseParameterFilter($filter);
     }
@@ -431,10 +432,8 @@ class Route {
      */
     public function parameters()
     {
-        if (isset($this->parameters))
-        {
-            return array_map(function($value)
-            {
+        if (isset($this->parameters)) {
+            return array_map(function ($value) {
                 return is_string($value) ? rawurldecode($value) : $value;
 
             }, $this->parameters);
@@ -450,7 +449,7 @@ class Route {
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), function($p) { return ! is_null($p); });
+        return array_filter($this->parameters(), function ($p) { return ! is_null($p); });
     }
 
     /**
@@ -460,7 +459,9 @@ class Route {
      */
     public function parameterNames()
     {
-        if (isset($this->parameterNames)) return $this->parameterNames;
+        if (isset($this->parameterNames)) {
+            return $this->parameterNames;
+        }
 
         return $this->parameterNames = $this->compileParameterNames();
     }
@@ -474,7 +475,7 @@ class Route {
     {
         preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
 
-        return array_map(function($m) { return trim($m, '?'); }, $matches[1]);
+        return array_map(function ($m) { return trim($m, '?'); }, $matches[1]);
     }
 
     /**
@@ -512,8 +513,7 @@ class Route {
         // If the route has a regular expression for the host part of the URI, we will
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
-        if ( ! is_null($this->compiled->getHostRegex()))
-        {
+        if (! is_null($this->compiled->getHostRegex())) {
             $params = $this->bindHostParameters(
                 $request, $params
             );
@@ -557,12 +557,13 @@ class Route {
      */
     protected function matchToKeys(array $matches)
     {
-        if (count($this->parameterNames()) == 0) return array();
+        if (count($this->parameterNames()) == 0) {
+            return array();
+        }
 
         $parameters = array_intersect_key($matches, array_flip($this->parameterNames()));
 
-        return array_filter($parameters, function($value)
-        {
+        return array_filter($parameters, function ($value) {
             return is_string($value) && strlen($value) > 0;
         });
     }
@@ -575,8 +576,7 @@ class Route {
      */
     protected function replaceDefaults(array $parameters)
     {
-        foreach ($parameters as $key => &$value)
-        {
+        foreach ($parameters as $key => &$value) {
             $value = isset($value) ? $value : array_get($this->defaults, $key);
         }
 
@@ -594,16 +594,14 @@ class Route {
         // If the action is already a Closure instance, we will just set that instance
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
-        if (is_callable($action))
-        {
+        if (is_callable($action)) {
             return array('uses' => $action);
         }
 
         // If no "uses" property has been set, we will dig through the array to find a
         // Closure instance within this list. We will set the first Closure we come
         // across into the "uses" property that will get fired off by this route.
-        elseif ( ! isset($action['uses']))
-        {
+        elseif (! isset($action['uses'])) {
             $action['uses'] = $this->findCallable($action);
         }
 
@@ -618,8 +616,7 @@ class Route {
      */
     protected function findCallable(array $action)
     {
-        return array_first($action, function($key, $value)
-        {
+        return array_first($action, function ($key, $value) {
             return is_callable($value) && is_numeric($key);
         });
     }
@@ -631,7 +628,9 @@ class Route {
      */
     public static function getValidators()
     {
-        if (isset(static::$validators)) return static::$validators;
+        if (isset(static::$validators)) {
+            return static::$validators;
+        }
 
         // To match the route, we will use a chain of responsibility pattern with the
         // validator implementations. We will spin through each one making sure it
@@ -675,14 +674,11 @@ class Route {
     {
         $filters = static::explodeFilters($filters);
 
-        if (isset($this->action[$type]))
-        {
+        if (isset($this->action[$type])) {
             $existing = static::explodeFilters($this->action[$type]);
 
             $this->action[$type] = array_merge($existing, $filters);
-        }
-        else
-        {
+        } else {
             $this->action[$type] = $filters;
         }
 
@@ -712,8 +708,7 @@ class Route {
      */
     public function where($name, $expression = null)
     {
-        foreach ($this->parseWhere($name, $expression) as $name => $expression)
-        {
+        foreach ($this->parseWhere($name, $expression) as $name => $expression) {
             $this->wheres[$name] = $expression;
         }
 
@@ -740,8 +735,7 @@ class Route {
      */
     protected function whereArray(array $wheres)
     {
-        foreach ($wheres as $name => $expression)
-        {
+        foreach ($wheres as $name => $expression) {
             $this->where($name, $expression);
         }
 
@@ -949,8 +943,7 @@ class Route {
      */
     public function prepareForSerialization()
     {
-        if ($this->action['uses'] instanceof Closure)
-        {
+        if ($this->action['uses'] instanceof Closure) {
             throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }
 
@@ -967,5 +960,4 @@ class Route {
     {
         return $this->parameter($key);
     }
-
 }

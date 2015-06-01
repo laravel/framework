@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -64,10 +64,10 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase {
         $relation = new EloquentRelationStub($eloquentBuilder, $parent);
         $relation->wrap('test');
     }
-
 }
 
-class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model {
+class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model
+{
     //Override method call which would normally go through __call()
     public function getQuery()
     {
@@ -76,10 +76,21 @@ class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model 
 }
 
 
-class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relation {
-    public function addConstraints() {}
-    public function addEagerConstraints(array $models) {}
-    public function initRelation(array $models, $relation) {}
-    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation) {}
-    public function getResults() {}
+class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relation
+{
+    public function addConstraints()
+    {
+    }
+    public function addEagerConstraints(array $models)
+    {
+    }
+    public function initRelation(array $models, $relation)
+    {
+    }
+    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
+    {
+    }
+    public function getResults()
+    {
+    }
 }

@@ -3,8 +3,8 @@
 use Illuminate\Support\Manager;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
-class SessionManager extends Manager {
-
+class SessionManager extends Manager
+{
     /**
      * Call a custom driver creator.
      *
@@ -162,14 +162,11 @@ class SessionManager extends Manager {
      */
     protected function buildSession($handler)
     {
-        if ($this->app['config']['session.encrypt'])
-        {
+        if ($this->app['config']['session.encrypt']) {
             return new EncryptedStore(
                 $this->app['config']['session.cookie'], $handler, $this->app['encrypter']
             );
-        }
-        else
-        {
+        } else {
             return new Store($this->app['config']['session.cookie'], $handler);
         }
     }
@@ -204,5 +201,4 @@ class SessionManager extends Manager {
     {
         $this->app['config']['session.driver'] = $name;
     }
-
 }

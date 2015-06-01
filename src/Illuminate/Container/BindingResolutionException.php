@@ -2,4 +2,6 @@
 
 use Exception;
 
-class BindingResolutionException extends Exception {}
+class BindingResolutionException extends Exception
+{
+}

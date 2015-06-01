@@ -2,8 +2,8 @@
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as PaginatorContract;
 
-class UrlWindow {
-
+class UrlWindow
+{
     /**
      * The paginator implementation.
      *
@@ -42,8 +42,7 @@ class UrlWindow {
      */
     public function get($onEachSide = 3)
     {
-        if ($this->paginator->lastPage() < ($onEachSide * 2) + 6)
-        {
+        if ($this->paginator->lastPage() < ($onEachSide * 2) + 6) {
             return $this->getSmallSlider();
         }
 
@@ -74,8 +73,7 @@ class UrlWindow {
     {
         $window = $onEachSide * 2;
 
-        if ( ! $this->hasPages())
-        {
+        if (! $this->hasPages()) {
             return [
                 'first'  => null,
                 'slider' => null,
@@ -86,16 +84,14 @@ class UrlWindow {
         // If the current page is very close to the beginning of the page range, we will
         // just render the beginning of the page range, followed by the last 2 of the
         // links in this list, since we will not have room to create a full slider.
-        if ($this->currentPage() <= $window)
-        {
+        if ($this->currentPage() <= $window) {
             return $this->getSliderTooCloseToBeginning($window);
         }
 
         // If the current page is close to the ending of the page range we will just get
         // this first couple pages, followed by a larger window of these ending pages
         // since we're too close to the end of the list to create a full on slider.
-        elseif ($this->currentPage() > ($this->lastPage() - $window))
-        {
+        elseif ($this->currentPage() > ($this->lastPage() - $window)) {
             return $this->getSliderTooCloseToEnding($window);
         }
 
@@ -221,5 +217,4 @@ class UrlWindow {
     {
         return $this->paginator->lastPage();
     }
-
 }

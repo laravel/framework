@@ -1,11 +1,10 @@
 <?php
 
-class SupportHelpersTest extends PHPUnit_Framework_TestCase {
-
+class SupportHelpersTest extends PHPUnit_Framework_TestCase
+{
     public function testArrayBuild()
     {
-        $this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function($key, $value)
-        {
+        $this->assertEquals(array('foo' => 'bar'), array_build(array('foo' => 'bar'), function ($key, $value) {
             return array($key, $value);
         }));
     }
@@ -23,7 +22,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
         $array = array('names' => array('developer' => 'taylor'));
         $this->assertEquals('taylor', array_get($array, 'names.developer'));
         $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function() { return 'dayle'; }));
+        $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function () { return 'dayle'; }));
     }
 
 
@@ -123,13 +122,13 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
     public function testArrayFirst()
     {
         $array = array('name' => 'taylor', 'otherDeveloper' => 'dayle');
-        $this->assertEquals('dayle', array_first($array, function($key, $value) { return $value == 'dayle'; }));
+        $this->assertEquals('dayle', array_first($array, function ($key, $value) { return $value == 'dayle'; }));
     }
 
     public function testArrayLast()
     {
         $array = array(100, 250, 290, 320, 500, 560, 670);
-        $this->assertEquals(670, array_last($array, function($key, $value) { return $value > 320; }));
+        $this->assertEquals(670, array_last($array, function ($key, $value) { return $value > 320; }));
     }
 
 
@@ -287,7 +286,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
     public function testValue()
     {
         $this->assertEquals('foo', value('foo'));
-        $this->assertEquals('foo', value(function() { return 'foo'; }));
+        $this->assertEquals('foo', value(function () { return 'foo'; }));
     }
 
 
@@ -312,7 +311,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
         $this->assertNull(data_get($array, '0.users.3'));
         $this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', function (){ return 'Not found'; }));
+        $this->assertEquals('Not found', data_get($array, '0.users.3', function () { return 'Not found'; }));
         $this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
         $this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
         $this->assertEquals(56, data_get($arrayAccess, 'price'));
@@ -336,7 +335,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
             array('name' => 'bar'),
             array('name' => 'baz'),
             array('name' => 'foo')),
-        array_values(array_sort($array, function($v) { return $v['name']; })));
+        array_values(array_sort($array, function ($v) { return $v['name']; })));
     }
 
 
@@ -345,8 +344,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
         $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
         $this->assertEquals(['b' => 2, 'd' => 4, 'f' => 6, 'h' => 8], array_where(
             $array,
-            function($key, $value)
-            {
+            function ($key, $value) {
                 return $value % 2 === 0;
             }
         ));
@@ -390,33 +388,52 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
         $this->assertEquals(array('firstname' => 'Ferid'), $developer);
     }
-
 }
 
-trait SupportTestTraitOne {}
+trait SupportTestTraitOne
+{
+}
 
-trait SupportTestTraitTwo {
+trait SupportTestTraitTwo
+{
     use SupportTestTraitOne;
 }
 
-class SupportTestClassOne {
+class SupportTestClassOne
+{
     use SupportTestTraitTwo;
 }
 
-class SupportTestClassTwo extends SupportTestClassOne {}
+class SupportTestClassTwo extends SupportTestClassOne
+{
+}
 
-class SupportTestArrayAccess implements ArrayAccess {
-
+class SupportTestArrayAccess implements ArrayAccess
+{
     protected $attributes = [];
 
-    public function __construct ($attributes = []){ $this->attributes = $attributes; }
+    public function __construct($attributes = [])
+    {
+        $this->attributes = $attributes;
+    }
 
-    public function offsetExists ($offset){ return isset($this->attributes[$offset]); }
+    public function offsetExists($offset)
+    {
+        return isset($this->attributes[$offset]);
+    }
 
-    public function offsetGet ($offset){ return $this->attributes[$offset]; }
+    public function offsetGet($offset)
+    {
+        return $this->attributes[$offset];
+    }
 
-    public function offsetSet ($offset, $value){ $this->attributes[$offset] = $value; }
+    public function offsetSet($offset, $value)
+    {
+        $this->attributes[$offset] = $value;
+    }
 
-    public function offsetUnset ($offset){ unset($this->attributes[$offset]); }
-
+    public function offsetUnset($offset)
+    {
+        unset($this->attributes[$offset]);
+    }
 }

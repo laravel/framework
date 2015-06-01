@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Contracts\Hashing;
 
-interface Hasher {
-
+interface Hasher
+{
     /**
      * Hash the given value.
      *
@@ -29,5 +29,4 @@ interface Hasher {
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = array());
-
 }

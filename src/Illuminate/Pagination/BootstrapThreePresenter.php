@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 
-class BootstrapThreePresenter implements PresenterContract {
-
+class BootstrapThreePresenter implements PresenterContract
+{
     use BootstrapThreeNextPreviousButtonRendererTrait, UrlWindowPresenterTrait;
 
     /**
@@ -51,8 +51,7 @@ class BootstrapThreePresenter implements PresenterContract {
      */
     public function render()
     {
-        if ($this->hasPages())
-        {
+        if ($this->hasPages()) {
             return sprintf(
                 '<ul class="pagination">%s %s %s</ul>',
                 $this->getPreviousButton(),
@@ -130,5 +129,4 @@ class BootstrapThreePresenter implements PresenterContract {
     {
         return $this->paginator->lastPage();
     }
-
 }

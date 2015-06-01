@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
-
+class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         m::close();
@@ -23,7 +23,8 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($pivot->exists);
     }
 
-    public function testMutatorsAreCalledFromConstructor() {
+    public function testMutatorsAreCalledFromConstructor()
+    {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
@@ -96,26 +97,29 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($pivot->delete());
     }
-
 }
 
 
-class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+class DatabaseEloquentPivotTestDateStub extends Illuminate\Database\Eloquent\Relations\Pivot
+{
     public function getDates()
     {
         return array();
     }
 }
 
-class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\Relations\Pivot {
+class DatabaseEloquentPivotTestMutatorStub extends Illuminate\Database\Eloquent\Relations\Pivot
+{
     private $mutatorCalled = false;
 
-    public function setFooAttribute($value) {
+    public function setFooAttribute($value)
+    {
         $this->mutatorCalled = true;
         return $value;
     }
 
-    public function getMutatorCalled() {
+    public function getMutatorCalled()
+    {
         return $this->mutatorCalled;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-class SupportMacroableTest extends PHPUnit_Framework_TestCase {
-
+class SupportMacroableTest extends PHPUnit_Framework_TestCase
+{
     private $macroable;
 
     public function setUp()
@@ -19,7 +19,7 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase {
     public function testRegisterMacro()
     {
         $macroable = $this->macroable;
-        $macroable::macro(__CLASS__, function() { return 'Taylor'; });
+        $macroable::macro(__CLASS__, function () { return 'Taylor'; });
         $this->assertEquals('Taylor', $macroable::{__CLASS__}());
     }
 
@@ -27,15 +27,15 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase {
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
-        $macroable::macro(__CLASS__, function() { return 'Taylor'; });
+        $macroable::macro(__CLASS__, function () { return 'Taylor'; });
         $this->assertEquals('Taylor', $macroable->{__CLASS__}());
     }
 
 
     public function testWhenCallingMacroClosureIsBoundToObject()
     {
-        TestMacroable::macro('tryInstance', function() { return $this->protectedVariable; } );
-        TestMacroable::macro('tryStatic', function() { return static::getProtectedStatic(); } );
+        TestMacroable::macro('tryInstance', function () { return $this->protectedVariable; });
+        TestMacroable::macro('tryStatic', function () { return static::getProtectedStatic(); });
         $instance = new TestMacroable;
 
         $result = $instance->tryInstance();
@@ -44,10 +44,10 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase {
         $result = TestMacroable::tryStatic();
         $this->assertEquals('static', $result);
     }
-
 }
 
-class TestMacroable {
+class TestMacroable
+{
     use Illuminate\Support\Traits\Macroable;
     protected $protectedVariable = 'instance';
     protected static function getProtectedStatic()

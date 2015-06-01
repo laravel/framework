@@ -5,8 +5,8 @@ use ReflectionClass;
 use Psy\Presenter\ObjectPresenter;
 use Illuminate\Foundation\Application;
 
-class IlluminateApplicationPresenter extends ObjectPresenter {
-
+class IlluminateApplicationPresenter extends ObjectPresenter
+{
     /**
      * Illuminate Application methods to include in the presenter.
      *
@@ -52,21 +52,18 @@ class IlluminateApplicationPresenter extends ObjectPresenter {
     {
         $properties = [];
 
-        foreach (self::$appProperties as $property)
-        {
-            try
-            {
+        foreach (self::$appProperties as $property) {
+            try {
                 $val = $value->$property();
 
-                if ( ! is_null($val)) $properties[$property] = $val;
-            }
-            catch (Exception $e)
-            {
+                if (! is_null($val)) {
+                    $properties[$property] = $val;
+                }
+            } catch (Exception $e) {
                 //
             }
         }
 
         return $properties;
     }
-
 }

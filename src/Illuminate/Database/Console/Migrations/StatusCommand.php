@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migrator;
 
-class StatusCommand extends BaseCommand {
-
+class StatusCommand extends BaseCommand
+{
     /**
      * The console command name.
      *
@@ -45,8 +45,7 @@ class StatusCommand extends BaseCommand {
      */
     public function fire()
     {
-        if ( ! $this->migrator->repositoryExists())
-        {
+        if (! $this->migrator->repositoryExists()) {
             return $this->error('No migrations found.');
         }
 
@@ -54,17 +53,13 @@ class StatusCommand extends BaseCommand {
 
         $migrations = [];
 
-        foreach ($this->getAllMigrationFiles() as $migration)
-        {
+        foreach ($this->getAllMigrationFiles() as $migration) {
             $migrations[] = in_array($migration, $ran) ? ['<info>Y</info>', $migration] : ['<fg=red>N</fg=red>', $migration];
         }
 
-        if (count($migrations) > 0)
-        {
+        if (count($migrations) > 0) {
             $this->table(['Ran?', 'Migration'], $migrations);
-        }
-        else
-        {
+        } else {
             $this->error('No migrations found');
         }
     }
@@ -78,5 +73,4 @@ class StatusCommand extends BaseCommand {
     {
         return $this->migrator->getMigrationFiles($this->getMigrationPath());
     }
-
 }
