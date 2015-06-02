@@ -106,7 +106,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global from address and name.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function alwaysFrom($address, $name = null)

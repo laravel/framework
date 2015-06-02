@@ -70,7 +70,7 @@ class Message
      * Add a recipient to the message.
      *
      * @param  string|array  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function to($address, $name = null)
