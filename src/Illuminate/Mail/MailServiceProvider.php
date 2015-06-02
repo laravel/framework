@@ -42,6 +42,17 @@ class MailServiceProvider extends ServiceProvider
                 $mailer->alwaysFrom($from['address'], $from['name']);
             }
 
+            // If a "to" address is set, we will set it on the mailer so that all mail
+            // messages sent by the applications will utilize the same "to" address
+            // on each one, which makes it easier for a develop to test, view
+            // and share emails sent from a development or staging
+            // environment without spamming real customers.
+            $to = $app['config']['mail.to'];
+
+            if (is_array($to) && isset($to['address'])) {
+                $mailer->alwaysTo($to['address'], $to['name']);
+            }
+
             // Here we will determine if the mailer should be in "pretend" mode for this
             // environment, which will simply write out e-mail to the logs instead of
             // sending it over the web, which is useful for local dev environments.
