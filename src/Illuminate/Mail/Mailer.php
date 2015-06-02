@@ -115,6 +115,18 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Set the global to address and name.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return void
+     */
+    public function alwaysTo($address, $name = null)
+    {
+        $this->to = compact('address', 'name');
+    }
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
@@ -164,6 +176,13 @@ class Mailer implements MailerContract, MailQueueContract
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
         $this->addContent($message, $view, $plain, $raw, $data);
+
+
+        // If a global to address has been specified we will override any
+        // recipient addresses previously set and use this one instead.
+        if (isset($this->to['address'])) {
+            $message->to($this->to['address'], $this->to['name'], true);
+        }
 
         $message = $message->getSwiftMessage();
 
