@@ -296,8 +296,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         return Collection::make($contents)
             ->where('type', $type)
-            ->fetch('path')
-            ->values()->all();
+            ->pluck('path')
+            ->values()
+            ->all();
     }
 
     /**
