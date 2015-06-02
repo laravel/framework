@@ -648,9 +648,9 @@ if (!function_exists('event')) {
     /**
      * Fire an event and call the listeners.
      *
-     * @param  string  $event
-     * @param  mixed   $payload
-     * @param  bool    $halt
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
     function event($event, $payload = [], $halt = false)
