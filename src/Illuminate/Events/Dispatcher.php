@@ -387,7 +387,7 @@ class Dispatcher implements DispatcherContract
     {
         try {
             return (new ReflectionClass($class))->implementsInterface(
-                'Illuminate\Contracts\Queue\ShouldBeQueued'
+                'Illuminate\Contracts\Queue\ShouldQueue'
             );
         } catch (Exception $e) {
             return false;
