@@ -9,16 +9,16 @@ use Illuminate\Contracts\Routing\Middleware;
 class AuthenticateWithBasicAuth implements Middleware
 {
     /**
-     * The Guard implementation.
+     * The guard instance.
      *
-     * @var Guard
+     * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $auth;
 
     /**
-     * Create a new filter instance.
+     * Create a new middleware instance.
      *
-     * @param  Guard  $auth
+     * @param  \Illuminate\Contracts\Auth\Guard  $auth
      * @return void
      */
     public function __construct(Guard $auth)
