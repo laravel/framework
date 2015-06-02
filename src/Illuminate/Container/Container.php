@@ -373,8 +373,10 @@ class Container implements ArrayAccess, ContainerContract
     {
         $results = [];
 
-        foreach ($this->tags[$tag] as $abstract) {
-            $results[] = $this->make($abstract);
+        if (isset($this->tags[$tag])) {
+            foreach ($this->tags[$tag] as $abstract) {
+                $results[] = $this->make($abstract);
+            }
         }
 
         return $results;
