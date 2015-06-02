@@ -29,7 +29,7 @@ class Message
      * Add a "from" address to the message.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -43,7 +43,7 @@ class Message
      * Set the "sender" of the message.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function sender($address, $name = null)
@@ -87,7 +87,7 @@ class Message
      * Add a carbon copy to the message.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function cc($address, $name = null)
@@ -99,7 +99,7 @@ class Message
      * Add a blind carbon copy to the message.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -111,7 +111,7 @@ class Message
      * Add a reply to address to the message.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -168,7 +168,7 @@ class Message
      * Attach a file to the message.
      *
      * @param  string  $file
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -194,7 +194,7 @@ class Message
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -232,7 +232,7 @@ class Message
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  string  $contentType
+     * @param  string|null  $contentType
      * @return string
      */
     public function embedData($data, $name, $contentType = null)
@@ -284,7 +284,7 @@ class Message
      * Dynamically pass missing methods to the Swift instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
