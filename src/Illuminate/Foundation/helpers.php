@@ -296,7 +296,7 @@ if (!function_exists('group')) {
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array     $attributes
+     * @param  array  $attributes
      * @param  \Closure  $callback
      * @return void
      */
