@@ -266,6 +266,8 @@ class Route
      * Get the "before" filters for the route.
      *
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public function beforeFilters()
     {
@@ -280,6 +282,8 @@ class Route
      * Get the "after" filters for the route.
      *
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public function afterFilters()
     {
@@ -295,6 +299,8 @@ class Route
      *
      * @param  string  $filters
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public static function parseFilters($filters)
     {
@@ -340,6 +346,8 @@ class Route
      *
      * @param  string  $filter
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public static function parseFilter($filter)
     {
@@ -648,6 +656,8 @@ class Route
      *
      * @param  string  $filters
      * @return $this
+     *
+     * @deprecated since version 5.1
      */
     public function before($filters)
     {
@@ -659,6 +669,8 @@ class Route
      *
      * @param  string  $filters
      * @return $this
+     *
+     * @deprecated since version 5.1
      */
     public function after($filters)
     {
