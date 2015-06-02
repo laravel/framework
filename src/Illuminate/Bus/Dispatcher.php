@@ -12,9 +12,9 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\HandlerResolver;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 
@@ -214,12 +214,12 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     protected function commandShouldBeQueued($command)
     {
-        if ($command instanceof ShouldBeQueued) {
+        if ($command instanceof ShouldQueue) {
             return true;
         }
 
         return (new ReflectionClass($this->getHandlerClass($command)))->implementsInterface(
-            'Illuminate\Contracts\Queue\ShouldBeQueued'
+            'Illuminate\Contracts\Queue\ShouldQueue'
         );
     }
 
