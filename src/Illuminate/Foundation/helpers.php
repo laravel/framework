@@ -292,8 +292,7 @@ if (!function_exists('get')) {
     }
 }
 
-if ( ! function_exists('group'))
-{
+if (!function_exists('group')) {
     /**
      * Create a route group with shared attributes.
      *
