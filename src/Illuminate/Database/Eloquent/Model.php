@@ -2172,6 +2172,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Disable all mass assignable restrictions.
      *
+     * @param  bool  $state
      * @return void
      */
     public static function unguard($state = true)
