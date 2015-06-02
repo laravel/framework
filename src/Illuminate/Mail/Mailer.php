@@ -34,7 +34,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -92,7 +92,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Swift_Mailer  $swift
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
     public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
@@ -106,7 +106,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global from address and name.
      *
      * @param  string  $address
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function alwaysFrom($address, $name = null)
@@ -115,10 +115,22 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Set the global to address and name.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return void
+     */
+    public function alwaysTo($address, $name = null)
+    {
+        $this->to = compact('address', 'name');
+    }
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
-     * @param  mixed   $callback
+     * @param  mixed  $callback
      * @return int
      */
     public function raw($text, $callback)
@@ -130,8 +142,8 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a new message when only a plain part.
      *
      * @param  string  $view
-     * @param  array   $data
-     * @param  mixed   $callback
+     * @param  array  $data
+     * @param  mixed  $callback
      * @return int
      */
     public function plain($view, array $data, $callback)
@@ -165,6 +177,10 @@ class Mailer implements MailerContract, MailQueueContract
         // to creating view based emails that are able to receive arrays of data.
         $this->addContent($message, $view, $plain, $raw, $data);
 
+        if (isset($this->to['address'])) {
+            $message->to($this->to['address'], $this->to['name'], true);
+        }
+
         $message = $message->getSwiftMessage();
 
         return $this->sendSwiftMessage($message);
@@ -174,9 +190,9 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new e-mail message for sending.
      *
      * @param  string|array  $view
-     * @param  array   $data
+     * @param  array  $data
      * @param  \Closure|string  $callback
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function queue($view, array $data, $callback, $queue = null)
@@ -191,7 +207,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $queue
      * @param  string|array  $view
-     * @param  array   $data
+     * @param  array  $data
      * @param  \Closure|string  $callback
      * @return mixed
      */
@@ -207,7 +223,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $view, array $data, $callback, $queue = null)
@@ -295,7 +311,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  string  $plain
      * @param  string  $raw
-     * @param  array   $data
+     * @param  array  $data
      * @return void
      */
     protected function addContent($message, $view, $plain, $raw, $data)
@@ -337,7 +353,7 @@ class Mailer implements MailerContract, MailQueueContract
         // If the view is an array, but doesn't contain numeric keys, we will assume
         // the the views are being explicitly specified and will extract them via
         // named keys instead, allowing the developers to use one or the other.
-        elseif (is_array($view)) {
+        if (is_array($view)) {
             return [
                 array_get($view, 'html'),
                 array_get($view, 'text'),
@@ -393,7 +409,9 @@ class Mailer implements MailerContract, MailQueueContract
     {
         if ($callback instanceof Closure) {
             return call_user_func($callback, $message);
-        } elseif (is_string($callback)) {
+        }
+
+        if (is_string($callback)) {
             return $this->container->make($callback)->mail($message);
         }
 
@@ -423,7 +441,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Render the given view.
      *
      * @param  string  $view
-     * @param  array   $data
+     * @param  array  $data
      * @return \Illuminate\View\View
      */
     protected function getView($view, $data)
