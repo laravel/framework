@@ -88,6 +88,8 @@ class Collection extends BaseCollection
      *
      * @param  string  $key
      * @return static
+     *
+     * @deprecated since version 5.1. Use pluck instead.
      */
     public function fetch($key)
     {
