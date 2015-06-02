@@ -213,19 +213,54 @@ class Str {
 	 */
 	public static function random($length = 16)
 	{
+		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 		if ( ! function_exists('openssl_random_pseudo_bytes'))
 		{
 			throw new RuntimeException('OpenSSL extension is required.');
 		}
 
-		$bytes = openssl_random_pseudo_bytes($length * 2);
-
-		if ($bytes === false)
+		$crypto_rand_secure = function ($min, $max)
 		{
-			throw new RuntimeException('Unable to generate random string.');
+			$range = $max - $min;
+
+			// not so random...
+			if ($range < 0) return $min;
+
+			$log = log($range, 2);
+			// length in bytes
+			$bytes = (int)($log / 8) + 1;
+			// length in bits
+			$bits = (int)$log + 1;
+			// set all lower bits to 1
+			$filter = (int)(1 << $bits) - 1;
+
+			do
+			{
+				$rnd = openssl_random_pseudo_bytes($bytes, $crypto_strong);
+
+				if ($crypto_strong === false || $rnd === false)
+				{
+					throw new RuntimeException('Unable to generate random string.');
+				}
+
+				$rnd = hexdec(bin2hex($rnd));
+
+				// discard irrelevant bits
+				$rnd = $rnd & $filter;
+			} while ($rnd >= $range);
+
+			return $min + $rnd;
+		};
+
+		$str = '';
+		$max = strlen($pool);
+		for ($i = 0; $i < $length; $i++)
+		{
+			$str .= $pool[$crypto_rand_secure(0, $max)];
 		}
 
-		return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+		return $str;
 	}
 
 	/**
