@@ -55,6 +55,8 @@ abstract class Controller
      * @param  \Closure|string  $filter
      * @param  array  $options
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function beforeFilter($filter, array $options = [])
     {
@@ -67,6 +69,8 @@ abstract class Controller
      * @param  \Closure|string  $filter
      * @param  array  $options
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function afterFilter($filter, array $options = [])
     {
@@ -149,6 +153,8 @@ abstract class Controller
      *
      * @param  string  $filter
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function forgetBeforeFilter($filter)
     {
@@ -160,6 +166,8 @@ abstract class Controller
      *
      * @param  string  $filter
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function forgetAfterFilter($filter)
     {
@@ -194,6 +202,8 @@ abstract class Controller
      * Get the registered "before" filters.
      *
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public function getBeforeFilters()
     {
@@ -204,6 +214,8 @@ abstract class Controller
      * Get the registered "after" filters.
      *
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public function getAfterFilters()
     {
