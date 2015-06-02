@@ -111,7 +111,7 @@
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "zendframework/zend-diactoros": "Required to use the PSR-7 Http Message Factory"
+        "zendframework/zend-diactoros": "Required to use the PSR-7 Http Message Factory (~1.0)."
     },
     "minimum-stability": "dev"
 }
