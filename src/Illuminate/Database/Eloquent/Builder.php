@@ -231,7 +231,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $key
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function lists($column, $key = null)
     {
@@ -248,7 +248,7 @@ class Builder
             }
         }
 
-        return $results;
+        return collect($results);
     }
 
     /**
