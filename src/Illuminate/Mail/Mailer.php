@@ -177,9 +177,6 @@ class Mailer implements MailerContract, MailQueueContract
         // to creating view based emails that are able to receive arrays of data.
         $this->addContent($message, $view, $plain, $raw, $data);
 
-
-        // If a global to address has been specified we will override any
-        // recipient addresses previously set and use this one instead.
         if (isset($this->to['address'])) {
             $message->to($this->to['address'], $this->to['name'], true);
         }
