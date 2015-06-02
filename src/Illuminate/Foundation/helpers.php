@@ -292,6 +292,21 @@ if (!function_exists('get')) {
     }
 }
 
+if ( ! function_exists('group'))
+{
+    /**
+     * Create a route group with shared attributes.
+     *
+     * @param  array     $attributes
+     * @param  \Closure  $callback
+     * @return void
+     */
+    function group($attributes, $callback)
+    {
+        return app('router')->group($attributes, $callback);
+    }
+}
+
 if (!function_exists('info')) {
     /**
      * Write some information to the log.
