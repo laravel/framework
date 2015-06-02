@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Exception;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;

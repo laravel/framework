@@ -8,8 +8,8 @@ interface Dispatcher
      * Register an event listener with the dispatcher.
      *
      * @param  string|array  $events
-     * @param  mixed   $listener
-     * @param  int     $priority
+     * @param  mixed  $listener
+     * @param  int  $priority
      * @return void
      */
     public function listen($events, $listener, $priority = 0);
@@ -26,7 +26,7 @@ interface Dispatcher
      * Fire an event until the first non-null response is returned.
      *
      * @param  string  $event
-     * @param  array   $payload
+     * @param  array  $payload
      * @return mixed
      */
     public function until($event, $payload = []);
@@ -35,8 +35,8 @@ interface Dispatcher
      * Fire an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed   $payload
-     * @param  bool    $halt
+     * @param  mixed  $payload
+     * @param  bool  $halt
      * @return array|null
      */
     public function fire($event, $payload = [], $halt = false);
