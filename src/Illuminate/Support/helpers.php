@@ -718,6 +718,19 @@ if (!function_exists('studly_case')) {
     }
 }
 
+if (!function_exists('title_case')) {
+	/**
+	 * Convert a value to title case.
+	 *
+	 * @param  string  $value
+	 * @return string
+	 */
+	function title_case($value)
+	{
+		return Str::title($value);
+	}
+}
+
 if (!function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
