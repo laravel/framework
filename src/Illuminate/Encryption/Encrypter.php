@@ -38,8 +38,8 @@ class Encrypter implements EncrypterContract
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
-        $this->key = (string) $key;
         $this->cipher = $cipher;
+        $this->key = (string) $key;
         $this->block = openssl_cipher_iv_length($this->cipher);
     }
 
