@@ -21,14 +21,6 @@ interface Encrypter
     public function decrypt($payload);
 
     /**
-     * Set the encryption mode.
-     *
-     * @param  string  $mode
-     * @return void
-     */
-    public function setMode($mode);
-
-    /**
      * Set the encryption cipher.
      *
      * @param  string  $cipher

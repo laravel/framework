@@ -262,19 +262,6 @@ class Encrypter implements EncrypterContract
     }
 
     /**
-     * Set the encryption mode.
-     *
-     * @param  string  $mode
-     * @return void
-     */
-    public function setMode($mode)
-    {
-        $this->cipher = $mode;
-
-        $this->updateBlockSize();
-    }
-
-    /**
      * Update the block size for the current cipher and mode.
      *
      * @return void
