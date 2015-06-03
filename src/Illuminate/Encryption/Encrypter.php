@@ -2,10 +2,8 @@
 
 namespace Illuminate\Encryption;
 
-use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Core\Util\SecureRandom;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class Encrypter implements EncrypterContract
@@ -22,14 +20,7 @@ class Encrypter implements EncrypterContract
      *
      * @var string
      */
-    protected $cipher = MCRYPT_RIJNDAEL_128;
-
-    /**
-     * The mode used for encryption.
-     *
-     * @var string
-     */
-    protected $mode = MCRYPT_MODE_CBC;
+    protected $cipher;
 
     /**
      * The block size of the cipher.
@@ -44,9 +35,11 @@ class Encrypter implements EncrypterContract
      * @param  string  $key
      * @return void
      */
-    public function __construct($key)
+    public function __construct($key, $cipher = 'AES-128-CBC')
     {
+        $this->cipher = $cipher;
         $this->key = (string) $key;
+        $this->block = openssl_cipher_iv_length($this->cipher);
     }
 
     /**
@@ -57,9 +50,9 @@ class Encrypter implements EncrypterContract
      */
     public function encrypt($value)
     {
-        $iv = mcrypt_create_iv($this->getIvSize(), $this->getRandomizer());
+        $iv = openssl_random_pseudo_bytes($this->getIvSize());
 
-        $value = base64_encode($this->padAndMcrypt($value, $iv));
+        $value = base64_encode($this->padAndEncrypt($value, $iv));
 
         // Once we have the encrypted value we will go ahead base64_encode the input
         // vector and create the MAC for the encrypted value so we can verify its
@@ -70,17 +63,17 @@ class Encrypter implements EncrypterContract
     }
 
     /**
-     * Pad and use mcrypt on the given value and input vector.
+     * Pad and encrypt on the given value and input vector.
      *
      * @param  string  $value
      * @param  string  $iv
      * @return string
      */
-    protected function padAndMcrypt($value, $iv)
+    protected function padAndEncrypt($value, $iv)
     {
         $value = $this->addPadding(serialize($value));
 
-        return mcrypt_encrypt($this->cipher, $this->key, $value, $this->mode, $iv);
+        return openssl_encrypt($value, $this->cipher, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
     }
 
     /**
@@ -100,25 +93,27 @@ class Encrypter implements EncrypterContract
 
         $iv = base64_decode($payload['iv']);
 
-        return unserialize($this->stripPadding($this->mcryptDecrypt($value, $iv)));
+        return unserialize($this->stripPadding($this->opensslDecrypt($value, $iv)));
     }
 
     /**
-     * Run the mcrypt decryption routine for the value.
+     * Run the openssl decryption routine for the value.
      *
      * @param  string  $value
      * @param  string  $iv
      * @return string
      *
-     * @throws \Exception
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    protected function mcryptDecrypt($value, $iv)
+    protected function opensslDecrypt($value, $iv)
     {
-        try {
-            return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
-        } catch (Exception $e) {
-            throw new DecryptException($e->getMessage());
+        $decrypted = openssl_decrypt($value, $this->cipher, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+
+        if ($decrypted === false) {
+            throw new DecryptException('Could not decrypt data.');
         }
+
+        return $decrypted;
     }
 
     /**
@@ -157,11 +152,11 @@ class Encrypter implements EncrypterContract
      */
     protected function validMac(array $payload)
     {
-        $bytes = (new SecureRandom)->nextBytes(16);
+        $bytes = Str::randomBytes(16);
 
         $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
-        return StringUtils::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
+        return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
     }
 
     /**
@@ -234,27 +229,7 @@ class Encrypter implements EncrypterContract
      */
     protected function getIvSize()
     {
-        return mcrypt_get_iv_size($this->cipher, $this->mode);
-    }
-
-    /**
-     * Get the random data source available for the OS.
-     *
-     * @return int
-     */
-    protected function getRandomizer()
-    {
-        if (defined('MCRYPT_DEV_URANDOM')) {
-            return MCRYPT_DEV_URANDOM;
-        }
-
-        if (defined('MCRYPT_DEV_RANDOM')) {
-            return MCRYPT_DEV_RANDOM;
-        }
-
-        mt_srand();
-
-        return MCRYPT_RAND;
+        return $this->block;
     }
 
     /**
@@ -266,41 +241,5 @@ class Encrypter implements EncrypterContract
     public function setKey($key)
     {
         $this->key = (string) $key;
-    }
-
-    /**
-     * Set the encryption cipher.
-     *
-     * @param  string  $cipher
-     * @return void
-     */
-    public function setCipher($cipher)
-    {
-        $this->cipher = $cipher;
-
-        $this->updateBlockSize();
-    }
-
-    /**
-     * Set the encryption mode.
-     *
-     * @param  string  $mode
-     * @return void
-     */
-    public function setMode($mode)
-    {
-        $this->mode = $mode;
-
-        $this->updateBlockSize();
-    }
-
-    /**
-     * Update the block size for the current cipher and mode.
-     *
-     * @return void
-     */
-    protected function updateBlockSize()
-    {
-        $this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
     }
 }
