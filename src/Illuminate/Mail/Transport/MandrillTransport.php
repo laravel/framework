@@ -72,13 +72,7 @@ class MandrillTransport implements Swift_Transport
             'async' => false,
         ];
 
-        if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $options = ['form_params' => $data];
-        } else {
-            $options = ['body' => $data];
-        }
-
-        return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', $options);
+        return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', ['form_params' => $data]);
     }
 
     /**
