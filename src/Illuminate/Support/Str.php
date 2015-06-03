@@ -222,19 +222,62 @@ class Str
      */
     public static function random($length = 16)
     {
-        if (function_exists('random_bytes')) {
-            $bytes = random_bytes($length * 2);
-        } elseif (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes($length * 2);
-        } else {
-            throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+        static $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        static $max = 62 // strlen($pool)
+
+        $str = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $pool[static::randomInteger(0, $max)];
         }
 
-        if ($bytes === false) {
-            throw new RuntimeException('Unable to generate random string.');
+        return $str;
+    }
+
+    /**
+     * Generate a more truly "random" integer.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return int
+     *
+     * @throws \RuntimeException
+     */
+    public static function randomInteger($min = 0, $max = 127)
+    {
+        if (function_exists('random_int')) {
+            return random_int($min, $max);
         }
 
-        return substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
+        if (!function_exists('openssl_random_pseudo_bytes')) {
+            throw new RuntimeException('OpenSSL extension is required.');
+        }
+
+        $range = $max - $min;
+
+        if ($range < 0) {
+            return $min;
+        }
+
+        $log = log($range, 2);
+        $bytes = (int) ($log / 8) + 1;
+        $bits = (int) $log + 1;
+        $filter = (int)(1 << $bits) - 1;
+
+        do {
+            $rnd = openssl_random_pseudo_bytes($bytes, $crypto_strong);
+
+            if ($crypto_strong === false || $rnd === false) {
+                throw new RuntimeException('Unable to generate random bytes.');
+            }
+
+            $rnd = hexdec(bin2hex($rnd));
+
+            // discard irrelevant bits
+            $rnd = $rnd & $filter;
+        } while ($rnd >= $range);
+
+        return $min + $rnd;
     }
 
     /**
