@@ -14,8 +14,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
     public function testEncryptionWithCustomCipher()
     {
-        $e = $this->getEncrypter();
-        $e->setCipher('AES-256-CBC');
+        $e = new Encrypter(str_repeat('a', 32), 'AES-256-CBC');
         $this->assertNotEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
         $encrypted = $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
         $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->decrypt($encrypted));

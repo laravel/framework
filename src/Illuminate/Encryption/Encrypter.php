@@ -113,7 +113,7 @@ class Encrypter implements EncrypterContract
         if ($decrypted === false) {
             throw new DecryptException('Could not decrypt data.');
         }
-        
+
         return $decrypted;
     }
 
