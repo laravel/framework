@@ -64,9 +64,10 @@ class Migrator
      *
      * @param  string  $path
      * @param  bool    $pretend
+     * @param  int|null  $times
      * @return void
      */
-    public function run($path, $pretend = false)
+    public function run($path, $pretend = false, $times = null)
     {
         $this->notes = [];
 
@@ -78,6 +79,10 @@ class Migrator
         $ran = $this->repository->getRan();
 
         $migrations = array_diff($files, $ran);
+
+        if ($times) {
+            $migrations = array_slice($migrations, 0, $times);
+        }
 
         $this->requireFiles($path, $migrations);
 
@@ -176,13 +181,18 @@ class Migrator
      * Rolls all of the currently applied migrations back.
      *
      * @param  bool  $pretend
+     * @param  int|null  $times
      * @return int
      */
-    public function reset($pretend = false)
+    public function reset($pretend = false, $times = null)
     {
         $this->notes = [];
 
         $migrations = array_reverse($this->repository->getRan());
+
+        if ($times) {
+            $migrations = array_slice($migrations, 0, $times);
+        }
 
         if (count($migrations) == 0) {
             $this->note('<info>Nothing to rollback.</info>');
