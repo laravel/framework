@@ -2,9 +2,8 @@
 
 namespace Illuminate\Encryption;
 
-use Illuminate\Contracts\Encryption\DecryptException;
-use Symfony\Component\Security\Core\Util\StringUtils;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class Encrypter implements EncrypterContract
@@ -157,7 +156,7 @@ class Encrypter implements EncrypterContract
 
         $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
-        return StringUtils::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
+        return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
     }
 
     /**

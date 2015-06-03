@@ -17,8 +17,7 @@
         "php": ">=5.5.9",
         "ext-openssl": "*",
         "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "symfony/security-core": "2.7.*"
+        "illuminate/support": "5.1.*"
     },
     "autoload": {
         "psr-4": {
