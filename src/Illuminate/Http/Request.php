@@ -19,13 +19,6 @@ class Request extends SymfonyRequest implements ArrayAccess
     protected $json;
 
     /**
-     * The Illuminate session store implementation.
-     *
-     * @var \Illuminate\Session\Store
-     */
-    protected $sessionStore;
-
-    /**
      * The user resolver callback.
      *
      * @var \Closure
