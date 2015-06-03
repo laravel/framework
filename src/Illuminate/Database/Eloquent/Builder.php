@@ -238,39 +238,6 @@ class Builder {
 
 		$paginator = $this->query->getConnection()->getPaginator();
 
-		if (isset($this->query->groups))
-		{
-			return $this->groupedPaginate($paginator, $perPage, $columns);
-		}
-
-		return $this->ungroupedPaginate($paginator, $perPage, $columns);
-	}
-
-	/**
-	 * Get a paginator for a grouped statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function groupedPaginate($paginator, $perPage, $columns)
-	{
-		$results = $this->get($columns)->all();
-
-		return $this->query->buildRawPaginator($paginator, $results, $perPage);
-	}
-
-	/**
-	 * Get a paginator for an ungrouped statement.
-	 *
-	 * @param  \Illuminate\Pagination\Factory  $paginator
-	 * @param  int    $perPage
-	 * @param  array  $columns
-	 * @return \Illuminate\Pagination\Paginator
-	 */
-	protected function ungroupedPaginate($paginator, $perPage, $columns)
-	{
 		$total = $this->query->getPaginationCount();
 
 		// Once we have the paginator we need to set the limit and offset values for
