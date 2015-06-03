@@ -114,19 +114,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Fetch a nested element of the collection.
-     *
-     * @param  string  $key
-     * @return static
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public function fetch($key)
-    {
-        return new static(array_fetch($this->items, $key));
-    }
-
-    /**
      * Run a filter over each of the items.
      *
      * @param  callable  $callback

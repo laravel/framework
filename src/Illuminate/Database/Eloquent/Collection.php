@@ -84,19 +84,6 @@ class Collection extends BaseCollection
     }
 
     /**
-     * Fetch a nested element of the collection.
-     *
-     * @param  string  $key
-     * @return static
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public function fetch($key)
-    {
-        return new static(array_fetch($this->toArray(), $key));
-    }
-
-    /**
      * Get the max value of a given key.
      *
      * @param  string  $key
