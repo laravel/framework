@@ -273,12 +273,11 @@ class Str
     }
 
     /**
-     * Compares two strings.
+     * Compares two strings using a constant-time algorithm.
      *
-     * This method implements a constant-time algorithm to compare strings.
-     * Regardless of the used implementation, it will leak length information.
+     * Note: This method will leak length information.
      *
-     * This method is adapted from Symfony\Component\Security\Core\Util\StringUtils.
+     * Note: Adapted from Symfony\Component\Security\Core\Util\StringUtils.
      *
      * @param  string  $knownString
      * @param  string  $userInput
