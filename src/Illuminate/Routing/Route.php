@@ -259,7 +259,7 @@ class Route
      */
     public function middleware()
     {
-        return (array) array_get($this->action, 'middleware', []);
+        return (array) isset($this->action['middleware']) ? $this->action['middleware'] : [];
     }
 
     /**
