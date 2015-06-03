@@ -17,7 +17,6 @@
     "require": {
         "php": ">=5.5.9",
         "ext-openssl": "*",
-        "ext-mcrypt": "*",
         "ext-mbstring": "*",
         "classpreloader/classpreloader": "~1.2",
         "danielstjules/stringy": "~1.8",
@@ -38,7 +37,6 @@
         "symfony/http-kernel": "2.8.*",
         "symfony/process": "2.8.*",
         "symfony/routing": "2.8.*",
-        "symfony/security-core": "2.8.*",
         "symfony/translation": "2.8.*",
         "symfony/var-dumper": "2.8.*",
         "vlucas/phpdotenv": "~1.0"
