@@ -284,7 +284,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure  $closure
      * @return void
      *
-     * @deprecated since version 5.1
+     * @deprecated since version 5.1. Use singleton instead.
+     * @see singleton()
      */
     public function bindShared($abstract, Closure $closure)
     {
