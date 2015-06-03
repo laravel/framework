@@ -130,14 +130,14 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued
+class TestDispatcherQueuedHandler implements Illuminate\Contracts\Queue\ShouldQueue
 {
     public function handle()
     {
     }
 }
 
-class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Queue\ShouldBeQueued
+class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Queue\ShouldQueue
 {
     public function handle()
     {

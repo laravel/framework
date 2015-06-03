@@ -24,7 +24,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $result);
     }
 
-    public function testCommandsThatShouldBeQueuedAreQueued()
+    public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -34,10 +34,10 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
             return $mock;
         });
 
-        $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
+        $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
     }
 
-    public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomHandler()
+    public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -50,7 +50,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
     }
 
-    public function testCommandsThatShouldBeQueuedAreQueuedUsingCustomQueueAndDelay()
+    public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -63,7 +63,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
     }
 
-    public function testHandlersThatShouldBeQueuedAreQueued()
+    public function testHandlersThatShouldQueueIsQueued()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -86,7 +86,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $dispatcher = new Dispatcher($container);
         $dispatcher->mapUsing(function () { return 'Handler@handle'; });
 
-        $result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldBeQueued'));
+        $result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
         $this->assertEquals('foo', $result);
     }
 
@@ -149,11 +149,11 @@ class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\S
     }
 }
 
-class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldBeQueued
+class BusDispatcherTestQueuedHandler implements Illuminate\Contracts\Queue\ShouldQueue
 {
 }
 
-class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldBeQueued
+class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldQueue
 {
     public function queue($queue, $command)
     {
@@ -161,7 +161,7 @@ class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\
     }
 }
 
-class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldBeQueued
+class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldQueue
 {
     public $queue = 'foo';
     public $delay = 10;

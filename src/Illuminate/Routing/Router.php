@@ -783,6 +783,8 @@ class Router implements RegistrarContract
      *
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function before($callback)
     {
@@ -794,6 +796,8 @@ class Router implements RegistrarContract
      *
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function after($callback)
     {
@@ -842,6 +846,8 @@ class Router implements RegistrarContract
      * @param  string  $name
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function filter($name, $callback)
     {
@@ -870,6 +876,8 @@ class Router implements RegistrarContract
      * @param  string  $name
      * @param  array|null  $methods
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function when($pattern, $name, $methods = null)
     {
@@ -887,6 +895,8 @@ class Router implements RegistrarContract
      * @param  string     $name
      * @param  array|null $methods
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function whenRegex($pattern, $name, $methods = null)
     {
@@ -1047,6 +1057,8 @@ class Router implements RegistrarContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
+     * @deprecated since version 5.1
      */
     public function findPatternFilters($request)
     {
@@ -1143,6 +1155,8 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Http\Response  $response
      * @return mixed
+     *
+     * @deprecated since version 5.1
      */
     public function callRouteAfter($route, $request, $response)
     {
@@ -1160,6 +1174,8 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Http\Response|null $response
      * @return mixed
+     *
+     * @deprecated since version 5.1
      */
     public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
     {
