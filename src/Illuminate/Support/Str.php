@@ -286,7 +286,6 @@ class Str
      */
     public static function equals($knownString, $userInput)
     {
-        // Avoid making unnecessary duplications of secret data
         if (!is_string($knownString)) {
             $knownString = (string) $knownString;
         }
@@ -311,7 +310,6 @@ class Str
             $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
         }
 
-        // They are only identical strings if $result is exactly 0
         return 0 === $result;
     }
 
