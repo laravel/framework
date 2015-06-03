@@ -191,7 +191,9 @@ class Builder
     }
 
     /**
-     * An alias for the "value" method.
+     * Get a single column's value from the first result of a query.
+     *
+     * This is an alias for the "value" method.
      *
      * @param  string  $column
      * @return mixed
@@ -231,7 +233,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $key
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function lists($column, $key = null)
     {
@@ -248,7 +250,7 @@ class Builder
             }
         }
 
-        return $results;
+        return collect($results);
     }
 
     /**

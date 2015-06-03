@@ -180,7 +180,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'bar']));
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'baz']));
 
-        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->lists('name'));
+        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->lists('name')->all());
     }
 
     public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
@@ -190,7 +190,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
 
-        $this->assertEquals(['bar', 'baz'], $builder->lists('name'));
+        $this->assertEquals(['bar', 'baz'], $builder->lists('name')->all());
     }
 
     public function testMacrosAreCalledOnBuilder()

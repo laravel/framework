@@ -94,6 +94,8 @@ interface Registrar
      *
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function before($callback);
 
@@ -102,6 +104,8 @@ interface Registrar
      *
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function after($callback);
 
@@ -111,6 +115,8 @@ interface Registrar
      * @param  string  $name
      * @param  string|callable  $callback
      * @return void
+     *
+     * @deprecated since version 5.1
      */
     public function filter($name, $callback);
 }
