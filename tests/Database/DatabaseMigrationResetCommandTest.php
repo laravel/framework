@@ -16,7 +16,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel(new AppDatabaseMigrationStub());
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with(false);
+        $migrator->shouldReceive('reset')->once()->with(false, null);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command);
@@ -28,7 +28,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel(new AppDatabaseMigrationStub());
         $migrator->shouldReceive('setConnection')->once()->with('foo');
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with(true);
+        $migrator->shouldReceive('reset')->once()->with(true, null);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);

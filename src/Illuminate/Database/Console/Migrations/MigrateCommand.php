@@ -62,6 +62,9 @@ class MigrateCommand extends BaseCommand
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
+        // How many migrations are we running?
+        $times = $this->input->getOption('times');
+
         // Next, we will check to see if a path option has been defined. If it has
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
@@ -71,7 +74,7 @@ class MigrateCommand extends BaseCommand
             $path = $this->getMigrationPath();
         }
 
-        $this->migrator->run($path, $pretend);
+        $this->migrator->run($path, $pretend, $times);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -121,6 +124,8 @@ class MigrateCommand extends BaseCommand
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
+
+            ['times', null, InputOption::VALUE_OPTIONAL, 'Amount of migrations to run through.'],
         ];
     }
 }
