@@ -9,6 +9,9 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * @deprecated since version 5.1
+ */
 class SubscribeCommand extends Command
 {
     /**
