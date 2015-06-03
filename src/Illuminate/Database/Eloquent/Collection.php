@@ -90,6 +90,7 @@ class Collection extends BaseCollection
      * @return static
      *
      * @deprecated since version 5.1. Use pluck instead.
+     * @see pluck()
      */
     public function fetch($key)
     {
