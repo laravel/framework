@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use IronMQ\IronMQ;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -16,13 +15,6 @@ class IronQueue extends Queue implements QueueContract
      * @var \IronMQ\IronMQ
      */
     protected $iron;
-
-    /**
-     * The current request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
 
     /**
      * The name of the default tube.
@@ -42,15 +34,13 @@ class IronQueue extends Queue implements QueueContract
      * Create a new IronMQ queue instance.
      *
      * @param  \IronMQ\IronMQ  $iron
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $default
      * @param  bool  $shouldEncrypt
      * @return void
      */
-    public function __construct(IronMQ $iron, Request $request, $default, $shouldEncrypt = false)
+    public function __construct(IronMQ $iron, $default, $shouldEncrypt = false)
     {
         $this->iron = $iron;
-        $this->request = $request;
         $this->default = $default;
         $this->shouldEncrypt = $shouldEncrypt;
     }
@@ -153,47 +143,6 @@ class IronQueue extends Queue implements QueueContract
     }
 
     /**
-     * Marshal a push queue request and fire the job.
-     *
-     * @return \Illuminate\Http\Response
-     *
-     * @deprecated since version 5.1
-     */
-    public function marshal()
-    {
-        $this->createPushedIronJob($this->marshalPushedJob())->fire();
-
-        return new Response('OK');
-    }
-
-    /**
-     * Marshal out the pushed job and payload.
-     *
-     * @return object
-     */
-    protected function marshalPushedJob()
-    {
-        $r = $this->request;
-
-        $body = $this->parseJobBody($r->getContent());
-
-        return (object) [
-            'id' => $r->header('iron-message-id'), 'body' => $body, 'pushed' => true,
-        ];
-    }
-
-    /**
-     * Create a new IronJob for a pushed job.
-     *
-     * @param  object  $job
-     * @return \Illuminate\Queue\Jobs\IronJob
-     */
-    protected function createPushedIronJob($job)
-    {
-        return new IronJob($this->container, $this, $job, true);
-    }
-
-    /**
      * Create a payload string from the given job and data.
      *
      * @param  string  $job
@@ -238,26 +187,5 @@ class IronQueue extends Queue implements QueueContract
     public function getIron()
     {
         return $this->iron;
-    }
-
-    /**
-     * Get the request instance.
-     *
-     * @return \Symfony\Component\HttpFoundation\Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Set the request instance.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return void
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
     }
 }
