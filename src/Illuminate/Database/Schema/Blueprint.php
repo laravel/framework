@@ -290,6 +290,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the remember token column should be dropped.
+     *
+     * @return void
+     */
+    public function dropRememberToken()
+    {
+        $this->dropColumn('remember_token');
+    }
+
+    /**
      * Rename the table to a given name.
      *
      * @param  string  $to

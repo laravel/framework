@@ -343,7 +343,7 @@ class Router implements RegistrarContract
     protected function updateGroupStack(array $attributes)
     {
         if (!empty($this->groupStack)) {
-            $attributes = $this->mergeGroup($attributes, last($this->groupStack));
+            $attributes = $this->mergeGroup($attributes, end($this->groupStack));
         }
 
         $this->groupStack[] = $attributes;
@@ -357,7 +357,7 @@ class Router implements RegistrarContract
      */
     public function mergeWithLastGroup($new)
     {
-        return $this->mergeGroup($new, last($this->groupStack));
+        return $this->mergeGroup($new, end($this->groupStack));
     }
 
     /**
@@ -377,7 +377,10 @@ class Router implements RegistrarContract
             unset($old['domain']);
         }
 
-        $new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
+        $new['where'] = array_merge(
+            isset($old['where']) ? $old['where'] : [],
+            isset($new['where']) ? $new['where'] : []
+        );
 
         return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where']), $new);
     }
@@ -392,12 +395,12 @@ class Router implements RegistrarContract
     protected static function formatUsesPrefix($new, $old)
     {
         if (isset($new['namespace']) && isset($old['namespace'])) {
-            return trim(array_get($old, 'namespace'), '\\').'\\'.trim($new['namespace'], '\\');
+            return trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\');
         } elseif (isset($new['namespace'])) {
             return trim($new['namespace'], '\\');
         }
 
-        return array_get($old, 'namespace');
+        return isset($old['namespace']) ? $old['namespace'] : null;
     }
 
     /**
@@ -409,11 +412,13 @@ class Router implements RegistrarContract
      */
     protected static function formatGroupPrefix($new, $old)
     {
+        $oldPrefix = isset($old['prefix']) ? $old['prefix'] : null;
+
         if (isset($new['prefix'])) {
-            return trim(array_get($old, 'prefix'), '/').'/'.trim($new['prefix'], '/');
+            return trim($oldPrefix, '/').'/'.trim($new['prefix'], '/');
         }
 
-        return array_get($old, 'prefix');
+        return $oldPrefix;
     }
 
     /**
@@ -510,9 +515,9 @@ class Router implements RegistrarContract
      */
     protected function addWhereClausesToRoute($route)
     {
-        $route->where(
-            array_merge($this->patterns, array_get($route->getAction(), 'where', []))
-        );
+        $where = isset($route->getAction()['where']) ? $route->getAction()['where'] : [];
+
+        $route->where(array_merge($this->patterns, $where));
 
         return $route;
     }
@@ -542,7 +547,7 @@ class Router implements RegistrarContract
             return false;
         }
 
-        return is_string($action) || is_string(array_get($action, 'uses'));
+        return is_string($action) || is_string(isset($action['uses']) ? $action['uses'] : null);
     }
 
     /**
@@ -580,7 +585,7 @@ class Router implements RegistrarContract
      */
     protected function prependGroupUses($uses)
     {
-        $group = last($this->groupStack);
+        $group = end($this->groupStack);
 
         return isset($group['namespace']) && strpos($uses, '\\') !== 0 ? $group['namespace'].'\\'.$uses : $uses;
     }
@@ -675,7 +680,7 @@ class Router implements RegistrarContract
 
         list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-        return array_get($map, $name, $name).($parameters ? ':'.$parameters : '');
+        return (isset($map[$name]) ? $map[$name] : $name).($parameters ? ':'.$parameters : '');
     }
 
     /**
