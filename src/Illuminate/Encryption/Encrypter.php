@@ -2,7 +2,6 @@
 
 namespace Illuminate\Encryption;
 
-use Exception;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Core\Util\SecureRandom;
@@ -22,14 +21,7 @@ class Encrypter implements EncrypterContract
      *
      * @var string
      */
-    protected $cipher = 'AES-128-CBC';
-
-    /**
-     * The mode used for encryption.
-     *
-     * @var string
-     */
-    protected $mode;
+    protected $cipher;
 
     /**
      * The block size of the cipher.
@@ -44,9 +36,11 @@ class Encrypter implements EncrypterContract
      * @param  string  $key
      * @return void
      */
-    public function __construct($key)
+    public function __construct($key, $cipher = 'AES-128-CBC')
     {
         $this->key = (string) $key;
+        $this->cipher = $cipher;
+        $this->block = openssl_cipher_iv_length($this->cipher);
     }
 
     /**
@@ -110,15 +104,17 @@ class Encrypter implements EncrypterContract
      * @param  string  $iv
      * @return string
      *
-     * @throws \Exception
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     protected function opensslDecrypt($value, $iv)
     {
-        try {
-            return openssl_decrypt($value, $this->cipher, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-        } catch (Exception $e) {
-            throw new DecryptException($e->getMessage());
+        $decrypted = openssl_decrypt($value, $this->cipher, $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+
+        if ($decrypted === false) {
+            throw new DecryptException('Could not decrypt data.');
         }
+        
+        return $decrypted;
     }
 
     /**
@@ -234,7 +230,7 @@ class Encrypter implements EncrypterContract
      */
     protected function getIvSize()
     {
-        return openssl_cipher_iv_length($this->cipher);
+        return $this->block;
     }
 
     /**
@@ -246,28 +242,5 @@ class Encrypter implements EncrypterContract
     public function setKey($key)
     {
         $this->key = (string) $key;
-    }
-
-    /**
-     * Set the encryption cipher.
-     *
-     * @param  string  $cipher
-     * @return void
-     */
-    public function setCipher($cipher)
-    {
-        $this->cipher = $cipher;
-
-        $this->updateBlockSize();
-    }
-
-    /**
-     * Update the block size for the current cipher and mode.
-     *
-     * @return void
-     */
-    protected function updateBlockSize()
-    {
-        $this->block = openssl_cipher_iv_length($this->cipher);
     }
 }

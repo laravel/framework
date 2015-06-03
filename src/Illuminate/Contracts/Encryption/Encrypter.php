@@ -19,12 +19,4 @@ interface Encrypter
      * @return string
      */
     public function decrypt($payload);
-
-    /**
-     * Set the encryption cipher.
-     *
-     * @param  string  $cipher
-     * @return void
-     */
-    public function setCipher($cipher);
 }
