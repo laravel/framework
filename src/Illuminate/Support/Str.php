@@ -225,7 +225,14 @@ class Str {
 			throw new RuntimeException('Unable to generate random string.');
 		}
 
-		return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+		$string = substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+
+		while (($len = strlen($string)) < $length)
+		{
+			$string .= static::random($length - $len);
+		}
+
+		return $string;
 	}
 
 	/**
