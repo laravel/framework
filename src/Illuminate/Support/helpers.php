@@ -20,7 +20,7 @@ if (!function_exists('append_config')) {
             if (is_numeric($key)) {
                 $start++;
 
-                $array[$start] = array_pull($array, $key);
+                $array[$start] = Arr::pull($array, $key);
             }
         }
 
