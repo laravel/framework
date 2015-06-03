@@ -222,52 +222,62 @@ class Str
      */
     public static function random($length = 16)
     {
-        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        static $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        static $max = 62 // strlen($pool)
+
+        $str = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $pool[static::randomInteger(0, $max)];
+        }
+
+        return $str;
+    }
+
+    /**
+     * Generate a more truly "random" integer.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return int
+     *
+     * @throws \RuntimeException
+     */
+    public static function randomInteger($min = 0, $max = 127)
+    {
+        if (function_exists('random_int')) {
+            return random_int($min, $max);
+        }
 
         if (!function_exists('openssl_random_pseudo_bytes')) {
             throw new RuntimeException('OpenSSL extension is required.');
         }
 
-        // can be replaced by random_int in  PHP 7: https://wiki.php.net/rfc/easy_userland_csprng
-        $random_int = function ($min, $max) {
-            $range = $max - $min;
+        $range = $max - $min;
 
-            // not so random...
-            if ($range < 0) {
-                return $min;
-            }
-
-            $log = log($range, 2);
-            // length in bytes
-            $bytes = (int)($log / 8) + 1;
-            // length in bits
-            $bits = (int)$log + 1;
-            // set all lower bits to 1
-            $filter = (int)(1 << $bits) - 1;
-
-            do {
-                $rnd = openssl_random_pseudo_bytes($bytes, $crypto_strong);
-
-                if ($crypto_strong === false || $rnd === false) {
-                    throw new RuntimeException('Unable to generate random string.');
-                }
-
-                $rnd = hexdec(bin2hex($rnd));
-
-                // discard irrelevant bits
-                $rnd = $rnd & $filter;
-            } while ($rnd >= $range);
-
-            return $min + $rnd;
-        };
-
-        $str = '';
-        $max = strlen($pool);
-        for ($i = 0; $i < $length; $i++) {
-            $str .= $pool[$random_int(0, $max)];
+        if ($range < 0) {
+            return $min;
         }
 
-        return $str;
+        $log = log($range, 2);
+        $bytes = (int) ($log / 8) + 1;
+        $bits = (int) $log + 1;
+        $filter = (int)(1 << $bits) - 1;
+
+        do {
+            $rnd = openssl_random_pseudo_bytes($bytes, $crypto_strong);
+
+            if ($crypto_strong === false || $rnd === false) {
+                throw new RuntimeException('Unable to generate random bytes.');
+            }
+
+            $rnd = hexdec(bin2hex($rnd));
+
+            // discard irrelevant bits
+            $rnd = $rnd & $filter;
+        } while ($rnd >= $range);
+
+        return $min + $rnd;
     }
 
     /**
