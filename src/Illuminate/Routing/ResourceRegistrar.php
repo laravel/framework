@@ -137,7 +137,7 @@ class ResourceRegistrar
 
         $uri = $this->getNestedResourceUri($segments);
 
-        return str_replace('/{'.$this->getResourceWildcard(last($segments)).'}', '', $uri);
+        return str_replace('/{'.$this->getResourceWildcard(end($segments)).'}', '', $uri);
     }
 
     /**

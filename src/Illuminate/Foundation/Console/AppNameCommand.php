@@ -77,6 +77,8 @@ class AppNameCommand extends Command
 
         $this->setComposerNamespace();
 
+        $this->setDatabaseFactoryNamespaces();
+
         $this->setPhpSpecNamespace();
 
         $this->info('Application namespace set!');
@@ -224,6 +226,18 @@ class AppNameCommand extends Command
         if ($this->files->exists($path = $this->getPhpSpecConfigPath())) {
             $this->replaceIn($path, $this->currentRoot, $this->argument('name'));
         }
+    }
+
+    /**
+     * Set the namespace in database factory files.
+     *
+     * @return void
+     */
+    protected function setDatabaseFactoryNamespaces()
+    {
+        $this->replaceIn(
+            $this->laravel->databasePath().'/factories', $this->currentRoot, $this->argument('name')
+        );
     }
 
     /**

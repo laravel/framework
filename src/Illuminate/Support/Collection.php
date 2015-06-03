@@ -60,7 +60,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function collapse()
     {
-        return new static(array_collapse($this->items));
+        return new static(Arr::collapse($this->items));
     }
 
     /**
@@ -346,7 +346,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return count($this->items) > 0 ? end($this->items) : value($default);
         }
 
-        return array_last($this->items, $callback, $default);
+        return Arr::last($this->items, $callback, $default);
     }
 
     /**
@@ -358,7 +358,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pluck($value, $key = null)
     {
-        return new static(array_pluck($this->items, $value, $key));
+        return new static(Arr::pluck($this->items, $value, $key));
     }
 
     /**
@@ -456,7 +456,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pull($key, $default = null)
     {
-        return array_pull($this->items, $key, $default);
+        return Arr::pull($this->items, $key, $default);
     }
 
     /**

@@ -7,6 +7,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -748,6 +749,10 @@ class Builder
         // execute those Closures, then we can re-construct the entire sub-selects.
         if ($values instanceof Closure) {
             return $this->whereInSub($column, $values, $boolean, $not);
+        }
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');

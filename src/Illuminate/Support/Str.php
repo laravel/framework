@@ -225,16 +225,21 @@ class Str
         if (function_exists('random_bytes')) {
             $bytes = random_bytes($length * 2);
         } elseif (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes($length * 2);
+            $bytes = openssl_random_pseudo_bytes($length * 2, $strong);
+            if ($bytes === false || $strong === false) {
+                throw new RuntimeException('Unable to generate random string.');
+            }
         } else {
             throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
         }
 
-        if ($bytes === false) {
-            throw new RuntimeException('Unable to generate random string.');
+        $string = substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
+
+        while (($len = strlen($string)) < $length) {
+            $string .= static::random($length - $len);
         }
 
-        return substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
+        return $string;
     }
 
     /**
