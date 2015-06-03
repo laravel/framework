@@ -156,6 +156,8 @@ class IronQueue extends Queue implements QueueContract
      * Marshal a push queue request and fire the job.
      *
      * @return \Illuminate\Http\Response
+     *
+     * @deprecated since version 5.1
      */
     public function marshal()
     {
