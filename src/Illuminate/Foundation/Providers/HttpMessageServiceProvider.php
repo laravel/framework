@@ -1,10 +1,8 @@
 <?php namespace Illuminate\Foundation\Providers;
 
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Illuminate\Support\ServiceProvider;
-use Psr\Http\Message\HttpMessageInterface;
-use Illuminate\Contracts\Events\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
@@ -17,7 +15,7 @@ class HttpMessageServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected $defer = false;
+    protected $defer = true;
 
     /**
      * Register the service provider.
@@ -38,7 +36,7 @@ class HttpMessageServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(RequestInterface::class, ServerRequestInterface::class);
-        $this->app->alias(RequestInterface::class, HttpMessageInterface::class);
+        $this->app->alias(RequestInterface::class, MessageInterface::class);
     }
 
     public function registerHttpFoundationFactory()
@@ -52,18 +50,6 @@ class HttpMessageServiceProvider extends ServiceProvider
     {
         $this->app->bind('psr7.http_message_factory', function () {
             return new DiactorosFactory();
-        });
-    }
-
-    public function boot(Dispatcher $dispatcher)
-    {
-        $dispatcher->listen('router.prepare', function ($request, $response) {
-            if ($response instanceof ResponseInterface) {
-                $factory = $this->app->make('psr7.http_foundation_factory');
-                return $factory->createResponse($response);
-            }
-
-            return $response;
         });
     }
 
@@ -81,7 +67,7 @@ class HttpMessageServiceProvider extends ServiceProvider
             HttpMessageFactoryInterface::class,
             RequestInterface::class,
             ServerRequestInterface::class,
-            HttpMessageInterface::class,
+            MessageInterface::class,
         ];
     }
 }

@@ -1190,13 +1190,10 @@ class Router implements RegistrarContract
      */
     public function prepareResponse($request, $response)
     {
-        $filterResponse = $this->callFilter('prepare', $request, $response);
-
-        if (!is_null($filterResponse)) {
-            $response = $filterResponse;
-        }
-
-        if (!$response instanceof SymfonyResponse) {
+        if ($response instanceof ResponseInterface) {
+            $factory = $this->container->make('psr7.http_foundation_factory');
+            $response = $factory->createResponse($response);
+        } elseif (!$response instanceof SymfonyResponse) {
             $response = new Response($response);
         }
 

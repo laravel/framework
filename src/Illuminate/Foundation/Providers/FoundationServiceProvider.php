@@ -13,5 +13,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected $providers = [
         'Illuminate\Foundation\Providers\FormRequestServiceProvider',
+        'Illuminate\Foundation\Providers\HttpMessageServiceProvider',
     ];
 }
