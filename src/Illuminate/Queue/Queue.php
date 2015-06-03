@@ -47,18 +47,6 @@ abstract class Queue
     }
 
     /**
-     * Marshal a push queue request and fire the job.
-     *
-     * @throws \RuntimeException
-     *
-     * @deprecated since version 5.1
-     */
-    public function marshal()
-    {
-        throw new RuntimeException('Push queues only supported by Iron.');
-    }
-
-    /**
      * Push an array of jobs onto the queue.
      *
      * @param  array   $jobs
