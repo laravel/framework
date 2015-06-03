@@ -3,11 +3,11 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
-use Symfony\Component\Security\Core\Util\StringUtils;
 
 class VerifyCsrfToken implements Middleware
 {
@@ -85,7 +85,7 @@ class VerifyCsrfToken implements Middleware
             $token = $this->encrypter->decrypt($header);
         }
 
-        return StringUtils::equals($request->session()->token(), $token);
+        return Str::equals($request->session()->token(), $token);
     }
 
     /**

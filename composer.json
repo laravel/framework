@@ -37,7 +37,6 @@
         "symfony/http-kernel": "2.7.*",
         "symfony/process": "2.7.*",
         "symfony/routing": "2.7.*",
-        "symfony/security-core": "2.7.*",
         "symfony/translation": "2.7.*",
         "symfony/var-dumper": "2.7.*",
         "vlucas/phpdotenv": "~1.0"

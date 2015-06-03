@@ -222,16 +222,7 @@ class Str
      */
     public static function random($length = 16)
     {
-        if (function_exists('random_bytes')) {
-            $bytes = random_bytes($length * 2);
-        } elseif (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes($length * 2, $strong);
-            if ($bytes === false || $strong === false) {
-                throw new RuntimeException('Unable to generate random string.');
-            }
-        } else {
-            throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
-        }
+        $bytes = static::randomBytes($length * 2);
 
         $string = substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
 
@@ -240,6 +231,30 @@ class Str
         }
 
         return $string;
+    }
+
+    /**
+     * Generate a more truly "random" bytes.
+     *
+     * @param  int  $length
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public static function randomBytes($length = 16)
+    {
+        if (function_exists('random_bytes')) {
+            $bytes = random_bytes($length);
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
+            $bytes = openssl_random_pseudo_bytes($length, $strong);
+            if ($bytes === false || $strong === false) {
+                throw new RuntimeException('Unable to generate random string.');
+            }
+        } else {
+            throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+        }
+
+        return $bytes;
     }
 
     /**
@@ -255,6 +270,47 @@ class Str
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+    }
+
+    /**
+     * Compares two strings.
+     *
+     * This method implements a constant-time algorithm to compare strings.
+     * Regardless of the used implementation, it will leak length information.
+     *
+     * This method is adapted from Symfony\Component\Security\Core\Util\StringUtils.
+     *
+     * @param  string  $knownString
+     * @param  string  $userInput
+     * @return bool
+     */
+    public static function equals($knownString, $userInput)
+    {
+        if (!is_string($knownString)) {
+            $knownString = (string) $knownString;
+        }
+
+        if (!is_string($userInput)) {
+            $userInput = (string) $userInput;
+        }
+
+        if (function_exists('hash_equals')) {
+            return hash_equals($knownString, $userInput);
+        }
+
+        $knownLength = mb_strlen($knownString);
+
+        if (mb_strlen($userInput) !== $knownLength) {
+            return false;
+        }
+
+        $result = 0;
+
+        for ($i = 0; $i < $knownLength; ++$i) {
+            $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
+        }
+
+        return 0 === $result;
     }
 
     /**
