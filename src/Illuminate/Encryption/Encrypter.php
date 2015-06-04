@@ -4,6 +4,7 @@ namespace Illuminate\Encryption;
 
 use RuntimeException;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
@@ -66,6 +67,10 @@ class Encrypter implements EncrypterContract
 
         $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
 
+        if ($value === false) {
+            throw new EncryptException('Could not encrypt the data.');
+        }
+
         // Once we have the encrypted value we will go ahead base64_encode the input
         // vector and create the MAC for the encrypted value so we can verify its
         // authenticity. Then, we'll JSON encode the data in a "payload" array.
@@ -87,8 +92,8 @@ class Encrypter implements EncrypterContract
 
         $decrypted = openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
-        if ($decrypted  === false) {
-            throw new DecryptException('Could not decrypt data.');
+        if ($decrypted === false) {
+            throw new DecryptException('Could not decrypt the data.');
         }
 
         return unserialize($decrypted);
