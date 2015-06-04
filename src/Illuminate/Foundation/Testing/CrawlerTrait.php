@@ -162,7 +162,7 @@ trait CrawlerTrait
     }
 
     /**
-     * Make a request parameters using the given form.
+     * Extract the parameters from the given form.
      *
      * @param  \Symfony\Component\DomCrawler\Form  $form
      * @return array
