@@ -50,11 +50,11 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	protected $escapedTags = array('{{{', '}}}');
 
 	/**
-	 * The "regular" / legacy echo string format.
-	 *
-	 * @var string
-	 */
-	protected $echoFormat = 'e(%s)';
+     * Allow way to turn off content tag escaped
+     *
+     * @var bool
+     */
+    protected $contentTagsEscaped = true;
 
 	/**
 	 * Array of footer lines to be added to template.
@@ -294,8 +294,12 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$callback = function($matches)
 		{
 			$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
-
-			$wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
+			
+			if ($this->contentTagsEscaped) {
+				$wrapped = sprintf('e(%s)', $this->compileEchoDefaults($matches[2]));
+			} else {
+				$wrapped = sprintf('%s', $this->compileEchoDefaults($matches[2]));
+			}
 
 			return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$wrapped.'; ?>'.$whitespace;
 		};
@@ -747,10 +751,10 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @return void
 	 */
 	public function setContentTags($openTag, $closeTag, $escaped = false)
-	{
-		$property = ($escaped === true) ? 'escapedTags' : 'contentTags';
+	{		
+		$this->setContentTagsEscaped($escaped);
 
-		$this->{$property} = array(preg_quote($openTag), preg_quote($closeTag));
+		$this->contentTags = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
@@ -762,7 +766,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 */
 	public function setEscapedContentTags($openTag, $closeTag)
 	{
-		$this->setContentTags($openTag, $closeTag, true);
+		$this->escapedTags = array(preg_quote($openTag), preg_quote($closeTag));
 	}
 
 	/**
@@ -798,15 +802,14 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		return array_map('stripcslashes', $tags);
 	}
 
-	/**
-	 * Set the echo format to be used by the compiler.
-	 *
-	 * @param  string  $format
-	 * @return void
-	 */
-	public function setEchoFormat($format)
-	{
-		$this->echoFormat = $format;
-	}
+  	/**
+     * Set if content tags should be escaped
+     *
+     * @param  bool  $escaped
+     * @return void
+     */
+    public function setContentTagsEscaped($escaped = true) {
+    	$this->contentTagsEscaped = $escaped;
+    }
 
 }
