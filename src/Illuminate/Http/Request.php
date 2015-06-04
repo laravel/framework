@@ -275,9 +275,9 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @param  null|string  $delimiter
+     * @param  string      $key
+     * @param  mixed       $default
+     * @param  string|null $delimiter
      *
      * @return array|string
      */
@@ -287,7 +287,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $value = array_get($input, $key, $default);
 
-        if (is_string($value) && null !== $delimiter) {
+        if (is_string($value) && $delimiter !== null) {
             return explode($delimiter, $value);
         }
 
@@ -335,9 +335,9 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Retrieve a query string item from the request.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @param  null|string  $delimiter
+     * @param  string      $key
+     * @param  mixed       $default
+     * @param  string|null $delimiter
      *
      * @return array|string
      */
@@ -345,7 +345,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $value = $this->retrieveItem('query', $key, $default);
 
-        if (is_string($value) && null !== $delimiter) {
+        if (is_string($value) && $delimiter !== null) {
             return explode($value, $delimiter);
         }
 

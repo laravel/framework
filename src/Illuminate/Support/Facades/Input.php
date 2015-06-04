@@ -9,11 +9,12 @@ class Input extends Facade
 {
     /**
      * Get an item from the input data.
+     *
      * This method is used for all request verbs (GET, POST, PUT, and DELETE)
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @param  null|string  $delimiter
+     * @param  string      $key
+     * @param  mixed       $default
+     * @param  string|null $delimiter
      *
      * @return mixed
      */
