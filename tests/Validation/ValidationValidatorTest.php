@@ -1331,6 +1331,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['foo' => 'Array']);
         $v->each('foo', ['numeric|min:4|max:16']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foo', 'numeric|min:4|max:16');
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateEachWithNonIndexedArray()
