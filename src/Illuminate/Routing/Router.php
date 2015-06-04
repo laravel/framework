@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Psr\Http\Message\ResponseInterface;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
@@ -1211,7 +1212,10 @@ class Router implements RegistrarContract
      */
     public function prepareResponse($request, $response)
     {
-        if (!$response instanceof SymfonyResponse) {
+        if ($response instanceof ResponseInterface) {
+            $factory = $this->container->make('psr7.http_foundation_factory');
+            $response = $factory->createResponse($response);
+        } elseif (!$response instanceof SymfonyResponse) {
             $response = new Response($response);
         }
 
