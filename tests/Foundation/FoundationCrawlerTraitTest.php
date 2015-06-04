@@ -1,10 +1,11 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Foundation\Testing\CrawlerTrait;
 
 class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 {
-    use Illuminate\Foundation\Testing\CrawlerTrait;
+    use CrawlerTrait;
 
     public function test_making_request_parameters_using_form()
     {

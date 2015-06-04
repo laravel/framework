@@ -170,6 +170,7 @@ trait CrawlerTrait
     protected function makeRequestParametersUsingForm(Form $form)
     {
         parse_str(http_build_query($form->getValues()), $parameters);
+
         return $parameters;
     }
 
