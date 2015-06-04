@@ -9,8 +9,8 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 use InvalidArgumentException;
-use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container implements ArrayAccess, ContainerContract
 {
