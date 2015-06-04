@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -20,7 +21,7 @@ class Encrypter implements EncrypterContract
      *
      * @var string
      */
-    protected $cipher = 'AES-128-CBC';
+    protected $cipher;
 
     /**
      * The block size of the cipher.
@@ -33,16 +34,23 @@ class Encrypter implements EncrypterContract
      * Create a new encrypter instance.
      *
      * @param  string  $key
-     * @param  string|null  $cipher
+     * @param  string  $cipher
      * @return void
      */
-    public function __construct($key, $cipher = null)
+    public function __construct($key, $cipher = 'AES-128-CBC')
     {
-        $this->key = (string) $key;
+        $len = mb_strlen($key = (string) $key, '8bit');
 
-        if ($cipher) {
+        if ($len === 16 || $len === 32) {
+            $this->key = $key;
+        } else {
+            throw new RuntimeException('The only supported key lengths are 16 bytes and 32 bytes.');
+        }
+
+        if ($cipher === 'AES-128-CBC' || $cipher === 'AES-256-CBC') {
             $this->cipher = $cipher;
-            $this->block = openssl_cipher_iv_length($this->cipher);
+        } else {
+            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC.');
         }
     }
 
