@@ -67,7 +67,7 @@ class Encrypter implements EncrypterContract
 
         $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
 
-        if ($value  === false) {
+        if ($value === false) {
             throw new EncryptException('Could not encrypt the data.');
         }
 
@@ -92,7 +92,7 @@ class Encrypter implements EncrypterContract
 
         $decrypted = openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
-        if ($decrypted  === false) {
+        if ($decrypted === false) {
             throw new DecryptException('Could not decrypt the data.');
         }
 
