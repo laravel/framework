@@ -750,7 +750,7 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 	 * @param  bool    $escaped
 	 * @return void
 	 */
-	public function setContentTags($openTag, $closeTag, $escaped = false)
+	public function setContentTags($openTag, $closeTag, $escaped = true)
 	{		
 		$this->setContentTagsEscaped($escaped);
 
