@@ -157,7 +157,7 @@ trait CrawlerTrait
     protected function makeRequestUsingForm(Form $form)
     {
         return $this->makeRequest(
-            $form->getMethod(), $form->getUri(), $this->makeRequestParametersUsingForm($form), [], $form->getFiles()
+            $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $form->getFiles()
         );
     }
 
@@ -167,7 +167,7 @@ trait CrawlerTrait
      * @param  \Symfony\Component\DomCrawler\Form  $form
      * @return array
      */
-    protected function makeRequestParametersUsingForm(Form $form)
+    protected function extractParametersFromForm(Form $form)
     {
         parse_str(http_build_query($form->getValues()), $parameters);
 
