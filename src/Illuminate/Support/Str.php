@@ -222,12 +222,12 @@ class Str
      */
     public static function random($length = 16)
     {
-        $bytes = static::randomBytes($length * 2);
-
-        $string = substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
+        $string = '';
 
         while (($len = strlen($string)) < $length) {
-            $string .= static::random($length - $len);
+            $size = $length - $len;
+            $bytes = static::randomBytes($size);
+            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
