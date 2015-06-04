@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
