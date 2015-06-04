@@ -79,6 +79,23 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testPostgresSearchPathArraySupported()
+	{
+		$dsn = 'pgsql:host=foo;dbname=bar';
+		$config = array('host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8');
+		$connector = $this->getMock('Illuminate\Database\Connectors\PostgresConnector', array('createConnection', 'getOptions'));
+		$connection = m::mock('stdClass');
+		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
+		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
+		$connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
+		$connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
+		$connection->shouldReceive('execute')->twice();
+		$result = $connector->connect($config);
+
+		$this->assertSame($result, $connection);
+	}
+
+
 	public function testSQLiteMemoryDatabasesMayBeConnectedTo()
 	{
 		$dsn = 'sqlite::memory:';
