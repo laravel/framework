@@ -52,9 +52,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // may have been specified on the connections. If that is the case we will
         // set the default schema search paths to the specified database schema.
         if (isset($config['schema'])) {
-            $schema = $config['schema'];
+            $schema = '"'.(is_array($config['schema']) ? implode('", "', $config['schema']) : $config['schema']).'"';
 
-            $connection->prepare("set search_path to \"{$schema}\"")->execute();
+            $connection->prepare("set search_path to {$schema}")->execute();
         }
 
         return $connection;
