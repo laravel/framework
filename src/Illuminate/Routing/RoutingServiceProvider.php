@@ -3,6 +3,9 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -18,6 +21,8 @@ class RoutingServiceProvider extends ServiceProvider
         $this->registerUrlGenerator();
 
         $this->registerRedirector();
+
+        $this->registerPsrRequest();
 
         $this->registerResponseFactory();
     }
@@ -100,6 +105,18 @@ class RoutingServiceProvider extends ServiceProvider
             }
 
             return $redirector;
+        });
+    }
+
+    /**
+     * Register a binding for the PSR-7 request implementation.
+     *
+     * @return void
+     */
+    protected function registerPsrRequest()
+    {
+        $this->app->bind('Psr\Http\Message\ServerRequestInterface', function ($app) {
+            return (new DiactorosFactory)->createRequest($app->make('request'));
         });
     }
 
