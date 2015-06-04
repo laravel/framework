@@ -39,7 +39,7 @@ class Encrypter implements EncrypterContract
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
-        $len = mb_strlen($key = (string) $key);
+        $len = mb_strlen($key = (string) $key, '8bit');
 
         if ($len === 16 || $len === 32) {
             $this->key = $key;
