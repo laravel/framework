@@ -9,16 +9,17 @@ class Input extends Facade
 {
     /**
      * Get an item from the input data.
-     *
      * This method is used for all request verbs (GET, POST, PUT, and DELETE)
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
+     * @param  null|string  $delimiter
+     *
      * @return mixed
      */
-    public static function get($key = null, $default = null)
+    public static function get($key = null, $default = null, $delimiter = null)
     {
-        return static::$app['request']->input($key, $default);
+        return static::$app['request']->input($key, $default, $delimiter);
     }
 
     /**
