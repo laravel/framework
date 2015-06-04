@@ -129,12 +129,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Run a filter over each of the items.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback)
+    public function filter(callable $callback = null)
     {
-        return new static(array_filter($this->items, $callback));
+        if ($callback) {
+           return new static(array_filter($this->items, $callback));
+        }
+
+        return new static(array_filter($this->items));
     }
 
     /**

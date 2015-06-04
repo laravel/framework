@@ -167,6 +167,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1 => ['id' => 2, 'name' => 'World']], $c->filter(function ($item) {
             return $item['id'] == 2;
         })->all());
+
+        $c = new Collection(['', 'Hello', '', 'World']);
+        $this->assertEquals(['Hello', 'World'], $c->filter()->values()->toArray());
     }
 
     public function testWhere()
