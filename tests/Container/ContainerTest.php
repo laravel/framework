@@ -321,7 +321,7 @@ return $obj; });
 
     public function testInternalClassWithDefaultParameters()
     {
-        $this->setExpectedException('Illuminate\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
+        $this->setExpectedException('Illuminate\Contracts\Container\BindingResolutionException', 'Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class ContainerMixedPrimitiveStub');
         $container = new Container;
         $parameters = [];
         $container->make('ContainerMixedPrimitiveStub', $parameters);
