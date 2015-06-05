@@ -7,6 +7,8 @@ class KeyLengths
     /**
      * An array of supported ciphers with allowed key lengths.
      *
+     * Each element is an array of valid lengths, the first being preferred.
+     *
      * @var array
      */
     protected static $lengths = [
