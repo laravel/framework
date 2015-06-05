@@ -21,7 +21,7 @@ class Parser
         }
 
         $tokens = array_values(array_filter(
-            array_map('trim', explode(' ', $expression))
+            array_map('trim', explode('{', $expression))
         ));
 
         return [
@@ -67,21 +67,23 @@ class Parser
      */
     protected static function parseArgument($token)
     {
+        list($name, $description) = static::parseToken($token);
+
         switch (true) {
-            case ends_with($token, '?*'):
-                return new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY);
+            case ends_with($name, '?*'):
+                return new InputArgument(trim($name, '?*'), InputArgument::IS_ARRAY, $description);
 
-            case ends_with($token, '*'):
-                return new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED);
+            case ends_with($name, '*'):
+                return new InputArgument(trim($name, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED, $description);
 
-            case ends_with($token, '?'):
-                return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL);
+            case ends_with($name, '?'):
+                return new InputArgument(trim($name, '?'), InputArgument::OPTIONAL, $description);
 
-            case (preg_match('/(.+)\=(.+)/', $token, $matches)):
-                return new InputArgument($matches[1], InputArgument::OPTIONAL, '', $matches[2]);
+            case (preg_match('/(.+)\=(.+)/', $name, $matches)):
+                return new InputArgument($matches[1], InputArgument::OPTIONAL, $description, $matches[2]);
 
             default:
-                return new InputArgument($token, InputArgument::REQUIRED);
+                return new InputArgument($name, InputArgument::REQUIRED, $description);
         }
     }
 
@@ -93,18 +95,47 @@ class Parser
      */
     protected static function parseOption($token)
     {
+        list($name, $shortcut, $description) = static::parseToken($token, 'option');
+
         switch (true) {
-            case ends_with($token, '='):
-                return new InputOption(trim($token, '='), null, InputOption::VALUE_OPTIONAL);
+            case ends_with($name, '='):
+                return new InputOption(trim($name, '='), $shortcut, InputOption::VALUE_OPTIONAL, $description);
 
-            case ends_with($token, '=*'):
-                return new InputOption(trim($token, '=*'), null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+            case ends_with($name, '=*'):
+                return new InputOption(trim($name, '=*'), $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
 
-            case (preg_match('/(.+)\=(.+)/', $token, $matches)):
-                return new InputOption($matches[1], null, InputOption::VALUE_OPTIONAL, '', $matches[2]);
+            case (preg_match('/(.+)\=(.+)/', $name, $matches)):
+                return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
 
             default:
-                return new InputOption($token, null, InputOption::VALUE_NONE);
+                return new InputOption($name, $shortcut, InputOption::VALUE_NONE, $description);
         }
+    }
+
+    /**
+     * parse the token to extract description
+     * and shortcut(if present)
+     *
+     *@param $for
+     * @param $token
+     *
+     * @return array
+     */
+    protected static function parseToken($token, $for = '')
+    {
+        $haystack = explode(':', $token);
+
+        $name = $haystack[0];
+        $description = isset($haystack[1]) ? $haystack[1] : '';
+
+        if(!strcmp($for, 'option')) {
+            $haystack = explode(',', $name);
+            $name = $haystack[0];
+            $shortcut = isset($haystack[1]) ? $haystack[1] : null;
+
+            return [$name, $shortcut, $description];
+        }
+
+        return [$name, $description];
     }
 }
