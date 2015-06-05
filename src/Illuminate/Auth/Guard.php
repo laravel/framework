@@ -369,10 +369,8 @@ class Guard implements GuardContract
         if ($this->hasValidCredentials($user, $credentials)) {
             if ($login) {
                 $this->login($user, $remember);
-            }
-            {
-                return true;
 
+                return true;
             }
         }
 
