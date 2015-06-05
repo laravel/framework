@@ -849,8 +849,8 @@ class Router implements RegistrarContract
      *
      * Middlewares are passed through with the format [ 'name' => 'class', ... ]
      *
-     * @param array $middlewares
-     * @return $this;
+     * @param  array  $middlewares
+     * @return $this
      */
     public function bulkRegisterMiddlewares($middlewares = [])
     {
