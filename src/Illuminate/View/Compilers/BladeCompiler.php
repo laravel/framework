@@ -61,7 +61,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $escapedTags = ['{{{', '}}}'];
 
     /**
-     * To keep track of if content tag are escaped
+     * Switch to track escape setting for contentTags.
      *
      * @var bool
      */
@@ -804,11 +804,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-    * Set if content tags should be escaped
-    *
-    * @param  bool  $escaped
-    * @return void
-    */
+     * Enable/Disable escape setting for contentTags.
+     *
+     * @param  bool  $escaped
+     * @return void
+     */
     public function setContentTagsEscaped($escaped = true) {
         $this->contentTagsEscaped = $escaped;
     }
