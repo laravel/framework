@@ -21,13 +21,6 @@ class Kernel implements KernelContract
     protected $app;
 
     /**
-     * The router instance.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
      * The bootstrap classes for the application.
      *
      * @var array
@@ -60,17 +53,11 @@ class Kernel implements KernelContract
      * Create a new HTTP kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    public function __construct(Application $app, Router $router)
+    public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->router = $router;
-
-        foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->middleware($key, $middleware);
-        }
     }
 
     /**
@@ -115,6 +102,10 @@ class Kernel implements KernelContract
         $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
                                 $this->app->make('middleware.disable') === true;
 
+        if (!$shouldSkipMiddleware) {
+            $this->app['router']->bulkRegisterMiddlewares($this->routeMiddleware);
+        }
+
         return (new Pipeline($this->app))
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $this->middleware)
@@ -154,7 +145,7 @@ class Kernel implements KernelContract
     protected function gatherRouteMiddlewares($request)
     {
         if ($request->route()) {
-            return $this->router->gatherRouteMiddlewares($request->route());
+            return $this->app['router']->gatherRouteMiddlewares($request->route());
         }
 
         return [];
@@ -229,7 +220,7 @@ class Kernel implements KernelContract
         return function ($request) {
             $this->app->instance('request', $request);
 
-            return $this->router->dispatch($request);
+            return $this->app['router']->dispatch($request);
         };
     }
 

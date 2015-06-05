@@ -686,12 +686,9 @@ class Router implements RegistrarContract
     {
         $middleware = $this->gatherRouteMiddlewares($route);
 
-        $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
-                                $this->container->make('middleware.disable') === true;
-
         return (new Pipeline($this->container))
                         ->send($request)
-                        ->through($shouldSkipMiddleware ? [] : $middleware)
+                        ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
                                 $request,
@@ -843,6 +840,23 @@ class Router implements RegistrarContract
     public function middleware($name, $class)
     {
         $this->middleware[$name] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Bulk register short-hand names for a set of middleware. Middlewares
+     * are passed through with the format [ 'name' => 'class', ... ]
+     *
+     * @param array $middlewares
+     * @return $this;
+     */
+
+    public function bulkRegisterMiddlewares($middlewares = [])
+    {
+        foreach ($middlewares as $key => $middleware) {
+            $this->middleware($key, $middleware);
+        }
 
         return $this;
     }
