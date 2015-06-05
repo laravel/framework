@@ -30,29 +30,29 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage The only supported ciphers are [AES-128-CBC, AES-256-CBC] with the correct key lengths.
      */
     public function testWithBadKeyLength()
     {
-        $e = new Encrypter(str_repeat('a', 5));
+        new Encrypter(str_repeat('a', 5));
     }
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage The only supported ciphers are [AES-128-CBC, AES-256-CBC] with the correct key lengths.
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        $e = new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
     }
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage The only supported ciphers are [AES-128-CBC, AES-256-CBC] with the correct key lengths.
      */
     public function testWithUnsupportedCipher()
     {
-        $e = new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
 
     /**
