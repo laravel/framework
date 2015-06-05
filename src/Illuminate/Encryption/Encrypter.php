@@ -40,14 +40,27 @@ class Encrypter implements EncrypterContract
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
-        $len = mb_strlen($key = (string) $key, '8bit');
-
-        if (($cipher === 'AES-128-CBC' && ($len === 16 || $len === 32)) || ($cipher === 'AES-256-CBC' && $len === 32)) {
+        if ($this->hasValidCipherAndKeyCombination($key, $cipher)) {
             $this->key = $key;
             $this->cipher = $cipher;
         } else {
             throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
         }
+    }
+
+    /**
+     * Determine if the given key and cipher combination is valid.
+     *
+     * @param  string  $key
+     * @param  string  $cipher
+     * @return bool
+     */
+    protected function hasValidCipherAndKeyCombination($key, $cipher)
+    {
+        $length = mb_strlen($key = (string) $key, '8bit');
+
+        return ($cipher === 'AES-128-CBC' && ($length === 16 || $length === 32)) ||
+               ($cipher === 'AES-256-CBC' && $length === 32);
     }
 
     /**
