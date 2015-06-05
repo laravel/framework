@@ -59,7 +59,7 @@ class Encrypter implements EncrypterContract
      */
     protected function hasValidCipherAndKeyCombination($key, $cipher)
     {
-        $length = mb_strlen($key = (string) $key, '8bit');
+        $length = mb_strlen($key, '8bit');
 
         return ($cipher === 'AES-128-CBC' && ($length === 16 || $length === 32)) ||
                ($cipher === 'AES-256-CBC' && $length === 32);
