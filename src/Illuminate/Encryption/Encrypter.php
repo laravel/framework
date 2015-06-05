@@ -122,11 +122,11 @@ class Encrypter implements EncrypterContract
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
         if (!$payload || $this->invalidPayload($payload)) {
-            throw new DecryptException('Invalid data.');
+            throw new DecryptException('The payload is invalid.');
         }
 
         if (!$this->validMac($payload)) {
-            throw new DecryptException('MAC is invalid.');
+            throw new DecryptException('The MAC is invalid.');
         }
 
         return $payload;
