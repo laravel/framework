@@ -42,16 +42,11 @@ class Encrypter implements EncrypterContract
     {
         $len = mb_strlen($key = (string) $key, '8bit');
 
-        if ($len === 16 || $len === 32) {
+        if (($cipher === 'AES-128-CBC' && ($len === 16 || $len === 32)) || ($cipher === 'AES-256-CBC' && $len === 32)) {
             $this->key = $key;
-        } else {
-            throw new RuntimeException('The only supported key lengths are 16 bytes and 32 bytes.');
-        }
-
-        if ($cipher === 'AES-128-CBC' || $cipher === 'AES-256-CBC') {
             $this->cipher = $cipher;
         } else {
-            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC.');
+            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
         }
     }
 
@@ -127,11 +122,11 @@ class Encrypter implements EncrypterContract
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
         if (!$payload || $this->invalidPayload($payload)) {
-            throw new DecryptException('Invalid data.');
+            throw new DecryptException('The payload is invalid.');
         }
 
         if (!$this->validMac($payload)) {
-            throw new DecryptException('MAC is invalid.');
+            throw new DecryptException('The MAC is invalid.');
         }
 
         return $payload;

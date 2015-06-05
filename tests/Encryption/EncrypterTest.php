@@ -6,33 +6,75 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 {
     public function testEncryption()
     {
-        $e = $this->getEncrypter();
-        $this->assertNotEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
-        $encrypted = $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-        $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->decrypt($encrypted));
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+        $this->assertNotEquals('foo', $encrypted);
+        $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
-    public function testEncryptionWithCustomCipher()
+    public function testWithCustomCipher()
     {
-        $e = new Encrypter(str_repeat('a', 32), 'AES-256-CBC');
-        $this->assertNotEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
-        $encrypted = $e->encrypt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-        $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $e->decrypt($encrypted));
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+        $encrypted = $e->encrypt('bar');
+        $this->assertNotEquals('bar', $encrypted);
+        $this->assertEquals('bar', $e->decrypt($encrypted));
+    }
+
+    public function testAllowLongerKeyForBC()
+    {
+        $e = new Encrypter(str_repeat('z', 32));
+        $encrypted = $e->encrypt('baz');
+        $this->assertNotEquals('baz', $encrypted);
+        $this->assertEquals('baz', $e->decrypt($encrypted));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     */
+    public function testWithBadKeyLength()
+    {
+        $e = new Encrypter(str_repeat('a', 5));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     */
+    public function testWithBadKeyLengthAlternativeCipher()
+    {
+        $e = new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     */
+    public function testWithUnsupportedCipher()
+    {
+        $e = new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
 
     /**
      * @expectedException Illuminate\Contracts\Encryption\DecryptException
+     * @expectedExceptionMessage The payload is invalid.
      */
     public function testExceptionThrownWhenPayloadIsInvalid()
     {
-        $e = $this->getEncrypter();
+        $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
         $payload = str_shuffle($payload);
         $e->decrypt($payload);
     }
 
-    protected function getEncrypter()
+    /**
+     * @expectedException Illuminate\Contracts\Encryption\DecryptException
+     * @expectedExceptionMessage The MAC is invalid.
+     */
+    public function testExceptionThrownWithDifferentKey()
     {
-        return new Encrypter(str_repeat('a', 32));
+        $a = new Encrypter(str_repeat('a', 16));
+        $b = new Encrypter(str_repeat('b', 16));
+        $b->decrypt($a->encrypt('baz'));
     }
 }
