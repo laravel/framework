@@ -591,7 +591,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $items = $this->items;
 
-        array_shuffle($items);
+        shuffle($items);
 
         return new static($items);
     }
