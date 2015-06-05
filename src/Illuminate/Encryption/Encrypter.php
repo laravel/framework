@@ -11,6 +11,16 @@ use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 class Encrypter implements EncrypterContract
 {
     /**
+     * The list of supported ciphers. Values are supported key lengths.
+     *
+     * @var array
+     */
+    protected $supportedCiphers = [
+        'AES-128-CBC' => 16,
+        'AES-256-CBC' => 32,
+    ];
+
+    /**
      * The encryption key.
      *
      * @var string
@@ -40,19 +50,20 @@ class Encrypter implements EncrypterContract
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
-        $len = mb_strlen($key = (string) $key, '8bit');
-
-        if ($len === 16 || $len === 32) {
-            $this->key = $key;
-        } else {
-            throw new RuntimeException('The only supported key lengths are 16 bytes and 32 bytes.');
-        }
-
-        if ($cipher === 'AES-128-CBC' || $cipher === 'AES-256-CBC') {
-            $this->cipher = $cipher;
-        } else {
+        if (!isset($this->supportedCiphers[$cipher])) {
             throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC.');
         }
+
+        $this->cipher = $cipher;
+
+        $supportedKeyLength = $this->supportedCiphers[$cipher];
+        $keyLen = mb_strlen($key = (string) $key, '8bit');
+
+        if ($keyLen != $supportedKeyLength) {
+            throw new RuntimeException("Unsupported key length for $cipher. Use a $supportedKeyLength bytes key.");
+        }
+
+        $this->key = $key;
     }
 
     /**
