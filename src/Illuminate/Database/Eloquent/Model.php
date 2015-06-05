@@ -2529,9 +2529,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getAttribute($key)
     {
-        // If the key references an attribute, we can just go ahead and return the
-        // plain attribute value from the model. This allows every attribute to
-        // be dynamically accessed through the _get method without accessors.
         if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
             return $this->getAttributeValue($key);
         }
