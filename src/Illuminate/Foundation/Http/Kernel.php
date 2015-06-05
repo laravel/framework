@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Http;
 
 use Exception;
 use RuntimeException;
-use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;

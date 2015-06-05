@@ -845,13 +845,13 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Bulk register short-hand names for a set of middleware. Middlewares
-     * are passed through with the format [ 'name' => 'class', ... ]
+     * Bulk register short-hand names for a set of middleware.
+     *
+     * Middlewares are passed through with the format [ 'name' => 'class', ... ]
      *
      * @param array $middlewares
      * @return $this;
      */
-
     public function bulkRegisterMiddlewares($middlewares = [])
     {
         foreach ($middlewares as $key => $middleware) {
