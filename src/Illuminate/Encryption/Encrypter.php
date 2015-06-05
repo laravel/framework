@@ -60,7 +60,7 @@ class Encrypter implements EncrypterContract
         $keyLen = mb_strlen($key = (string) $key, '8bit');
 
         if ($keyLen != $supportedKeyLength) {
-            throw new RuntimeException('Unsupported key length for '.$cipher.'. Use a '.$supportedKeyLength.' bytes key.');
+            throw new RuntimeException("Unsupported key length for $cipher. Use a $supportedKeyLength bytes key.");
         }
 
         $this->key = $key;
