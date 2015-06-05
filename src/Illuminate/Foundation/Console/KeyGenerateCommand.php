@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -29,7 +28,7 @@ class KeyGenerateCommand extends Command
      */
     public function fire()
     {
-        $key = $this->getRandomKey();
+        $key = $this->getRandomKey($this->laravel['config']['app.cipher']);
 
         if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
@@ -51,11 +50,16 @@ class KeyGenerateCommand extends Command
     /**
      * Generate a random key for the application.
      *
+     * @param  string  $cipher
      * @return string
      */
-    protected function getRandomKey()
+    protected function getRandomKey($cipher)
     {
-        return Str::random(32);
+        if ($cipher === 'AES-128-CBC') {
+            return str_random(16);
+        }
+
+        return str_random(32);
     }
 
     /**
