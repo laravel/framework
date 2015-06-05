@@ -73,7 +73,6 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
         $this->assertSame($result, $connection);
     }
 
-
     public function testPostgresSearchPathArraySupported()
 	{
 		$dsn = 'pgsql:host=foo;dbname=bar';
@@ -89,7 +88,6 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
 
 		$this->assertSame($result, $connection);
 	}
-
 
     public function testSQLiteMemoryDatabasesMayBeConnectedTo()
     {
