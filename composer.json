@@ -16,8 +16,8 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "ext-openssl": "*",
         "ext-mbstring": "*",
+        "ext-openssl": "*",
         "classpreloader/classpreloader": "~1.2",
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",
