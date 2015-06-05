@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Encryption\KeyLengths;
 use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command
@@ -55,11 +56,7 @@ class KeyGenerateCommand extends Command
      */
     protected function getRandomKey($cipher)
     {
-        if ($cipher === 'AES-128-CBC') {
-            return str_random(16);
-        }
-
-        return str_random(32);
+        return str_random(KeyLengths::of($cipher));
     }
 
     /**
