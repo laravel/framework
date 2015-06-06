@@ -20,12 +20,13 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $e->decrypt($encrypted));
     }
 
-    public function testAllowLongerKeyForBC()
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     */
+    public function testDoNoAllowLongerKey()
     {
-        $e = new Encrypter(str_repeat('z', 32));
-        $encrypted = $e->encrypt('baz');
-        $this->assertNotEquals('baz', $encrypted);
-        $this->assertEquals('baz', $e->decrypt($encrypted));
+        new Encrypter(str_repeat('z', 32));
     }
 
     /**
@@ -34,7 +35,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
      */
     public function testWithBadKeyLength()
     {
-        $e = new Encrypter(str_repeat('a', 5));
+        new Encrypter(str_repeat('a', 5));
     }
 
     /**
@@ -43,7 +44,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        $e = new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
     }
 
     /**
@@ -52,7 +53,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
      */
     public function testWithUnsupportedCipher()
     {
-        $e = new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
 
     /**
@@ -77,7 +78,6 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
-
 
     public function testOpenSslEncrypterCanDecryptMcryptedData()
     {
