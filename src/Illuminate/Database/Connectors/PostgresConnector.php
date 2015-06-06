@@ -52,9 +52,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // may have been specified on the connections. If that is the case we will
         // set the default schema search paths to the specified database schema.
         if (isset($config['schema'])) {
-            $schema = $config['schema'];
+            $schema = $this->formatSchema($config['schema']);
 
-            $connection->prepare("set search_path to \"{$schema}\"")->execute();
+            $connection->prepare("set search_path to {$schema}")->execute();
         }
 
         return $connection;
@@ -89,5 +89,20 @@ class PostgresConnector extends Connector implements ConnectorInterface
         }
 
         return $dsn;
+    }
+
+    /**
+     * Format the schema for the DSN.
+     *
+     * @param  array|string  $schema
+     * @return string
+     */
+    protected function formatSchema($schema)
+    {
+        if (is_array($schema)) {
+            return '"'.implode('", "', $schema).'"';
+        } else {
+            return '"'.$schema.'"';
+        }
     }
 }
