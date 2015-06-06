@@ -18,13 +18,6 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
     protected $cipher;
 
     /**
-     * The block size of the cipher.
-     *
-     * @var int
-     */
-    protected $block = 16;
-
-    /**
      * Create a new encrypter instance.
      *
      * @param  string  $key
@@ -108,6 +101,6 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      */
     protected function getIvSize()
     {
-        return $this->block;
+        return 16;
     }
 }
