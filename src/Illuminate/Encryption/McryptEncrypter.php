@@ -1,9 +1,8 @@
 <?php namespace Illuminate\Encryption;
 
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Core\Util\SecureRandom;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class McryptEncrypter implements EncrypterContract {
@@ -160,11 +159,11 @@ class McryptEncrypter implements EncrypterContract {
 	 */
 	protected function validMac(array $payload)
 	{
-		$bytes = (new SecureRandom)->nextBytes(16);
+		$bytes = Str::randomBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
-		return StringUtils::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
+		return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
 	}
 
 	/**
