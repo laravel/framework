@@ -1,10 +1,15 @@
-<?php namespace Illuminate\Encryption;
+<?php
+
+namespace Illuminate\Encryption;
 
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
+/**
+ * @deprecated since version 5.1. Use Illuminate\Encryption\Encrypter.
+ */
 class McryptEncrypter implements EncrypterContract
 {
     /**
