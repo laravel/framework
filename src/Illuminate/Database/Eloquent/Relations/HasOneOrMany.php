@@ -217,14 +217,16 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a collection of models to the parent instance.
      *
-     * @param  mixed  $models
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $models
+     * @return \Illuminate\Database\Eloquent\Collection|array
      */
     public function saveMany($models)
     {
-        return (new Collection($models))->each(function(Model $model) {
+        foreach ($models as $model) {
             $this->save($model);
-        });
+        }
+
+        return $models;
     }
 
     /**
