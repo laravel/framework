@@ -15,15 +15,17 @@ class EncryptionServiceProvider extends ServiceProvider
     {
         $this->app->singleton('encrypter', function ($app) {
             $config = $app->make('config')->get('app');
+
             $key = $config['key'];
+
             $cipher = $config['cipher'];
 
             if (Encrypter::supported($key, $cipher)) {
                 return new Encrypter($key, $cipher);
-            } else if (McryptEncrypter::supported($key, $cipher)) {
+            } elseif (McryptEncrypter::supported($key, $cipher)) {
                 return new McryptEncrypter($key, $cipher);
             } else {
-                throw new RuntimException('No supported encrypted found. This means the cipher and/or key length were invalid.');
+                throw new RuntimException('No supported encrypter found. The cipher and / or key length are invalid.');
             }
         });
     }

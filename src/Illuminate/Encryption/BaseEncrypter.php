@@ -5,7 +5,7 @@ namespace Illuminate\Encryption;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 
-class BaseEncrypter
+abstract class BaseEncrypter
 {
     /**
      * The encryption key.
