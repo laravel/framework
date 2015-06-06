@@ -612,6 +612,39 @@ return 'foo!'; });
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRoutePrefixing()
+    {
+        /**
+         * Prefix route
+         */
+        $router = $this->getRouter();
+        $router->get('foo/bar', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('prefix');
+        $this->assertEquals('prefix/foo/bar', $routes[0]->uri());
+
+        /**
+         * Use empty prefix
+         */
+        $router = $this->getRouter();
+        $router->get('foo/bar', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('/');
+        $this->assertEquals('foo/bar', $routes[0]->uri());
+
+        /**
+         * Prefix homepage
+         */
+        $router = $this->getRouter();
+        $router->get('/', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('prefix');
+        $this->assertEquals('prefix', $routes[0]->uri());
+    }
+
     public function testMergingControllerUses()
     {
         $router = $this->getRouter();
