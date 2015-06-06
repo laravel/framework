@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use RuntimeException;
 use Illuminate\Support\ServiceProvider;
 
 class EncryptionServiceProvider extends ServiceProvider
@@ -25,7 +26,7 @@ class EncryptionServiceProvider extends ServiceProvider
             } elseif (McryptEncrypter::supported($key, $cipher)) {
                 return new McryptEncrypter($key, $cipher);
             } else {
-                throw new RuntimException('No supported encrypter found. The cipher and / or key length are invalid.');
+                throw new RuntimeException('No supported encrypter found. The cipher and / or key length are invalid.');
             }
         });
     }
