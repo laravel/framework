@@ -20,12 +20,20 @@ class Parser
             throw new InvalidArgumentException('Console command definition is empty.');
         }
 
-        $tokens = array_values(array_filter(
-            array_map('trim', explode(' ', $expression))
-        ));
+        preg_match('/.*?\s/', $expression, $matches);
+
+        if (isset($matches[0])) {
+            $name = trim($matches[0]);
+        } else {
+            throw new InvalidArgumentException('Unable to determine command name from signature.');
+        }
+
+        preg_match_all('/\{.*?\}/', $expression, $matches);
+
+        $tokens = isset($matches[0]) ? $matches[0] : [];
 
         return [
-            array_shift($tokens), static::arguments($tokens), static::options($tokens),
+            $name, static::arguments($tokens), static::options($tokens),
         ];
     }
 
@@ -37,11 +45,11 @@ class Parser
      */
     protected static function arguments(array $tokens)
     {
-        return array_filter(array_map(function ($token) {
+        return array_values(array_filter(array_map(function ($token) {
             if (starts_with($token, '{') && !starts_with($token, '{--')) {
                 return static::parseArgument(trim($token, '{}'));
             }
-        }, $tokens));
+        }, $tokens)));
     }
 
     /**
@@ -52,11 +60,11 @@ class Parser
      */
     protected static function options(array $tokens)
     {
-        return array_filter(array_map(function ($token) {
+        return array_values(array_filter(array_map(function ($token) {
             if (starts_with($token, '{--')) {
                 return static::parseOption(ltrim(trim($token, '{}'), '-'));
             }
-        }, $tokens));
+        }, $tokens)));
     }
 
     /**
@@ -67,21 +75,31 @@ class Parser
      */
     protected static function parseArgument($token)
     {
+        $description = null;
+
+        if (str_contains($token, ' : ')) {
+            list($token, $description) = explode(' : ', $token);
+
+            $token = trim($token);
+
+            $description = trim($description);
+        }
+
         switch (true) {
             case ends_with($token, '?*'):
-                return new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY);
+                return new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY, $description);
 
             case ends_with($token, '*'):
-                return new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED);
+                return new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED, $description);
 
             case ends_with($token, '?'):
-                return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL);
+                return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL, $description);
 
             case (preg_match('/(.+)\=(.+)/', $token, $matches)):
-                return new InputArgument($matches[1], InputArgument::OPTIONAL, '', $matches[2]);
+                return new InputArgument($matches[1], InputArgument::OPTIONAL, $description, $matches[2]);
 
             default:
-                return new InputArgument($token, InputArgument::REQUIRED);
+                return new InputArgument($token, InputArgument::REQUIRED, $description);
         }
     }
 
@@ -93,18 +111,28 @@ class Parser
      */
     protected static function parseOption($token)
     {
+        $description = null;
+
+        if (str_contains($token, ' : ')) {
+            list($token, $description) = explode(' : ', $token);
+
+            $token = trim($token);
+
+            $description = trim($description);
+        }
+
         switch (true) {
             case ends_with($token, '='):
-                return new InputOption(trim($token, '='), null, InputOption::VALUE_OPTIONAL);
+                return new InputOption(trim($token, '='), null, InputOption::VALUE_OPTIONAL, $description);
 
             case ends_with($token, '=*'):
-                return new InputOption(trim($token, '=*'), null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+                return new InputOption(trim($token, '=*'), null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
 
             case (preg_match('/(.+)\=(.+)/', $token, $matches)):
-                return new InputOption($matches[1], null, InputOption::VALUE_OPTIONAL, '', $matches[2]);
+                return new InputOption($matches[1], null, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
 
             default:
-                return new InputOption($token, null, InputOption::VALUE_NONE);
+                return new InputOption($token, null, InputOption::VALUE_NONE, $description);
         }
     }
 }
