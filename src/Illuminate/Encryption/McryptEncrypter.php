@@ -10,45 +10,52 @@ use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 /**
  * @deprecated since version 5.1. Use Illuminate\Encryption\Encrypter.
  */
-class McryptEncrypter implements EncrypterContract
+class McryptEncrypter extends BaseEncrypter implements EncrypterContract
 {
-    /**
-     * The encryption key.
-     *
-     * @var string
-     */
-    protected $key;
-
     /**
      * The algorithm used for encryption.
      *
      * @var string
      */
-    protected $cipher = MCRYPT_RIJNDAEL_128;
-
-    /**
-     * The mode used for encryption.
-     *
-     * @var string
-     */
-    protected $mode = MCRYPT_MODE_CBC;
+    protected $cipher;
 
     /**
      * The block size of the cipher.
      *
      * @var int
      */
-    protected $block = 16;
+    protected $block;
 
     /**
      * Create a new encrypter instance.
      *
      * @param  string  $key
+     * @param  int     $cipher
      * @return void
      */
-    public function __construct($key)
+    public function __construct($key, $cipher = MCRYPT_RIJNDAEL_128)
     {
-        $this->key = (string) $key;
+        $key = (string) $key;
+
+        if (static::supported($key, $cipher)) {
+            $this->key = $key;
+            $this->cipher = $cipher;
+            $this->block = mcrypt_get_iv_size($this->cipher, MCRYPT_MODE_CBC);
+        } else {
+            throw new RuntimeException('The only supported ciphers are MCRYPT_RIJNDAEL_128 and MCRYPT_RIJNDAEL_256.');
+        }
+    }
+
+    /**
+     * Determine if the given key and cipher combination is valid.
+     *
+     * @param  string  $key
+     * @param  string  $cipher
+     * @return bool
+     */
+    public static function supported($key, $cipher)
+    {
+        return (defined('MCRYPT_RIJNDAEL_128') && ($cipher === MCRYPT_RIJNDAEL_128 || MCRYPT_RIJNDAEL_256));
     }
 
     /**
@@ -82,7 +89,7 @@ class McryptEncrypter implements EncrypterContract
     {
         $value = $this->addPadding(serialize($value));
 
-        return mcrypt_encrypt($this->cipher, $this->key, $value, $this->mode, $iv);
+        return mcrypt_encrypt($this->cipher, $this->key, $value, MCRYPT_MODE_CBC, $iv);
     }
 
     /**
@@ -117,65 +124,10 @@ class McryptEncrypter implements EncrypterContract
     protected function mcryptDecrypt($value, $iv)
     {
         try {
-            return mcrypt_decrypt($this->cipher, $this->key, $value, $this->mode, $iv);
+            return mcrypt_decrypt($this->cipher, $this->key, $value, MCRYPT_MODE_CBC, $iv);
         } catch (Exception $e) {
             throw new DecryptException($e->getMessage());
         }
-    }
-
-    /**
-     * Get the JSON array from the given payload.
-     *
-     * @param  string  $payload
-     * @return array
-     *
-     * @throws \Illuminate\Contracts\Encryption\DecryptException
-     */
-    protected function getJsonPayload($payload)
-    {
-        $payload = json_decode(base64_decode($payload), true);
-
-        // If the payload is not valid JSON or does not have the proper keys set we will
-        // assume it is invalid and bail out of the routine since we will not be able
-        // to decrypt the given value. We'll also check the MAC for this encryption.
-        if (!$payload || $this->invalidPayload($payload)) {
-            throw new DecryptException('The payload is invalid.');
-        }
-
-        if (!$this->validMac($payload)) {
-            throw new DecryptException('The MAC is invalid.');
-        }
-
-        return $payload;
-    }
-
-    /**
-     * Determine if the MAC for the given payload is valid.
-     *
-     * @param  array  $payload
-     * @return bool
-     *
-     * @throws \RuntimeException
-     */
-    protected function validMac(array $payload)
-    {
-        $bytes = Str::randomBytes(16);
-
-        $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
-
-        return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
-    }
-
-    /**
-     * Create a MAC for the given value.
-     *
-     * @param  string  $iv
-     * @param  string  $value
-     * @return string
-     */
-    protected function hash($iv, $value)
-    {
-        return hash_hmac('sha256', $iv.$value, $this->key);
     }
 
     /**
@@ -219,24 +171,13 @@ class McryptEncrypter implements EncrypterContract
     }
 
     /**
-     * Verify that the encryption payload is valid.
-     *
-     * @param  array|mixed  $data
-     * @return bool
-     */
-    protected function invalidPayload($data)
-    {
-        return !is_array($data) || !isset($data['iv']) || !isset($data['value']) || !isset($data['mac']);
-    }
-
-    /**
      * Get the IV size for the cipher.
      *
      * @return int
      */
     protected function getIvSize()
     {
-        return mcrypt_get_iv_size($this->cipher, $this->mode);
+        return mcrypt_get_iv_size($this->cipher, MCRYPT_MODE_CBC);
     }
 
     /**
@@ -257,52 +198,5 @@ class McryptEncrypter implements EncrypterContract
         mt_srand();
 
         return MCRYPT_RAND;
-    }
-
-    /**
-     * Set the encryption key.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public function setKey($key)
-    {
-        $this->key = (string) $key;
-    }
-
-    /**
-     * Set the encryption cipher.
-     *
-     * @param  string  $cipher
-     * @return void
-     */
-    public function setCipher($cipher)
-    {
-        $this->cipher = $cipher;
-
-        $this->updateBlockSize();
-    }
-
-    /**
-     * Set the encryption mode.
-     *
-     * @param  string  $mode
-     * @return void
-     */
-    public function setMode($mode)
-    {
-        $this->mode = $mode;
-
-        $this->updateBlockSize();
-    }
-
-    /**
-     * Update the block size for the current cipher and mode.
-     *
-     * @return void
-     */
-    protected function updateBlockSize()
-    {
-        $this->block = mcrypt_get_iv_size($this->cipher, $this->mode);
     }
 }
