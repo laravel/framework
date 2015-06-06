@@ -77,4 +77,15 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
+
+
+    public function testOpenSslEncrypterCanDecryptMcryptedData()
+    {
+        $key = str_random(32);
+        $encrypter = new Illuminate\Encryption\McryptEncrypter($key);
+        $encrypted = $encrypter->encrypt('foo');
+        $openSslEncrypter = new Illuminate\Encryption\Encrypter($key);
+
+        $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
+    }
 }
