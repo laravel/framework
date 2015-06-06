@@ -55,8 +55,8 @@ class McryptEncrypter extends BaseEncrypter implements EncrypterContract
      */
     public static function supported($key, $cipher)
     {
-        return (defined('MCRYPT_RIJNDAEL_128') &&
-                ($cipher === MCRYPT_RIJNDAEL_128 || $cipher === MCRYPT_RIJNDAEL_256));
+        return defined('MCRYPT_RIJNDAEL_128') &&
+                ($cipher === MCRYPT_RIJNDAEL_128 || $cipher === MCRYPT_RIJNDAEL_256);
     }
 
     /**
