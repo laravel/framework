@@ -84,7 +84,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $key = str_random(32);
         $encrypter = new Illuminate\Encryption\McryptEncrypter($key);
         $encrypted = $encrypter->encrypt('foo');
-        $openSslEncrypter = new Illuminate\Encryption\Encrypter($key);
+        $openSslEncrypter = new Illuminate\Encryption\Encrypter($key, 'AES-256-CBC');
 
         $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
     }
