@@ -398,6 +398,10 @@ class Router implements RegistrarContract
             isset($new['where']) ? $new['where'] : []
         );
 
+        if (isset($old['as_prefix']) && isset($new['as'])) {
+            $new['as'] = $old['as_prefix'].$new['as'];
+        }
+
         return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where']), $new);
     }
 
