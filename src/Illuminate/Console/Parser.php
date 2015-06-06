@@ -20,7 +20,7 @@ class Parser
             throw new InvalidArgumentException('Console command definition is empty.');
         }
 
-        preg_match('/.*?\s/', $expression, $matches);
+        preg_match('/[^\s]+/', $expression, $matches);
 
         if (isset($matches[0])) {
             $name = trim($matches[0]);
