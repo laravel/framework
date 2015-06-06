@@ -389,4 +389,41 @@ class Str {
 		return static::$studlyCache[$key] = str_replace(' ', '', $value);
 	}
 
+    /**
+     * Get the string between the given start and end in the given string.
+     *
+     * @param string $string
+     * @param string $start
+     * @param string $end
+     * @return string
+     */
+    public static function between($string, $start, $end)
+    {
+        if ($start == '' && $end == '') {
+            return $string;
+        }
+        
+        if ($start != '' && strpos($string, $start) === false) {
+            return '';
+        }
+        
+        if ($end != '' && strpos($string, $end) === false) {
+            return '';
+        }
+        
+        if ($start == '') {
+            return substr($string, 0, strpos($string, $end));
+        }
+
+        if ($end == '') {
+            return substr($string, strpos($string, $start) + strlen($start));
+        }
+
+        $stringWithoutStart = explode($start, $string)[1];
+        $middle = explode($end, $stringWithoutStart)[0];
+
+        return $middle;
+    }
+
+
 }
