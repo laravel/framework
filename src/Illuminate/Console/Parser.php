@@ -78,7 +78,7 @@ class Parser
         $description = null;
 
         if (str_contains($token, ' : ')) {
-            list($token, $description) = explode(' : ', $token);
+            list($token, $description) = explode(' : ', $token, 2);
 
             $token = trim($token);
 
