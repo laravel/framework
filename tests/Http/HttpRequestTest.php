@@ -190,6 +190,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
+    public function testInputWithDelimiterMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor,Smith']);
+        $this->assertCount(2, $request->input('name', null, ','));
+        $this->assertEquals('Taylor', $request->input('name', null, ',')[0]);
+        $this->assertEquals('Smith', $request->input('name', null, ',')[1]);
+    }
+
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
