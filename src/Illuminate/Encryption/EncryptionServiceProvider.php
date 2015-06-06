@@ -20,7 +20,7 @@ class EncryptionServiceProvider extends ServiceProvider
 
             if (Encrypter::supported($key, $cipher)) {
                 return new Encrypter($key, $cipher);
-            } else if (McryptEncrypter::supported($key, $cipher)) {
+            } elseif (defined('MCRYPT_RIJNDAEL_128') && McryptEncrypter::supported($key, $cipher)) {
                 return new McryptEncrypter($key, $cipher);
             } else {
                 throw new RuntimException('No supported encrypted found. This means the cipher and/or key length were invalid.');
