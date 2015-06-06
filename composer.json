@@ -78,8 +78,7 @@
         "mockery/mockery": "~0.9.1",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~4.0",
-        "predis/predis": "~1.0",
-        "symfony/security-core": "2.7.*"
+        "predis/predis": "~1.0"
     },
     "autoload": {
         "classmap": [
