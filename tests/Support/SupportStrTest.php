@@ -151,5 +151,4 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('StartMiddle', Str::between('StartMiddleEnd', '', 'End'));
         $this->assertEquals('StartMiddleEnd', Str::between('StartMiddleEnd', '', ''));
     }
-
 }
