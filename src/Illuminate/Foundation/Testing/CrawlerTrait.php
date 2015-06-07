@@ -578,7 +578,7 @@ trait CrawlerTrait
     {
         $name = str_replace('#', '', $name);
 
-        return $this->crawler->filter("{$element}#{$name}, {$element}[name={$name}]");
+        return $this->crawler->filter("{$element}#{$name}, {$element}[name='{$name}']");
     }
 
     /**
