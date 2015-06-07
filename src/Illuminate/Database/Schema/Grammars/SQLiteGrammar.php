@@ -20,7 +20,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var array
      */
-    protected $serials = ['bigInteger', 'integer'];
+    protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * Compile the query to determine if a table exists.
