@@ -50,7 +50,7 @@ class ResponseFactory implements FactoryContract
      * @param  string  $content
      * @param  int     $status
      * @param  array   $headers
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     public function make($content = '', $status = 200, array $headers = [])
     {
@@ -64,7 +64,7 @@ class ResponseFactory implements FactoryContract
      * @param  array   $data
      * @param  int     $status
      * @param  array   $headers
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     public function view($view, $data = [], $status = 200, array $headers = [])
     {
@@ -78,7 +78,7 @@ class ResponseFactory implements FactoryContract
      * @param  int    $status
      * @param  array  $headers
      * @param  int    $options
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function json($data = [], $status = 200, array $headers = [], $options = 0)
     {
@@ -97,7 +97,7 @@ class ResponseFactory implements FactoryContract
      * @param  int    $status
      * @param  array  $headers
      * @param  int    $options
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0)
     {
@@ -144,7 +144,7 @@ class ResponseFactory implements FactoryContract
      * @param  int     $status
      * @param  array   $headers
      * @param  bool    $secure
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectTo($path, $status = 302, $headers = [], $secure = null)
     {
@@ -158,7 +158,7 @@ class ResponseFactory implements FactoryContract
      * @param  array   $parameters
      * @param  int     $status
      * @param  array   $headers
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectToRoute($route, $parameters = [], $status = 302, $headers = [])
     {
@@ -172,7 +172,7 @@ class ResponseFactory implements FactoryContract
      * @param  array   $parameters
      * @param  int     $status
      * @param  array   $headers
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectToAction($action, $parameters = [], $status = 302, $headers = [])
     {
@@ -186,7 +186,7 @@ class ResponseFactory implements FactoryContract
      * @param  int     $status
      * @param  array   $headers
      * @param  bool    $secure
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectGuest($path, $status = 302, $headers = [], $secure = null)
     {
@@ -200,7 +200,7 @@ class ResponseFactory implements FactoryContract
      * @param  int     $status
      * @param  array   $headers
      * @param  bool    $secure
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null)
     {
