@@ -612,6 +612,17 @@ return 'foo!'; });
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRouteGroupingWithAs()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->get('bar', ['as' => 'bar', function () { return 'hello'; }]);
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::bar');
+        $this->assertEquals('foo/bar', $route->getPath());
+    }
+
     public function testRoutePrefixing()
     {
         /**
