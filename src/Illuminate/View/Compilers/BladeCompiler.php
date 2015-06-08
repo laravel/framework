@@ -809,4 +809,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->echoFormat = $format;
     }
+
+	/**
+	* Gets the raw tags used for the compiler.
+	*
+	* @return string
+	*/
+	public function getRawTags()
+	{
+		return $this->rawTags;
+	}
+	
+	/**
+	* Gets the extensions used for the compiler.
+	*
+	* @return string
+	*/
+	public function getExtensions()
+	{
+		return $this->extensions;
+	}
 }
