@@ -198,7 +198,7 @@ class Builder
      * @param  string  $column
      * @return mixed
      *
-     * @deprecated since version 5.1
+     * @deprecated since version 5.1.
      */
     public function pluck($column)
     {

@@ -51,7 +51,7 @@ abstract class Queue
      *
      * @throws \RuntimeException
      *
-     * @deprecated since version 5.1
+     * @deprecated since version 5.1.
      */
     public function marshal()
     {

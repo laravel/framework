@@ -157,7 +157,7 @@ class IronQueue extends Queue implements QueueContract
      *
      * @return \Illuminate\Http\Response
      *
-     * @deprecated since version 5.1
+     * @deprecated since version 5.1.
      */
     public function marshal()
     {
