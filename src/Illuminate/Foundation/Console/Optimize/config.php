@@ -28,8 +28,6 @@ return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/ResponseFactory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/UrlGenerator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/UrlRoutable.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/Middleware.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Routing/TerminableMiddleware.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Validation/ValidatesWhenResolved.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/View/Factory.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/MessageProvider.php',
