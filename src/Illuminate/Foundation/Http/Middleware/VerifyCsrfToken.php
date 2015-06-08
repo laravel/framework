@@ -4,12 +4,11 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
 
-class VerifyCsrfToken implements Middleware
+class VerifyCsrfToken
 {
     /**
      * The encrypter implementation.

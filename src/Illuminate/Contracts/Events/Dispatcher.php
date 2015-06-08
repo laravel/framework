@@ -23,6 +23,23 @@ interface Dispatcher
     public function hasListeners($eventName);
 
     /**
+     * Register an event and payload to be fired later.
+     *
+     * @param  string  $event
+     * @param  array  $payload
+     * @return void
+     */
+    public function push($event, $payload = []);
+
+    /**
+     * Register an event subscriber with the dispatcher.
+     *
+     * @param  object|string  $subscriber
+     * @return void
+     */
+    public function subscribe($subscriber);
+
+    /**
      * Fire an event until the first non-null response is returned.
      *
      * @param  string  $event
@@ -30,6 +47,14 @@ interface Dispatcher
      * @return mixed
      */
     public function until($event, $payload = []);
+
+    /**
+     * Flush a set of pushed events.
+     *
+     * @param  string  $event
+     * @return void
+     */
+    public function flush($event);
 
     /**
      * Fire an event and call the listeners.
