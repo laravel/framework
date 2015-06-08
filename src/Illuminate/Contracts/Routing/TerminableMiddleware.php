@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Routing;
 
+/**
+ * @deprecated since version 5.1.
+ */
 interface TerminableMiddleware extends Middleware
 {
     /**
