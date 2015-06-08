@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
@@ -1054,6 +1055,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Get the application namespace.
      *
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function getNamespace()
     {
@@ -1061,8 +1064,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             return $this->namespace;
         }
 
-        $this->namespace = strtok(get_class($this->getKernel()), '\\').'\\';
+        $composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
 
-        return $this->namespace;
+        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+            foreach ((array) $path as $pathChoice) {
+                if (realpath(app_path()) == realpath(base_path().'/'.$pathChoice)) {
+                    return $this->namespace = $namespace;
+                }
+            }
+        }
+
+        throw new RuntimeException('Unable to detect application namespace.');
     }
 }

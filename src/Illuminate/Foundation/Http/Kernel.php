@@ -8,7 +8,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
 class Kernel implements KernelContract
@@ -137,7 +136,7 @@ class Kernel implements KernelContract
 
             $instance = $this->app->make($name);
 
-            if ($instance instanceof TerminableMiddleware) {
+            if (method_exists($instance, 'terminate')) {
                 $instance->terminate($request, $response);
             }
         }

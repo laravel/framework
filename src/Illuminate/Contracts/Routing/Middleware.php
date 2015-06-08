@@ -4,6 +4,9 @@ namespace Illuminate\Contracts\Routing;
 
 use Closure;
 
+/**
+ * @deprecated since version 5.1.
+ */
 interface Middleware
 {
     /**

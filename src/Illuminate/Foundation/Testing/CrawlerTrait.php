@@ -137,13 +137,13 @@ trait CrawlerTrait
     {
         $uri = $this->prepareUrlForRequest($uri);
 
-        $response = $this->call($method, $uri, $parameters, $cookies, $files);
+        $this->call($method, $uri, $parameters, $cookies, $files);
 
         $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
 
         $this->currentUri = $this->app->make('request')->fullUrl();
 
-        $this->crawler = new Crawler($response->getContent(), $uri);
+        $this->crawler = new Crawler($this->response->getContent(), $uri);
 
         return $this;
     }
@@ -578,7 +578,7 @@ trait CrawlerTrait
     {
         $name = str_replace('#', '', $name);
 
-        return $this->crawler->filter("{$element}#{$name}, {$element}[name={$name}]");
+        return $this->crawler->filter("{$element}#{$name}, {$element}[name='{$name}']");
     }
 
     /**

@@ -370,7 +370,7 @@ class Guard implements GuardContract
             if ($login) {
                 $this->login($user, $remember);
             }
-            
+
             return true;
         }
 

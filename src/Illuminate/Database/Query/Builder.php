@@ -1140,7 +1140,7 @@ class Builder
     public function orderByRaw($sql, $bindings = [])
     {
         $property = $this->unions ? 'unionOrders' : 'orders';
-        
+
         $type = 'raw';
 
         $this->{$property}[] = compact('type', 'sql');
