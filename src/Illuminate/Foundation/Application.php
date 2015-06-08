@@ -1056,7 +1056,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @return string
      *
-     * @ throws \RuntimeException
+     * @throws \RuntimeException
      */
     public function getNamespace()
     {
