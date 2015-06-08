@@ -3,11 +3,10 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class CheckForMaintenanceMode implements Middleware
+class CheckForMaintenanceMode
 {
     /**
      * The application implementation.

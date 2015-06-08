@@ -3,9 +3,8 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 
-class FrameGuard implements Middleware
+class FrameGuard
 {
     /**
      * Handle the given request and get the response.

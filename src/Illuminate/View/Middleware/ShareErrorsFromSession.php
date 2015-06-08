@@ -4,10 +4,9 @@ namespace Illuminate\View\Middleware;
 
 use Closure;
 use Illuminate\Support\ViewErrorBag;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class ShareErrorsFromSession implements Middleware
+class ShareErrorsFromSession
 {
     /**
      * The view factory implementation.
