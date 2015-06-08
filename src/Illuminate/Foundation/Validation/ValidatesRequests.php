@@ -17,6 +17,8 @@ trait ValidatesRequests
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
+     *
+     * @throws \Illuminate\Http\Exception\HttpResponseException
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
@@ -33,6 +35,8 @@ trait ValidatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
+     *
+     * @throws \Illuminate\Http\Exception\HttpResponseException
      */
     protected function throwValidationException(Request $request, $validator)
     {
