@@ -3,10 +3,9 @@
 namespace Illuminate\Cookie\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
-class AddQueuedCookiesToResponse implements Middleware
+class AddQueuedCookiesToResponse
 {
     /**
      * The cookie jar instance.

@@ -4,13 +4,12 @@ namespace Illuminate\Cookie\Middleware;
 
 use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class EncryptCookies implements Middleware
+class EncryptCookies
 {
     /**
      * The encrypter instance.
