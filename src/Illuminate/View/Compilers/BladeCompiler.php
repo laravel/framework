@@ -705,6 +705,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+    * Get the extensions used by the compiler.
+    *
+    * @return array
+    */
+    public function getExtensions()
+    {
+        return $this->extensions;
+    }
+
+    /**
      * Register a custom Blade compiler.
      *
      * @param  callable  $compiler
@@ -725,6 +735,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function directive($name, callable $handler)
     {
         $this->customDirectives[$name] = $handler;
+    }
+
+    /**
+    * Gets the raw tags used by the compiler.
+    *
+    * @return array
+    */
+    public function getRawTags()
+    {
+        return $this->rawTags;
     }
 
     /**
@@ -809,24 +829,4 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->echoFormat = $format;
     }
-
-	/**
-	* Gets the raw tags used for the compiler.
-	*
-	* @return string
-	*/
-	public function getRawTags()
-	{
-		return $this->rawTags;
-	}
-	
-	/**
-	* Gets the extensions used for the compiler.
-	*
-	* @return string
-	*/
-	public function getExtensions()
-	{
-		return $this->extensions;
-	}
 }
