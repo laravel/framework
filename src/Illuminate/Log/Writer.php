@@ -48,6 +48,13 @@ class Writer implements LogContract, PsrLoggerInterface {
 	];
 
 	/**
+	 * The permission mode for for new log files.
+	 *
+	 * @var int
+	 */
+	protected $filePermission = null;
+
+	/**
 	 * Create a new log writer instance.
 	 *
 	 * @param  \Monolog\Logger  $monolog
@@ -183,7 +190,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	public function write($level, $message, array $context = array())
 	{
-		return $this->writeLog($level, $message, $context);
+		return $this->log($level, $message, $context);
 	}
 
 	/**
@@ -210,7 +217,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 */
 	public function useFiles($path, $level = 'debug')
 	{
-		$this->monolog->pushHandler($handler = new StreamHandler($path, $this->parseLevel($level)));
+		$this->monolog->pushHandler($handler = new StreamHandler($path, $this->parseLevel($level), true, $this->filePermission));
 
 		$handler->setFormatter($this->getDefaultFormatter());
 	}
@@ -226,7 +233,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	public function useDailyFiles($path, $days = 0, $level = 'debug')
 	{
 		$this->monolog->pushHandler(
-			$handler = new RotatingFileHandler($path, $days, $this->parseLevel($level))
+			$handler = new RotatingFileHandler($path, $days, $this->parseLevel($level), true, $this->filePermission)
 		);
 
 		$handler->setFormatter($this->getDefaultFormatter());
@@ -248,7 +255,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	 * Register an error_log handler.
 	 *
 	 * @param  string  $level
-	 * @param  int  $messageType
+	 * @param  integer $messageType
 	 * @return void
 	 */
 	public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
@@ -261,7 +268,8 @@ class Writer implements LogContract, PsrLoggerInterface {
 	}
 
 	/**
-	 * Register a new callback handler for when a log event is triggered.
+	 * Register a new callback handler for when
+	 * a log event is triggered.
 	 *
 	 * @param  \Closure  $callback
 	 * @return void
@@ -350,7 +358,7 @@ class Writer implements LogContract, PsrLoggerInterface {
 	}
 
 	/**
-	 * Get a defaut Monolog formatter instance.
+	 * Get a default Monolog formatter instance.
 	 *
 	 * @return \Monolog\Formatter\LineFormatter
 	 */
@@ -372,12 +380,29 @@ class Writer implements LogContract, PsrLoggerInterface {
 	/**
 	 * Set the event dispatcher instance.
 	 *
-	 * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+	 * @param  \Illuminate\Contracts\Events\Dispatcher
 	 * @return void
 	 */
 	public function setEventDispatcher(Dispatcher $dispatcher)
 	{
 		$this->dispatcher = $dispatcher;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFilePermission()
+	{
+		return $this->filePermission;
+	}
+
+	/**
+	 * @param  int  $filePermission
+	 * @return void
+	 */
+	public function setFilePermission( $filePermission )
+	{
+		$this->filePermission = $filePermission;
 	}
 
 }
