@@ -19,6 +19,13 @@ class EncryptCookies
     protected $encrypter;
 
     /**
+     * The names of all cookies for which encryption is disabled.
+     *
+     * @var array
+     */
+    protected static $disabled = [];
+
+    /**
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
@@ -27,6 +34,17 @@ class EncryptCookies
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
+    }
+
+    /**
+     * Disable encryption for the given cookie name(s).
+     *
+     * @param string|array $cookieName
+     * @return void
+     */
+    public static function disableFor($cookieName)
+    {
+        static::$disabled[] = array_merge(static::$disabled, (array) $cookieName);
     }
 
     /**
@@ -50,6 +68,10 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
+            if ($this->isDisabled($key)) {
+                continue;
+            }
+
             try {
                 $request->cookies->set($key, $this->decryptCookie($c));
             } catch (DecryptException $e) {
@@ -99,6 +121,10 @@ class EncryptCookies
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
+            if ($this->isDisabled($key)) {
+                continue;
+            }
+
             $response->headers->setCookie($this->duplicate(
                 $cookie, $this->encrypter->encrypt($cookie->getValue())
             ));
@@ -120,5 +146,16 @@ class EncryptCookies
             $c->getName(), $value, $c->getExpiresTime(), $c->getPath(),
             $c->getDomain(), $c->isSecure(), $c->isHttpOnly()
         );
+    }
+
+    /**
+     * Determine whether encryption has been disabled for the given cookie.
+     *
+     * @param string $name
+     * @return bool
+     */
+    protected function isDisabled($name)
+    {
+        return in_array($name, static::$disabled);
     }
 }
