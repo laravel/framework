@@ -694,4 +694,22 @@ trait CrawlerTrait
 
         return $this;
     }
+
+    /**
+     * Dump the content from the last response.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        $content = $this->response->getContent();
+
+        $json = json_decode($content);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $content = $json;
+        }
+
+        dd($content);
+    }
 }
