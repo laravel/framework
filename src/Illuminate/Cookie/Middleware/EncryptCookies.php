@@ -19,11 +19,11 @@ class EncryptCookies
     protected $encrypter;
 
     /**
-     * The names of all cookies for which encryption is disabled.
+     * The names of the cookies that should not be encrypted.
      *
      * @var array
      */
-    protected static $disabled = [];
+    protected $except = [];
 
     /**
      * Create a new CookieGuard instance.
@@ -42,9 +42,9 @@ class EncryptCookies
      * @param string|array $cookieName
      * @return void
      */
-    public static function disableFor($cookieName)
+    public function disableFor($cookieName)
     {
-        static::$disabled[] = array_merge(static::$disabled, (array) $cookieName);
+        $this->except[] = array_merge($this->except, (array) $cookieName);
     }
 
     /**
@@ -68,7 +68,7 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
-            if (static::isDisabled($key)) {
+            if ($this->isDisabled($key)) {
                 continue;
             }
 
@@ -121,7 +121,7 @@ class EncryptCookies
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
-            if (static::isDisabled($key)) {
+            if ($this->isDisabled($key)) {
                 continue;
             }
 
@@ -154,8 +154,8 @@ class EncryptCookies
      * @param  string $name
      * @return bool
      */
-    public static function isDisabled($name)
+    public function isDisabled($name)
     {
-        return in_array($name, static::$disabled);
+        return in_array($name, $this->except);
     }
 }
