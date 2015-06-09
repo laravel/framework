@@ -44,7 +44,7 @@ class EncryptCookies
      */
     public function disableFor($cookieName)
     {
-        $this->except[] = array_merge($this->except, (array) $cookieName);
+        $this->except = array_merge($this->except, (array) $cookieName);
     }
 
     /**
