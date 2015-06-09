@@ -109,8 +109,6 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
-        $this->verifySessionConfigurationIsValid();
-
         $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
                                 $this->app->make('middleware.disable') === true;
 
@@ -251,19 +249,6 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
-    }
-
-    /**
-     * Verify that the session configuration is valid.
-     *
-     * @return void
-     */
-    protected function verifySessionConfigurationIsValid()
-    {
-        if ($this->app['config']['session.driver'] === 'cookie' &&
-            !$this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
-            throw new RuntimeException('Cookie encryption must be enabled to use cookie sessions.');
-        }
     }
 
     /**
