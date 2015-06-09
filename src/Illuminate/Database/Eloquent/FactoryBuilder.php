@@ -127,6 +127,16 @@ class FactoryBuilder
             }
 
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker);
+            
+            foreach($definition as $key => $attribute)
+            {
+                try {
+                    $class = app($attribute);
+                    if($class instanceof Model)
+                        $definition[$key] = $class::orderByRaw("RAND()")->get()->id;
+                } 
+                catch(Exception $e) {   }
+            }
 
             return new $this->class(array_merge($definition, $attributes));
         });
