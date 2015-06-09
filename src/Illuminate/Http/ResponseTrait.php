@@ -44,11 +44,15 @@ trait ResponseTrait
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
+     * @param  \Symfony\Component\HttpFoundation\Cookie|dynamic  $cookie
      * @return $this
      */
-    public function withCookie(Cookie $cookie)
+    public function withCookie($cookie)
     {
+        if (is_string($cookie) && function_exists('cookie')) {
+            $cookie = call_user_func_array('cookie', func_get_args());
+        }
+
         $this->headers->setCookie($cookie);
 
         return $this;
