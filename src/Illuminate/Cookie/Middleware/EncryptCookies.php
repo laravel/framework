@@ -68,7 +68,7 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
-            if ($this->isDisabled($key)) {
+            if (static::isDisabled($key)) {
                 continue;
             }
 
@@ -121,7 +121,7 @@ class EncryptCookies
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
-            if ($this->isDisabled($key)) {
+            if (static::isDisabled($key)) {
                 continue;
             }
 
@@ -151,10 +151,10 @@ class EncryptCookies
     /**
      * Determine whether encryption has been disabled for the given cookie.
      *
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
-    protected function isDisabled($name)
+    public static function isDisabled($name)
     {
         return in_array($name, static::$disabled);
     }
