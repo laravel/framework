@@ -128,8 +128,6 @@ class FactoryBuilder
 
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker);
             
-            foreach($definition as $key => $attribute)
-            {
                 try {
                     $class = app($attribute);
                     if($class instanceof Model)
