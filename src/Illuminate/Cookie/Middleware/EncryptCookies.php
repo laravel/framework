@@ -19,11 +19,11 @@ class EncryptCookies
     protected $encrypter;
 
     /**
-     * The names of all cookies that should not be encrypted.
+     * The names of all cookies for which encryption is disabled.
      *
      * @var array
      */
-    protected static $ignored = [];
+    protected static $disabled = [];
 
     /**
      * Create a new CookieGuard instance.
@@ -37,14 +37,14 @@ class EncryptCookies
     }
 
     /**
-     * Ignore the given cookie name(s) during encryption.
+     * Disable encryption for the given cookie name(s).
      *
      * @param string|array $cookieName
      * @return void
      */
-    public static function ignore($cookieName)
+    public static function disableFor($cookieName)
     {
-        static::$ignored[] = array_merge(static::$ignored, (array) $cookieName);
+        static::$disabled[] = array_merge(static::$disabled, (array) $cookieName);
     }
 
     /**
@@ -68,7 +68,7 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
-            if ($this->shouldBeIgnored($key)) {
+            if ($this->isDisabled($key)) {
                 continue;
             }
 
@@ -121,7 +121,7 @@ class EncryptCookies
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
-            if ($this->shouldBeIgnored($key)) {
+            if ($this->isDisabled($key)) {
                 continue;
             }
 
@@ -149,13 +149,13 @@ class EncryptCookies
     }
 
     /**
-     * Determine whether the given cookie should not be encrypted.
+     * Determine whether encryption has been disabled for the given cookie.
      *
      * @param string $name
      * @return bool
      */
-    protected function shouldBeIgnored($name)
+    protected function isDisabled($name)
     {
-        return in_array($name, static::$ignored);
+        return in_array($name, static::$disabled);
     }
 }
