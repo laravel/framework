@@ -19,6 +19,13 @@ class EncryptCookies
     protected $encrypter;
 
     /**
+     * The names of all cookies that should not be encrypted.
+     *
+     * @var array
+     */
+    protected static $ignored = [];
+
+    /**
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
@@ -27,6 +34,17 @@ class EncryptCookies
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
+    }
+
+    /**
+     * Ignore the given cookie name(s) during encryption.
+     *
+     * @param string|array $cookieName
+     * @return void
+     */
+    public static function ignore($cookieName)
+    {
+        static::$ignored[] = array_merge(static::$ignored, (array) $cookieName);
     }
 
     /**
@@ -50,6 +68,10 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
+            if ($this->shouldBeIgnored($key)) {
+                continue;
+            }
+
             try {
                 $request->cookies->set($key, $this->decryptCookie($c));
             } catch (DecryptException $e) {
@@ -99,6 +121,10 @@ class EncryptCookies
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
+            if ($this->shouldBeIgnored($key)) {
+                continue;
+            }
+
             $response->headers->setCookie($this->duplicate(
                 $cookie, $this->encrypter->encrypt($cookie->getValue())
             ));
@@ -120,5 +146,16 @@ class EncryptCookies
             $c->getName(), $value, $c->getExpiresTime(), $c->getPath(),
             $c->getDomain(), $c->isSecure(), $c->isHttpOnly()
         );
+    }
+
+    /**
+     * Determine whether the given cookie should not be encrypted.
+     *
+     * @param string $name
+     * @return bool
+     */
+    protected function shouldBeIgnored($name)
+    {
+        return in_array($name, static::$ignored);
     }
 }
