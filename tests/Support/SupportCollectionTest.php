@@ -229,13 +229,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
 
         $result = [];
-        $c->each(function ($item, $key) use (&$result) { $result[$key] = $item; });
+        $c->each(function ($item, $key) use (&$result) {
+            $result[$key] = $item;
+        });
         $this->assertEquals($original, $result);
 
         $result = [];
-        $c->each(function ($item, $key) use (&$result) { $result[$key] = $item; if (is_string($key)) {
-     return false;
- } });
+        $c->each(function ($item, $key) use (&$result) {
+            $result[$key] = $item;
+            if (is_string($key)) {
+                return false;
+            }
+        });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
