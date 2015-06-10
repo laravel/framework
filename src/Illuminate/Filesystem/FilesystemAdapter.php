@@ -114,7 +114,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function prepend($path, $data)
     {
-        return $this->put($path, $data.PHP_EOL.$this->get($path));
+        if ($this->exists($path)) {
+            return $this->put($path, $data.PHP_EOL.$this->get($path));
+        }
+
+        return $this->put($path, $data);
     }
 
     /**
@@ -126,7 +130,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function append($path, $data)
     {
-        return $this->put($path, $this->get($path).PHP_EOL.$data);
+        if ($this->exists($path)) {
+            return $this->put($path, $this->get($path).PHP_EOL.$data);
+        }
+
+        return $this->put($path, $data);
     }
 
     /**
