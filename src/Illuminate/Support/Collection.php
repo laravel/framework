@@ -406,6 +406,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function max($key)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            return is_null($result) || $item->{$key} > $result ? $item->{$key} : $result;
+        });
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  mixed  $items
@@ -414,6 +427,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function merge($items)
     {
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Get the min value of a given key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function min($key)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            return is_null($result) || $item->{$key} < $result ? $item->{$key} : $result;
+        });
     }
 
     /**
