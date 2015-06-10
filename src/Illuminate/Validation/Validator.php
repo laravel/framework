@@ -962,7 +962,10 @@ class Validator implements ValidatorContract
      */
     protected function validateIn($attribute, $value, $parameters)
     {
-        return in_array((string) $value, $parameters);
+        if(is_array($value))
+            return (count(array_diff($value, $parameters)) == 0);
+        else
+            return in_array((string) $value, $parameters);
     }
 
     /**
