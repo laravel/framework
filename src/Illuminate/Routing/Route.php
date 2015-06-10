@@ -618,9 +618,10 @@ class Route
             $action['uses'] = $this->findCallable($action);
         }
 
-        // Verify if provided "uses" property is valid Controller@action string
-        elseif (substr_count($action['uses'], '@', 1) != 1 || substr($action['uses'], -1, 1) == '@') {
-            throw new UnexpectedValueException(sprintf('Invalid route action: %s', $action['uses']));
+        if (is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
+            throw new UnexpectedValueException(sprintf(
+                'Invalid route action: [%s]', $action['uses']
+            ));
         }
 
         return $action;
@@ -774,7 +775,7 @@ class Route
     {
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
 
-        $this->uri = trim($uri , '/');
+        $this->uri = trim($uri, '/');
 
         return $this;
     }
