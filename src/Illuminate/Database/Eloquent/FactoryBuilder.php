@@ -132,7 +132,7 @@ class FactoryBuilder
             
             foreach ($definition as $key => $attribute) {
                 try {
-                    $class = new ReflectionException($attribute);
+                    $class = new ReflectionClass($attribute);
                     if ($class instanceof Model) {
                         $definition[$key] = $class::orderByRaw('RAND()')->first()->id;
                     }
