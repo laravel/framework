@@ -3,7 +3,6 @@
 namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
-use Illuminate\Cache\CacheManager;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 class SessionManager extends Manager
@@ -126,9 +125,7 @@ class SessionManager extends Manager
      */
     protected function createRedisDriver()
     {
-        $minutes = $this->app['config']['session.lifetime'];
-        $cache = new CacheManager($this->app);
-        $handler = new CacheBasedSessionHandler($cache->driver('redis'), $minutes);
+        $handler = $this->createCacheHandler('redis');
 
         $handler->getCache()->getStore()->setConnection($this->app['config']['session.connection']);
 
@@ -154,9 +151,10 @@ class SessionManager extends Manager
      */
     protected function createCacheHandler($driver)
     {
+        $cache = clone $this->app['cache'];
         $minutes = $this->app['config']['session.lifetime'];
 
-        return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
+        return new CacheBasedSessionHandler($cache->driver($driver), $minutes);
     }
 
     /**
