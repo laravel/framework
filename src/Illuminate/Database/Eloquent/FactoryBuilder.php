@@ -132,9 +132,9 @@ class FactoryBuilder
                 try {
                     $class = app($attribute);
                     if ($class instanceof Model) {
-                        $definition[$key] = $class::orderByRaw('RAND()')->get()->id;
+                        $definition[$key] = $class::orderByRaw('RAND()')->first()->id;
                     }
-                } catch (Exception $e) {
+                } catch (\ReflectionException $e) {
                 }
             }
 
