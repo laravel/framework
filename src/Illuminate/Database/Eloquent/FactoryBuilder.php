@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent;
 
 use Faker\Factory as Faker;
 use InvalidArgumentException;
+use ReflectionException;
+use ReflectionClass;
 
 class FactoryBuilder
 {
@@ -130,7 +132,7 @@ class FactoryBuilder
             
             foreach ($definition as $key => $attribute) {
                 try {
-                    $class = app($attribute);
+                    $class = new ReflectionException($attribute);
                     if ($class instanceof Model) {
                         $definition[$key] = $class::orderByRaw('RAND()')->first()->id;
                     }
