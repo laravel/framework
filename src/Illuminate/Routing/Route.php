@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Http\Request;
+use UnexpectedValueException;
 use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
@@ -598,6 +599,8 @@ class Route
      *
      * @param  callable|array  $action
      * @return array
+     *
+     * @throws \UnexpectedValueException
      */
     protected function parseAction($action)
     {
@@ -613,6 +616,11 @@ class Route
         // across into the "uses" property that will get fired off by this route.
         elseif (!isset($action['uses'])) {
             $action['uses'] = $this->findCallable($action);
+        }
+
+        // Verify if provided "uses" property is valid Controller@action string
+        elseif (substr_count($action['uses'], '@', 1) != 1 || substr($action['uses'], -1, 1) == '@') {
+            throw new UnexpectedValueException(sprintf('Invalid route action: %s', $action['uses']));
         }
 
         return $action;
