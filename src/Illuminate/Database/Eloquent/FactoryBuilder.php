@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent;
 
 use Faker\Factory as Faker;
 use InvalidArgumentException;
+use ReflectionException;
+use ReflectionClass;
 
 class FactoryBuilder
 {
@@ -127,6 +129,16 @@ class FactoryBuilder
             }
 
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker);
+            
+            foreach ($definition as $key => $attribute) {
+                try {
+                    $class = new ReflectionClass($attribute);
+                    if ($class instanceof Model) {
+                        $definition[$key] = $class::orderByRaw('RAND()')->first()->id;
+                    }
+                } catch (\ReflectionException $e) {
+                }
+            }
 
             return new $this->class(array_merge($definition, $attributes));
         });
