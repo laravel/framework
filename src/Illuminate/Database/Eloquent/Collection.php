@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection
@@ -57,6 +58,69 @@ class Collection extends BaseCollection
         $this->items[] = $item;
 
         return $this;
+    }
+
+    /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string  $value
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function pluck($value, $key = null)
+    {
+        return new BaseCollection(Arr::pluck($this->items, $value, $key));
+    }
+
+    /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function keys()
+    {
+        return new BaseCollection(array_keys($this->items));
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @param  mixed ...$items
+     * @return \Illuminate\Support\Collection
+     */
+    public function zip($items)
+    {
+        return new BaseCollection(parent::zip($items));
+    }
+
+    /**
+     * Collapse the collection of items into a single array.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collapse()
+    {
+        return new BaseCollection(Arr::collapse($this->items));
+    }
+
+    /**
+     * Get a flattened array of the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flatten()
+    {
+        return new BaseCollection(array_flatten($this->items));
+    }
+
+    /**
+     * Flip the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flip()
+    {
+        return new BaseCollection(array_flip($this->items));
     }
 
     /**
