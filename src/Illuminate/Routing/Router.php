@@ -398,8 +398,8 @@ class Router implements RegistrarContract
             isset($new['where']) ? $new['where'] : []
         );
 
-        if (isset($old['as']) && isset($new['as'])) {
-            $new['as'] = $old['as'].$new['as'];
+        if (isset($old['as'])) {
+            $new['as'] = $old['as'].(isset($new['as']) ? $new['as'] : '');
         }
 
         return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where', 'as']), $new);
@@ -410,14 +410,12 @@ class Router implements RegistrarContract
      *
      * @param  array  $new
      * @param  array  $old
-     * @return string
+     * @return string|null
      */
     protected static function formatUsesPrefix($new, $old)
     {
-        if (isset($new['namespace']) && isset($old['namespace'])) {
-            return trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\');
-        } elseif (isset($new['namespace'])) {
-            return trim($new['namespace'], '\\');
+        if (isset($new['namespace'])) {
+            return isset($old['namespace']) ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\') : trim($new['namespace'], '\\');
         }
 
         return isset($old['namespace']) ? $old['namespace'] : null;
@@ -428,7 +426,7 @@ class Router implements RegistrarContract
      *
      * @param  array  $new
      * @param  array  $old
-     * @return string
+     * @return string|null
      */
     protected static function formatGroupPrefix($new, $old)
     {
