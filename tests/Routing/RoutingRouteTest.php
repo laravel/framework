@@ -568,7 +568,7 @@ return 'foo!'; });
     public function testRouteGrouping()
     {
         /*
-         * Inhereting Filters
+         * Inheriting Filters
          */
         $router = $this->getRouter();
         $router->group(['before' => 'foo'], function () use ($router) {
