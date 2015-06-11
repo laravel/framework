@@ -617,10 +617,15 @@ return 'foo!'; });
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
             $router->get('bar', ['as' => 'bar', function () { return 'hello'; }]);
+            $router->group([], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () { return 'hello'; }]);
+            });
         });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::bar');
         $this->assertEquals('foo/bar', $route->getPath());
+        $route = $routes->getByName('Foo::baz');
+        $this->assertEquals('foo/baz', $route->getPath());
     }
 
     public function testRoutePrefixing()
