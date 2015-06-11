@@ -128,7 +128,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['controller' => 'namespace\foo@bar']);
         $routes->add($route);
 
-        $route = new Illuminate\Routing\Route(['GET'], 'something/else', ['controller' => 'something\foo@bar']);
+        $route = new Illuminate\Routing\Route(['GET'], 'something/else', ['controller' => '\something\foo@bar']);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
