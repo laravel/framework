@@ -1209,7 +1209,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Validate the MIME type of a file upload attribute is in a set of MIME types.
+     * Validate the guessed extension of a file upload is in a set of file extensions.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1223,6 +1223,23 @@ class Validator implements ValidatorContract
         }
 
         return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+    }
+
+    /**
+     * Validate the MIME type of a file upload attribute is in a set of MIME types.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateMimetypes($attribute, $value, $parameters)
+    {
+        if (!$this->isAValidFileInstance($value)) {
+            return false;
+        }
+
+        return $value->getPath() != '' && in_array($value->getMimeType(), $parameters);
     }
 
     /**
