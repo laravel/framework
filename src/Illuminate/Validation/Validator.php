@@ -1230,7 +1230,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return bool
      */
     protected function validateMimetypes($attribute, $value, $parameters)
