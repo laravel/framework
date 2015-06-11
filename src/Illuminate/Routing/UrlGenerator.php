@@ -541,9 +541,13 @@ class UrlGenerator implements UrlGeneratorContract
     {
         if ($this->rootNamespace && !(strpos($action, '\\') === 0)) {
             $action = $this->rootNamespace.'\\'.$action;
-        } else {
-            $action = trim($action, '\\');
         }
+
+        if (!is_null($route = $this->routes->getByAction($action))) {
+            return $this->toRoute($route, $parameters, $absolute);
+        }
+
+        $action = trim($action, '\\');
 
         if (!is_null($route = $this->routes->getByAction($action))) {
             return $this->toRoute($route, $parameters, $absolute);
