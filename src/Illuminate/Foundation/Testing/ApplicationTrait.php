@@ -119,7 +119,7 @@ trait ApplicationTrait
      * Set the session to the given array.
      *
      * @param  array  $data
-     * @return void
+     * @return $this
      */
     public function withSession(array $data)
     {
