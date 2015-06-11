@@ -60,6 +60,69 @@ class Collection extends BaseCollection
     }
 
     /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function pluck($value, $key = null)
+    {
+        return (new BaseCollection($this->items))->pluck($value, $key);
+    }
+
+    /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function keys()
+    {
+        return (new BaseCollection($this->items))->keys();
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @param  mixed ...$items
+     * @return \Illuminate\Support\Collection
+     */
+    public function zip($items)
+    {
+        return call_user_func_array([new BaseCollection($this->items), 'zip'], func_get_args());
+    }
+
+    /**
+     * Collapse the collection of items into a single array.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collapse()
+    {
+        return (new BaseCollection($this->items))->collapse();
+    }
+
+    /**
+     * Get a flattened array of the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flatten()
+    {
+        return (new BaseCollection($this->items))->flatten();
+    }
+
+    /**
+     * Flip the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flip()
+    {
+        return (new BaseCollection($this->items))->flip();
+    }
+
+    /**
      * Determine if a key exists in the collection.
      *
      * @param  mixed  $key
@@ -235,7 +298,7 @@ class Collection extends BaseCollection
     /**
      * Get a dictionary keyed by primary keys.
      *
-     * @param  \ArrayAccess|array  $items
+     * @param  \ArrayAccess|array|null  $items
      * @return array
      */
     public function getDictionary($items = null)
