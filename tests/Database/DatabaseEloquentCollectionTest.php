@@ -221,4 +221,13 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Collection([$one, $three]), $c->except(2));
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
+
+    public function testNonModelRelatedMethods()
+    {
+        $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
+        $this->assertInstanceOf('Illuminate\Support\Collection', $a->pluck('foo'));
+        $this->assertInstanceOf('Illuminate\Support\Collection', $a->keys());
+        $this->assertInstanceOf('Illuminate\Support\Collection', $a->collapse());
+        $this->assertInstanceOf('Illuminate\Support\Collection', $a->zip(['a', 'b'], ['c', 'd']));
+    }
 }
