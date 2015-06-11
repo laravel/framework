@@ -990,6 +990,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateMimetypes()
+    {
+        $trans = $this->getRealTranslator();
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
+        $file->expects($this->any())->method('validateMimetypes')->will($this->returnValue('php'));
+        $v = new Validator($trans, [], ['x' => 'mimetypes:text/x-php']);
+        $v->setFiles(['x' => $file]);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateMime()
     {
         $trans = $this->getRealTranslator();
