@@ -343,6 +343,16 @@ abstract class AbstractPaginator
     }
 
     /**
+     * Get the query string variable used to store the page.
+     *
+     * @return string
+     */
+    public function getPageName()
+    {
+        return $this->pageName;
+    }
+
+    /**
      * Set the query string variable used to store the page.
      *
      * @param  string  $name
