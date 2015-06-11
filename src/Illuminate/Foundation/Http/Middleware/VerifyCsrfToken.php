@@ -96,8 +96,13 @@ class VerifyCsrfToken
      */
     protected function addCookieToResponse($request, $response)
     {
+        $config = config('session');
+
         $response->headers->setCookie(
-            new Cookie('XSRF-TOKEN', $request->session()->token(), time() + 60 * 120, config("session.path"), config("session.domain"), false, false)
+            new Cookie(
+                'XSRF-TOKEN', $request->session()->token(), time() + 60 * 120,
+                $config['path'], $config['domain'], false, false
+            )
         );
 
         return $response;
