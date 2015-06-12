@@ -715,7 +715,7 @@ class Event
      *
      * @param  int  $position
      * @param  string  $value
-     * @return void
+     * @return $this
      */
     protected function spliceIntoPosition($position, $value)
     {
