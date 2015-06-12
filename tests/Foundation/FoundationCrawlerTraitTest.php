@@ -7,7 +7,12 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 {
     use CrawlerTrait;
 
-    public function test_making_request_parameters_using_form()
+    public function tearDown()
+    {
+        m::close();
+    }
+
+    public function testExtractsRequestParametersFromForm()
     {
         $form = m::mock('\Symfony\Component\DomCrawler\Form');
 

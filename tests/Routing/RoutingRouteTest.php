@@ -468,34 +468,43 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     {
         $router = $this->getRouter();
         $router->group(['namespace' => 'Namespace'], function () use ($router) {
-            $router->get('foo/bar', 'Controller');
+            $router->get('foo/bar', 'Controller@action');
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Controller@action', $action['controller']);
 
         $router = $this->getRouter();
         $router->group(['namespace' => 'Namespace'], function () use ($router) {
             $router->group(['namespace' => 'Nested'], function () use ($router) {
-                $router->get('foo/bar', 'Controller');
+                $router->get('foo/bar', 'Controller@action');
             });
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Nested\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Nested\\Controller@action', $action['controller']);
 
         $router = $this->getRouter();
         $router->group(['prefix' => 'baz'], function () use ($router) {
             $router->group(['namespace' => 'Namespace'], function () use ($router) {
-                $router->get('foo/bar', 'Controller');
+                $router->get('foo/bar', 'Controller@action');
             });
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Controller@action', $action['controller']);
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testInvalidActionException()
+    {
+        $router = $this->getRouter();
+        $router->get('/', ['uses' => 'Controller']);
     }
 
     public function testResourceRouting()
