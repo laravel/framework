@@ -544,16 +544,18 @@ class UrlGenerator implements UrlGeneratorContract
     public function action($action, $parameters = [], $absolute = true)
     {
         if ($this->rootNamespace && !(strpos($action, '\\') === 0)) {
-            $action = $this->rootNamespace.'\\'.$action;
+            $amendedAction = $this->rootNamespace.'\\'.$action;
         } else {
-            $action = trim($action, '\\');
+            $amendedAction = trim($action, '\\');
         }
 
-        if (!is_null($route = $this->routes->getByAction($action))) {
-            return $this->toRoute($route, $parameters, $absolute);
+        if (is_null($route = $this->routes->getByAction($amendedAction))) {
+            if (is_null($route = $this->routes->getByAction($action))) {
+                throw new InvalidArgumentException("Action {$action} not defined.");
+            }
         }
 
-        throw new InvalidArgumentException("Action {$action} not defined.");
+        return $this->toRoute($route, $parameters, $absolute);
     }
 
     /**
