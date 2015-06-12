@@ -106,7 +106,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function addToActionList($action, $route)
     {
-        $this->actionList[$action['controller']] = $route;
+        $this->actionList[trim($action['controller'],'\\')] = $route;
     }
 
     /**
