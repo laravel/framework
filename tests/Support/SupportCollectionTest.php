@@ -229,13 +229,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
 
         $result = [];
-        $c->each(function ($item, $key) use (&$result) { $result[$key] = $item; });
+        $c->each(function ($item, $key) use (&$result) {
+            $result[$key] = $item;
+        });
         $this->assertEquals($original, $result);
 
         $result = [];
-        $c->each(function ($item, $key) use (&$result) { $result[$key] = $item; if (is_string($key)) {
-     return false;
- } });
+        $c->each(function ($item, $key) use (&$result) {
+            $result[$key] = $item;
+            if (is_string($key)) {
+                return false;
+            }
+        });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
     }
 
@@ -742,6 +747,36 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1, 4, 7], $c[0]->all());
         $this->assertEquals([2, 5, null], $c[1]->all());
         $this->assertEquals([3, 6, null], $c[2]->all());
+    }
+
+    public function testGettingMaxItemsFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(20, $c->max('foo'));
+
+        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $this->assertEquals(20, $c->max('foo'));
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals(5, $c->max());
+
+        $c = new Collection();
+        $this->assertNull($c->max());
+    }
+
+    public function testGettingMinItemsFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(10, $c->min('foo'));
+
+        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $this->assertEquals(10, $c->min('foo'));
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals(1, $c->min());
+
+        $c = new Collection();
+        $this->assertNull($c->min());
     }
 }
 

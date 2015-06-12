@@ -809,6 +809,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['name' => 'foo'], ['name' => 'In:foo,baz']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Array|In:foo,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', 'qux']], ['name' => 'Array|In:foo,baz,qux']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateNotIn()
@@ -981,6 +987,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $file6 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
         $file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
         $v->setFiles(['x' => $file6]);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMimetypes()
+    {
+        $trans = $this->getRealTranslator();
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
+        $file->expects($this->any())->method('validateMimetypes')->will($this->returnValue('php'));
+        $v = new Validator($trans, [], ['x' => 'mimetypes:text/x-php']);
+        $v->setFiles(['x' => $file]);
         $this->assertTrue($v->passes());
     }
 
