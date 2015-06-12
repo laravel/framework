@@ -17,7 +17,7 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "illuminate/contracts": "5.1.*",
+        "illuminate/contracts": "5.2.*",
         "illuminate/support": "5.1.*"
     },
     "autoload": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "minimum-stability": "dev"

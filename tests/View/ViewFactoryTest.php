@@ -234,6 +234,15 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hi', $factory->yieldContent('foo'));
     }
 
+    public function testStartSectionWithInlineContentOverwrites()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo', 'bar');
+        $this->assertEquals('bar', $factory->yieldContent('foo'));
+        $factory->startSection('foo', 'baz');
+        $this->assertEquals('baz', $factory->yieldContent('foo'));
+    }
+
     public function testSectionExtending()
     {
         $factory = $this->getFactory();
