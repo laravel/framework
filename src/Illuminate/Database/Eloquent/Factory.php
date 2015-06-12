@@ -143,7 +143,7 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  string  $name
-     * @return \Illuminate\Database\Factory\Builder
+     * @return \Illuminate\Database\Eloquent\FactoryBuilder
      */
     public function of($class, $name = 'default')
     {
