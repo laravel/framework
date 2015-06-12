@@ -114,19 +114,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Fetch a nested element of the collection.
-     *
-     * @param  string  $key
-     * @return static
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public function fetch($key)
-    {
-        return new static(Arr::fetch($this->items, $key));
-    }
-
-    /**
      * Run a filter over each of the items.
      *
      * @param  callable|null  $callback
@@ -406,6 +393,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function max($key = null)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            $value = data_get($item, $key);
+
+            return is_null($result) || $value > $result ? $value : $result;
+        });
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  mixed  $items
@@ -414,6 +416,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function merge($items)
     {
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Get the min value of a given key.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function min($key = null)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            $value = data_get($item, $key);
+
+            return is_null($result) || $value < $result ? $value : $result;
+        });
     }
 
     /**

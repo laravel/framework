@@ -84,45 +84,6 @@ class Collection extends BaseCollection
     }
 
     /**
-     * Fetch a nested element of the collection.
-     *
-     * @param  string  $key
-     * @return static
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public function fetch($key)
-    {
-        return new static(array_fetch($this->toArray(), $key));
-    }
-
-    /**
-     * Get the max value of a given key.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function max($key)
-    {
-        return $this->reduce(function ($result, $item) use ($key) {
-            return is_null($result) || $item->{$key} > $result ? $item->{$key} : $result;
-        });
-    }
-
-    /**
-     * Get the min value of a given key.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function min($key)
-    {
-        return $this->reduce(function ($result, $item) use ($key) {
-            return is_null($result) || $item->{$key} < $result ? $item->{$key} : $result;
-        });
-    }
-
-    /**
      * Get the array of primary keys.
      *
      * @return array
