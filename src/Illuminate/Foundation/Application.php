@@ -252,7 +252,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function setBasePath($basePath)
     {
-        $this->basePath = rtrim($basePath, DIRECTORY_SEPARATOR);
+        $this->basePath = rtrim($basePath, '\/');
 
         $this->bindPathsInContainer();
 
