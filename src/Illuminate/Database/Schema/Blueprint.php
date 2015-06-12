@@ -43,7 +43,7 @@ class Blueprint
     public $charset;
 
     /**
-     * The collation that should be used for the table;.
+     * The collation that should be used for the table.
      */
     public $collation;
 
