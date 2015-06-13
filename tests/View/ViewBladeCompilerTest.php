@@ -488,6 +488,16 @@ empty
         $this->assertEquals('<?php $__env->appendSection(); ?>', $compiler->compileString('@append'));
     }
 
+    public function testWhenStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php echo isset($foo) ? "<p>Here\'s the value: {$foo}</p>" : \'\'; ?>', $compiler->compileString("@when(\$foo, '<p>Here's the value: :value</p>')"));
+        $this->assertEquals('<?php echo isset($foo) ? "<p>Here\'s the value: {$foo}</p>" : \'\'; ?>', $compiler->compileString("@when(\$foo, \"<p>Here's the value: :value</p>\")"));
+        $this->assertEquals('<?php echo isset($foo) ? "<p>Here\'s the value: {$foo}</p>" : \'\'; ?>', $compiler->compileString("@when( \$foo, \"<p>Here's the value: :value</p>\")"));
+        $this->assertEquals('<?php echo isset($foo) ? "<p>Here\'s the value: {$foo}</p>" : \'\'; ?>', $compiler->compileString("@when(\$foo,\"<p>Here's the value: :value</p>\")"));
+        $this->assertEquals('<?php echo isset($foo) ? "<p>Here\'s the value: {$foo}</p>" : \'\'; ?>', $compiler->compileString("@when(\$foo, \"<p>Here's the value: :value</p>\" )"));
+    }
+
     public function testCustomPhpCodeIsCorrectlyHandled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

@@ -705,6 +705,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the when statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileWhen($expression)
+    {
+        preg_match('/\(\s*(\$.+),\s*[\'"](.*)[\'"]\s*\)/', $expression, $matches);
+
+        $formattedString = str_replace(':value', "{{$matches[1]}}", $matches[2]);
+        $formattedString = str_replace('"', '\"', $formattedString);
+
+        return "<?php echo isset({$matches[1]}) ? \"{$formattedString}\" : ''; ?>";
+    }
+
+    /**
     * Get the extensions used by the compiler.
     *
     * @return array
