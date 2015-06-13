@@ -100,6 +100,23 @@ class Arr
     }
 
     /**
+     * Expand dot-flattened array into a multi-dimensional associative array.
+     *
+     * @param  array $array
+     * @return array
+     */
+    public static function expand($array)
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value);
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all of the given array except for a specified array of items.
      *
      * @param  array  $array

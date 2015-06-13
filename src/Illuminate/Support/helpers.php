@@ -97,6 +97,19 @@ if (!function_exists('array_dot')) {
     }
 }
 
+if (!function_exists('array_expand')) {
+    /**
+     * Expand dot-flattened array into a multi-dimensional associative array.
+     *
+     * @param  array $array
+     * @return array
+     */
+    function array_expand($array)
+    {
+        return Arr::expand($array);
+    }
+}
+
 if (!function_exists('array_except')) {
     /**
      * Get all of the given array except for a specified array of items.
