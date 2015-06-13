@@ -428,6 +428,20 @@ if (!function_exists('resource')) {
     }
 }
 
+if (!function_exists('group')) {
+    /**
+     * Create a route group with shared attributes.
+     *
+     * @param  array     $attributes
+     * @param  \Closure  $callback
+     * @return \Illuminate\Routing\Route
+     */
+    function group(array $attributes, Closure $callback)
+    {
+        return app('router')->group($attributes, $callback);
+    }
+}
+
 if (!function_exists('response')) {
     /**
      * Return a new response from the application.
