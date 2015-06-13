@@ -237,6 +237,17 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that a given string is not seen on the page.
+     *
+     * @param  string  $text
+     * @return $this
+     */
+    protected function dontSee($text)
+    {
+        return $this->see($text, true);
+    }
+
+    /**
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
