@@ -230,6 +230,48 @@ this is a comment
 this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '
+{{--
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *              this is a long comment                 *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+--}}';
+        $expected = '
+<?php /*
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *              this is a long comment                 *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    *                                                     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/ ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
     }
 
     public function testIfStatementsAreCompiled()
