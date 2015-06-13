@@ -231,7 +231,7 @@ this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
-        $string = "
+        $string = '
 {{--
     * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     *                                                     *
@@ -250,8 +250,8 @@ this is a comment
     *                                                     *
     *                                                     *
     * * * * * * * * * * * * * * * * * * * * * * * * * * * *
---}}";
-        $expected = "
+--}}';
+        $expected = '
 <?php /*
     * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     *                                                     *
@@ -270,7 +270,7 @@ this is a comment
     *                                                     *
     *                                                     *
     * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*/ ?>";
+*/ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 

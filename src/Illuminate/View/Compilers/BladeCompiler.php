@@ -84,8 +84,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the view at the given path.
      *
-     * @param  string  $path
-     * @return void
+     * @param string $path
      */
     public function compile($path = null)
     {
@@ -113,8 +112,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Set the path currently being compiled.
      *
-     * @param  string  $path
-     * @return void
+     * @param string $path
      */
     public function setPath($path)
     {
@@ -124,7 +122,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the given Blade template contents.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileString($value)
@@ -154,7 +153,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Parse the tokens from the template.
      *
-     * @param  array  $token
+     * @param array $token
+     *
      * @return string
      */
     protected function parseToken($token)
@@ -173,7 +173,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Execute the user defined extensions.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileExtensions($value)
@@ -188,7 +189,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile Blade comments into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileComments($value)
@@ -199,9 +201,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $pattern = "/{$openPattern}((.|\s)*?){$closePattern}/";
 
         if (($compiledValue = preg_replace($pattern, '<?php /*$1*/ ?>', $value)) === null) {
-            foreach (str_split ( $value, 800) as $fragment) {
+            foreach (str_split($value, 800) as $fragment) {
                 $compiledValue  .=  preg_replace("/{$openPattern}/", '<?php /*$1', $fragment);
-                $compiledValue  =  preg_replace("/{$closePattern}/", '$1*/ ?>', $compiledValue);
+                $compiledValue = preg_replace("/{$closePattern}/", '$1*/ ?>', $compiledValue);
             }
         }
 
@@ -211,7 +213,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile Blade echos into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEchos($value)
@@ -267,7 +270,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile Blade statements that start with "@".
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return mixed
      */
     protected function compileStatements($value)
@@ -288,7 +292,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the "raw" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRawEchos($value)
@@ -307,7 +312,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the "regular" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRegularEchos($value)
@@ -328,7 +334,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the escaped echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEscapedEchos($value)
@@ -347,7 +354,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the default values for the echo statement.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileEchoDefaults($value)
@@ -358,7 +366,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEach($expression)
@@ -369,7 +378,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the inject statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileInject($expression)
@@ -382,7 +392,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the yield statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileYield($expression)
@@ -393,7 +404,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the show statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileShow($expression)
@@ -404,7 +416,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the section statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileSection($expression)
@@ -415,7 +428,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the append statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileAppend($expression)
@@ -426,7 +440,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-section statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndsection($expression)
@@ -437,7 +452,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the stop statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileStop($expression)
@@ -448,7 +464,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the overwrite statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileOverwrite($expression)
@@ -459,7 +476,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the unless statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileUnless($expression)
@@ -470,7 +488,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end unless statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndunless($expression)
@@ -481,7 +500,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the lang statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileLang($expression)
@@ -492,7 +512,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the choice statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileChoice($expression)
@@ -503,7 +524,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the else statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElse($expression)
@@ -514,7 +536,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the for statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileFor($expression)
@@ -525,7 +548,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the foreach statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileForeach($expression)
@@ -536,7 +560,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the forelse statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileForelse($expression)
@@ -549,7 +574,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIf($expression)
@@ -560,7 +586,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the else-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElseif($expression)
@@ -571,7 +598,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the forelse statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEmpty($expression)
@@ -584,7 +612,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the while statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileWhile($expression)
@@ -595,7 +624,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-while statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndwhile($expression)
@@ -606,7 +636,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-for statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndfor($expression)
@@ -617,7 +648,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-for-each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndforeach($expression)
@@ -628,7 +660,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndif($expression)
@@ -639,7 +672,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the end-for-else statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndforelse($expression)
@@ -650,7 +684,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the extends statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileExtends($expression)
@@ -669,7 +704,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the include statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileInclude($expression)
@@ -684,7 +720,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the stack statements into the content.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileStack($expression)
@@ -695,7 +732,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the push statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compilePush($expression)
@@ -706,7 +744,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the endpush statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEndpush($expression)
@@ -715,10 +754,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-    * Get the extensions used by the compiler.
-    *
-    * @return array
-    */
+     * Get the extensions used by the compiler.
+     *
+     * @return array
+     */
     public function getExtensions()
     {
         return $this->extensions;
@@ -727,8 +766,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a custom Blade compiler.
      *
-     * @param  callable  $compiler
-     * @return void
+     * @param callable $compiler
      */
     public function extend(callable $compiler)
     {
@@ -738,9 +776,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a handler for custom directives.
      *
-     * @param  string  $name
-     * @param  callable  $handler
-     * @return void
+     * @param string   $name
+     * @param callable $handler
      */
     public function directive($name, callable $handler)
     {
@@ -748,10 +785,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-    * Gets the raw tags used by the compiler.
-    *
-    * @return array
-    */
+     * Gets the raw tags used by the compiler.
+     *
+     * @return array
+     */
     public function getRawTags()
     {
         return $this->rawTags;
@@ -760,9 +797,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Sets the raw tags used for the compiler.
      *
-     * @param  string  $openTag
-     * @param  string  $closeTag
-     * @return void
+     * @param string $openTag
+     * @param string $closeTag
      */
     public function setRawTags($openTag, $closeTag)
     {
@@ -772,10 +808,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Sets the content tags used for the compiler.
      *
-     * @param  string  $openTag
-     * @param  string  $closeTag
-     * @param  bool    $escaped
-     * @return void
+     * @param string $openTag
+     * @param string $closeTag
+     * @param bool   $escaped
      */
     public function setContentTags($openTag, $closeTag, $escaped = false)
     {
@@ -787,9 +822,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Sets the escaped content tags used for the compiler.
      *
-     * @param  string  $openTag
-     * @param  string  $closeTag
-     * @return void
+     * @param string $openTag
+     * @param string $closeTag
      */
     public function setEscapedContentTags($openTag, $closeTag)
     {
@@ -819,7 +853,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Gets the tags used for the compiler.
      *
-     * @param  bool  $escaped
+     * @param bool $escaped
+     *
      * @return array
      */
     protected function getTags($escaped = false)
@@ -832,8 +867,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Set the echo format to be used by the compiler.
      *
-     * @param  string  $format
-     * @return void
+     * @param string $format
      */
     public function setEchoFormat($format)
     {
