@@ -21,6 +21,13 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     protected $concrete;
 
     /**
+     * The abstract target.
+     *
+     * @var string
+     */
+    protected $needs;
+
+    /**
      * Create a new contextual binding builder.
      *
      * @param  \Illuminate\Container\Container  $container
