@@ -193,9 +193,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileComments($value)
     {
-        $pattern = sprintf('/%s--((.|\s)*?)--%s/', $this->contentTags[0], $this->contentTags[1]);
+        $openPattern = sprintf('%s--', $this->contentTags[0]);
+        $closePattern = sprintf('--%s', $this->contentTags[1]);
 
-        return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
+        $pattern = "/{$openPattern}((.|\s)*?){$closePattern}/";
+
+        if (($compiledValue = preg_replace($pattern, '<?php /*$1*/ ?>', $value)) === null) {
+            foreach (str_split ( $value, 800) as $fragment) {
+                $compiledValue  .=  preg_replace("/{$openPattern}/", '<?php /*$1', $fragment);
+                $compiledValue  =  preg_replace("/{$closePattern}/", '$1*/ ?>', $compiledValue);
+            }
+        }
+
+        return $compiledValue;
     }
 
     /**
