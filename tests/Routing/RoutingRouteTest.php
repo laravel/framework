@@ -672,11 +672,17 @@ return 'foo!'; });
             $router->group(['namespace' => 'Nested'], function () use ($router) {
                 $router->get('foo/bar', 'Controller@action');
             });
+            $router->group(['namespace' => '\Root'], function() use ($router) {
+                $router->get('baz/bam', 'Controller@action');
+            });
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
         $this->assertEquals('Namespace\\Nested\\Controller@action', $action['controller']);
+
+        $rootAction = $routes[1]->getAction();
+        $this->assertEquals('Root\\Controller@action', $rootAction['controller']);
 
         $router = $this->getRouter();
         $router->group(['prefix' => 'baz'], function () use ($router) {
