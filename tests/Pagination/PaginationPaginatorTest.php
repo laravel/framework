@@ -13,6 +13,15 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testPaginatorGetPageName()
+    {
+        $p = new LengthAwarePaginator($array = ['item3', 'item4'], 4, 2, 2);
+        $this->assertEquals('page', $p->getPageName());
+
+        $p->setPageName('p');
+        $this->assertEquals('p', $p->getPageName());
+    }
+
     public function testPaginatorCanGiveMeRelevantPageInformation()
     {
         $p = new LengthAwarePaginator($array = ['item3', 'item4'], 4, 2, 2);

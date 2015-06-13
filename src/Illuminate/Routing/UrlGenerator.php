@@ -491,11 +491,15 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addPortToDomain($domain)
     {
-        if (in_array($this->request->getPort(), ['80', '443'])) {
+        $secure = $this->request->isSecure();
+
+        $port = $this->request->getPort();
+
+        if (($secure && $port === 443) || (!$secure && $port === 80)) {
             return $domain;
         }
 
-        return $domain.':'.$this->request->getPort();
+        return $domain.':'.$port;
     }
 
     /**
