@@ -57,7 +57,7 @@ class SesTransport implements Swift_Transport
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
         return $this->ses->sendRawEmail([
-            'Source' => key(is_null($message->getSender()) ? $message->getFrom() : $message->getSender()),
+            'Source' => key($message->getSender() ?: $message->getFrom()),
             'Destinations' => $this->getTo($message),
             'RawMessage' => [
                 'Data' => (string) $message,
