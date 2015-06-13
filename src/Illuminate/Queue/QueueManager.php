@@ -31,6 +31,7 @@ class QueueManager implements FactoryContract, MonitorContract
 +     */
 +    protected $connectors = [];
 
+
     /**
      * Create a new queue manager instance.
      *
