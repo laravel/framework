@@ -171,6 +171,27 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    public function testChunkCanBeStoppedByReturningFalse()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
+        $builder->shouldReceive('forPage')->never()->with(2, 2);
+        $builder->shouldReceive('get')->times(1)->andReturn(['foo1', 'foo2']);
+
+        $callbackExecutionAssertor = m::mock('StdClass');
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->never();
+
+        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
+            foreach ($results as $result) {
+                $callbackExecutionAssertor->doSomething($result);
+            }
+
+            return false;
+        });
+    }
+
     public function testListsReturnsTheMutatedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
