@@ -3,8 +3,8 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class Encrypter extends BaseEncrypter implements EncrypterContract
@@ -72,6 +72,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
 
         return base64_encode(json_encode(compact('iv', 'value', 'mac')));
     }
+
     /**
      * Decrypt the given value.
      *
