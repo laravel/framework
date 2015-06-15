@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 trait ApplicationTrait
@@ -59,14 +60,25 @@ trait ApplicationTrait
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::spy('Illuminate\Contracts\Events\Dispatcher');
 
-        $mock->shouldIgnoreMissing();
+        $mock->shouldReceive('fire')->andReturnUsing(function ($called) use (&$events) {
+            foreach ($events as $key => $event) {
+                if ((is_string($called) && $called === $event) ||
+                    (is_string($called) && is_subclass_of($called, $event)) ||
+                    (is_object($called) && $called instanceof $event)) {
+                    unset($events[$key]);
+                }
+            }
+        });
 
-        foreach ($events as $event) {
-            $mock->shouldReceive('fire')->atLeast()->once()
-                ->with(Mockery::type($event), [], false);
-        }
+        $this->beforeApplicationDestroyed(function () use (&$events) {
+            if ($events) {
+                throw new Exception(
+                    'The following events were not fired: '.implode(', ', $events)
+                );
+            }
+        });
 
         $this->app->instance('events', $mock);
 
