@@ -51,8 +51,9 @@ class MySqlGrammar extends Grammar
     protected function compileUnion(array $union)
     {
         $joiner = $union['all'] ? ' union all ' : ' union ';
+        $sql    = $union['query']->toSql();
 
-        return $joiner.'('.$union['query']->toSql().')';
+		return $joiner.(preg_match( '/^\(.*\)$/', $sql ) ? $sql : "($sql)" );
     }
 
     /**
