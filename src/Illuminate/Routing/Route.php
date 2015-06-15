@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Closure;
 use LogicException;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
 use Illuminate\Container\Container;
@@ -635,7 +636,7 @@ class Route
      */
     protected function findCallable(array $action)
     {
-        return array_first($action, function ($key, $value) {
+        return Arr::first($action, function ($key, $value) {
             return is_callable($value) && is_numeric($key);
         });
     }

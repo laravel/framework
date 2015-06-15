@@ -8,6 +8,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -343,7 +344,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function getGlobalScope($scope)
     {
-        return array_first(static::$globalScopes[get_called_class()], function ($key, $value) use ($scope) {
+        return Arr::first(static::$globalScopes[get_called_class()], function ($key, $value) use ($scope) {
             return $scope instanceof $value;
         });
     }
@@ -1016,7 +1017,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $self = __FUNCTION__;
 
-        $caller = array_first(debug_backtrace(false), function ($key, $trace) use ($self) {
+        $caller = Arr::first(debug_backtrace(false), function ($key, $trace) use ($self) {
             $caller = $trace['function'];
 
             return !in_array($caller, Model::$manyMethods) && $caller != $self;

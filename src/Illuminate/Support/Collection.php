@@ -182,7 +182,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return count($this->items) > 0 ? reset($this->items) : null;
         }
 
-        return array_first($this->items, $callback, $default);
+        return Arr::first($this->items, $callback, $default);
     }
 
     /**
