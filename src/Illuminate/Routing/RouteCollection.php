@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Countable;
 use ArrayIterator;
 use IteratorAggregate;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -210,7 +211,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function check(array $routes, $request, $includingMethod = true)
     {
-        return array_first($routes, function ($key, $value) use ($request, $includingMethod) {
+        return Arr::first($routes, function ($key, $value) use ($request, $includingMethod) {
             return $value->matches($request, $includingMethod);
         });
     }

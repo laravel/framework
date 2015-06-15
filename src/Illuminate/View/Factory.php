@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -306,7 +307,7 @@ class Factory implements FactoryContract
     {
         $extensions = array_keys($this->extensions);
 
-        return array_first($extensions, function ($key, $value) use ($path) {
+        return Arr::first($extensions, function ($key, $value) use ($path) {
             return ends_with($path, $value);
         });
     }
