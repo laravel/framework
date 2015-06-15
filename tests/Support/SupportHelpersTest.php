@@ -1,7 +1,14 @@
 <?php
 
+use Mockery as m;
+
 class SupportHelpersTest extends PHPUnit_Framework_TestCase
 {
+    public function tearDown()
+    {
+        m::close();
+    }
+
     public function testArrayBuild()
     {
         $this->assertEquals(['foo' => 'bar'], array_build(['foo' => 'bar'], function ($key, $value) {
@@ -189,6 +196,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(starts_with('jason', ['jas']));
         $this->assertFalse(starts_with('jason', 'day'));
         $this->assertFalse(starts_with('jason', ['day']));
+    }
+
+    public function testE()
+    {
+        $str = 'A \'quote\' is <b>bold</b>';
+        $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+        $html = m::mock('Illuminate\Support\HtmlString');
+        $html->shouldReceive('toHtml')->andReturn($str);
+        $this->assertEquals($str, e($html));
     }
 
     public function testEndsWith()
