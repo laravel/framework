@@ -252,6 +252,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
+    public function testAddingColumnInTableFirst()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('name')->first();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `name` varchar(255) not null first', $statements[0]);
+    }
+
     public function testAddingColumnAfterAnotherColumn()
     {
         $blueprint = new Blueprint('users');
