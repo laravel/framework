@@ -598,12 +598,14 @@ class Request extends SymfonyRequest implements ArrayAccess
             return true;
         }
 
+        $types = (array) $contentTypes;
+
         foreach ($accepts as $accept) {
             if ($accept === '*/*') {
                 return true;
             }
 
-            foreach ((array) $contentTypes as $type) {
+            foreach ($types as $type) {
                 if ($accept === $type || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
