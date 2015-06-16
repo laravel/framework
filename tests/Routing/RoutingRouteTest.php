@@ -554,6 +554,9 @@ return 'foo!'; });
         $old = ['domain' => 'foo'];
         $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['domain' => 'baz'], $old));
 
+        $old = ['as' => 'foo.'];
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['as' => 'bar'], $old));
+
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
@@ -568,7 +571,7 @@ return 'foo!'; });
     public function testRouteGrouping()
     {
         /*
-         * Inhereting Filters
+         * Inheriting Filters
          */
         $router = $this->getRouter();
         $router->group(['before' => 'foo'], function () use ($router) {
@@ -621,6 +624,35 @@ return 'foo!'; });
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::bar');
         $this->assertEquals('foo/bar', $route->getPath());
+    }
+
+    public function testNestedRouteGroupingWithAs()
+    {
+        /*
+         * nested with all layers present
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['prefix' => 'bar', 'as' => 'Bar::'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () { return 'hello'; }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::Bar::baz');
+        $this->assertEquals('foo/bar/baz', $route->getPath());
+
+        /*
+         * nested with layer skipped
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['prefix' => 'bar'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () { return 'hello'; }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::baz');
+        $this->assertEquals('foo/bar/baz', $route->getPath());
     }
 
     public function testRoutePrefixing()
