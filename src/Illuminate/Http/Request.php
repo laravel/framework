@@ -594,6 +594,10 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $accepts = $this->getAcceptableContentTypes();
 
+        if (count($accepts) === 0) {
+            return true;
+        }
+
         foreach ($accepts as $accept) {
             if ($accept === '*/*') {
                 return true;
