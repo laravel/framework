@@ -778,6 +778,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection();
         $this->assertNull($c->min());
     }
+    
+	public function testPrepend()
+	{
+	    $collection = new Collection(['a'=>1, 'b'=>2, 'c'=>3]);
+	    $collection->prepend('test');
+	    $this->assertSame([0=>'test', 'a'=>1, 'b'=>2, 'c'=>3], $collection->all());
+	}    
 }
 
 class TestAccessorEloquentTestStub
