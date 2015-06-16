@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait CrawlerTrait
@@ -37,6 +38,13 @@ trait CrawlerTrait
      * @var array
      */
     protected $inputs = [];
+
+    /**
+     * All of the stored uploads for the current page.
+     *
+     * @var array
+     */
+    protected $uploads = [];
 
     /**
      * Visit the given URI with a GET request.
@@ -152,12 +160,15 @@ trait CrawlerTrait
      * Make a request to the application using the given form.
      *
      * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @param  array  $uploads
      * @return $this
      */
-    protected function makeRequestUsingForm(Form $form)
+    protected function makeRequestUsingForm(Form $form, array $uploads = [])
     {
+        $files = $this->convertUploads($form, $uploads);
+
         return $this->makeRequest(
-            $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $form->getFiles()
+            $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $files
         );
     }
 
@@ -196,6 +207,7 @@ trait CrawlerTrait
     protected function clearInputs()
     {
         $this->inputs = [];
+        $this->uploads = [];
 
         return $this;
     }
@@ -465,6 +477,9 @@ trait CrawlerTrait
      */
     protected function attach($absolutePath, $element)
     {
+        $name = str_replace('#', '', $element);
+        $this->uploads[$name] = $absolutePath;
+
         return $this->storeInput($element, $absolutePath);
     }
 
@@ -476,7 +491,7 @@ trait CrawlerTrait
      */
     protected function press($buttonText)
     {
-        return $this->submitForm($buttonText, $this->inputs);
+        return $this->submitForm($buttonText, $this->inputs, $this->uploads);
     }
 
     /**
@@ -484,11 +499,12 @@ trait CrawlerTrait
      *
      * @param  string  $buttonText
      * @param  array  $inputs
+     * @param  array  $uploads
      * @return $this
      */
-    protected function submitForm($buttonText, $inputs = [])
+    protected function submitForm($buttonText, $inputs = [], $uploads = [])
     {
-        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs));
+        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs), $uploads);
 
         return $this;
     }
@@ -711,5 +727,32 @@ trait CrawlerTrait
         }
 
         dd($content);
+    }
+
+    /**
+     * Convert the uploads to UploadedFile, this will set the testing properties of UploadedFile
+     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @param  array  $uploads
+     * @return array
+     */
+    protected function convertUploads(Form $form, array $uploads)
+    {
+        $files = $form->getFiles();
+
+        $names = array_keys($files);
+
+        $files = array_map(function (array $file, $name) use ($uploads) {
+            if (isset($uploads[$name])) {
+                $absolutePath = $uploads[$name];
+                return new UploadedFile($file['tmp_name'], basename($absolutePath), $file['type'], $file['size'], $file['error'], true);
+            }
+
+            return $file;
+        }, $files, $names);
+
+        $files = array_combine($names, $files);
+
+        return $files;
     }
 }
