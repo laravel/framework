@@ -202,7 +202,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
-        $html = m::mock('Illuminate\Support\HtmlString');
+        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
