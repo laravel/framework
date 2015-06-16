@@ -369,6 +369,61 @@ trait CrawlerTrait
     }
 
     /**
+     * Asserts that the response contains the given header and equals the optional value.
+     *
+     * @param  string $headerName
+     * @param  mixed $value
+     * @return $this
+     */
+    protected function seeHeader($headerName, $value = null)
+    {
+        $headers = $this->response->headers;
+
+        $this->assertTrue($headers->has($headerName), "Header [{$headerName}] not found.");
+
+        if (!is_null($value))
+        {
+            $this->assertEquals(
+                $headers->get($headerName), $value,
+                "Header [{$headerName}] found but it's value [{$headers->get($headerName)}] not equals [{$value}]"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the response contains the given cookie and equals the optional value.
+     *
+     * @param  string $cookieName
+     * @param  mixed $value
+     * @return $this
+     */
+    protected function seeCookie($cookieName, $value = null)
+    {
+        $headers = $this->response->headers;
+
+        $exist = false;
+        foreach ($headers->getCookies() as $cookie) {
+            if ($cookie->getName() === $cookieName) {
+                $exist = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($exist, "Cookie [{$cookieName}] not found.");
+
+        if (!is_null($value)) {
+            $this->assertEquals(
+                $cookie->getValue(), $value,
+                "Cookie [{$cookieName}] found but it's value [{$cookie->getValue()}] not equals [{$value}]"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the current page matches a given URI.
      *
      * @param  string  $uri
