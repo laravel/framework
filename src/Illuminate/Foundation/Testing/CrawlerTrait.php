@@ -352,7 +352,7 @@ trait CrawlerTrait
      */
     protected function seeStatusCode($status)
     {
-        $this->assertEquals($this->response->getStatusCode(), $status);
+        $this->assertEquals($status, $this->response->getStatusCode());
 
         return $this;
     }
