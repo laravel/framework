@@ -24,9 +24,9 @@ class Database implements DatabaseContract
      */
     public function __construct(array $servers = [])
     {
-        $cluster = array_pull($servers, 'cluster');
+        $cluster = Arr::pull($servers, 'cluster');
 
-        $options = (array) array_pull($servers, 'options');
+        $options = (array) Arr::pull($servers, 'options');
 
         if ($cluster) {
             $this->clients = $this->createAggregateClient($servers, $options);

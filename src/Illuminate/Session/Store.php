@@ -327,7 +327,7 @@ class Store implements SessionInterface
      */
     public function pull($key, $default = null)
     {
-        return array_pull($this->attributes, $key, $default);
+        return Arr::pull($this->attributes, $key, $default);
     }
 
     /**
@@ -501,7 +501,7 @@ class Store implements SessionInterface
      */
     public function remove($name)
     {
-        return array_pull($this->attributes, $name);
+        return Arr::pull($this->attributes, $name);
     }
 
     /**
