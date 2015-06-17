@@ -161,6 +161,19 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
+    /**
+     * @expectedException Illuminate\Database\Eloquent\PaginatorLastPageExceededException
+     */
+    public function testPaginatedExceedingLastPage()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        Paginator::currentPageResolver(function () { return 2; });
+        $models = EloquentTestUser::oldest('id')->paginate(1);
+
+        $this->assertInstanceIf('Illuminate\Database\Eloquent\PaginatorLastPageExceededException', $models);
+    }
+
     public function testListsRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
