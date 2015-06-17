@@ -9,6 +9,7 @@ use Exception;
 use DateTimeZone;
 use RuntimeException;
 use BadMethodCallException;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
@@ -442,7 +443,7 @@ class Validator implements ValidatorContract
     protected function passesOptionalCheck($attribute)
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
-            return array_key_exists($attribute, array_dot($this->data))
+            return array_key_exists($attribute, Arr::dot($this->data))
                 || in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
         }
