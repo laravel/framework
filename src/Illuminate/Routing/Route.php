@@ -306,7 +306,7 @@ class Route
      */
     public static function parseFilters($filters)
     {
-        return array_build(static::explodeFilters($filters), function ($key, $value) {
+        return Arr::build(static::explodeFilters($filters), function ($key, $value) {
             return Route::parseFilter($value);
         });
     }
