@@ -365,7 +365,7 @@ class Store implements SessionInterface
      */
     public function set($name, $value)
     {
-        array_set($this->attributes, $name, $value);
+        Arr::set($this->attributes, $name, $value);
     }
 
     /**

@@ -113,7 +113,7 @@ class IronJob extends Job implements JobContract
     {
         $payload = json_decode($this->job->body, true);
 
-        array_set($payload, 'attempts', Arr::get($payload, 'attempts', 1) + 1);
+        Arr::set($payload, 'attempts', Arr::get($payload, 'attempts', 1) + 1);
 
         $this->iron->recreate(json_encode($payload), $this->getQueue(), $delay);
     }

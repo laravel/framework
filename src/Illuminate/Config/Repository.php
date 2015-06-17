@@ -60,10 +60,10 @@ class Repository implements ArrayAccess, ConfigContract
     {
         if (is_array($key)) {
             foreach ($key as $innerKey => $innerValue) {
-                array_set($this->items, $innerKey, $innerValue);
+                Arr::set($this->items, $innerKey, $innerValue);
             }
         } else {
-            array_set($this->items, $key, $value);
+            Arr::set($this->items, $key, $value);
         }
     }
 
