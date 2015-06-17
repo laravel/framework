@@ -1641,7 +1641,9 @@ class Builder
         $this->aggregate = compact('function', 'columns');
 
         $previousColumns = $this->columns;
-
+        $previousSelectBindings = $this->bindings['select'];
+        $this->bindings['select'] = [];
+        
         $results = $this->get($columns);
 
         // Once we have executed the query, we will reset the aggregate property so
@@ -1650,6 +1652,7 @@ class Builder
         $this->aggregate = null;
 
         $this->columns = $previousColumns;
+        $this->bindings['select'] = $previousSelectBindings;
 
         if (isset($results[0])) {
             $result = array_change_key_case((array) $results[0]);

@@ -795,6 +795,16 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result);
     }
 
+    public function testAggregateWithSubSelect()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
+        $builder->from('users')->selectSub(function($query) { $query->from('posts')->select('foo')->where('title', 'foo'); }, 'post');
+        $count = $builder->count();
+        $this->assertEquals(1, $count);
+    }
+
     public function testInsertMethod()
     {
         $builder = $this->getBuilder();
