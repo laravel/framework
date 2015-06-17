@@ -2637,7 +2637,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.studly_case($key).'Attribute');
+        return in_array($key, $this->getMutatedAttributes());
     }
 
     /**
@@ -2649,14 +2649,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.studly_case($key).'Attribute'}($value);
+        return $this->{array_flip($this->getMutatedAttributes())[$key]}($value);
     }
 
     /**
      * Get the value of an attribute using its mutator for array conversion.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string       $key
+     * @param  mixed        $value
      * @return mixed
      */
     protected function mutateAttributeForArray($key, $value)
@@ -3236,7 +3236,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                     $matches[1] = snake_case($matches[1]);
                 }
 
-                $mutatedAttributes[] = lcfirst($matches[1]);
+                $mutatedAttributes[$method] = lcfirst($matches[1]);
             }
         }
 
