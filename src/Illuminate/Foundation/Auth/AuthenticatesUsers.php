@@ -57,7 +57,8 @@ trait AuthenticatesUsers
      * Get the validation rules for the request.
      * @return array
      */
-    protected function getValidationRules() {
+    protected function getValidationRules()
+    {
         return [
             'email' => 'required|email',
             'password'  =>  'required'
@@ -68,7 +69,8 @@ trait AuthenticatesUsers
      * Get the credentials that must not be sent back to input form.
      * @return array
      */
-    protected function getHiddenCredentials() {
+    protected function getHiddenCredentials()
+    {
         return [
             'password'
         ];
