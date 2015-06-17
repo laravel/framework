@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Closure;
 use Swift_Mailer;
 use Swift_Message;
+use Illuminate\Support\Arr;
 use SuperClosure\Serializer;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
@@ -355,9 +356,9 @@ class Mailer implements MailerContract, MailQueueContract
         // named keys instead, allowing the developers to use one or the other.
         if (is_array($view)) {
             return [
-                array_get($view, 'html'),
-                array_get($view, 'text'),
-                array_get($view, 'raw'),
+                Arr::get($view, 'html'),
+                Arr::get($view, 'text'),
+                Arr::get($view, 'raw'),
             ];
         }
 

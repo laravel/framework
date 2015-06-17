@@ -2,6 +2,7 @@
 
 namespace Illuminate\Translation;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Symfony\Component\Translation\MessageSelector;
@@ -111,7 +112,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
-        $line = array_get($this->loaded[$namespace][$group][$locale], $item);
+        $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);

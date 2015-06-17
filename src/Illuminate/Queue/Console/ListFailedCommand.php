@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class ListFailedCommand extends Command
@@ -69,7 +70,7 @@ class ListFailedCommand extends Command
     {
         $row = array_values(array_except($failed, ['payload']));
 
-        array_splice($row, 3, 0, array_get(json_decode($failed['payload'], true), 'job'));
+        array_splice($row, 3, 0, Arr::get(json_decode($failed['payload'], true), 'job'));
 
         return $row;
     }
