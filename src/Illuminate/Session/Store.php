@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
@@ -511,7 +512,7 @@ class Store implements SessionInterface
      */
     public function forget($key)
     {
-        array_forget($this->attributes, $key);
+        Arr::forget($this->attributes, $key);
     }
 
     /**

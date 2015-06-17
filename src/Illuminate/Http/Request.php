@@ -6,6 +6,7 @@ use Closure;
 use ArrayAccess;
 use SplFileInfo;
 use RuntimeException;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -319,7 +320,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $results = $this->all();
 
-        array_forget($results, $keys);
+        Arr::forget($results, $keys);
 
         return $results;
     }
