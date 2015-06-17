@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
@@ -353,6 +354,35 @@ trait CrawlerTrait
         }
 
         return $expected;
+    }
+
+    /**
+     * Asserts that the response JSON contains the given path.
+     *
+     * @param  string  $path
+     * @return $this
+     * @throws PHPUnitException
+     */
+    protected function seeJsonMatchesPath($path)
+    {
+        $response = json_decode($this->response->getContent(), true);
+
+        // Remove heading $. symbols
+        $search = ltrim($path, '$.');
+
+        // Using random string to protect against null values
+        $notFoundString = Str::quickRandom(6);
+
+        try {
+            $this->assertNotEquals(
+                array_get($response, $search, $notFoundString),
+                $notFoundString
+            );
+        } catch (PHPUnitException $e) {
+            throw new PHPUnitException("Unable to find provided path [{$path}] in received JSON [{$this->response->getContent()}].");
+        }
+
+        return $this;
     }
 
     /**
