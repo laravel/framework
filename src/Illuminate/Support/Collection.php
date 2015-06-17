@@ -463,9 +463,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function prepend($value)
     {
-        $this->items = (array) $value + $this->items;
-
-        return $this;
+        $this->items = array_merge([$value], $this->items);
     }
 
     /**
