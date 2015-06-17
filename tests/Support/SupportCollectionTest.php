@@ -779,11 +779,34 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertNull($c->min());
     }
     
-    public function testPrepend()
+    public function testPrependWithArrayKeyValues()
     {
         $collection = new Collection(['a'=>1, 'b'=>2, 'c'=>3]);
         $collection->prepend('test');
         $this->assertSame([0=>'test', 'a'=>1, 'b'=>2, 'c'=>3], $collection->all());
+    }
+    
+    public function testPrependWithNumericKey()
+    {
+        $collection = new Collection(['a', 'b', 'c']);
+        $collection->prepend('test');
+        $this->assertSame(['test', 'a', 'b', 'c'], $collection->all());
+    }
+	
+    public function testPrependWithObjectParameter()
+    {
+        $collection = new Collection(['a'=>1, 'b'=>2, 'c'=>3]);
+        $object = new \stdClass;
+        $collection->prepend($object);
+        $this->assertSame([0=>$object, 'a'=>1, 'b'=>2, 'c'=>3], $collection->all());
+    }
+    
+    public function testPrependWithNumericKeyAndObjectParameter()
+    {
+        $collection = new Collection(['a', 'b', 'c']);
+        $object = new \stdClass;
+        $collection->prepend($object);
+        $this->assertSame([0=>$object, 'a', 'b', 'c'], $collection->all());
     }
 }
 
