@@ -315,7 +315,7 @@ class Store implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return array_get($this->attributes, $name, $default);
+        return Arr::get($this->attributes, $name, $default);
     }
 
     /**
@@ -357,7 +357,7 @@ class Store implements SessionInterface
         // Input that is flashed to the session can be easily retrieved by the
         // developer, making repopulating old forms and the like much more
         // convenient, since the request's previous input is available.
-        return array_get($input, $key, $default);
+        return Arr::get($input, $key, $default);
     }
 
     /**
@@ -558,7 +558,7 @@ class Store implements SessionInterface
      */
     public function getBag($name)
     {
-        return array_get($this->bags, $name, function () {
+        return Arr::get($this->bags, $name, function () {
             throw new InvalidArgumentException('Bag not registered.');
         });
     }
@@ -579,7 +579,7 @@ class Store implements SessionInterface
      */
     public function getBagData($name)
     {
-        return array_get($this->bagData, $name, []);
+        return Arr::get($this->bagData, $name, []);
     }
 
     /**

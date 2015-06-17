@@ -128,7 +128,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function segment($index, $default = null)
     {
-        return array_get($this->segments(), $index - 1, $default);
+        return Arr::get($this->segments(), $index - 1, $default);
     }
 
     /**
@@ -284,7 +284,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $input = $this->getInputSource()->all() + $this->query->all();
 
-        return array_get($input, $key, $default);
+        return Arr::get($input, $key, $default);
     }
 
     /**
@@ -302,7 +302,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $key) {
-            array_set($results, $key, array_get($input, $key));
+            array_set($results, $key, Arr::get($input, $key));
         }
 
         return $results;
@@ -369,7 +369,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        return array_get($this->files->all(), $key, $default);
+        return Arr::get($this->files->all(), $key, $default);
     }
 
     /**
@@ -546,7 +546,7 @@ class Request extends SymfonyRequest implements ArrayAccess
             return $this->json;
         }
 
-        return array_get($this->json->all(), $key, $default);
+        return Arr::get($this->json->all(), $key, $default);
     }
 
     /**
@@ -794,7 +794,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return array_get($this->all(), $offset);
+        return Arr::get($this->all(), $offset);
     }
 
     /**

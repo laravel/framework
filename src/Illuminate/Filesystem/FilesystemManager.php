@@ -5,6 +5,7 @@ namespace Illuminate\Filesystem;
 use Closure;
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
+use Illuminate\Support\Arr;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
@@ -186,7 +187,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function getRackspaceContainer(Rackspace $client, array $config)
     {
-        $urlType = array_get($config, 'url_type');
+        $urlType = Arr::get($config, 'url_type');
 
         $store = $client->objectStoreService('cloudFiles', $config['region'], $urlType);
 

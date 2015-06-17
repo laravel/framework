@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use LogicException;
 use RuntimeException;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
@@ -896,7 +897,7 @@ class Connection implements ConnectionInterface
      */
     public function getConfig($option)
     {
-        return array_get($this->config, $option);
+        return Arr::get($this->config, $option);
     }
 
     /**

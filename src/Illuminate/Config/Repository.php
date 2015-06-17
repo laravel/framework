@@ -3,6 +3,7 @@
 namespace Illuminate\Config;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
 class Repository implements ArrayAccess, ConfigContract
@@ -45,7 +46,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function get($key, $default = null)
     {
-        return array_get($this->items, $key, $default);
+        return Arr::get($this->items, $key, $default);
     }
 
     /**

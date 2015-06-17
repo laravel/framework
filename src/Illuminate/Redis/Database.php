@@ -4,6 +4,7 @@ namespace Illuminate\Redis;
 
 use Closure;
 use Predis\Client;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Database as DatabaseContract;
 
 class Database implements DatabaseContract
@@ -72,7 +73,7 @@ class Database implements DatabaseContract
      */
     public function connection($name = 'default')
     {
-        return array_get($this->clients, $name ?: 'default');
+        return Arr::get($this->clients, $name ?: 'default');
     }
 
     /**

@@ -1513,7 +1513,7 @@ class Builder
 
         $results = new Collection($this->get($columns));
 
-        return $results->pluck($columns[0], array_get($columns, 1))->all();
+        return $results->pluck($columns[0], Arr::get($columns, 1))->all();
     }
 
     /**

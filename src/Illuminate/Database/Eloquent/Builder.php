@@ -916,7 +916,7 @@ class Builder
      */
     public function getMacro($name)
     {
-        return array_get($this->macros, $name);
+        return Arr::get($this->macros, $name);
     }
 
     /**
