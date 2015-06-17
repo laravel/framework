@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -1860,7 +1861,7 @@ class Builder
      */
     public function getBindings()
     {
-        return array_flatten($this->bindings);
+        return Arr::flatten($this->bindings);
     }
 
     /**
