@@ -2387,7 +2387,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // We want to spin through all the mutated attributes for this model and call
         // the mutator for the attribute. We cache off every mutated attributes so
         // we don't have to constantly check on attributes that actually change.
-        foreach ($mutatedAttributes as $key) {
+        foreach ($mutatedAttributes as $key => $method) {
             if (!array_key_exists($key, $attributes)) {
                 continue;
             }
@@ -2637,7 +2637,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasGetMutator($key)
     {
-        return in_array($key, $this->getMutatedAttributes());
+        return array_key_exists($key, $this->getMutatedAttributes()) ||
+                method_exists($this, static::generateGetMutatorMethodName($key));
     }
 
     /**
@@ -2649,14 +2650,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{array_flip($this->getMutatedAttributes())[$key]}($value);
+        $mutatedAttributes = $this->getMutatedAttributes();
+
+        $method = isset($mutatedAttributes[$key]) ? $mutatedAttributes[$key] : static::generateGetMutatorMethodName($key);
+
+        return $this->$method($value);
     }
 
     /**
      * Get the value of an attribute using its mutator for array conversion.
      *
-     * @param  string       $key
-     * @param  mixed        $value
+     * @param  string   $key
+     * @param  mixed    $value
      * @return mixed
      */
     protected function mutateAttributeForArray($key, $value)
@@ -2664,6 +2669,28 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $value = $this->mutateAttribute($key, $value);
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
+    }
+
+    /**
+     * Generates get mutator method name by attribute key
+     *
+     * @param string $key
+     * @return string
+     */
+    protected static function generateGetMutatorMethodName($key)
+    {
+        return 'get'.studly_case($key).'Attribute';
+    }
+
+    /**
+     * Generates set mutator method name given a key
+     *
+     * @param string $key
+     * @return string
+     */
+    protected static function generateSetMutatorMethodName($key)
+    {
+        return 'set'.studly_case($key).'Attribute';
     }
 
     /**
@@ -2756,7 +2783,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set'.studly_case($key).'Attribute';
+            $method = static::generateSetMutatorMethodName($key);
 
             return $this->{$method}($value);
         }
@@ -2783,7 +2810,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.studly_case($key).'Attribute');
+        return method_exists($this, static::generateSetMutatorMethodName($key));
     }
 
     /**
@@ -3236,7 +3263,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                     $matches[1] = snake_case($matches[1]);
                 }
 
-                $mutatedAttributes[$method] = lcfirst($matches[1]);
+                $mutatedAttributes[lcfirst($matches[1])] = $method;
             }
         }
 
