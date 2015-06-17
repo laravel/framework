@@ -594,19 +594,25 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $accepts = $this->getAcceptableContentTypes();
 
+        if (count($accepts) === 0) {
+            return true;
+        }
+
+        $types = (array) $contentTypes;
+
         foreach ($accepts as $accept) {
             if ($accept === '*/*') {
                 return true;
             }
 
-            foreach ((array) $contentTypes as $type) {
+            foreach ($types as $type) {
                 if ($accept === $type || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
 
                 $split = explode('/', $accept);
 
-                if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
                     return true;
                 }
             }
