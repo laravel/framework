@@ -4,5 +4,4 @@ use RuntimeException;
 
 class PaginatorLastPageExceededException extends RuntimeException
 {
-
 }
