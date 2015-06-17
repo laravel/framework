@@ -34,7 +34,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function has($key)
     {
-        return array_has($this->items, $key);
+        return Arr::has($this->items, $key);
     }
 
     /**
