@@ -356,6 +356,36 @@ trait CrawlerTrait
     }
 
     /**
+     * Asserts that the response JSON contains the given path.
+     *
+     * @param  string $path
+     * @return $this
+     */
+    protected function seeJsonMatchesPath($path)
+    {
+        $response = json_decode($this->response->getContent(), true);
+
+        // Remove heading $. symbols
+        $search = ltrim($path, '$.');
+
+        // Using random string to protect against null values
+        $notFoundString = str_random(6);
+
+        try {
+            $this->assertNotEquals(
+                array_get($response, $search, $notFoundString),
+                $notFoundString
+            );
+        } catch (PHPUnitException $e) {
+            $message = "Unable to find provided path [{$path}] in received JSON [{$this->response->getContent()}].";
+
+            throw new PHPUnitException($message);
+        }
+
+        return $this;
+    }
+
+    /**
      * Asserts that the status code of the response matches the given code.
      *
      * @param  int  $status
