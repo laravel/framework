@@ -55,6 +55,7 @@ trait AuthenticatesUsers
 
     /**
      * Get the validation rules for the request.
+     * 
      * @return array
      */
     protected function getValidationRules()
@@ -67,6 +68,7 @@ trait AuthenticatesUsers
 
     /**
      * Get the credentials that must not be sent back to input form.
+     * 
      * @return array
      */
     protected function getHiddenCredentials()
