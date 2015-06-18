@@ -126,7 +126,7 @@ class OptimizeCommand extends Command
 
             ['psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'],
 
-            ['portable', null, InputOption::VALUE_NONE, 'Skip files with __DIR__ or __FILE__ to make the cache portable'],
+            ['portable', null, InputOption::VALUE_NONE, 'Skip files with __DIR__ or __FILE__ to make the cache portable.'],
         ];
     }
 }
