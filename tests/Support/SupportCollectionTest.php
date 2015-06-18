@@ -781,9 +781,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     
     public function testPrependWithArrayKeyValues()
     {
-        $collection = new Collection(['a'=>1, 'b'=>2, 'c'=>3]);
+        $collection = new Collection(['a' => 1, 'b' => 2, 'c' => 3]);
         $collection->prepend('test');
-        $this->assertSame([0=>'test', 'a'=>1, 'b'=>2, 'c'=>3], $collection->all());
+        $this->assertSame([0=>'test', 'a' => 1, 'b' => 2, 'c' => 3], $collection->all());
     }
     
     public function testPrependWithNumericKey()
@@ -795,10 +795,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 	
     public function testPrependWithObjectParameter()
     {
-        $collection = new Collection(['a'=>1, 'b'=>2, 'c'=>3]);
+        $collection = new Collection(['a' => 1, 'b' => 2, 'c' => 3]);
         $object = new \stdClass;
         $collection->prepend($object);
-        $this->assertSame([0=>$object, 'a'=>1, 'b'=>2, 'c'=>3], $collection->all());
+        $this->assertSame([0=>$object, 'a' => 1, 'b' => 2, 'c' => 3], $collection->all());
     }
     
     public function testPrependWithNumericKeyAndObjectParameter()
