@@ -4,15 +4,25 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Http\Middleware\PassThroughTrait;
 
 class AuthenticateWithBasicAuth
 {
+    use PassThroughTrait;
+
     /**
      * The guard instance.
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $auth;
+
+    /**
+     * The URIs that should be excluded from http basic authentication.
+     *
+     * @var array
+     */
+    protected $except = [];
 
     /**
      * Create a new middleware instance.
