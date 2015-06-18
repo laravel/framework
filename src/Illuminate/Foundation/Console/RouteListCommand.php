@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
@@ -174,7 +175,7 @@ class RouteListCommand extends Command
 
         foreach ($controller->getMiddleware() as $name => $options) {
             if (!$this->methodExcludedByOptions($method, $options)) {
-                $results[] = array_get($middleware, $name, $name);
+                $results[] = Arr::get($middleware, $name, $name);
             }
         }
 

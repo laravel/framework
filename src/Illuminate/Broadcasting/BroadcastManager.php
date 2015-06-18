@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting;
 
 use Pusher;
 use Closure;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
@@ -133,7 +134,7 @@ class BroadcastManager implements FactoryContract
     protected function createRedisDriver(array $config)
     {
         return new RedisBroadcaster(
-            $this->app->make('redis'), array_get($config, 'connection')
+            $this->app->make('redis'), Arr::get($config, 'connection')
         );
     }
 

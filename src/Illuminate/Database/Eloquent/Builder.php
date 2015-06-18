@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -355,7 +356,7 @@ class Builder
 
         $column = $this->model->getUpdatedAtColumn();
 
-        return array_add($values, $column, $this->model->freshTimestampString());
+        return Arr::add($values, $column, $this->model->freshTimestampString());
     }
 
     /**
@@ -915,7 +916,7 @@ class Builder
      */
     public function getMacro($name)
     {
-        return array_get($this->macros, $name);
+        return Arr::get($this->macros, $name);
     }
 
     /**

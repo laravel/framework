@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
@@ -266,7 +267,7 @@ class ControllerDispatcher
      */
     protected function filterFailsOn($filter, $request, $method)
     {
-        $on = array_get($filter, 'options.on');
+        $on = Arr::get($filter, 'options.on');
 
         if (is_null($on)) {
             return false;

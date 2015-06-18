@@ -356,7 +356,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getGlobalScopes()
     {
-        return array_get(static::$globalScopes, get_class($this), []);
+        return Arr::get(static::$globalScopes, get_class($this), []);
     }
 
     /**
@@ -1477,7 +1477,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->syncOriginal();
 
-        if (array_get($options, 'touch', true)) {
+        if (Arr::get($options, 'touch', true)) {
             $this->touchOwners();
         }
     }
@@ -1504,7 +1504,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // First we need to create a fresh query instance and touch the creation and
             // update timestamp on the model which are maintained by us for developer
             // convenience. Then we will just continue saving the model instances.
-            if ($this->timestamps && array_get($options, 'timestamps', true)) {
+            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
                 $this->updateTimestamps();
             }
 
@@ -1539,7 +1539,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we'll need to create a fresh query instance and touch the creation and
         // update timestamps on this model, which are maintained by us for developer
         // convenience. After, we will just continue saving these model instances.
-        if ($this->timestamps && array_get($options, 'timestamps', true)) {
+        if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
             $this->updateTimestamps();
         }
 
@@ -2944,7 +2944,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getOriginal($key = null, $default = null)
     {
-        return array_get($this->original, $key, $default);
+        return Arr::get($this->original, $key, $default);
     }
 
     /**
