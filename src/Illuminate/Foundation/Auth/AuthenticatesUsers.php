@@ -27,9 +27,7 @@ trait AuthenticatesUsers
      */
     public function postLogin(Request $request)
     {
-        $this->validate($request, [
-            'email' => 'required|email', 'password' => 'required',
-        ]);
+        $this->validate($request, $this->getValidationRules());
 
         $credentials = $this->getCredentials($request);
 
@@ -38,9 +36,9 @@ trait AuthenticatesUsers
         }
 
         return redirect($this->loginPath())
-            ->withInput($request->only('email', 'remember'))
+            ->withInput($request->except($this->getHiddenCredentials()))
             ->withErrors([
-                'email' => $this->getFailedLoginMessage(),
+                'login' => $this->getFailedLoginMessage(),
             ]);
     }
 
@@ -53,6 +51,31 @@ trait AuthenticatesUsers
     protected function getCredentials(Request $request)
     {
         return $request->only('email', 'password');
+    }
+
+    /**
+     * Get the validation rules for the request.
+     * 
+     * @return array
+     */
+    protected function getValidationRules()
+    {
+        return [
+            'email' => 'required|email',
+            'password'  =>  'required'
+        ];
+    }
+
+    /**
+     * Get the credentials that must not be sent back to input form.
+     * 
+     * @return array
+     */
+    protected function getHiddenCredentials()
+    {
+        return [
+            'password'
+        ];
     }
 
     /**
