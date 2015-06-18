@@ -258,9 +258,11 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     protected function isEmptyString($key)
     {
-        $boolOrArray = is_bool($this->input($key)) || is_array($this->input($key));
+        $value = $this->input($key);
 
-        return !$boolOrArray && trim((string) $this->input($key)) === '';
+        $boolOrArray = is_bool($value) || is_array($value);
+
+        return !$boolOrArray && trim((string) $value) === '';
     }
 
     /**
