@@ -94,7 +94,7 @@ class Collection extends BaseCollection
      */
     public function fetch($key)
     {
-        return new static(array_fetch($this->toArray(), $key));
+        return new static(Arr::fetch($this->toArray(), $key));
     }
 
     /**
@@ -189,7 +189,7 @@ class Collection extends BaseCollection
      */
     public function only($keys)
     {
-        $dictionary = array_only($this->getDictionary(), $keys);
+        $dictionary = Arr::only($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }

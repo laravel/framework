@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -564,7 +565,7 @@ class BelongsToMany extends Relation
     public function saveMany(array $models, array $joinings = [])
     {
         foreach ($models as $key => $model) {
-            $this->save($model, (array) array_get($joinings, $key), false);
+            $this->save($model, (array) Arr::get($joinings, $key), false);
         }
 
         $this->touchIfTouching();
@@ -712,7 +713,7 @@ class BelongsToMany extends Relation
         $instances = [];
 
         foreach ($records as $key => $record) {
-            $instances[] = $this->create($record, (array) array_get($joinings, $key), false);
+            $instances[] = $this->create($record, (array) Arr::get($joinings, $key), false);
         }
 
         $this->touchIfTouching();
