@@ -1643,7 +1643,7 @@ class Builder
         $previousColumns = $this->columns;
         $previousSelectBindings = $this->bindings['select'];
         $this->bindings['select'] = [];
-        
+
         $results = $this->get($columns);
 
         // Once we have executed the query, we will reset the aggregate property so

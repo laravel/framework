@@ -803,6 +803,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->from('users')->selectSub(function($query) { $query->from('posts')->select('foo')->where('title', 'foo'); }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
+        $this->assertEquals(['foo'], $builder->getBindings());
     }
 
     public function testInsertMethod()
