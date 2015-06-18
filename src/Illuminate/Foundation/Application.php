@@ -111,6 +111,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $storagePath;
 
     /**
+     * The custom environment path defined by the developer.
+     *
+     * @var string
+     */
+    protected $environmentPath;
+
+    /**
      * The environment file to load during bootstrapping.
      *
      * @var string
@@ -370,6 +377,29 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->storagePath = $path;
 
         $this->instance('path.storage', $path);
+
+        return $this;
+    }
+
+    /**
+     * Get the path to the environment file directory.
+     *
+     * @return string
+     */
+    public function environmentPath()
+    {
+        return $this->environmentPath ?: $this->basePath;
+    }
+
+    /**
+     * Set the directory for the environment file.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useEnvironmentPath($path)
+    {
+        $this->environmentPath = $path;
 
         return $this;
     }
