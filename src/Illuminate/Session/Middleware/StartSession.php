@@ -10,15 +10,25 @@ use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Middleware\PassThroughTrait;
 
 class StartSession
 {
+    use PassThroughTrait;
+
     /**
      * The session manager.
      *
      * @var \Illuminate\Session\SessionManager
      */
     protected $manager;
+
+    /**
+     * The URIs that should be excluded from start session.
+     *
+     * @var array
+     */
+    protected $except = [];
 
     /**
      * Indicates if the session was handled for the current request.

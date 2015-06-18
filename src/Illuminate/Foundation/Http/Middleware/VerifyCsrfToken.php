@@ -7,9 +7,12 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Http\Middleware\PassThroughTrait;
 
 class VerifyCsrfToken
 {
+    use PassThroughTrait;
+
     /**
      * The encrypter implementation.
      *
@@ -51,23 +54,6 @@ class VerifyCsrfToken
         }
 
         throw new TokenMismatchException;
-    }
-
-    /**
-     * Determine if the request has a URI that should pass through CSRF verification.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    protected function shouldPassThrough($request)
-    {
-        foreach ($this->except as $except) {
-            if ($request->is($except)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
