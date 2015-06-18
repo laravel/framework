@@ -401,8 +401,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->environmentPath = $path;
 
-        $this->instance('path.environment', $path);
-
         return $this;
     }
 
