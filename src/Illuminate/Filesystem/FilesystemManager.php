@@ -5,6 +5,7 @@ namespace Illuminate\Filesystem;
 use Closure;
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
+use Illuminate\Support\Arr;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
@@ -135,7 +136,7 @@ class FilesystemManager implements FactoryContract
      */
     public function createFtpDriver(array $config)
     {
-        $ftpConfig = array_only($config, ['host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout']);
+        $ftpConfig = Arr::only($config, ['host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout']);
 
         return $this->adapt(new Flysystem(new FtpAdapter($ftpConfig)));
     }
@@ -149,7 +150,7 @@ class FilesystemManager implements FactoryContract
     public function createS3Driver(array $config)
     {
         $config += [
-            'credentials' => array_only($config, ['key', 'secret']),
+            'credentials' => Arr::only($config, ['key', 'secret']),
             'version'     => 'latest',
         ];
 
@@ -186,7 +187,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function getRackspaceContainer(Rackspace $client, array $config)
     {
-        $urlType = array_get($config, 'url_type');
+        $urlType = Arr::get($config, 'url_type');
 
         $store = $client->objectStoreService('cloudFiles', $config['region'], $urlType);
 

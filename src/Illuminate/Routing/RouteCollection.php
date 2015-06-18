@@ -228,7 +228,7 @@ class RouteCollection implements Countable, IteratorAggregate
             return $this->getRoutes();
         }
 
-        return array_get($this->routes, $method, []);
+        return Arr::get($this->routes, $method, []);
     }
 
     /**
