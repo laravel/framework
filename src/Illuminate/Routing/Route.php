@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Http\Request;
+use UnexpectedValueException;
 use Illuminate\Container\Container;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
@@ -489,6 +490,8 @@ class Route
      *
      * @param  callable|array  $action
      * @return array
+     *
+     * @throws \UnexpectedValueException
      */
     protected function parseAction($action)
     {
@@ -504,6 +507,12 @@ class Route
         // across into the "uses" property that will get fired off by this route.
         elseif (!isset($action['uses'])) {
             $action['uses'] = $this->findCallable($action);
+        }
+
+        if (is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
+            throw new UnexpectedValueException(sprintf(
+                'Invalid route action: [%s]', $action['uses']
+            ));
         }
 
         return $action;
@@ -607,7 +616,9 @@ class Route
      */
     public function prefix($prefix)
     {
-        $this->uri = trim($prefix, '/').'/'.trim($this->uri, '/');
+        $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
+
+        $this->uri = trim($uri, '/');
 
         return $this;
     }

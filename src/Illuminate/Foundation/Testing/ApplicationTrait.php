@@ -37,8 +37,8 @@ trait ApplicationTrait
      * Register an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  mixed  $instance
-     * @return $this
+     * @param  object  $instance
+     * @return object
      */
     protected function instance($abstract, $instance)
     {
@@ -119,7 +119,7 @@ trait ApplicationTrait
      * Set the session to the given array.
      *
      * @param  array  $data
-     * @return void
+     * @return $this
      */
     public function withSession(array $data)
     {
@@ -172,7 +172,7 @@ trait ApplicationTrait
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $driver
-     * @return void
+     * @return $this
      */
     public function actingAs(UserContract $user, $driver = null)
     {

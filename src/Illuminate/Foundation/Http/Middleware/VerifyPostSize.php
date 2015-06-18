@@ -3,10 +3,9 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Http\Exception\PostTooLargeException;
 
-class VerifyPostSize implements Middleware
+class VerifyPostSize
 {
     /**
      * Handle an incoming request.

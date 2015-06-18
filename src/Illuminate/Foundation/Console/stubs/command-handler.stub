@@ -2,6 +2,9 @@
 
 namespace DummyNamespace;
 
+use DummyFullCommand;
+use Illuminate\Queue\InteractsWithQueue;
+
 class DummyClass
 {
     /**

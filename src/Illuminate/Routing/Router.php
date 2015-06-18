@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -382,7 +384,11 @@ class Router implements RegistrarContract
             isset($new['where']) ? $new['where'] : []
         );
 
-        return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where']), $new);
+        if (isset($old['as']) && isset($new['as'])) {
+            $new['as'] = $old['as'].$new['as'];
+        }
+
+        return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where', 'as']), $new);
     }
 
     /**
@@ -872,7 +878,9 @@ class Router implements RegistrarContract
      */
     public function prepareResponse($request, $response)
     {
-        if (!$response instanceof SymfonyResponse) {
+        if ($response instanceof PsrResponseInterface) {
+            $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif (!$response instanceof SymfonyResponse) {
             $response = new Response($response);
         }
 

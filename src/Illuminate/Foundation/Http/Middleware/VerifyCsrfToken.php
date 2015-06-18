@@ -4,12 +4,11 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
 
-class VerifyCsrfToken implements Middleware
+class VerifyCsrfToken
 {
     /**
      * The encrypter implementation.
@@ -97,8 +96,13 @@ class VerifyCsrfToken implements Middleware
      */
     protected function addCookieToResponse($request, $response)
     {
+        $config = config('session');
+
         $response->headers->setCookie(
-            new Cookie('XSRF-TOKEN', $request->session()->token(), time() + 60 * 120, '/', null, false, false)
+            new Cookie(
+                'XSRF-TOKEN', $request->session()->token(), time() + 60 * 120,
+                $config['path'], $config['domain'], false, false
+            )
         );
 
         return $response;

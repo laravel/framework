@@ -10,9 +10,8 @@ use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Routing\TerminableMiddleware;
 
-class StartSession implements TerminableMiddleware
+class StartSession
 {
     /**
      * The session manager.

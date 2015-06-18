@@ -4,13 +4,12 @@ namespace Illuminate\Cookie\Middleware;
 
 use Closure;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class EncryptCookies implements Middleware
+class EncryptCookies
 {
     /**
      * The encrypter instance.
@@ -18,6 +17,13 @@ class EncryptCookies implements Middleware
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
     protected $encrypter;
+
+    /**
+     * The names of the cookies that should not be encrypted.
+     *
+     * @var array
+     */
+    protected $except = [];
 
     /**
      * Create a new CookieGuard instance.
@@ -28,6 +34,17 @@ class EncryptCookies implements Middleware
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
+    }
+
+    /**
+     * Disable encryption for the given cookie name(s).
+     *
+     * @param string|array $cookieName
+     * @return void
+     */
+    public function disableFor($cookieName)
+    {
+        $this->except = array_merge($this->except, (array) $cookieName);
     }
 
     /**
@@ -51,6 +68,10 @@ class EncryptCookies implements Middleware
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $c) {
+            if ($this->isDisabled($key)) {
+                continue;
+            }
+
             try {
                 $request->cookies->set($key, $this->decryptCookie($c));
             } catch (DecryptException $e) {
@@ -100,6 +121,10 @@ class EncryptCookies implements Middleware
     protected function encrypt(Response $response)
     {
         foreach ($response->headers->getCookies() as $key => $cookie) {
+            if ($this->isDisabled($key)) {
+                continue;
+            }
+
             $response->headers->setCookie($this->duplicate(
                 $cookie, $this->encrypter->encrypt($cookie->getValue())
             ));
@@ -121,5 +146,16 @@ class EncryptCookies implements Middleware
             $c->getName(), $value, $c->getExpiresTime(), $c->getPath(),
             $c->getDomain(), $c->isSecure(), $c->isHttpOnly()
         );
+    }
+
+    /**
+     * Determine whether encryption has been disabled for the given cookie.
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function isDisabled($name)
+    {
+        return in_array($name, $this->except);
     }
 }

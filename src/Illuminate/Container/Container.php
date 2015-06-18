@@ -9,6 +9,7 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 use InvalidArgumentException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container implements ArrayAccess, ContainerContract
@@ -707,7 +708,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  array   $parameters
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function build($concrete, array $parameters = [])
     {
@@ -795,7 +796,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionParameter  $parameter
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolveNonClass(ReflectionParameter $parameter)
     {
@@ -814,7 +815,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionParameter  $parameter
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolveClass(ReflectionParameter $parameter)
     {

@@ -420,38 +420,91 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRouteGroupingWithAs()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->get('bar', ['as' => 'bar', function () { return 'hello'; }]);
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::bar');
+        $this->assertEquals('foo/bar', $route->getPath());
+    }
+
+    public function testRoutePrefixing()
+    {
+        /**
+         * Prefix route
+         */
+        $router = $this->getRouter();
+        $router->get('foo/bar', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('prefix');
+        $this->assertEquals('prefix/foo/bar', $routes[0]->uri());
+
+        /**
+         * Use empty prefix
+         */
+        $router = $this->getRouter();
+        $router->get('foo/bar', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('/');
+        $this->assertEquals('foo/bar', $routes[0]->uri());
+
+        /**
+         * Prefix homepage
+         */
+        $router = $this->getRouter();
+        $router->get('/', function() { return 'hello'; });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('prefix');
+        $this->assertEquals('prefix', $routes[0]->uri());
+    }
+
     public function testMergingControllerUses()
     {
         $router = $this->getRouter();
         $router->group(['namespace' => 'Namespace'], function () use ($router) {
-            $router->get('foo/bar', 'Controller');
+            $router->get('foo/bar', 'Controller@action');
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Controller@action', $action['controller']);
 
         $router = $this->getRouter();
         $router->group(['namespace' => 'Namespace'], function () use ($router) {
             $router->group(['namespace' => 'Nested'], function () use ($router) {
-                $router->get('foo/bar', 'Controller');
+                $router->get('foo/bar', 'Controller@action');
             });
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Nested\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Nested\\Controller@action', $action['controller']);
 
         $router = $this->getRouter();
         $router->group(['prefix' => 'baz'], function () use ($router) {
             $router->group(['namespace' => 'Namespace'], function () use ($router) {
-                $router->get('foo/bar', 'Controller');
+                $router->get('foo/bar', 'Controller@action');
             });
         });
         $routes = $router->getRoutes()->getRoutes();
         $action = $routes[0]->getAction();
 
-        $this->assertEquals('Namespace\\Controller', $action['controller']);
+        $this->assertEquals('Namespace\\Controller@action', $action['controller']);
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testInvalidActionException()
+    {
+        $router = $this->getRouter();
+        $router->get('/', ['uses' => 'Controller']);
     }
 
     public function testResourceRouting()

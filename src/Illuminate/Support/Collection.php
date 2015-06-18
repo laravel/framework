@@ -116,12 +116,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Run a filter over each of the items.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback)
+    public function filter(callable $callback = null)
     {
-        return new static(array_filter($this->items, $callback));
+        if ($callback) {
+           return new static(array_filter($this->items, $callback));
+        }
+
+        return new static(array_filter($this->items));
     }
 
     /**
@@ -389,6 +393,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function max($key = null)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            $value = data_get($item, $key);
+
+            return is_null($result) || $value > $result ? $value : $result;
+        });
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  mixed  $items
@@ -397,6 +416,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function merge($items)
     {
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Get the min value of a given key.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function min($key = null)
+    {
+        return $this->reduce(function ($result, $item) use ($key) {
+            $value = data_get($item, $key);
+
+            return is_null($result) || $value < $result ? $value : $result;
+        });
     }
 
     /**
@@ -578,7 +612,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $items = $this->items;
 
-        array_shuffle($items);
+        shuffle($items);
 
         return new static($items);
     }

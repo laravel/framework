@@ -23,6 +23,9 @@ class Inspiring
             'Smile, breathe, and go slowly. - Thich Nhat Hanh',
             'Simplicity is an acquired taste. - Katharine Gerould',
             'Well begun is half done. - Aristotle',
+            'He who is contented is rich. - Laozi',
+            'Very little is needed to make a happy life. - Marcus Antoninus',
+
 
         ])->random();
     }

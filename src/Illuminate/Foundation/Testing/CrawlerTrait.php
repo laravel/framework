@@ -137,13 +137,13 @@ trait CrawlerTrait
     {
         $uri = $this->prepareUrlForRequest($uri);
 
-        $response = $this->call($method, $uri, $parameters, $cookies, $files);
+        $this->call($method, $uri, $parameters, $cookies, $files);
 
         $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
 
         $this->currentUri = $this->app->make('request')->fullUrl();
 
-        $this->crawler = new Crawler($response->getContent(), $uri);
+        $this->crawler = new Crawler($this->response->getContent(), $uri);
 
         return $this;
     }
@@ -157,8 +157,21 @@ trait CrawlerTrait
     protected function makeRequestUsingForm(Form $form)
     {
         return $this->makeRequest(
-            $form->getMethod(), $form->getUri(), $form->getValues(), [], $form->getFiles()
+            $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $form->getFiles()
         );
+    }
+
+    /**
+     * Extract the parameters from the given form.
+     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @return array
+     */
+    protected function extractParametersFromForm(Form $form)
+    {
+        parse_str(http_build_query($form->getValues()), $parameters);
+
+        return $parameters;
     }
 
     /**
@@ -565,7 +578,7 @@ trait CrawlerTrait
     {
         $name = str_replace('#', '', $name);
 
-        return $this->crawler->filter("{$element}#{$name}, {$element}[name={$name}]");
+        return $this->crawler->filter("{$element}#{$name}, {$element}[name='{$name}']");
     }
 
     /**
@@ -680,5 +693,23 @@ trait CrawlerTrait
         $this->app->instance('middleware.disable', true);
 
         return $this;
+    }
+
+    /**
+     * Dump the content from the last response.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        $content = $this->response->getContent();
+
+        $json = json_decode($content);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $content = $json;
+        }
+
+        dd($content);
     }
 }

@@ -4,9 +4,8 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Routing\Middleware;
 
-class AuthenticateWithBasicAuth implements Middleware
+class AuthenticateWithBasicAuth
 {
     /**
      * The guard instance.

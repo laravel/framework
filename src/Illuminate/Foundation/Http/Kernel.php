@@ -8,7 +8,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\TerminableMiddleware;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 
 class Kernel implements KernelContract
@@ -110,8 +109,6 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
-        $this->verifySessionConfigurationIsValid();
-
         $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
                                 $this->app->make('middleware.disable') === true;
 
@@ -137,7 +134,7 @@ class Kernel implements KernelContract
 
             $instance = $this->app->make($name);
 
-            if ($instance instanceof TerminableMiddleware) {
+            if (method_exists($instance, 'terminate')) {
                 $instance->terminate($request, $response);
             }
         }
@@ -252,19 +249,6 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
-    }
-
-    /**
-     * Verify that the session configuration is valid.
-     *
-     * @return void
-     */
-    protected function verifySessionConfigurationIsValid()
-    {
-        if ($this->app['config']['session.driver'] === 'cookie' &&
-            !$this->hasMiddleware('Illuminate\Cookie\Middleware\EncryptCookies')) {
-            throw new RuntimeException('Cookie encryption must be enabled to use cookie sessions.');
-        }
     }
 
     /**

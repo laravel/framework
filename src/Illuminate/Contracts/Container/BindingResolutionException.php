@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Container;
+namespace Illuminate\Contracts\Container;
 
 use Exception;
 
