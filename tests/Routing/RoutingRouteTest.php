@@ -852,7 +852,7 @@ return 'foo!'; });
             $_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'],
             $_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
             $_SERVER['route.test.controller.middleware.class'],
-            $_SERVER['route.test.controller.middleware.parameters']
+            $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
         );
         $router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
 
@@ -875,7 +875,8 @@ return 'foo!'; });
         $this->assertTrue($_SERVER['route.test.controller.after.filter']);
         $this->assertTrue($_SERVER['route.test.controller.middleware']);
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
-        $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters']);
+        $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
+        $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
 
@@ -897,7 +898,8 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     public function __construct()
     {
         $this->middleware('RouteTestControllerMiddleware');
-        $this->middleware('RouteTestControllerParameterizedMiddleware:foo,bar');
+        $this->middleware('RouteTestControllerParameterizedMiddlewareOne:0');
+        $this->middleware('RouteTestControllerParameterizedMiddlewareTwo:foo,bar');
         $this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
         $this->beforeFilter('route.test.controller.before.filter');
         $this->afterFilter('route.test.controller.after.filter');
@@ -920,11 +922,21 @@ class RouteTestControllerMiddleware
     }
 }
 
-class RouteTestControllerParameterizedMiddleware
+class RouteTestControllerParameterizedMiddlewareOne
+{
+    public function handle($request, $next, $parameter)
+    {
+        $_SERVER['route.test.controller.middleware.parameters.one'] = $parameter;
+
+        return $next($request);
+    }
+}
+
+class RouteTestControllerParameterizedMiddlewareTwo
 {
     public function handle($request, $next, $parameter1, $parameter2)
     {
-        $_SERVER['route.test.controller.middleware.parameters'] = [$parameter1, $parameter2];
+        $_SERVER['route.test.controller.middleware.parameters.two'] = [$parameter1, $parameter2];
 
         return $next($request);
     }
