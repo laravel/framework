@@ -8,6 +8,7 @@ use Countable;
 use Exception;
 use DateTimeZone;
 use RuntimeException;
+use Illuminate\Support\Arr;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Support\Fluent;
@@ -258,7 +259,7 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = array_get($this->data, $attribute);
+        $data = Arr::get($this->data, $attribute);
 
         if (!is_array($data)) {
             if ($this->hasRule($attribute, 'Array')) {
@@ -398,9 +399,9 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
-        if (!is_null($value = array_get($this->data, $attribute))) {
+        if (!is_null($value = Arr::get($this->data, $attribute))) {
             return $value;
-        } elseif (!is_null($value = array_get($this->files, $attribute))) {
+        } elseif (!is_null($value = Arr::get($this->files, $attribute))) {
             return $value;
         }
     }
@@ -442,7 +443,7 @@ class Validator implements ValidatorContract
     protected function passesOptionalCheck($attribute)
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
-            return array_key_exists($attribute, array_dot($this->data))
+            return array_key_exists($attribute, Arr::dot($this->data))
                 || in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
         }
@@ -672,7 +673,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
-        $data = array_get($this->data, $parameters[0]);
+        $data = Arr::get($this->data, $parameters[0]);
 
         $values = array_slice($parameters, 1);
 
@@ -694,7 +695,7 @@ class Validator implements ValidatorContract
         $count = 0;
 
         foreach ($attributes as $key) {
-            if (array_get($this->data, $key) || array_get($this->files, $key)) {
+            if (Arr::get($this->data, $key) || Arr::get($this->files, $key)) {
                 $count++;
             }
         }
@@ -726,7 +727,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'same');
 
-        $other = array_get($this->data, $parameters[0]);
+        $other = Arr::get($this->data, $parameters[0]);
 
         return isset($other) && $value == $other;
     }
@@ -743,7 +744,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'different');
 
-        $other = array_get($this->data, $parameters[0]);
+        $other = Arr::get($this->data, $parameters[0]);
 
         return isset($other) && $value != $other;
     }
@@ -942,7 +943,7 @@ class Validator implements ValidatorContract
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return array_get($this->data, $attribute);
+            return Arr::get($this->data, $attribute);
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -1905,7 +1906,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], array_get($this->data, $parameters[0]));
+        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
 
         $parameters[0] = $this->getAttribute($parameters[0]);
 
@@ -2045,7 +2046,7 @@ class Validator implements ValidatorContract
      */
     protected function parseArrayRule(array $rules)
     {
-        return [studly_case(trim(array_get($rules, 0))), array_slice($rules, 1)];
+        return [studly_case(trim(Arr::get($rules, 0))), array_slice($rules, 1)];
     }
 
     /**

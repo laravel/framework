@@ -4,6 +4,7 @@ namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
@@ -177,7 +178,7 @@ class StartSession
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], array_get($config, 'secure', false)
+                $config['path'], $config['domain'], Arr::get($config, 'secure', false)
             ));
         }
     }
@@ -189,7 +190,7 @@ class StartSession
      */
     protected function getSessionLifetimeInSeconds()
     {
-        return array_get($this->manager->getSessionConfig(), 'lifetime') * 60;
+        return Arr::get($this->manager->getSessionConfig(), 'lifetime') * 60;
     }
 
     /**
@@ -211,7 +212,7 @@ class StartSession
      */
     protected function sessionConfigured()
     {
-        return !is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+        return !is_null(Arr::get($this->manager->getSessionConfig(), 'driver'));
     }
 
     /**

@@ -824,7 +824,7 @@ class Factory implements FactoryContract
      */
     public function shared($key, $default = null)
     {
-        return array_get($this->shared, $key, $default);
+        return Arr::get($this->shared, $key, $default);
     }
 
     /**
