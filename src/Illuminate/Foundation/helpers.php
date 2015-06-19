@@ -278,6 +278,29 @@ if (!function_exists('factory')) {
     }
 }
 
+if (!function_exists('attributes')) {
+    /**
+     * Get an array of attributes using a model factory builder for a given class, name, and attributes.
+     *
+     * @param  dynamic  class|class,name|class,attributes|class,name,attributes
+     * @return array
+     */
+    function attributes()
+    {
+        $factory = app('Illuminate\Database\Eloquent\Factory');
+
+        $arguments = func_get_args();
+
+        if (isset($arguments[1]) && is_string($arguments[1])) {
+            return $factory->raw($arguments[0], [], $arguments[1]);
+        } elseif (isset($arguments[1]) && is_array($arguments[1])) {
+            return $factory->raw($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : 'default');
+        } else {
+            return $factory->raw($arguments[0]);
+        }
+    }
+}
+
 if (!function_exists('get')) {
     /**
      * Register a new GET route with the router.
