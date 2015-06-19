@@ -588,13 +588,26 @@ class Request extends SymfonyRequest implements ArrayAccess
         return false;
     }
 
+    /**
+     * Determine if the request is of the specified content type.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isType($type)
+    {
+        return $this->matchesType($type, $this->header('CONTENT_TYPE'));
+    }
+
+    /**
      * Determine if the request is sending JSON.
      *
      * @return bool
      */
     public function isJson()
     {
-        return str_contains($this->header('CONTENT_TYPE'), '/json');
+        return $this->isType('application/json');
     }
 
     /**
