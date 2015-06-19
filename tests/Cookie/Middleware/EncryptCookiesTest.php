@@ -3,16 +3,20 @@
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Cookie\CookieJar;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class EncryptCookiesTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var Illuminate\Routing\Router
+     * @var Router
      */
     protected $router;
 
@@ -24,11 +28,11 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
         parent::setUp();
 
         $container = new Container;
-        $container->singleton('Illuminate\Contracts\Encryption\Encrypter', function () {
+        $container->singleton(EncrypterContract::class, function () {
             return new Encrypter(str_repeat('a', 16));
         });
 
-        $this->router = new Router(new Illuminate\Events\Dispatcher, $container);
+        $this->router = new Router(new Dispatcher, $container);
     }
 
     public function testSetCookieEncryption()
@@ -66,7 +70,7 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class EncryptCookiesTestController extends Illuminate\Routing\Controller
+class EncryptCookiesTestController extends Controller
 {
     public function setCookies()
     {
@@ -94,7 +98,7 @@ class AddQueuedCookiesToResponseTestMiddleware extends AddQueuedCookiesToRespons
 {
     public function __construct()
     {
-        $cookie = new Illuminate\Cookie\CookieJar;
+        $cookie = new CookieJar;
         $cookie->queue(new Cookie('encrypted_cookie', 'value'));
         $cookie->queue(new Cookie('unencrypted_cookie', 'value'));
 
