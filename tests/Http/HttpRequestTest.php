@@ -315,8 +315,6 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     {
         $payload = ['name' => 'taylor'];
         $content = json_encode($payload);
-        // The built in PHP 5.4 webserver incorrectly provides HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH,
-        // rather than CONTENT_TYPE and CONTENT_LENGTH
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)], $content);
         $this->assertTrue($request->isJson());
         $data = $request->json()->all();
@@ -324,6 +322,37 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $data = $request->all();
         $this->assertEquals($payload, $data);
+    }
+
+    public function testIsJson()
+    {
+        // true because application/json is strictly correctly
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'])->isJson());
+
+        // false because application/jsonn isn't anything
+        $this->assertFalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/jsonn'])->isJson());
+
+        // true because application/foo+json is still json, just specifically formatted
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/foo+json'])->isJson());
+
+        // false because text/json is not json
+        $this->assertFalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'text/json'])->isJson());
+
+        // false because application/* isn't a valid content type
+        $this->assertfalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/*'])->isJson());
+
+        // make sure we work with other info in the header
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json; charset=utf-8'])->isJson());
+
+        // make sure we still reject this with other info in the header
+        $this->assertFalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/xml; charset=utf-8'])->isJson());
+    }
+
+    public function testIsType()
+    {
+        $this->assertfalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'])->isType('application/foo+json'));
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'text/plain'])->isType('text/plain'));
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'text/plain'])->isType('text/*'));
     }
 
     public function testAllInputReturnsInputAndFiles()
@@ -399,6 +428,10 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('json', $request->format());
         $this->assertTrue($request->wantsJson());
 
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8']);
+        $this->assertEquals('json', $request->format());
+        $this->assertTrue($request->wantsJson());
+
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/atom+xml']);
         $this->assertEquals('atom', $request->format());
         $this->assertFalse($request->wantsJson());
@@ -449,6 +482,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->accepts('application/baz+xml'));
         $this->assertTrue($request->acceptsHtml());
         $this->assertTrue($request->acceptsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*']);
+        $this->assertEquals('html', $request->format());
+        $this->assertTrue($request->accepts('text/html'));
+        $this->assertTrue($request->accepts('foo/bar'));
+        $this->assertTrue($request->accepts('application/baz+xml'));
+        $this->assertTrue($request->acceptsHtml());
+        $this->assertTrue($request->acceptsJson());
     }
 
     public function testFormatReturnsAcceptsMultiple()
@@ -457,6 +498,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->accepts(['text/html', 'application/json']));
         $this->assertTrue($request->accepts('text/html'));
         $this->assertTrue($request->accepts('text/foo'));
+        $this->assertTrue($request->accepts('application/json'));
+        $this->assertTrue($request->accepts('application/baz+json'));
+    }
+
+    public function testFormatReturnsAcceptsCharset()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+        $this->assertFalse($request->accepts('text/html'));
+        $this->assertFalse($request->accepts('text/foo'));
         $this->assertTrue($request->accepts('application/json'));
         $this->assertTrue($request->accepts('application/baz+json'));
     }
