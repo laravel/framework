@@ -4,6 +4,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
+use Illuminate\Contracts\Support\Htmlable;
 
 if (!function_exists('append_config')) {
     /**
@@ -431,7 +432,7 @@ if (!function_exists('e')) {
      */
     function e($value)
     {
-        if ($value instanceof Illuminate\Contracts\Support\Htmlable) {
+        if ($value instanceof Htmlable) {
             return $value->toHtml();
         }
 
