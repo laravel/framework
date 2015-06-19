@@ -597,7 +597,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function isType($type)
     {
-        return $this->matchesType($type, $this->header('CONTENT_TYPE'));
+        return $this->matchesType($type, strtok($this->header('CONTENT_TYPE'), ';'));
     }
 
     /**
@@ -619,7 +619,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && $acceptable[0] == 'application/json';
+        return isset($acceptable[0]) && strtok($acceptable[0], ';') === 'application/json';
     }
 
     /**
