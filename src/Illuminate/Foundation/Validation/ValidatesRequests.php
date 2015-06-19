@@ -54,7 +54,7 @@ trait ValidatesRequests
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
     {
-        if ($request->ajax() || $request->wantsJson()) {
+        if ($request->ajax()) {
             return new JsonResponse($errors, 422);
         }
 

@@ -569,11 +569,13 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function isJson()
     {
-        return str_contains($this->header('CONTENT_TYPE'), '/json');
+        return $this->header('CONTENT_TYPE') === 'application/json';
     }
 
     /**
      * Determine if the current request is asking for JSON in return.
+     *
+     * @deprecated since version 5.2. Use acceptsJson().
      *
      * @return bool
      */
