@@ -283,7 +283,7 @@ if (!function_exists('attributes')) {
      * Get an array of attributes using a model factory builder for a given class, name, and attributes.
      *
      * @param  dynamic  class|class,name|class,attributes|class,name,attributes
-     * @return \Illuminate\Database\Eloquent\FactoryBuilder
+     * @return array
      */
     function attributes()
     {
