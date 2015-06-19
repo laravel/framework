@@ -30,11 +30,12 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
 
         $this->router = new Router(new Illuminate\Events\Dispatcher, $container);
     }
+
     public function testSetCookieEncryption()
     {
         $this->router->get($this->setCookiePath, [
             'middleware' => 'EncryptCookiesTestMiddleware',
-            'uses'=>'EncryptCookiesTestController@setCookies'
+            'uses' => 'EncryptCookiesTestController@setCookies'
         ]);
 
         $response = $this->router->dispatch(Request::create($this->setCookiePath, 'GET'));
@@ -46,11 +47,12 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('unencrypted_cookie', $cookies[1]->getName());
         $this->assertEquals('value', $cookies[1]->getValue());
     }
+
     public function testQueuedCookieEncryption()
     {
         $this->router->get($this->queueCookiePath, [
             'middleware' => ['EncryptCookiesTestMiddleware', 'AddQueuedCookiesToResponseTestMiddleware'],
-            'uses'=>'EncryptCookiesTestController@queueCookies'
+            'uses' => 'EncryptCookiesTestController@queueCookies'
         ]);
 
         $response = $this->router->dispatch(Request::create($this->queueCookiePath, 'GET'));
@@ -74,6 +76,7 @@ class EncryptCookiesTestController extends Illuminate\Routing\Controller
 
         return $response;
     }
+
     public function queueCookies()
     {
         return new Response();
