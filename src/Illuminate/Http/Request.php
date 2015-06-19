@@ -566,6 +566,28 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Do the two content types match.
+     *
+     * If the first type is the same as the second type, or is a subset, then
+     * we're returning true, otherwise, false.
+     *
+     * @return bool
+     */
+    public function matchesType($actual, $type)
+    {
+        if ($actual === $type) {
+            return true;
+        }
+
+        $split = explode('/', $actual);
+
+        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+            return true;
+        }
+
+        return false;
+    }
+
      * Determine if the request is sending JSON.
      *
      * @return bool
@@ -609,13 +631,7 @@ class Request extends SymfonyRequest implements ArrayAccess
             }
 
             foreach ($types as $type) {
-                if ($accept === $type || $accept === strtok('/', $type).'/*') {
-                    return true;
-                }
-
-                $split = explode('/', $accept);
-
-                if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                if ($this->matchesType($accept, $type) || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
             }
