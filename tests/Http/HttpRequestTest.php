@@ -342,6 +342,13 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertfalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/*'])->isJson());
     }
 
+    public function testIsType()
+    {
+        $this->assertfalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'])->isType('application/foo+json'));
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'text/plain'])->isType('text/plain'));
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'text/plain'])->isType('text/*'));
+    }
+
     public function testAllInputReturnsInputAndFiles()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
