@@ -626,7 +626,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $types = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if ($accept === '*/*') {
+            if ($accept === '*/*' || $accept === '*') {
                 return true;
             }
 
