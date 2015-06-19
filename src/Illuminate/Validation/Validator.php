@@ -398,8 +398,7 @@ class Validator implements ValidatorContract
      */
     public function validated()
     {
-        $valid = $this->valid();
-        return array_intersect_key($valid, $this->rules);
+        return array_intersect_key($this->valid(), $this->rules);
     }
 
     /**
@@ -411,7 +410,7 @@ class Validator implements ValidatorContract
     {
         return array_diff_key($this->data, $this->rules);
     }
-    
+
     /**
      * Get the value of a given attribute.
      *

@@ -10,14 +10,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         m::close();
     }
-    
+
     public function testValidReturnsValidData()
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => 'notEmpty','bar' => 'notNumeric','baz' => 'extra'], ['foo' => 'required|alpha', 'bar' => 'numeric']);
         $this->assertEquals($v->valid(),['foo' => 'notEmpty','baz' => 'extra']);
     }
-    
+
     public function testInvalidReturnsInvalidData()
     {
         $trans = $this->getRealTranslator();
@@ -31,14 +31,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => 'notEmpty','bar' => 'notNumeric','baz' => 'extra'], ['foo' => 'required|alpha', 'bar' => 'numeric']);
         $this->assertEquals($v->validated(),['foo' => 'notEmpty']);
     }
-    
+
     public function testUnvalidatedReturnsUnvalidatedDataOnly()
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => 'notEmpty','bar' => 'notNumeric','baz' => 'extra'], ['foo' => 'required|alpha', 'bar' => 'numeric']);
         $this->assertEquals($v->unvalidated(),['baz' => 'extra']);
     }
-    
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getRealTranslator();
