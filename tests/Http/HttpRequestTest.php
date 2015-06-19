@@ -340,6 +340,12 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         // false because application/* isn't a valid content type
         $this->assertfalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/*'])->isJson());
+
+        // make sure we work with other info in the header
+        $this->assertTrue(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json; charset=utf-8'])->isJson());
+
+        // make sure we still reject this with other info in the header
+        $this->assertFalse(Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/xml; charset=utf-8'])->isJson());
     }
 
     public function testIsType()
@@ -422,6 +428,10 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('json', $request->format());
         $this->assertTrue($request->wantsJson());
 
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8']);
+        $this->assertEquals('json', $request->format());
+        $this->assertTrue($request->wantsJson());
+
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/atom+xml']);
         $this->assertEquals('atom', $request->format());
         $this->assertFalse($request->wantsJson());
@@ -488,6 +498,16 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->accepts(['text/html', 'application/json']));
         $this->assertTrue($request->accepts('text/html'));
         $this->assertTrue($request->accepts('text/foo'));
+        $this->assertTrue($request->accepts('application/json'));
+        $this->assertTrue($request->accepts('application/baz+json'));
+    }
+
+    public function testFormatReturnsAcceptsCharset()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+        $this->assertFalse($request->accepts('text/html'));
+        $this->assertFalse($request->accepts('text/foo'));
         $this->assertTrue($request->accepts('application/json'));
         $this->assertTrue($request->accepts('application/baz+json'));
     }
