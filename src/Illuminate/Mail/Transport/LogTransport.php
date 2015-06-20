@@ -17,6 +17,13 @@ class LogTransport implements Swift_Transport
      */
     protected $logger;
 
+	/**
+	 * Plugins for transport
+	 *
+	 * @var array
+	 */
+	public $plugins = [];
+
     /**
      * Create a new log transport instance.
      *
@@ -82,6 +89,17 @@ class LogTransport implements Swift_Transport
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
-        //
+		array_push($this->plugins, $plugin);
     }
+
+	/**
+	 * @param $message
+	 */
+	protected function executePlugins(Swift_Mime_Message $message)
+	{
+		foreach ($this->plugins as $plugin) {
+			$evt = new \Swift_Events_SendEvent($this, $message);
+			$plugin->beforeSendPerformed($evt);
+		}
+	}
 }
