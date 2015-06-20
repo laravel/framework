@@ -1,0 +1,817 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a76d65c8-dad3-41f7-8be3-ae6dba083c21" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/LogTransport.php" afterPath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/LogTransport.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MailgunTransport.php" afterPath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MailgunTransport.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MandrillTransport.php" afterPath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MandrillTransport.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/SesTransport.php" afterPath="$PROJECT_DIR$/src/Illuminate/Mail/Transport/SesTransport.php" />
+    </list>
+    <ignored path="framework.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path=".idea/dataSources.local.xml" />
+    <ignored path=".idea/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="framework" />
+  </component>
+  <component name="FileEditorManager">
+    <splitter split-orientation="horizontal" split-proportion="0.1">
+      <split-first>
+        <leaf>
+          <file leaf-file-name="Mailer.php" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift/Mailer.php">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.5832258" vertical-offset="1108" max-vertical-offset="1896">
+                  <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="LogTransport.php" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Transport/LogTransport.php">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.78680205" vertical-offset="1348" max-vertical-offset="2136">
+                  <caret line="106" column="1" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
+                  <folding>
+                    <element signature="e#998#1195#0#PHP" expanded="true" />
+                    <element signature="e#1871#2083#0#PHP" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift/Transport.php" />
+        <option value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift/Mailer.php" />
+        <option value="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MandrillTransport.php" />
+        <option value="$PROJECT_DIR$/src/Illuminate/Mail/Transport/MailgunTransport.php" />
+        <option value="$PROJECT_DIR$/src/Illuminate/Mail/Transport/SesTransport.php" />
+        <option value="$PROJECT_DIR$/src/Illuminate/Mail/Transport/LogTransport.php" />
+      </list>
+    </option>
+  </component>
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1590" />
+    <option name="y" value="-8" />
+    <option name="width" value="1490" />
+    <option name="height" value="880" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vendor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Illuminate" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Illuminate" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Mail" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Illuminate" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Mail" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Transport" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="options.lastSelected" value="preferences.keymap" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Jeff\code\framework\src\Illuminate" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a76d65c8-dad3-41f7-8be3-ae6dba083c21" name="Default" comment="" />
+      <created>1434795646472</created>
+      <option name="number" value="Default" />
+      <updated>1434795646472</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1590" y="-8" width="1490" height="880" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32953104" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18113975" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift/Transport.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.48730963" vertical-offset="0" max-vertical-offset="1296">
+          <caret line="22" column="32" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
+          <folding>
+            <marker date="1434795733530" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Sends Messages via an abstract Transport subsystem. ..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Test if this Transport mechanism has started. ..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Start this Transport mechanism. ..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Stop this Transport mechanism. ..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Send the given Message. ..." />
+            <marker date="1434795733530" expanded="true" signature="-1:-1" placeholder=" Register a plugin in the Transport. ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/MailServiceProvider.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.4568528" vertical-offset="360" max-vertical-offset="1416">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Indicates if loading of the provider is deferred. ..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Register the service provider. ..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Set a few dependencies on the mailer instance. ..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Register the Swift Mailer instance. ..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Register the Swift Transport instance. ..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311534" expanded="true" signature="-1:-1" placeholder=" Get the services provided by the provider. ..." />
+            <marker date="1434793311534" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Message.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42131978" vertical-offset="3964" max-vertical-offset="4752">
+          <caret line="275" column="29" selection-start-line="275" selection-start-column="29" selection-end-line="275" selection-end-column="29" />
+          <folding>
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" The Swift Message instance. ..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Create a new message instance. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a &quot;from&quot; address to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Set the &quot;sender&quot; of the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Set the &quot;return path&quot; of the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a recipient to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a carbon copy to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a blind carbon copy to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a reply to address to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Add a recipient to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Set the subject of the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Set the message priority level. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Attach a file to the message. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Create a Swift Attachment instance. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Attach in-memory data as an attachment. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Create a Swift Attachment instance from data. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Embed a file in the message and get the CID. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Embed in-memory data in the message and get the CID. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Prepare and attach the given attachment. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Get the underlying Swift Message instance. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311547" expanded="true" signature="-1:-1" placeholder=" Dynamically pass missing methods to the Swift instance. ..." />
+            <marker date="1434793311547" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9390863" vertical-offset="4" max-vertical-offset="1080">
+          <caret line="31" column="9" selection-start-line="31" selection-start-column="9" selection-end-line="31" selection-end-column="9" />
+          <folding>
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;illuminate/mail&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;issues&quot;: &quot;https://github.com/laravel/framework/issues&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;Taylor Otwell&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;php&quot;: &quot;&gt;=5.5.9&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;Illuminate\\Mail\\&quot;: &quot;&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;dev-master&quot;: &quot;5.1-dev&quot;...}" />
+            <marker date="1434793311599" expanded="true" signature="-1:-1" placeholder="{&quot;aws/aws-sdk-php&quot;: &quot;Required to use the SES mail driver (~3.0).&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.18274112" vertical-offset="0" max-vertical-offset="788">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="888">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;swiftmailer/swiftmailer&quot;...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;Chris Corbyn&quot;...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;Fabien Potencier&quot;...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;php&quot;: &quot;&gt;=5.3.3&quot;...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;mockery/mockery&quot;: &quot;~0.9.1,&lt;0.9.4&quot;...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732910" expanded="true" signature="-1:-1" placeholder="{&quot;dev-master&quot;: &quot;5.4-dev&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.0219355" vertical-offset="0" max-vertical-offset="2856">
+          <caret line="33" column="39" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
+          <folding>
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;laravel/framework&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;issues&quot;: &quot;https://github.com/laravel/framework/issues&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;name&quot;: &quot;Taylor Otwell&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;php&quot;: &quot;&gt;=5.5.9&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;illuminate/auth&quot;: &quot;self.version&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;aws/aws-sdk-php&quot;: &quot;~3.0&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="[...]" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;Illuminate\\&quot;: &quot;src/Illuminate/&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;dev-master&quot;: &quot;5.1-dev&quot;...}" />
+            <marker date="1434795580343" expanded="true" signature="-1:-1" placeholder="{&quot;aws/aws-sdk-php&quot;: &quot;Required to use the SQS queue driver and SES mail driver (~3.0).&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift/Mailer.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5832258" vertical-offset="1108" max-vertical-offset="1896">
+          <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/swiftmailer/swiftmailer/lib/classes/Swift.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.27918783" vertical-offset="412" max-vertical-offset="1200">
+          <caret line="14" column="11" selection-start-line="14" selection-start-column="11" selection-end-line="14" selection-end-column="11" />
+          <folding>
+            <marker date="1434795732960" expanded="false" signature="-1:-1" placeholder="..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder=" General utility class in Swift Mailer, not to be instantiated. ..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder=" Registers an initializer callable that will be called the first time ..." />
+            <marker date="1434795732960" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder=" Internal autoloader for spl_autoload_register(). ..." />
+            <marker date="1434795732960" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder=" Configure autoloading using Swift Mailer. ..." />
+            <marker date="1434795732960" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795732960" expanded="true" signature="-1:-1" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Mailer.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="5.6510153" vertical-offset="3227" max-vertical-offset="8784">
+          <caret line="492" column="0" selection-start-line="492" selection-start-column="0" selection-end-line="492" selection-end-column="0" />
+          <folding>
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The view factory instance. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The Swift Mailer instance. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The event dispatcher instance. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The global from address and name. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The log writer instance. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The IoC container instance. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" The queue implementation. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Indicates if the actual sending is disabled. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Array of failed recipients. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Array of parsed views containing html and text view name. ..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Create a new Mailer instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the global from address and name. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the global to address and name. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Send a new message when only a raw text part. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Send a new message when only a plain part. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Send a new message using a view. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Queue a new e-mail message for sending. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Queue a new e-mail message for sending on the given queue. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Queue a new e-mail message for sending after (n) seconds. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Queue a new e-mail message for sending after (n) seconds on the given queue. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Build the callable for a queued e-mail job. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Handle a queued e-mail message job. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Get the true callable for a queued e-mail message. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Force the transport to re-connect. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Add the content to a given message. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Parse the given view name or array. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Send a Swift Message instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Log that a message was sent. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Call the provided message builder. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Create a new message instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Render the given view. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Tell the mailer to not really send messages. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Check if the mailer is pretending to send messages. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Get the view factory instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Get the Swift Mailer instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Get the array of failed recipients. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the Swift Mailer instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the log writer instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the queue manager instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434793311541" expanded="true" signature="-1:-1" placeholder=" Set the IoC container instance. ..." />
+            <marker date="1434793311541" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/Client.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.21319798" vertical-offset="432" max-vertical-offset="3048">
+          <caret line="25" column="6" selection-start-line="25" selection-start-column="6" selection-end-line="25" selection-end-column="6" />
+          <folding>
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" @method ResponseInterface get($uri, array $options = []) ..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" Clients accept an array of constructor parameters. ..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" Configures the default options for a client. ..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" Merges default options into the array. ..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" Transfers the given request and applies request options. ..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder=" Applies the array of request options to a request. ..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773305" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/guzzlehttp/guzzle/src/ClientInterface.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.12436548" vertical-offset="386" max-vertical-offset="2160">
+          <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
+          <folding>
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Client interface for sending HTTP requests. ..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Send an HTTP request. ..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Asynchronously send an HTTP request. ..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Create and send an HTTP request. ..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Create and send an asynchronous HTTP request. ..." />
+            <marker date="1434795773310" expanded="true" signature="-1:-1" placeholder=" Get a client configuration option. ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Transport/MailgunTransport.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.1497462" vertical-offset="1850" max-vertical-offset="3600">
+          <caret line="96" column="37" selection-start-line="96" selection-start-column="37" selection-end-line="96" selection-end-column="37" />
+          <folding>
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Guzzle client instance. ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" The Mailgun API key. ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" The Mailgun domain. ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" THe Mailgun API end-point. ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Plugins for transport ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Create a new Mailgun transport instance. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" @param $message ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Get the &quot;to&quot; payload field for the API request. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Get the API key being used by the transport. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Set the API key being used by the transport. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Get the domain being used by the transport. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799884611" expanded="true" signature="-1:-1" placeholder=" Set the domain being used by the transport. ..." />
+            <marker date="1434799884611" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Transport/MandrillTransport.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.060913704" vertical-offset="1440" max-vertical-offset="2904">
+          <caret line="75" column="0" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
+          <folding>
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Guzzle client instance. ..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" The Mandrill API key. ..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Plugins for transport ..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Create a new Mandrill transport instance. ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Get all the addresses this message should be sent to. ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" @param $message ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Get the API key being used by the transport. ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799843813" expanded="true" signature="-1:-1" placeholder=" Set the API key being used by the transport. ..." />
+            <marker date="1434799843813" expanded="false" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Transport/SesTransport.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.51269037" vertical-offset="1468" max-vertical-offset="2256">
+          <caret line="93" column="5" selection-start-line="93" selection-start-column="5" selection-end-line="93" selection-end-column="5" />
+          <folding>
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" The Amazon SES instance. ..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" Plugins for transport ..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" Create a new SES transport instance. ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" {@inheritdoc} ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" @param $message ..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder=" Get the &quot;to&quot; payload field for the API request. ..." />
+            <marker date="1434799912023" expanded="false" signature="-1:-1" placeholder="{...}" />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1434799912023" expanded="true" signature="-1:-1" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Illuminate/Mail/Transport/LogTransport.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.78680205" vertical-offset="1348" max-vertical-offset="2136">
+          <caret line="106" column="1" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
+          <folding>
+            <element signature="e#998#1195#0#PHP" expanded="true" />
+            <element signature="e#1871#2083#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
