@@ -28,7 +28,7 @@ class MandrillTransport implements Swift_Transport
 	 *
 	 * @var array
 	 */
-	protected $plugins = [];
+	public $plugins = [];
 
     /**
      * Create a new Mandrill transport instance.
@@ -72,8 +72,6 @@ class MandrillTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-		$this->runThroughPlugins($message);
-
 		$data = [
             'key' => $this->key,
             'to' => $this->getToAddresses($message),
@@ -125,6 +123,17 @@ class MandrillTransport implements Swift_Transport
 		array_push($this->plugins, $plugin);
     }
 
+	/**
+	 * @param $message
+	 */
+	protected function executePlugins(Swift_Mime_Message $message)
+	{
+		foreach ($this->plugins as $plugin) {
+			$evt = new \Swift_Events_SendEvent($this, $message);
+			$plugin->beforeSendPerformed($evt);
+		}
+	}
+
     /**
      * Get the API key being used by the transport.
      *
@@ -145,16 +154,5 @@ class MandrillTransport implements Swift_Transport
     {
         return $this->key = $key;
     }
-
-	/**
-	 * @param Swift_Mime_Message $message
-	 */
-	protected function runThroughPlugins(Swift_Mime_Message $message)
-	{
-		foreach ($this->plugins as $plugin) {
-			$evt = new \Swift_Events_SendEvent($this, $message);
-			$plugin->beforeSendPerformed($evt);
-		}
-	}
 
 }
