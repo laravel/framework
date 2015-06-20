@@ -616,6 +616,45 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Determines whether the current requests accepts a given content type
+     * based on content negotiation.
+     *
+     * @param  string|array  $contentTypes
+     * @return string|null
+     */
+    public function wants($contentTypes)
+    {
+        $accepts = $this->getAcceptableContentTypes();
+
+        foreach ($accepts as $accept) {
+            foreach ((array) $contentTypes as $contentType) {
+                $type = $contentType;
+
+                if (!is_null($mimeType = $this->getMimeType($contentType))) {
+                    $type = $mimeType;
+                }
+
+                if ($accept === $type) {
+                    return $contentType;
+                }
+
+                $split = explode('/', $accept);
+
+                if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                    return $contentType;
+                }
+
+            }
+
+            if ($accept === '*/*') {
+                return is_array($contentTypes) ? $contentTypes[0] : $contentTypes;
+            }
+        }
+
+        return ;
+    }
+
+    /**
      * Determines whether a request accepts JSON.
      *
      * @return bool
