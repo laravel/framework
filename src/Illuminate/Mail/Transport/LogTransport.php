@@ -64,6 +64,8 @@ class LogTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
+		$this->beforeSendPerformed($message);
+
         $this->logger->debug($this->getMimeEntityString($message));
     }
 
@@ -95,7 +97,7 @@ class LogTransport implements Swift_Transport
 	/**
 	 * @param $message
 	 */
-	protected function executePlugins(Swift_Mime_Message $message)
+	protected function beforeSendPerformed(Swift_Mime_Message $message)
 	{
 		foreach ($this->plugins as $plugin) {
 			$evt = new \Swift_Events_SendEvent($this, $message);

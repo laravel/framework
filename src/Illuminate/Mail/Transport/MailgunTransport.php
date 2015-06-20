@@ -89,7 +89,9 @@ class MailgunTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $options = ['auth' => ['api', $this->key]];
+		$this->beforeSendPerformed($message);
+
+		$options = ['auth' => ['api', $this->key]];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $options['multipart'] = [
@@ -117,7 +119,7 @@ class MailgunTransport implements Swift_Transport
 	/**
 	 * @param $message
 	 */
-	protected function executePlugins(Swift_Mime_Message $message)
+	protected function beforeSendPerformed(Swift_Mime_Message $message)
 	{
 		foreach ($this->plugins as $plugin) {
 			$evt = new \Swift_Events_SendEvent($this, $message);
