@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
 use Swift_Mime_Message;
+use Swift_Events_SendEvent;
 use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
@@ -38,12 +39,12 @@ class MailgunTransport implements Swift_Transport
      */
     protected $url;
 
-	/**
-	 * Plugins for transport
-	 *
-	 * @var array
-	 */
-	public $plugins = [];
+    /**
+     * Plugins for transport.
+     *
+     * @var array
+     */
+    public $plugins = [];
 
     /**
      * Create a new Mailgun transport instance.
@@ -89,9 +90,9 @@ class MailgunTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-		$this->beforeSendPerformed($message);
+        $this->beforeSendPerformed($message);
 
-		$options = ['auth' => ['api', $this->key]];
+        $options = ['auth' => ['api', $this->key]];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $options['multipart'] = [
@@ -113,19 +114,21 @@ class MailgunTransport implements Swift_Transport
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
-		array_push($this->plugins, $plugin);
+        array_push($this->plugins, $plugin);
     }
 
-	/**
-	 * @param $message
-	 */
-	protected function beforeSendPerformed(Swift_Mime_Message $message)
-	{
-		foreach ($this->plugins as $plugin) {
-			$evt = new \Swift_Events_SendEvent($this, $message);
-			$plugin->beforeSendPerformed($evt);
-		}
-	}
+    /**
+     * Iterate through registered plugins and execute plugins' methods.
+     *
+     * @param Swift_Mime_Message $message
+     */
+    protected function beforeSendPerformed(Swift_Mime_Message $message)
+    {
+        foreach ($this->plugins as $plugin) {
+            $evt = new Swift_Events_SendEvent($this, $message);
+            $plugin->beforeSendPerformed($evt);
+        }
+    }
 
     /**
      * Get the "to" payload field for the API request.
