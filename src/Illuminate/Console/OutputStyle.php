@@ -8,14 +8,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputStyle extends SymfonyStyle
 {
-    /** @var OutputInterface */
+    /**
+     * The output instance.
+     *
+     * @var \Symfony\Component\Console\Output\OutputInterface
+     */
     private $output;
 
     /**
      * Create a new Console OutputStyle instance.
      *
-     * @param  InputInterface $input
-     * @param  OutputInterface $output
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return void
      */
     public function __construct(InputInterface $input, OutputInterface $output)
@@ -26,9 +30,9 @@ class OutputStyle extends SymfonyStyle
     }
 
     /**
-     * Returns whether verbosity is quiet (-q)
+     * Returns whether verbosity is quiet (-q).
      *
-     * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
+     * @return bool
      */
     public function isQuiet()
     {
@@ -36,9 +40,9 @@ class OutputStyle extends SymfonyStyle
     }
 
     /**
-     * Returns whether verbosity is verbose (-v)
+     * Returns whether verbosity is verbose (-v).
      *
-     * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
+     * @return bool
      */
     public function isVerbose()
     {
@@ -46,9 +50,9 @@ class OutputStyle extends SymfonyStyle
     }
 
     /**
-     * Returns whether verbosity is very verbose (-vv)
+     * Returns whether verbosity is very verbose (-vv).
      *
-     * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
+     * @return bool
      */
     public function isVeryVerbose()
     {
@@ -56,9 +60,9 @@ class OutputStyle extends SymfonyStyle
     }
 
     /**
-     * Returns whether verbosity is debug (-vvv)
+     * Returns whether verbosity is debug (-vvv).
      *
-     * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
+     * @return bool
      */
     public function isDebug()
     {
