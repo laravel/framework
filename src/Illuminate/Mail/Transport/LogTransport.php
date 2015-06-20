@@ -99,6 +99,7 @@ class LogTransport implements Swift_Transport
      * Iterate through registered plugins and execute plugins' methods.
      *
      * @param Swift_Mime_Message $message
+     * @return void
      */
     protected function beforeSendPerformed(Swift_Mime_Message $message)
     {
