@@ -54,7 +54,7 @@ class FactoryBuilder
     {
         $this->name = $name;
         $this->class = $class;
-        $this->faker = Faker::create();
+        $this->faker = Faker::create(env('FAKER_LOCALE', 'en_US'));
         $this->definitions = $definitions;
     }
 
