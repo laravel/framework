@@ -766,7 +766,7 @@ trait CrawlerTrait
      *
      * @return $this
      */
-    public function withoutCSRF()
+    public function withoutCsrf()
     {
         $this->app->instance('csrf.disable', true);
 
