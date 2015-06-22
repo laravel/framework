@@ -9,6 +9,7 @@ use Exception;
 use LogicException;
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Processors\Processor;
@@ -667,7 +668,7 @@ class Connection implements ConnectionInterface
     {
         $message = $e->getPrevious()->getMessage();
 
-        return str_contains($message, [
+        return Str::contains($message, [
             'server has gone away',
             'no connection to the server',
             'Lost connection',

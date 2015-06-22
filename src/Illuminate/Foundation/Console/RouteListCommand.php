@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
@@ -239,8 +240,8 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && !str_contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && !str_contains($route['uri'], $this->option('path'))) {
+        if (($this->option('name') && !Str::contains($route['name'], $this->option('name'))) ||
+             $this->option('path') && !Str::contains($route['uri'], $this->option('path'))) {
             return;
         }
 

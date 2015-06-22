@@ -6,6 +6,7 @@ use Closure;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
 use Illuminate\Container\Container;
@@ -353,7 +354,7 @@ class Route
      */
     public static function parseFilter($filter)
     {
-        if (!str_contains($filter, ':')) {
+        if (!Str::contains($filter, ':')) {
             return [$filter, []];
         }
 
@@ -619,7 +620,7 @@ class Route
             $action['uses'] = $this->findCallable($action);
         }
 
-        if (is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
+        if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
             throw new UnexpectedValueException(sprintf(
                 'Invalid route action: [%s]', $action['uses']
             ));
