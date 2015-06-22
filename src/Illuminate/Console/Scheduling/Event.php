@@ -83,7 +83,7 @@ class Event
      * @var string
      */
     public $output = '/dev/null';
-    
+
     /**
      * The array of callbacks to be run before the event is started.
      *
@@ -152,14 +152,14 @@ class Event
     protected function runCommandInForeground(Container $container)
     {
         $this->callBeforeCallbacks($container);
-        
+
         (new Process(
             trim($this->buildCommand(), '& '), base_path(), null, null, null
         ))->run();
 
         $this->callAfterCallbacks($container);
     }
-    
+
     /**
      * Call all of the "before" callbacks for the event.
      *
@@ -683,16 +683,16 @@ class Event
 
         return 'Scheduled Job Output';
     }
-    
+
     /**
      * Register a callback to ping a given URL before the job runs.
      *
      * @param  string  $url
      * @return $this
      */
-    public function firstPing($url)
+    public function pingBefore($url)
     {
-        return $this->first(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->before(function () use ($url) { (new HttpClient)->get($url); });
     }
 
     /**
@@ -701,7 +701,7 @@ class Event
      * @param  \Closure  $callback
      * @return $this
      */
-    public function first(Closure $callback)
+    public function before(Closure $callback)
     {
         $this->beforeCallbacks[] = $callback;
 
@@ -717,6 +717,17 @@ class Event
     public function thenPing($url)
     {
         return $this->then(function () use ($url) { (new HttpClient)->get($url); });
+    }
+
+    /**
+     * Register a callback to be called after the operation.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function after(Closure $callback)
+    {
+        return $this->then($callback);
     }
 
     /**
