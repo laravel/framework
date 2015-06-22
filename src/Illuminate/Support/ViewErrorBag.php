@@ -90,7 +90,7 @@ class ViewErrorBag implements Countable
      */
     public function __get($key)
     {
-        return array_get($this->bags, $key, new MessageBag);
+        return Arr::get($this->bags, $key, new MessageBag);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -211,7 +213,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $i = 'index.php';
 
-        return str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
+        return Str::contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
     }
 
     /**
@@ -339,7 +341,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function replaceNamedParameters($path, &$parameters)
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
+            return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
 
         }, $path);
     }
@@ -434,7 +436,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getStringParameters(array $parameters)
     {
-        return array_where($parameters, function ($k, $v) { return is_string($k); });
+        return Arr::where($parameters, function ($k, $v) { return is_string($k); });
     }
 
     /**
@@ -445,7 +447,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getNumericParameters(array $parameters)
     {
-        return array_where($parameters, function ($k, $v) { return is_numeric($k); });
+        return Arr::where($parameters, function ($k, $v) { return is_numeric($k); });
     }
 
     /**
@@ -573,7 +575,7 @@ class UrlGenerator implements UrlGeneratorContract
             $root = $this->cachedRoot;
         }
 
-        $start = starts_with($root, 'http://') ? 'http://' : 'https://';
+        $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
         return preg_replace('~'.$start.'~', $scheme, $root, 1);
     }
@@ -598,7 +600,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function isValidUrl($path)
     {
-        if (starts_with($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) {
+        if (Str::startsWith($path, ['#', '//', 'mailto:', 'tel:', 'http://', 'https://'])) {
             return true;
         }
 

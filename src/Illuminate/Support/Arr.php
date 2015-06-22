@@ -372,6 +372,27 @@ class Arr
     }
 
     /**
+     * Recursively sort an array by keys and values.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function sortRecursive($array)
+    {
+        foreach ($array as &$value) {
+            if (is_array($value) && isset($value[0])) {
+                sort($value);
+            } elseif (is_array($value)) {
+                self::sortRecursive($value);
+            }
+        }
+
+        ksort($array);
+
+        return $array;
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection
@@ -19,7 +20,7 @@ class Collection extends BaseCollection
             $key = $key->getKey();
         }
 
-        return array_first($this->items, function ($itemKey, $model) use ($key) {
+        return Arr::first($this->items, function ($itemKey, $model) use ($key) {
             return $model->getKey() == $key;
 
         }, $default);
@@ -175,7 +176,7 @@ class Collection extends BaseCollection
      */
     public function only($keys)
     {
-        $dictionary = array_only($this->getDictionary(), $keys);
+        $dictionary = Arr::only($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }

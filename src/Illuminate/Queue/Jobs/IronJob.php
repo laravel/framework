@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Arr;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
@@ -112,7 +113,7 @@ class IronJob extends Job implements JobContract
     {
         $payload = json_decode($this->job->body, true);
 
-        array_set($payload, 'attempts', array_get($payload, 'attempts', 1) + 1);
+        Arr::set($payload, 'attempts', Arr::get($payload, 'attempts', 1) + 1);
 
         $this->iron->recreate(json_encode($payload), $this->getQueue(), $delay);
     }
@@ -124,7 +125,7 @@ class IronJob extends Job implements JobContract
      */
     public function attempts()
     {
-        return array_get(json_decode($this->job->body, true), 'attempts', 1);
+        return Arr::get(json_decode($this->job->body, true), 'attempts', 1);
     }
 
     /**
@@ -174,6 +175,6 @@ class IronJob extends Job implements JobContract
      */
     public function getQueue()
     {
-        return array_get(json_decode($this->job->body, true), 'queue');
+        return Arr::get(json_decode($this->job->body, true), 'queue');
     }
 }

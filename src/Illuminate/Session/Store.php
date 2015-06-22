@@ -2,6 +2,8 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use SessionHandlerInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
@@ -192,7 +194,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).str_random(25).microtime(true));
+        return sha1(uniqid('', true).Str::random(25).microtime(true));
     }
 
     /**
@@ -314,7 +316,7 @@ class Store implements SessionInterface
      */
     public function get($name, $default = null)
     {
-        return array_get($this->attributes, $name, $default);
+        return Arr::get($this->attributes, $name, $default);
     }
 
     /**
@@ -326,7 +328,7 @@ class Store implements SessionInterface
      */
     public function pull($key, $default = null)
     {
-        return array_pull($this->attributes, $key, $default);
+        return Arr::pull($this->attributes, $key, $default);
     }
 
     /**
@@ -356,7 +358,7 @@ class Store implements SessionInterface
         // Input that is flashed to the session can be easily retrieved by the
         // developer, making repopulating old forms and the like much more
         // convenient, since the request's previous input is available.
-        return array_get($input, $key, $default);
+        return Arr::get($input, $key, $default);
     }
 
     /**
@@ -364,7 +366,7 @@ class Store implements SessionInterface
      */
     public function set($name, $value)
     {
-        array_set($this->attributes, $name, $value);
+        Arr::set($this->attributes, $name, $value);
     }
 
     /**
@@ -500,7 +502,7 @@ class Store implements SessionInterface
      */
     public function remove($name)
     {
-        return array_pull($this->attributes, $name);
+        return Arr::pull($this->attributes, $name);
     }
 
     /**
@@ -511,7 +513,7 @@ class Store implements SessionInterface
      */
     public function forget($key)
     {
-        array_forget($this->attributes, $key);
+        Arr::forget($this->attributes, $key);
     }
 
     /**
@@ -557,7 +559,7 @@ class Store implements SessionInterface
      */
     public function getBag($name)
     {
-        return array_get($this->bags, $name, function () {
+        return Arr::get($this->bags, $name, function () {
             throw new InvalidArgumentException('Bag not registered.');
         });
     }
@@ -578,7 +580,7 @@ class Store implements SessionInterface
      */
     public function getBagData($name)
     {
-        return array_get($this->bagData, $name, []);
+        return Arr::get($this->bagData, $name, []);
     }
 
     /**
@@ -608,7 +610,7 @@ class Store implements SessionInterface
      */
     public function regenerateToken()
     {
-        $this->put('_token', str_random(40));
+        $this->put('_token', Str::random(40));
     }
 
     /**

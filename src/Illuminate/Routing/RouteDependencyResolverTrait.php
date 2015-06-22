@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use ReflectionMethod;
+use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
 
 trait RouteDependencyResolverTrait
@@ -74,7 +75,7 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return !is_null(array_first($parameters, function ($key, $value) use ($class) {
+        return !is_null(Arr::first($parameters, function ($key, $value) use ($class) {
             return $value instanceof $class;
         }));
     }
