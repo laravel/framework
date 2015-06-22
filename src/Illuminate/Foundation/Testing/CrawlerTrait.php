@@ -771,7 +771,9 @@ trait CrawlerTrait
         $server = [];
 
         foreach ($headers as $name => $value) {
-            $name = 'HTTP_'.strtr(strtoupper($name), '-', '_');
+            if (!starts_with($name, 'HTTP_')) {
+                $name = 'HTTP_'.strtr(strtoupper($name), '-', '_');
+            }
 
             $server[$name] = $value;
         }
