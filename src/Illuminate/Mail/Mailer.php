@@ -6,6 +6,7 @@ use Closure;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use SuperClosure\Serializer;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
@@ -286,7 +287,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function getQueuedCallable(array $data)
     {
-        if (str_contains($data['callback'], 'SerializableClosure')) {
+        if (Str::contains($data['callback'], 'SerializableClosure')) {
             return unserialize($data['callback'])->getClosure();
         }
 
