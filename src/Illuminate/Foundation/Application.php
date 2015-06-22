@@ -4,6 +4,8 @@ namespace Illuminate\Foundation;
 
 use Closure;
 use RuntimeException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
@@ -108,6 +110,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @var string
      */
     protected $storagePath;
+
+    /**
+     * The custom environment path defined by the developer.
+     *
+     * @var string
+     */
+    protected $environmentPath;
 
     /**
      * The environment file to load during bootstrapping.
@@ -374,6 +383,29 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the environment file directory.
+     *
+     * @return string
+     */
+    public function environmentPath()
+    {
+        return $this->environmentPath ?: $this->basePath;
+    }
+
+    /**
+     * Set the directory for the environment file.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useEnvironmentPath($path)
+    {
+        $this->environmentPath = $path;
+
+        return $this;
+    }
+
+    /**
      * Set the environment file to be loaded during bootstrapping.
      *
      * @param  string  $file
@@ -408,7 +440,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
             foreach ($patterns as $pattern) {
-                if (str_is($pattern, $this['env'])) {
+                if (Str::is($pattern, $this['env'])) {
                     return true;
                 }
             }
@@ -527,7 +559,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return array_first($this->serviceProviders, function ($key, $value) use ($name) {
+        return Arr::first($this->serviceProviders, function ($key, $value) use ($name) {
             return $value instanceof $name;
         });
     }

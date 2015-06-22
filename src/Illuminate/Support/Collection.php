@@ -169,7 +169,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return count($this->items) > 0 ? reset($this->items) : null;
         }
 
-        return array_first($this->items, $callback, $default);
+        return Arr::first($this->items, $callback, $default);
     }
 
     /**
@@ -179,7 +179,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flatten()
     {
-        return new static(array_flatten($this->items));
+        return new static(Arr::flatten($this->items));
     }
 
     /**

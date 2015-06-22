@@ -6,6 +6,8 @@ use Closure;
 use ArrayAccess;
 use SplFileInfo;
 use RuntimeException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -127,7 +129,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function segment($index, $default = null)
     {
-        return array_get($this->segments(), $index - 1, $default);
+        return Arr::get($this->segments(), $index - 1, $default);
     }
 
     /**
@@ -151,7 +153,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     public function is()
     {
         foreach (func_get_args() as $pattern) {
-            if (str_is($pattern, urldecode($this->path()))) {
+            if (Str::is($pattern, urldecode($this->path()))) {
                 return true;
             }
         }
@@ -257,9 +259,11 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     protected function isEmptyString($key)
     {
-        $boolOrArray = is_bool($this->input($key)) || is_array($this->input($key));
+        $value = $this->input($key);
 
-        return !$boolOrArray && trim((string) $this->input($key)) === '';
+        $boolOrArray = is_bool($value) || is_array($value);
+
+        return !$boolOrArray && trim((string) $value) === '';
     }
 
     /**
@@ -283,7 +287,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $input = $this->getInputSource()->all() + $this->query->all();
 
-        return array_get($input, $key, $default);
+        return Arr::get($input, $key, $default);
     }
 
     /**
@@ -301,7 +305,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $key) {
-            array_set($results, $key, array_get($input, $key));
+            Arr::set($results, $key, Arr::get($input, $key));
         }
 
         return $results;
@@ -319,7 +323,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $results = $this->all();
 
-        array_forget($results, $keys);
+        Arr::forget($results, $keys);
 
         return $results;
     }
@@ -368,7 +372,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        return array_get($this->files->all(), $key, $default);
+        return Arr::get($this->files->all(), $key, $default);
     }
 
     /**
@@ -545,7 +549,7 @@ class Request extends SymfonyRequest implements ArrayAccess
             return $this->json;
         }
 
-        return array_get($this->json->all(), $key, $default);
+        return Arr::get($this->json->all(), $key, $default);
     }
 
     /**
@@ -569,7 +573,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function isJson()
     {
-        return str_contains($this->header('CONTENT_TYPE'), '/json');
+        return Str::contains($this->header('CONTENT_TYPE'), '/json');
     }
 
     /**
@@ -594,19 +598,25 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $accepts = $this->getAcceptableContentTypes();
 
+        if (count($accepts) === 0) {
+            return true;
+        }
+
+        $types = (array) $contentTypes;
+
         foreach ($accepts as $accept) {
             if ($accept === '*/*') {
                 return true;
             }
 
-            foreach ((array) $contentTypes as $type) {
+            foreach ($types as $type) {
                 if ($accept === $type || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
 
                 $split = explode('/', $accept);
 
-                if (preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
                     return true;
                 }
             }
@@ -793,7 +803,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return array_get($this->all(), $offset);
+        return Arr::get($this->all(), $offset);
     }
 
     /**

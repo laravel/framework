@@ -395,6 +395,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $old = ['domain' => 'foo'];
         $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['domain' => 'baz'], $old));
 
+        $old = ['as' => 'foo.'];
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], Router::mergeGroup(['as' => 'bar'], $old));
+
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
@@ -429,6 +432,35 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $route = $routes->getByName('Foo::bar');
         $this->assertEquals('foo/bar', $route->getPath());
+    }
+
+    public function testNestedRouteGroupingWithAs()
+    {
+        /*
+         * nested with all layers present
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['prefix' => 'bar', 'as' => 'Bar::'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () { return 'hello'; }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::Bar::baz');
+        $this->assertEquals('foo/bar/baz', $route->getPath());
+
+        /*
+         * nested with layer skipped
+         */
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['prefix' => 'bar'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () { return 'hello'; }]);
+            });
+        });
+        $routes = $router->getRoutes();
+        $route = $routes->getByName('Foo::baz');
+        $this->assertEquals('foo/bar/baz', $route->getPath());
     }
 
     public function testRoutePrefixing()
@@ -626,7 +658,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     {
         unset(
             $_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
-            $_SERVER['route.test.controller.middleware.class'], $_SERVER['route.test.controller.middleware.parameters']
+            $_SERVER['route.test.controller.middleware.class'],
+            $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
         );
 
         $router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
@@ -640,7 +673,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertTrue($_SERVER['route.test.controller.middleware']);
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
-        $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters']);
+        $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
+        $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
 
@@ -662,7 +696,8 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     public function __construct()
     {
         $this->middleware('RouteTestControllerMiddleware');
-        $this->middleware('RouteTestControllerParameterizedMiddleware:foo,bar');
+        $this->middleware('RouteTestControllerParameterizedMiddlewareOne:0');
+        $this->middleware('RouteTestControllerParameterizedMiddlewareTwo:foo,bar');
         $this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
     }
     public function index()
@@ -683,11 +718,21 @@ class RouteTestControllerMiddleware
     }
 }
 
-class RouteTestControllerParameterizedMiddleware
+class RouteTestControllerParameterizedMiddlewareOne
+{
+    public function handle($request, $next, $parameter)
+    {
+        $_SERVER['route.test.controller.middleware.parameters.one'] = $parameter;
+
+        return $next($request);
+    }
+}
+
+class RouteTestControllerParameterizedMiddlewareTwo
 {
     public function handle($request, $next, $parameter1, $parameter2)
     {
-        $_SERVER['route.test.controller.middleware.parameters'] = [$parameter1, $parameter2];
+        $_SERVER['route.test.controller.middleware.parameters.two'] = [$parameter1, $parameter2];
 
         return $next($request);
     }

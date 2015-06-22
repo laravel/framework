@@ -8,6 +8,8 @@ use Countable;
 use Exception;
 use DateTimeZone;
 use RuntimeException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Support\Fluent;
@@ -258,7 +260,7 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = array_get($this->data, $attribute);
+        $data = Arr::get($this->data, $attribute);
 
         if (!is_array($data)) {
             if ($this->hasRule($attribute, 'Array')) {
@@ -398,9 +400,9 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
-        if (!is_null($value = array_get($this->data, $attribute))) {
+        if (!is_null($value = Arr::get($this->data, $attribute))) {
             return $value;
-        } elseif (!is_null($value = array_get($this->files, $attribute))) {
+        } elseif (!is_null($value = Arr::get($this->files, $attribute))) {
             return $value;
         }
     }
@@ -442,7 +444,7 @@ class Validator implements ValidatorContract
     protected function passesOptionalCheck($attribute)
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
-            return array_key_exists($attribute, array_dot($this->data))
+            return array_key_exists($attribute, Arr::dot($this->data))
                 || in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
         }
@@ -672,7 +674,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
-        $data = array_get($this->data, $parameters[0]);
+        $data = Arr::get($this->data, $parameters[0]);
 
         $values = array_slice($parameters, 1);
 
@@ -694,7 +696,7 @@ class Validator implements ValidatorContract
         $count = 0;
 
         foreach ($attributes as $key) {
-            if (array_get($this->data, $key) || array_get($this->files, $key)) {
+            if (Arr::get($this->data, $key) || Arr::get($this->files, $key)) {
                 $count++;
             }
         }
@@ -726,7 +728,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'same');
 
-        $other = array_get($this->data, $parameters[0]);
+        $other = Arr::get($this->data, $parameters[0]);
 
         return isset($other) && $value == $other;
     }
@@ -743,7 +745,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'different');
 
-        $other = array_get($this->data, $parameters[0]);
+        $other = Arr::get($this->data, $parameters[0]);
 
         return isset($other) && $value != $other;
     }
@@ -942,7 +944,7 @@ class Validator implements ValidatorContract
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return array_get($this->data, $attribute);
+            return Arr::get($this->data, $attribute);
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -1039,7 +1041,7 @@ class Validator implements ValidatorContract
      */
     protected function parseUniqueTable($table)
     {
-        return str_contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
 
     /**
@@ -1502,7 +1504,7 @@ class Validator implements ValidatorContract
      */
     protected function getMessage($attribute, $rule)
     {
-        $lowerRule = snake_case($rule);
+        $lowerRule = Str::snake($rule);
 
         $inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
 
@@ -1578,7 +1580,7 @@ class Validator implements ValidatorContract
      */
     protected function getSizeMessage($attribute, $rule)
     {
-        $lowerRule = snake_case($rule);
+        $lowerRule = Str::snake($rule);
 
         // There are three different types of size validations. The attribute may be
         // either a number, file, or string so we will check a few things to know
@@ -1625,8 +1627,8 @@ class Validator implements ValidatorContract
     {
         $message = str_replace(':attribute', $this->getAttribute($attribute), $message);
 
-        if (isset($this->replacers[snake_case($rule)])) {
-            $message = $this->callReplacer($message, $attribute, snake_case($rule), $parameters);
+        if (isset($this->replacers[Str::snake($rule)])) {
+            $message = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
             $message = $this->$replacer($message, $attribute, $rule, $parameters);
         }
@@ -1681,7 +1683,7 @@ class Validator implements ValidatorContract
         // If no language line has been specified for the attribute all of the
         // underscores are removed from the attribute name and that will be
         // used as default versions of the attribute's displayable names.
-        return str_replace('_', ' ', snake_case($attribute));
+        return str_replace('_', ' ', Str::snake($attribute));
     }
 
     /**
@@ -1905,7 +1907,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], array_get($this->data, $parameters[0]));
+        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
 
         $parameters[0] = $this->getAttribute($parameters[0]);
 
@@ -2045,7 +2047,7 @@ class Validator implements ValidatorContract
      */
     protected function parseArrayRule(array $rules)
     {
-        return [studly_case(trim(array_get($rules, 0))), array_slice($rules, 1)];
+        return [Str::studly(trim(Arr::get($rules, 0))), array_slice($rules, 1)];
     }
 
     /**
@@ -2067,7 +2069,7 @@ class Validator implements ValidatorContract
             $parameters = $this->parseParameters($rules, $parameter);
         }
 
-        return [studly_case(trim($rules)), $parameters];
+        return [Str::studly(trim($rules)), $parameters];
     }
 
     /**
@@ -2105,7 +2107,7 @@ class Validator implements ValidatorContract
     public function addExtensions(array $extensions)
     {
         if ($extensions) {
-            $keys = array_map('snake_case', array_keys($extensions));
+            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
         }
@@ -2124,7 +2126,7 @@ class Validator implements ValidatorContract
         $this->addExtensions($extensions);
 
         foreach ($extensions as $rule => $extension) {
-            $this->implicitRules[] = studly_case($rule);
+            $this->implicitRules[] = Str::studly($rule);
         }
     }
 
@@ -2137,7 +2139,7 @@ class Validator implements ValidatorContract
      */
     public function addExtension($rule, $extension)
     {
-        $this->extensions[snake_case($rule)] = $extension;
+        $this->extensions[Str::snake($rule)] = $extension;
     }
 
     /**
@@ -2151,7 +2153,7 @@ class Validator implements ValidatorContract
     {
         $this->addExtension($rule, $extension);
 
-        $this->implicitRules[] = studly_case($rule);
+        $this->implicitRules[] = Str::studly($rule);
     }
 
     /**
@@ -2173,7 +2175,7 @@ class Validator implements ValidatorContract
     public function addReplacers(array $replacers)
     {
         if ($replacers) {
-            $keys = array_map('snake_case', array_keys($replacers));
+            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }
@@ -2190,7 +2192,7 @@ class Validator implements ValidatorContract
      */
     public function addReplacer($rule, $replacer)
     {
-        $this->replacers[snake_case($rule)] = $replacer;
+        $this->replacers[Str::snake($rule)] = $replacer;
     }
 
     /**
@@ -2573,7 +2575,7 @@ class Validator implements ValidatorContract
      */
     public function __call($method, $parameters)
     {
-        $rule = snake_case(substr($method, 8));
+        $rule = Str::snake(substr($method, 8));
 
         if (isset($this->extensions[$rule])) {
             return $this->callExtension($rule, $parameters);

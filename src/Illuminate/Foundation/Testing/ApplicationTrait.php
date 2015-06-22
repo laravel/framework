@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 trait ApplicationTrait
@@ -59,14 +60,25 @@ trait ApplicationTrait
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::spy('Illuminate\Contracts\Events\Dispatcher');
 
-        $mock->shouldIgnoreMissing();
+        $mock->shouldReceive('fire')->andReturnUsing(function ($called) use (&$events) {
+            foreach ($events as $key => $event) {
+                if ((is_string($called) && $called === $event) ||
+                    (is_string($called) && is_subclass_of($called, $event)) ||
+                    (is_object($called) && $called instanceof $event)) {
+                    unset($events[$key]);
+                }
+            }
+        });
 
-        foreach ($events as $event) {
-            $mock->shouldReceive('fire')->atLeast()->once()
-                ->with(Mockery::type($event), [], false);
-        }
+        $this->beforeApplicationDestroyed(function () use (&$events) {
+            if ($events) {
+                throw new Exception(
+                    'The following events were not fired: ['.implode(', ', $events).']'
+                );
+            }
+        });
 
         $this->app->instance('events', $mock);
 
@@ -198,11 +210,16 @@ trait ApplicationTrait
      *
      * @param  string  $table
      * @param  array  $data
+     * @param  string  $connection
      * @return $this
      */
-    protected function seeInDatabase($table, array $data)
+    protected function seeInDatabase($table, array $data, $connection = null)
     {
-        $count = $this->app->make('db')->table($table)->where($data)->count();
+        $database = $this->app->make('db');
+
+        $connection = $connection ?: $database->getDefaultConnection();
+
+        $count = $database->connection($connection)->table($table)->where($data)->count();
 
         $this->assertGreaterThan(0, $count, sprintf(
             'Unable to find row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
@@ -216,11 +233,12 @@ trait ApplicationTrait
      *
      * @param  string  $table
      * @param  array  $data
+     * @param  string  $connection
      * @return $this
      */
-    protected function missingFromDatabase($table, array $data)
+    protected function missingFromDatabase($table, array $data, $connection = null)
     {
-        return $this->notSeeInDatabase($table, $data);
+        return $this->notSeeInDatabase($table, $data, $connection);
     }
 
     /**
@@ -228,11 +246,16 @@ trait ApplicationTrait
      *
      * @param  string  $table
      * @param  array  $data
+     * @param  string  $connection
      * @return $this
      */
-    protected function notSeeInDatabase($table, array $data)
+    protected function notSeeInDatabase($table, array $data, $connection = null)
     {
-        $count = $this->app->make('db')->table($table)->where($data)->count();
+        $database = $this->app->make('db');
+
+        $connection = $connection ?: $database->getDefaultConnection();
+
+        $count = $database->connection($connection)->table($table)->where($data)->count();
 
         $this->assertEquals(0, $count, sprintf(
             'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
