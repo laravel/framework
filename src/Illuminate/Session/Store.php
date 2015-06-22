@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use SessionHandlerInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
@@ -193,7 +194,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).str_random(25).microtime(true));
+        return sha1(uniqid('', true).Str::random(25).microtime(true));
     }
 
     /**
@@ -609,7 +610,7 @@ class Store implements SessionInterface
      */
     public function regenerateToken()
     {
-        $this->put('_token', str_random(40));
+        $this->put('_token', Str::random(40));
     }
 
     /**

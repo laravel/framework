@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 
 class MigrationCreator
@@ -110,7 +111,7 @@ class MigrationCreator
      */
     protected function getClassName($name)
     {
-        return studly_case($name);
+        return Str::studly($name);
     }
 
     /**

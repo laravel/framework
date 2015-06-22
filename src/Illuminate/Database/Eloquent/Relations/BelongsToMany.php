@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -1047,7 +1048,7 @@ class BelongsToMany extends Relation
      */
     protected function guessInverseRelation()
     {
-        return camel_case(str_plural(class_basename($this->getParent())));
+        return Str::camel(Str::plural(class_basename($this->getParent())));
     }
 
     /**
