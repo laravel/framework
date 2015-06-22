@@ -690,9 +690,9 @@ class Event
      * @param  string  $url
      * @return $this
      */
-    public function beforePing($url)
+    public function firstPing($url)
     {
-        return $this->before(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->first(function () use ($url) { (new HttpClient)->get($url); });
     }
 
     /**
@@ -701,7 +701,7 @@ class Event
      * @param  \Closure  $callback
      * @return $this
      */
-    public function before(Closure $callback)
+    public function first(Closure $callback)
     {
         $this->beforeCallbacks[] = $callback;
 
