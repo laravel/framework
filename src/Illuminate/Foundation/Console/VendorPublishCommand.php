@@ -53,12 +53,27 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
+        $tags = explode(',', $this->option('tag'));
+
+        foreach ($tags as $tag) {
+            $this->publishTag($tag);
+        }
+    }
+
+    /**
+     * Publish the assets for one tag.
+     *
+     * @param  string  $tag
+     * @return void
+     */
+    private function publishTag($tag)
+    {
         $paths = ServiceProvider::pathsToPublish(
-            $this->option('provider'), $this->option('tag')
+            $this->option('provider'), $tag
         );
 
         if (empty($paths)) {
-            return $this->comment('Nothing to publish.');
+            return $this->comment("Nothing to publish for tag $tag.");
         }
 
         foreach ($paths as $from => $to) {
@@ -71,7 +86,7 @@ class VendorPublishCommand extends Command
             }
         }
 
-        $this->info('Publishing Complete!');
+        $this->info("Publishing Complete for tag $tag!");
     }
 
     /**
@@ -159,7 +174,7 @@ class VendorPublishCommand extends Command
 
             ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'],
 
-            ['tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'],
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'One or many comma-separated tags that have assets you want to publish.'],
         ];
     }
 }
