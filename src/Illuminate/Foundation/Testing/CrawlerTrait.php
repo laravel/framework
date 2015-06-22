@@ -656,18 +656,22 @@ trait CrawlerTrait
      * @param  array   $parameters
      * @param  array   $cookies
      * @param  array   $files
-     * @param  array   $server
+     * @param  array   $headers
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
-    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $headers = [], $content = null)
     {
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
         $request = Request::create(
             $this->currentUri, $method, $parameters,
-            $cookies, $files, $server, $content
+            $cookies, $files, [], $content
         );
+
+        foreach ($headers as $name => $value) {
+            $request->headers->set($name, $value);
+        }
 
         return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
     }
@@ -680,15 +684,15 @@ trait CrawlerTrait
      * @param  array   $parameters
      * @param  array   $cookies
      * @param  array   $files
-     * @param  array   $server
+     * @param  array   $headers
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
-    public function callSecure($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    public function callSecure($method, $uri, $parameters = [], $cookies = [], $files = [], $headers = [], $content = null)
     {
         $uri = $this->app['url']->secure(ltrim($uri, '/'));
 
-        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $headers, $content);
     }
 
     /**
@@ -700,15 +704,15 @@ trait CrawlerTrait
      * @param  array   $parameters
      * @param  array   $cookies
      * @param  array   $files
-     * @param  array   $server
+     * @param  array   $headers
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
-    public function action($method, $action, $wildcards = [], $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    public function action($method, $action, $wildcards = [], $parameters = [], $cookies = [], $files = [], $headers = [], $content = null)
     {
         $uri = $this->app['url']->action($action, $wildcards, true);
 
-        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $headers, $content);
     }
 
     /**
@@ -720,15 +724,15 @@ trait CrawlerTrait
      * @param  array   $parameters
      * @param  array   $cookies
      * @param  array   $files
-     * @param  array   $server
+     * @param  array   $headers
      * @param  string  $content
      * @return \Illuminate\Http\Response
      */
-    public function route($method, $name, $routeParameters = [], $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    public function route($method, $name, $routeParameters = [], $parameters = [], $cookies = [], $files = [], $headers = [], $content = null)
     {
         $uri = $this->app['url']->route($name, $routeParameters);
 
-        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);
+        return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $headers, $content);
     }
 
     /**
