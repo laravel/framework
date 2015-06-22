@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\View\Engines\EngineResolver;
@@ -268,7 +269,7 @@ class Factory implements FactoryContract
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
         else {
-            if (starts_with($empty, 'raw|')) {
+            if (Str::startsWith($empty, 'raw|')) {
                 $result = substr($empty, 4);
             } else {
                 $result = $this->make($empty)->render();
@@ -476,11 +477,11 @@ class Factory implements FactoryContract
      */
     protected function parseClassEvent($class, $prefix)
     {
-        if (str_contains($class, '@')) {
+        if (Str::contains($class, '@')) {
             return explode('@', $class);
         }
 
-        $method = str_contains($prefix, 'composing') ? 'compose' : 'create';
+        $method = Str::contains($prefix, 'composing') ? 'compose' : 'create';
 
         return [$class, $method];
     }

@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Redis\Database;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -261,7 +262,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function getRandomId()
     {
-        return str_random(32);
+        return Str::random(32);
     }
 
     /**

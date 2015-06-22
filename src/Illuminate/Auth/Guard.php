@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use RuntimeException;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\UserProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -237,7 +238,7 @@ class Guard implements GuardContract
      */
     protected function validRecaller($recaller)
     {
-        if (!is_string($recaller) || !str_contains($recaller, '|')) {
+        if (!is_string($recaller) || !Str::contains($recaller, '|')) {
             return false;
         }
 
@@ -583,7 +584,7 @@ class Guard implements GuardContract
      */
     protected function refreshRememberToken(UserContract $user)
     {
-        $user->setRememberToken($token = str_random(60));
+        $user->setRememberToken($token = Str::random(60));
 
         $this->provider->updateRememberToken($user, $token);
     }

@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Closure;
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
@@ -439,7 +440,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
             foreach ($patterns as $pattern) {
-                if (str_is($pattern, $this['env'])) {
+                if (Str::is($pattern, $this['env'])) {
                     return true;
                 }
             }

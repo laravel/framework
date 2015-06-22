@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pipeline\Pipeline;
@@ -874,7 +875,7 @@ class Router implements RegistrarContract
      */
     protected function parseFilter($callback)
     {
-        if (is_string($callback) && !str_contains($callback, '@')) {
+        if (is_string($callback) && !Str::contains($callback, '@')) {
             return $callback.'@filter';
         }
 
@@ -1082,7 +1083,7 @@ class Router implements RegistrarContract
             // To find the patterned middlewares for a request, we just need to check these
             // registered patterns against the path info for the current request to this
             // applications, and when it matches we will merge into these middlewares.
-            if (str_is($pattern, $path)) {
+            if (Str::is($pattern, $path)) {
                 $merge = $this->patternsByMethod($method, $filters);
 
                 $results = array_merge($results, $merge);
@@ -1309,7 +1310,7 @@ class Router implements RegistrarContract
     public function is()
     {
         foreach (func_get_args() as $pattern) {
-            if (str_is($pattern, $this->currentRouteName())) {
+            if (Str::is($pattern, $this->currentRouteName())) {
                 return true;
             }
         }
@@ -1353,7 +1354,7 @@ class Router implements RegistrarContract
     public function uses()
     {
         foreach (func_get_args() as $pattern) {
-            if (str_is($pattern, $this->currentRouteAction())) {
+            if (Str::is($pattern, $this->currentRouteAction())) {
                 return true;
             }
         }

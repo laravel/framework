@@ -3,6 +3,7 @@
 namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -647,7 +648,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileExtends($expression)
     {
-        if (starts_with($expression, '(')) {
+        if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -666,7 +667,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileInclude($expression)
     {
-        if (starts_with($expression, '(')) {
+        if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 

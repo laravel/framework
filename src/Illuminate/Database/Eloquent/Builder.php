@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -516,9 +517,9 @@ class Builder
      */
     protected function isNested($name, $relation)
     {
-        $dots = str_contains($name, '.');
+        $dots = Str::contains($name, '.');
 
-        return $dots && starts_with($name, $relation.'.');
+        return $dots && Str::startsWith($name, $relation.'.');
     }
 
     /**
