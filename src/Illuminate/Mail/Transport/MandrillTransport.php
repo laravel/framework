@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
 use Swift_Mime_Message;
+use Swift_Events_SendEvent;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
@@ -22,6 +23,13 @@ class MandrillTransport implements Swift_Transport
      * @var string
      */
     protected $key;
+
+    /**
+     * Plugins for transport.
+     *
+     * @var array
+     */
+    public $plugins = [];
 
     /**
      * Create a new Mandrill transport instance.
@@ -65,6 +73,8 @@ class MandrillTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $this->beforeSendPerformed($message);
+
         $data = [
             'key' => $this->key,
             'to' => $this->getToAddresses($message),
@@ -113,7 +123,21 @@ class MandrillTransport implements Swift_Transport
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
-        //
+        array_push($this->plugins, $plugin);
+    }
+
+    /**
+     * Iterate through registered plugins and execute plugins' methods.
+     *
+     * @param Swift_Mime_Message $message
+     * @return void
+     */
+    protected function beforeSendPerformed(Swift_Mime_Message $message)
+    {
+        foreach ($this->plugins as $plugin) {
+            $evt = new Swift_Events_SendEvent($this, $message);
+            $plugin->beforeSendPerformed($evt);
+        }
     }
 
     /**
