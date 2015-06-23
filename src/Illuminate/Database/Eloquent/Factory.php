@@ -16,16 +16,31 @@ class Factory implements ArrayAccess
     protected $definitions = [];
 
     /**
+     * Default locale used on faker
+     *
+     * @var string|null
+     */
+    protected $fakerLocale = null;
+
+    /**
+     * @var \Faker\Generator|null
+     */
+    protected $faker = null;
+
+    /**
      * Create a new factory container.
      *
-     * @param  string|null  $pathToFactories
+     * @param  string|null $pathToFactories
+     * @param  string|null $fakerLocale
      * @return static
      */
-    public static function construct($pathToFactories = null)
+    public static function construct($pathToFactories = null, $fakerLocale = null)
     {
         $pathToFactories = $pathToFactories ?: database_path('factories');
 
         $factory = new static;
+
+        $factory->setFakerLocale($fakerLocale);
 
         if (is_dir($pathToFactories)) {
             foreach (Finder::create()->files()->in($pathToFactories) as $file) {
@@ -135,7 +150,7 @@ class Factory implements ArrayAccess
      */
     public function raw($class, array $attributes = [], $name = 'default')
     {
-        $raw = call_user_func($this->definitions[$class][$name], Faker::create(env('FAKER_LOCALE', 'en_US')));
+        $raw = call_user_func($this->definitions[$class][$name], $this->getFaker());
 
         return array_merge($raw, $attributes);
     }
@@ -149,7 +164,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions);
+        return new FactoryBuilder($class, $name, $this->definitions, $this->getFaker());
     }
 
     /**
@@ -195,5 +210,47 @@ class Factory implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->definitions[$offset]);
+    }
+
+    /**
+     * Get a new instance of faker locale or the latest created
+     *
+     * @param string|null $locale
+     * @return \Faker\Generator
+     */
+    public function getFaker($locale = null)
+    {
+        if (!$this->faker) {
+            $locale = $locale ?: $this->getFakerLocale();
+
+            $this->faker = Faker::create($locale);
+        }
+
+        return $this->faker;
+    }
+
+    /**
+     * Set the locale to faker
+     *
+     * @param $locale
+     */
+    public function setFakerLocale($locale)
+    {
+        /*
+         * Reset faker instance
+         */
+        $this->faker = null;
+
+        $this->fakerLocale = $locale;
+    }
+
+    /**
+     * Get faker locale
+     *
+     * @return string
+     */
+    public function getFakerLocale()
+    {
+        return $this->fakerLocale ?: Faker::DEFAULT_LOCALE;
     }
 }

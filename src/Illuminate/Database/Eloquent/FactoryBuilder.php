@@ -45,16 +45,16 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $definitions
-     * @return void
+     * @param  string $class
+     * @param  string $name
+     * @param  array $definitions
+     * @param \Faker\Generator $faker
      */
-    public function __construct($class, $name, array $definitions)
+    public function __construct($class, $name, array $definitions, \Faker\Generator $faker = null)
     {
         $this->name = $name;
         $this->class = $class;
-        $this->faker = Faker::create(env('FAKER_LOCALE', 'en_US'));
+        $this->faker = $faker ?: Faker::create();
         $this->definitions = $definitions;
     }
 
