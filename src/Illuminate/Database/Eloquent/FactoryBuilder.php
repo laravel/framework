@@ -48,13 +48,14 @@ class FactoryBuilder
      * @param  string  $class
      * @param  string  $name
      * @param  array  $definitions
+     * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, array $definitions)
+    public function __construct($class, $name, array $definitions, \Faker\Generator $faker = null)
     {
         $this->name = $name;
         $this->class = $class;
-        $this->faker = Faker::create();
+        $this->faker = $faker ?: Faker::create();
         $this->definitions = $definitions;
     }
 

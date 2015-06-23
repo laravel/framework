@@ -56,7 +56,7 @@ class DatabaseServiceProvider extends ServiceProvider
     protected function registerEloquentFactory()
     {
         $this->app->singleton('Illuminate\Database\Eloquent\Factory', function () {
-            return EloquentFactory::construct(database_path('factories'));
+            return EloquentFactory::construct(database_path('factories'), $this->app['config']['app.faker_locale']);
         });
     }
 
