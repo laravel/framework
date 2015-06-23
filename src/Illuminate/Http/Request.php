@@ -567,10 +567,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
-     * Do the two content types match.
-     *
-     * If the first type is the same as the second type, or is a subset, then
-     * we're returning true, otherwise, false.
+     * Determine if the given content types match.
      *
      * @return bool
      */
