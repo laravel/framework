@@ -326,6 +326,37 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         array_values(array_sort($array, function ($v) { return $v['name']; })));
     }
 
+    public function testArraySortRecursive()
+    {
+        $array = [
+            [
+                'foo',
+                'bar',
+                'baz',
+            ],
+            [
+                'baz',
+                'foo',
+                'bar',
+            ],
+        ];
+
+        $assumedArray = [
+            [
+                'bar',
+                'baz',
+                'foo',
+            ],
+            [
+                'bar',
+                'baz',
+                'foo',
+            ]
+        ];
+
+        $this->assertEquals($assumedArray, array_sort_recursive($array));
+    }
+
     public function testArrayWhere()
     {
         $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
