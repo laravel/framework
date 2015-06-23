@@ -9,7 +9,7 @@ use Swift_Events_SendEvent;
 use Psr\Log\LoggerInterface;
 use Swift_Events_EventListener;
 
-class LogTransport implements Swift_Transport
+class LogTransport extends Transport implements Swift_Transport
 {
     /**
      * The Logger instance.
@@ -17,13 +17,6 @@ class LogTransport implements Swift_Transport
      * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
-
-    /**
-     * Plugins for transport.
-     *
-     * @var array
-     */
-    public $plugins = [];
 
     /**
      * Create a new log transport instance.
@@ -85,27 +78,5 @@ class LogTransport implements Swift_Transport
         }
 
         return $string;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        array_push($this->plugins, $plugin);
-    }
-
-    /**
-     * Iterate through registered plugins and execute plugins' methods.
-     *
-     * @param Swift_Mime_Message $message
-     * @return void
-     */
-    protected function beforeSendPerformed(Swift_Mime_Message $message)
-    {
-        foreach ($this->plugins as $plugin) {
-            $evt = new Swift_Events_SendEvent($this, $message);
-            $plugin->beforeSendPerformed($evt);
-        }
     }
 }
