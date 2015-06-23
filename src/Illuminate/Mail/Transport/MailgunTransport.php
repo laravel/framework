@@ -9,7 +9,7 @@ use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
-class MailgunTransport implements Swift_Transport
+class MailgunTransport extends Transport implements Swift_Transport
 {
     /**
      * Guzzle client instance.
@@ -38,13 +38,6 @@ class MailgunTransport implements Swift_Transport
      * @var string
      */
     protected $url;
-
-    /**
-     * Plugins for transport.
-     *
-     * @var array
-     */
-    public $plugins = [];
 
     /**
      * Create a new Mailgun transport instance.
@@ -107,28 +100,6 @@ class MailgunTransport implements Swift_Transport
         }
 
         return $this->client->post($this->url, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        array_push($this->plugins, $plugin);
-    }
-
-    /**
-     * Iterate through registered plugins and execute plugins' methods.
-     *
-     * @param Swift_Mime_Message $message
-     * @return void
-     */
-    protected function beforeSendPerformed(Swift_Mime_Message $message)
-    {
-        foreach ($this->plugins as $plugin) {
-            $evt = new Swift_Events_SendEvent($this, $message);
-            $plugin->beforeSendPerformed($evt);
-        }
     }
 
     /**
