@@ -5,6 +5,7 @@ namespace Illuminate\Mail\Transport;
 use Swift_Transport;
 use Aws\Ses\SesClient;
 use Swift_Mime_Message;
+use Swift_Events_SendEvent;
 use Swift_Events_EventListener;
 
 class SesTransport implements Swift_Transport
@@ -15,6 +16,13 @@ class SesTransport implements Swift_Transport
      * @var \Aws\Ses\SesClient
      */
     protected $ses;
+
+    /**
+     * Plugins for transport.
+     *
+     * @var array
+     */
+    public $plugins = [];
 
     /**
      * Create a new SES transport instance.
@@ -56,6 +64,8 @@ class SesTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $this->beforeSendPerformed($message);
+
         return $this->ses->sendRawEmail([
             'Source' => key($message->getSender() ?: $message->getFrom()),
             'Destinations' => $this->getTo($message),
@@ -70,7 +80,21 @@ class SesTransport implements Swift_Transport
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
-        //
+        array_push($this->plugins, $plugin);
+    }
+
+    /**
+     * Iterate through registered plugins and execute plugins' methods.
+     *
+     * @param Swift_Mime_Message $message
+     * @return void
+     */
+    protected function beforeSendPerformed(Swift_Mime_Message $message)
+    {
+        foreach ($this->plugins as $plugin) {
+            $evt = new Swift_Events_SendEvent($this, $message);
+            $plugin->beforeSendPerformed($evt);
+        }
     }
 
     /**
