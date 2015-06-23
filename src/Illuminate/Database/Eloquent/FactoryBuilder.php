@@ -126,7 +126,7 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}].");
             }
 
-            $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker);
+            $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker, $attributes);
 
             return new $this->class(array_merge($definition, $attributes));
         });
