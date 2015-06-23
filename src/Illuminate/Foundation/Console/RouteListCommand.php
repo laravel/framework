@@ -89,6 +89,16 @@ class RouteListCommand extends Command
             $results[] = $this->getRouteInformation($route);
         }
 
+        if ($sort = $this->option('sort')) {
+            $results = array_sort($results, function ($value) use ($sort) {
+                return $value[$sort];
+            });
+        }
+
+        if ($this->option('reverse')) {
+            $results = array_reverse($results);
+        }
+
         return array_filter($results);
     }
 
@@ -259,6 +269,10 @@ class RouteListCommand extends Command
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+
+            ['reverse', 'r', InputOption::VALUE_NONE, 'Order descending alphabetically.'],
+
+            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by.', 'uri'],
         ];
     }
 }
