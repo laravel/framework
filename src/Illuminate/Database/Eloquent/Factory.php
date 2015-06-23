@@ -16,14 +16,14 @@ class Factory implements ArrayAccess
     protected $definitions = [];
 
     /**
-     * Default locale used on faker
+     * Default locale used on faker.
      *
      * @var string
      */
     protected $fakerLocale ;
 
     /**
-     * The Faker instance for the factory
+     * The Faker instance for the factory.
      *
      * @var \Faker\Generator
      */
@@ -215,7 +215,7 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Get a new instance of faker locale or the latest created
+     * Get a new instance of faker locale or the latest created.
      *
      * @param  string|null  $locale
      * @return \Faker\Generator
@@ -232,7 +232,7 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Set the locale to faker
+     * Set the locale to faker.
      *
      * @param  string|null  $locale
      * @return void
@@ -248,7 +248,7 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Get faker locale
+     * Get faker locale.
      *
      * @return string
      */
