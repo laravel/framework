@@ -18,20 +18,22 @@ class Factory implements ArrayAccess
     /**
      * Default locale used on faker
      *
-     * @var string|null
+     * @var string
      */
-    protected $fakerLocale = null;
+    protected $fakerLocale ;
 
     /**
-     * @var \Faker\Generator|null
+     * The Faker instance for the factory
+     *
+     * @var \Faker\Generator
      */
-    protected $faker = null;
+    protected $faker;
 
     /**
      * Create a new factory container.
      *
-     * @param  string|null $pathToFactories
-     * @param  string|null $fakerLocale
+     * @param  string|null  $pathToFactories
+     * @param  string|null  $fakerLocale
      * @return static
      */
     public static function construct($pathToFactories = null, $fakerLocale = null)
@@ -215,7 +217,7 @@ class Factory implements ArrayAccess
     /**
      * Get a new instance of faker locale or the latest created
      *
-     * @param string|null $locale
+     * @param  string|null  $locale
      * @return \Faker\Generator
      */
     public function getFaker($locale = null)
@@ -232,9 +234,10 @@ class Factory implements ArrayAccess
     /**
      * Set the locale to faker
      *
-     * @param $locale
+     * @param  string|null  $locale
+     * @return void
      */
-    public function setFakerLocale($locale)
+    public function setFakerLocale($locale = null)
     {
         /*
          * Reset faker instance

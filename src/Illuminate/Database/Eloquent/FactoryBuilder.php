@@ -45,10 +45,11 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
-     * @param  string $class
-     * @param  string $name
-     * @param  array $definitions
-     * @param \Faker\Generator $faker
+     * @param  string  $class
+     * @param  string  $name
+     * @param  array  $definitions
+     * @param  \Faker\Generator  $faker
+     * @return void
      */
     public function __construct($class, $name, array $definitions, \Faker\Generator $faker = null)
     {
