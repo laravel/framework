@@ -32,133 +32,31 @@ trait AuthenticatesUsers
             'email' => 'required|email', 'password' => 'required',
         ]);
 
-        if ($this->tooManyLoginAttempts($request)) {
+        $throttles = in_array(
+            ThrottlesLogins::class, class_uses_recursive(get_class($this))
+        );
+
+        if ($throttles && $this->hasTooManyLoginAttempts($request)) {
             return $this->sendLockoutResponse($request);
         }
 
         if (Auth::attempt($this->getCredentials($request), $request->has('remember'))) {
-            $this->clearLoginAttempts($request);
+            if ($throttles) {
+                $this->clearLoginAttempts($request);
+            }
 
             return redirect()->intended($this->redirectPath());
         }
 
-        $this->incrementLoginAttempts($request);
+        if ($throttles) {
+            $this->incrementLoginAttempts($request);
+        }
 
         return redirect($this->loginPath())
             ->withInput($request->only('email', 'remember'))
             ->withErrors([
                 'email' => $this->getFailedLoginMessage(),
             ]);
-    }
-
-    /**
-     * Determine if the user is locked out.
-     *
-     * @param  Request  $request
-     * @return bool
-     */
-    protected function tooManyLoginAttempts(Request $request)
-    {
-        $attempts = $this->getLoginAttempts($request);
-
-        if ($attempts > 3) {
-            $expiration = $this->calculateLockExpiration($attempts);
-
-            if (Cache::add($timeKey = $this->getLoginLockExpirationKey($request), $expiration, \Carbon\Carbon::createFromTimestamp($expiration))) {
-                $this->incrementLoginAttempts($request);
-            }
-
-            return (bool) Cache::get($timeKey);
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the login attempts for the user.
-     *
-     * @param  Request  $request
-     * @return int
-     */
-    protected function getLoginAttempts(Request $request)
-    {
-        return Cache::get($this->getLoginAttemptsKey($request)) ?: 0;
-    }
-
-    /**
-     * Increment the login attempts for the user.
-     *
-     * @param  Request  $request
-     * @return int
-     */
-    protected function incrementLoginAttempts(Request $request)
-    {
-        Cache::add($key = $this->getLoginAttemptsKey($request), 1, 15);
-
-        return (int) Cache::increment($key);
-    }
-
-    /**
-     * Calculate the next lock expiration time based on the login attempts.
-     *
-     * @param  int  $attempts
-     * @return int
-     */
-    protected function calculateLockExpiration($attempts)
-    {
-        return min(time() + 120, time() + (($attempts - 3) * 15));
-    }
-
-    /**
-     * Redirect the user after determining they are locked out.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    protected function sendLockoutResponse(Request $request)
-    {
-        $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
-
-        return redirect($this->loginPath())
-            ->withInput($request->only('email', 'remember'))
-            ->withErrors([
-                'email' => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
-            ]);
-    }
-
-    /**
-     * Clear the login locks for the given user credentials.
-     *
-     * @param  Request  $request
-     * @return void
-     */
-    protected function clearLoginAttempts(Request $request)
-    {
-        Cache::forget($this->getLoginAttemptsKey($request));
-
-        Cache::forget($this->getLoginLockExpirationKey($request));
-    }
-
-    /**
-     * Get the login attempts cache key.
-     *
-     * @param  Request  $request
-     * @return string
-     */
-    protected function getLoginAttemptsKey(Request $request)
-    {
-        return 'login:attempts:'.md5($request->email.$request->ip());
-    }
-
-    /**
-     * Get the login lock cache key.
-     *
-     * @param  Request  $request
-     * @return string
-     */
-    protected function getLoginLockExpirationKey(Request $request)
-    {
-        return 'login:expiration:'.md5($request->email.$request->ip());
     }
 
     /**
