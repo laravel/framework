@@ -61,9 +61,9 @@ trait ThrottlesLogins
         $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
 
         return redirect($this->loginPath())
-            ->withInput($request->only('email', 'remember'))
+            ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
-                'email' => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
+                $this->loginUsername() => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
             ]);
     }
 
@@ -88,7 +88,9 @@ trait ThrottlesLogins
      */
     protected function getLoginAttemptsKey(Request $request)
     {
-        return 'login:attempts:'.md5($request->email.$request->ip());
+        $username = $request->input($this->loginUsername());
+
+        return 'login:attempts:'.md5($username.$request->ip());
     }
 
     /**
@@ -99,6 +101,8 @@ trait ThrottlesLogins
      */
     protected function getLoginLockExpirationKey(Request $request)
     {
-        return 'login:expiration:'.md5($request->email.$request->ip());
+        $username = $request->input($this->loginUsername());
+
+        return 'login:expiration:'.md5($username.$request->ip());
     }
 }

@@ -29,7 +29,7 @@ trait AuthenticatesUsers
     public function postLogin(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|email', 'password' => 'required',
+            $this->loginUsername() => 'required', 'password' => 'required',
         ]);
 
         $throttles = in_array(
@@ -53,9 +53,9 @@ trait AuthenticatesUsers
         }
 
         return redirect($this->loginPath())
-            ->withInput($request->only('email', 'remember'))
+            ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
-                'email' => $this->getFailedLoginMessage(),
+                $this->loginUsername() => $this->getFailedLoginMessage(),
             ]);
     }
 
@@ -67,7 +67,7 @@ trait AuthenticatesUsers
      */
     protected function getCredentials(Request $request)
     {
-        return $request->only('email', 'password');
+        return $request->only($this->loginUsername(), 'password');
     }
 
     /**
@@ -100,5 +100,15 @@ trait AuthenticatesUsers
     public function loginPath()
     {
         return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+    }
+
+    /**
+     * Get the login username to be used by the controller.
+     *
+     * @return string
+     */
+    public function loginUsername()
+    {
+        return property_exists($this, 'username') ? $this->username : 'email';
     }
 }
