@@ -54,8 +54,8 @@ trait CrawlerTrait
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
-     * @param  array   $headers
-     * @param  array   $cookies
+     * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
     public function get($uri, array $headers = [], array $cookies = [])
@@ -71,9 +71,9 @@ trait CrawlerTrait
      * Visit the given URI with a POST request.
      *
      * @param  string  $uri
-     * @param  array   $data
-     * @param  array   $headers
-     * @param  array   $cookies
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
     public function post($uri, array $data = [], array $headers = [], array $cookies = [])
@@ -89,9 +89,9 @@ trait CrawlerTrait
      * Visit the given URI with a PUT request.
      *
      * @param  string  $uri
-     * @param  array   $data
-     * @param  array   $headers
-     * @param  array   $cookies
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
     public function put($uri, array $data = [], array $headers = [], array $cookies = [])
@@ -107,9 +107,9 @@ trait CrawlerTrait
      * Visit the given URI with a PATCH request.
      *
      * @param  string  $uri
-     * @param  array   $data
-     * @param  array   $headers
-     * @param  array   $cookies
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
     public function patch($uri, array $data = [], array $headers = [], array $cookies = [])
@@ -125,9 +125,9 @@ trait CrawlerTrait
      * Visit the given URI with a DELETE request.
      *
      * @param  string  $uri
-     * @param  array   $data
-     * @param  array   $headers
-     * @param  array   $cookies
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
     public function delete($uri, array $data = [], array $headers = [], array $cookies = [])
@@ -144,9 +144,9 @@ trait CrawlerTrait
      *
      * @param  string  $method
      * @param  string  $uri
-     * @param  array   $parameters
-     * @param  array   $cookies
-     * @param  array   $files
+     * @param  array  $parameters
+     * @param  array  $cookies
+     * @param  array  $files
      * @return $this
      */
     protected function makeRequest($method, $uri, $parameters = [], $cookies = [], $files = [])
