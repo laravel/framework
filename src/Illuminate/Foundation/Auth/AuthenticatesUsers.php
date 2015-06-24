@@ -36,7 +36,7 @@ trait AuthenticatesUsers
             return $this->sendLockoutResponse($request);
         }
 
-        if (Auth::attempt($this->getCredentials(), $request->has('remember'))) {
+        if (Auth::attempt($this->getCredentials($request), $request->has('remember'))) {
             $this->clearLoginAttempts($request);
 
             return redirect()->intended($this->redirectPath());
@@ -59,10 +59,16 @@ trait AuthenticatesUsers
      */
     protected function tooManyLoginAttempts(Request $request)
     {
-        if ($this->getLoginAttempts($request) > 3) {
-            Cache::add($timeKey = $this->getLoginLockExpirationKey($request), time() + 120, 2);
+        $attempts = $this->getLoginAttempts($request);
 
-            return ($time = Cache::get($timeKey)) && time() > $time;
+        if ($attempts > 3) {
+            $expiration = $this->calculateLockExpiration($attempts);
+
+            if (Cache::add($timeKey = $this->getLoginLockExpirationKey($request), $expiration, \Carbon\Carbon::createFromTimestamp($expiration))) {
+                $this->incrementLoginAttempts($request);
+            }
+
+            return (bool) Cache::get($timeKey);
         }
 
         return false;
@@ -87,9 +93,20 @@ trait AuthenticatesUsers
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        Cache::add($key = $this->getLoginAttemptsKey($request), 0, 2);
+        Cache::add($key = $this->getLoginAttemptsKey($request), 1, 15);
 
         return (int) Cache::increment($key);
+    }
+
+    /**
+     * Calculate the next lock expiration time based on the login attempts.
+     *
+     * @param  int  $attempts
+     * @return int
+     */
+    protected function calculateLockExpiration($attempts)
+    {
+        return min(time() + 120, time() + (($attempts - 3) * 15));
     }
 
     /**
@@ -100,9 +117,9 @@ trait AuthenticatesUsers
      */
     protected function sendLockoutResponse(Request $request)
     {
-        $seconds = time() - (int) Cache::get($this->getLoginLockExpirationKey($request));
+        $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
 
-        return redirect($this->loginPath)
+        return redirect($this->loginPath())
             ->withInput($request->only('email', 'remember'))
             ->withErrors([
                 'email' => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
