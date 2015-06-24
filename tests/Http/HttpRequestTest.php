@@ -347,7 +347,6 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->wants('application/json'));
         $this->assertEquals('application/xml', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->wants('application/xml'));
         $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->wants('text/html'));
-
     }
 
     public function testAllInputReturnsInputAndFiles()
