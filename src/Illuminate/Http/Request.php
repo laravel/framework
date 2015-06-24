@@ -567,6 +567,26 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Determine if the given content types match.
+     *
+     * @return bool
+     */
+    public static function matchesType($actual, $type)
+    {
+        if ($actual === $type) {
+            return true;
+        }
+
+        $split = explode('/', $actual);
+
+        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the request is sending JSON.
      *
      * @return bool
@@ -585,7 +605,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && $acceptable[0] == 'application/json';
+        return isset($acceptable[0]) && $acceptable[0] === 'application/json';
     }
 
     /**
@@ -605,18 +625,12 @@ class Request extends SymfonyRequest implements ArrayAccess
         $types = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if ($accept === '*/*') {
+            if ($accept === '*/*' || $accept === '*') {
                 return true;
             }
 
             foreach ($types as $type) {
-                if ($accept === $type || $accept === strtok('/', $type).'/*') {
-                    return true;
-                }
-
-                $split = explode('/', $accept);
-
-                if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                if ($this->matchesType($accept, $type) || $accept === strtok('/', $type).'/*') {
                     return true;
                 }
             }

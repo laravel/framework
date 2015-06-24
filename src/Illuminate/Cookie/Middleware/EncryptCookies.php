@@ -120,8 +120,8 @@ class EncryptCookies
      */
     protected function encrypt(Response $response)
     {
-        foreach ($response->headers->getCookies() as $key => $cookie) {
-            if ($this->isDisabled($key)) {
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($this->isDisabled($cookie->getName())) {
                 continue;
             }
 
