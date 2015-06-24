@@ -7,7 +7,7 @@ use Swift_Mime_Message;
 use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
-class MailgunTransport implements Swift_Transport
+class MailgunTransport extends Transport implements Swift_Transport
 {
     /**
      * Guzzle client instance.
@@ -47,8 +47,8 @@ class MailgunTransport implements Swift_Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->setDomain($domain);
     }
 
@@ -81,20 +81,16 @@ class MailgunTransport implements Swift_Transport
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $options = ['auth' => ['api', $this->key], 'multipart' => [
+        $this->beforeSendPerformed($message);
+
+        $options = ['auth' => ['api', $this->key]];
+
+        $options['multipart'] = [
             ['name' => 'to', 'contents' => $this->getTo($message)],
             ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
-        ]];
+        ];
 
         return $this->client->post($this->url, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        //
     }
 
     /**
