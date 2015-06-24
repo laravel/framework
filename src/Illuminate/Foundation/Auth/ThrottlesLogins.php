@@ -45,7 +45,7 @@ trait ThrottlesLogins
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        Cache::add($key = $this->getLoginAttemptsKey($request), 1, 10);
+        Cache::add($key = $this->getLoginAttemptsKey($request), 1, 1);
 
         return (int) Cache::increment($key);
     }
