@@ -55,13 +55,14 @@ trait CrawlerTrait
      *
      * @param  string  $uri
      * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
-    public function get($uri, array $headers = [])
+    public function get($uri, array $headers = [], array $cookies = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call('GET', $uri, [], [], [], $server);
+        $this->call('GET', $uri, [], $cookies, [], $server);
 
         return $this;
     }
@@ -72,13 +73,14 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
-    public function post($uri, array $data = [], array $headers = [])
+    public function post($uri, array $data = [], array $headers = [], array $cookies = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
-        $this->call('POST', $uri, $data, [], [], $server);
+
+        $this->call('POST', $uri, $data, $cookies, [], $server);
 
         return $this;
     }
@@ -89,13 +91,14 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
-    public function put($uri, array $data = [], array $headers = [])
+    public function put($uri, array $data = [], array $headers = [], array $cookies = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
-        $this->call('PUT', $uri, $data, [], [], $server);
+
+        $this->call('PUT', $uri, $data, $cookies, [], $server);
 
         return $this;
     }
@@ -106,13 +109,14 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
-    public function patch($uri, array $data = [], array $headers = [])
+    public function patch($uri, array $data = [], array $headers = [], array $cookies = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
-        $this->call('PATCH', $uri, $data, [], [], $server);
+
+        $this->call('PATCH', $uri, $data, $cookies, [], $server);
 
         return $this;
     }
@@ -123,13 +127,14 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  array  $cookies
      * @return $this
      */
-    public function delete($uri, array $data = [], array $headers = [])
+    public function delete($uri, array $data = [], array $headers = [], array $cookies = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
-        $this->call('DELETE', $uri, $data, [], [], $server);
+
+        $this->call('DELETE', $uri, $data, $cookies, [], $server);
 
         return $this;
     }
