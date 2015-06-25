@@ -3012,7 +3012,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         foreach ($this->attributes as $key => $value) {
             if (!array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
-            } elseif ($value !== $this->original[$key] &&
+            } elseif ((($this->hasCast($key) && $value !== $this->castAttribute($key, $this->original[$key])) ||
+                       (!$this->hasCast($key) && $value !== $this->original[$key])) &&
                                  !$this->originalIsNumericallyEquivalent($key)) {
                 $dirty[$key] = $value;
             }
