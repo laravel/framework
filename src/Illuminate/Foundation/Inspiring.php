@@ -26,7 +26,6 @@ class Inspiring
             'He who is contented is rich. - Laozi',
             'Very little is needed to make a happy life. - Marcus Antoninus',
 
-
         ])->random();
     }
 }

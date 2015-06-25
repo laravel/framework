@@ -77,7 +77,7 @@ trait CrawlerTrait
     public function post($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
+
         $this->call('POST', $uri, $data, [], [], $server);
 
         return $this;
@@ -94,7 +94,7 @@ trait CrawlerTrait
     public function put($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
+
         $this->call('PUT', $uri, $data, [], [], $server);
 
         return $this;
@@ -111,7 +111,7 @@ trait CrawlerTrait
     public function patch($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
+
         $this->call('PATCH', $uri, $data, [], [], $server);
 
         return $this;
@@ -128,7 +128,7 @@ trait CrawlerTrait
     public function delete($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
-        
+
         $this->call('DELETE', $uri, $data, [], [], $server);
 
         return $this;
