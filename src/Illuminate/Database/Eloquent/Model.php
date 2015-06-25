@@ -2849,7 +2849,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $format = $this->getDateFormat();
 
         return Carbon::createFromFormat($format, $value);
-        
     }
 
     /**
