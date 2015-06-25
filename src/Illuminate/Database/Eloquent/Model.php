@@ -2826,7 +2826,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // these checks since they will be a waste of time, and hinder performance
         // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTime) {
-            //
+            return Carbon::instance($value);
         }
 
         // If this value is an integer, we will assume it is a UNIX timestamp's value
@@ -2851,8 +2851,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             return Carbon::createFromFormat($format, $value);
         }
-
-        return Carbon::instance($value);
     }
 
     /**
