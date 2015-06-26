@@ -522,7 +522,7 @@ class Factory implements FactoryContract
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content);
+            $this->overwriteSection($section, $content);
         }
     }
 
@@ -598,6 +598,18 @@ class Factory implements FactoryContract
             $content = str_replace('@parent', $content, $this->sections[$section]);
         }
 
+        $this->sections[$section] = $content;
+    }
+
+    /**
+     * Overwrite content to a given section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    protected function overwriteSection($section, $content)
+    {
         $this->sections[$section] = $content;
     }
 
