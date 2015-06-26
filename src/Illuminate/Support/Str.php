@@ -357,11 +357,7 @@ class Str
     public static function slug($title, $separator = '-')
     {
         // Convert to UTF8
-        if (function_exists('mb_convert_encoding')) {
-            $title = mb_convert_encoding($title, 'UTF-8');
-        } else {
-            $title = utf8_encode($title);
-        }
+        $title = mb_convert_encoding($title, 'UTF-8');
 
         // Convert all dashes/underscores into separator
         $flip = $separator == '-' ? '_' : '-';
