@@ -98,6 +98,20 @@ class MigrateMakeCommand extends BaseCommand
     }
 
     /**
+     * Get migration path (either specified by '--path' option or default location).
+     *
+     * @return string
+     */
+    protected function getMigrationPath()
+    {
+        if (is_null($path = $this->input->getOption('path'))) {
+            $path = parent::getMigrationPath();
+        }
+        
+        return $path;
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
@@ -120,6 +134,8 @@ class MigrateMakeCommand extends BaseCommand
             ['create', null, InputOption::VALUE_OPTIONAL, 'The table to be created.'],
 
             ['table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to create the migration file in.'],
         ];
     }
 }
