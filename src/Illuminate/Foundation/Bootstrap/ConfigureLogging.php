@@ -88,7 +88,7 @@ class ConfigureLogging
     protected function configureDailyHandler(Application $app, Writer $log)
     {
         $log->useDailyFiles(
-            $app->storagePath().'/logs/laravel.log',
+            $app->make('config')->get('app.log_directory', $app->storagePath().'/logs/laravel.log'),
             $app->make('config')->get('app.log_max_files', 5)
         );
     }
