@@ -645,7 +645,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      * @param  string|array  $contentTypes
      * @return string|null
      */
-    public function wants($contentTypes)
+    public function prefers($contentTypes)
     {
         $accepts = $this->getAcceptableContentTypes();
         $contentTypes = (array) $contentTypes;
