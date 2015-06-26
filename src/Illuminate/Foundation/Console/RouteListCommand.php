@@ -270,7 +270,7 @@ class RouteListCommand extends Command
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
 
-            ['reverse', 'r', InputOption::VALUE_NONE, 'Order descending alphabetically.'],
+            ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
 
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by.', 'uri'],
         ];
