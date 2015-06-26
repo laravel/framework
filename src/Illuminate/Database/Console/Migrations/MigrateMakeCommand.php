@@ -3,18 +3,19 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Foundation\Composer;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
 
 class MigrateMakeCommand extends BaseCommand
 {
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'make:migration';
+    protected $signature = 'make:migration {name : The name of the migration.}
+        {--create= : The table to be created.}
+        {--table= : The table to migrate.}
+        {--path= : The path to create the migration file in.}';
 
     /**
      * The console command description.
@@ -111,31 +112,4 @@ class MigrateMakeCommand extends BaseCommand
         return parent::getMigrationPath();
     }
 
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of the migration'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['create', null, InputOption::VALUE_OPTIONAL, 'The table to be created.'],
-
-            ['table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'],
-
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to create the migration file in.'],
-        ];
-    }
 }
