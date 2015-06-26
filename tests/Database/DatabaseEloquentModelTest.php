@@ -48,7 +48,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $string = '2015-01-01 01:01:01';
         $datetime = new DateTime($string);
-        $carbon = \Carbon\Carbon::instance($datetime);
+        $carbon = Carbon\Carbon::instance($datetime);
 
         $this->assertEquals($carbon->getTimestamp(), $carbon->getTimestamp());
         $this->assertEquals($carbon->getTimezone(), $carbon->getTimezone());
@@ -72,7 +72,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
         $string = '2015-12-31 23:59:59';
         $datetime = new DateTime($string);
-        $carbon = \Carbon\Carbon::instance($datetime);
+        $carbon = Carbon\Carbon::instance($datetime);
 
         $model->created_at = $datetime;
         $model->updated_at = $carbon;
