@@ -72,7 +72,7 @@ class VendorPublishCommand extends Command
         );
 
         if (empty($paths)) {
-            return $this->comment("Nothing to publish for $tag.");
+            return $this->comment("Nothing to publish for tag [{$tag}].");
         }
 
         foreach ($paths as $from => $to) {
@@ -85,7 +85,7 @@ class VendorPublishCommand extends Command
             }
         }
 
-        $this->info("Publishing Complete for $tag!");
+        $this->info("Publishing complete for tag [{$tag}]!");
     }
 
     /**
