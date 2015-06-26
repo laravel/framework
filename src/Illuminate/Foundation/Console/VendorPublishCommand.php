@@ -7,7 +7,6 @@ use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
-use Symfony\Component\Console\Input\InputOption;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class VendorPublishCommand extends Command
@@ -20,11 +19,13 @@ class VendorPublishCommand extends Command
     protected $files;
 
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'vendor:publish';
+    protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
+            {--provider? : The service provider that has assets you want to publish.}
+            {--tag?* : One or many tags that have assets you want to publish.}';
 
     /**
      * The console command description.
@@ -53,12 +54,25 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
+        foreach ($this->option('tag') as $tag) {
+            $this->publishTag($tag);
+        }
+    }
+
+    /**
+     * Publishes the assets for a tag.
+     *
+     * @param  string  $tag
+     * @return mixed
+     */
+    private function publishTag($tag)
+    {
         $paths = ServiceProvider::pathsToPublish(
-            $this->option('provider'), $this->option('tag')
+            $this->option('provider'), $tag
         );
 
         if (empty($paths)) {
-            return $this->comment('Nothing to publish.');
+            return $this->comment("Nothing to publish for $tag.");
         }
 
         foreach ($paths as $from => $to) {
@@ -71,7 +85,7 @@ class VendorPublishCommand extends Command
             }
         }
 
-        $this->info('Publishing Complete!');
+        $this->info("Publishing Complete for $tag!");
     }
 
     /**
@@ -145,21 +159,5 @@ class VendorPublishCommand extends Command
         $to = str_replace(base_path(), '', realpath($to));
 
         $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'],
-
-            ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'],
-
-            ['tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'],
-        ];
     }
 }
