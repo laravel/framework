@@ -38,15 +38,13 @@ class KeyGenerateCommand extends Command
         $path = base_path('.env');
 
         if (! file_exists($path)) {
-            $this->error('Missing '.$path.' file.');
-            return;
+            return $this->error("Missing {$path} file.");
         }
 
         $envContent = file_get_contents($path);
 
         if (strpos($envContent, 'APP_KEY=') === false) {
-            $this->error('Missing APP_KEY= in .env file.');
-            return;
+            return $this->error('Missing APP_KEY= in .env file.');
         }
 
         $envContent = str_replace('APP_KEY='.$this->laravel['config']['app.key'], 'APP_KEY='.$key, $envContent);
