@@ -741,14 +741,18 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @return \Illuminate\Routing\Route|null
+     * @param string|null $param
+     *
+     * @return object|string
      */
-    public function route()
+    public function route($param = null)
     {
-        if (func_num_args() == 1) {
-            return $this->route()->parameter(func_get_arg(0));
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($param)) {
+            return $route;
         } else {
-            return call_user_func($this->getRouteResolver());
+            return $route->parameter($param);
         }
     }
 
@@ -855,8 +859,8 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         if (array_key_exists($key, $all)) {
             return $all[$key];
-        } elseif (!is_null($this->route())) {
-            return $this->route()->parameter($key);
+        } else {
+            return $this->route($key);
         }
     }
 }
