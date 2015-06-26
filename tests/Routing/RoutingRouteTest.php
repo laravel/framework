@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase
@@ -544,6 +546,16 @@ return 'foo!'; });
         $router->get('foo/{bar}', function ($name) { return $name; });
         $router->model('bar', 'RouteModelBindingNullStub', function ($value) { return (new RouteModelBindingClosureStub())->findAlternate($value); });
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
+    }
+
+    public function testModelBindingThroughIOC()
+    {
+        $router = new Router(new Dispatcher, $container = new Container);
+
+        $container->bind('RouteModelInterface', 'RouteModelBindingStub');
+        $router->get('foo/{bar}', function ($name) { return $name; });
+        $router->model('bar', 'RouteModelInterface');
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
     public function testGroupMerging()
