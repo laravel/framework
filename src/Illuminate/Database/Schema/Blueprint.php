@@ -712,6 +712,18 @@ class Blueprint
     }
 
     /**
+     * Add creation and update timestampTz columns to the table.
+     *
+     * @return void
+     */
+    public function timestampsTz()
+    {
+        $this->timestampTz('created_at');
+
+        $this->timestampTz('updated_at');
+    }
+
+    /**
      * Add a "deleted at" timestamp for the table.
      *
      * @return \Illuminate\Support\Fluent
