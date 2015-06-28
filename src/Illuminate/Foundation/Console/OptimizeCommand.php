@@ -80,7 +80,7 @@ class OptimizeCommand extends Command
             '--config' => implode(',', $this->getClassFiles()),
             '--output' => $this->laravel->getCachedCompilePath(),
             '--strip_comments' => 1,
-            '--skip_dir_file' => (bool) $this->option('portable'),
+            '--skip_dir_file' => 1,
         ]);
     }
 
@@ -125,8 +125,6 @@ class OptimizeCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'],
 
             ['psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'],
-
-            ['portable', null, InputOption::VALUE_NONE, 'Skip files with __DIR__ or __FILE__ to make the cache portable.'],
         ];
     }
 }
