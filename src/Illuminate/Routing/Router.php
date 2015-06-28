@@ -791,7 +791,7 @@ class Router implements RegistrarContract
             // For model binders, we will attempt to retrieve the models using the first
             // method on the model instance. If we cannot retrieve the models we'll
             // throw a not found exception otherwise we will return the instance.
-            $instance = new $class;
+            $instance = $this->container->make($class);
 
             if ($model = $instance->where($instance->getRouteKeyName(), $value)->first()) {
                 return $model;

@@ -38,7 +38,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $items
      * @return static
      */
-    public static function make($items = null)
+    public static function make($items = [])
     {
         return new static($items);
     }
