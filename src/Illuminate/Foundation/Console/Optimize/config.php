@@ -196,5 +196,4 @@ return array_map('realpath', [
     $basePath.'/vendor/symfony/finder/Adapter/PhpAdapter.php',
     $basePath.'/vendor/symfony/finder/Adapter/BsdFindAdapter.php',
     $basePath.'/vendor/symfony/finder/Finder.php',
-    $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
 ]);
