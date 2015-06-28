@@ -104,7 +104,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 
         $presenter = $presenter ?: new SimpleBootstrapThreePresenter($this);
 
-        return $presenter->render();
+        return new Expression($presenter->render());
     }
 
     /**
