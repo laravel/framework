@@ -2,10 +2,17 @@
 
 namespace Illuminate\Foundation\Console;
 
+use PhpParser\Lexer;
+use PhpParser\Parser;
 use Illuminate\Console\Command;
+use ClassPreloader\ClassPreloader;
 use Illuminate\Foundation\Composer;
-use ClassPreloader\Command\PreCompileCommand;
+use ClassPreloader\Parser\DirVisitor;
+use ClassPreloader\Parser\FileVisitor;
+use ClassPreloader\Parser\NodeTraverser;
+use ClassPreloader\Exceptions\SkipFileException;
 use Symfony\Component\Console\Input\InputOption;
+use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
 
 class OptimizeCommand extends Command
 {
@@ -60,7 +67,6 @@ class OptimizeCommand extends Command
 
         if ($this->option('force') || !$this->laravel['config']['app.debug']) {
             $this->info('Compiling common classes');
-
             $this->compileClasses();
         } else {
             $this->call('clear-compiled');
@@ -74,14 +80,35 @@ class OptimizeCommand extends Command
      */
     protected function compileClasses()
     {
-        $this->registerClassPreloaderCommand();
+        $preloader = new ClassPreloader(new PrettyPrinter, new Parser(new Lexer), $this->getTraverser());
 
-        $this->callSilent('compile', [
-            '--config' => implode(',', $this->getClassFiles()),
-            '--output' => $this->laravel->getCachedCompilePath(),
-            '--strip_comments' => 1,
-            '--skip_dir_file' => 1,
-        ]);
+        $handle = $preloader->prepareOutput($this->laravel->getCachedCompilePath());
+
+        foreach ($this->getClassFiles() as $file) {
+            try {
+                fwrite($handle, $preloader->getCode($file, false)."\n");
+            } catch (SkipFileException $ex) {
+                //
+            }
+        }
+
+        fclose($handle);
+    }
+
+    /**
+     * Get the node traverser used by the command.
+     *
+     * @return \ClassPreloader\Parser\NodeTraverser
+     */
+    protected function getTraverser()
+    {
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(new DirVisitor(true));
+
+        $traverser->addVisitor(new FileVisitor(true));
+
+        return $traverser;
     }
 
     /**
@@ -102,16 +129,6 @@ class OptimizeCommand extends Command
         }
 
         return $files;
-    }
-
-    /**
-     * Register the pre-compiler command instance with Artisan.
-     *
-     * @return void
-     */
-    protected function registerClassPreloaderCommand()
-    {
-        $this->getApplication()->add(new PreCompileCommand);
     }
 
     /**
