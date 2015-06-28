@@ -21,7 +21,7 @@
         "illuminate/http": "5.2.*",
         "illuminate/support": "5.2.*",
         "symfony/process": "2.8.*",
-        "nesbot/carbon": "~1.19"
+        "nesbot/carbon": "~1.20"
     },
     "autoload": {
         "psr-4": {
