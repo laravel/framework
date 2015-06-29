@@ -2764,13 +2764,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->{$method}($value);
         }
 
+        $this->setRawAttribute($key, $value);
+    }
+
+    /**
+     * Set the row value of a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    protected function setRawAttribute($key, $value)
+    {
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif (in_array($key, $this->getDates()) && $value) {
+        if (in_array($key, $this->getDates()) && $value) {
             $value = $this->fromDateTime($value);
         }
 
+        // If an attribute is an array or an object, we'll cast it to its string representation.
         if ($this->isJsonCastable($key)) {
             $value = json_encode($value);
         }
@@ -2932,7 +2945,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setRawAttributes(array $attributes, $sync = false)
     {
-        $this->attributes = $attributes;
+        $this->attributes = [];
+
+        foreach ($attributes as $key => $value) {
+            $this->setRawAttribute($key, $value);
+        }
 
         if ($sync) {
             $this->syncOriginal();
