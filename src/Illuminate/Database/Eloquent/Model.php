@@ -2828,7 +2828,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // This prevents us having to reinstantiate a Carbon instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
         if ($value instanceof Carbon) {
-          return $value;
+            return $value;
         }
 
         // If the value is already a DateTime instance, we will just skip the rest of
@@ -2855,9 +2855,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        $format = $this->getDateFormat();
-
-        return Carbon::createFromFormat($format, $value);
+        return Carbon::createFromFormat($this->getDateFormat(), $value);
     }
 
     /**

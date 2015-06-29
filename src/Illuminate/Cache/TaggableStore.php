@@ -9,6 +9,8 @@ abstract class TaggableStore
      *
      * @param  string  $name
      * @return \Illuminate\Cache\TaggedCache
+     *
+     * @deprecated since version 5.1. Use tags instead.
      */
     public function section($name)
     {
