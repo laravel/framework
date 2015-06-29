@@ -138,7 +138,7 @@ class Event
      */
     protected function runCommandInBackground()
     {
-        chdir(base_path());
+        chdir(bin_path());
 
         exec($this->buildCommand());
     }
@@ -154,7 +154,7 @@ class Event
         $this->callBeforeCallbacks($container);
 
         (new Process(
-            trim($this->buildCommand(), '& '), base_path(), null, null, null
+            trim($this->buildCommand(), '& '), bin_path(), null, null, null
         ))->run();
 
         $this->callAfterCallbacks($container);
