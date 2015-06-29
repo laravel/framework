@@ -309,7 +309,7 @@ class Factory implements FactoryContract
         $extensions = array_keys($this->extensions);
 
         return Arr::first($extensions, function ($key, $value) use ($path) {
-            return ends_with($path, $value);
+            return Str::endsWith($path, $value);
         });
     }
 

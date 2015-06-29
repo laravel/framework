@@ -359,7 +359,7 @@ trait CrawlerTrait
             $expected = substr($expected, 1);
         }
 
-        if (ends_with($expected, '}')) {
+        if (Str::endsWith($expected, '}')) {
             $expected = substr($expected, 0, -1);
         }
 
