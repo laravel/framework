@@ -414,7 +414,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function max($callback = null)
     {
         if (is_null($callback)) {
-            if($this->count() == 0) {
+            if ($this->count() == 0) {
                 return 0;
             }
             return max($this->items);
@@ -449,7 +449,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function min($callback = null)
     {
         if (is_null($callback)) {
-            if($this->count() == 0) {
+            if ($this->count() == 0) {
                 return 0;
             }
             return min($this->items);
