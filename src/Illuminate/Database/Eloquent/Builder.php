@@ -269,10 +269,15 @@ class Builder
     {
         $total = $this->query->getCountForPagination($columns);
 
-        $this->query->forPage(
-            $page = Paginator::resolveCurrentPage($pageName),
-            $perPage = $perPage ?: $this->model->getPerPage()
-        );
+        $page = Paginator::resolveCurrentPage($pageName);
+        $perPage = $perPage ?: $this->model->getPerPage();
+        $lastPage = ceil($total / $perPage);
+
+        if ($page > $lastPage) {
+            throw new PaginatorLastPageExceededException;
+        }
+
+        $this->query->forPage($page, $perPage);
 
         return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
