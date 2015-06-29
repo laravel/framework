@@ -147,7 +147,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // add them here at the end of the template. This gets used mainly for the
         // template inheritance via the extends keyword that should be appended.
         if (count($this->footer) > 0) {
-            $result = ltrim($result, PHP_EOL)
+            $result = ltrim($result)
                     .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
         }
 
