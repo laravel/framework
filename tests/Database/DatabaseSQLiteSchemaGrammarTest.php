@@ -421,6 +421,20 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $statements);
     }
 
+    public function testAddingTimeStampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(2, count($statements));
+        $expected = [
+            'alter table "users" add column "created_at" datetime not null',
+            'alter table "users" add column "updated_at" datetime not null',
+        ];
+        $this->assertEquals($expected, $statements);
+    }
+
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');
