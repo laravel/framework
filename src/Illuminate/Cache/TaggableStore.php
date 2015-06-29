@@ -7,19 +7,6 @@ abstract class TaggableStore
     /**
      * Begin executing a new tags operation.
      *
-     * @param  string  $name
-     * @return \Illuminate\Cache\TaggedCache
-     *
-     * @deprecated since version 5.1. Use tags instead.
-     */
-    public function section($name)
-    {
-        return $this->tags($name);
-    }
-
-    /**
-     * Begin executing a new tags operation.
-     *
      * @param  array|mixed  $names
      * @return \Illuminate\Cache\TaggedCache
      */
