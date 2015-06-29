@@ -16,7 +16,7 @@ class CheckForMaintenanceMode
     protected $app;
 
     /**
-     * Create a new filter instance.
+     * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
