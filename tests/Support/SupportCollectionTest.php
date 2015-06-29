@@ -636,52 +636,52 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection();
         $this->assertEquals(0, $c->sum('foo'));
-	    $this->assertEquals(0, $c->sum());
+        $this->assertEquals(0, $c->sum());
     }
 
-	public function testGettingMaxFromCollection()
-	{
-		$c = new Collection([(object) ['foo' => 50], (object) ['foo' => 30]]);
-		$this->assertEquals(50, $c->max('foo'));
+    public function testGettingMaxFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 30]]);
+        $this->assertEquals(50, $c->max('foo'));
 
-		$c = new Collection([(object) ['foo' => 30], (object) ['foo' => 50]]);
-		$this->assertEquals(50, $c->max(function ($i) { return $i->foo; }));
-	}
+        $c = new Collection([(object) ['foo' => 30], (object) ['foo' => 50]]);
+        $this->assertEquals(50, $c->max(function ($i) { return $i->foo; }));
+    }
 
-	public function testCanMaxValuesWithoutACallback()
-	{
-		$c = new Collection([1, 2, 3, 4, 5]);
-		$this->assertEquals(5, $c->max());
-	}
+    public function testCanMaxValuesWithoutACallback()
+    {
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals(5, $c->max());
+    }
 
-	public function testGettingMaxFromEmptyCollection()
-	{
-		$c = new Collection();
-		$this->assertEquals(0, $c->max('foo'));
-		$this->assertEquals(0, $c->max());
-	}
+    public function testGettingMaxFromEmptyCollection()
+    {
+        $c = new Collection();
+        $this->assertEquals(0, $c->max('foo'));
+        $this->assertEquals(0, $c->max());
+    }
 
-	public function testGettingMinFromCollection()
-	{
-		$c = new Collection([(object) ['foo' => 50], (object) ['foo' => 30]]);
-		$this->assertEquals(30, $c->min('foo'));
+    public function testGettingMinFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 50], (object) ['foo' => 30]]);
+        $this->assertEquals(30, $c->min('foo'));
 
-		$c = new Collection([(object) ['foo' => 30], (object) ['foo' => 50]]);
-		$this->assertEquals(30, $c->min(function ($i) { return $i->foo; }));
-	}
+        $c = new Collection([(object) ['foo' => 30], (object) ['foo' => 50]]);
+        $this->assertEquals(30, $c->min(function ($i) { return $i->foo; }));
+    }
 
-	public function testCanMinValuesWithoutACallback()
-	{
-		$c = new Collection([1, 2, 3, 4, 5]);
-		$this->assertEquals(1, $c->min());
-	}
+    public function testCanMinValuesWithoutACallback()
+    {
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals(1, $c->min());
+    }
 
-	public function testGettingMinFromEmptyCollection()
-	{
-		$c = new Collection();
-		$this->assertEquals(0, $c->min('foo'));
-		$this->assertEquals(0, $c->min());
-	}
+    public function testGettingMinFromEmptyCollection()
+    {
+        $c = new Collection();
+        $this->assertEquals(0, $c->min('foo'));
+        $this->assertEquals(0, $c->min());
+    }
 
     public function testValueRetrieverAcceptsDotNotation()
     {

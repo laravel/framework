@@ -405,29 +405,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new static(array_combine($keys, $items));
     }
 
-	/**
-	 * Get the max value of the given values.
-	 *
-	 * @param  callable|string|null  $callback
-	 * @return mixed
-	 */
-	public function max($callback = null)
-	{
-		if (is_null($callback)) {
-			if($this->count() == 0) {
-				return 0;
-			}
-			return max($this->items);
-		}
+    /**
+     * Get the max value of the given values.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function max($callback = null)
+    {
+        if (is_null($callback)) {
+            if($this->count() == 0) {
+                return 0;
+            }
+            return max($this->items);
+        }
 
-		$callback = $this->valueRetriever($callback);
+        $callback = $this->valueRetriever($callback);
 
-		return $this->reduce(function ($result, $item) use ($callback) {
-			$value = $callback($item);
+        return $this->reduce(function ($result, $item) use ($callback) {
+            $value = $callback($item);
 
-			return is_null($result) || $value > $result ? $value : $result;
-		});
-	}
+            return is_null($result) || $value > $result ? $value : $result;
+        });
+    }
 
     /**
      * Merge the collection with the given items.
@@ -440,29 +440,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
 
-	/**
-	 * Get the min value of the given values.
-	 *
-	 * @param  callable|string|null  $callback
-	 * @return mixed
-	 */
-	public function min($callback = null)
-	{
-		if (is_null($callback)) {
-			if($this->count() == 0) {
-				return 0;
-			}
-			return min($this->items);
-		}
+    /**
+     * Get the min value of the given values.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function min($callback = null)
+    {
+        if (is_null($callback)) {
+            if($this->count() == 0) {
+                return 0;
+            }
+            return min($this->items);
+        }
 
-		$callback = $this->valueRetriever($callback);
+        $callback = $this->valueRetriever($callback);
 
-		return $this->reduce(function ($result, $item) use ($callback) {
-			$value = $callback($item);
+        return $this->reduce(function ($result, $item) use ($callback) {
+            $value = $callback($item);
 
-			return is_null($result) || $value < $result ? $value : $result;
-		});
-	}
+            return is_null($result) || $value < $result ? $value : $result;
+        });
+    }
 
     /**
      * "Paginate" the collection by slicing it into a smaller collection.
