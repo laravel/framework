@@ -106,6 +106,19 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('bin_path')) {
+    /**
+     * Get the path to the directory containing the artisan binary.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function bin_path($path = '')
+    {
+        return app()->binPath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
 if (!function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
