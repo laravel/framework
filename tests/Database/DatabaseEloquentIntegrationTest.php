@@ -149,6 +149,18 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo@gmail.com', $models[0]->email);
     }
 
+    public function testCountForPagination()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'bar@gmail.com']);
+
+        $query = EloquentTestUser::getQuery();
+
+        $this->assertEquals(4, $query->getCountForPagination());
+    }
+
     public function testCountForPaginationWithGrouping()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -157,6 +169,42 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
 
         $query = EloquentTestUser::groupBy('email')->getQuery();
+
+        $this->assertEquals(3, $query->getCountForPagination());
+    }
+
+    public function testCountForPaginationWithGroupingAndJoining()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $date = '1970-01-01';
+
+        $result = EloquentTestPost::insert([
+            ['user_id' => 1, 'name' => 'Post 1', 'created_at' => $date, 'updated_at' => $date],
+            ['user_id' => 2, 'name' => 'Post 2', 'created_at' => $date, 'updated_at' => $date],
+        ]);
+
+        $query = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')->groupBy('email')->getQuery();
+
+        $this->assertEquals(2, $query->getCountForPagination());
+    }
+
+    public function testCountForPaginationWithGroupingAndLeftJoining()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        $date = '1970-01-01';
+
+        $result = EloquentTestPost::insert([
+            ['user_id' => 1, 'name' => 'Post 1', 'created_at' => $date, 'updated_at' => $date],
+            ['user_id' => 2, 'name' => 'Post 2', 'created_at' => $date, 'updated_at' => $date],
+        ]);
+
+        $query = EloquentTestUser::leftJoin('posts', 'users.id', '=', 'posts.user_id')->groupBy('email')->getQuery();
 
         $this->assertEquals(3, $query->getCountForPagination());
     }
