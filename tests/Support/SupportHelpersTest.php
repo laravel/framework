@@ -210,10 +210,10 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testEndsWith()
     {
-        $this->assertTrue(ends_with('jason', 'on'));
-        $this->assertTrue(ends_with('jason', ['on']));
-        $this->assertFalse(ends_with('jason', 'no'));
-        $this->assertFalse(ends_with('jason', ['no']));
+        $this->assertTrue(Str::endsWith('jason', 'on'));
+        $this->assertTrue(Str::endsWith('jason', ['on']));
+        $this->assertFalse(Str::endsWith('jason', 'no'));
+        $this->assertFalse(Str::endsWith('jason', ['no']));
     }
 
     public function testStrContains()
