@@ -640,7 +640,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
-     * Return the most suitable content type based on content negotiation.
+     * Return the most suitable content type from the given array based on content negotiation.
      *
      * @param  string|array  $contentTypes
      * @return string|null
@@ -648,6 +648,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     public function prefers($contentTypes)
     {
         $accepts = $this->getAcceptableContentTypes();
+
         $contentTypes = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
