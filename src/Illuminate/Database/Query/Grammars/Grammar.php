@@ -177,7 +177,15 @@ class Grammar extends BaseGrammar
     {
         $first = $this->wrap($clause['first']);
 
-        $second = $clause['where'] ? '?' : $this->wrap($clause['second']);
+        if ($clause['where']) {
+            if ($clause['operator'] === 'in' || $clause['operator'] === 'not in') {
+                $second = '('.join(', ', array_fill(0, $clause['second'], '?')).')';
+            } else {
+                $second = '?';
+            }
+        } else {
+            $second = $this->wrap($clause['second']);
+        }
 
         return "{$clause['boolean']} $first {$clause['operator']} $second";
     }
