@@ -630,13 +630,43 @@ class Request extends SymfonyRequest implements ArrayAccess
             }
 
             foreach ($types as $type) {
-                if ($this->matchesType($accept, $type) || $accept === strtok('/', $type).'/*') {
+                if ($this->matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Return the most suitable content type based on content negotiation.
+     *
+     * @param  string|array  $contentTypes
+     * @return string|null
+     */
+    public function prefers($contentTypes)
+    {
+        $accepts = $this->getAcceptableContentTypes();
+        $contentTypes = (array) $contentTypes;
+
+        foreach ($accepts as $accept) {
+            if (in_array($accept, ['*/*', '*'])) {
+                return $contentTypes[0];
+            }
+
+            foreach ($contentTypes as $contentType) {
+                $type = $contentType;
+
+                if (!is_null($mimeType = $this->getMimeType($contentType))) {
+                    $type = $mimeType;
+                }
+
+                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
+                    return $contentType;
+                }
+            }
+        }
     }
 
     /**
