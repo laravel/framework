@@ -61,7 +61,6 @@ class JoinClause
             $this->bindings[] = $second;
         }
 
-        // In case of `whereIn`, store array count.
         if ($where && ($operator === 'in' || $operator === 'not in') && is_array($second)) {
             $second = count($second);
         }

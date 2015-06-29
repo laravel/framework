@@ -179,10 +179,8 @@ class Grammar extends BaseGrammar
 
         if ($clause['where']) {
             if ($clause['operator'] === 'in' || $clause['operator'] === 'not in') {
-                // In case of `whereIn` operator.
-                $second = '(' . join(', ', array_fill(0, $clause['second'], '?')) . ')';
+                $second = '('.join(', ', array_fill(0, $clause['second'], '?')).')';
             } else {
-                // In case of common `where` operator.
                 $second = '?';
             }
         } else {
