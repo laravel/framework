@@ -456,6 +456,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['password' => 'foo', 'password_confirmation' => 'foo'], ['password' => 'Confirmed']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['password' => '1e2', 'password_confirmation' => '100'], ['password' => 'Confirmed']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateSame()
@@ -469,6 +472,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Same:baz']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'Same:baz']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDifferent()
@@ -482,6 +488,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Different:baz']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'Different:baz']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateAccepted()

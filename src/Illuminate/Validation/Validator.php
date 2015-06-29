@@ -730,7 +730,7 @@ class Validator implements ValidatorContract
 
         $other = Arr::get($this->data, $parameters[0]);
 
-        return isset($other) && $value == $other;
+        return isset($other) && $value === $other;
     }
 
     /**
@@ -747,7 +747,7 @@ class Validator implements ValidatorContract
 
         $other = Arr::get($this->data, $parameters[0]);
 
-        return isset($other) && $value != $other;
+        return isset($other) && $value !== $other;
     }
 
     /**
