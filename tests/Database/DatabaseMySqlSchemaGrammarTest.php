@@ -182,6 +182,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
 
+    public function testDropTimestampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropTimestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -552,6 +562,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `created_at` timestamp default 0 not null, add `updated_at` timestamp default 0 not null', $statements[0]);
+    }
+
+    public function testAddingTimeStampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
