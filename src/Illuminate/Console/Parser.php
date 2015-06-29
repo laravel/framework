@@ -87,13 +87,13 @@ class Parser
         }
 
         switch (true) {
-            case ends_with($token, '?*'):
+            case Str::endsWith($token, '?*'):
                 return new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY, $description);
 
-            case ends_with($token, '*'):
+            case Str::endsWith($token, '*'):
                 return new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED, $description);
 
-            case ends_with($token, '?'):
+            case Str::endsWith($token, '?'):
                 return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL, $description);
 
             case (preg_match('/(.+)\=(.+)/', $token, $matches)):
@@ -123,10 +123,10 @@ class Parser
         }
 
         switch (true) {
-            case ends_with($token, '='):
+            case Str::endsWith($token, '='):
                 return new InputOption(trim($token, '='), null, InputOption::VALUE_OPTIONAL, $description);
 
-            case ends_with($token, '=*'):
+            case Str::endsWith($token, '=*'):
                 return new InputOption(trim($token, '=*'), null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
 
             case (preg_match('/(.+)\=(.+)/', $token, $matches)):
