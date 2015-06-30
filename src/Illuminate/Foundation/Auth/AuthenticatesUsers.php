@@ -17,6 +17,10 @@ trait AuthenticatesUsers
      */
     public function getLogin()
     {
+        if (view()->exists('auth.authenticate')) {
+            return view('auth.authenticate');
+        }
+
         return view('auth.login');
     }
 
