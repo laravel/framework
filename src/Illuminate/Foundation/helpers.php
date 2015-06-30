@@ -324,6 +324,19 @@ if (!function_exists('logger')) {
     }
 }
 
+if (!function_exists('method_field')) {
+    /**
+     * Generate a form field to spoof the HTTP verb used by forms.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    function method_field($method)
+    {
+        return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$method.'">');
+    }
+}
+
 if (!function_exists('old')) {
     /**
      * Retrieve an old input item.

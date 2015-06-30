@@ -54,7 +54,11 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
-        foreach ($this->option('tag') as $tag) {
+        $tags = $this->option('tag');
+
+        $tags = $tags ?: [null];
+
+        foreach ($tags as $tag) {
             $this->publishTag($tag);
         }
     }
