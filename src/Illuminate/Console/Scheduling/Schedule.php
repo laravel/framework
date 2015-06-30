@@ -36,7 +36,9 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
-        return $this->exec(PHP_BINARY.' artisan '.$command, $parameters);
+        $artisan = (defined('ARTISAN_BINARY')) ? ARTISAN_BINARY : 'artisan';
+
+        return $this->exec(PHP_BINARY.' '.$artisan.' '.$command, $parameters);
     }
 
     /**

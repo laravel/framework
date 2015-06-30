@@ -126,6 +126,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $environmentFile = '.env';
 
     /**
+     * The custom path to the artisan binary defined by the developer.
+     *
+     * @var string
+     */
+    protected $binPath;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -472,6 +479,29 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
         return $this['env'] = (new EnvironmentDetector())->detect($callback, $args);
+    }
+
+    /**
+     * Get the path to the directory containing the artisan binary.
+     *
+     * @return string
+     */
+    public function binPath()
+    {
+        return $this->binPath ?: $this->basePath;
+    }
+
+    /**
+     * Set the directory for the artisan binary.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBinPath($path)
+    {
+        $this->binPath = $path;
+
+        return $this;
     }
 
     /**
