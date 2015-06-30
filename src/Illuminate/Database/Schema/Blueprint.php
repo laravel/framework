@@ -280,6 +280,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the timestamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropTimestampsTz()
+    {
+        $this->dropTimestamps();
+    }
+
+    /**
      * Indicate that the soft delete column should be dropped.
      *
      * @return void
@@ -709,6 +719,18 @@ class Blueprint
         $this->timestamp('created_at');
 
         $this->timestamp('updated_at');
+    }
+
+    /**
+     * Add creation and update timestampTz columns to the table.
+     *
+     * @return void
+     */
+    public function timestampsTz()
+    {
+        $this->timestampTz('created_at');
+
+        $this->timestampTz('updated_at');
     }
 
     /**
