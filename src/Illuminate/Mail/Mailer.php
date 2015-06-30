@@ -172,12 +172,12 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $message = $this->createMessage();
 
-        $this->callMessageBuilder($callback, $message);
-
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
         $this->addContent($message, $view, $plain, $raw, $data);
+
+        $this->callMessageBuilder($callback, $message);
 
         if (isset($this->to['address'])) {
             $message->to($this->to['address'], $this->to['name'], true);
