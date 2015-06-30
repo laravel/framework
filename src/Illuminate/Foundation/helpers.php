@@ -324,14 +324,14 @@ if (!function_exists('logger')) {
     }
 }
 
-if (!function_exists('method_spoof')) {
+if (!function_exists('method_field')) {
     /**
      * Generate a method spoof form field for POST method's.
      *
      * @param string $method
      * @return string
      */
-    function method_spoof($method = "")
+    function method_field($method = "")
     {
         return new Illuminate\View\Expression('<input type="hidden" name="_method" value="$method">');
     }
