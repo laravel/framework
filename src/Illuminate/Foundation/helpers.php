@@ -331,7 +331,7 @@ if (!function_exists('method_field')) {
      * @param  string  $method
      * @return string
      */
-    function method_field($method = "")
+    function method_field($method)
     {
         return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$method.'">');
     }
