@@ -670,7 +670,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Get the SQL for an "comment" column modifier.
+     * Get the SQL for a "comment" column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
