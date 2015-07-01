@@ -44,6 +44,45 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testDirtyDatesAttributes()
+    {
+        $string = '2015-01-01 01:01:01';
+        $datetime = new DateTime($string);
+        $carbon = Carbon\Carbon::instance($datetime);
+
+        $this->assertEquals($carbon->getTimestamp(), $carbon->getTimestamp());
+        $this->assertEquals($carbon->getTimezone(), $carbon->getTimezone());
+        $this->assertSame($string, $carbon->toDateTimeString());
+
+        $model = $this->getMock('EloquentDateModelStub', ['getDateFormat']);
+        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+        $model->setRawAttributes([
+            'created_at' => $carbon,
+            'updated_at' => $datetime,
+        ]);
+        $model->syncOriginal();
+
+        $model->created_at = $datetime;
+        $model->updated_at = $carbon;
+        $this->assertFalse($model->isDirty());
+
+        $model->created_at = $string;
+        $model->updated_at = $string;
+        $this->assertFalse($model->isDirty());
+
+        $string = '2015-12-31 23:59:59';
+        $datetime = new DateTime($string);
+        $carbon = Carbon\Carbon::instance($datetime);
+
+        $model->created_at = $datetime;
+        $model->updated_at = $carbon;
+        $this->assertTrue($model->isDirty());
+
+        $model->created_at = $string;
+        $model->updated_at = $string;
+        $this->assertTrue($model->isDirty());
+    }
+
     public function testCalculatedAttributes()
     {
         $model = new EloquentModelStub;
