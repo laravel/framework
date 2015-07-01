@@ -1181,6 +1181,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['eighth']);
     }
 
+    public function testPrimaryKeyNotOverwrittenIfManuallySet()
+    {
+        $model = new EloquentTestPrimaryKeyPreserveStub();
+
+        $tempId = 99999999; // ID that is not used elsewhere, and is not PDO's next insert ID
+
+        $model->id = $tempId;
+        $model->save();
+
+        $this->assertEquals($model->id, $tempId);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1275,6 +1287,17 @@ class EloquentModelSaveStub extends Model
     public function setIncrementing($value)
     {
         $this->incrementing = $value;
+    }
+}
+
+class EloquentTestPrimaryKeyPreserveStub extends EloquentModelSaveStub
+{
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+
+    public function setIncrementing($value)
+    {
+        $this->incrementing = true;
     }
 }
 
