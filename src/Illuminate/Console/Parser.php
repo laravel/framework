@@ -49,6 +49,7 @@ class Parser
     protected static function parameters(array $tokens)
     {
         $arguments = [];
+
         $options = [];
 
         foreach ($tokens as $token) {
