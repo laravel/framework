@@ -2,6 +2,10 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Container\Container;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Session\Session;
+use Illuminate\Support\Facades\Session;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -367,15 +371,58 @@ class Guard implements GuardContract
         // If an implementation of UserInterface was returned, we'll ask the provider
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials)) {
-            if ($login) {
-                $this->login($user, $remember);
+        // If we are continuing the attempt, we skip this because we unset the password
+        if (Session::get('continueAttempt') || $this->hasValidCredentials($user, $credentials)) {
+            Session::forget('continueAttempt');
+            // Strip the password from being passed to authenticators
+            unset($credentials['password']);
+            // Pass the user through any additional authenticators that may be required
+            if($redirect = $this->passesAuthenticators($user, $credentials)){
+                if ($login) {
+                    $this->login($user, $remember);
+                }
+                return true;
+            }elseif(isset($redirect) && !is_bool($redirect)){
+                // User didn't pass additional authenticators
+                // And is being redirect to a new page
+                Session::put('credentials', $credentials);
+                Session::put('remember', $remember);
+                Session::put('login', $login);
+                Session::put('continueAttempt', TRUE);
+                return $redirect;
             }
+            return false;
+        }
+        return false;
+    }
 
-            return true;
+    public function continueAttempt(array $credentials = [])
+    {
+        if(Session::get('continueAttempt')){
+            return $this->attempt(array_merge(Session::get('credentials'),$credentials),Session::get('remember'),Session::get('login'));
+        }else{
+            return false;
         }
 
-        return false;
+    }
+
+    /**
+     * Determine if the user matches the credentials.
+     *
+     * @param  mixed  $user
+     * @param  array  $credentials
+     * @return bool|redirect
+     */
+    protected function passesAuthenticators($user, $credentials)
+    {
+
+        $authenticators = [
+            \Illuminate\Auth\Authenticators\HasValidCredentials::class
+        ];
+
+        return (new Pipeline(new Container))
+            ->send($user, $credentials)
+            ->through($authenticators);
     }
 
     /**
