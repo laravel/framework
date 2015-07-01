@@ -770,3 +770,20 @@ if (!function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('escape_like')) {
+    /**
+     * Escape characters within LIKE clause
+     * In able to search for special characters such as '%' or '_'
+     * Example usage User::where('name', 'LIKE', '%' . escape_like($value) . '%');
+     *
+     * @param $string
+     * @return mixed
+     */
+    function escape_like($string)
+    {
+        $search = array('%', '_');
+        $replace   = array('\%', '\_');
+        return str_replace($search, $replace, $string);
+    }
+}
