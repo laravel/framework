@@ -1003,14 +1003,14 @@ class BelongsToMany extends Relation
             $query->whereIn($this->otherKey, (array) $ids);
         }
 
-        if ($touch) {
-            $this->touchIfTouching();
-        }
-
         // Once we have all of the conditions set on the statement, we are ready
         // to run the delete on the pivot table. Then, if the touch parameter
         // is true, we will go ahead and touch all related models to sync.
         $results = $query->delete();
+
+        if ($touch) {
+            $this->touchIfTouching();
+        }
 
         return $results;
     }
