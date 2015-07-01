@@ -643,6 +643,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function all($columns = ['*'])
     {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
         $instance = new static;
 
         return $instance->newQuery()->get($columns);
