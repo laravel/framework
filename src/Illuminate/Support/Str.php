@@ -249,6 +249,7 @@ class Str
             $bytes = random_bytes($length);
         } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes($length, $strong);
+
             if ($bytes === false || $strong === false) {
                 throw new RuntimeException('Unable to generate random string.');
             }
