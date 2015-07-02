@@ -639,20 +639,18 @@ if (!function_exists('str_plural')) {
     }
 }
 
-if ( ! function_exists('str_possessive'))
-{
+if ( ! function_exists('str_possessive')) {
     /**
      * Make a string possessive
      *
      * @param  string  $string
-     * @return string|null
+     * @return string
      */
     function str_possessive($string)
     {
         return $string.'\''.($string[strlen($string) - 1] != 's' ? 's' : '');
     }
 }
-
 
 if (!function_exists('str_random')) {
     /**
