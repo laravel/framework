@@ -639,6 +639,21 @@ if (!function_exists('str_plural')) {
     }
 }
 
+if ( ! function_exists('str_possessive'))
+{
+    /**
+     * Make a string possessive
+     *
+     * @param  string  $string
+     * @return string|null
+     */
+    function str_possessive($string)
+    {
+        return $string.'\''.($string[strlen($string) - 1] != 's' ? 's' : '');
+    }
+}
+
+
 if (!function_exists('str_random')) {
     /**
      * Generate a more truly "random" alpha-numeric string.
