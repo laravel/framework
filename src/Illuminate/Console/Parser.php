@@ -111,14 +111,14 @@ class Parser
 
         if (Str::contains($token, ' : ')) {
             list($token, $description) = explode(' : ', $token);
-
             $token = trim($token);
-
             $description = trim($description);
         }
 
         $shortcut = null;
+
         $matches = preg_split('/\s*\|\s*/', $token, 2);
+
         if (isset($matches[1])) {
             $shortcut = $matches[0];
             $token = $matches[1];
