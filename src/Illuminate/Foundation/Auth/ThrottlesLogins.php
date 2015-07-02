@@ -17,8 +17,8 @@ trait ThrottlesLogins
     {
         $attempts = $this->getLoginAttempts($request);
 
-        if ($attempts > 3) {
-            Cache::add($timeKey = $this->getLoginLockExpirationKey($request), time() + 60, 1);
+        if ($attempts > config('auth.throtlle.maximum')) {
+            Cache::add($timeKey = $this->getLoginLockExpirationKey($request), time() + config('auth.throtlle.delay'), 1);
 
             return true;
         }
