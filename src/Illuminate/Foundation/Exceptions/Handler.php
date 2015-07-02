@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
 use Illuminate\Auth\Exceptions\LoginRedirectException;
-use Illuminate\Auth\Exceptions\RequiresRedirectException;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;

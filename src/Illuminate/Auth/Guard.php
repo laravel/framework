@@ -3,7 +3,6 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Auth\Exceptions\LoginRedirectException;
-use Illuminate\Auth\Exceptions\RequiresRedirect;
 use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Session;
@@ -400,7 +399,6 @@ class Guard implements GuardContract
 
     public function continueAttempt(array $credentials = [])
     {
-        //dd(Session::all());
         if(!Session::get('continueAttempt'))
             return false;
 
