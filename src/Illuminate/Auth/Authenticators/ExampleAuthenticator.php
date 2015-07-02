@@ -3,7 +3,9 @@
 namespace Illuminate\Auth\Authenticators;
 
 use Closure;
+
 class ExampleAuthenticator {
+
     /**
      * Handle an incoming request.
      *
@@ -11,14 +13,14 @@ class ExampleAuthenticator {
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($user, $credentials, Closure $next)
-    {
-        if(isset($user)&&isset($credentials))
-        {
+    public function handle($input, Closure $next) {
+        $user = $input['user'];
+        $credentials = $input['credentials'];
+
+        if(isset($credentials['test']) && $credentials['test'] == 'abc'){
             return $next($user, $credentials);
-        }else{
-            return false;
         }
 
+        return redirect('/test/auth');
     }
 }

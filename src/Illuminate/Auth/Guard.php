@@ -2,9 +2,10 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Exceptions\LoginRedirectException;
+use Illuminate\Auth\Exceptions\RequiresRedirect;
 use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Session\Session;
 use Illuminate\Support\Facades\Session;
 use RuntimeException;
 use Illuminate\Support\Str;
@@ -357,12 +358,13 @@ class Guard implements GuardContract
     /**
      * Attempt to authenticate a user using the given credentials.
      *
-     * @param  array  $credentials
-     * @param  bool   $remember
-     * @param  bool   $login
+     * @param  array $credentials
+     * @param  bool $remember
+     * @param  bool $login
+     * @param array $additionalCredentials
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true)
+    public function attempt(array $credentials = [], $remember = false, $login = true, array $additionalCredentials = [])
     {
         $this->fireAttemptEvent($credentials, $remember, $login);
 
@@ -372,24 +374,24 @@ class Guard implements GuardContract
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
         // If we are continuing the attempt, we skip this because we unset the password
-        if (Session::get('continueAttempt') || $this->hasValidCredentials($user, $credentials)) {
-            Session::forget('continueAttempt');
-            // Strip the password from being passed to authenticators
-            unset($credentials['password']);
+        if (Session::pull('continueAttempt') || $this->hasValidCredentials($user, $credentials)) {
             // Pass the user through any additional authenticators that may be required
-            if($redirect = $this->passesAuthenticators($user, $credentials)){
+            $credentials['password'] = null;
+            $redirect = $this->passesAuthenticators($user, array_merge($credentials, $additionalCredentials));
+            if(is_bool($redirect) && $redirect){
                 if ($login) {
                     $this->login($user, $remember);
                 }
                 return true;
-            }elseif(isset($redirect) && !is_bool($redirect)){
+            }elseif(!is_bool($redirect)){
                 // User didn't pass additional authenticators
                 // And is being redirect to a new page
                 Session::put('credentials', $credentials);
                 Session::put('remember', $remember);
                 Session::put('login', $login);
-                Session::put('continueAttempt', TRUE);
-                return $redirect;
+                Session::put('continueAttempt', true);
+                Session::put('additionalCredentials',$additionalCredentials);
+                throw new LoginRedirectException($redirect);
             }
             return false;
         }
@@ -398,11 +400,17 @@ class Guard implements GuardContract
 
     public function continueAttempt(array $credentials = [])
     {
-        if(Session::get('continueAttempt')){
-            return $this->attempt(array_merge(Session::get('credentials'),$credentials),Session::get('remember'),Session::get('login'));
-        }else{
+        //dd(Session::all());
+        if(!Session::get('continueAttempt'))
             return false;
-        }
+
+        $additionalCreds=array_merge(Session::pull('additionalCredentials'),$credentials);
+        return $this->attempt(
+            Session::pull('credentials'),
+            Session::pull('remember'),
+            Session::pull('login'),
+            $additionalCreds
+        );
 
     }
 
@@ -411,18 +419,20 @@ class Guard implements GuardContract
      *
      * @param  mixed  $user
      * @param  array  $credentials
-     * @return bool|redirect
+     * @return bool | \Illuminate\Foundation\RedirectResponse
      */
     protected function passesAuthenticators($user, $credentials)
     {
-
         $authenticators = [
-            \Illuminate\Auth\Authenticators\HasValidCredentials::class
+            \Illuminate\Auth\Authenticators\ExampleAuthenticator::class
         ];
 
         return (new Pipeline(new Container))
-            ->send($user, $credentials)
-            ->through($authenticators);
+            ->send(['user'=>$user, 'credentials'=>$credentials])
+            ->through($authenticators)
+            ->then(function () {
+                return true;
+            });
     }
 
     /**

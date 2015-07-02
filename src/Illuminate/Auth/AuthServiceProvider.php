@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Exceptions\RequiresRedirect;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider

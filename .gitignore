@@ -4,3 +4,7 @@ composer.lock
 .php_cs.cache
 .DS_Store
 Thumbs.db
+
+Gruntfile.js
+node_modules
+package.json
