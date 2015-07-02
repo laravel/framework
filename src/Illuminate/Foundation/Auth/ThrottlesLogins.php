@@ -59,11 +59,11 @@ trait ThrottlesLogins
     protected function sendLockoutResponse(Request $request)
     {
         $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
-
+        $key = 'passwords.throttle';
         return redirect($this->loginPath())
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
-                $this->loginUsername() => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
+                $this->loginUsername() => trans()->has($key) ? trans($key, ['seconds' => $seconds]) : 'Too many login attempts. Please try again in '.$seconds.' seconds.',
             ]);
     }
 
