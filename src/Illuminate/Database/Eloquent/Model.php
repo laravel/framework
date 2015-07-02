@@ -1546,12 +1546,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->updateTimestamps();
         }
 
-        // If the model has an incrementing key, we can use the "insertGetId" method on
+        // If the model's primary key is not set manually, we can use the "insertGetId" method on
         // the query builder, which will give us back the final inserted ID for this
         // table from the database. Not all tables have to be incrementing though.
         $attributes = $this->attributes;
 
-        if ($this->incrementing) {
+        if ($this->hasAutoIncrementingKey()) {
             $this->insertAndSetId($query, $attributes);
         }
 
@@ -1570,6 +1570,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->fireModelEvent('created', false);
 
         return true;
+    }
+
+    /**
+     * Determines if the developer has manually set the primary key on the model.
+     *
+     * @return bool
+     */
+    protected function hasAutoIncrementingKey()
+    {
+        return $this->incrementing && ! isset($this->attributes[$this->getKeyName()]);
     }
 
     /**
