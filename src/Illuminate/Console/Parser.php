@@ -117,18 +117,25 @@ class Parser
             $description = trim($description);
         }
 
+        $shortcut = null;
+        $matches = preg_split('/\s*\|\s*/', $token, 2);
+        if (isset($matches[1])) {
+            $shortcut = $matches[0];
+            $token = $matches[1];
+        }
+
         switch (true) {
             case Str::endsWith($token, '='):
-                return new InputOption(trim($token, '='), null, InputOption::VALUE_OPTIONAL, $description);
+                return new InputOption(trim($token, '='), $shortcut, InputOption::VALUE_OPTIONAL, $description);
 
             case Str::endsWith($token, '=*'):
-                return new InputOption(trim($token, '=*'), null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
+                return new InputOption(trim($token, '=*'), $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
 
             case (preg_match('/(.+)\=(.+)/', $token, $matches)):
-                return new InputOption($matches[1], null, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
+                return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
 
             default:
-                return new InputOption($token, null, InputOption::VALUE_NONE, $description);
+                return new InputOption($token, $shortcut, InputOption::VALUE_NONE, $description);
         }
     }
 }
