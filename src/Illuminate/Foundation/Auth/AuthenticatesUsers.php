@@ -81,7 +81,7 @@ trait AuthenticatesUsers
      */
     protected function getFailedLoginMessage()
     {
-        return 'These credentials do not match our records.';
+        return trans()->has('passwords.failed') ? trans('passwords.failed') : 'These credentials do not match our records.';
     }
 
     /**
