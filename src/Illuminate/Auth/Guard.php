@@ -90,6 +90,13 @@ class Guard implements GuardContract
     protected $tokenRetrievalAttempted = false;
 
     /**
+     * Array of Authenticators to be used when Authenticating a user.
+     *
+     * @var array
+     */
+    protected $authenticators = [];
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -104,6 +111,7 @@ class Guard implements GuardContract
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
+        $this->authenticators = config('auth.authenticators', []);
     }
 
     /**
@@ -421,16 +429,44 @@ class Guard implements GuardContract
      */
     protected function passesAuthenticators($user, $credentials)
     {
-        $authenticators = [
-            \Illuminate\Auth\Authenticators\ExampleAuthenticator::class
-        ];
-
         return (new Pipeline(new Container))
             ->send(['user'=>$user, 'credentials'=>$credentials])
-            ->through($authenticators)
+            ->through($this->authenticators)
             ->then(function () {
                 return true;
             });
+    }
+
+    /**
+     * Add authenticators to be used
+     *
+     * @param $authenticators
+     * @return void
+     */
+    public function addAuthenticators($authenticators)
+    {
+        $this->authenticators = array_merge($this->authenticators,$authenticators);
+    }
+
+    /**
+     * Set authenticators to be used
+     *
+     * @param array $authenticators
+     * @return void
+     */
+    public function setAuthenticators(array $authenticators)
+    {
+        $this->authenticators = $authenticators;
+    }
+
+    /**
+     * Get authenticators to be used
+     *
+     * @return array
+     */
+    public function getAuthenticators()
+    {
+        return $this->authenticators;
     }
 
     /**
