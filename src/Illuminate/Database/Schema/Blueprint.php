@@ -369,7 +369,7 @@ class Blueprint
     }
 
     /**
-     * Create a new auto-incrementing integer column on the table.
+     * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
@@ -378,9 +378,31 @@ class Blueprint
     {
         return $this->unsignedInteger($column, true);
     }
+    
+    /**
+     * Create a new auto-incrementing small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function smallIncrements($column)
+    {
+        return $this->unsignedSmallInteger($column, true);
+    }
 
     /**
-     * Create a new auto-incrementing big integer column on the table.
+     * Create a new auto-incrementing medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function mediumIncrements($column)
+    {
+        return $this->unsignedMediumInteger($column, true);
+    }
+
+    /**
+     * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
@@ -448,7 +470,7 @@ class Blueprint
     }
 
     /**
-     * Create a new integer column on the table.
+     * Create a new integer (4-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
@@ -461,33 +483,7 @@ class Blueprint
     }
 
     /**
-     * Create a new big integer column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
-     */
-    public function bigInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-        return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
-    }
-
-    /**
-     * Create a new medium integer column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
-     */
-    public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-        return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
-    }
-
-    /**
-     * Create a new tiny integer column on the table.
+     * Create a new tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
@@ -500,7 +496,7 @@ class Blueprint
     }
 
     /**
-     * Create a new small integer column on the table.
+     * Create a new small integer (2-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
@@ -513,7 +509,69 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned integer column on the table.
+     * Create a new medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @param  bool  $unsigned
+     * @return \Illuminate\Support\Fluent
+     */
+    public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
+    {
+        return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
+    }
+
+    /**
+     * Create a new big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @param  bool  $unsigned
+     * @return \Illuminate\Support\Fluent
+     */
+    public function bigInteger($column, $autoIncrement = false, $unsigned = false)
+    {
+        return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedTinyInteger($column, $autoIncrement = false)
+    {
+        return $this->tinyInteger($column, $autoIncrement, true);
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedSmallInteger($column, $autoIncrement = false)
+    {
+        return $this->smallInteger($column, $autoIncrement, true);
+    }
+
+    /**
+     * Create a new unsigned medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $autoIncrement
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedMediumInteger($column, $autoIncrement = false)
+    {
+        return $this->mediumInteger($column, $autoIncrement, true);
+    }
+
+    /**
+     * Create a new unsigned integer (4-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
@@ -525,7 +583,7 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned big integer column on the table.
+     * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement

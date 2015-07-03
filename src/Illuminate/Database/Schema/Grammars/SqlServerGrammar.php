@@ -19,7 +19,7 @@ class SqlServerGrammar extends Grammar
      *
      * @var array
      */
-    protected $serials = ['bigInteger', 'integer'];
+    protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
      * Compile the query to determine if a table exists.
