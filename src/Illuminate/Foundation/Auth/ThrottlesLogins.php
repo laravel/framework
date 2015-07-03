@@ -18,8 +18,12 @@ trait ThrottlesLogins
     {
         $attempts = $this->getLoginAttempts($request);
 
-        if ($attempts > 5) {
-            Cache::add($this->getLoginLockExpirationKey($request), time() + 60, 1);
+        $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
+
+        if ($attempts > 5 || $lockedOut) {
+            if (! $lockedOut) {
+                Cache::put($this->getLoginLockExpirationKey($request), time() + 60, 1);
+            }
 
             return true;
         }
