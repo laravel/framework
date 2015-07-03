@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Cache;
 trait ThrottlesLogins
 {
     /**
+     * Get the login lock expiration time.
+     * 
+     * @var int
+     */
+    protected $throttleExpirationTime = 1;
+    
+    /**
      * Determine if the user has too many failed login attempts.
      *
      * @param  Request  $request
@@ -19,7 +26,11 @@ trait ThrottlesLogins
         $attempts = $this->getLoginAttempts($request);
 
         if ($attempts > 5) {
-            Cache::add($this->getLoginLockExpirationKey($request), time() + 60, 1);
+            Cache::add(
+                $this->getLoginLockExpirationKey($request),
+                time() + 60,
+                $this->$throttleExpirationTime
+            );
 
             return true;
         }
