@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Console\Tinker\Casters;
+namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Support\Collection;
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Caster\Caster;
 
-class FoundationCaster
+class IlluminateCaster
 {
     /**
      * Illuminate application methods to include in the presenter.
