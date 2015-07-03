@@ -405,17 +405,23 @@ class Guard implements GuardContract
         return false;
     }
 
-    public function continueAttempt(array $credentials = [])
+    /**
+     * Continue an attempt to authenticate a user using the given previous credentials and any additional ones.
+     *
+     * @param  array $additionalCredentials
+     * @return bool
+     */
+    public function continueAttempt(array $additionalCredentials = [])
     {
         if(!Session::get('continueAttempt'))
             return false;
 
-        $additionalCreds=array_merge(Session::pull('additionalCredentials'),$credentials);
+        $additionalCredentials=array_merge(Session::pull('additionalCredentials'),$additionalCredentials);
         return $this->attempt(
             Session::pull('credentials'),
             Session::pull('remember'),
             Session::pull('login'),
-            $additionalCreds
+            $additionalCredentials
         );
 
     }
@@ -425,7 +431,7 @@ class Guard implements GuardContract
      *
      * @param  mixed  $user
      * @param  array  $credentials
-     * @return bool | \Illuminate\Foundation\RedirectResponse
+     * @return bool|\Illuminate\Foundation\RedirectResponse
      */
     protected function passesAuthenticators($user, $credentials)
     {
