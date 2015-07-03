@@ -3,16 +3,16 @@
 namespace Illuminate\Foundation\Console\Tinker\Casters;
 
 use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
-use Symfony\Component\VarDumper\Caster\Caster;
+use Illuminate\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Caster\Caster;
 
 class FoundationCaster
 {
     /**
-     * Illuminate Application methods to include in the presenter.
+     * Illuminate application methods to include in the presenter.
      *
      * @var array
      */
@@ -34,9 +34,9 @@ class FoundationCaster
     ];
 
     /**
-     * Get an array representing the properties of an Application object.
+     * Get an array representing the properties of an application.
      *
-     * @param  Application  $value
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  array  $a
      * @param  Stub  $stub
      * @param  bool  $isNested
@@ -49,11 +49,12 @@ class FoundationCaster
 
         foreach (self::$appProperties as $property) {
             try {
-                $val = $value->$property();
-                if ( ! is_null($val)) {
+                $val = $app->$property();
+                if (!is_null($val)) {
                     $a[Caster::PREFIX_VIRTUAL . $property] = $val;
                 }
             } catch (Exception $e) {
+                //
             }
         }
 
@@ -61,9 +62,9 @@ class FoundationCaster
     }
 
     /**
-     * Get an array representing the properties of a Collection.
+     * Get an array representing the properties of a collection.
      *
-     * @param  Collection  $value
+     * @param  \Illuminate\Support\Collection  $value
      * @param  array  $a
      * @param  Stub  $stub
      * @param  bool  $isNested
@@ -78,9 +79,9 @@ class FoundationCaster
     }
 
     /**
-     * Get an array representing the properties of a Model object.
+     * Get an array representing the properties of a model.
      *
-     * @param  Application  $value
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  array  $a
      * @param  Stub  $stub
      * @param  bool  $isNested
