@@ -73,15 +73,15 @@ class TinkerCommand extends Command
     }
 
     /**
-     * Get an array of Laravel tailored Casters.
+     * Get an array of Laravel tailored casters.
      *
      * @return array
      */
     protected function getCasters()
     {
         return [
-            'Illuminate\Foundation\Application' => 'Illuminate\Foundation\Console\Tinker\IlluminateCaster::castApplication',
-            'Illuminate\Support\Collection' => 'Illuminate\Foundation\Console\Tinker\IlluminateCaster::castCollection',
+            'Illuminate\Foundation\Application'  => 'Illuminate\Foundation\Console\Tinker\IlluminateCaster::castApplication',
+            'Illuminate\Support\Collection'      => 'Illuminate\Foundation\Console\Tinker\IlluminateCaster::castCollection',
             'Illuminate\Database\Eloquent\Model' => 'Illuminate\Foundation\Console\Tinker\IlluminateCaster::castModel',
         ];
     }
