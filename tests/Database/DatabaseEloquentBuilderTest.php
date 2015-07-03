@@ -214,36 +214,6 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['bar', 'baz'], $builder->lists('name')->all());
     }
 
-    public function testPaginatePassesColumnsToGetCountForPaginationMethod()
-    {
-        $totalItems = 100;
-        $itemsPerPage = 50;
-        $page = 1;
-        $database = 'SQLite';
-        $table = 'table';
-        $columns = [$table . '.column'];
-
-        $model = new EloquentBuilderTestNestedStub;
-
-        $this->mockConnectionForModel($model, $database);
-
-        $query = m::mock('Illuminate\Database\Query\Builder');
-        $query->shouldReceive('from')->once()->with($table);
-        $query->shouldReceive('forPage')->once()->with($page, $itemsPerPage)->andReturn($query);
-        $query->shouldReceive('get')->once()->andReturn($columns);
-
-        /**
-         * Add check that paginate method passes $columns param to getCountForPagination method
-         */
-        $query->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn($totalItems);
-
-        $builder = new Builder($query);
-
-        $builder->setModel($model);
-
-        $builder->paginate($itemsPerPage, $columns);
-    }
-
     public function testMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
