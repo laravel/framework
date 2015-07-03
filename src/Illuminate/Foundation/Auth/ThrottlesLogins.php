@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
 
 trait ThrottlesLogins
@@ -17,8 +18,8 @@ trait ThrottlesLogins
     {
         $attempts = $this->getLoginAttempts($request);
 
-        if ($attempts > 3) {
-            Cache::add($timeKey = $this->getLoginLockExpirationKey($request), time() + 60, 1);
+        if ($attempts > 5) {
+            Cache::add($this->getLoginLockExpirationKey($request), time() + 60, 1);
 
             return true;
         }
@@ -60,10 +61,14 @@ trait ThrottlesLogins
     {
         $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
 
+        $message = Lang::has('passwords.throttle')
+                    ? Lang::get('passwords.throttle', ['seconds' => $seconds])
+                    : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
+
         return redirect($this->loginPath())
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
-                $this->loginUsername() => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
+                $this->loginUsername() => $message,
             ]);
     }
 

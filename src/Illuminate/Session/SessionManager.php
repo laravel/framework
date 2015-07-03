@@ -153,7 +153,7 @@ class SessionManager extends Manager
     {
         $minutes = $this->app['config']['session.lifetime'];
 
-        return new CacheBasedSessionHandler($this->app['cache']->driver($driver), $minutes);
+        return new CacheBasedSessionHandler(clone $this->app['cache']->driver($driver), $minutes);
     }
 
     /**
