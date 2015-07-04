@@ -49,7 +49,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Return the Request instance.
      *
-     * @return $this
+     * @return \Illuminate\Http\Request
      */
     public function instance()
     {
@@ -801,7 +801,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      * Set the user resolver callback.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Http\Request
      */
     public function setUserResolver(Closure $callback)
     {
@@ -824,7 +824,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      * Set the route resolver callback.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Http\Request
      */
     public function setRouteResolver(Closure $callback)
     {

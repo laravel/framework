@@ -22,7 +22,7 @@ trait Queueable
      * Set the desired queue for the job.
      *
      * @param  string  $queue
-     * @return $this
+     * @return \Illuminate\Bus\Queueable
      */
     public function onQueue($queue)
     {
@@ -35,7 +35,7 @@ trait Queueable
      * Set the desired delay for the job.
      *
      * @param  int  $delay
-     * @return $this
+     * @return \Illuminate\Bus\Queueable
      */
     public function delay($delay)
     {

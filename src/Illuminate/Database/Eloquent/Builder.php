@@ -529,7 +529,7 @@ class Builder
      * @param  string  $operator
      * @param  mixed   $value
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -741,7 +741,7 @@ class Builder
      * Set the relationships that should be eager loaded.
      *
      * @param  mixed  $relations
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function with($relations)
     {
@@ -840,7 +840,7 @@ class Builder
      * Set the underlying query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function setQuery($query)
     {
@@ -863,7 +863,7 @@ class Builder
      * Set the relationships being eagerly loaded.
      *
      * @param  array  $eagerLoad
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function setEagerLoads(array $eagerLoad)
     {
@@ -886,7 +886,7 @@ class Builder
      * Set a model instance for the model being queried.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function setModel(Model $model)
     {

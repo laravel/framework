@@ -16,7 +16,7 @@ interface MessageBag
      *
      * @param  string  $key
      * @param  string  $message
-     * @return $this
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function add($key, $message);
 
@@ -24,7 +24,7 @@ interface MessageBag
      * Merge a new array of messages into the bag.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
-     * @return $this
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function merge($messages);
 
@@ -73,7 +73,7 @@ interface MessageBag
      * Set the default message format.
      *
      * @param  string  $format
-     * @return $this
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function setFormat($format = ':message');
 

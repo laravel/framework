@@ -177,7 +177,7 @@ abstract class Grammar
      * Set the grammar's table prefix.
      *
      * @param  string  $prefix
-     * @return $this
+     * @return \Illuminate\Database\Grammar
      */
     public function setTablePrefix($prefix)
     {

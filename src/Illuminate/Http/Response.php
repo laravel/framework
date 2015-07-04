@@ -29,7 +29,7 @@ class Response extends BaseResponse
      * Set the content on the response.
      *
      * @param  mixed  $content
-     * @return $this
+     * @return \Illuminate\Http\Response
      */
     public function setContent($content)
     {

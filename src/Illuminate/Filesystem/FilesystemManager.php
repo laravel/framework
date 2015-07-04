@@ -231,7 +231,7 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string    $driver
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Filesystem\FilesystemManager
      */
     public function extend($driver, Closure $callback)
     {

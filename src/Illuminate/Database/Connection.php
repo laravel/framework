@@ -841,7 +841,7 @@ class Connection implements ConnectionInterface
      * Set the PDO connection.
      *
      * @param  \PDO|null  $pdo
-     * @return $this
+     * @return \Illuminate\Database\Connection
      */
     public function setPdo($pdo)
     {
@@ -858,7 +858,7 @@ class Connection implements ConnectionInterface
      * Set the PDO connection used for reading.
      *
      * @param  \PDO|null  $pdo
-     * @return $this
+     * @return \Illuminate\Database\Connection
      */
     public function setReadPdo($pdo)
     {
@@ -871,7 +871,7 @@ class Connection implements ConnectionInterface
      * Set the reconnect instance on the connection.
      *
      * @param  callable  $reconnector
-     * @return $this
+     * @return \Illuminate\Database\Connection
      */
     public function setReconnector(callable $reconnector)
     {

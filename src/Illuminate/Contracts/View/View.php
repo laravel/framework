@@ -18,7 +18,7 @@ interface View extends Renderable
      *
      * @param  string|array  $key
      * @param  mixed   $value
-     * @return $this
+     * @return \Illuminate\Contracts\View\View
      */
     public function with($key, $value = null);
 }

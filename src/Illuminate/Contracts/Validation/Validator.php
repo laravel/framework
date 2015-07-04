@@ -34,7 +34,7 @@ interface Validator extends MessageProvider
      * After an after validation callback.
      *
      * @param  callable|string  $callback
-     * @return $this
+     * @return \Illuminate\Contracts\Validation\Validator
      */
     public function after($callback);
 }

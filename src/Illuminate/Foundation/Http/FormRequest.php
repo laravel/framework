@@ -195,7 +195,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * Set the container implementation.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @return $this
+     * @return \Illuminate\Foundation\Http\FormRequest
      */
     public function setContainer(Container $container)
     {

@@ -286,7 +286,7 @@ class Event
      * The Cron expression representing the event's frequency.
      *
      * @param  string  $expression
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function cron($expression)
     {
@@ -298,7 +298,7 @@ class Event
     /**
      * Schedule the event to run hourly.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function hourly()
     {
@@ -308,7 +308,7 @@ class Event
     /**
      * Schedule the event to run daily.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function daily()
     {
@@ -319,7 +319,7 @@ class Event
      * Schedule the command at a given time.
      *
      * @param  string  $time
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function at($time)
     {
@@ -330,7 +330,7 @@ class Event
      * Schedule the event to run daily at a given time (10:00, 19:30, etc).
      *
      * @param  string  $time
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function dailyAt($time)
     {
@@ -343,7 +343,7 @@ class Event
     /**
      * Schedule the event to run twice daily.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function twiceDaily()
     {
@@ -353,7 +353,7 @@ class Event
     /**
      * Schedule the event to run only on weekdays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function weekdays()
     {
@@ -363,7 +363,7 @@ class Event
     /**
      * Schedule the event to run only on Mondays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function mondays()
     {
@@ -373,7 +373,7 @@ class Event
     /**
      * Schedule the event to run only on Tuesdays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function tuesdays()
     {
@@ -383,7 +383,7 @@ class Event
     /**
      * Schedule the event to run only on Wednesdays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function wednesdays()
     {
@@ -393,7 +393,7 @@ class Event
     /**
      * Schedule the event to run only on Thursdays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function thursdays()
     {
@@ -403,7 +403,7 @@ class Event
     /**
      * Schedule the event to run only on Fridays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function fridays()
     {
@@ -413,7 +413,7 @@ class Event
     /**
      * Schedule the event to run only on Saturdays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function saturdays()
     {
@@ -423,7 +423,7 @@ class Event
     /**
      * Schedule the event to run only on Sundays.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function sundays()
     {
@@ -433,7 +433,7 @@ class Event
     /**
      * Schedule the event to run weekly.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function weekly()
     {
@@ -445,7 +445,7 @@ class Event
      *
      * @param  int  $day
      * @param  string  $time
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function weeklyOn($day, $time = '0:0')
     {
@@ -457,7 +457,7 @@ class Event
     /**
      * Schedule the event to run monthly.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function monthly()
     {
@@ -467,7 +467,7 @@ class Event
     /**
      * Schedule the event to run yearly.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function yearly()
     {
@@ -477,7 +477,7 @@ class Event
     /**
      * Schedule the event to run every minute.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function everyMinute()
     {
@@ -487,7 +487,7 @@ class Event
     /**
      * Schedule the event to run every five minutes.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function everyFiveMinutes()
     {
@@ -497,7 +497,7 @@ class Event
     /**
      * Schedule the event to run every ten minutes.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function everyTenMinutes()
     {
@@ -507,7 +507,7 @@ class Event
     /**
      * Schedule the event to run every thirty minutes.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function everyThirtyMinutes()
     {
@@ -518,7 +518,7 @@ class Event
      * Set the days of the week the command should run on.
      *
      * @param  array|dynamic  $days
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function days($days)
     {
@@ -531,7 +531,7 @@ class Event
      * Set the timezone the date should be evaluated on.
      *
      * @param  \DateTimeZone|string  $timezone
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function timezone($timezone)
     {
@@ -544,7 +544,7 @@ class Event
      * Set which user the command should run as.
      *
      * @param  string  $user
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function user($user)
     {
@@ -557,7 +557,7 @@ class Event
      * Limit the environments the command should run in.
      *
      * @param  array|dynamic  $environments
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function environments($environments)
     {
@@ -569,7 +569,7 @@ class Event
     /**
      * State that the command should run even in maintenance mode.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function evenInMaintenanceMode()
     {
@@ -581,7 +581,7 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function withoutOverlapping()
     {
@@ -596,7 +596,7 @@ class Event
      * Register a callback to further filter the schedule.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function when(Closure $callback)
     {
@@ -609,7 +609,7 @@ class Event
      * Register a callback to further filter the schedule.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function skip(Closure $callback)
     {
@@ -622,7 +622,7 @@ class Event
      * Send the output of the command to a given location.
      *
      * @param  string  $location
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function sendOutputTo($location)
     {
@@ -635,7 +635,7 @@ class Event
      * E-mail the results of the scheduled operation.
      *
      * @param  array|dynamic  $addresses
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      *
      * @throws \LogicException
      */
@@ -688,7 +688,7 @@ class Event
      * Register a callback to ping a given URL before the job runs.
      *
      * @param  string  $url
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function pingBefore($url)
     {
@@ -699,7 +699,7 @@ class Event
      * Register a callback to be called before the operation.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function before(Closure $callback)
     {
@@ -712,7 +712,7 @@ class Event
      * Register a callback to ping a given URL after the job runs.
      *
      * @param  string  $url
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function thenPing($url)
     {
@@ -723,7 +723,7 @@ class Event
      * Register a callback to be called after the operation.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function after(Closure $callback)
     {
@@ -734,7 +734,7 @@ class Event
      * Register a callback to be called after the operation.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function then(Closure $callback)
     {
@@ -747,7 +747,7 @@ class Event
      * Set the human-friendly description of the event.
      *
      * @param  string  $description
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function name($description)
     {
@@ -758,7 +758,7 @@ class Event
      * Set the human-friendly description of the event.
      *
      * @param  string  $description
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     public function description($description)
     {
@@ -772,7 +772,7 @@ class Event
      *
      * @param  int  $position
      * @param  string  $value
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\Event
      */
     protected function spliceIntoPosition($position, $value)
     {

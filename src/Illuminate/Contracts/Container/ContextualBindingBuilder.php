@@ -8,7 +8,7 @@ interface ContextualBindingBuilder
      * Define the abstract target that depends on the context.
      *
      * @param  string  $abstract
-     * @return $this
+     * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function needs($abstract);
 

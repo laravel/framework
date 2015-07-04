@@ -58,7 +58,7 @@ interface UrlGenerator
      * Set the root controller namespace.
      *
      * @param  string  $rootNamespace
-     * @return $this
+     * @return \Illuminate\Contracts\Routing\UrlGenerator
      */
     public function setRootControllerNamespace($rootNamespace);
 }

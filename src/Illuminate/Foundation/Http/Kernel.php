@@ -178,7 +178,7 @@ class Kernel implements KernelContract
      * Add a new middleware to beginning of the stack if it does not already exist.
      *
      * @param  string  $middleware
-     * @return $this
+     * @return \Illuminate\Foundation\Http\Kernel
      */
     public function prependMiddleware($middleware)
     {
@@ -193,7 +193,7 @@ class Kernel implements KernelContract
      * Add a new middleware to end of the stack if it does not already exist.
      *
      * @param  string  $middleware
-     * @return $this
+     * @return \Illuminate\Foundation\Http\Kernel
      */
     public function pushMiddleware($middleware)
     {

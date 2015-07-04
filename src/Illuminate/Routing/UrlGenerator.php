@@ -648,7 +648,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Set the route collection.
      *
      * @param  \Illuminate\Routing\RouteCollection  $routes
-     * @return $this
+     * @return \Illuminate\Routing\UrlGenerator
      */
     public function setRoutes(RouteCollection $routes)
     {
@@ -683,7 +683,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Set the session resolver for the generator.
      *
      * @param  callable  $sessionResolver
-     * @return $this
+     * @return \Illuminate\Routing\UrlGenerator
      */
     public function setSessionResolver(callable $sessionResolver)
     {
@@ -696,7 +696,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Set the root controller namespace.
      *
      * @param  string  $rootNamespace
-     * @return $this
+     * @return \Illuminate\Routing\UrlGenerator
      */
     public function setRootControllerNamespace($rootNamespace)
     {

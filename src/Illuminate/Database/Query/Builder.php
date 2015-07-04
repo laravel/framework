@@ -212,7 +212,7 @@ class Builder
      * Set the columns to be selected.
      *
      * @param  array  $columns
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function select($columns = ['*'])
     {
@@ -271,7 +271,7 @@ class Builder
      * Add a new select column to the query.
      *
      * @param  mixed  $column
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function addSelect($column)
     {
@@ -285,7 +285,7 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function distinct()
     {
@@ -298,7 +298,7 @@ class Builder
      * Set the table which the query is targeting.
      *
      * @param  string  $table
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function from($table)
     {
@@ -316,7 +316,7 @@ class Builder
      * @param  string  $two
      * @param  string  $type
      * @param  bool    $where
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
     {
@@ -421,7 +421,7 @@ class Builder
      * @param  string  $operator
      * @param  mixed   $value
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      *
      * @throws \InvalidArgumentException
      */
@@ -522,7 +522,7 @@ class Builder
      * @param  string  $sql
      * @param  array   $bindings
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function whereRaw($sql, array $bindings = [], $boolean = 'and')
     {
@@ -554,7 +554,7 @@ class Builder
      * @param  array   $values
      * @param  string  $boolean
      * @param  bool  $not
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function whereBetween($column, array $values, $boolean = 'and', $not = false)
     {
@@ -630,7 +630,7 @@ class Builder
      *
      * @param  \Illuminate\Database\Query\Builder|static $query
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
@@ -652,7 +652,7 @@ class Builder
      * @param  string   $operator
      * @param  \Closure $callback
      * @param  string   $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     protected function whereSub($column, $operator, Closure $callback, $boolean)
     {
@@ -678,7 +678,7 @@ class Builder
      * @param  \Closure $callback
      * @param  string   $boolean
      * @param  bool     $not
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
@@ -740,7 +740,7 @@ class Builder
      * @param  mixed   $values
      * @param  string  $boolean
      * @param  bool    $not
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -808,7 +808,7 @@ class Builder
      * @param  \Closure $callback
      * @param  string   $boolean
      * @param  bool     $not
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     protected function whereInSub($column, Closure $callback, $boolean, $not)
     {
@@ -832,7 +832,7 @@ class Builder
      * @param  string  $column
      * @param  string  $boolean
      * @param  bool    $not
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function whereNull($column, $boolean = 'and', $not = false)
     {
@@ -941,7 +941,7 @@ class Builder
      * @param  string  $operator
      * @param  int  $value
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and')
     {
@@ -957,7 +957,7 @@ class Builder
      *
      * @param  string  $method
      * @param  string  $parameters
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function dynamicWhere($method, $parameters)
     {
@@ -1016,7 +1016,7 @@ class Builder
      * Add a "group by" clause to the query.
      *
      * @param  array|string  $column,...
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function groupBy()
     {
@@ -1034,7 +1034,7 @@ class Builder
      * @param  string  $operator
      * @param  string  $value
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -1068,7 +1068,7 @@ class Builder
      * @param  string  $sql
      * @param  array   $bindings
      * @param  string  $boolean
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function havingRaw($sql, array $bindings = [], $boolean = 'and')
     {
@@ -1098,7 +1098,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $direction
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
@@ -1137,7 +1137,7 @@ class Builder
      *
      * @param  string  $sql
      * @param  array  $bindings
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function orderByRaw($sql, $bindings = [])
     {
@@ -1156,7 +1156,7 @@ class Builder
      * Set the "offset" value of the query.
      *
      * @param  int  $value
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function offset($value)
     {
@@ -1182,7 +1182,7 @@ class Builder
      * Set the "limit" value of the query.
      *
      * @param  int  $value
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function limit($value)
     {
@@ -1251,7 +1251,7 @@ class Builder
      * Lock the selected rows in the table.
      *
      * @param  bool  $value
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function lock($value = true)
     {
@@ -1880,7 +1880,7 @@ class Builder
      *
      * @param  array   $bindings
      * @param  string  $type
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      *
      * @throws \InvalidArgumentException
      */
@@ -1900,7 +1900,7 @@ class Builder
      *
      * @param  mixed   $value
      * @param  string  $type
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      *
      * @throws \InvalidArgumentException
      */
@@ -1923,7 +1923,7 @@ class Builder
      * Merge an array of bindings into our bindings.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function mergeBindings(Builder $query)
     {
@@ -1965,7 +1965,7 @@ class Builder
     /**
      * Use the write pdo for query.
      *
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function useWritePdo()
     {

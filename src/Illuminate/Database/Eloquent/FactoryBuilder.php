@@ -62,7 +62,7 @@ class FactoryBuilder
      * Set the amount of models you wish to create / make.
      *
      * @param  int  $amount
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\FactoryBuilder
      */
     public function times($amount)
     {

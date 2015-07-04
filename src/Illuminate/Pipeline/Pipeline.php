@@ -51,7 +51,7 @@ class Pipeline implements PipelineContract
      * Set the object being sent through the pipeline.
      *
      * @param  mixed  $passable
-     * @return $this
+     * @return \Illuminate\Pipeline\Pipeline
      */
     public function send($passable)
     {
@@ -64,7 +64,7 @@ class Pipeline implements PipelineContract
      * Set the array of pipes.
      *
      * @param  dynamic|array  $pipes
-     * @return $this
+     * @return \Illuminate\Pipeline\Pipeline
      */
     public function through($pipes)
     {
@@ -77,7 +77,7 @@ class Pipeline implements PipelineContract
      * Set the method to call on the pipes.
      *
      * @param  string  $method
-     * @return $this
+     * @return \Illuminate\Pipeline\Pipeline
      */
     public function via($method)
     {

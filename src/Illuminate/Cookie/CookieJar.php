@@ -146,7 +146,7 @@ class CookieJar implements JarContract
      *
      * @param  string  $path
      * @param  string  $domain
-     * @return $this
+     * @return \Illuminate\Cookie\CookieJar
      */
     public function setDefaultPathAndDomain($path, $domain)
     {

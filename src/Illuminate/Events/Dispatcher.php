@@ -484,7 +484,7 @@ class Dispatcher implements DispatcherContract
      * Set the queue resolver implementation.
      *
      * @param  callable  $resolver
-     * @return $this
+     * @return \Illuminate\Events\Dispatcher
      */
     public function setQueueResolver(callable $resolver)
     {

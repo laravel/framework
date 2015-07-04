@@ -30,7 +30,7 @@ class Collection extends BaseCollection
      * Load a set of relationships onto the collection.
      *
      * @param  mixed  $relations
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function load($relations)
     {
@@ -51,7 +51,7 @@ class Collection extends BaseCollection
      * Add an item to the collection.
      *
      * @param  mixed  $item
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function add($item)
     {

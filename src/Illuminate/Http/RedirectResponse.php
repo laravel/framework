@@ -51,7 +51,7 @@ class RedirectResponse extends BaseRedirectResponse
      * Add multiple cookies to the response.
      *
      * @param  array  $cookies
-     * @return $this
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function withCookies(array $cookies)
     {
@@ -66,7 +66,7 @@ class RedirectResponse extends BaseRedirectResponse
      * Flash an array of input to the session.
      *
      * @param  array  $input
-     * @return $this
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function withInput(array $input = null)
     {
@@ -87,7 +87,7 @@ class RedirectResponse extends BaseRedirectResponse
      * Flash an array of input to the session.
      *
      * @param  mixed  string
-     * @return $this
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function onlyInput()
     {
@@ -110,7 +110,7 @@ class RedirectResponse extends BaseRedirectResponse
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
      * @param  string  $key
-     * @return $this
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function withErrors($provider, $key = 'default')
     {

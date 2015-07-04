@@ -395,7 +395,7 @@ class BelongsToMany extends Relation
      * Set the join clause for the relation query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     protected function setJoin($query = null)
     {
@@ -416,7 +416,7 @@ class BelongsToMany extends Relation
     /**
      * Set the where clause for the relation query.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     protected function setWhere()
     {
@@ -1117,7 +1117,7 @@ class BelongsToMany extends Relation
      * Set the columns on the pivot table to retrieve.
      *
      * @param  mixed  $columns
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function withPivot($columns)
     {

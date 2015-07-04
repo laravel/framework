@@ -119,7 +119,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      * Set the existence state for the session.
      *
      * @param  bool  $value
-     * @return $this
+     * @return \Illuminate\Session\DatabaseSessionHandler
      */
     public function setExists($value)
     {

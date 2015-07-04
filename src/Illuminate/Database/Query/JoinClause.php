@@ -53,7 +53,7 @@ class JoinClause
      * @param  string  $second
      * @param  string  $boolean
      * @param  bool  $where
-     * @return $this
+     * @return \Illuminate\Database\Query\JoinClause
      */
     public function on($first, $operator, $second, $boolean = 'and', $where = false)
     {

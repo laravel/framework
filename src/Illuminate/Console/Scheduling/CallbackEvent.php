@@ -81,7 +81,7 @@ class CallbackEvent extends Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @return $this
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function withoutOverlapping()
     {

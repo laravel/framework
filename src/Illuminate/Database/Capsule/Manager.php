@@ -145,7 +145,7 @@ class Manager
      * Set the fetch mode for the database connections.
      *
      * @param  int  $fetchMode
-     * @return $this
+     * @return \Illuminate\Database\Capsule\Manager
      */
     public function setFetchMode($fetchMode)
     {
