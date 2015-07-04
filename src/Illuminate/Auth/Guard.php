@@ -408,7 +408,7 @@ class Guard implements GuardContract
     /**
      * Continue an attempt to authenticate a user using the given previous credentials and any additional ones.
      *
-     * @param  array $additionalCredentials
+     * @param  array  $additionalCredentials
      * @return bool
      */
     public function continueAttempt(array $additionalCredentials = [])
@@ -446,10 +446,10 @@ class Guard implements GuardContract
     /**
      * Add authenticators to be used
      *
-     * @param $authenticators
+     * @param  array  $authenticators
      * @return void
      */
-    public function addAuthenticators($authenticators)
+    public function addAuthenticators(array $authenticators)
     {
         $this->authenticators = array_merge($this->authenticators,$authenticators);
     }
