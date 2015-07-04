@@ -235,4 +235,16 @@ class Collection extends BaseCollection
     {
         return new BaseCollection($this->items);
     }
+
+    /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string  $value
+     * @param  string  $key
+     * @return static
+     */
+    public function pluck($value, $key = null)
+    {
+        return collect(Arr::pluck($this->items, $value, $key));
+    }
 }
