@@ -239,8 +239,8 @@ class Collection extends BaseCollection
     /**
      * Get an array with the values of a given key.
      *
-     * @param  string  $value
-     * @param  string  $key
+     * @param  string       $value
+     * @param  string|null  $key
      * @return static
      */
     public function pluck($value, $key = null)

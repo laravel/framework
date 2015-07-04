@@ -226,6 +226,6 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection([(object) ['foo' => 'bar'], (object) ['foo' => 'baz']]);
 
-        $this->assertEquals( collect(['bar', 'baz']), $c->pluck('foo') );
+        $this->assertEquals(collect(['bar', 'baz']), $c->pluck('foo'));
     }
 }
