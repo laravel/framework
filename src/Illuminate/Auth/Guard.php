@@ -366,9 +366,9 @@ class Guard implements GuardContract
      * Attempt to authenticate a user using the given credentials.
      *
      * @param  array $credentials
-     * @param  bool $remember
-     * @param  bool $login
-     * @param array $additionalCredentials
+     * @param  bool  $remember
+     * @param  bool  $login
+     * @param  array $additionalCredentials
      * @return bool
      */
     public function attempt(array $credentials = [], $remember = false, $login = true, array $additionalCredentials = [])
