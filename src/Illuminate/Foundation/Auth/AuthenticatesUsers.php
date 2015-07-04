@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
 
 trait AuthenticatesUsers
@@ -103,7 +104,9 @@ trait AuthenticatesUsers
      */
     protected function getFailedLoginMessage()
     {
-        return 'These credentials do not match our records.';
+        return Lang::has('auth.failed')
+                ? Lang::get('auth.failed')
+                : 'These credentials do not match our records.';
     }
 
     /**
