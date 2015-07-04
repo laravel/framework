@@ -38,11 +38,15 @@ class DatabaseEloquentIntegrationWithPdoErrModeExceptionTest extends DatabaseElo
     {
         $columns = ['id', 'email'];
 
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
         $query = EloquentTestUser::oldest('id')->getQuery();
 
-        $this->setExpectedException('Illuminate\Database\QueryException');
+        $total = $query->getCountForPagination($columns);
 
-        $query->getCountForPagination($columns);
+        $this->assertEquals(3, $total);
     }
 
     public function testEmptyMorphToRelationship()
