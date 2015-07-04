@@ -219,7 +219,7 @@ class Validator implements ValidatorContract
      * After an after validation callback.
      *
      * @param  callable|string  $callback
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function after($callback)
     {
@@ -2230,7 +2230,7 @@ class Validator implements ValidatorContract
      * Set the validation rules.
      *
      * @param  array  $rules
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function setRules(array $rules)
     {
@@ -2243,7 +2243,7 @@ class Validator implements ValidatorContract
      * Set the custom attributes on the validator.
      *
      * @param  array  $attributes
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function setAttributeNames(array $attributes)
     {
@@ -2256,7 +2256,7 @@ class Validator implements ValidatorContract
      * Set the custom values on the validator.
      *
      * @param  array  $values
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function setValueNames(array $values)
     {
@@ -2279,7 +2279,7 @@ class Validator implements ValidatorContract
      * Set the files under validation.
      *
      * @param  array  $files
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function setFiles(array $files)
     {
@@ -2371,7 +2371,7 @@ class Validator implements ValidatorContract
      * Add custom attributes to the validator.
      *
      * @param  array  $customAttributes
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function addCustomAttributes(array $customAttributes)
     {
@@ -2394,7 +2394,7 @@ class Validator implements ValidatorContract
      * Add the custom values for the validator.
      *
      * @param  array  $customValues
-     * @return $this
+     * @return \Illuminate\Validation\Validator
      */
     public function addCustomValues(array $customValues)
     {

@@ -148,7 +148,7 @@ abstract class AbstractPaginator
      * Get / set the URL fragment to be appended to URLs.
      *
      * @param  string|null  $fragment
-     * @return $this|string|null
+     * @return \Illuminate\Pagination\AbstractPaginator|string|null
      */
     public function fragment($fragment = null)
     {
@@ -166,7 +166,7 @@ abstract class AbstractPaginator
      *
      * @param  array|string  $key
      * @param  string|null  $value
-     * @return $this
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
     public function appends($key, $value = null)
     {
@@ -181,7 +181,7 @@ abstract class AbstractPaginator
      * Add an array of query string values.
      *
      * @param  array  $keys
-     * @return $this
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
     protected function appendArray(array $keys)
     {
@@ -197,7 +197,7 @@ abstract class AbstractPaginator
      *
      * @param  string  $key
      * @param  string  $value
-     * @return $this
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
     public function addQuery($key, $value)
     {
@@ -356,7 +356,7 @@ abstract class AbstractPaginator
      * Set the query string variable used to store the page.
      *
      * @param  string  $name
-     * @return $this
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
     public function setPageName($name)
     {
@@ -369,7 +369,7 @@ abstract class AbstractPaginator
      * Set the base path to assign to all URLs.
      *
      * @param  string  $path
-     * @return $this
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
     public function setPath($path)
     {

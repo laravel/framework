@@ -10,7 +10,7 @@ interface Pipeline
      * Set the traveler object being sent on the pipeline.
      *
      * @param  mixed  $traveler
-     * @return $this
+     * @return \Illuminate\Contracts\Pipeline\Pipeline
      */
     public function send($traveler);
 
@@ -18,7 +18,7 @@ interface Pipeline
      * Set the stops of the pipeline.
      *
      * @param  dynamic|array  $stops
-     * @return $this
+     * @return \Illuminate\Contracts\Pipeline\Pipeline
      */
     public function through($stops);
 
@@ -26,7 +26,7 @@ interface Pipeline
      * Set the method to call on the stops.
      *
      * @param  string  $method
-     * @return $this
+     * @return \Illuminate\Contracts\Pipeline\Pipeline
      */
     public function via($method);
 

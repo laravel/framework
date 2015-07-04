@@ -400,7 +400,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      * Set the pipes through which commands should be piped before dispatching.
      *
      * @param  array  $pipes
-     * @return $this
+     * @return \Illuminate\Bus\Dispatcher
      */
     public function pipeThrough(array $pipes)
     {

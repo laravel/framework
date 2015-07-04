@@ -718,7 +718,7 @@ class Guard implements GuardContract
      * Set the current request instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return $this
+     * @return \Illuminate\Auth\Guard
      */
     public function setRequest(Request $request)
     {

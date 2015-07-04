@@ -52,7 +52,7 @@ trait InteractsWithQueue
      * Set the base queue job instance.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @return $this
+     * @return \Illuminate\Queue\InteractsWithQueue
      */
     public function setJob(JobContract $job)
     {

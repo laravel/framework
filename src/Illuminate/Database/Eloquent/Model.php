@@ -387,7 +387,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
@@ -415,7 +415,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Fill the model with an array of attributes. Force mass assignment.
      *
      * @param  array  $attributes
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function forceFill(array $attributes)
     {
@@ -670,7 +670,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Reload a fresh model instance from the database.
      *
      * @param  array  $with
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function fresh(array $with = [])
     {
@@ -687,7 +687,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Eager load relations on the model.
      *
      * @param  array|string  $relations
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function load($relations)
     {
@@ -2142,7 +2142,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the fillable attributes for the model.
      *
      * @param  array  $fillable
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function fillable(array $fillable)
     {
@@ -2165,7 +2165,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the guarded attributes for the model.
      *
      * @param  array  $guarded
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function guard(array $guarded)
     {
@@ -2883,7 +2883,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the date format used by the model.
      *
      * @param  string  $format
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function setDateFormat($format)
     {
@@ -2954,7 +2954,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Sync the original attributes with the current.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function syncOriginal()
     {
@@ -2967,7 +2967,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Sync a single original attribute with its current value.
      *
      * @param  string  $attribute
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function syncOriginalAttribute($attribute)
     {
@@ -3076,7 +3076,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  string  $relation
      * @param  mixed   $value
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function setRelation($relation, $value)
     {
@@ -3089,7 +3089,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the entire relations array on the model.
      *
      * @param  array  $relations
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function setRelations(array $relations)
     {
@@ -3122,7 +3122,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the connection associated with the model.
      *
      * @param  string  $name
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function setConnection($name)
     {

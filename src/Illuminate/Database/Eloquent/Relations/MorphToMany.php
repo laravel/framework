@@ -56,7 +56,7 @@ class MorphToMany extends BelongsToMany
     /**
      * Set the where clause for the relation query.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     protected function setWhere()
     {

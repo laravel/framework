@@ -54,7 +54,7 @@ trait ApplicationTrait
      * These events will be mocked, so that handlers will not actually be executed.
      *
      * @param  array|dynamic  $events
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     public function expectsEvents($events)
     {
@@ -88,7 +88,7 @@ trait ApplicationTrait
     /**
      * Mock the event dispatcher so all events are silenced.
      *
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     protected function withoutEvents()
     {
@@ -107,7 +107,7 @@ trait ApplicationTrait
      * These jobs will be mocked, so that handlers will not actually be executed.
      *
      * @param  array|dynamic  $jobs
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     protected function expectsJobs($jobs)
     {
@@ -131,7 +131,7 @@ trait ApplicationTrait
      * Set the session to the given array.
      *
      * @param  array  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     public function withSession(array $data)
     {
@@ -184,7 +184,7 @@ trait ApplicationTrait
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $driver
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     public function actingAs(UserContract $user, $driver = null)
     {
@@ -211,7 +211,7 @@ trait ApplicationTrait
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     protected function seeInDatabase($table, array $data, $connection = null)
     {
@@ -234,7 +234,7 @@ trait ApplicationTrait
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     protected function missingFromDatabase($table, array $data, $connection = null)
     {
@@ -247,7 +247,7 @@ trait ApplicationTrait
      * @param  string  $table
      * @param  array  $data
      * @param  string  $connection
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\ApplicationTrait
      */
     protected function notSeeInDatabase($table, array $data, $connection = null)
     {

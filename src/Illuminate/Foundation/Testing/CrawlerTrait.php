@@ -43,7 +43,7 @@ trait CrawlerTrait
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function visit($uri)
     {
@@ -55,7 +55,7 @@ trait CrawlerTrait
      *
      * @param  string  $uri
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function get($uri, array $headers = [])
     {
@@ -72,7 +72,7 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function post($uri, array $data = [], array $headers = [])
     {
@@ -89,7 +89,7 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function put($uri, array $data = [], array $headers = [])
     {
@@ -106,7 +106,7 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function patch($uri, array $data = [], array $headers = [])
     {
@@ -123,7 +123,7 @@ trait CrawlerTrait
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function delete($uri, array $data = [], array $headers = [])
     {
@@ -142,7 +142,7 @@ trait CrawlerTrait
      * @param  array  $parameters
      * @param  array  $cookies
      * @param  array  $files
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function makeRequest($method, $uri, $parameters = [], $cookies = [], $files = [])
     {
@@ -163,7 +163,7 @@ trait CrawlerTrait
      * Make a request to the application using the given form.
      *
      * @param  \Symfony\Component\DomCrawler\Form  $form
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function makeRequestUsingForm(Form $form)
     {
@@ -188,7 +188,7 @@ trait CrawlerTrait
     /**
      * Follow redirects from the last response.
      *
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function followRedirects()
     {
@@ -202,7 +202,7 @@ trait CrawlerTrait
     /**
      * Clear the inputs for the current page.
      *
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function clearInputs()
     {
@@ -236,7 +236,7 @@ trait CrawlerTrait
      *
      * @param  string  $text
      * @param  bool  $negate
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function see($text, $negate = false)
     {
@@ -251,7 +251,7 @@ trait CrawlerTrait
      * Assert that a given string is not seen on the page.
      *
      * @param  string  $text
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function dontSee($text)
     {
@@ -262,7 +262,7 @@ trait CrawlerTrait
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function shouldReturnJson(array $data = null)
     {
@@ -273,7 +273,7 @@ trait CrawlerTrait
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function receiveJson($data = null)
     {
@@ -288,7 +288,7 @@ trait CrawlerTrait
      * Assert that the response contains an exact JSON array.
      *
      * @param  array  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function seeJsonEquals(array $data)
     {
@@ -305,7 +305,7 @@ trait CrawlerTrait
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function seeJson(array $data = null)
     {
@@ -324,7 +324,7 @@ trait CrawlerTrait
      * Assert that the response contains the given JSON.
      *
      * @param  array  $data
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function seeJsonContains(array $data)
     {
@@ -370,7 +370,7 @@ trait CrawlerTrait
      * Asserts that the status code of the response matches the given code.
      *
      * @param  int  $status
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function seeStatusCode($status)
     {
@@ -383,7 +383,7 @@ trait CrawlerTrait
      * Assert that the current page matches a given URI.
      *
      * @param  string  $uri
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function seePageIs($uri)
     {
@@ -394,7 +394,7 @@ trait CrawlerTrait
      * Assert that the current page matches a given URI.
      *
      * @param  string  $uri
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function onPage($uri)
     {
@@ -405,7 +405,7 @@ trait CrawlerTrait
      * Assert that the current page matches a given URI.
      *
      * @param  string  $uri
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function landOn($uri)
     {
@@ -423,7 +423,7 @@ trait CrawlerTrait
      *
      * @param  string $headerName
      * @param  mixed $value
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function seeHeader($headerName, $value = null)
     {
@@ -446,7 +446,7 @@ trait CrawlerTrait
      *
      * @param  string $cookieName
      * @param  mixed $value
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function seeCookie($cookieName, $value = null)
     {
@@ -477,7 +477,7 @@ trait CrawlerTrait
      * Click a link with the given body, name, or ID attribute.
      *
      * @param  string  $name
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function click($name)
     {
@@ -503,7 +503,7 @@ trait CrawlerTrait
      *
      * @param  string  $text
      * @param  string  $element
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function type($text, $element)
     {
@@ -514,7 +514,7 @@ trait CrawlerTrait
      * Check a checkbox on the page.
      *
      * @param  string  $element
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function check($element)
     {
@@ -526,7 +526,7 @@ trait CrawlerTrait
      *
      * @param  string  $option
      * @param  string  $element
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function select($option, $element)
     {
@@ -538,7 +538,7 @@ trait CrawlerTrait
      *
      * @param  string  $absolutePath
      * @param  string  $element
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function attach($absolutePath, $element)
     {
@@ -549,7 +549,7 @@ trait CrawlerTrait
      * Submit a form using the button with the given text value.
      *
      * @param  string  $buttonText
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function press($buttonText)
     {
@@ -561,7 +561,7 @@ trait CrawlerTrait
      *
      * @param  string  $buttonText
      * @param  array  $inputs
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function submitForm($buttonText, $inputs = [])
     {
@@ -614,7 +614,7 @@ trait CrawlerTrait
      *
      * @param  string  $element
      * @param  string  $text
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     protected function storeInput($element, $text)
     {
@@ -784,7 +784,7 @@ trait CrawlerTrait
     /**
      * Disable middleware for the test.
      *
-     * @return $this
+     * @return \Illuminate\Foundation\Testing\CrawlerTrait
      */
     public function withoutMiddleware()
     {

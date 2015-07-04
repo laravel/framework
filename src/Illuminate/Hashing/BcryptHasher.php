@@ -67,7 +67,7 @@ class BcryptHasher implements HasherContract
      * Set the default password work factor.
      *
      * @param  int  $rounds
-     * @return $this
+     * @return \Illuminate\Hashing\BcryptHasher
      */
     public function setRounds($rounds)
     {

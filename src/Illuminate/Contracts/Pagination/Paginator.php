@@ -17,7 +17,7 @@ interface Paginator
      *
      * @param  array|string  $key
      * @param  string|null  $value
-     * @return $this
+     * @return \Illuminate\Contracts\Pagination\Pagination
      */
     public function appends($key, $value = null);
 
@@ -25,7 +25,7 @@ interface Paginator
      * Get / set the URL fragment to be appended to URLs.
      *
      * @param  string|null  $fragment
-     * @return $this|string
+     * @return \Illuminate\Contracts\Pagination\Paginator|string
      */
     public function fragment($fragment = null);
 

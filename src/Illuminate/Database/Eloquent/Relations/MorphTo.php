@@ -239,7 +239,7 @@ class MorphTo extends BelongsTo
     /**
      * Fetch soft-deleted model instances with query.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function withTrashed()
     {

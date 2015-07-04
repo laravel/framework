@@ -257,7 +257,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Set the base path for the application.
      *
      * @param  string  $basePath
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function setBasePath($basePath)
     {
@@ -326,7 +326,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Set the database directory.
      *
      * @param  string  $path
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function useDatabasePath($path)
     {
@@ -371,7 +371,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Set the storage directory.
      *
      * @param  string  $path
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function useStoragePath($path)
     {
@@ -396,7 +396,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Set the directory for the environment file.
      *
      * @param  string  $path
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function useEnvironmentPath($path)
     {
@@ -409,7 +409,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Set the environment file to be loaded during bootstrapping.
      *
      * @param  string  $file
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function loadEnvironmentFrom($file)
     {
@@ -875,7 +875,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a terminating callback with the application.
      *
      * @param  \Closure  $callback
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function terminating(Closure $callback)
     {
@@ -953,7 +953,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Define a callback to be used to configure Monolog.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return \Illuminate\Foundation\Application
      */
     public function configureMonologUsing(callable $callback)
     {

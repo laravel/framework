@@ -53,7 +53,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @param  string  $key
      * @param  string  $message
-     * @return $this
+     * @return \Illuminate\Support\MessageBag
      */
     public function add($key, $message)
     {
@@ -68,7 +68,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      * Merge a new array of messages into the bag.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
-     * @return $this
+     * @return \Illuminate\Support\MessageBag
      */
     public function merge($messages)
     {

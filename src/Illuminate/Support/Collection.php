@@ -100,7 +100,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Execute a callback over each item.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function each(callable $callback)
     {
@@ -209,7 +209,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Remove an item from the collection by key.
      *
      * @param  mixed  $key
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function forget($key)
     {
@@ -472,7 +472,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push an item onto the beginning of the collection.
      *
      * @param  mixed  $value
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function prepend($value)
     {
@@ -485,7 +485,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push an item onto the end of the collection.
      *
      * @param  mixed  $value
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function push($value)
     {
@@ -511,7 +511,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  mixed  $key
      * @param  mixed  $value
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function put($key, $value)
     {
@@ -777,7 +777,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Transform each item in the collection using a callback.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return \Illuminate\Support\Collection
      */
     public function transform(callable $callback)
     {

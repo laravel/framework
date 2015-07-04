@@ -113,7 +113,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Resolve an array of commands through the application.
      *
      * @param  array|mixed  $commands
-     * @return $this
+     * @return \Illuminate\Console\Application
      */
     public function resolveCommands($commands)
     {

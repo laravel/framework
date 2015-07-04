@@ -844,7 +844,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @return $this
+     * @return \Illuminate\Routing\Router
      */
     public function middleware($name, $class)
     {

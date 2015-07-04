@@ -517,7 +517,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the log writer instance.
      *
      * @param  \Psr\Log\LoggerInterface  $logger
-     * @return $this
+     * @return \Illuminate\Mail\Mailer
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -530,7 +530,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the queue manager instance.
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
-     * @return $this
+     * @return \Illuminate\Mail\Mailer
      */
     public function setQueue(QueueContract $queue)
     {
