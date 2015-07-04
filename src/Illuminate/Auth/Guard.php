@@ -2,6 +2,10 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Exceptions\LoginRedirectException;
+use Illuminate\Container\Container;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Session;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -86,6 +90,13 @@ class Guard implements GuardContract
     protected $tokenRetrievalAttempted = false;
 
     /**
+     * Array of Authenticators to be used when Authenticating a user.
+     *
+     * @var array
+     */
+    protected $authenticators = [];
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -100,6 +111,7 @@ class Guard implements GuardContract
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
+        $this->authenticators = config('auth.authenticators', []);
     }
 
     /**
@@ -356,9 +368,10 @@ class Guard implements GuardContract
      * @param  array  $credentials
      * @param  bool   $remember
      * @param  bool   $login
+     * @param  array  $additionalCredentials
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true)
+    public function attempt(array $credentials = [], $remember = false, $login = true, array $additionalCredentials = [])
     {
         $this->fireAttemptEvent($credentials, $remember, $login);
 
@@ -367,15 +380,99 @@ class Guard implements GuardContract
         // If an implementation of UserInterface was returned, we'll ask the provider
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials)) {
-            if ($login) {
-                $this->login($user, $remember);
+        // If we are continuing the attempt, we skip this because we unset the password
+        if (Session::pull('continueAttempt') || $this->hasValidCredentials($user, $credentials)) {
+            // Pass the user through any additional authenticators that may be required
+            $credentials['password'] = null;
+            $redirect = $this->passesAuthenticators($user, array_merge($credentials, $additionalCredentials));
+            if(is_bool($redirect) && $redirect){
+                if ($login) {
+                    $this->login($user, $remember);
+                }
+                return true;
+            }elseif(!is_bool($redirect)){
+                // User didn't pass additional authenticators
+                // And is being redirect to a new page
+                Session::put('credentials', $credentials);
+                Session::put('remember', $remember);
+                Session::put('login', $login);
+                Session::put('continueAttempt', true);
+                Session::put('additionalCredentials',$additionalCredentials);
+                throw new LoginRedirectException($redirect);
             }
-
-            return true;
+            return false;
         }
-
         return false;
+    }
+
+    /**
+     * Continue an attempt to authenticate a user using the given previous credentials and any additional ones.
+     *
+     * @param  array  $additionalCredentials
+     * @return bool
+     */
+    public function continueAttempt(array $additionalCredentials = [])
+    {
+        if(!Session::get('continueAttempt'))
+            return false;
+
+        $additionalCredentials=array_merge(Session::pull('additionalCredentials'),$additionalCredentials);
+        return $this->attempt(
+            Session::pull('credentials'),
+            Session::pull('remember'),
+            Session::pull('login'),
+            $additionalCredentials
+        );
+
+    }
+
+    /**
+     * Determine if the user matches the credentials.
+     *
+     * @param  mixed  $user
+     * @param  array  $credentials
+     * @return bool|\Illuminate\Foundation\RedirectResponse
+     */
+    protected function passesAuthenticators($user, $credentials)
+    {
+        return (new Pipeline(new Container))
+            ->send(['user'=>$user, 'credentials'=>$credentials])
+            ->through($this->authenticators)
+            ->then(function () {
+                return true;
+            });
+    }
+
+    /**
+     * Add authenticators to be used
+     *
+     * @param  array  $authenticators
+     * @return void
+     */
+    public function addAuthenticators(array $authenticators)
+    {
+        $this->authenticators = array_merge($this->authenticators,$authenticators);
+    }
+
+    /**
+     * Set authenticators to be used
+     *
+     * @param array $authenticators
+     * @return void
+     */
+    public function setAuthenticators(array $authenticators)
+    {
+        $this->authenticators = $authenticators;
+    }
+
+    /**
+     * Get authenticators to be used
+     *
+     * @return array
+     */
+    public function getAuthenticators()
+    {
+        return $this->authenticators;
     }
 
     /**

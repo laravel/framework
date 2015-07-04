@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
+use Illuminate\Auth\Exceptions\LoginRedirectException;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -89,6 +90,8 @@ class Handler implements ExceptionHandlerContract
     {
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
+        } elseif($e instanceof LoginRedirectException ) {
+            return $e->redirect;
         } else {
             return $this->toIlluminateResponse((new SymfonyDisplayer(config('app.debug')))->createResponse($e), $e);
         }

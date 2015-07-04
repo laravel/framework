@@ -39,9 +39,18 @@ interface Guard
      * @param  array  $credentials
      * @param  bool   $remember
      * @param  bool   $login
+     * @param  array  $additionalCredentials
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true);
+    public function attempt(array $credentials = [], $remember = false, $login = true, array $additionalCredentials = []);
+
+    /**
+     * Continue a previous attempt to authenticate a user using the previous credentials, and any additional ones.
+     *
+     * @param  array  $additionalCredentials
+     * @return bool
+     */
+    public function continueAttempt(array $additionalCredentials = []);
 
     /**
      * Attempt to authenticate using HTTP Basic Auth.
