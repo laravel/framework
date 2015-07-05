@@ -1643,7 +1643,12 @@ class Builder
         $this->aggregate = compact('function', 'columns');
 
         $previousColumns = $this->columns;
+
+        // We will also back up the select bindings since the select clause will be
+        // removed when performing the aggregate function. Once the query is run
+        // we will add the bindings back onto this query so they can get used.
         $previousSelectBindings = $this->bindings['select'];
+
         $this->bindings['select'] = [];
 
         $results = $this->get($columns);
@@ -1654,6 +1659,7 @@ class Builder
         $this->aggregate = null;
 
         $this->columns = $previousColumns;
+
         $this->bindings['select'] = $previousSelectBindings;
 
         if (isset($results[0])) {
