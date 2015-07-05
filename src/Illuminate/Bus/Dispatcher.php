@@ -240,9 +240,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
         }
 
         if (method_exists($command, 'queue')) {
-            $command->queue($queue, $command);
+            return $command->queue($queue, $command);
         } else {
-            $this->pushCommandToQueue($queue, $command);
+            return $this->pushCommandToQueue($queue, $command);
         }
     }
 
@@ -267,7 +267,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
             return $queue->later($command->delay, $command);
         }
 
-        $queue->push($command);
+        return $queue->push($command);
     }
 
     /**
