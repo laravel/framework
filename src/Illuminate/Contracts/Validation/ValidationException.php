@@ -26,7 +26,7 @@ class ValidationException extends RuntimeException
     }
 
     /**
-     * Get the validation error message provider.
+     * Get the validation error message bag.
      *
      * @return \Illuminate\Support\MessageBag
      */
