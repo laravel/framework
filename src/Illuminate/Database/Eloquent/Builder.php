@@ -193,21 +193,6 @@ class Builder
     }
 
     /**
-     * Get a single column's value from the first result of a query.
-     *
-     * This is an alias for the "value" method.
-     *
-     * @param  string  $column
-     * @return mixed
-     *
-     * @deprecated since version 5.1.
-     */
-    public function pluck($column)
-    {
-        return $this->value($column);
-    }
-
-    /**
      * Chunk the results of the query.
      *
      * @param  int  $count
