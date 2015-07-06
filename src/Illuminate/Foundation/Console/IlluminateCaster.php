@@ -65,7 +65,7 @@ class IlluminateCaster
     public static function castCollection(Collection $collection)
     {
         return [
-            Caster::PREFIX_VIRTUAL.'all' => $coll->all(),
+            Caster::PREFIX_VIRTUAL.'all' => $collection->all(),
         ];
     }
 
