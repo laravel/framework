@@ -138,7 +138,7 @@ class Factory implements FactoryContract
      * @param  string  $view
      * @param  array   $data
      * @param  array   $mergeData
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function make($view, $data = [], $mergeData = [])
     {
