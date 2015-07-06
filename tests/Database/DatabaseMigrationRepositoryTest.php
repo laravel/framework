@@ -24,6 +24,28 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $repo->getRan());
     }
 
+    public function testGetRanMigrationsWithBatchInCorrectOrder()
+    {
+        $repo = $this->getRepository();
+        require_once __DIR__.'/OrderByMock.php';
+        $order = new OrderByMock();
+        $expected = [
+            ['batch' => '1', 'migration' => '20100101_user_table'],
+            ['batch' => '1', 'migration' => '20100202_other_table'],
+            ['batch' => '2', 'migration' => '20100102_user_table'],
+            ['batch' => '2', 'migration' => '20100203_user_table'],
+            ['batch' => '3', 'migration' => '20100301_better_table'],
+        ];
+        $order->migrations = $expected;
+        shuffle($order->migrations);
+
+        $connectionMock = m::mock('Illuminate\Database\Connection');
+        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($order);
+
+        $this->assertEquals(array_pluck($expected, 'migration'), $repo->getRan());
+    }
+
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
         $repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
