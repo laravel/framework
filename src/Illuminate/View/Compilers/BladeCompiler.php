@@ -479,7 +479,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileLang($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expression; ?>";
+        return "<?php echo app('translator')->get$expression; ?>";
     }
 
     /**
@@ -490,7 +490,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileChoice($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expression; ?>";
+        return "<?php echo app('translator')->choice$expression; ?>";
     }
 
     /**
