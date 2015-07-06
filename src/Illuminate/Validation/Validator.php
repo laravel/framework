@@ -1109,6 +1109,12 @@ class Validator implements ValidatorContract
     {
         $verifier = $this->getPresenceVerifier();
 
+        list($connection, $table) = $this->parseUniqueTable($parameters[0]);
+
+        if (!is_null($connection)) {
+            $verifier->setConnection($connection);
+        }
+
         $extra = $this->getExtraExistConditions($parameters);
 
         if (is_array($value)) {
