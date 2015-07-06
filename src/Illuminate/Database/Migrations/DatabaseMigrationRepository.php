@@ -47,7 +47,10 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function getRan()
     {
-        return $this->table()->lists('migration');
+        return $this->table()
+                ->orderBy('batch', 'asc')
+                ->orderBy('migration', 'asc')
+                ->lists('migration');
     }
 
     /**
