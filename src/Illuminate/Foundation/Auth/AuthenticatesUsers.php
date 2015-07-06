@@ -3,8 +3,6 @@
 namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
 
 trait AuthenticatesUsers
@@ -48,7 +46,7 @@ trait AuthenticatesUsers
 
         $credentials = $this->getCredentials($request);
 
-        if (Auth::attempt($credentials, $request->has('remember'))) {
+        if (auth()->attempt($credentials, $request->has('remember'))) {
             return $this->handleUserWasAuthenticated($request, $throttles);
         }
 
@@ -80,7 +78,7 @@ trait AuthenticatesUsers
         }
 
         if (method_exists($this, 'authenticated')) {
-            return $this->authenticated($request, Auth::user());
+            return $this->authenticated($request, auth()->user());
         }
 
         return redirect()->intended($this->redirectPath());
@@ -104,8 +102,8 @@ trait AuthenticatesUsers
      */
     protected function getFailedLoginMessage()
     {
-        return Lang::has('auth.failed')
-                ? Lang::get('auth.failed')
+        return trans()->has('auth.failed')
+                ? trans()->get('auth.failed')
                 : 'These credentials do not match our records.';
     }
 
@@ -116,7 +114,7 @@ trait AuthenticatesUsers
      */
     public function getLogout()
     {
-        Auth::logout();
+        auth()->logout();
 
         return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
     }
