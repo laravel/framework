@@ -127,12 +127,14 @@ class ControllerInspector
      * @param  \ReflectionMethod  $method
      * @return string
      */
-    public function addUriWildcards($uri, $method)
+    public function addUriWildcards($uri, ReflectionMethod $method)
     {
         $parameters = [];
+
         foreach ($method->getParameters() as $parameter) {
             $parameters[] = $parameter->isOptional() ? "{{$parameter->getName()}?}" : "{{$parameter->getName()}}";
         }
+
         return $uri . '/' . implode('/', $parameters);
      }
 }
