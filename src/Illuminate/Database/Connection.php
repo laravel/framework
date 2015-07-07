@@ -507,7 +507,12 @@ class Connection implements ConnectionInterface
             $this->pdo->commit();
         }
 
-        --$this->transactions;
+        if ($this->transactions > 0) {
+            --$this->transactions;
+        }
+        else{
+            $this->transactions = 0;   
+        }
 
         $this->fireConnectionEvent('committed');
     }
@@ -524,7 +529,12 @@ class Connection implements ConnectionInterface
 
             $this->pdo->rollBack();
         } else {
-            --$this->transactions;
+            if ($this->transactions > 0) {
+                --$this->transactions;
+            }
+            else{
+                $this->transactions = 0;   
+            }
         }
 
         $this->fireConnectionEvent('rollingBack');
