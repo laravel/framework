@@ -204,7 +204,7 @@ class Builder
             return call_user_func($this->resolver, $table, $callback);
         }
 
-        return new Blueprint($table, $this->connection, $callback);
+        return new Blueprint($table, $callback, $this->connection);
     }
 
     /**

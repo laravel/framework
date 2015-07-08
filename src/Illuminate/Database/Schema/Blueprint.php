@@ -48,18 +48,18 @@ class Blueprint
     public $collation;
 
     /**
-     * @var Connection
+     * @var \Illuminate\Database\Connection
      */
     private $connection;
 
     /**
      * Create a new schema blueprint.
      *
-     * @param  string  $table
-     * @param  \Closure|null  $callback
-     * @return void
+     * @param  string        $table
+     * @param  \Closure|null $callback
+     * @param Connection     $connection
      */
-    public function __construct($table, Connection $connection = null, Closure $callback = null)
+    public function __construct($table, Closure $callback = null, Connection $connection = null)
     {
         $this->connection = $connection;
         $this->table = $table;
@@ -841,7 +841,10 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $prefix = $this->connection->getTablePrefix();
+        $prefix = '';
+        if ($this->connection) {
+            $prefix = $this->connection->getTablePrefix();
+        }
         $index = strtolower($prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
