@@ -55,9 +55,9 @@ class Blueprint
     /**
      * Create a new schema blueprint.
      *
-     * @param  string        $table
-     * @param  \Closure|null $callback
-     * @param Connection     $connection
+     * @param  string  $table
+     * @param  \Closure|null  $callback
+     * @param  \Illuminate\Database\Connection  $connection
      */
     public function __construct($table, Closure $callback = null, Connection $connection = null)
     {
