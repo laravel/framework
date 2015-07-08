@@ -418,7 +418,7 @@ empty
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = "Foo @lang(function_call('foo(blah)')) bar";
-        $expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
+        $expected = "Foo <?php echo app('translator')->get(function_call('foo(blah)')); ?> bar";
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -453,8 +453,8 @@ empty
     public function testLanguageAndChoicesAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+        $this->assertEquals('<?php echo app(\'translator\')->get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+        $this->assertEquals('<?php echo app(\'translator\')->choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
     }
 
     public function testSectionStartsAreCompiled()
@@ -563,7 +563,7 @@ empty
     public function testExpressionsOnTheSameLine()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Facades\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
+        $this->assertEquals('<?php echo app(\'translator\')->get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo app(\'translator\')->get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
     }
 
     public function testExpressionWithinHTML()
@@ -571,7 +571,7 @@ empty
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<html <?php echo e($foo); ?>>', $compiler->compileString('<html {{ $foo }}>'));
         $this->assertEquals('<html<?php echo e($foo); ?>>', $compiler->compileString('<html{{ $foo }}>'));
-        $this->assertEquals('<html <?php echo e($foo); ?> <?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
+        $this->assertEquals('<html <?php echo e($foo); ?> <?php echo app(\'translator\')->get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
     }
 
     protected function getFiles()
