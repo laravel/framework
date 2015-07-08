@@ -59,7 +59,7 @@ class Blueprint
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function __construct($table, Connection $connection, Closure $callback = null)
+    public function __construct($table, Connection $connection = null, Closure $callback = null)
     {
         $this->connection = $connection;
         $this->table = $table;
