@@ -18,6 +18,7 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "ext-openssl": "*",
+        "andersonef/repositories-pattern": "^1.0",
         "classpreloader/classpreloader": "~2.0",
         "danielstjules/stringy": "~1.8",
         "doctrine/inflector": "~1.0",
