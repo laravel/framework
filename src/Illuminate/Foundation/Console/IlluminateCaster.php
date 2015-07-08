@@ -40,20 +40,21 @@ class IlluminateCaster
      */
     public static function castApplication(Application $app)
     {
-        $result = [];
+        $results = [];
 
         foreach (self::$appProperties as $property) {
             try {
                 $val = $app->$property();
+
                 if (!is_null($val)) {
-                    $result[Caster::PREFIX_VIRTUAL . $property] = $val;
+                    $results[Caster::PREFIX_VIRTUAL . $property] = $val;
                 }
             } catch (Exception $e) {
                 //
             }
         }
 
-        return $result;
+        return $results;
     }
 
     /**
@@ -77,16 +78,20 @@ class IlluminateCaster
      */
     public static function castModel(Model $model)
     {
-        $attributes = array_merge($model->getAttributes(), $model->getRelations());
-        $visible = array_flip($model->getVisible() ?: array_diff(array_keys($attributes), $model->getHidden()));
-        $attributes = array_intersect_key($attributes, $visible);
+        $attributes = array_merge(
+            $model->getAttributes(), $model->getRelations()
+        );
 
-        $result = [];
+        $visible = array_flip(
+            $model->getVisible() ?: array_diff(array_keys($attributes), $model->getHidden())
+        );
 
-        foreach ($attributes as $key => $value) {
-            $result[(isset($visible[$key]) ? Caster::PREFIX_VIRTUAL : Caster::PREFIX_PROTECTED).$key] = $value;
+        $results = [];
+
+        foreach (array_intersect_key($attributes, $visible) as $key => $value) {
+            $results[(isset($visible[$key]) ? Caster::PREFIX_VIRTUAL : Caster::PREFIX_PROTECTED).$key] = $value;
         }
 
-        return $result;
+        return $results;
     }
 }
