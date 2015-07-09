@@ -2741,6 +2741,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return json_decode($value, true);
             case 'collection':
                 return new BaseCollection(json_decode($value, true));
+            case 'null':
+                return $value ?: null;
             default:
                 return $value;
         }
@@ -2773,6 +2775,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($this->isJsonCastable($key)) {
             $value = json_encode($value);
+        }
+        
+        if ($this->getCastType($key) == 'null') {
+            $value = $value ?: null;
         }
 
         $this->attributes[$key] = $value;
