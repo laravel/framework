@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class ListFailedCommand extends Command
@@ -70,9 +69,30 @@ class ListFailedCommand extends Command
     {
         $row = array_values(array_except($failed, ['payload']));
 
-        array_splice($row, 3, 0, Arr::get(json_decode($failed['payload'], true), 'job'));
+        array_splice($row, 3, 0, $this->setPayload($failed['payload']));
 
         return $row;
+    }
+
+    /**
+     * @param array $payload
+     *
+     * @return string
+     */
+    private function setPayload($payload)
+    {
+        $response = '';
+
+        $jsonDecode = json_decode($payload, true);
+
+        if ($jsonDecode && array_key_exists('data', $jsonDecode)) {
+            $data = unserialize($jsonDecode['data']['command']);
+            $name = (is_object($data) ? get_class($data) : substr(var_export($data, true), 0, 40));
+
+            $response .= $name;
+        }
+
+        return $response;
     }
 
     /**
