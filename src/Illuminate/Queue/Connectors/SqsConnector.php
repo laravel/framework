@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Arr;
+use Illuminate\Queue\SqsQueue;
 
 class SqsConnector implements ConnectorInterface
 {
@@ -18,7 +18,6 @@ class SqsConnector implements ConnectorInterface
     {
         $config += ['version' => 'latest'];
 
-        // Move 'key' and 'secret' under 'credentials', if present.
         if ($config['key'] && $config['secret']) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
         }
