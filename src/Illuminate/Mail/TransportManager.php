@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Manager;
+use Illuminate\Support\Arr;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
@@ -70,14 +71,13 @@ class TransportManager extends Manager
 
         $config += [
             'version' => 'latest',
-            'service' => 'email',
-            'credentials' => [
-                'key'    => $config['key'],
-                'secret' => $config['secret'],
-            ],
+            'service' => 'email', // Fixes issue with SDK versions < 3.0.2
         ];
 
-        unset($config['key'], $config['secret']);
+        // Move 'key' and 'secret' under 'credentials', if present.
+        if ($config['key'] && $config['secret']) {
+            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+        }
 
         return new SesTransport(new SesClient($config));
     }
