@@ -82,7 +82,7 @@ class Event
      *
      * @var string
      */
-    public $output = null;
+    public $output = '/dev/null';
 
     /**
      * The array of callbacks to be run before the event is started.
