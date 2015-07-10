@@ -69,7 +69,7 @@ class ListFailedCommand extends Command
     {
         $row = array_values(array_except($failed, ['payload']));
 
-        array_splice($row, 3, 0, $this->setPayload($failed['payload']));
+        array_splice($row, 3, 0, $this->extractJobName($failed['payload']));
 
         return $row;
     }
@@ -79,20 +79,23 @@ class ListFailedCommand extends Command
      *
      * @return string
      */
-    private function setPayload($payload)
+    private function extractJobName($payload)
     {
-        $response = '';
+        $payload = json_decode($payload, true);
 
-        $jsonDecode = json_decode($payload, true);
-
-        if ($jsonDecode && array_key_exists('data', $jsonDecode)) {
-            $data = unserialize($jsonDecode['data']['command']);
-            $name = (is_object($data) ? get_class($data) : substr(var_export($data, true), 0, 40));
-
-            $response .= $name;
+        if ($payload && (! isset($payload['data']['command']))) {
+            return array_get($payload, 'job');
         }
 
-        return $response;
+        if ($payload && isset($payload['data']['command'])) {
+            preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
+
+            if (isset($matches[1])) {
+                return $matches[1];
+            } else {
+                return array_get($payload['job']);
+            }
+        }
     }
 
     /**
