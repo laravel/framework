@@ -122,9 +122,9 @@ class Event
      *
      * @return string
      */
-    private function getDefaultOutput()
+    protected function getDefaultOutput()
     {
-        return (strpos(strtoupper(PHP_OS), 'WIN')===0) ? 'NUL' : '/dev/null';
+        return (strpos(strtoupper(PHP_OS), 'WIN') === 0) ? 'NUL' : '/dev/null';
     }
 
     /**
