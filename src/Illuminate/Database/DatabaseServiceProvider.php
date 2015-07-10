@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database;
 
+use Faker\Factory as FakerFactory;
+use Faker\Generator as FakerGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
@@ -55,8 +57,14 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerEloquentFactory()
     {
-        $this->app->singleton('Illuminate\Database\Eloquent\Factory', function () {
-            return EloquentFactory::construct(database_path('factories'));
+        $this->app->singleton(FakerGenerator::class, function () {
+            return FakerFactory::create();
+        });
+
+        $this->app->singleton(EloquentFactory::class, function ($app) {
+            $faker = $app->make(FakerGenerator::class);
+
+            return EloquentFactory::construct($faker, database_path('factories'));
         });
     }
 
