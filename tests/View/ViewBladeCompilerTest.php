@@ -159,29 +159,6 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             '));
     }
 
-    public function testReversedEchosAreCompiled()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setEscapedContentTags('{{', '}}');
-        $compiler->setContentTags('{{{', '}}}');
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{
-            $name
-        }}}'));
-    }
-
-    public function testShortRawEchosAreCompiled()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setRawTags('{{', '}}');
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-    }
-
     public function testExtendsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -535,19 +512,6 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testConfiguringContentTags()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setContentTags('[[', ']]');
-        $compiler->setEscapedContentTags('[[[', ']]]');
-
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[[ $name ]]]'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[ $name ]]'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[
-            $name
-        ]]'));
-    }
-
     public function testRawTagsCanBeSetToLegacyValues()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -603,26 +567,6 @@ test';
         $string = '@extends(name(foo))'.PHP_EOL.'test';
         $expected = 'test'.PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    /**
-     * @dataProvider testGetTagsProvider()
-     */
-    public function testSetAndRetrieveContentTags($openingTag, $closingTag)
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setContentTags($openingTag, $closingTag);
-        $this->assertSame([$openingTag, $closingTag], $compiler->getContentTags());
-    }
-
-    /**
-     * @dataProvider testGetTagsProvider()
-     */
-    public function testSetAndRetrieveEscapedContentTags($openingTag, $closingTag)
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setEscapedContentTags($openingTag, $closingTag);
-        $this->assertSame([$openingTag, $closingTag], $compiler->getEscapedContentTags());
     }
 
     public function testGetTagsProvider()
