@@ -28,7 +28,7 @@ class ValidationException extends RuntimeException
     /**
      * Get the validation error message provider.
      *
-     * @return \Illuminate\Contracts\Support\MessageProvider
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function errors()
     {

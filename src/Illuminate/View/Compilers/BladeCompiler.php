@@ -326,12 +326,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEscapedEchos($value)
     {
-        $pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
+        $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
         $callback = function ($matches) {
-            $whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
+            $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
+            return $matches[1] ? $matches[0] : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
@@ -479,7 +479,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileLang($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expression; ?>";
+        return "<?php echo app('translator')->get$expression; ?>";
     }
 
     /**
@@ -490,7 +490,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileChoice($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expression; ?>";
+        return "<?php echo app('translator')->choice$expression; ?>";
     }
 
     /**
@@ -757,7 +757,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $closeTag
      * @return void
      */
-    public function setRawTags($openTag, $closeTag)
+    protected function setRawTags($openTag, $closeTag)
     {
         $this->rawTags = [preg_quote($openTag), preg_quote($closeTag)];
     }
@@ -770,7 +770,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  bool    $escaped
      * @return void
      */
-    public function setContentTags($openTag, $closeTag, $escaped = false)
+    protected function setContentTags($openTag, $closeTag, $escaped = false)
     {
         $property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
@@ -784,7 +784,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $closeTag
      * @return void
      */
-    public function setEscapedContentTags($openTag, $closeTag)
+    protected function setEscapedContentTags($openTag, $closeTag)
     {
         $this->setContentTags($openTag, $closeTag, true);
     }
