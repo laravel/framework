@@ -114,6 +114,17 @@ class Event
     public function __construct($command)
     {
         $this->command = $command;
+        $this->output = $this->getDefaultOutput();
+    }
+
+    /**
+     * Get the default output depending on the OS.
+     *
+     * @return string
+     */
+    private function getDefaultOutput()
+    {
+        return (strpos(strtoupper(PHP_OS), 'WIN')===0) ? 'NUL' : '/dev/null';
     }
 
     /**
@@ -641,7 +652,7 @@ class Event
      */
     public function emailOutputTo($addresses)
     {
-        if (is_null($this->output) || $this->output == '/dev/null') {
+        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             throw new LogicException('Must direct output to a file in order to e-mail results.');
         }
 
