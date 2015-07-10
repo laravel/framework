@@ -837,7 +837,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         else {
             $instance = new $class;
             
-			if (!is_null($interface) and !$instance instanceof $interface)
+			if (!is_null($interface) && !$instance instanceof $interface)
 			{
 				throw new LogicException('morphTo relationship must return an object of type '
 					. $interface);
