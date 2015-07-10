@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class ListFailedCommand extends Command
@@ -84,7 +85,7 @@ class ListFailedCommand extends Command
         $payload = json_decode($payload, true);
 
         if ($payload && (! isset($payload['data']['command']))) {
-            return array_get($payload, 'job');
+            return Arr::get($payload, 'job');
         }
 
         if ($payload && isset($payload['data']['command'])) {
@@ -93,7 +94,7 @@ class ListFailedCommand extends Command
             if (isset($matches[1])) {
                 return $matches[1];
             } else {
-                return array_get($payload['job']);
+                return Arr::get($payload['job']);
             }
         }
     }
