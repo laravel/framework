@@ -832,7 +832,7 @@ class BelongsToMany extends Relation
      * @param  mixed  $id
      * @param  array  $attributes
      * @param  bool   $touch
-     * @return void
+     * @return int
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {

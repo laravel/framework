@@ -65,8 +65,8 @@ trait ThrottlesLogins
     {
         $seconds = (int) Cache::get($this->getLoginLockExpirationKey($request)) - time();
 
-        $message = Lang::has('passwords.throttle')
-                    ? Lang::get('passwords.throttle', ['seconds' => $seconds])
+        $message = Lang::has('auth.throttle')
+                    ? Lang::get('auth.throttle', ['seconds' => $seconds])
                     : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
 
         return redirect($this->loginPath())
