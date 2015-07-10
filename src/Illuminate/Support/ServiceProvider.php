@@ -21,6 +21,13 @@ abstract class ServiceProvider
     protected $defer = false;
 
     /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $package;
+
+    /**
      * The paths that should be published.
      *
      * @var array
@@ -103,7 +110,7 @@ abstract class ServiceProvider
      */
     protected function publishes(array $paths, $group = null)
     {
-        $class = get_class($this);
+        $class = isset($this->package) ? $this->package : get_class($this);
 
         if (!array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
