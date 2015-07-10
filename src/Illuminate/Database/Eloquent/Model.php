@@ -806,9 +806,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
+     * @param  string  $interface
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null)
+    public function morphTo($name = null, $type = null, $id = null, $interface = null)
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -835,6 +836,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // we will pass in the appropriate values so that it behaves as expected.
         else {
             $instance = new $class;
+            
+			if (!is_null($interface) and !$instance instanceof $interface)
+			{
+				throw new LogicException('morphTo relationship must return an object of type '
+					. $interface);
+			}
 
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
