@@ -10,6 +10,7 @@ use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Type;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -2737,29 +2738,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return (float) $value;
-            case 'string':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $value;
-            case 'object':
-                return json_decode($value);
-            case 'array':
-            case 'json':
-                return json_decode($value, true);
-            case 'collection':
-                return new BaseCollection(json_decode($value, true));
-            default:
-                return $value;
+        $method = 'cast'.Str::studly($this->getCastType($key));
+
+        if (method_exists(Type::class, $method)) {
+            return call_user_func([Type::class, $method], $value);
         }
+        return $value;
     }
 
     /**
