@@ -14,8 +14,6 @@ class DummyClass extends Command implements SelfHandling, ShouldQueue
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
