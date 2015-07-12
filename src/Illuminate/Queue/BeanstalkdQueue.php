@@ -12,7 +12,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * The Pheanstalk instance.
      *
-     * @var \Pheanstalk_Pheanstalk
+     * @var \Pheanstalk\Pheanstalk
      */
     protected $pheanstalk;
 
@@ -134,7 +134,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Get the underlying Pheanstalk instance.
      *
-     * @return \Pheanstalk_Pheanstalk
+     * @return \Pheanstalk\Pheanstalk
      */
     public function getPheanstalk()
     {

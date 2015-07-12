@@ -184,6 +184,26 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
     }
 
+    public function testAddingSmallIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->smallIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" smallserial primary key not null', $statements[0]);
+    }
+
+    public function testAddingMediumIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
