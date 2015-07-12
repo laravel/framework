@@ -17,7 +17,7 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  Pusher  $pusher
+     * @param  \Pusher  $pusher
      * @return void
      */
     public function __construct(Pusher $pusher)

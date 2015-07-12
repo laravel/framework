@@ -11,7 +11,7 @@ trait ThrottlesLogins
     /**
      * Determine if the user has too many failed login attempts.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     protected function hasTooManyLoginAttempts(Request $request)
@@ -34,7 +34,7 @@ trait ThrottlesLogins
     /**
      * Get the login attempts for the user.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return int
      */
     protected function getLoginAttempts(Request $request)
@@ -45,7 +45,7 @@ trait ThrottlesLogins
     /**
      * Increment the login attempts for the user.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return int
      */
     protected function incrementLoginAttempts(Request $request)
@@ -58,7 +58,7 @@ trait ThrottlesLogins
     /**
      * Redirect the user after determining they are locked out.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendLockoutResponse(Request $request)
@@ -79,7 +79,7 @@ trait ThrottlesLogins
     /**
      * Clear the login locks for the given user credentials.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function clearLoginAttempts(Request $request)
@@ -92,7 +92,7 @@ trait ThrottlesLogins
     /**
      * Get the login attempts cache key.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     protected function getLoginAttemptsKey(Request $request)
@@ -105,7 +105,7 @@ trait ThrottlesLogins
     /**
      * Get the login lock cache key.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     protected function getLoginLockExpirationKey(Request $request)
