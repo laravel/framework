@@ -17,6 +17,7 @@ use Illuminate\Routing\Matching\SchemeValidator;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use SuperClosure\SerializableClosure;
 
 class Route
 {
@@ -148,6 +149,9 @@ class Route
      */
     protected function runCallable(Request $request)
     {
+        if ($this->action['uses'] instanceof SerializableClosure) {
+            $this->action['uses'] = $this->action['uses']->getClosure();
+        }
         $parameters = $this->resolveMethodDependencies(
             $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
         );
@@ -971,7 +975,7 @@ class Route
     public function prepareForSerialization()
     {
         if ($this->action['uses'] instanceof Closure) {
-            throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
+            $this->action['uses'] = new SerializableClosure($this->action['uses']);
         }
 
         unset($this->container, $this->compiled);
