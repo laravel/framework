@@ -180,7 +180,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Get the Rackspace Cloud Files container.
      *
-     * @param  Rackspace  $client
+     * @param  \OpenCloud\Rackspace  $client
      * @param  array  $config
      * @return \OpenCloud\ObjectStore\Resource\Container
      */

@@ -18,7 +18,7 @@ abstract class Transport
     /**
      * Register a plug-in with the transport.
      *
-     * @param  Swift_Events_EventListener  $plugin
+     * @param  \Swift_Events_EventListener  $plugin
      * @return void
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
@@ -29,7 +29,7 @@ abstract class Transport
     /**
      * Iterate through registered plugins and execute plugins' methods.
      *
-     * @param  Swift_Mime_Message $message
+     * @param  \Swift_Mime_Message $message
      * @return void
      */
     protected function beforeSendPerformed(Swift_Mime_Message $message)
