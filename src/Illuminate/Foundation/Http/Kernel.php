@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
+use Throwable;
 use RuntimeException;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
@@ -85,6 +86,10 @@ class Kernel implements KernelContract
 
             $response = $this->sendRequestThroughRouter($request);
         } catch (Exception $e) {
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
