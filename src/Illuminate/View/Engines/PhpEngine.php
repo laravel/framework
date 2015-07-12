@@ -3,6 +3,7 @@
 namespace Illuminate\View\Engines;
 
 use Exception;
+use Throwable;
 
 class PhpEngine implements EngineInterface
 {
@@ -40,6 +41,8 @@ class PhpEngine implements EngineInterface
             include $__path;
         } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
+        } catch (Throwable $e) {
+            $this->handleViewException($e, $obLevel);
         }
 
         return ltrim(ob_get_clean());
@@ -48,7 +51,7 @@ class PhpEngine implements EngineInterface
     /**
      * Handle a view exception.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @param  int  $obLevel
      * @return void
      *
