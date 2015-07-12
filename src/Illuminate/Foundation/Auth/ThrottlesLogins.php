@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
@@ -20,9 +21,15 @@ trait ThrottlesLogins
 
         $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
 
-        if ($attempts > 5 || $lockedOut) {
+        if ($attempts > $this->getMaximumLoginAttempts() || $lockedOut) {
             if (! $lockedOut) {
-                Cache::put($this->getLoginLockExpirationKey($request), time() + 60, 1);
+                $timeLocked = $this->getTimeLocked();
+
+                Cache::put(
+                    $this->getLoginLockExpirationKey($request),
+                    time() + $timeLocked,
+                    Carbon::now()->addSeconds($timeLocked)
+                );
             }
 
             return true;
@@ -113,5 +120,25 @@ trait ThrottlesLogins
         $username = $request->input($this->loginUsername());
 
         return 'login:expiration:'.md5($username.$request->ip());
+    }
+
+    /**
+     * Get the maximum allowed attempts.
+     *
+     * @return int
+     */
+    protected function getMaximumLoginAttempts()
+    {
+        return property_exists($this, 'maxLoginAttempts') ? $this->maxLoginAttempts : 5;
+    }
+
+    /**
+     * Get the total time the user will be locked.
+     *
+     * @return int
+     */
+    protected function getTimeLocked()
+    {
+        return property_exists($this, 'timeLocked') ? $this->timeLocked * 60 : 60;
     }
 }
