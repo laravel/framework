@@ -81,7 +81,7 @@ trait ValidatesRequests
      */
     protected function getRedirectUrl()
     {
-        return app('Illuminate\Routing\UrlGenerator')->previous();
+        return property_exists($this, 'validationPath') ? $this->validationPath : app('Illuminate\Routing\UrlGenerator')->previous();
     }
 
     /**
