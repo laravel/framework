@@ -757,7 +757,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $closeTag
      * @return void
      */
-    protected function setRawTags($openTag, $closeTag)
+    public function setRawTags($openTag, $closeTag)
     {
         $this->rawTags = [preg_quote($openTag), preg_quote($closeTag)];
     }
@@ -770,7 +770,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  bool    $escaped
      * @return void
      */
-    protected function setContentTags($openTag, $closeTag, $escaped = false)
+    public function setContentTags($openTag, $closeTag, $escaped = false)
     {
         $property = ($escaped === true) ? 'escapedTags' : 'contentTags';
 
@@ -784,7 +784,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $closeTag
      * @return void
      */
-    protected function setEscapedContentTags($openTag, $closeTag)
+    public function setEscapedContentTags($openTag, $closeTag)
     {
         $this->setContentTags($openTag, $closeTag, true);
     }
