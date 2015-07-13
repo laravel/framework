@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Support\Manager;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
 
 class AuthManager extends Manager
 {
@@ -36,7 +37,7 @@ class AuthManager extends Manager
     {
         $custom = parent::callCustomCreator($driver);
 
-        if ($custom instanceof Guard) {
+        if ($custom instanceof GuardContract) {
             return $custom;
         }
 
