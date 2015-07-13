@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResetsPasswords
@@ -13,11 +15,11 @@ trait ResetsPasswords
     /**
      * Display the form to request a password reset link.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function getEmail()
     {
-        return view('auth.password');
+        return View::make('auth.password');
     }
 
     /**
@@ -36,10 +38,10 @@ trait ResetsPasswords
 
         switch ($response) {
             case Password::RESET_LINK_SENT:
-                return redirect()->back()->with('status', trans($response));
+                return Redirect::back()->with('status', trans($response));
 
             case Password::INVALID_USER:
-                return redirect()->back()->withErrors(['email' => trans($response)]);
+                return Redirect::back()->withErrors(['email' => trans($response)]);
         }
     }
 
@@ -65,7 +67,7 @@ trait ResetsPasswords
             throw new NotFoundHttpException;
         }
 
-        return view('auth.reset')->with('token', $token);
+        return View::make('auth.reset')->with('token', $token);
     }
 
     /**
@@ -95,7 +97,7 @@ trait ResetsPasswords
                 return redirect($this->redirectPath());
 
             default:
-                return redirect()->back()
+                return Redirect::back()
                             ->withInput($request->only('email'))
                             ->withErrors(['email' => trans($response)]);
         }
