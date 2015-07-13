@@ -354,8 +354,8 @@ class Event
     /**
      * Schedule the event to run twice daily.
      *
-     * @param string|null  $first
-     * @param string|null  $second
+     * @param  string $first
+     * @param  string $second
      * @return $this
      */
     public function twiceDaily($first = '1:00', $second = '13:00')
