@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redirect;
 
 trait AuthenticatesUsers
 {
@@ -18,11 +20,11 @@ trait AuthenticatesUsers
      */
     public function getLogin()
     {
-        if (view()->exists('auth.authenticate')) {
-            return view('auth.authenticate');
+        if (View::exists('auth.authenticate')) {
+            return View::make('auth.authenticate');
         }
 
-        return view('auth.login');
+        return View::make('auth.login');
     }
 
     /**
@@ -34,7 +36,8 @@ trait AuthenticatesUsers
     public function postLogin(Request $request)
     {
         $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
+            $this->loginUsername() => 'required', 
+            'password' => 'required',
         ]);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -59,7 +62,7 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
-        return redirect($this->loginPath())
+        return Redirect::to($this->loginPath())
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getFailedLoginMessage(),
@@ -83,7 +86,7 @@ trait AuthenticatesUsers
             return $this->authenticated($request, Auth::user());
         }
 
-        return redirect()->intended($this->redirectPath());
+        return Redirect::intended($this->redirectPath());
     }
 
     /**
@@ -118,7 +121,9 @@ trait AuthenticatesUsers
     {
         Auth::logout();
 
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return Redirect::to(
+            property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/'
+        );
     }
 
     /**
