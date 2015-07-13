@@ -5,13 +5,14 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redirect;
 
 trait ThrottlesLogins
 {
     /**
      * Determine if the user has too many failed login attempts.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return bool
      */
     protected function hasTooManyLoginAttempts(Request $request)
@@ -21,7 +22,7 @@ trait ThrottlesLogins
         $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
 
         if ($attempts > 5 || $lockedOut) {
-            if (! $lockedOut) {
+            if (!$lockedOut) {
                 Cache::put($this->getLoginLockExpirationKey($request), time() + 60, 1);
             }
 
@@ -34,7 +35,7 @@ trait ThrottlesLogins
     /**
      * Get the login attempts for the user.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return int
      */
     protected function getLoginAttempts(Request $request)
@@ -45,7 +46,7 @@ trait ThrottlesLogins
     /**
      * Increment the login attempts for the user.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return int
      */
     protected function incrementLoginAttempts(Request $request)
@@ -58,7 +59,7 @@ trait ThrottlesLogins
     /**
      * Redirect the user after determining they are locked out.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendLockoutResponse(Request $request)
@@ -69,7 +70,7 @@ trait ThrottlesLogins
                     ? Lang::get('auth.throttle', ['seconds' => $seconds])
                     : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
 
-        return redirect($this->loginPath())
+        return Redirect::to($this->loginPath())
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $message,
@@ -79,7 +80,7 @@ trait ThrottlesLogins
     /**
      * Clear the login locks for the given user credentials.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return void
      */
     protected function clearLoginAttempts(Request $request)
@@ -92,7 +93,7 @@ trait ThrottlesLogins
     /**
      * Get the login attempts cache key.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return string
      */
     protected function getLoginAttemptsKey(Request $request)
@@ -105,7 +106,7 @@ trait ThrottlesLogins
     /**
      * Get the login lock cache key.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return string
      */
     protected function getLoginLockExpirationKey(Request $request)

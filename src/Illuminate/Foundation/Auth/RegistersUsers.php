@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Redirect;
 
 trait RegistersUsers
 {
@@ -12,11 +14,11 @@ trait RegistersUsers
     /**
      * Show the application registration form.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function getRegister()
     {
-        return view('auth.register');
+        return View::make('auth.register');
     }
 
     /**
@@ -37,6 +39,6 @@ trait RegistersUsers
 
         Auth::login($this->create($request->all()));
 
-        return redirect($this->redirectPath());
+        return Redirect::to($this->redirectPath());
     }
 }
