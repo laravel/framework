@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
+use Throwable;
 use RuntimeException;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
@@ -85,6 +86,10 @@ class Kernel implements KernelContract
 
             $response = $this->sendRequestThroughRouter($request);
         } catch (Exception $e) {
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
@@ -254,10 +259,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function reportException(Exception $e)
+    protected function reportException($e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
     }
@@ -266,10 +271,10 @@ class Kernel implements KernelContract
      * Render the exception to a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderException($request, Exception $e)
+    protected function renderException($request, $e)
     {
         return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
     }

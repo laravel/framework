@@ -9,26 +9,26 @@ interface ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    public function report(Exception $e);
+    public function report($e);
 
     /**
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function render($request, Exception $e);
+    public function render($request, $e);
 
     /**
      * Render an exception to the console.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    public function renderForConsole($output, Exception $e);
+    public function renderForConsole($output, $e);
 }

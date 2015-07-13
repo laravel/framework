@@ -227,10 +227,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function reportException(Exception $e)
+    protected function reportException($e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
     }
@@ -239,10 +239,10 @@ class Kernel implements KernelContract
      * Report the exception to the exception handler.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function renderException($output, Exception $e)
+    protected function renderException($output, $e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
     }
