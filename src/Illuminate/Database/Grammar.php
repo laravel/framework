@@ -50,6 +50,8 @@ abstract class Grammar
     {
         if ($this->isExpression($value)) {
             return $this->getValue($value);
+        } elseif (is_int($value)) {
+            return $value;
         }
 
         // If the value being wrapped has a column alias we will need to separate out

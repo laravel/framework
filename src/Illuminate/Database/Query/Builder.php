@@ -1563,7 +1563,7 @@ class Builder
     {
         $limit = $this->limit;
 
-        $result = $this->limit(1)->count() > 0;
+        $result = $this->limit(1)->aggregate(null, [1]) != null;
 
         $this->limit($limit);
 
