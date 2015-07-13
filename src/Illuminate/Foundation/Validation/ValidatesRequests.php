@@ -48,7 +48,7 @@ trait ValidatesRequests
      *
      * @throws \Illuminate\Http\Exception\HttpResponseException
      */
-    public function validateUsingBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
         $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
             $this->validate($request, $rules, $messages, $customAttributes);
