@@ -69,7 +69,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $key
      * @param  array   $replace
      * @param  string  $locale
-     * @return string
+     * @return string|array
      */
     public function get($key, array $replace = [], $locale = null)
     {
@@ -163,7 +163,8 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function choice($key, $number, array $replace = [], $locale = null)
     {
-        $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
+        $lines = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
+        $line = is_array($lines) ? array_shift($lines) : $lines;
 
         $replace['count'] = $number;
 
@@ -181,7 +182,10 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function trans($id, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        return $this->get($id, $parameters, $locale);
+        $lines = $this->get($id, $parameters, $locale);
+        $line = is_array($lines) ? array_shift($lines) : $lines;
+        
+        return $line;
     }
 
     /**
