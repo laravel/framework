@@ -1561,11 +1561,18 @@ class Builder
      */
     public function exists()
     {
-        $limit = $this->limit;
+        // Backup limit, select columns and select bindings
+        $previousLimit = $this->limit;
+        $previousColumns = $this->columns;
+        $previousSelectBindings = $this->bindings['select'];
+        $this->bindings['select'] = [];
 
-        $result = $this->limit(1)->count() > 0;
+        $result = $this->selectRaw('1')->first() !== null;
 
-        $this->limit($limit);
+        // Restore limit, select columns and select bindings
+        $this->limit($previousLimit);
+        $this->columns = $previousColumns;
+        $this->bindings['select'] = $previousSelectBindings;
 
         return $result;
     }
