@@ -354,20 +354,16 @@ class Event
     /**
      * Schedule the event to run twice daily.
      *
-     * @param  string $first
-     * @param  string $second
+     * @param  int  $first
+     * @param  int  $second
      * @return $this
      */
-    public function twiceDaily($first = '1:00', $second = '13:00')
+    public function twiceDaily($first = 1, $second = 13)
     {
-        $first = explode(':', $first);
-        $second = explode(':', $second);
+        $hours = $first . ',' . $second;
 
-        $minutes = (int) count($first) == 2 ? $first[1] : 0;
-        $hours = $first[0] . ',' . $second[0];
-
-        return $this->spliceIntoPosition(2, $hours)
-             ->spliceIntoPosition(1, $minutes);
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, $hours);
     }
 
     /**
