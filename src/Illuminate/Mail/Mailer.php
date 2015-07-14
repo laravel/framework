@@ -7,7 +7,7 @@ use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use SuperClosure\Serializer;
+use Opis\Closure\SerializableClosure;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
@@ -262,7 +262,7 @@ class Mailer implements MailerContract, MailQueueContract
             return $callback;
         }
 
-        return (new Serializer)->serialize($callback);
+        return serialize(new SerializableClosure($callback));
     }
 
     /**
