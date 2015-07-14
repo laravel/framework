@@ -360,7 +360,7 @@ class Event
      */
     public function twiceDaily($first = 1, $second = 13)
     {
-        $hours = $first . ',' . $second;
+        $hours = $first.','.$second;
 
         return $this->spliceIntoPosition(1, 0)
                     ->spliceIntoPosition(2, $hours);
