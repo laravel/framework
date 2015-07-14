@@ -240,9 +240,17 @@ trait CrawlerTrait
      */
     protected function see($text, $negate = false)
     {
-        $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
+        $method = $negate ?'assertNotRegExp' : 'assertRegExp';
 
-        $this->$method('/'.preg_quote($text, '/').'/i', $this->response->getContent());
+        $escaped = e($text);
+        $text = preg_quote($text, '/');
+
+        if (preg_match('/\&[^\s]*;/', $escaped)) {
+            $escaped = preg_quote($escaped, '/');
+            $text = "$escaped|$text";
+        }
+
+        $this->$method("/$text/i", $this->response->getContent());
 
         return $this;
     }
