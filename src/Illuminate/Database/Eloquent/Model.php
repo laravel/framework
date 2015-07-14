@@ -10,6 +10,7 @@ use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Type;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -21,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -729,13 +729,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
-
-        $instance = new $related;
-
-        $localKey = $localKey ?: $this->getKeyName();
-
-        return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return $this->hasOneOrMany(HasOne::class, $related, $foreignKey, $localKey);
     }
 
     /**
@@ -750,15 +744,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
-        $instance = new $related;
-
-        list($type, $id) = $this->getMorphs($name, $type, $id);
-
-        $table = $instance->getTable();
-
-        $localKey = $localKey ?: $this->getKeyName();
-
-        return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        return $this->morphOneOrMany(MorphOne::class, $related, $name, $type, $id, $localKey);
     }
 
     /**
@@ -852,13 +838,54 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
+        return $this->hasOneOrMany(HasMany::class, $related, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-one or one-to-many relationship.
+     *
+     * @param  string  $className
+     * @param  string  $related
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneOrMany
+     */
+    private function hasOneOrMany($className, $related, $foreignKey = null, $localKey = null)
+    {
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related;
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return new $className($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /**
+     * Define a polymorphic one-to-one or one-to-many relationship.
+     *
+     * @param  string  $className
+     * @param  string  $related
+     * @param  string  $name
+     * @param  string  $type
+     * @param  string  $id
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOneOrMany
+     */
+    private function morphOneOrMany($className, $related, $name, $type = null, $id = null, $localKey = null)
+    {
+        $instance = new $related;
+
+        // Here we will gather up the morph type and ID for the relationship so that we
+        // can properly query the intermediate table of a relation. Finally, we will
+        // get the table and create the relationship instances for the developers.
+        list($type, $id) = $this->getMorphs($name, $type, $id);
+
+        $table = $instance->getTable();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new $className($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
     /**
@@ -895,18 +922,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
-        $instance = new $related;
-
-        // Here we will gather up the morph type and ID for the relationship so that we
-        // can properly query the intermediate table of a relation. Finally, we will
-        // get the table and create the relationship instances for the developers.
-        list($type, $id) = $this->getMorphs($name, $type, $id);
-
-        $table = $instance->getTable();
-
-        $localKey = $localKey ?: $this->getKeyName();
-
-        return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        return $this->morphOneOrMany(MorphMany::class, $related, $name, $type, $id, $localKey);
     }
 
     /**
@@ -2721,29 +2737,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return (float) $value;
-            case 'string':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $value;
-            case 'object':
-                return json_decode($value);
-            case 'array':
-            case 'json':
-                return json_decode($value, true);
-            case 'collection':
-                return new BaseCollection(json_decode($value, true));
-            default:
-                return $value;
+        $method = 'cast'.Str::studly($this->getCastType($key));
+
+        if (method_exists(Type::class, $method)) {
+            return call_user_func([Type::class, $method], $value);
         }
+        return $value;
     }
 
     /**
