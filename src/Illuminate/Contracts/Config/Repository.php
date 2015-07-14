@@ -47,4 +47,11 @@ interface Repository
      * @return void
      */
     public function push($key, $value);
+
+    /**
+     * Get all of the configuration items for the application.
+     *
+     * @return array
+     */
+    public function all();
 }
