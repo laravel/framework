@@ -121,7 +121,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      */
     protected function parseTable($table)
     {
-        return str_contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
 
     /**
