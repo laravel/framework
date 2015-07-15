@@ -37,7 +37,7 @@ class ListenerMakeCommand extends GeneratorCommand
     public function fire()
     {
         if (!$this->option('event')) {
-            return $this->error("Missing required --event option");
+            return $this->error('Missing required --event option');
         }
 
         parent::fire();
