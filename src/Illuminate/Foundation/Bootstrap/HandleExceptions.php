@@ -2,10 +2,12 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Exception;
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class HandleExceptions
 {
@@ -65,11 +67,15 @@ class HandleExceptions
      * the HTTP and Console kernels. But, fatal error exceptions must
      * be handled differently since they are not normal exceptions.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     public function handleException($e)
     {
+        if (!$e instanceof Exception) {
+            $e = new FatalThrowableError($e);
+        }
+
         $this->getExceptionHandler()->report($e);
 
         if ($this->app->runningInConsole()) {

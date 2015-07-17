@@ -3,12 +3,14 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
+use Throwable;
 use RuntimeException;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel implements KernelContract
 {
@@ -85,6 +87,12 @@ class Kernel implements KernelContract
 
             $response = $this->sendRequestThroughRouter($request);
         } catch (Exception $e) {
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);

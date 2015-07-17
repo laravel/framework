@@ -6,6 +6,7 @@ use PDO;
 use Closure;
 use DateTime;
 use Exception;
+use Throwable;
 use LogicException;
 use RuntimeException;
 use Illuminate\Support\Arr;
@@ -450,7 +451,7 @@ class Connection implements ConnectionInterface
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @param  \Throwable  $callback
      * @return mixed
      *
      * @throws \Exception
@@ -472,6 +473,10 @@ class Connection implements ConnectionInterface
         // up in the database. Then we'll re-throw the exception so it can
         // be handled how the developer sees fit for their applications.
         catch (Exception $e) {
+            $this->rollBack();
+
+            throw $e;
+        } catch (Throwable $e) {
             $this->rollBack();
 
             throw $e;
