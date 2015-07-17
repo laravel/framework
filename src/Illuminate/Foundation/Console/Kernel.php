@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel implements KernelContract
 {
@@ -97,6 +98,14 @@ class Kernel implements KernelContract
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
+            $this->reportException($e);
+
+            $this->renderException($output, $e);
+
+            return 1;
+        } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+
             $this->reportException($e);
 
             $this->renderException($output, $e);
@@ -227,10 +236,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    protected function reportException($e)
+    protected function reportException(Exception $e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
     }
@@ -239,10 +248,10 @@ class Kernel implements KernelContract
      * Report the exception to the exception handler.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    protected function renderException($output, $e)
+    protected function renderException($output, Exception $e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
     }
