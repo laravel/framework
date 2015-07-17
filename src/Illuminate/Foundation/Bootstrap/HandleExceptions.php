@@ -2,10 +2,12 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Exception;
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class HandleExceptions
 {
@@ -70,6 +72,10 @@ class HandleExceptions
      */
     public function handleException($e)
     {
+        if (!$e instanceof Exception) {
+            $e = new FatalThrowableError($e);
+        }
+
         $this->getExceptionHandler()->report($e);
 
         if ($this->app->runningInConsole()) {
@@ -82,10 +88,10 @@ class HandleExceptions
     /**
      * Render an exception to the console.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    protected function renderForConsole($e)
+    protected function renderForConsole(Exception $e)
     {
         $this->getExceptionHandler()->renderForConsole(new ConsoleOutput, $e);
     }
@@ -93,10 +99,10 @@ class HandleExceptions
     /**
      * Render an exception as an HTTP response and send it.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    protected function renderHttpResponse($e)
+    protected function renderHttpResponse(Exception $e)
     {
         $this->getExceptionHandler()->render($this->app['request'], $e)->send();
     }
