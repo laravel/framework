@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use Throwable;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -16,7 +17,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  mixed   $data
      * @param  string  $queue
      * @return mixed
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -25,6 +26,10 @@ class SyncQueue extends Queue implements QueueContract
         try {
             $queueJob->fire();
         } catch (Exception $e) {
+            $this->handleFailedJob($queueJob);
+
+            throw $e;
+        } catch (Throwable $e) {
             $this->handleFailedJob($queueJob);
 
             throw $e;
