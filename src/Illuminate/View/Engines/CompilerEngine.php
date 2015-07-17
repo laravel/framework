@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Engines;
 
+use Exception;
 use ErrorException;
 use Illuminate\View\Compilers\CompilerInterface;
 
