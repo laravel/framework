@@ -262,7 +262,7 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception $e
+     * @param  \Exception  $e
      * @return void
      */
     protected function reportException(Exception $e)
