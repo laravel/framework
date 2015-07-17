@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Cache;
 trait ThrottlesLogins
 {
     /**
+     * Amount of failed attempts a user can try before the login is locked out
+     * @var int
+     */
+    protected $throttleLimit = 5;
+
+    /**
+     * Time in minutes the login will be locked out after reaching the $throttleLimit
+     * @var int
+     */
+    protected $throttleTime = 1;
+
+    /**
      * Determine if the user has too many failed login attempts.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -20,9 +32,13 @@ trait ThrottlesLogins
 
         $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
 
-        if ($attempts > 5 || $lockedOut) {
+        if ($attempts > $this->throttleLimit || $lockedOut) {
             if (! $lockedOut) {
-                Cache::put($this->getLoginLockExpirationKey($request), time() + 60, 1);
+                Cache::put(
+                    $this->getLoginLockExpirationKey($request),
+                    time() + 60 * $this->throttleTime,
+                    1
+                );
             }
 
             return true;
