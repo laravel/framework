@@ -6,9 +6,10 @@ use Exception;
 use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Worker
 {
@@ -114,7 +115,7 @@ class Worker
             }
         } catch (Throwable $e) {
             if ($this->exceptions) {
-                $this->exceptions->report($e);
+                $this->exceptions->report(new FatalThrowableError($e));
             }
         }
     }

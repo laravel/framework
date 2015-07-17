@@ -10,6 +10,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel implements KernelContract
 {
@@ -90,6 +91,8 @@ class Kernel implements KernelContract
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
@@ -259,10 +262,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception $e
      * @return void
      */
-    protected function reportException($e)
+    protected function reportException(Exception $e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
     }
@@ -271,10 +274,10 @@ class Kernel implements KernelContract
      * Render the exception to a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderException($request, $e)
+    protected function renderException($request, Exception $e)
     {
         return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
     }

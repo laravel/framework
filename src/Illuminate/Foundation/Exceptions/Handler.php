@@ -40,10 +40,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    public function report($e)
+    public function report(Exception $e)
     {
         if ($this->shouldReport($e)) {
             $this->log->error($e);
@@ -53,10 +53,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Determine if the exception should be reported.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return bool
      */
-    public function shouldReport($e)
+    public function shouldReport(Exception $e)
     {
         return !$this->shouldntReport($e);
     }
@@ -64,10 +64,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Determine if the exception is in the "do not report" list.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return bool
      */
-    protected function shouldntReport($e)
+    protected function shouldntReport(Exception $e)
     {
         foreach ($this->dontReport as $type) {
             if ($e instanceof $type) {
@@ -82,10 +82,10 @@ class Handler implements ExceptionHandlerContract
      * Render an exception into a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
-    public function render($request, $e)
+    public function render($request, Exception $e)
     {
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
@@ -98,10 +98,10 @@ class Handler implements ExceptionHandlerContract
      * Map exception into an illuminate response.
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
-    protected function toIlluminateResponse($response, $e)
+    protected function toIlluminateResponse($response, Exception $e)
     {
         $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
 
@@ -114,10 +114,10 @@ class Handler implements ExceptionHandlerContract
      * Render an exception to the console.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      */
-    public function renderForConsole($output, $e)
+    public function renderForConsole($output, Exception $e)
     {
         (new ConsoleApplication)->renderException($e, $output);
     }
@@ -142,10 +142,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Determine if the given exception is an HTTP exception.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return bool
      */
-    protected function isHttpException($e)
+    protected function isHttpException(Exception $e)
     {
         return $e instanceof HttpException;
     }
