@@ -451,7 +451,7 @@ class Connection implements ConnectionInterface
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @param  \Throwable  $callback
      * @return mixed
      *
      * @throws \Throwable
