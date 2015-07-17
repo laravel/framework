@@ -180,6 +180,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $morphClass;
 
     /**
+     * An array mapping the morphable type saved to the database
+     * to the actual class
+     *
+     * @var array
+     */
+    protected $morphMap = [];
+
+    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -834,12 +842,31 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
         else {
+
+            $class = $this->getActualClassName($class);
+
             $instance = new $class;
 
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
             );
         }
+    }
+
+    /**
+     * Fetch the class name from the morph map, or return the original if it's not defined
+     * It has been declared public so that it can be used by the MorphTo relation class for eager loading
+     *
+     * @param $class
+     * @return string
+     */
+    public function getActualClassName($class)
+    {
+        if (array_key_exists($class, $this->morphMap)) {
+            return $this->morphMap[$class];
+        }
+
+        return $class;
     }
 
     /**
