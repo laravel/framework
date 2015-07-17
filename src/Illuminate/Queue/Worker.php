@@ -61,6 +61,7 @@ class Worker
         $this->failer = $failer;
         $this->events = $events;
         $this->manager = $manager;
+        $this->exceptionsCount = 0;
     }
 
     /**
@@ -108,9 +109,13 @@ class Worker
         try {
             $this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
         } catch (Exception $e) {
+
             if ($this->exceptions) {
-                $this->exceptions->report($e);
-            }
+          				$this->exceptionsCount++;
+          				$this->delayBetweenExceptions($this->exceptionsCount);
+          				$this->exceptions->report($e);
+                  
+          	}
         }
     }
 
@@ -351,4 +356,17 @@ class Worker
     {
         $this->manager = $manager;
     }
+
+    /**
+     * Delay logging between exceptions.
+     * @param \Illuminate\Queue $exceptionsCount
+     * @return void
+     *
+     */
+    	public function delayBetweenExceptions($exceptionsCount)
+    	{
+    		if($exceptionsCount < 5) return;
+    		if($exceptionsCount < 50) $this->sleep(1);
+    		if($exceptionsCount > 50) $this->sleep(10);
+    	}
 }
