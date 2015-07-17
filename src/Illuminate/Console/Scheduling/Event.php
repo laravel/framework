@@ -354,11 +354,16 @@ class Event
     /**
      * Schedule the event to run twice daily.
      *
+     * @param  int  $first
+     * @param  int  $second
      * @return $this
      */
-    public function twiceDaily()
+    public function twiceDaily($first = 1, $second = 13)
     {
-        return $this->cron('0 1,13 * * * *');
+        $hours = $first.','.$second;
+
+        return $this->spliceIntoPosition(1, 0)
+                    ->spliceIntoPosition(2, $hours);
     }
 
     /**
