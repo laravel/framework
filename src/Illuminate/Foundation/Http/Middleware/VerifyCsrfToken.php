@@ -100,8 +100,13 @@ class VerifyCsrfToken
 
         $response->headers->setCookie(
             new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), time() + 60 * 120,
-                $config['path'], $config['domain'], false, false
+                'XSRF-TOKEN',
+                $request->session()->token(),
+                time() + 60 * 120,
+                $config['path'],
+                $config['domain'],
+                false,
+                false
             )
         );
 

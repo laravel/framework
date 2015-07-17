@@ -262,12 +262,11 @@ class Factory implements FactoryContract
 
                 $result .= $this->make($view, $data)->render();
             }
-        }
 
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
-        else {
+        } else {
             if (Str::startsWith($empty, 'raw|')) {
                 $result = substr($empty, 4);
             } else {
@@ -618,7 +617,9 @@ class Factory implements FactoryContract
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
 
         return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
+            '--parent--holder--',
+            '@parent',
+            str_replace('@parent', '', $sectionContent)
         );
     }
 

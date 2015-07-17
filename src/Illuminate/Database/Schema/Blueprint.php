@@ -140,12 +140,11 @@ class Blueprint
                     $this->$index($column->name);
 
                     continue 2;
-                }
 
                 // If the index has been specified on the column and it is something
                 // other than boolean true, we will assume a name was provided on
                 // the index specification, and pass in the name to the method.
-                elseif (isset($column->$index)) {
+                } elseif (isset($column->$index)) {
                     $this->$index($column->name, $column->$index);
 
                     continue 2;
@@ -378,7 +377,7 @@ class Blueprint
     {
         return $this->unsignedInteger($column, true);
     }
-    
+
     /**
      * Create a new auto-incrementing small integer (2-byte) column on the table.
      *

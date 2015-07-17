@@ -24,7 +24,9 @@ trait SerializesModels
             ));
         }
 
-        return array_map(function ($p) { return $p->getName(); }, $properties);
+        return array_map(function ($p) {
+            return $p->getName();
+        }, $properties);
     }
 
     /**

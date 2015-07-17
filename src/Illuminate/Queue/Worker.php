@@ -54,10 +54,11 @@ class Worker
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
-    public function __construct(QueueManager $manager,
-                                FailedJobProviderInterface $failer = null,
-                                Dispatcher $events = null)
-    {
+    public function __construct(
+        QueueManager $manager,
+        FailedJobProviderInterface $failer = null,
+        Dispatcher $events = null
+    ) {
         $this->failer = $failer;
         $this->events = $events;
         $this->manager = $manager;
@@ -81,7 +82,11 @@ class Worker
         while (true) {
             if ($this->daemonShouldRun()) {
                 $this->runNextJobForDaemon(
-                    $connectionName, $queue, $delay, $sleep, $maxTries
+                    $connectionName,
+                    $queue,
+                    $delay,
+                    $sleep,
+                    $maxTries
                 );
             } else {
                 $this->sleep($sleep);
@@ -149,7 +154,10 @@ class Worker
         // we will "sleep" the worker for the specified number of seconds.
         if (!is_null($job)) {
             return $this->process(
-                $this->manager->getName($connectionName), $job, $maxTries, $delay
+                $this->manager->getName($connectionName),
+                $job,
+                $maxTries,
+                $delay
             );
         }
 

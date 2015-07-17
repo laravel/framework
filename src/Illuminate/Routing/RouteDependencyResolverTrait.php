@@ -18,7 +18,8 @@ trait RouteDependencyResolverTrait
     protected function callWithDependencies($instance, $method)
     {
         return call_user_func_array(
-            [$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
+            [$instance, $method],
+            $this->resolveClassMethodDependencies([], $instance, $method)
         );
     }
 
@@ -37,7 +38,8 @@ trait RouteDependencyResolverTrait
         }
 
         return $this->resolveMethodDependencies(
-            $parameters, new ReflectionMethod($instance, $method)
+            $parameters,
+            new ReflectionMethod($instance, $method)
         );
     }
 
@@ -58,7 +60,10 @@ trait RouteDependencyResolverTrait
 
             if ($class && !$this->alreadyInParameters($class->name, $parameters)) {
                 array_splice(
-                    $parameters, $key, 0, [$this->container->make($class->name)]
+                    $parameters,
+                    $key,
+                    0,
+                    [$this->container->make($class->name)]
                 );
             }
         }

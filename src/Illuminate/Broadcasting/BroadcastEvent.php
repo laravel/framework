@@ -43,7 +43,9 @@ class BroadcastEvent
                 ? $event->broadcastAs() : get_class($event);
 
         $this->broadcaster->broadcast(
-            $event->broadcastOn(), $name, $this->getPayloadFromEvent($event)
+            $event->broadcastOn(),
+            $name,
+            $this->getPayloadFromEvent($event)
         );
 
         $job->delete();

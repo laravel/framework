@@ -117,7 +117,8 @@ class RedirectResponse extends BaseRedirectResponse
         $value = $this->parseErrors($provider);
 
         $this->session->flash(
-            'errors', $this->session->get('errors', new ViewErrorBag)->put($key, $value)
+            'errors',
+            $this->session->get('errors', new ViewErrorBag)->put($key, $value)
         );
 
         return $this;

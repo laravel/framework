@@ -183,7 +183,9 @@ class RedisQueue extends Queue implements QueueContract
             // so that we can push them onto the main queue. After we get them we simply
             // remove them from this "delay" queues. All of this within a transaction.
             $jobs = $this->getExpiredJobs(
-                $transaction, $from, $time = $this->getTime()
+                $transaction,
+                $from,
+                $time = $this->getTime()
             );
 
             // If we actually found any jobs, we will remove them from the old queue and we

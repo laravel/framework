@@ -167,7 +167,8 @@ class RouteListCommand extends Command
         $segments = explode('@', $actionName);
 
         return $this->getControllerMiddlewareFromInstance(
-            $this->laravel->make($segments[0]), $segments[1]
+            $this->laravel->make($segments[0]),
+            $segments[1]
         );
     }
 

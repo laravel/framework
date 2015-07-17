@@ -126,7 +126,8 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue())
+                $cookie,
+                $this->encrypter->encrypt($cookie->getValue())
             ));
         }
 
@@ -143,8 +144,13 @@ class EncryptCookies
     protected function duplicate(Cookie $c, $value)
     {
         return new Cookie(
-            $c->getName(), $value, $c->getExpiresTime(), $c->getPath(),
-            $c->getDomain(), $c->isSecure(), $c->isHttpOnly()
+            $c->getName(),
+            $value,
+            $c->getExpiresTime(),
+            $c->getPath(),
+            $c->getDomain(),
+            $c->isSecure(),
+            $c->isHttpOnly()
         );
     }
 

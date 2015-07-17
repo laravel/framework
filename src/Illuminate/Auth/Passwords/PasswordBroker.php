@@ -55,11 +55,12 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  string  $emailView
      * @return void
      */
-    public function __construct(TokenRepositoryInterface $tokens,
-                                UserProvider $users,
-                                MailerContract $mailer,
-                                $emailView)
-    {
+    public function __construct(
+        TokenRepositoryInterface $tokens,
+        UserProvider $users,
+        MailerContract $mailer,
+        $emailView
+    ) {
         $this->users = $users;
         $this->mailer = $mailer;
         $this->tokens = $tokens;
@@ -197,7 +198,9 @@ class PasswordBroker implements PasswordBrokerContract
 
         if (isset($this->passwordValidator)) {
             return call_user_func(
-                $this->passwordValidator, $credentials) && $password === $confirm;
+                $this->passwordValidator,
+                $credentials
+            ) && $password === $confirm;
         }
 
         return $this->validatePasswordWithDefaults($credentials);

@@ -718,7 +718,8 @@ class Builder
         $hasQuery = $hasQuery->getModel()->removeGlobalScopes($hasQuery);
 
         $hasQuery->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
+            $relationQuery->wheres,
+            $relationQuery->getBindings()
         );
 
         $this->query->mergeBindings($hasQuery->getQuery());
@@ -771,7 +772,9 @@ class Builder
             // constraints have been specified for the eager load and we'll just put
             // an empty Closure with the loader so that we can treat all the same.
             if (is_numeric($name)) {
-                $f = function () {};
+                $f = function () {
+                    //
+                };
 
                 list($name, $constraints) = [$constraints, $f];
             }
@@ -805,7 +808,9 @@ class Builder
             $progress[] = $segment;
 
             if (!isset($results[$last = implode('.', $progress)])) {
-                $results[$last] = function () {};
+                $results[$last] = function () {
+                    //
+                };
             }
         }
 

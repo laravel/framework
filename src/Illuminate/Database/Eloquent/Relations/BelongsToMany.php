@@ -754,14 +754,17 @@ class BelongsToMany extends Relation
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
 
-            $changes['detached'] = (array) array_map(function ($v) { return (int) $v; }, $detach);
+            $changes['detached'] = (array) array_map(function ($v) {
+                return (int) $v;
+            }, $detach);
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $current, false)
+            $changes,
+            $this->attachNew($records, $current, false)
         );
 
         if (count($changes['attached']) || count($changes['updated'])) {
@@ -812,12 +815,11 @@ class BelongsToMany extends Relation
                 $this->attach($id, $attributes, $touch);
 
                 $changes['attached'][] = (int) $id;
-            }
 
             // Now we'll try to update an existing pivot record with the attributes that were
             // given to the method. If the model is actually updated we will add it to the
             // list of updated pivot records so we return them back out to the consumer.
-            elseif (count($attributes) > 0 &&
+            } elseif (count($attributes) > 0 &&
                 $this->updateExistingPivot($id, $attributes, $touch)) {
                 $changes['updated'][] = (int) $id;
             }

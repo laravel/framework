@@ -762,13 +762,9 @@ class Container implements ArrayAccess, ContainerContract
         // Once we have all the constructor's parameters we can create each of the
         // dependency instances and then use the reflection instances to make a
         // new instance of this class, injecting the created dependencies in.
-        $parameters = $this->keyParametersByArgument(
-            $dependencies, $parameters
-        );
+        $parameters = $this->keyParametersByArgument($dependencies, $parameters);
 
-        $instances = $this->getDependencies(
-            $dependencies, $parameters
-        );
+        $instances = $this->getDependencies($dependencies, $parameters);
 
         array_pop($this->buildStack);
 
@@ -835,12 +831,11 @@ class Container implements ArrayAccess, ContainerContract
     {
         try {
             return $this->make($parameter->getClass()->name);
-        }
 
         // If we can not resolve the class instance, we will check to see if the value
         // is optional, and if it is we will return the optional parameter value as
         // the value of the dependency, similarly to how we do this with scalars.
-        catch (BindingResolutionContractException $e) {
+        } catch (BindingResolutionContractException $e) {
             if ($parameter->isOptional()) {
                 return $parameter->getDefaultValue();
             }
@@ -970,17 +965,15 @@ class Container implements ArrayAccess, ContainerContract
         $this->fireCallbackArray($object, $this->globalResolvingCallbacks);
 
         $this->fireCallbackArray(
-            $object, $this->getCallbacksForType(
-                $abstract, $object, $this->resolvingCallbacks
-            )
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->resolvingCallbacks)
         );
 
         $this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
 
         $this->fireCallbackArray(
-            $object, $this->getCallbacksForType(
-                $abstract, $object, $this->afterResolvingCallbacks
-            )
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
         );
     }
 

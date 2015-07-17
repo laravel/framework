@@ -343,7 +343,8 @@ abstract class Grammar extends BaseGrammar
     protected function getDoctrineColumnForChange(Table $table, Fluent $fluent)
     {
         return $table->changeColumn(
-            $fluent['name'], $this->getDoctrineColumnChangeOptions($fluent)
+            $fluent['name'],
+            $this->getDoctrineColumnChangeOptions($fluent)
         )->getColumn($fluent['name']);
     }
 

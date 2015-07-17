@@ -120,9 +120,7 @@ trait ApplicationTrait
                 ->with(Mockery::type($job));
         }
 
-        $this->app->instance(
-            'Illuminate\Contracts\Bus\Dispatcher', $mock
-        );
+        $this->app->instance('Illuminate\Contracts\Bus\Dispatcher', $mock);
 
         return $this;
     }
@@ -222,7 +220,9 @@ trait ApplicationTrait
         $count = $database->connection($connection)->table($table)->where($data)->count();
 
         $this->assertGreaterThan(0, $count, sprintf(
-            'Unable to find row in database table [%s] that matched attributes [%s].', $table, json_encode($data)
+            'Unable to find row in database table [%s] that matched attributes [%s].',
+            $table,
+            json_encode($data)
         ));
 
         return $this;
@@ -258,7 +258,9 @@ trait ApplicationTrait
         $count = $database->connection($connection)->table($table)->where($data)->count();
 
         $this->assertEquals(0, $count, sprintf(
-            'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
+            'Found unexpected records in database table [%s] that matched attributes [%s].',
+            $table,
+            json_encode($data)
         ));
 
         return $this;

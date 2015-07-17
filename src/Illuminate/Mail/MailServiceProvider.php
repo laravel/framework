@@ -28,7 +28,9 @@ class MailServiceProvider extends ServiceProvider
             // on the mailer. This allows us to resolve mailer classes via containers
             // for maximum testability on said classes instead of passing Closures.
             $mailer = new Mailer(
-                $app['view'], $app['swift.mailer'], $app['events']
+                $app['view'],
+                $app['swift.mailer'],
+                $app['events']
             );
 
             $this->setMailerDependencies($mailer, $app);

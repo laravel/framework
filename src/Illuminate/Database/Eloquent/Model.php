@@ -826,18 +826,27 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // there are multiple types in the morph and we can't use single queries.
         if (is_null($class = $this->$type)) {
             return new MorphTo(
-                $this->newQuery(), $this, $id, null, $type, $name
+                $this->newQuery(),
+                $this,
+                $id,
+                null,
+                $type,
+                $name
             );
-        }
 
         // If we are not eager loading the relationship we will essentially treat this
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
-        else {
+        } else {
             $instance = new $class;
 
             return new MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+                $instance->newQuery(),
+                $this,
+                $id,
+                $instance->getKeyName(),
+                $type,
+                $name
             );
         }
     }
@@ -984,8 +993,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $table = $table ?: Str::plural($name);
 
         return new MorphToMany(
-            $query, $this, $name, $table, $foreignKey,
-            $otherKey, $caller, $inverse
+            $query,
+            $this,
+            $name,
+            $table,
+            $foreignKey,
+            $otherKey,
+            $caller,
+            $inverse
         );
     }
 
@@ -1452,12 +1467,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->performUpdate($query, $options);
-        }
 
         // If the model is brand new, we'll insert it into our database and set the
         // ID attribute on the model to the value of the newly inserted row's ID
         // which is typically an auto-increment value managed by the database.
-        else {
+        } else {
             $saved = $this->performInsert($query, $options);
         }
 
@@ -1553,12 +1567,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($this->incrementing) {
             $this->insertAndSetId($query, $attributes);
-        }
 
         // If the table is not incrementing we'll simply insert this attributes as they
         // are, as this attributes arrays must contain an "id" column already placed
         // there by the developer as the manually determined key for these models.
-        else {
+        } else {
             $query->insert($attributes);
         }
 
@@ -2396,7 +2409,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
 
             $attributes[$key] = $this->mutateAttributeForArray(
-                $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
         }
 
@@ -2410,7 +2424,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
 
             $attributes[$key] = $this->castAttribute(
-                $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
         }
 
@@ -2471,12 +2486,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // collections to their proper array form and we'll set the values.
             if ($value instanceof Arrayable) {
                 $relation = $value->toArray();
-            }
 
             // If the value is null, we'll still go ahead and set it in this list of
             // attributes since null is used to represent empty relationships if
             // if it a has one or belongs to type relationships on the models.
-            elseif (is_null($value)) {
+            } elseif (is_null($value)) {
                 $relation = $value;
             }
 
@@ -2562,12 +2576,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
             $value = $this->castAttribute($key, $value);
-        }
 
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        elseif (in_array($key, $this->getDates())) {
+        } elseif (in_array($key, $this->getDates())) {
             if (!is_null($value)) {
                 return $this->asDateTime($value);
             }
@@ -2690,7 +2703,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->hasCast($key)) {
             return in_array(
-                $this->getCastType($key), ['array', 'json', 'object', 'collection'], true
+                $this->getCastType($key),
+                ['array', 'json', 'object', 'collection'],
+                true
             );
         }
 
@@ -2762,12 +2777,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $method = 'set'.Str::studly($key).'Attribute';
 
             return $this->{$method}($value);
-        }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif (in_array($key, $this->getDates()) && $value) {
+        } elseif (in_array($key, $this->getDates()) && $value) {
             $value = $this->fromDateTime($value);
         }
 

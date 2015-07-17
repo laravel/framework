@@ -93,10 +93,11 @@ class Guard implements GuardContract
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return void
      */
-    public function __construct(UserProvider $provider,
-                                SessionInterface $session,
-                                Request $request = null)
-    {
+    public function __construct(
+        UserProvider $provider,
+        SessionInterface $session,
+        Request $request = null
+    ) {
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;

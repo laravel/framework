@@ -122,12 +122,11 @@ class ProviderRepository
                 }
 
                 $manifest['when'][$provider] = $instance->when();
-            }
 
             // If the service providers are not deferred, we will simply add it to an
             // array of eagerly loaded providers that will get registered on every
             // request to this application instead of "lazy" loading every time.
-            else {
+            } else {
                 $manifest['eager'][] = $provider;
             }
         }
@@ -184,7 +183,8 @@ class ProviderRepository
     public function writeManifest($manifest)
     {
         $this->files->put(
-            $this->manifestPath, json_encode($manifest, JSON_PRETTY_PRINT)
+            $this->manifestPath,
+            json_encode($manifest, JSON_PRETTY_PRINT)
         );
 
         return $manifest;

@@ -64,7 +64,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         ];
 
         $arguments = array_merge(
-            $arguments, Arr::only($config, ['appname', 'charset'])
+            $arguments,
+            Arr::only($config, ['appname', 'charset'])
         );
 
         return $this->buildConnectString('dblib', $arguments);

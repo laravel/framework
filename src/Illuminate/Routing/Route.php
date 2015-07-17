@@ -149,7 +149,8 @@ class Route
     protected function runCallable(Request $request)
     {
         $parameters = $this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(),
+            new ReflectionFunction($this->action['uses'])
         );
 
         return call_user_func_array($this->action['uses'], $parameters);
@@ -166,7 +167,9 @@ class Route
         list($class, $method) = explode('@', $this->action['uses']);
 
         $parameters = $this->resolveClassMethodDependencies(
-            $this->parametersWithoutNulls(), $class, $method
+            $this->parametersWithoutNulls(),
+            $class,
+            $method
         );
 
         if (!method_exists($instance = $this->container->make($class), $method)) {
@@ -237,9 +240,7 @@ class Route
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
 
         $this->compiled = with(
-
             new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
-
         )->compile();
     }
 
@@ -462,7 +463,9 @@ class Route
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), function ($p) { return !is_null($p); });
+        return array_filter($this->parameters(), function ($p) {
+            return !is_null($p);
+        });
     }
 
     /**
@@ -488,7 +491,9 @@ class Route
     {
         preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
 
-        return array_map(function ($m) { return trim($m, '?'); }, $matches[1]);
+        return array_map(function ($m) {
+            return trim($m, '?');
+        }, $matches[1]);
     }
 
     /**
@@ -518,9 +523,7 @@ class Route
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
         $params = $this->matchToKeys(
-
             array_slice($this->bindPathParameters($request), 1)
-
         );
 
         // If the route has a regular expression for the host part of the URI, we will
@@ -528,7 +531,8 @@ class Route
         // merge them into this parameters array so that this array is completed.
         if (!is_null($this->compiled->getHostRegex())) {
             $params = $this->bindHostParameters(
-                $request, $params
+                $request,
+                $params
             );
         }
 
@@ -611,18 +615,18 @@ class Route
         // it is available. Otherwise we will need to find it in the action list.
         if (is_callable($action)) {
             return ['uses' => $action];
-        }
 
         // If no "uses" property has been set, we will dig through the array to find a
         // Closure instance within this list. We will set the first Closure we come
         // across into the "uses" property that will get fired off by this route.
-        elseif (!isset($action['uses'])) {
+        } elseif (!isset($action['uses'])) {
             $action['uses'] = $this->findCallable($action);
         }
 
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
             throw new UnexpectedValueException(sprintf(
-                'Invalid route action: [%s]', $action['uses']
+                'Invalid route action: [%s]',
+                $action['uses']
             ));
         }
 

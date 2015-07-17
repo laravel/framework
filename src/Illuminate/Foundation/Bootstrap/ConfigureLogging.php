@@ -23,7 +23,8 @@ class ConfigureLogging
         // the configurations for the log system and use it for configuration.
         if ($app->hasMonologConfigurator()) {
             call_user_func(
-                $app->getMonologConfigurator(), $log->getMonolog()
+                $app->getMonologConfigurator(),
+                $log->getMonolog()
             );
         } else {
             $this->configureHandlers($app, $log);
@@ -46,8 +47,9 @@ class ConfigureLogging
     protected function registerLogger(Application $app)
     {
         $app->instance('log', $log = new Writer(
-            new Monolog($app->environment()), $app['events'])
-        );
+            new Monolog($app->environment()),
+            $app['events']
+        ));
 
         return $log;
     }

@@ -40,14 +40,14 @@ class ShareErrorsFromSession
         // without having to bind. An empty bag is set when there aren't errors.
         if ($request->session()->has('errors')) {
             $this->view->share(
-                'errors', $request->session()->get('errors')
+                'errors',
+                $request->session()->get('errors')
             );
-        }
 
         // Putting the errors in the view for every view allows the developer to just
         // assume that some errors are always available, which is convenient since
         // they don't have to continually run checks for the presence of errors.
-        else {
+        } else {
             $this->view->share('errors', new ViewErrorBag);
         }
 

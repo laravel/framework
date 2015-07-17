@@ -199,10 +199,11 @@ class Builder
      * @param  \Illuminate\Database\Query\Processors\Processor  $processor
      * @return void
      */
-    public function __construct(ConnectionInterface $connection,
-                                Grammar $grammar,
-                                Processor $processor)
-    {
+    public function __construct(
+        ConnectionInterface $connection,
+        Grammar $grammar,
+        Processor $processor
+    ) {
         $this->grammar = $grammar;
         $this->processor = $processor;
         $this->connection = $connection;
@@ -327,17 +328,14 @@ class Builder
             $this->joins[] = new JoinClause($type, $table);
 
             call_user_func($one, end($this->joins));
-        }
 
         // If the column is simply a string, we can assume the join simply has a basic
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
-        else {
+        } else {
             $join = new JoinClause($type, $table);
 
-            $this->joins[] = $join->on(
-                $one, $operator, $two, 'and', $where
-            );
+            $this->joins[] = $join->on($one, $operator, $two, 'and', $where);
         }
 
         return $this;
@@ -980,12 +978,11 @@ class Builder
                 $this->addDynamic($segment, $connector, $parameters, $index);
 
                 $index++;
-            }
 
             // Otherwise, we will store the connector so we know how the next where clause we
             // find in the query should be connected to the previous ones, meaning we will
             // have the proper boolean connector to connect the next where clause found.
-            else {
+            } else {
                 $connector = $segment;
             }
         }
@@ -1686,12 +1683,11 @@ class Builder
         // inserts statements by verifying the elements are actually an array.
         if (!is_array(reset($values))) {
             $values = [$values];
-        }
 
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
-        else {
+        } else {
             foreach ($values as $key => $value) {
                 ksort($value);
                 $values[$key] = $value;

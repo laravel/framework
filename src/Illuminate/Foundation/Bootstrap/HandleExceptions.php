@@ -123,7 +123,12 @@ class HandleExceptions
     protected function fatalExceptionFromError(array $error, $traceOffset = null)
     {
         return new FatalErrorException(
-            $error['message'], $error['type'], 0, $error['file'], $error['line'], $traceOffset
+            $error['message'],
+            $error['type'],
+            0,
+            $error['file'],
+            $error['line'],
+            $traceOffset
         );
     }
 

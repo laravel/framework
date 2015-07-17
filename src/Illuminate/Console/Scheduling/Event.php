@@ -165,7 +165,11 @@ class Event
         $this->callBeforeCallbacks($container);
 
         (new Process(
-            trim($this->buildCommand(), '& '), base_path(), null, null, null
+            trim($this->buildCommand(), '& '),
+            base_path(),
+            null,
+            null,
+            null
         ))->run();
 
         $this->callAfterCallbacks($container);
@@ -703,7 +707,9 @@ class Event
      */
     public function pingBefore($url)
     {
-        return $this->before(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->before(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**
@@ -727,7 +733,9 @@ class Event
      */
     public function thenPing($url)
     {
-        return $this->then(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->then(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**

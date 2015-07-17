@@ -46,9 +46,7 @@ class PasswordResetServiceProvider extends ServiceProvider
             // The password broker uses a token repository to validate tokens and send user
             // password e-mails, as well as validating that password reset process as an
             // aggregate service of sorts providing a convenient interface for resets.
-            return new PasswordBroker(
-                $tokens, $users, $app['mailer'], $view
-            );
+            return new PasswordBroker($tokens, $users, $app['mailer'], $view);
         });
     }
 

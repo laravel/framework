@@ -146,9 +146,12 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      * @param  array  $extras
      * @return mixed
      */
-    protected function getParameterValueForCommand($command, ArrayAccess $source,
-        ReflectionParameter $parameter, array $extras = [])
-    {
+    protected function getParameterValueForCommand(
+        $command,
+        ArrayAccess $source,
+        ReflectionParameter $parameter,
+        array $extras = []
+    ) {
         if (array_key_exists($parameter->name, $extras)) {
             return $extras[$parameter->name];
         }
@@ -201,7 +204,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
             }
 
             return call_user_func(
-                [$handler, $this->getHandlerMethod($command)], $command
+                [$handler, $this->getHandlerMethod($command)],
+                $command
             );
         });
     }
