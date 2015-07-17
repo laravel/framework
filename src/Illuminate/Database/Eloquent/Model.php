@@ -316,6 +316,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Reset the list of booted models.
+     *
+     * @return void
+     */
+    public static function resetBootedModels()
+    {
+        static::$booted = [];
+    }
+
+    /**
      * Register a new global scope on the model.
      *
      * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
