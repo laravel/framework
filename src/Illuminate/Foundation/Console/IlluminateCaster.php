@@ -79,7 +79,8 @@ class IlluminateCaster
     public static function castModel(Model $model)
     {
         $attributes = array_merge(
-            $model->getAttributes(), $model->getRelations()
+            $model->getAttributes(),
+            $model->getRelations()
         );
 
         $visible = array_flip(

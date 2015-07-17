@@ -29,7 +29,8 @@ class BroadcastServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(
-            'Illuminate\Broadcasting\BroadcastManager', 'Illuminate\Contracts\Broadcasting\Factory'
+            'Illuminate\Broadcasting\BroadcastManager',
+            'Illuminate\Contracts\Broadcasting\Factory'
         );
     }
 

@@ -32,11 +32,12 @@ class BeanstalkdJob extends Job implements JobContract
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container,
-                                Pheanstalk $pheanstalk,
-                                PheanstalkJob $job,
-                                $queue)
-    {
+    public function __construct(
+        Container $container,
+        Pheanstalk $pheanstalk,
+        PheanstalkJob $job,
+        $queue
+    ) {
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;

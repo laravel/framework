@@ -31,7 +31,8 @@ trait RegistersUsers
 
         if ($validator->fails()) {
             $this->throwValidationException(
-                $request, $validator
+                $request,
+                $validator
             );
         }
 

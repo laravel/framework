@@ -39,11 +39,12 @@ class IronJob extends Job implements JobContract
      * @param  bool    $pushed
      * @return void
      */
-    public function __construct(Container $container,
-                                IronQueue $iron,
-                                $job,
-                                $pushed = false)
-    {
+    public function __construct(
+        Container $container,
+        IronQueue $iron,
+        $job,
+        $pushed = false
+    ) {
         $this->job = $job;
         $this->iron = $iron;
         $this->pushed = $pushed;

@@ -112,7 +112,9 @@ class DatabaseQueue extends Queue implements QueueContract
 
         $records = array_map(function ($job) use ($queue, $data, $availableAt) {
             return $this->buildDatabaseRecord(
-                $queue, $this->createPayload($job, $data), $availableAt
+                $queue,
+                $this->createPayload($job, $data),
+                $availableAt
             );
         }, (array) $jobs);
 
@@ -144,7 +146,10 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
     {
         $attributes = $this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
+            $this->getQueue($queue),
+            $payload,
+            $this->getAvailableAt($delay),
+            $attempts
         );
 
         return $this->database->table($this->table)->insertGetId($attributes);
@@ -170,7 +175,10 @@ class DatabaseQueue extends Queue implements QueueContract
             $this->database->commit();
 
             return new DatabaseJob(
-                $this->container, $this, $job, $queue
+                $this->container,
+                $this,
+                $job,
+                $queue
             );
         }
 

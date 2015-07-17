@@ -46,11 +46,15 @@ class HandlerEventCommand extends GeneratorCommand
         }
 
         $stub = str_replace(
-            'DummyEvent', class_basename($event), $stub
+            'DummyEvent',
+            class_basename($event),
+            $stub
         );
 
         $stub = str_replace(
-            'DummyFullEvent', $event, $stub
+            'DummyFullEvent',
+            $event,
+            $stub
         );
 
         return $stub;

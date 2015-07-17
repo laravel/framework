@@ -42,12 +42,11 @@ class Response extends BaseResponse
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
-        }
 
         // If this content implements the "Renderable" interface then we will call the
         // render method on the object so we will avoid any "__toString" exceptions
         // that might be thrown and have their errors obscured by PHP's handling.
-        elseif ($content instanceof Renderable) {
+        } elseif ($content instanceof Renderable) {
             $content = $content->render();
         }
 

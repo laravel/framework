@@ -72,7 +72,8 @@ class VendorPublishCommand extends Command
     private function publishTag($tag)
     {
         $paths = ServiceProvider::pathsToPublish(
-            $this->option('provider'), $tag
+            $this->option('provider'),
+            $tag
         );
 
         if (empty($paths)) {

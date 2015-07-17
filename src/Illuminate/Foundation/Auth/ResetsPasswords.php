@@ -83,7 +83,10 @@ trait ResetsPasswords
         ]);
 
         $credentials = $request->only(
-            'email', 'password', 'password_confirmation', 'token'
+            'email',
+            'password',
+            'password_confirmation',
+            'token'
         );
 
         $response = Password::reset($credentials, function ($user, $password) {

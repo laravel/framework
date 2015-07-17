@@ -53,7 +53,9 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerPhpEngine($resolver)
     {
-        $resolver->register('php', function () { return new PhpEngine; });
+        $resolver->register('php', function () {
+            return new PhpEngine;
+        });
     }
 
     /**

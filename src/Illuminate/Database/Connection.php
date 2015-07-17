@@ -466,12 +466,11 @@ class Connection implements ConnectionInterface
             $result = $callback($this);
 
             $this->commit();
-        }
 
         // If we catch an exception, we will roll back so nothing gets messed
         // up in the database. Then we'll re-throw the exception so it can
         // be handled how the developer sees fit for their applications.
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->rollBack();
 
             throw $e;
@@ -591,7 +590,10 @@ class Connection implements ConnectionInterface
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {
             $result = $this->tryAgainIfCausedByLostConnection(
-                $e, $query, $bindings, $callback
+                $e,
+                $query,
+                $bindings,
+                $callback
             );
         }
 
@@ -622,15 +624,12 @@ class Connection implements ConnectionInterface
         // took to execute and log the query SQL, bindings and time in our memory.
         try {
             $result = $callback($this, $query, $bindings);
-        }
 
         // If an exception occurs when attempting to run a query, we'll format the error
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
-        catch (Exception $e) {
-            throw new QueryException(
-                $query, $this->prepareBindings($bindings), $e
-            );
+        } catch (Exception $e) {
+            throw new QueryException($query, $this->prepareBindings($bindings), $e);
         }
 
         return $result;

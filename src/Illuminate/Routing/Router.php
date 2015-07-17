@@ -490,7 +490,9 @@ class Router implements RegistrarContract
         }
 
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods,
+            $this->prefix($uri),
+            $action
         );
 
         // If we have groups that need to be merged, we will merge them now after this
@@ -666,9 +668,7 @@ class Router implements RegistrarContract
         $response = $this->callRouteBefore($route, $request);
 
         if (is_null($response)) {
-            $response = $this->runRouteWithinStack(
-                $route, $request
-            );
+            $response = $this->runRouteWithinStack($route, $request);
         }
 
         $response = $this->prepareResponse($request, $response);

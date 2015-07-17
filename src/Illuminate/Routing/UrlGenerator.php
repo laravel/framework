@@ -158,9 +158,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $extra = $this->formatParameters($extra);
 
-        $tail = implode('/', array_map(
-            'rawurlencode', (array) $extra)
-        );
+        $tail = implode('/', array_map('rawurlencode', (array) $extra));
 
         // Once we have the scheme we will compile the "tail" by collapsing the values
         // into a single string delimited by slashes. This just makes it convenient
@@ -324,7 +322,9 @@ class UrlGenerator implements UrlGeneratorContract
     {
         if (count($parameters)) {
             $path = preg_replace_sub(
-                '/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
+                '/\{.*?\}/',
+                $parameters,
+                $this->replaceNamedParameters($path, $parameters)
             );
         }
 
@@ -421,7 +421,8 @@ class UrlGenerator implements UrlGeneratorContract
         // will make the initial query string if it wasn't started with strings.
         if (count($keyed) < count($parameters)) {
             $query .= '&'.implode(
-                '&', $this->getNumericParameters($parameters)
+                '&',
+                $this->getNumericParameters($parameters)
             );
         }
 
@@ -436,7 +437,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getStringParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k, $v) { return is_string($k); });
+        return Arr::where($parameters, function ($k, $v) {
+            return is_string($k);
+        });
     }
 
     /**
@@ -447,7 +450,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getNumericParameters(array $parameters)
     {
-        return Arr::where($parameters, function ($k, $v) { return is_numeric($k); });
+        return Arr::where($parameters, function ($k, $v) {
+            return is_numeric($k);
+        });
     }
 
     /**
@@ -676,7 +681,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function getSession()
     {
-        return call_user_func($this->sessionResolver ?: function () {});
+        return call_user_func($this->sessionResolver ?: function () {
+            //
+        });
     }
 
     /**

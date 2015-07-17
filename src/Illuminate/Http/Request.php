@@ -141,7 +141,9 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $segments = explode('/', $this->path());
 
-        return array_values(array_filter($segments, function ($v) { return $v != ''; }));
+        return array_values(array_filter($segments, function ($v) {
+            return $v != '';
+        }));
     }
 
     /**
@@ -722,10 +724,12 @@ class Request extends SymfonyRequest implements ArrayAccess
         $content = $request->content;
 
         $request = (new static)->duplicate(
-
-            $request->query->all(), $request->request->all(), $request->attributes->all(),
-
-            $request->cookies->all(), $request->files->all(), $request->server->all()
+            $request->query->all(),
+            $request->request->all(),
+            $request->attributes->all(),
+            $request->cookies->all(),
+            $request->files->all(),
+            $request->server->all()
         );
 
         $request->content = $content;
@@ -794,7 +798,9 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function getUserResolver()
     {
-        return $this->userResolver ?: function () {};
+        return $this->userResolver ?: function () {
+            //
+        };
     }
 
     /**
@@ -817,7 +823,9 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function getRouteResolver()
     {
-        return $this->routeResolver ?: function () {};
+        return $this->routeResolver ?: function () {
+            //
+        };
     }
 
     /**

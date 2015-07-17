@@ -168,7 +168,11 @@ trait CrawlerTrait
     protected function makeRequestUsingForm(Form $form)
     {
         return $this->makeRequest(
-            $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $form->getFiles()
+            $form->getMethod(),
+            $form->getUri(),
+            $this->extractParametersFromForm($form),
+            [],
+            $form->getFiles()
         );
     }
 
@@ -311,7 +315,8 @@ trait CrawlerTrait
     {
         if (is_null($data)) {
             $this->assertJson(
-                $this->response->getContent(), "Failed asserting that JSON returned [{$this->currentUri}]."
+                $this->response->getContent(),
+                "Failed asserting that JSON returned [{$this->currentUri}]."
             );
 
             return $this;
@@ -412,7 +417,9 @@ trait CrawlerTrait
         $this->assertPageLoaded($uri = $this->prepareUrlForRequest($uri));
 
         $this->assertEquals(
-            $uri, $this->currentUri, "Did not land on expected page [{$uri}].\n"
+            $uri,
+            $this->currentUri,
+            "Did not land on expected page [{$uri}].\n"
         );
 
         return $this;
@@ -433,7 +440,8 @@ trait CrawlerTrait
 
         if (!is_null($value)) {
             $this->assertEquals(
-                $headers->get($headerName), $value,
+                $headers->get($headerName),
+                $value,
                 "Header [{$headerName}] was found, but value [{$headers->get($headerName)}] does not match [{$value}]."
             );
         }
@@ -465,7 +473,8 @@ trait CrawlerTrait
 
         if (!is_null($value)) {
             $this->assertEquals(
-                $cookie->getValue(), $value,
+                $cookie->getValue(),
+                $value,
                 "Cookie [{$cookieName}] was found, but value [{$cookie->getValue()}] does not match [{$value}]."
             );
         }
@@ -675,8 +684,13 @@ trait CrawlerTrait
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
         $request = Request::create(
-            $this->currentUri, $method, $parameters,
-            $cookies, $files, $server, $content
+            $this->currentUri,
+            $method,
+            $parameters,
+            $cookies,
+            $files,
+            $server,
+            $content
         );
 
         return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);

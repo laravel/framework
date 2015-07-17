@@ -67,7 +67,11 @@ class WorkCommand extends Command
         $connection = $this->argument('connection');
 
         $response = $this->runWorker(
-            $connection, $queue, $delay, $memory, $this->option('daemon')
+            $connection,
+            $queue,
+            $delay,
+            $memory,
+            $this->option('daemon')
         );
 
         // If a job was fired by the worker, we'll write the output out to the console
@@ -98,14 +102,21 @@ class WorkCommand extends Command
             );
 
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
-                $this->option('sleep'), $this->option('tries')
+                $connection,
+                $queue,
+                $delay,
+                $memory,
+                $this->option('sleep'),
+                $this->option('tries')
             );
         }
 
         return $this->worker->pop(
-            $connection, $queue, $delay,
-            $this->option('sleep'), $this->option('tries')
+            $connection,
+            $queue,
+            $delay,
+            $this->option('sleep'),
+            $this->option('tries')
         );
     }
 

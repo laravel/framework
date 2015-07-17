@@ -27,11 +27,13 @@ class BusServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(
-            'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\Dispatcher'
+            'Illuminate\Bus\Dispatcher',
+            'Illuminate\Contracts\Bus\Dispatcher'
         );
 
         $this->app->alias(
-            'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\QueueingDispatcher'
+            'Illuminate\Bus\Dispatcher',
+            'Illuminate\Contracts\Bus\QueueingDispatcher'
         );
     }
 

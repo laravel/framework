@@ -126,8 +126,13 @@ class Listener
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
         $command = sprintf(
-            $string, $connection, $queue, $delay,
-            $memory, $this->sleep, $this->maxTries
+            $string,
+            $connection,
+            $queue,
+            $delay,
+            $memory,
+            $this->sleep,
+            $this->maxTries
         );
 
         return new Process($command, $this->commandPath, null, null, $timeout);

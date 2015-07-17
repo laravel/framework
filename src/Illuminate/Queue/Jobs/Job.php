@@ -166,7 +166,9 @@ abstract class Job
         }
 
         if (is_array($data)) {
-            array_walk($data, function (&$d) { $d = $this->resolveQueueableEntity($d); });
+            array_walk($data, function (&$d) {
+                $d = $this->resolveQueueableEntity($d);
+            });
         }
 
         return $data;

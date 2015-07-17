@@ -35,7 +35,8 @@ class CallQueuedHandler
     public function call(Job $job, array $data)
     {
         $command = $this->setJobInstanceIfNecessary(
-            $job, unserialize($data['command'])
+            $job,
+            unserialize($data['command'])
         );
 
         $this->dispatcher->dispatchNow($command, function ($handler) use ($job) {

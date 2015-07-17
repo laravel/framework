@@ -33,9 +33,10 @@ class ControllerDispatcher
      * @param  \Illuminate\Container\Container  $container
      * @return void
      */
-    public function __construct(Router $router,
-                                Container $container = null)
-    {
+    public function __construct(
+        Router $router,
+        Container $container = null
+    ) {
         $this->router = $router;
         $this->container = $container;
     }
@@ -65,7 +66,10 @@ class ControllerDispatcher
         // out for processing by this router and the after filters can be called then.
         if (is_null($response)) {
             $response = $this->callWithinStack(
-                $instance, $route, $request, $method
+                $instance,
+                $route,
+                $request,
+                $method
             );
         }
 
@@ -109,7 +113,8 @@ class ControllerDispatcher
                     ->through($shouldSkipMiddleware ? [] : $middleware)
                     ->then(function ($request) use ($instance, $route, $method) {
                         return $this->router->prepareResponse(
-                            $request, $this->call($instance, $route, $method)
+                            $request,
+                            $this->call($instance, $route, $method)
                         );
                     });
     }
@@ -158,7 +163,9 @@ class ControllerDispatcher
     protected function call($instance, $route, $method)
     {
         $parameters = $this->resolveClassMethodDependencies(
-            $route->parametersWithoutNulls(), $instance, $method
+            $route->parametersWithoutNulls(),
+            $instance,
+            $method
         );
 
         return $instance->callAction($method, $parameters);
@@ -294,7 +301,10 @@ class ControllerDispatcher
     protected function callFilter($filter, $route, $request)
     {
         return $this->router->callRouteFilter(
-            $filter['filter'], $filter['parameters'], $route, $request
+            $filter['filter'],
+            $filter['parameters'],
+            $route,
+            $request
         );
     }
 }

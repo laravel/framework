@@ -60,7 +60,9 @@ class TableCommand extends Command
         $table = $this->laravel['config']['queue.connections.database.table'];
 
         $stub = str_replace(
-            '{{table}}', $table, $this->files->get(__DIR__.'/stubs/jobs.stub')
+            '{{table}}',
+            $table,
+            $this->files->get(__DIR__.'/stubs/jobs.stub')
         );
 
         $this->files->put($fullPath, $stub);

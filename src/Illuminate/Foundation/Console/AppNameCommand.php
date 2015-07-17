@@ -154,7 +154,9 @@ class AppNameCommand extends Command
     protected function setComposerNamespace()
     {
         $this->replaceIn(
-            $this->getComposerPath(), $this->currentRoot.'\\\\', str_replace('\\', '\\\\', $this->argument('name')).'\\\\'
+            $this->getComposerPath(),
+            $this->currentRoot.'\\\\',
+            str_replace('\\', '\\\\', $this->argument('name')).'\\\\'
         );
     }
 
@@ -200,7 +202,9 @@ class AppNameCommand extends Command
     protected function setAuthConfigNamespace()
     {
         $this->replaceIn(
-            $this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getAuthConfigPath(),
+            $this->currentRoot.'\\User',
+            $this->argument('name').'\\User'
         );
     }
 
@@ -212,7 +216,9 @@ class AppNameCommand extends Command
     protected function setServicesConfigNamespace()
     {
         $this->replaceIn(
-            $this->getServicesConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getServicesConfigPath(),
+            $this->currentRoot.'\\User',
+            $this->argument('name').'\\User'
         );
     }
 
@@ -236,7 +242,9 @@ class AppNameCommand extends Command
     protected function setDatabaseFactoryNamespaces()
     {
         $this->replaceIn(
-            $this->laravel->databasePath().'/factories/ModelFactory.php', $this->currentRoot, $this->argument('name')
+            $this->laravel->databasePath().'/factories/ModelFactory.php',
+            $this->currentRoot,
+            $this->argument('name')
         );
     }
 

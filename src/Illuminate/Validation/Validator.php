@@ -1027,9 +1027,12 @@ class Validator implements ValidatorContract
         $extra = $this->getUniqueExtra($parameters);
 
         return $verifier->getCount(
-
-            $table, $column, $value, $id, $idColumn, $extra
-
+            $table,
+            $column,
+            $value,
+            $id,
+            $idColumn,
+            $extra
         ) == 0;
     }
 
@@ -1524,12 +1527,11 @@ class Validator implements ValidatorContract
         // only some attributes and rules that need to get specially formed.
         if ($customMessage !== $customKey) {
             return $customMessage;
-        }
 
         // If the rule being validated is a "size" rule, we will need to gather the
         // specific error message for the type of attribute being validated such
         // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
+        } elseif (in_array($rule, $this->sizeRules)) {
             return $this->getSizeMessage($attribute, $rule);
         }
 
@@ -1543,7 +1545,9 @@ class Validator implements ValidatorContract
         }
 
         return $this->getInlineMessage(
-            $attribute, $lowerRule, $this->fallbackMessages
+            $attribute,
+            $lowerRule,
+            $this->fallbackMessages
         ) ?: $key;
     }
 

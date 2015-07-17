@@ -79,7 +79,9 @@ class SesTransport extends Transport implements Swift_Transport
         $destinations = [];
 
         $contacts = array_merge(
-            (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
+            (array) $message->getTo(),
+            (array) $message->getCc(),
+            (array) $message->getBcc()
         );
 
         foreach ($contacts as $address => $display) {

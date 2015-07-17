@@ -121,7 +121,9 @@ abstract class Queue
         }
 
         if (is_array($data)) {
-            array_walk($data, function (&$d) { $d = $this->prepareQueueableEntity($d); });
+            array_walk($data, function (&$d) {
+                $d = $this->prepareQueueableEntity($d);
+            });
         }
 
         return $data;

@@ -69,7 +69,11 @@ class ListenCommand extends Command
         $queue = $this->getQueue($connection);
 
         $this->listener->listen(
-            $connection, $queue, $delay, $memory, $timeout
+            $connection,
+            $queue,
+            $delay,
+            $memory,
+            $timeout
         );
     }
 
