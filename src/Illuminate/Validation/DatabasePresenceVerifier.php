@@ -104,7 +104,24 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      */
     protected function table($table)
     {
-        return $this->db->connection($this->connection)->table($table);
+        list($connection, $tableName) = $this->parseTable($table);
+
+        if (!is_null($connection)) {
+            $this->setConnection($connection);
+        }
+
+        return $this->db->connection($this->connection)->table($tableName);
+    }
+
+    /**
+     * Parse the connection / table for the unique,exists rule.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    protected function parseTable($table)
+    {
+        return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
 
     /**
