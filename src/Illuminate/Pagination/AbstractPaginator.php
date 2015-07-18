@@ -123,7 +123,7 @@ abstract class AbstractPaginator
         // to the URL. This allows for extra information like sortings storage.
         $parameters = [$this->pageName => $page];
 
-        if (count($this->query) > 0) {
+        if (! empty($this->query)) {
             $parameters = array_merge($this->query, $parameters);
         }
 

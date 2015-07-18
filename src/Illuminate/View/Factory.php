@@ -256,7 +256,7 @@ class Factory implements FactoryContract
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
-        if (count($data) > 0) {
+        if (! empty($data)) {
             foreach ($data as $key => $value) {
                 $data = ['key' => $key, $iterator => $value];
 

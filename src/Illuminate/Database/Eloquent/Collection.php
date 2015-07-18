@@ -34,7 +34,7 @@ class Collection extends BaseCollection
      */
     public function load($relations)
     {
-        if (count($this->items) > 0) {
+        if (! empty($this->items)) {
             if (is_string($relations)) {
                 $relations = func_get_args();
             }

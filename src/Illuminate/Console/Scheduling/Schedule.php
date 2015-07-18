@@ -54,7 +54,7 @@ class Schedule
      */
     public function exec($command, array $parameters = [])
     {
-        if (count($parameters)) {
+        if (! empty($parameters)) {
             $command .= ' '.$this->compileParameters($parameters);
         }
 

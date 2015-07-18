@@ -570,7 +570,7 @@ class Route
      */
     protected function matchToKeys(array $matches)
     {
-        if (count($this->parameterNames()) == 0) {
+        if (empty($this->parameterNames())) {
             return [];
         }
 

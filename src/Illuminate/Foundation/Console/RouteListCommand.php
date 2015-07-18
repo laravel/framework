@@ -69,7 +69,7 @@ class RouteListCommand extends Command
      */
     public function fire()
     {
-        if (count($this->routes) == 0) {
+        if (empty($this->routes)) {
             return $this->error("Your application doesn't have any routes.");
         }
 

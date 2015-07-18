@@ -162,7 +162,7 @@ class BelongsTo extends Relation
         // If there are no keys that were not null we will just return an array with 0 in
         // it so the query doesn't fail, but will not return any results, which should
         // be what this developer is expecting in a case where this happens to them.
-        if (count($keys) == 0) {
+        if (empty($keys)) {
             return [0];
         }
 

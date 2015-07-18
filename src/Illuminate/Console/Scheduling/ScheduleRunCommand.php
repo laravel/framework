@@ -55,7 +55,7 @@ class ScheduleRunCommand extends Command
             $event->run($this->laravel);
         }
 
-        if (count($events) === 0) {
+        if (empty($events)) {
             $this->info('No scheduled commands are ready to run.');
         }
     }

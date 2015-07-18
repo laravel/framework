@@ -136,7 +136,7 @@ class RouteCollection implements Countable, IteratorAggregate
         // inform the user agent of which HTTP verb it should use for this route.
         $others = $this->checkForAlternateVerbs($request);
 
-        if (count($others) > 0) {
+        if (! empty($others)) {
             return $this->getRouteForMethods($request, $others);
         }
 

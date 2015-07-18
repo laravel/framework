@@ -113,11 +113,11 @@ class Blueprint
      */
     protected function addImpliedCommands()
     {
-        if (count($this->getAddedColumns()) > 0 && !$this->creating()) {
+        if (! empty($this->getAddedColumns()) && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && !$this->creating()) {
+        if (! empty($this->getChangedColumns()) && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 

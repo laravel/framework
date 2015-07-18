@@ -135,7 +135,7 @@ class Event
      */
     public function run(Container $container)
     {
-        if (count($this->afterCallbacks) > 0 || count($this->beforeCallbacks) > 0) {
+        if (! empty($this->afterCallbacks) || ! empty($this->beforeCallbacks)) {
             $this->runCommandInForeground($container);
         } else {
             $this->runCommandInBackground();
