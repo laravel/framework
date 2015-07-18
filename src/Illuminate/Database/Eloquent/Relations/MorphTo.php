@@ -214,6 +214,7 @@ class MorphTo extends BelongsTo
     public function createModelByType($type)
     {
         $class = $this->parent->getActualClassName($type);
+
         return new $class;
     }
 
