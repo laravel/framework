@@ -1168,6 +1168,18 @@ class Builder
     }
 
     /**
+     * Get the current "offset" value of the query.
+     *
+     * @return int|null
+     */
+    public function getOffset()
+    {
+        $property = $this->unions ? 'unionOffset' : 'offset';
+
+        return $this->$property;
+    }
+
+    /**
      * Alias to set the "offset" value of the query.
      *
      * @param  int  $value
@@ -1193,6 +1205,18 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Get the current "limit" value of the query.
+     *
+     * @return int|null
+     */
+    public function getLimit()
+    {
+        $property = $this->unions ? 'unionLimit' : 'limit';
+
+        return $this->$property;
     }
 
     /**

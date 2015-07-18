@@ -216,7 +216,14 @@ class Builder
      */
     public function chunk($count, callable $callback)
     {
-        $results = $this->forPage($page = 1, $count)->get();
+        $originalOffset = $this->query->getOffset();
+        $originalLimit = $this->query->getLimit();
+
+        $offset = is_null($originalOffset) ? 0 : $originalOffset;
+        $limit = is_null($originalLimit) ? $count : min($count, $originalLimit);
+
+        $resultsFetched = 0;
+        $results = $this->skip($offset)->take($limit)->get();
 
         while (count($results) > 0) {
             // On each chunk result set, we will pass them to the callback and then let the
@@ -226,9 +233,19 @@ class Builder
                 break;
             }
 
-            $page++;
+            $resultsFetched += count($results);
+            $offset += $limit;
 
-            $results = $this->forPage($page, $count)->get();
+            if (!is_null($originalLimit)) {
+                $resultsLeft = $originalLimit - $resultsFetched;
+                if ($resultsLeft === 0) {
+                    break;
+                }
+
+                $limit = min($limit, $resultsLeft);
+            }
+
+            $results = $this->skip($offset)->take($limit)->get();
         }
     }
 

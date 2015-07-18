@@ -153,10 +153,13 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkExecuteCallbackOverPaginatedRequest()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[skip,take,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('getOffset')->andReturn(null);
+        $builder->getQuery()->shouldReceive('getLimit')->andReturn(null);
+        $builder->shouldReceive('skip')->once()->with(0)->andReturn($builder);
+        $builder->shouldReceive('skip')->once()->with(2)->andReturn($builder);
+        $builder->shouldReceive('skip')->once()->with(4)->andReturn($builder);
+        $builder->shouldReceive('take')->times(3)->with(2)->andReturn($builder);
         $builder->shouldReceive('get')->times(3)->andReturn(['foo1', 'foo2'], ['foo3'], []);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -173,9 +176,12 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkCanBeStoppedByReturningFalse()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
-        $builder->shouldReceive('forPage')->never()->with(2, 2);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[skip,take,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('getOffset')->andReturn(null);
+        $builder->getQuery()->shouldReceive('getLimit')->andReturn(null);
+        $builder->shouldReceive('skip')->once()->with(0)->andReturn($builder);
+        $builder->shouldReceive('take')->once()->with(2)->andReturn($builder);
+        $builder->shouldReceive('skip')->never()->with(2);
         $builder->shouldReceive('get')->times(1)->andReturn(['foo1', 'foo2']);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -189,6 +195,49 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
             }
 
             return false;
+        });
+    }
+
+    public function testChunkWithSmallLimit()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[skip,take,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('getOffset')->andReturn(1);
+        $builder->getQuery()->shouldReceive('getLimit')->andReturn(1);
+        $builder->shouldReceive('skip')->once()->with(1)->andReturn($builder);
+        $builder->shouldReceive('take')->times(1)->with(1)->andReturn($builder);
+        $builder->shouldReceive('get')->times(1)->andReturn(['foo2']);
+
+        $callbackExecutionAssertor = m::mock('StdClass');
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->never();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->never();
+
+        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
+            foreach ($results as $result) {
+                $callbackExecutionAssertor->doSomething($result);
+            }
+        });
+    }
+
+    public function testChunkWithBigLimit()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[skip,take,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('getOffset')->andReturn(1);
+        $builder->getQuery()->shouldReceive('getLimit')->andReturn(100);
+        $builder->shouldReceive('skip')->once()->with(1)->andReturn($builder);
+        $builder->shouldReceive('skip')->once()->with(3)->andReturn($builder);
+        $builder->shouldReceive('take')->times(2)->with(2)->andReturn($builder);
+        $builder->shouldReceive('get')->times(2)->andReturn(['foo2', 'foo3'], []);
+
+        $callbackExecutionAssertor = m::mock('StdClass');
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo1')->never();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo2')->once();
+        $callbackExecutionAssertor->shouldReceive('doSomething')->with('foo3')->once();
+
+        $builder->chunk(2, function ($results) use ($callbackExecutionAssertor) {
+            foreach ($results as $result) {
+                $callbackExecutionAssertor->doSomething($result);
+            }
         });
     }
 
