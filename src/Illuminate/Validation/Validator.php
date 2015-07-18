@@ -1268,7 +1268,7 @@ class Validator implements ValidatorContract
      */
     protected function validateAlpha($attribute, $value)
     {
-        return preg_match('/^[\pL\pM]+$/u', $value);
+        return @preg_match('/^[\pL\pM]+$/u', $value);
     }
 
     /**
@@ -1280,7 +1280,7 @@ class Validator implements ValidatorContract
      */
     protected function validateAlphaNum($attribute, $value)
     {
-        return preg_match('/^[\pL\pM\pN]+$/u', $value);
+        return @preg_match('/^[\pL\pM\pN]+$/u', $value);
     }
 
     /**
@@ -1292,7 +1292,7 @@ class Validator implements ValidatorContract
      */
     protected function validateAlphaDash($attribute, $value)
     {
-        return preg_match('/^[\pL\pM\pN_-]+$/u', $value);
+        return @preg_match('/^[\pL\pM\pN_-]+$/u', $value);
     }
 
     /**
@@ -1307,7 +1307,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'regex');
 
-        return preg_match($parameters[0], $value);
+        return @preg_match($parameters[0], $value);
     }
 
     /**
