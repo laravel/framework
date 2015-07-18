@@ -160,7 +160,7 @@ class Migrator
         if (count($migrations) == 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
-            return count($migrations);
+            return 0;
         }
 
         // We need to reverse these migrations so that they are "downed" in reverse
@@ -188,7 +188,7 @@ class Migrator
         if (count($migrations) == 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
-            return count($migrations);
+            return 0;
         }
 
         foreach ($migrations as $migration) {
