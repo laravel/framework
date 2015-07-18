@@ -54,7 +54,7 @@ class MorphTo extends BelongsTo
      * @param  string $relation
      * @param  array $morphMap
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation, array $morphMap)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation, array $morphMap = [])
     {
         $this->morphType = $type;
 
