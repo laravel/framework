@@ -673,13 +673,14 @@ trait CrawlerTrait
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
         $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
+
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
         $request = Request::create(
             $this->currentUri, $method, $parameters,
             $cookies, $files, $server, $content
         );
-        
+
         $response = $kernel->handle($request);
 
         $kernel->terminate($request, $response);
