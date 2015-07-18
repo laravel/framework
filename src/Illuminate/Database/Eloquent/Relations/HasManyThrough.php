@@ -283,7 +283,7 @@ class HasManyThrough extends Relation
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
-        if (count($models) > 0) {
+        if (! empty($models)) {
             $models = $this->query->eagerLoadRelations($models);
         }
 

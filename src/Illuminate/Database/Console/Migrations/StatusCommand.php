@@ -59,7 +59,7 @@ class StatusCommand extends BaseCommand
             $migrations[] = in_array($migration, $ran) ? ['<info>Y</info>', $migration] : ['<fg=red>N</fg=red>', $migration];
         }
 
-        if (count($migrations) > 0) {
+        if (! empty($migrations)) {
             $this->table(['Ran?', 'Migration'], $migrations);
         } else {
             $this->error('No migrations found');

@@ -33,7 +33,7 @@ class Parser
 
         $tokens = isset($matches[1]) ? $matches[1] : [];
 
-        if (count($tokens)) {
+        if (! empty($tokens)) {
             return array_merge([$name], static::parameters($tokens));
         }
 

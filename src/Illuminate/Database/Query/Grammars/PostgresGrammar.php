@@ -97,7 +97,7 @@ class PostgresGrammar extends Grammar
             $froms[] = $this->wrapTable($join->table);
         }
 
-        if (count($froms) > 0) {
+        if (! empty($froms)) {
             return ' from '.implode(', ', $froms);
         }
     }

@@ -189,7 +189,7 @@ class RedisQueue extends Queue implements QueueContract
             // If we actually found any jobs, we will remove them from the old queue and we
             // will insert them onto the new (ready) "queue". This means they will stand
             // ready to be processed by the queue worker whenever their turn comes up.
-            if (count($jobs) > 0) {
+            if (! empty($jobs)) {
                 $this->removeExpiredJobs($transaction, $from, $time);
 
                 $this->pushExpiredJobsOntoNewQueue($transaction, $to, $jobs);

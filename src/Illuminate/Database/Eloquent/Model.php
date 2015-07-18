@@ -437,7 +437,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function fillableFromArray(array $attributes)
     {
-        if (count($this->fillable) > 0 && !static::$unguarded) {
+        if (! empty($this->fillable) && !static::$unguarded) {
             return array_intersect_key($attributes, array_flip($this->fillable));
         }
 
@@ -1496,7 +1496,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $dirty = $this->getDirty();
 
-        if (count($dirty) > 0) {
+        if (! empty($dirty)) {
             // If the updating event returns false, we will cancel the update operation so
             // developers can hook Validation systems into their models and cancel this
             // operation if the model does not pass validation. Otherwise, we update.

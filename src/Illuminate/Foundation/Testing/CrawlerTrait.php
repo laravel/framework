@@ -483,10 +483,10 @@ trait CrawlerTrait
     {
         $link = $this->crawler->selectLink($name);
 
-        if (!count($link)) {
+        if (empty($link)) {
             $link = $this->filterByNameOrId($name, 'a');
 
-            if (!count($link)) {
+            if (empty($link)) {
                 throw new InvalidArgumentException(
                     "Could not find a link with a body, name, or ID attribute of [{$name}]."
                 );
@@ -637,7 +637,7 @@ trait CrawlerTrait
     {
         $crawler = $this->filterByNameOrId($filter);
 
-        if (!count($crawler)) {
+        if (empty($crawler)) {
             throw new InvalidArgumentException(
                 "Nothing matched the filter [{$filter}] CSS query provided for [{$this->currentUri}]."
             );

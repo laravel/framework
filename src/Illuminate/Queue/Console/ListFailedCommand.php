@@ -37,7 +37,7 @@ class ListFailedCommand extends Command
     {
         $jobs = $this->getFailedJobs();
 
-        if (count($jobs) == 0) {
+        if (! empty($jobs)) {
             return $this->info('No failed jobs!');
         }
 

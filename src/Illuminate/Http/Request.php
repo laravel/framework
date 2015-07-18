@@ -618,7 +618,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $accepts = $this->getAcceptableContentTypes();
 
-        if (count($accepts) === 0) {
+        if (empty($accepts)) {
             return true;
         }
 
