@@ -180,13 +180,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $morphClass;
 
     /**
-     * A map between the morphable type saved to database and the actual class.
-     *
-     * @var array
-     */
-    protected $morphMap = [];
-
-    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -810,12 +803,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @param  string $name
+     * @param  string $type
+     * @param  string $id
+     * @param  array $morphMap
+     * @return MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null)
+    public function morphTo($name = null, $type = null, $id = null, array $morphMap = [])
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -841,7 +835,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
         else {
-            $class = $this->getActualClassName($class);
+            $class = $this->getActualClassName($class, $morphMap);
 
             $instance = new $class;
 
@@ -854,12 +848,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Fetch the class name from the morph map if it exists.
      *
-     * @param $class
+     * @param  $class
+     * @param  array $morphMap
      * @return string
      */
-    public function getActualClassName($class)
+    public function getActualClassName($class, array $morphMap = [])
     {
-        if (array_key_exists($class, $this->morphMap)) {
+        if (array_key_exists($class, $morphMap)) {
             return $this->morphMap[$class];
         }
 
