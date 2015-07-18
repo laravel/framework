@@ -222,7 +222,7 @@ class Builder
         $offset = is_null($originalOffset) ? 0 : $originalOffset;
         $limit = is_null($originalLimit) ? $count : min($count, $originalLimit);
 
-        $resultsFetched = 0;
+        $totalResultsFetched = 0;
         $results = $this->skip($offset)->take($limit)->get();
 
         while (count($results) > 0) {
@@ -233,11 +233,11 @@ class Builder
                 break;
             }
 
-            $resultsFetched += count($results);
+            $totalResultsFetched += count($results);
             $offset += $limit;
 
             if (!is_null($originalLimit)) {
-                $resultsLeft = $originalLimit - $resultsFetched;
+                $resultsLeft = $originalLimit - $totalResultsFetched;
                 if ($resultsLeft === 0) {
                     break;
                 }
