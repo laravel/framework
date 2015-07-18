@@ -157,22 +157,20 @@ class Migrator
         // of them "down" to reverse the last migration "operation" which ran.
         $migrations = $this->repository->getLast();
 
-        $migrationsCount = count($migrations);
+        $count = count($migrations);
 
-        if ($migrationsCount === 0) {
+        if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
-
-            return $migrationsCount;
+        } else {
+            // We need to reverse these migrations so that they are "downed" in reverse
+            // to what they run on "up". It lets us backtrack through the migrations
+            // and properly reverse the entire database schema operation that ran.
+            foreach ($migrations as $migration) {
+                $this->runDown((object) $migration, $pretend);
+            }
         }
 
-        // We need to reverse these migrations so that they are "downed" in reverse
-        // to what they run on "up". It lets us backtrack through the migrations
-        // and properly reverse the entire database schema operation that ran.
-        foreach ($migrations as $migration) {
-            $this->runDown((object) $migration, $pretend);
-        }
-
-        return $migrationsCount;
+        return $count;
     }
 
     /**
@@ -187,19 +185,17 @@ class Migrator
 
         $migrations = array_reverse($this->repository->getRan());
 
-        $migrationsCount = count($migrations);
+        $count = count($migrations);
 
-        if ($migrationsCount === 0) {
+        if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
-
-            return $migrationsCount;
+        } else {
+            foreach ($migrations as $migration) {
+                $this->runDown((object) ['migration' => $migration], $pretend);
+            }
         }
 
-        foreach ($migrations as $migration) {
-            $this->runDown((object) ['migration' => $migration], $pretend);
-        }
-
-        return $migrationsCount;
+        return $count;
     }
 
     /**
