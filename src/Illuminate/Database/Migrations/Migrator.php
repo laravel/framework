@@ -157,10 +157,12 @@ class Migrator
         // of them "down" to reverse the last migration "operation" which ran.
         $migrations = $this->repository->getLast();
 
-        if (count($migrations) == 0) {
+        $migrationsCount = count($migrations);
+
+        if ($migrationsCount === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
-            return 0;
+            return $migrationsCount;
         }
 
         // We need to reverse these migrations so that they are "downed" in reverse
@@ -170,7 +172,7 @@ class Migrator
             $this->runDown((object) $migration, $pretend);
         }
 
-        return count($migrations);
+        return $migrationsCount;
     }
 
     /**
@@ -185,17 +187,19 @@ class Migrator
 
         $migrations = array_reverse($this->repository->getRan());
 
-        if (count($migrations) == 0) {
+        $migrationsCount = count($migrations);
+
+        if ($migrationsCount === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
-            return 0;
+            return $migrationsCount;
         }
 
         foreach ($migrations as $migration) {
             $this->runDown((object) ['migration' => $migration], $pretend);
         }
 
-        return count($migrations);
+        return $migrationsCount;
     }
 
     /**
