@@ -1268,6 +1268,10 @@ class Validator implements ValidatorContract
      */
     protected function validateAlpha($attribute, $value)
     {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         return preg_match('/^[\pL\pM]+$/u', $value);
     }
 
@@ -1280,6 +1284,10 @@ class Validator implements ValidatorContract
      */
     protected function validateAlphaNum($attribute, $value)
     {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         return preg_match('/^[\pL\pM\pN]+$/u', $value);
     }
 
@@ -1292,6 +1300,10 @@ class Validator implements ValidatorContract
      */
     protected function validateAlphaDash($attribute, $value)
     {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         return preg_match('/^[\pL\pM\pN_-]+$/u', $value);
     }
 
@@ -1305,6 +1317,10 @@ class Validator implements ValidatorContract
      */
     protected function validateRegex($attribute, $value, $parameters)
     {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         $this->requireParameterCount(1, $parameters, 'regex');
 
         return preg_match($parameters[0], $value);
