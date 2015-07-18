@@ -528,6 +528,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" limit 15 offset 0', $builder->toSql());
     }
 
+    public function testGetCountForPaginationWithBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSub(function($q) { $q->select('body')->from('posts')->where('id', 4); }, 'post');
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+        $this->assertEquals([4], $builder->getBindings());
+    }
+
     public function testWhereShortcut()
     {
         $builder = $this->getBuilder();
