@@ -703,7 +703,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Being querying a model with eager loading.
+     * Begin querying a model with eager loading.
      *
      * @param  array|string  $relations
      * @return \Illuminate\Database\Eloquent\Builder|static
