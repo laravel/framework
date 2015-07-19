@@ -827,7 +827,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // there are multiple types in the morph and we can't use single queries.
         if (is_null($class = $this->$type)) {
             return new MorphTo(
-                $this->newQuery(), $this, $id, null, $type, $name
+                $this->newQuery(), $this, $id, null, $type, $morphMap
             );
         }
 
@@ -840,7 +840,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $instance = new $class;
 
             return new MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $morphMap
             );
         }
     }
@@ -849,13 +849,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Fetch the class name from the morph map if it exists.
      *
      * @param  $class
-     * @param  array $morphMap
+     * @param  array $morph
      * @return string
      */
-    public function getActualClassName($class, array $morphMap = [])
+    public function getActualClassName($class, array $morph = [])
     {
-        if (array_key_exists($class, $morphMap)) {
-            return $this->morphMap[$class];
+        if (array_key_exists($class, $morph)) {
+            return $morph[$class];
         }
 
         return $class;
@@ -974,15 +974,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Define a polymorphic many-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $name
-     * @param  string  $table
-     * @param  string  $foreignKey
-     * @param  string  $otherKey
-     * @param  bool    $inverse
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @param  string $related
+     * @param  string $name
+     * @param  string $table
+     * @param  string $foreignKey
+     * @param  string $otherKey
+     * @param  bool $inverse
+     * @param  array $morphMap
+     * @return MorphToMany
      */
-    public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+    public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false, $morphMap = [])
     {
         $caller = $this->getBelongsToManyCaller();
 
@@ -1004,7 +1005,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         return new MorphToMany(
             $query, $this, $name, $table, $foreignKey,
-            $otherKey, $caller, $inverse
+            $otherKey, $caller, $inverse, $morphMap
         );
     }
 
