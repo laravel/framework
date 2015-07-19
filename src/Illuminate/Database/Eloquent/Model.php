@@ -801,6 +801,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Alias for morphTo with the morph map as first argument
+     *
+     * @param  array $morphMap
+     * @param  string $name
+     * @param  string $type
+     * @param  string $id
+     * @return MorphTo
+     */
+    public function morphToMap(array $morphMap = [], $name = null, $type = null, $id = null)
+    {
+        return $this->morphTo($name, $type, $id, $morphMap);
+    }
+
+    /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
      * @param  string $name
