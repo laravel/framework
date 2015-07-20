@@ -20,7 +20,7 @@ trait ThrottlesLogins
 
         $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
 
-        if ($attempts > $this->allowedAttempts() || $lockedOut) {
+        if ($attempts > $this->maxLoginAttempts() || $lockedOut) {
             if (! $lockedOut) {
                 Cache::put(
                     $this->getLoginLockExpirationKey($request), time() + $this->lockoutTime(), 1
@@ -131,9 +131,9 @@ trait ThrottlesLogins
      *
      * @return int
      */
-    protected function allowedAttempts()
+    protected function maxLoginAttempts()
     {
-        return property_exists($this, 'allowedAttempts') ? $this->allowedAttempts : 5;
+        return property_exists($this, 'maxLoginAttempts') ? $this->maxLoginAttempts : 5;
     }
 
     /**
