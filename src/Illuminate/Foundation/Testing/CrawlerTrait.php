@@ -176,7 +176,7 @@ trait CrawlerTrait
      */
     protected function makeRequestUsingForm(Form $form, array $uploads = [])
     {
-        $files = $this->convertUploads($form, $uploads);
+        $files = $this->convertUploadsForTesting($form, $uploads);
 
         return $this->makeRequest(
             $form->getMethod(), $form->getUri(), $this->extractParametersFromForm($form), [], $files
@@ -218,6 +218,7 @@ trait CrawlerTrait
     protected function clearInputs()
     {
         $this->inputs = [];
+
         $this->uploads = [];
 
         return $this;
@@ -558,8 +559,7 @@ trait CrawlerTrait
      */
     protected function attach($absolutePath, $element)
     {
-        $name = str_replace('#', '', $element);
-        $this->uploads[$name] = $absolutePath;
+        $this->uploads[$element] = $absolutePath;
 
         return $this->storeInput($element, $absolutePath);
     }
@@ -580,12 +580,11 @@ trait CrawlerTrait
      *
      * @param  string  $buttonText
      * @param  array  $inputs
-     * @param  array  $uploads
      * @return $this
      */
-    protected function submitForm($buttonText, $inputs = [], $uploads = [])
+    protected function submitForm($buttonText, $inputs = [])
     {
-        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs), $uploads);
+        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs));
 
         return $this;
     }
@@ -808,6 +807,43 @@ trait CrawlerTrait
     }
 
     /**
+     * Convert the given uploads to UploadedFile instances.
+     *
+     * @param  \Symfony\Component\DomCrawler\Form  $form
+     * @param  array  $uploads
+     * @return array
+     */
+    protected function convertUploadsForTesting(Form $form, array $uploads)
+    {
+        $files = $form->getFiles();
+
+        $names = array_keys($files);
+
+        $files = array_map(function (array $file, $name) use ($uploads) {
+            return isset($uploads[$name])
+                        ? $this->getUploadedFileForTesting($file, $uploads, $name)
+                        : $file;
+        }, $files, $names);
+
+        return array_combine($names, $files);
+    }
+
+    /**
+     * Create an UploadedFile instance for testing.
+     *
+     * @param  array  $file
+     * @param  array  $uploads
+     * @param  string  $name
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    protected function getUploadedFileForTesting($file, $uploads, $name)
+    {
+        return new UploadedFile(
+            $file['tmp_name'], basename($uploads[$name]), $file['type'], $file['size'], $file['error'], true
+        );
+    }
+
+    /**
      * Disable middleware for the test.
      *
      * @return $this
@@ -835,32 +871,5 @@ trait CrawlerTrait
         }
 
         dd($content);
-    }
-
-    /**
-     * Convert the uploads to UploadedFile, this will set the testing properties of UploadedFile
-     *
-     * @param  \Symfony\Component\DomCrawler\Form  $form
-     * @param  array  $uploads
-     * @return array
-     */
-    protected function convertUploads(Form $form, array $uploads)
-    {
-        $files = $form->getFiles();
-
-        $names = array_keys($files);
-
-        $files = array_map(function (array $file, $name) use ($uploads) {
-            if (isset($uploads[$name])) {
-                $absolutePath = $uploads[$name];
-                return new UploadedFile($file['tmp_name'], basename($absolutePath), $file['type'], $file['size'], $file['error'], true);
-            }
-
-            return $file;
-        }, $files, $names);
-
-        $files = array_combine($names, $files);
-
-        return $files;
     }
 }
