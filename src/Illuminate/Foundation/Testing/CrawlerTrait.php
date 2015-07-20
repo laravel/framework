@@ -580,11 +580,12 @@ trait CrawlerTrait
      *
      * @param  string  $buttonText
      * @param  array  $inputs
+     * @param  array  $uploads
      * @return $this
      */
-    protected function submitForm($buttonText, $inputs = [])
+    protected function submitForm($buttonText, $inputs = [], $uploads = [])
     {
-        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs));
+        $this->makeRequestUsingForm($this->fillForm($buttonText, $inputs), $uploads);
 
         return $this;
     }
