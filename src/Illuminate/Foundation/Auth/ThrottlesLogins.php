@@ -20,12 +20,10 @@ trait ThrottlesLogins
 
         $lockedOut = Cache::has($this->getLoginLockExpirationKey($request));
 
-        if ($attempts > $this->throttleLimit() || $lockedOut) {
+        if ($attempts > $this->allowedAttempts() || $lockedOut) {
             if (! $lockedOut) {
                 Cache::put(
-                    $this->getLoginLockExpirationKey($request),
-                    time() + $this->throttleTime(),
-                    1
+                    $this->getLoginLockExpirationKey($request), time() + $this->lockoutTime(), 1
                 );
             }
 
@@ -33,24 +31,6 @@ trait ThrottlesLogins
         }
 
         return false;
-    }
-
-    /**
-     * Amount of failed attempts a user can try before the login is locked out
-     * @return int
-     */
-    protected function throttleLimit()
-    {
-        return property_exists($this, 'throttleLimit') ? $this->throttleLimit : 5;
-    }
-
-    /**
-     * Time in seconds the login will be locked out after reaching the throttle limit
-     * @return int
-     */
-    protected function throttleTime()
-    {
-        return property_exists($this, 'throttleTime') ? $this->throttleTime : 60;
     }
 
     /**
@@ -78,19 +58,6 @@ trait ThrottlesLogins
     }
 
     /**
-     * Get the message that will be sent to the user after the attempts limit is exceeded
-     *
-     * @param $seconds
-     * @return string
-     */
-    protected function getLockoutMessage($seconds)
-    {
-        return Lang::has('auth.throttle')
-            ? Lang::get('auth.throttle', ['seconds' => $seconds])
-            : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
-    }
-
-    /**
      * Redirect the user after determining they are locked out.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -103,8 +70,21 @@ trait ThrottlesLogins
         return redirect($this->loginPath())
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
-                $this->loginUsername() => $this->getLockoutMessage($seconds),
+                $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
             ]);
+    }
+
+    /**
+     * Get the login lockout error message.
+     *
+     * @param  int  $seconds
+     * @return string
+     */
+    protected function getLockoutErrorMessage($seconds)
+    {
+        return Lang::has('auth.throttle')
+            ? Lang::get('auth.throttle', ['seconds' => $seconds])
+            : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
     }
 
     /**
@@ -144,5 +124,25 @@ trait ThrottlesLogins
         $username = $request->input($this->loginUsername());
 
         return 'login:expiration:'.md5($username.$request->ip());
+    }
+
+    /**
+     * Get the maximum number of login attempts for delaying further attempts.
+     *
+     * @return int
+     */
+    protected function allowedAttempts()
+    {
+        return property_exists($this, 'allowedAttempts') ? $this->allowedAttempts : 5;
+    }
+
+    /**
+     * The number of seconds to delay further login attempts.
+     *
+     * @return int
+     */
+    protected function lockoutTime()
+    {
+        return property_exists($this, 'lockoutTime') ? $this->lockoutTime : 60;
     }
 }
