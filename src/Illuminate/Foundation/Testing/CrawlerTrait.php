@@ -242,10 +242,11 @@ trait CrawlerTrait
     {
         $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
 
-        $textPattern = preg_quote($text, '/');
+        $rawPattern = preg_quote($text, '/');
+
         $escapedPattern = preg_quote(e($text), '/');
 
-        $this->$method("/({$textPattern}|{$escapedPattern})/i", $this->response->getContent());
+        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $this->response->getContent());
 
         return $this;
     }
