@@ -248,9 +248,9 @@ class Arr
 
     /**
      * Determines if an array is associative.
-     * 
-     * An array is "associative" if it doesn't have sequential numerical keys starting with 0.
-     * 
+     *
+     * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
+     *
      * @param  array  $array
      * @return bool
      */
@@ -399,11 +399,10 @@ class Arr
                 $value = self::sortRecursive($value);
             }
         }
+
         if (self::isAssoc($array)) {
-            // sort associative array
             ksort($array);
         } else {
-            // sort regular array
             sort($array);
         }
 
