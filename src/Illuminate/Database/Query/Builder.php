@@ -1433,7 +1433,12 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $columns];
+        $columnToCountBy = reset($columns);
+        if (!$columnToCountBy) {
+            $columnToCountBy = '*';
+        }
+
+        $this->aggregate = ['function' => 'count', 'columns' => [$columnToCountBy]];
 
         $results = $this->get();
 
