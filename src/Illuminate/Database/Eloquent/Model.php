@@ -316,11 +316,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Reset the list of booted models.
+     * Clear the list of booted models so they will be re-booted.
      *
      * @return void
      */
-    public static function resetBootedModels()
+    public static function clearBootedModels()
     {
         static::$booted = [];
     }
