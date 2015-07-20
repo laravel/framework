@@ -7,15 +7,12 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testIsAssoc()
     {
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));
-
         $this->assertTrue(Arr::isAssoc([1 => 'a', 0 => 'b']));
-
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
-
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
-
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
+
 
     public function testSortRecursive()
     {
