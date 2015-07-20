@@ -420,6 +420,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => $builder], $builder->delete());
     }
 
+    public function testRemoveGlobalScopeInWhereHas()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $result = $model->whereHas('foo', function ($query) { $query->withTrashed(); } )->toSql();
+        $sql = 'select * from "table" where (select count(*) from "foos" where "table"."foo_id" = "foos"."id") >= 1';
+
+        $this->assertEquals($sql, $result);
+    }
+
     public function testHasNestedWithConstraints()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -530,14 +540,17 @@ class EloquentBuilderTestListsStub
 
 class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Model
 {
+    protected $table = 'table';
     public function foo()
     {
-        return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
+        return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub', 'foo_id');
     }
 }
 
 class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloquent\Model
 {
+    protected $table = 'foos';
+    use Illuminate\Database\Eloquent\SoftDeletes;
     public function bar()
     {
         return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
