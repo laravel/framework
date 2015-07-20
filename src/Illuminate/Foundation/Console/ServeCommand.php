@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -38,8 +39,12 @@ class ServeCommand extends Command
 
         $this->info("Laravel development server started on http://{$host}:{$port}/");
         
-        if (defined('HHVM_VERSION') && HHVM_VERSION >= '3.8.0') {
-            passthru('"'.PHP_BINARY.'"'." -m server -v Server.Type=proxygen -v Server.SourceRoot=\"{$base}\"/ -v Server.IP={$host} -v Server.Port={$port} -v Server.DefaultDocument=server.php -v Server.ErrorDocument404=server.php");
+        if (defined('HHVM_VERSION')) {
+            if (HHVM_VERSION >= '3.8.0') {
+                passthru('"'.PHP_BINARY.'"'." -m server -v Server.Type=proxygen -v Server.SourceRoot=\"{$base}\"/ -v Server.IP={$host} -v Server.Port={$port} -v Server.DefaultDocument=server.php -v Server.ErrorDocument404=server.php");
+            } else {
+                throw new Exception("Requires HHVM >= 3.8.0");
+            }  
         } else {
             passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} \"{$base}\"/server.php");
         }
