@@ -31,7 +31,7 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        Model::resetBootedModels();
+        Model::clearBootedModels();
 
         $this->registerEloquentFactory();
 
