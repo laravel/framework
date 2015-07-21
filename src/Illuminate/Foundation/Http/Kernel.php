@@ -117,12 +117,9 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
-        $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
-                                $this->app->make('middleware.disable') === true;
-
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($shouldSkipMiddleware ? [] : $this->middleware)
+                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
                     ->then($this->dispatchToRouter());
     }
 
@@ -135,10 +132,7 @@ class Kernel implements KernelContract
      */
     public function terminate($request, $response)
     {
-        $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
-                                $this->app->make('middleware.disable') === true;
-
-        $middlewares = $shouldSkipMiddleware ? [] : array_merge(
+        $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
             $this->gatherRouteMiddlewares($request),
             $this->middleware
         );
