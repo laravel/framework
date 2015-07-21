@@ -135,9 +135,15 @@ class Kernel implements KernelContract
      */
     public function terminate($request, $response)
     {
-        $routeMiddlewares = $this->gatherRouteMiddlewares($request);
+        $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
+                                $this->app->make('middleware.disable') === true;
 
-        foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware) {
+        $middlewares = $shouldSkipMiddleware ? [] : array_merge(
+            $this->gatherRouteMiddlewares($request),
+            $this->middleware
+        );
+
+        foreach ($middlewares as $middleware) {
             list($name, $parameters) = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
