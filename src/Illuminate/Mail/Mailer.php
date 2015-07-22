@@ -200,6 +200,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function queue($view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $data = $this->buildQueueData($data);
 
         return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
     }
@@ -231,6 +232,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function later($delay, $view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $data = $this->buildQueueData($data);
 
         return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
     }
@@ -263,6 +265,25 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         return (new Serializer)->serialize($callback);
+    }
+
+    /**
+     * Builds the data array passed to the queue
+     *
+     * @param  array  $callback
+     * @return array
+     */
+    protected function buildQueueData(array $data)
+    {
+        if (isset($this->from['address'])) {
+            $data['alwaysFrom'] = ['address' => $this->from['address'], 'name' => $this->from['name']];
+        }
+
+        if (isset($this->to['address'])) {
+            $data['alwaysTo'] = ['address' => $this->to['address'], 'name' => $this->to['name']];
+        }
+
+        return $data;
     }
 
     /**

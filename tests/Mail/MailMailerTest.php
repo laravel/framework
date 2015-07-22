@@ -164,6 +164,37 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->send('foo', ['data'], 'FooMailer');
     }
 
+    public function testGlobalToIsRespectedOnAllMessages()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+        $view = m::mock('StdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->alwaysTo('taylorotwell@gmail.com', 'Taylor Otwell');
+        $me = $this;
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), [])->andReturnUsing(function ($message) use ($me) {
+            $me->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getTo());
+        });
+        $mailer->send('foo', ['data'], function ($m) {});
+    }
+
+    public function testGlobalToIsPassedOnToTheQueue($value='')
+    {
+        list($view, $swift) = $this->getMocks();
+        $mailer = new Illuminate\Mail\Mailer($view, $swift);
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->alwaysTo('taylorotwell@gmail.com', 'Taylor Otwell');
+        $queue->shouldReceive('push')->once()->with(
+            'mailer@handleQueuedMessage',
+            ['view' => 'foo', 'data' => [1, 'alwaysTo' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
+            null
+        );
+
+        $mailer->queue('foo', [1], 'callable');
+    }
+
     public function testGlobalFromIsRespectedOnAllMessages()
     {
         unset($_SERVER['__mailer.test']);
@@ -178,6 +209,21 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
             $me->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
         $mailer->send('foo', ['data'], function ($m) {});
+    }
+
+    public function testGlobalFromIsPassedOnToTheQueue($value='')
+    {
+        list($view, $swift) = $this->getMocks();
+        $mailer = new Illuminate\Mail\Mailer($view, $swift);
+        $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
+        $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
+        $queue->shouldReceive('push')->once()->with(
+            'mailer@handleQueuedMessage',
+            ['view' => 'foo', 'data' => [1, 'alwaysFrom' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
+            null
+        );
+
+        $mailer->queue('foo', [1], 'callable');
     }
 
     public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
