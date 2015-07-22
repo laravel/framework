@@ -46,7 +46,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
             )->execute();
         }
 
-        // If the "strict" option has been configured for the connection we'll enable/disable
+        // If the "strict" option has been configured for the connection we will setup
         // strict mode for this session. Strict mode enforces some extra rules when
         // using the MySQL database system and is a quicker way to enforce them.
         if (isset($config['strict'])) {
