@@ -677,6 +677,7 @@ class Connection implements ConnectionInterface
             'server has gone away',
             'no connection to the server',
             'Lost connection',
+            'is dead or not enabled',
         ]);
     }
 
