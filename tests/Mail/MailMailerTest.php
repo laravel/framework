@@ -73,7 +73,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
+        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'metadata' => [], 'callback' => 'callable'], null);
 
         $mailer->queue('foo', [1], 'callable');
     }
@@ -83,7 +83,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
+        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'metadata' => [], 'callback' => 'callable'], 'queue');
 
         $mailer->queueOn('queue', 'foo', [1], 'callable');
     }
@@ -94,7 +94,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
         $serialized = (new Serializer)->serialize($closure = function () {});
-        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => $serialized], null);
+        $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'metadata' => [], 'callback' => $serialized], null);
 
         $mailer->queue('foo', [1], $closure);
     }
@@ -104,7 +104,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], null);
+        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'metadata' => [], 'callback' => 'callable'], null);
 
         $mailer->later(10, 'foo', [1], 'callable');
     }
@@ -114,7 +114,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         list($view, $swift) = $this->getMocks();
         $mailer = new Illuminate\Mail\Mailer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => 'callable'], 'queue');
+        $queue->shouldReceive('later')->once()->with(10, 'mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'metadata' => [], 'callback' => 'callable'], 'queue');
 
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
     }
@@ -188,7 +188,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->alwaysTo('taylorotwell@gmail.com', 'Taylor Otwell');
         $queue->shouldReceive('push')->once()->with(
             'mailer@handleQueuedMessage',
-            ['view' => 'foo', 'data' => [1, 'alwaysTo' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
+            ['view' => 'foo', 'data' => [1], 'metadata' => ['alwaysTo' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
             null
         );
 
@@ -219,7 +219,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
         $queue->shouldReceive('push')->once()->with(
             'mailer@handleQueuedMessage',
-            ['view' => 'foo', 'data' => [1, 'alwaysFrom' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
+            ['view' => 'foo', 'data' => [1], 'metadata' => ['alwaysFrom' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']], 'callback' => 'callable'],
             null
         );
 

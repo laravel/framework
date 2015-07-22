@@ -200,9 +200,9 @@ class Mailer implements MailerContract, MailQueueContract
     public function queue($view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
-        $data = $this->buildQueueData($data);
+        $metadata = $this->queueMetadata();
 
-        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'metadata', 'callback'), $queue);
     }
 
     /**
@@ -232,9 +232,9 @@ class Mailer implements MailerContract, MailQueueContract
     public function later($delay, $view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
-        $data = $this->buildQueueData($data);
+        $metadata = $this->queueMetadata();
 
-        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'metadata', 'callback'), $queue);
     }
 
     /**
@@ -268,13 +268,16 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Builds the data array passed to the queue
+     * If alwaysTo or alwaysFrom were called, returns an array containing
+     * $to and $from properties
      *
-     * @param  array  $callback
+     * @param  array  $data
      * @return array
      */
-    protected function buildQueueData(array $data)
+    protected function queueMetadata()
     {
+        $data = [];
+
         if (isset($this->from['address'])) {
             $data['alwaysFrom'] = ['address' => $this->from['address'], 'name' => $this->from['name']];
         }
