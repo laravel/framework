@@ -558,6 +558,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `foo` timestamp default 0 not null', $statements[0]);
     }
 
+    public function testAddingTimeStampWithDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('foo')->default('2015-07-22 11:43:17');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
+    }
+
     public function testAddingTimeStampTz()
     {
         $blueprint = new Blueprint('users');
@@ -566,6 +576,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` timestamp default 0 not null', $statements[0]);
+    }
+
+    public function testAddingTimeStampTzWithDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');;
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
     }
 
     public function testAddingTimeStamps()
