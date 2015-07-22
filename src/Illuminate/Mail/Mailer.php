@@ -298,6 +298,19 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function handleQueuedMessage($job, $data)
     {
+        $metadata = $data['metadata'];
+        if (isset($metadata['alwaysTo'])) {
+            $address = $metadata['alwaysTo']['address'];
+            $name = isset($metadata['alwaysTo']['name']) ? $metadata['alwaysTo']['name'] : null;
+            $this->alwaysTo($address, $name);
+        }
+
+        if (isset($metadata['alwaysFrom'])) {
+            $address = $metadata['alwaysFrom']['address'];
+            $name = isset($metadata['alwaysFrom']['name']) ? $metadata['alwaysFrom']['name'] : null;
+            $this->alwaysFrom($address, $name);
+        }
+
         $this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
         $job->delete();

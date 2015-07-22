@@ -119,6 +119,63 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
     }
 
+    public function testQueuedMessagesDeleteJobs()
+    {
+        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['send'], $this->getMocks());
+        $message = m::mock('Swift_Mime_Message');
+        $mailer->expects($this->once())->method('send');
+
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
+        $data = ['view' => 'foo', 'data' => [], 'metadata' => [], 'callback' => 'callable'];
+        $mailer->handleQueuedMessage($job, $data);
+    }
+
+    public function testQueuedMessagesUseAlwaysToMetadeta()
+    {
+        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['send', 'alwaysTo'], $this->getMocks());
+        $message = m::mock('Swift_Mime_Message');
+        $mailer->expects($this->once())->method('send');
+        $mailer->expects($this->once())->method('alwaysTo')->with(
+            $this->equalTo('taylorotwell@gmail.com'),
+            $this->equalTo('Taylor Otwell')
+        );
+
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
+        $data = [
+            'view' => 'foo',
+            'data' => [],
+            'metadata' => ['alwaysTo' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']],
+            'callback' => 'callable'
+        ];
+
+        $mailer->handleQueuedMessage($job, $data);
+    }
+
+    public function testQueuedMessagesUseAlwaysFromMetadeta()
+    {
+        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['send', 'alwaysFrom'], $this->getMocks());
+        $message = m::mock('Swift_Mime_Message');
+        $mailer->expects($this->once())->method('send');
+        $mailer->expects($this->once())->method('alwaysFrom')->with(
+            $this->equalTo('taylorotwell@gmail.com'),
+            $this->equalTo('Taylor Otwell')
+        );
+
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('delete')->once();
+        $data = [
+            'view' => 'foo',
+            'data' => [],
+            'metadata' => ['alwaysFrom' => ['address' => 'taylorotwell@gmail.com', 'name' => 'Taylor Otwell']],
+            'callback' => 'callable'
+        ];
+
+        $mailer->handleQueuedMessage($job, $data);
+    }
+
+
     public function testMessagesCanBeLoggedInsteadOfSent()
     {
         $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
