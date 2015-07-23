@@ -271,6 +271,21 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
     }
 
+    public function testRoutesWithDomainsThroughProxy()
+    {
+        Illuminate\Http\Request::setTrustedProxies(['10.0.0.1']);
+
+        $url = new UrlGenerator(
+            $routes = new Illuminate\Routing\RouteCollection,
+            $request = Illuminate\Http\Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
+        );
+
+        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $routes->add($route);
+
+        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+    }
+
     public function testUrlGenerationForControllers()
     {
         $url = new UrlGenerator(
