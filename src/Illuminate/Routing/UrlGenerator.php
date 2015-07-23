@@ -497,7 +497,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $port = $this->request->getPort();
 
-        if (($secure && $port === 443) || (!$secure && $port === 80)) {
+        if (($secure && $port == 443) || (!$secure && $port == 80)) {
             return $domain;
         }
 
