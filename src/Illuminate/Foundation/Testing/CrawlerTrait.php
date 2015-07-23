@@ -795,10 +795,12 @@ trait CrawlerTrait
     protected function transformHeadersToServerVars(array $headers)
     {
         $server = [];
+        $prefix = 'HTTP_';
 
         foreach ($headers as $name => $value) {
-            if (!starts_with($name, 'HTTP_')) {
-                $name = 'HTTP_'.strtr(strtoupper($name), '-', '_');
+            $name = strtr(strtoupper($name), '-', '_');
+            if (!starts_with($name, $prefix) && $name != 'CONTENT_TYPE') {
+                $name = $prefix . $name;
             }
 
             $server[$name] = $value;
