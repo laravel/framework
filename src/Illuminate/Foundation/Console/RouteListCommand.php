@@ -267,11 +267,11 @@ class RouteListCommand extends Command
     protected function getOptions()
     {
         return [
+            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method.'],
+
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
-
-            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method.'],
 
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
 
