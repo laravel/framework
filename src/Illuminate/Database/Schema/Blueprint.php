@@ -378,7 +378,7 @@ class Blueprint
     {
         return $this->unsignedInteger($column, true);
     }
-    
+
     /**
      * Create a new auto-incrementing small integer (2-byte) column on the table.
      *
@@ -765,6 +765,18 @@ class Blueprint
         $this->timestamp('created_at')->nullable();
 
         $this->timestamp('updated_at')->nullable();
+    }
+
+    /**
+     * Add creation and update timestamps with default value to the table.
+     *
+     * @return void
+     */
+    public function defaultTimestamps($default)
+    {
+        $this->timestamp('created_at')->default($default);
+
+        $this->timestamp('updated_at')->default($default);
     }
 
     /**
