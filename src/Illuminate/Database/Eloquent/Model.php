@@ -191,7 +191,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * 
      * @var bool
      */
-     public $recent = false;
+    public $recent = false;
 
     /**
      * Indicates whether attributes are snake cased on arrays.
