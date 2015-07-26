@@ -29,6 +29,119 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
+    public function testSetRawAttributesCastToStringRepresentation()
+    {
+        $object = new StdClass();
+        $object->foo = 'bar';
+
+        $rawAttributes = [
+            'first'   => 1,
+            'second'  => 1.2,
+            'third'   => 'string',
+            'fourth'  => true,
+            'fifth'   => false,
+            'sixth'   => $object,
+            'seventh' => ['foo' => 'bar'],
+            'eighth'  => ['foo' => 'bar'],
+        ];
+        $model  = new EloquentModelCastingStub();
+        $model->setRawAttributes($rawAttributes);
+        $model->syncOriginal();
+
+        $this->assertSame($model->getOriginal('first'), 1);
+        $model->first = "1";
+        $this->assertFalse($model->isDirty('first'));
+        $model->first = "2";
+        $this->assertTrue($model->isDirty('first'));
+
+        $this->assertSame($model->getOriginal('second'), 1.2);
+        $model->second = "1.2";
+        $this->assertFalse($model->isDirty('second'));
+        $model->second = 1.3;
+        $this->assertTrue($model->isDirty('second'));
+
+        $this->assertSame($model->getOriginal('third'), 'string');
+        $model->third = "string";
+        $this->assertFalse($model->isDirty('third'));
+        $model->third = 'bar';
+        $this->assertTrue($model->isDirty('third'));
+
+        $this->assertSame($model->getOriginal('fourth'), true);
+        $model->fourth = 1;
+        // @TODO : Need fix :
+        $this->assertFalse($model->isDirty('fourth'));
+        $model->fourth = 0;
+        $this->assertTrue($model->isDirty('fourth'));
+
+        $this->assertSame($model->getOriginal('fifth'), false);
+        $model->fifth = 0;
+        // @TODO : Need fix :
+        $this->assertFalse($model->isDirty('fifth'));
+        $model->fifth = 1;
+        $this->assertTrue($model->isDirty('fifth'));
+
+        $this->assertSame($model->getOriginal('sixth'), '{"foo":"bar"}');
+        $model->sixth = $object;
+        $this->assertFalse($model->isDirty('sixth'));
+        $object->foo = 'baz';
+        $model->sixth = $object;
+        $this->assertTrue($model->isDirty('sixth'));
+
+        $this->assertSame($model->getOriginal('seventh'), '{"foo":"bar"}');
+        $model->seventh = $object;
+        // @TODO : Need fix :
+        $this->assertFalse($model->isDirty('seventh'));
+        $object->foo = 'baz';
+        $model->seventh = $object;
+        $this->assertTrue($model->isDirty('seventh'));
+
+        $this->assertSame($model->getOriginal('eighth'), '{"foo":"bar"}');
+        $model->eighth = ['foo' => 'bar'];
+        // @TODO : Need fix :
+        $this->assertFalse($model->isDirty('eighth'));
+        $model->eighth = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('eighth'));
+    }
+
+    public function testDirtyDatesAttributes()
+    {
+        $string   = '2015-01-01 01:01:01';
+        $datetime = new DateTime($string);
+        $carbon   = Carbon\Carbon::instance($datetime);
+
+        $this->assertEquals($carbon->getTimestamp(), $carbon->getTimestamp());
+        $this->assertEquals($carbon->getTimezone(), $carbon->getTimezone());
+        $this->assertSame($string, $carbon->toDateTimeString());
+
+        $model = $this->getMock('EloquentDateModelStub', ['getDateFormat']);
+        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+        $model->setRawAttributes([
+            'created_at' => $carbon,
+            'updated_at' => $datetime,
+        ]);
+        $model->syncOriginal();
+
+        $model->created_at = $datetime;
+        $model->updated_at = $carbon;
+        $this->assertFalse($model->isDirty());
+
+        $model->created_at = $string;
+        $model->updated_at = $string;
+        $this->assertFalse($model->isDirty());
+
+        $string   = '2015-12-31 23:59:59';
+        $datetime = new DateTime($string);
+        $carbon   = Carbon\Carbon::instance($datetime);
+
+        $model->created_at = $datetime;
+        $model->updated_at = $carbon;
+        $this->assertTrue($model->isDirty());
+
+        $model->created_at = $string;
+        $model->updated_at = $string;
+        $this->assertTrue($model->isDirty());
+    }
+
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
