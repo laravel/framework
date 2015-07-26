@@ -200,8 +200,9 @@ class Mailer implements MailerContract, MailQueueContract
     public function queue($view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $metadata = $this->queueMetadata();
 
-        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'metadata', 'callback'), $queue);
     }
 
     /**
@@ -231,8 +232,9 @@ class Mailer implements MailerContract, MailQueueContract
     public function later($delay, $view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $metadata = $this->queueMetadata();
 
-        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
+        return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'metadata', 'callback'), $queue);
     }
 
     /**
@@ -266,6 +268,28 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * If alwaysTo or alwaysFrom were called, returns an array containing
+     * $to and $from properties
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function queueMetadata()
+    {
+        $data = [];
+
+        if (isset($this->from['address'])) {
+            $data['alwaysFrom'] = ['address' => $this->from['address'], 'name' => $this->from['name']];
+        }
+
+        if (isset($this->to['address'])) {
+            $data['alwaysTo'] = ['address' => $this->to['address'], 'name' => $this->to['name']];
+        }
+
+        return $data;
+    }
+
+    /**
      * Handle a queued e-mail message job.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -274,6 +298,19 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function handleQueuedMessage($job, $data)
     {
+        $metadata = $data['metadata'];
+        if (isset($metadata['alwaysTo'])) {
+            $address = $metadata['alwaysTo']['address'];
+            $name = isset($metadata['alwaysTo']['name']) ? $metadata['alwaysTo']['name'] : null;
+            $this->alwaysTo($address, $name);
+        }
+
+        if (isset($metadata['alwaysFrom'])) {
+            $address = $metadata['alwaysFrom']['address'];
+            $name = isset($metadata['alwaysFrom']['name']) ? $metadata['alwaysFrom']['name'] : null;
+            $this->alwaysFrom($address, $name);
+        }
+
         $this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
         $job->delete();
