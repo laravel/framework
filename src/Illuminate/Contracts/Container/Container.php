@@ -63,7 +63,7 @@ interface Container
     /**
      * Register a shared binding in the container.
      *
-     * @param  string  $abstract
+     * @param  string|array  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
