@@ -62,12 +62,13 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  boolean  $caseSensitive  (optional)
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $caseSensitive = true)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
+            if ($needle != '' && ($caseSensitive ? strpos($haystack, $needle) : stripos($haystack, $needle)) !== false) {
                 return true;
             }
         }
