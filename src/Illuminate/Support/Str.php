@@ -62,7 +62,7 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
-     * @param  boolean  $caseSensitive  (optional)
+     * @param  bool  $caseSensitive
      * @return bool
      */
     public static function contains($haystack, $needles, $caseSensitive = true)
