@@ -55,9 +55,9 @@ class FailedTableCommand extends Command
      */
     public function fire()
     {
-        $fullPath = $this->createBaseMigration();
-
         $table = $this->laravel['config']['queue.failed.table'];
+
+        $fullPath = $this->createBaseMigration($table);
 
         $stub = str_replace(
             '{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
@@ -73,11 +73,12 @@ class FailedTableCommand extends Command
     /**
      * Create a base migration file for the table.
      *
+     * @param  string  $table
      * @return string
      */
-    protected function createBaseMigration()
+    protected function createBaseMigration($table = 'failed_jobs')
     {
-        $name = 'create_failed_jobs_table';
+        $name = 'create_'.$table.'_table';
 
         $path = $this->laravel->databasePath().'/migrations';
 
