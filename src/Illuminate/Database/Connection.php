@@ -585,6 +585,11 @@ class Connection implements ConnectionInterface
      */
     protected function run($query, $bindings, Closure $callback)
     {
+
+        // Before execution we will dispatch an event for listeners that
+        // need to intercept all the queries before their execution
+        $this->dispatchReadyQuery($query, $bindings);
+
         $this->reconnectIfMissingConnection();
 
         $start = microtime(true);
@@ -717,6 +722,22 @@ class Connection implements ConnectionInterface
         if (is_null($this->getPdo()) || is_null($this->getReadPdo())) {
             $this->reconnect();
         }
+    }
+
+    /**
+     * Dispatches a query ready event before execution.
+     *
+     * @param  string  $query
+     * @param  array   $bindings
+     * @return void
+     */
+    protected function dispatchReadyQuery($query, $bindings)
+    {
+
+        if (isset($this->events)) {
+            $this->events->fire('illuminate.ready.query', [$query, $bindings, $this->getName()]);
+        }
+
     }
 
     /**
