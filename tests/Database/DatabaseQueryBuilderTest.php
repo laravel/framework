@@ -310,6 +310,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->union($this->getMySqlBuilder()->select('*')->from('users')->where('id', '=', 2));
         $this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getMysqlBuilder();
+        $second = $this->getMysqlBuilder()->select('*')->from('users')->orderByRaw('id = ?', 2);
+        $third = $this->getMysqlBuilder()->select('*')->from('users')->where('id', 3)->groupBy('id')->having('id', '!=', 4);
+        $builder->groupBy('a')->having('a', '=', 1)->union($second)->union($third);
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 4], $builder->getBindings());
     }
 
     public function testUnionAlls()
