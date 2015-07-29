@@ -640,7 +640,7 @@ class Builder
 
             $this->wheres[] = compact('type', 'query', 'boolean');
 
-            $this->mergeBindings($query);
+            $this->addBinding($query->getBindings(), 'where');
         }
 
         return $this;
@@ -668,7 +668,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'operator', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -694,7 +694,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query, 'where');
 
         return $this;
     }
@@ -822,7 +822,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -1234,7 +1234,9 @@ class Builder
 
         $this->unions[] = compact('query', 'all');
 
-        return $this->addBinding($query->bindings, 'union');
+        $this->addBinding($query->bindings, 'union');
+
+        return $this;
     }
 
     /**

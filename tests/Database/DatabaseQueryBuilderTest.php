@@ -312,10 +312,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getMysqlBuilder();
-        $second = $this->getMysqlBuilder()->select('*')->from('users')->orderByRaw('id = ?', 2);
-        $third = $this->getMysqlBuilder()->select('*')->from('users')->where('id', 3)->groupBy('id')->having('id', '!=', 4);
-        $builder->groupBy('a')->having('a', '=', 1)->union($second)->union($third);
-        $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 4], $builder->getBindings());
+        $expectedSql = '(select `a` from `t1` where `a` = ? and `b` = ?) union (select `a` from `t2` where `a` = ? and `b` = ?) order by `a` asc limit 10';
+        $union = $this->getMysqlBuilder()->select('a')->from('t2')->where('a', 11)->where('b', 2);
+        $builder->select('a')->from('t1')->where('a', 10)->where('b', 1)->union($union)->orderBy('a')->limit(10);
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 10, 1 => 1, 2 => 11, 3 => 2], $builder->getBindings());
     }
 
     public function testUnionAlls()
@@ -844,6 +845,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $count = $builder->count();
         $this->assertEquals(1, $count);
         $this->assertEquals(['foo'], $builder->getBindings());
+    }
+
+    public function testSubqueriesBindings()
+    {
+        $builder = $this->getBuilder();
+        $second = $this->getBuilder()->select('*')->from('users')->orderByRaw('id = ?', 2);
+        $third = $this->getBuilder()->select('*')->from('users')->where('id', 3)->groupBy('id')->having('id', '!=', 4);
+        $builder->groupBy('a')->having('a', '=', 1)->union($second)->union($third);
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 4], $builder->getBindings());
+
+        $builder = $this->getBuilder()->select('*')->from('users')->where('email', '=', function ($q) {
+            $q->select(new Raw('max(id)'))
+              ->from('users')->where('email', '=', 'bar')
+              ->orderByRaw('email like ?', '%.com')
+              ->groupBy('id')->having('id', '=', 4);
+        })->orWhere('id', '=', 'foo')->groupBy('id')->having('id', '=', 5);
+        $this->assertEquals([0 => 'bar', 1 => 4, 2 => '%.com', 3 => 'foo', 4 => 5], $builder->getBindings());
     }
 
     public function testInsertMethod()
