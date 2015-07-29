@@ -49,6 +49,7 @@ class Builder
         'where'  => [],
         'having' => [],
         'order'  => [],
+        'union'  => [],
     ];
 
     /**
@@ -1233,7 +1234,7 @@ class Builder
 
         $this->unions[] = compact('query', 'all');
 
-        return $this->mergeBindings($query);
+        return $this->addBinding($query->bindings, 'union');
     }
 
     /**
