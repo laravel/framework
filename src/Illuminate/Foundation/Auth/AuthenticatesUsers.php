@@ -34,7 +34,7 @@ trait AuthenticatesUsers
     public function postLogin(Request $request)
     {
         $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
+            $this->loginUsername() => 'required', $this->loginPassword() => 'required',
         ]);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -94,7 +94,7 @@ trait AuthenticatesUsers
      */
     protected function getCredentials(Request $request)
     {
-        return $request->only($this->loginUsername(), 'password');
+        return $request->only($this->loginUsername(), $this->loginPassword());
     }
 
     /**
@@ -139,6 +139,16 @@ trait AuthenticatesUsers
     public function loginUsername()
     {
         return property_exists($this, 'username') ? $this->username : 'email';
+    }
+
+    /**
+     * Get the password to be used by the controller.
+     *
+     * @return string
+     */
+    public function loginPassword()
+    {
+        return property_exists($this, 'password') ? $this->password : 'password';
     }
 
     /**
