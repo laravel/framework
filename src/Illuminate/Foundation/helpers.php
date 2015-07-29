@@ -586,11 +586,15 @@ if (!function_exists('url')) {
      * @param  string  $path
      * @param  mixed   $parameters
      * @param  bool    $secure
-     * @return string
+     * @return mixed
      */
     function url($path = null, $parameters = [], $secure = null)
     {
-        return app('Illuminate\Contracts\Routing\UrlGenerator')->to($path, $parameters, $secure);
+        if (is_null($path)) {
+            return app('url');
+        }
+
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 
