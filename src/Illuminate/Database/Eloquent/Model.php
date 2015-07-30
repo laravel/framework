@@ -2791,7 +2791,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
+        if ($this->isJsonCastable($key) && ! is_null($value) && ! is_string($value)) {
             $value = json_encode($value);
         }
 

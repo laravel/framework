@@ -1192,6 +1192,20 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['eighth']);
     }
 
+    public function testModelAttributeCastingPreventJsonEncodeFromJsonString()
+    {
+        $json_string = '{"foo":"bar"}';
+        $model = new EloquentModelCastingStub;
+        $model->sixth = $json_string;
+        $model->seventh = $json_string;
+        $model->eighth = $json_string;
+
+        $this->assertInternalType('object', $model->getAttribute('sixth'));
+        $this->assertInternalType('array', $model->getAttribute('seventh'));
+        $this->assertInternalType('array', $model->getAttribute('eighth'));
+        $this->assertEquals('{"foo":"bar"}', $model->eighthAttributeValue());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
