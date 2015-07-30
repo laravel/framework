@@ -187,6 +187,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $exists = false;
 
     /**
+     * Indicates if the model was inserted during the current request/run.
+     * 
+     * @var bool
+     */
+    public $recent = false;
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -1577,6 +1584,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the created event is fired, just in case the developer tries to update it
         // during the event. This will allow them to do so and run an update here.
         $this->exists = true;
+        
+        $this->recent = true;
 
         $this->fireModelEvent('created', false);
 
