@@ -316,6 +316,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Clear the list of booted models so they will be re-booted.
+     *
+     * @return void
+     */
+    public static function clearBootedModels()
+    {
+        static::$booted = [];
+    }
+
+    /**
      * Register a new global scope on the model.
      *
      * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
@@ -704,7 +714,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Being querying a model with eager loading.
+     * Begin querying a model with eager loading.
      *
      * @param  array|string  $relations
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -869,6 +879,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $through
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
+     * @param  string|null  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
@@ -2773,7 +2784,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key)) {
+        if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = json_encode($value);
         }
 

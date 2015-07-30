@@ -1160,6 +1160,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->seventh = null;
         $model->eighth = null;
 
+        $attributes = $model->getAttributes();
+
+        $this->assertNull($attributes['first']);
+        $this->assertNull($attributes['second']);
+        $this->assertNull($attributes['third']);
+        $this->assertNull($attributes['fourth']);
+        $this->assertNull($attributes['fifth']);
+        $this->assertNull($attributes['sixth']);
+        $this->assertNull($attributes['seventh']);
+        $this->assertNull($attributes['eighth']);
+
         $this->assertNull($model->first);
         $this->assertNull($model->second);
         $this->assertNull($model->third);

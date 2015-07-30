@@ -82,7 +82,7 @@ class LoadConfiguration
      * @param  \Symfony\Component\Finder\SplFileInfo  $file
      * @return string
      */
-    private function getConfigurationNesting(SplFileInfo $file)
+    protected function getConfigurationNesting(SplFileInfo $file)
     {
         $directory = dirname($file->getRealPath());
 

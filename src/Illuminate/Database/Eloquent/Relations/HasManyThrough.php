@@ -343,4 +343,24 @@ class HasManyThrough extends Relation
     {
         return $this->farParent->getQualifiedKeyName();
     }
+
+    /**
+     * Get the qualified foreign key on the related model.
+     *
+     * @return string
+     */
+    public function getForeignKey()
+    {
+        return $this->related->getTable().'.'.$this->secondKey;
+    }
+
+    /**
+     * Get the qualified foreign key on the "through" model.
+     *
+     * @return string
+     */
+    public function getThroughKey()
+    {
+        return $this->parent->getTable().'.'.$this->firstKey;
+    }
 }
