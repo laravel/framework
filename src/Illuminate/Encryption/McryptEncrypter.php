@@ -29,7 +29,7 @@ class McryptEncrypter extends BaseEncrypter implements EncrypterContract
      * Create a new encrypter instance.
      *
      * @param  string  $key
-     * @param  int     $cipher
+     * @param  string  $cipher
      * @return void
      */
     public function __construct($key, $cipher = MCRYPT_RIJNDAEL_128)

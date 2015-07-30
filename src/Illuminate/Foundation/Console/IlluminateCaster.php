@@ -60,7 +60,7 @@ class IlluminateCaster
     /**
      * Get an array representing the properties of a collection.
      *
-     * @param  \Illuminate\Support\Collection  $value
+     * @param  \Illuminate\Support\Collection  $collection
      * @return array
      */
     public static function castCollection(Collection $collection)
