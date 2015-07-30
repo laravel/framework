@@ -38,6 +38,7 @@ class TableCommand extends Command
      * Create a new queue job table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  \Illuminate\Foundation\Composer    $composer
      * @return void
      */
     public function __construct(Filesystem $files, Composer $composer)
