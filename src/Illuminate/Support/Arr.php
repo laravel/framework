@@ -247,6 +247,21 @@ class Arr
     }
 
     /**
+     * Determines if an array is associative.
+     *
+     * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    public static function isAssoc(array $array)
+    {
+        $keys = array_keys($array);
+
+        return array_keys($keys) !== $keys;
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
@@ -380,14 +395,16 @@ class Arr
     public static function sortRecursive($array)
     {
         foreach ($array as &$value) {
-            if (is_array($value) && isset($value[0])) {
-                sort($value);
-            } elseif (is_array($value)) {
-                self::sortRecursive($value);
+            if (is_array($value)) {
+                $value = self::sortRecursive($value);
             }
         }
 
-        ksort($array);
+        if (self::isAssoc($array)) {
+            ksort($array);
+        } else {
+            sort($array);
+        }
 
         return $array;
     }
