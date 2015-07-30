@@ -21,13 +21,6 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 class Application extends Container implements ApplicationContract, HttpKernelInterface
 {
     /**
-     * The Laravel framework version.
-     *
-     * @var string
-     */
-    const VERSION = '5.1.8 (LTS)';
-
-    /**
      * The base path for the Laravel installation.
      *
      * @var string
@@ -158,7 +151,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function version()
     {
-        return static::VERSION;
+        return '5.1.8 (LTS)';
     }
 
     /**
