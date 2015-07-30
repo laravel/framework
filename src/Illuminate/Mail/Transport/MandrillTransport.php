@@ -4,8 +4,6 @@ namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
 use Swift_Mime_Message;
-use Swift_Events_SendEvent;
-use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
 class MandrillTransport extends Transport implements Swift_Transport
