@@ -694,7 +694,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
 
-        $this->addBinding($query, 'where');
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
