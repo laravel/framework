@@ -123,6 +123,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertCount(1, $users);
         $this->assertEquals(1, $users->first()->id);
     }
+    
+    public function testExistsPropertyOnDeletion()
+    {
+        $this->createUsers();
+        
+        $abigail = SoftDeletesTestUser::find(2);
+        $this->assertTrue($abigail->exists);
+        
+        $abigail->delete();
+        $this->assertTrue($abigail->exists);
+        
+        $abigail->forceDelete();
+        $this->assertFalse($abigail->exists);
+        $this->assertNull(SoftDeletesTestUser::find(2));
+    }
 
 
     /**
