@@ -676,7 +676,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function findOrNew($id, $columns = ['*'])
     {
-        if (!is_null($model = static::find($id, $columns))) {
+        if (!is_null($model = static::query()->find($id, $columns))) {
             return $model;
         }
 
