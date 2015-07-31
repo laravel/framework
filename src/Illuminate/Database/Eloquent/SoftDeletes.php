@@ -44,9 +44,9 @@ trait SoftDeletes
     {
         if ($this->forceDeleting) {
             $res = $this->withTrashed()->where($this->getKeyName(), $this->getKey())->forceDelete();
-            
+
             $this->exists = false;
-            
+
             return $res;
         }
 
