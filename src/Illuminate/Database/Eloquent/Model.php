@@ -735,6 +735,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         return $instance->newQuery()->with($relations);
     }
+    
+    /**
+     * Append attributes to query when building a query
+     *
+     * @return $this
+     */
+    public function append($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        $this->appends = array_merge($this->appends, $relations);
+
+        return $this;
+    }
 
     /**
      * Define a one-to-one relationship.
