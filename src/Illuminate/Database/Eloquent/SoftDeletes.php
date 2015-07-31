@@ -43,7 +43,11 @@ trait SoftDeletes
     protected function performDeleteOnModel()
     {
         if ($this->forceDeleting) {
-            return $this->withTrashed()->where($this->getKeyName(), $this->getKey())->forceDelete();
+            $res = $this->withTrashed()->where($this->getKeyName(), $this->getKey())->forceDelete();
+            
+            $this->exists = false;
+            
+            return $res;
         }
 
         return $this->runSoftDelete();
