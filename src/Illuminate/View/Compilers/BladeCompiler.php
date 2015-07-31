@@ -741,6 +741,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Get the list of custom directives.gs
+     *
+     * @return array
+     */
+    public function getCustomDirectives()
+    {
+        return $this->customDirectives;
+    }
+
+    /**
     * Gets the raw tags used by the compiler.
     *
     * @return array
