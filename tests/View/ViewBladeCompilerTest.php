@@ -487,9 +487,11 @@ empty
     public function testCustomStatements()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertCount(0, $compiler->getCustomDirectives());
         $compiler->directive('customControl', function ($expression) {
             return "<?php echo custom_control{$expression}; ?>";
         });
+        $this->assertCount(1, $compiler->getCustomDirectives());
 
         $string = '@if($foo)
 @customControl(10, $foo, \'bar\')
