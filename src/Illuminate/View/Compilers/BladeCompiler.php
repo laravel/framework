@@ -741,7 +741,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Get the list of custom directives.gs
+     * Get the list of custom directives.
      *
      * @return array
      */
