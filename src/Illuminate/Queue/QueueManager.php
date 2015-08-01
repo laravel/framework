@@ -98,7 +98,7 @@ class QueueManager implements FactoryContract, MonitorContract
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
         // not make any unnecessary connection to the various queue end-points.
-        if (!isset($this->connections[$name])) {
+        if (! isset($this->connections[$name])) {
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);

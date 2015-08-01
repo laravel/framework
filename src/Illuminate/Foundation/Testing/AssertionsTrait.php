@@ -45,7 +45,7 @@ trait AssertionsTrait
             return $this->assertViewHasAll($key);
         }
 
-        if (!isset($this->response->original) || !$this->response->original instanceof View) {
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 
@@ -81,7 +81,7 @@ trait AssertionsTrait
      */
     public function assertViewMissing($key)
     {
-        if (!isset($this->response->original) || !$this->response->original instanceof View) {
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
             return PHPUnit::assertTrue(false, 'The response was not a view.');
         }
 

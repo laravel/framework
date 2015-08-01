@@ -231,7 +231,7 @@ class Event
      */
     public function isDue(Application $app)
     {
-        if (!$this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
+        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
         }
 
@@ -264,7 +264,7 @@ class Event
      */
     protected function filtersPass(Application $app)
     {
-        if (($this->filter && !$app->call($this->filter)) ||
+        if (($this->filter && ! $app->call($this->filter)) ||
              $this->reject && $app->call($this->reject)) {
             return false;
         }
