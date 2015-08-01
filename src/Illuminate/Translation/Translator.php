@@ -85,7 +85,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
                 $namespace, $group, $locale, $item, $replace
             );
 
-            if (!is_null($line)) {
+            if (! is_null($line)) {
                 break;
             }
         }
@@ -93,7 +93,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        if (!isset($line)) {
+        if (! isset($line)) {
             return $key;
         }
 
@@ -271,7 +271,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     protected function parseLocale($locale)
     {
-        if (!is_null($locale)) {
+        if (! is_null($locale)) {
             return array_filter([$locale, $this->fallback]);
         }
 
@@ -285,7 +285,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     public function getSelector()
     {
-        if (!isset($this->selector)) {
+        if (! isset($this->selector)) {
             $this->selector = new MessageSelector;
         }
 

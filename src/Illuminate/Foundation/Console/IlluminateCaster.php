@@ -46,8 +46,8 @@ class IlluminateCaster
             try {
                 $val = $app->$property();
 
-                if (!is_null($val)) {
-                    $results[Caster::PREFIX_VIRTUAL . $property] = $val;
+                if (! is_null($val)) {
+                    $results[Caster::PREFIX_VIRTUAL.$property] = $val;
                 }
             } catch (Exception $e) {
                 //

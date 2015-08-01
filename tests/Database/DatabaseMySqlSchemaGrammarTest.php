@@ -581,7 +581,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
     public function testAddingTimeStampTzWithDefault()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');;
+        $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));

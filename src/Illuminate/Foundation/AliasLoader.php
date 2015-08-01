@@ -86,7 +86,7 @@ class AliasLoader
      */
     public function register()
     {
-        if (!$this->registered) {
+        if (! $this->registered) {
             $this->prependToLoaderStack();
 
             $this->registered = true;

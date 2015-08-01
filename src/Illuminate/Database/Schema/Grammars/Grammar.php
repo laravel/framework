@@ -97,11 +97,11 @@ abstract class Grammar extends BaseGrammar
         // Once we have the basic foreign key creation statement constructed we can
         // build out the syntax for what should happen on an update or delete of
         // the affected columns, which will get something like "cascade", etc.
-        if (!is_null($command->onDelete)) {
+        if (! is_null($command->onDelete)) {
             $sql .= " on delete {$command->onDelete}";
         }
 
-        if (!is_null($command->onUpdate)) {
+        if (! is_null($command->onUpdate)) {
             $sql .= " on update {$command->onUpdate}";
         }
 
@@ -322,7 +322,7 @@ abstract class Grammar extends BaseGrammar
             // Doctrine column definitions, which is necessasry because Laravel and Doctrine
             // use some different terminology for various column attributes on the tables.
             foreach ($fluent->getAttributes() as $key => $value) {
-                if (!is_null($option = $this->mapFluentOptionToDoctrine($key))) {
+                if (! is_null($option = $this->mapFluentOptionToDoctrine($key))) {
                     if (method_exists($column, $method = 'set'.ucfirst($option))) {
                         $column->{$method}($this->mapFluentValueToDoctrine($option, $value));
                     }
@@ -446,6 +446,6 @@ abstract class Grammar extends BaseGrammar
      */
     protected function mapFluentValueToDoctrine($option, $value)
     {
-        return $option == 'notnull' ? !$value : $value;
+        return $option == 'notnull' ? ! $value : $value;
     }
 }

@@ -61,7 +61,7 @@ class MorphTo extends BelongsTo
      */
     public function getResults()
     {
-        if (!$this->otherKey) {
+        if (! $this->otherKey) {
             return;
         }
 
