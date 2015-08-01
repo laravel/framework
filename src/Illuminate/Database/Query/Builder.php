@@ -172,6 +172,13 @@ class Builder
     protected $backups = [];
 
     /**
+     * The binding backups currently in use.
+     * 
+     * @var array
+     */
+    protected $bindingBackups = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -694,7 +701,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
 
-        $this->addBinding($query, 'where');
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -1448,6 +1455,12 @@ class Builder
 
             $this->{$field} = null;
         }
+
+        foreach (['order', 'select'] as $key) {
+            $this->bindingBackups[$key] = $this->bindings[$key];
+
+            $this->bindings[$key] = [];
+        }
     }
 
     /**
@@ -1461,7 +1474,12 @@ class Builder
             $this->{$field} = $this->backups[$field];
         }
 
+        foreach (['order', 'select'] as $key) {
+            $this->bindings[$key] = $this->bindingBackups[$key];
+        }
+
         $this->backups = [];
+        $this->bindingBackups = [];
     }
 
     /**

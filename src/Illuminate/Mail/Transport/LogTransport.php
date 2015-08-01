@@ -5,9 +5,7 @@ namespace Illuminate\Mail\Transport;
 use Swift_Transport;
 use Swift_Mime_Message;
 use Swift_Mime_MimeEntity;
-use Swift_Events_SendEvent;
 use Psr\Log\LoggerInterface;
-use Swift_Events_EventListener;
 
 class LogTransport extends Transport implements Swift_Transport
 {
