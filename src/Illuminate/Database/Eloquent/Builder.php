@@ -263,12 +263,13 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
-     * @param  int  $page
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $total = $this->query->getCountForPagination();
+
         $this->query->forPage(
             $page = $page ?: Paginator::resolveCurrentPage($pageName),
             $perPage = $perPage ?: $this->model->getPerPage()
