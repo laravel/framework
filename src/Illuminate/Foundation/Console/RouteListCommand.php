@@ -147,7 +147,7 @@ class RouteListCommand extends Command
 
         $actionName = $route->getActionName();
 
-        if (!empty($actionName) && $actionName !== 'Closure') {
+        if (! empty($actionName) && $actionName !== 'Closure') {
             $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
         }
 
@@ -185,7 +185,7 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($controller->getMiddleware() as $name => $options) {
-            if (!$this->methodExcludedByOptions($method, $options)) {
+            if (! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = Arr::get($middleware, $name, $name);
             }
         }
@@ -202,8 +202,8 @@ class RouteListCommand extends Command
      */
     protected function methodExcludedByOptions($method, array $options)
     {
-        return (!empty($options['only']) && !in_array($method, (array) $options['only'])) ||
-            (!empty($options['except']) && in_array($method, (array) $options['except']));
+        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+            (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -250,9 +250,9 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && !Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && !Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && !Str::contains($route['method'], $this->option('method'))) {
+        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
+             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+             $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
             return;
         }
 

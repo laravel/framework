@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Htmlable;
 class HtmlString implements Htmlable
 {
     /**
-     * The HTML string
+     * The HTML string.
      *
      * @var string
      */
@@ -25,7 +25,7 @@ class HtmlString implements Htmlable
     }
 
     /**
-     * Get the the HTML string
+     * Get the the HTML string.
      *
      * @return string
      */
@@ -35,7 +35,7 @@ class HtmlString implements Htmlable
     }
 
     /**
-     * Get the the HTML string
+     * Get the the HTML string.
      *
      * @return string
      */

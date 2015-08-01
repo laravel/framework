@@ -79,7 +79,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         if ($this->useAsCallable($key)) {
-            return !is_null($this->first($key));
+            return ! is_null($this->first($key));
         }
 
         return in_array($key, $this->items);
@@ -250,7 +250,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         foreach ($this->items as $key => $value) {
             $groupKey = $groupBy($value, $key);
 
-            if (!array_key_exists($groupKey, $results)) {
+            if (! array_key_exists($groupKey, $results)) {
                 $results[$groupKey] = new static;
             }
 
@@ -337,7 +337,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function useAsCallable($value)
     {
-        return !is_string($value) && is_callable($value);
+        return ! is_string($value) && is_callable($value);
     }
 
     /**
@@ -565,7 +565,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($this->useAsCallable($callback)) {
             return $this->filter(function ($item) use ($callback) {
-                return !$callback($item);
+                return ! $callback($item);
             });
         }
 
@@ -593,7 +593,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function search($value, $strict = false)
     {
-        if (!$this->useAsCallable($value)) {
+        if (! $this->useAsCallable($value)) {
             return array_search($value, $this->items, $strict);
         }
 

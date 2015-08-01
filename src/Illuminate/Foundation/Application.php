@@ -517,7 +517,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function register($provider, $options = [], $force = false)
     {
-        if ($registered = $this->getProvider($provider) && !$force) {
+        if ($registered = $this->getProvider($provider) && ! $force) {
             return $registered;
         }
 
@@ -615,7 +615,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function loadDeferredProvider($service)
     {
-        if (!isset($this->deferredServices[$service])) {
+        if (! isset($this->deferredServices[$service])) {
             return;
         }
 
@@ -624,7 +624,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if (!isset($this->loadedProviders[$provider])) {
+        if (! isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -647,7 +647,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->register($instance = new $provider($this));
 
-        if (!$this->booted) {
+        if (! $this->booted) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -980,7 +980,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function hasMonologConfigurator()
     {
-        return !is_null($this->monologConfigurator);
+        return ! is_null($this->monologConfigurator);
     }
 
     /**
@@ -1102,7 +1102,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getNamespace()
     {
-        if (!is_null($this->namespace)) {
+        if (! is_null($this->namespace)) {
             return $this->namespace;
         }
 

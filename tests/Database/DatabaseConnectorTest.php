@@ -77,7 +77,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8'];
-        $connector = $this->getMock('Illuminate\Database\Connectors\PostgresConnector', ['createConnection', 'getOptions'] );
+        $connector = $this->getMock('Illuminate\Database\Connectors\PostgresConnector', ['createConnection', 'getOptions']);
         $connection = m::mock('stdClass');
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));

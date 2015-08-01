@@ -13,7 +13,6 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
-
     public function testSortRecursive()
     {
         $array = [
