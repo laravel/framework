@@ -124,7 +124,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, $users->first()->id);
     }
 
-
     /**
      * Helpers...
      */
@@ -168,7 +167,6 @@ class SoftDeletesTestUser extends Eloquent
     protected $table = 'users';
     protected $guarded = [];
 }
-
 
 /**
  * Connection Resolver.

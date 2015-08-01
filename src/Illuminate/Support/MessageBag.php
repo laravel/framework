@@ -92,7 +92,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return !isset($messages[$key]) || !in_array($message, $messages[$key]);
+        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
     }
 
     /**
@@ -243,7 +243,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function isEmpty()
     {
-        return !$this->any();
+        return ! $this->any();
     }
 
     /**

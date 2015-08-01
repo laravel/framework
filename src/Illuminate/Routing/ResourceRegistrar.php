@@ -128,7 +128,7 @@ class ResourceRegistrar
      */
     public function getResourceUri($resource)
     {
-        if (!Str::contains($resource, '.')) {
+        if (! Str::contains($resource, '.')) {
             return $resource;
         }
 
@@ -194,7 +194,7 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-        if (!$this->router->hasGroupStack()) {
+        if (! $this->router->hasGroupStack()) {
             return $prefix.$resource.'.'.$method;
         }
 

@@ -181,7 +181,7 @@ class Str
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if (!isset($matches[0]) || strlen($value) === strlen($matches[0])) {
+        if (! isset($matches[0]) || strlen($value) === strlen($matches[0])) {
             return $value;
         }
 
@@ -288,11 +288,11 @@ class Str
      */
     public static function equals($knownString, $userInput)
     {
-        if (!is_string($knownString)) {
+        if (! is_string($knownString)) {
             $knownString = (string) $knownString;
         }
 
-        if (!is_string($userInput)) {
+        if (! is_string($userInput)) {
             $userInput = (string) $userInput;
         }
 
@@ -388,7 +388,7 @@ class Str
             return static::$snakeCache[$key];
         }
 
-        if (!ctype_lower($value)) {
+        if (! ctype_lower($value)) {
             $value = strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 
             $value = preg_replace('/\s+/', '', $value);

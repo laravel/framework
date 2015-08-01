@@ -69,7 +69,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create');
 
-        if (!$table && is_string($create)) {
+        if (! $table && is_string($create)) {
             $table = $create;
         }
 
@@ -105,7 +105,7 @@ class MigrateMakeCommand extends BaseCommand
      */
     protected function getMigrationPath()
     {
-        if (!is_null($targetPath = $this->input->getOption('path'))) {
+        if (! is_null($targetPath = $this->input->getOption('path'))) {
             return $this->laravel->basePath().'/'.$targetPath;
         }
 

@@ -224,7 +224,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $value) {
-            if (!array_key_exists($value, $input)) {
+            if (! array_key_exists($value, $input)) {
                 return false;
             }
         }
@@ -263,7 +263,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $boolOrArray = is_bool($value) || is_array($value);
 
-        return !$boolOrArray && trim((string) $value) === '';
+        return ! $boolOrArray && trim((string) $value) === '';
     }
 
     /**
@@ -348,7 +348,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasCookie($key)
     {
-        return !is_null($this->cookie($key));
+        return ! is_null($this->cookie($key));
     }
 
     /**
@@ -383,7 +383,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasFile($key)
     {
-        if (!is_array($files = $this->file($key))) {
+        if (! is_array($files = $this->file($key))) {
             $files = [$files];
         }
 
@@ -452,7 +452,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function flash($filter = null, $keys = [])
     {
-        $flash = (!is_null($filter)) ? $this->$filter($keys) : $this->input();
+        $flash = (! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
         $this->session()->flashInput($flash);
     }
@@ -541,7 +541,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (!isset($this->json)) {
+        if (! isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
         }
 
@@ -659,7 +659,7 @@ class Request extends SymfonyRequest implements ArrayAccess
             foreach ($contentTypes as $contentType) {
                 $type = $contentType;
 
-                if (!is_null($mimeType = $this->getMimeType($contentType))) {
+                if (! is_null($mimeType = $this->getMimeType($contentType))) {
                     $type = $mimeType;
                 }
 
@@ -752,7 +752,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function session()
     {
-        if (!$this->hasSession()) {
+        if (! $this->hasSession()) {
             throw new RuntimeException('Session store not set on request.');
         }
 

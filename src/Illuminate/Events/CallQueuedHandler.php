@@ -42,7 +42,7 @@ class CallQueuedHandler
             [$handler, $data['method']], unserialize($data['data'])
         );
 
-        if (!$job->isDeletedOrReleased()) {
+        if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
     }

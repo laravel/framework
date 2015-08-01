@@ -56,7 +56,7 @@ class Grammar extends BaseGrammar
             // To compile the query, we'll spin through each component of the query and
             // see if that component exists. If it does we'll just call the compiler
             // function for the component which is responsible for making the SQL.
-            if (!is_null($query->$component)) {
+            if (! is_null($query->$component)) {
                 $method = 'compile'.ucfirst($component);
 
                 $sql[$component] = $this->$method($query, $query->$component);
@@ -99,7 +99,7 @@ class Grammar extends BaseGrammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (!is_null($query->aggregate)) {
+        if (! is_null($query->aggregate)) {
             return;
         }
 
@@ -179,7 +179,7 @@ class Grammar extends BaseGrammar
 
         if ($clause['where']) {
             if ($clause['operator'] === 'in' || $clause['operator'] === 'not in') {
-                $second = '('.join(', ', array_fill(0, $clause['second'], '?')).')';
+                $second = '('.implode(', ', array_fill(0, $clause['second'], '?')).')';
             } else {
                 $second = '?';
             }
@@ -625,7 +625,7 @@ class Grammar extends BaseGrammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 

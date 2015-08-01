@@ -262,7 +262,7 @@ class Validator implements ValidatorContract
     {
         $data = Arr::get($this->data, $attribute);
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             if ($this->hasRule($attribute, 'Array')) {
                 return;
             }
@@ -272,7 +272,7 @@ class Validator implements ValidatorContract
 
         foreach ($data as $dataKey => $dataValue) {
             foreach ((array) $rules as $ruleKey => $ruleValue) {
-                if (!is_string($ruleKey)) {
+                if (! is_string($ruleKey)) {
                     $this->mergeRules("$attribute.$dataKey", $ruleValue);
                 } else {
                     $this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
@@ -332,7 +332,7 @@ class Validator implements ValidatorContract
      */
     public function fails()
     {
-        return !$this->passes();
+        return ! $this->passes();
     }
 
     /**
@@ -359,7 +359,7 @@ class Validator implements ValidatorContract
 
         $method = "validate{$rule}";
 
-        if ($validatable && !$this->$method($attribute, $value, $parameters, $this)) {
+        if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
         }
     }
@@ -371,7 +371,7 @@ class Validator implements ValidatorContract
      */
     public function valid()
     {
-        if (!$this->messages) {
+        if (! $this->messages) {
             $this->passes();
         }
 
@@ -385,7 +385,7 @@ class Validator implements ValidatorContract
      */
     public function invalid()
     {
-        if (!$this->messages) {
+        if (! $this->messages) {
             $this->passes();
         }
 
@@ -400,9 +400,9 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
-        if (!is_null($value = Arr::get($this->data, $attribute))) {
+        if (! is_null($value = Arr::get($this->data, $attribute))) {
             return $value;
-        } elseif (!is_null($value = Arr::get($this->files, $attribute))) {
+        } elseif (! is_null($value = Arr::get($this->files, $attribute))) {
             return $value;
         }
     }
@@ -475,7 +475,7 @@ class Validator implements ValidatorContract
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
         return in_array($rule, ['Unique', 'Exists'])
-                        ? !$this->messages->has($attribute) : true;
+                        ? ! $this->messages->has($attribute) : true;
     }
 
     /**
@@ -569,7 +569,7 @@ class Validator implements ValidatorContract
     protected function anyFailingRequired(array $attributes)
     {
         foreach ($attributes as $key) {
-            if (!$this->validateRequired($key, $this->getValue($key))) {
+            if (! $this->validateRequired($key, $this->getValue($key))) {
                 return true;
             }
         }
@@ -604,7 +604,7 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWith($attribute, $value, $parameters)
     {
-        if (!$this->allFailingRequired($parameters)) {
+        if (! $this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -621,7 +621,7 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWithAll($attribute, $value, $parameters)
     {
-        if (!$this->anyFailingRequired($parameters)) {
+        if (! $this->anyFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -921,7 +921,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'max');
 
-        if ($value instanceof UploadedFile && !$value->isValid()) {
+        if ($value instanceof UploadedFile && ! $value->isValid()) {
             return false;
         }
 
@@ -981,7 +981,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNotIn($attribute, $value, $parameters)
     {
-        return !$this->validateIn($attribute, $value, $parameters);
+        return ! $this->validateIn($attribute, $value, $parameters);
     }
 
     /**
@@ -1020,7 +1020,7 @@ class Validator implements ValidatorContract
         // data store like Redis, etc. We will use it to determine uniqueness.
         $verifier = $this->getPresenceVerifier();
 
-        if (!is_null($connection)) {
+        if (! is_null($connection)) {
             $verifier->setConnection($connection);
         }
 
@@ -1220,7 +1220,7 @@ class Validator implements ValidatorContract
      */
     protected function validateMimes($attribute, $value, $parameters)
     {
-        if (!$this->isAValidFileInstance($value)) {
+        if (! $this->isAValidFileInstance($value)) {
             return false;
         }
 
@@ -1237,7 +1237,7 @@ class Validator implements ValidatorContract
      */
     protected function validateMimetypes($attribute, $value, $parameters)
     {
-        if (!$this->isAValidFileInstance($value)) {
+        if (! $this->isAValidFileInstance($value)) {
             return false;
         }
 
@@ -1252,7 +1252,7 @@ class Validator implements ValidatorContract
      */
     protected function isAValidFileInstance($value)
     {
-        if ($value instanceof UploadedFile && !$value->isValid()) {
+        if ($value instanceof UploadedFile && ! $value->isValid()) {
             return false;
         }
 
@@ -1381,7 +1381,7 @@ class Validator implements ValidatorContract
             return $this->validateBeforeWithFormat($format, $value, $parameters);
         }
 
-        if (!($date = strtotime($parameters[0]))) {
+        if (! ($date = strtotime($parameters[0]))) {
             return strtotime($value) < strtotime($this->getValue($parameters[0]));
         }
 
@@ -1419,7 +1419,7 @@ class Validator implements ValidatorContract
             return $this->validateAfterWithFormat($format, $value, $parameters);
         }
 
-        if (!($date = strtotime($parameters[0]))) {
+        if (! ($date = strtotime($parameters[0]))) {
             return strtotime($value) > strtotime($this->getValue($parameters[0]));
         }
 
@@ -1527,7 +1527,7 @@ class Validator implements ValidatorContract
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
         // custom message, otherwise we'll keep searching for a valid message.
-        if (!is_null($inlineMessage)) {
+        if (! is_null($inlineMessage)) {
             return $inlineMessage;
         }
 
@@ -1983,7 +1983,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        if (!(strtotime($parameters[0]))) {
+        if (! (strtotime($parameters[0]))) {
             return str_replace(':date', $this->getAttribute($parameters[0]), $message);
         }
 
@@ -2013,7 +2013,7 @@ class Validator implements ValidatorContract
      */
     protected function hasRule($attribute, $rules)
     {
-        return !is_null($this->getRule($attribute, $rules));
+        return ! is_null($this->getRule($attribute, $rules));
     }
 
     /**
@@ -2025,7 +2025,7 @@ class Validator implements ValidatorContract
      */
     protected function getRule($attribute, $rules)
     {
-        if (!array_key_exists($attribute, $this->rules)) {
+        if (! array_key_exists($attribute, $this->rules)) {
             return;
         }
 
@@ -2313,7 +2313,7 @@ class Validator implements ValidatorContract
      */
     public function getPresenceVerifier()
     {
-        if (!isset($this->presenceVerifier)) {
+        if (! isset($this->presenceVerifier)) {
             throw new RuntimeException('Presence verifier has not been set.');
         }
 
@@ -2457,7 +2457,7 @@ class Validator implements ValidatorContract
      */
     public function messages()
     {
-        if (!$this->messages) {
+        if (! $this->messages) {
             $this->passes();
         }
 
