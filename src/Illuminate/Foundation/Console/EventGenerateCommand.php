@@ -33,7 +33,7 @@ class EventGenerateCommand extends Command
         );
 
         foreach ($provider->listens() as $event => $listeners) {
-            if (!Str::contains($event, '\\')) {
+            if (! Str::contains($event, '\\')) {
                 continue;
             }
 

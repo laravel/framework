@@ -34,7 +34,7 @@ class CallbackEvent extends Event
         $this->callback = $callback;
         $this->parameters = $parameters;
 
-        if (!is_string($this->callback) && !is_callable($this->callback)) {
+        if (! is_string($this->callback) && ! is_callable($this->callback)) {
             throw new InvalidArgumentException(
                 'Invalid scheduled callback event. Must be string or callable.'
             );
@@ -85,7 +85,7 @@ class CallbackEvent extends Event
      */
     public function withoutOverlapping()
     {
-        if (!isset($this->description)) {
+        if (! isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );

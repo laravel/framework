@@ -351,7 +351,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 'bar',
                 'baz',
                 'foo',
-            ]
+            ],
         ];
 
         $this->assertEquals($assumedArray, array_sort_recursive($array));

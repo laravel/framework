@@ -53,7 +53,7 @@ class Parser
         $options = [];
 
         foreach ($tokens as $token) {
-            if (!Str::startsWith($token, '--')) {
+            if (! Str::startsWith($token, '--')) {
                 $arguments[] = static::parseArgument($token);
             } else {
                 $options[] = static::parseOption(ltrim($token, '-'));

@@ -58,7 +58,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
 
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
-         $command = new MigrateMakeCommand(
+        $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
             m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'

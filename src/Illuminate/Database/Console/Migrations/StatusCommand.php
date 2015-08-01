@@ -47,7 +47,7 @@ class StatusCommand extends BaseCommand
      */
     public function fire()
     {
-        if (!$this->migrator->repositoryExists()) {
+        if (! $this->migrator->repositoryExists()) {
             return $this->error('No migrations found.');
         }
 

@@ -187,7 +187,7 @@ class Container implements ArrayAccess, ContainerContract
         // If the factory is not a Closure, it means it is just a class name which is
         // is bound into this container to the abstract type and we will just wrap
         // it up inside a Closure to make things more convenient when extending.
-        if (!$concrete instanceof Closure) {
+        if (! $concrete instanceof Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }
 
@@ -239,7 +239,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function bindIf($abstract, $concrete = null, $shared = false)
     {
-        if (!$this->bound($abstract)) {
+        if (! $this->bound($abstract)) {
             $this->bind($abstract, $concrete, $shared);
         }
     }
@@ -356,7 +356,7 @@ class Container implements ArrayAccess, ContainerContract
         $tags = is_array($tags) ? $tags : array_slice(func_get_args(), 1);
 
         foreach ($tags as $tag) {
-            if (!isset($this->tags[$tag])) {
+            if (! isset($this->tags[$tag])) {
                 $this->tags[$tag] = [];
             }
 
@@ -510,7 +510,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function isCallableWithAtSign($callback)
     {
-        if (!is_string($callback)) {
+        if (! is_string($callback)) {
             return false;
         }
 
@@ -657,14 +657,14 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcrete($abstract)
     {
-        if (!is_null($concrete = $this->getContextualConcrete($abstract))) {
+        if (! is_null($concrete = $this->getContextualConcrete($abstract))) {
             return $concrete;
         }
 
         // If we don't have a registered resolver or concrete for the type, we'll just
         // assume each type is a concrete name and will attempt to resolve it as is
         // since the container should be able to resolve concretes automatically.
-        if (!isset($this->bindings[$abstract])) {
+        if (! isset($this->bindings[$abstract])) {
             if ($this->missingLeadingSlash($abstract) &&
                 isset($this->bindings['\\'.$abstract])) {
                 $abstract = '\\'.$abstract;
@@ -738,7 +738,7 @@ class Container implements ArrayAccess, ContainerContract
         // If the type is not instantiable, the developer is attempting to resolve
         // an abstract type such as an Interface of Abstract Class and there is
         // no binding registered for the abstractions so we need to bail out.
-        if (!$reflector->isInstantiable()) {
+        if (! $reflector->isInstantiable()) {
             $message = "Target [$concrete] is not instantiable.";
 
             throw new BindingResolutionContractException($message);
@@ -951,7 +951,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $expected = $function->getParameters()[0];
 
-        if (!$expected->getClass()) {
+        if (! $expected->getClass()) {
             return;
         }
 
@@ -1169,7 +1169,7 @@ class Container implements ArrayAccess, ContainerContract
         // If the value is not a Closure, we will make it one. This simply gives
         // more "drop-in" replacement functionality for the Pimple which this
         // container's simplest functions are base modeled and built after.
-        if (!$value instanceof Closure) {
+        if (! $value instanceof Closure) {
             $value = function () use ($value) {
                 return $value;
             };

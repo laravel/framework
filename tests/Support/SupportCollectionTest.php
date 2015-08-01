@@ -694,7 +694,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $c->search(2));
         $this->assertEquals('foo', $c->search('bar'));
         $this->assertEquals(4, $c->search(function ($value) { return $value > 4; }));
-        $this->assertEquals('foo', $c->search(function ($value) { return !is_numeric($value); }));
+        $this->assertEquals('foo', $c->search(function ($value) { return ! is_numeric($value); }));
     }
 
     public function testSearchReturnsFalseWhenItemIsNotFound()
@@ -804,7 +804,7 @@ class TestAccessorEloquentTestStub
         $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return !is_null($this->$accessor());
+            return ! is_null($this->$accessor());
         }
 
         return isset($this->$attribute);

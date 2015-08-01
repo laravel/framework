@@ -258,7 +258,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function buildQueueCallable($callback)
     {
-        if (!$callback instanceof Closure) {
+        if (! $callback instanceof Closure) {
             return $callback;
         }
 
@@ -378,7 +378,7 @@ class Mailer implements MailerContract, MailQueueContract
             $this->events->fire('mailer.sending', [$message]);
         }
 
-        if (!$this->pretending) {
+        if (! $this->pretending) {
             return $this->swift->send($message, $this->failedRecipients);
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
@@ -432,7 +432,7 @@ class Mailer implements MailerContract, MailQueueContract
         // If a global from address has been specified we will set it on every message
         // instances so the developer does not have to repeat themselves every time
         // they create a new message. We will just go ahead and push the address.
-        if (!empty($this->from['address'])) {
+        if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 

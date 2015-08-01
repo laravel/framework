@@ -77,7 +77,7 @@ class RedirectResponse extends BaseRedirectResponse
                 $value = array_filter($value, $callback);
             }
 
-            return !$value instanceof UploadedFile;
+            return ! $value instanceof UploadedFile;
         }));
 
         return $this;

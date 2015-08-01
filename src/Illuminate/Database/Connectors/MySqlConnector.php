@@ -33,7 +33,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         $charset = $config['charset'];
 
         $names = "set names '$charset'".
-            (!is_null($collation) ? " collate '$collation'" : '');
+            (! is_null($collation) ? " collate '$collation'" : '');
 
         $connection->prepare($names)->execute();
 
@@ -81,7 +81,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function configHasSocket(array $config)
     {
-        return isset($config['unix_socket']) && !empty($config['unix_socket']);
+        return isset($config['unix_socket']) && ! empty($config['unix_socket']);
     }
 
     /**
