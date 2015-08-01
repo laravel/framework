@@ -260,10 +260,10 @@ class Builder
     /**
      * Paginate the given query.
      *
-     * @param  int $perPage
-     * @param  array $columns
-     * @param  string $pageName
-     * @param  null $page
+     * @param  int  $perPage
+     * @param  array  $columns
+     * @param  string  $pageName
+     * @param  int  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
