@@ -2,12 +2,11 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Transport;
 use Swift_Mime_Message;
 use Swift_Mime_MimeEntity;
 use Psr\Log\LoggerInterface;
 
-class LogTransport extends Transport implements Swift_Transport
+class LogTransport extends Transport
 {
     /**
      * The Logger instance.
@@ -25,30 +24,6 @@ class LogTransport extends Transport implements Swift_Transport
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isStarted()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function start()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stop()
-    {
-        return true;
     }
 
     /**
