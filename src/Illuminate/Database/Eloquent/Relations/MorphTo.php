@@ -46,13 +46,14 @@ class MorphTo extends BelongsTo
     /**
      * Create a new morph to relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Model $parent
-     * @param  string $foreignKey
-     * @param  string $otherKey
-     * @param  string $type
-     * @param  string $relation
-     * @param  array $morphMap
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $otherKey
+     * @param  string  $type
+     * @param  string  $relation
+     * @param  array   $morphMap
+     * @return void
      */
     public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation, array $morphMap = [])
     {

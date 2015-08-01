@@ -801,13 +801,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Alias for morphTo with the morph map as first argument
+     * Alias for morphTo with the morph map as first argument.
      *
      * @param  array $morphMap
      * @param  string $name
      * @param  string $type
      * @param  string $id
-     * @return MorphTo
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function morphToMap(array $morphMap = [], $name = null, $type = null, $id = null)
     {
