@@ -2,8 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
