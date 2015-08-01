@@ -187,6 +187,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $exists = false;
 
     /**
+     * Indicates if the model was inserted during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyCreated = false;
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -728,6 +735,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = new static;
 
         return $instance->newQuery()->with($relations);
+    }
+
+    /**
+     * Append attributes to query when building a query.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        if (is_string($attributes)) {
+            $attributes = func_get_args();
+        }
+
+        $this->appends = array_unique(
+            array_merge($this->appends, $attributes)
+        );
+
+        return $this;
     }
 
     /**
@@ -1579,6 +1605,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the created event is fired, just in case the developer tries to update it
         // during the event. This will allow them to do so and run an update here.
         $this->exists = true;
+
+        $this->wasRecentlyCreated = true;
 
         $this->fireModelEvent('created', false);
 
