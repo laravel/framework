@@ -75,7 +75,7 @@ class Command extends SymfonyCommand
 
         $this->setDescription($this->description);
 
-        if (!isset($this->signature)) {
+        if (! isset($this->signature)) {
             $this->specifyParameters();
         }
     }

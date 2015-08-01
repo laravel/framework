@@ -235,7 +235,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     {
         $queue = call_user_func($this->queueResolver);
 
-        if (!$queue instanceof Queue) {
+        if (! $queue instanceof Queue) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
 

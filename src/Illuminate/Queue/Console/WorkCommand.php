@@ -51,7 +51,7 @@ class WorkCommand extends Command
      */
     public function fire()
     {
-        if ($this->downForMaintenance() && !$this->option('daemon')) {
+        if ($this->downForMaintenance() && ! $this->option('daemon')) {
             return $this->worker->sleep($this->option('sleep'));
         }
 
@@ -73,7 +73,7 @@ class WorkCommand extends Command
         // If a job was fired by the worker, we'll write the output out to the console
         // so that the developer can watch live while the queue runs in the console
         // window, which will also of get logged if stdout is logged out to disk.
-        if (!is_null($response['job'])) {
+        if (! is_null($response['job'])) {
             $this->writeOutput($response['job'], $response['failed']);
         }
     }

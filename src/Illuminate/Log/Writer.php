@@ -271,7 +271,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function listen(Closure $callback)
     {
-        if (!isset($this->dispatcher)) {
+        if (! isset($this->dispatcher)) {
             throw new RuntimeException('Events dispatcher has not been set.');
         }
 

@@ -202,7 +202,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (!$this->app->hasBeenBootstrapped()) {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
 

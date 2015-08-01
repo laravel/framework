@@ -160,7 +160,7 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        if (!is_null($this->expire)) {
+        if (! is_null($this->expire)) {
             $this->releaseJobsThatHaveBeenReservedTooLong($queue);
         }
 

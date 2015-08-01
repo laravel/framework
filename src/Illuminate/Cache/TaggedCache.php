@@ -44,7 +44,7 @@ class TaggedCache implements Store
      */
     public function has($key)
     {
-        return !is_null($this->get($key));
+        return ! is_null($this->get($key));
     }
 
     /**
@@ -58,7 +58,7 @@ class TaggedCache implements Store
     {
         $value = $this->store->get($this->taggedItemKey($key));
 
-        return !is_null($value) ? $value : value($default);
+        return ! is_null($value) ? $value : value($default);
     }
 
     /**
@@ -73,7 +73,7 @@ class TaggedCache implements Store
     {
         $minutes = $this->getMinutes($minutes);
 
-        if (!is_null($minutes)) {
+        if (! is_null($minutes)) {
             $this->store->put($this->taggedItemKey($key), $value, $minutes);
         }
     }
@@ -167,7 +167,7 @@ class TaggedCache implements Store
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes in storage.
-        if (!is_null($value = $this->get($key))) {
+        if (! is_null($value = $this->get($key))) {
             return $value;
         }
 
@@ -200,7 +200,7 @@ class TaggedCache implements Store
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes. It's easy.
-        if (!is_null($value = $this->get($key))) {
+        if (! is_null($value = $this->get($key))) {
             return $value;
         }
 

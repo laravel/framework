@@ -36,7 +36,7 @@ class HandleExceptions
 
         register_shutdown_function([$this, 'handleShutdown']);
 
-        if (!$app->environment('testing')) {
+        if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
         }
     }
@@ -72,7 +72,7 @@ class HandleExceptions
      */
     public function handleException($e)
     {
-        if (!$e instanceof Exception) {
+        if (! $e instanceof Exception) {
             $e = new FatalThrowableError($e);
         }
 
@@ -114,7 +114,7 @@ class HandleExceptions
      */
     public function handleShutdown()
     {
-        if (!is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
+        if (! is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
             $this->handleException($this->fatalExceptionFromError($error, 0));
         }
     }
