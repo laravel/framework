@@ -8,7 +8,6 @@ use Swift_Message;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SuperClosure\Serializer;
-use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
