@@ -130,7 +130,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
         if ($constructor = $reflection->getConstructor()) {
             $injected = array_map(function ($parameter) use ($command, $source, $extras) {
                 return $this->getParameterValueForCommand($command, $source, $parameter, $extras);
-
             }, $constructor->getParameters());
         }
 
