@@ -81,6 +81,15 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->forget('foo');
     }
 
+    public function testGetAndSetPrefix()
+    {
+        $redis = $this->getRedis();
+        $this->assertEquals('prefix:', $redis->getPrefix());
+
+        $redis->setPrefix('foo');
+        $this->assertEquals('foo:', $redis->getPrefix());
+    }
+
     protected function getRedis()
     {
         return new Illuminate\Cache\RedisStore(m::mock('Illuminate\Redis\Database'), 'prefix');
