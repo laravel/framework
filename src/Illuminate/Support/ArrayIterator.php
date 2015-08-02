@@ -46,7 +46,7 @@ class ArrayIterator extends BaseArrayIterator
 
     public function isLast($returnIfTrue = true, $returnIfFalse = false)
     {
-        if($this->count() == $this->i + 1) {
+        if($this->count() === $this->i + 1) {
 
             return $returnIfTrue;
         }
