@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Countable;
 use ArrayAccess;
-use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
