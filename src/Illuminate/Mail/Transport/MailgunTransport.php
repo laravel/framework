@@ -2,12 +2,11 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Transport;
 use Swift_Mime_Message;
 use GuzzleHttp\Post\PostFile;
 use GuzzleHttp\ClientInterface;
 
-class MailgunTransport extends Transport implements Swift_Transport
+class MailgunTransport extends Transport
 {
     /**
      * Guzzle client instance.
@@ -50,30 +49,6 @@ class MailgunTransport extends Transport implements Swift_Transport
         $this->client = $client;
         $this->key = $key;
         $this->setDomain($domain);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isStarted()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function start()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stop()
-    {
-        return true;
     }
 
     /**
