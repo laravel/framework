@@ -1268,11 +1268,7 @@ class Validator implements ValidatorContract
      */
     protected function validateAlpha($attribute, $value)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
-            return false;
-        }
-
-        return preg_match('/^[\pL\pM]+$/u', $value);
+        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
     }
 
     /**
