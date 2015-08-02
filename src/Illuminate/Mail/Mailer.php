@@ -376,10 +376,10 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @throws \InvalidArgumentException
      */
-    protected function callMessageBuilder($callback, $message)
+    protected function callMessageBuilder($callback, &$message)
     {
         if ($callback instanceof Closure) {
-            return call_user_func($callback, $message);
+            return call_user_func_array($callback, [&$message]);
         }
 
         if (is_string($callback)) {
