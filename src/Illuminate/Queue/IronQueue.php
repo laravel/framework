@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use IronMQ\IronMQ;
-use Illuminate\Http\Response;
 use Illuminate\Queue\Jobs\IronJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
