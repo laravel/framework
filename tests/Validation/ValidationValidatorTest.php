@@ -1082,6 +1082,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['x' => '❤'], ['x' => 'Alpha']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '123'], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaNum()
@@ -1148,6 +1157,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => 'a,b'], ['x' => 'Regex:/^a,b$/i']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '12'], ['x' => 'Regex:/^12$/i']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'Regex:/^123$/i']);
         $this->assertTrue($v->passes());
     }
 
