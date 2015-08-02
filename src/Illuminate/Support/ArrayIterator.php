@@ -8,22 +8,22 @@ class ArrayIterator extends BaseArrayIterator
 {
     private $i = 0;
 
-    public function rewind() {
-
+    public function rewind()
+    {
         $this->i = 0;
 
         return parent::rewind();
     }
 
-    public function next() {
-
+    public function next()
+    {
         $this->i++;
 
         return parent::next();
     }
 
-    public function prev() {
-
+    public function prev()
+    {
         $this->i--;
 
         return parent::prev();
