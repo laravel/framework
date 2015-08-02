@@ -40,7 +40,7 @@ class RedisStore extends TaggableStore implements Store
     {
         $this->redis = $redis;
         $this->connection = $connection;
-        $this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
+        $this->setPrefix($prefix);
     }
 
     /**
@@ -172,6 +172,17 @@ class RedisStore extends TaggableStore implements Store
     public function getRedis()
     {
         return $this->redis;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 
     /**
