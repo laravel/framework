@@ -2,11 +2,10 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Transport;
 use Aws\Ses\SesClient;
 use Swift_Mime_Message;
 
-class SesTransport extends Transport implements Swift_Transport
+class SesTransport extends Transport
 {
     /**
      * The Amazon SES instance.
@@ -24,30 +23,6 @@ class SesTransport extends Transport implements Swift_Transport
     public function __construct(SesClient $ses)
     {
         $this->ses = $ses;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isStarted()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function start()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stop()
-    {
-        return true;
     }
 
     /**
