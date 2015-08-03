@@ -33,6 +33,8 @@ class SqlServerProcessor extends Processor
     public function processColumnListing($results)
     {
         $mapping = function ($r) {
+            $r = (object) $r;
+
             return $r->name;
         };
 
