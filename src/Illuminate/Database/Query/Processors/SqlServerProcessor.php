@@ -34,6 +34,7 @@ class SqlServerProcessor extends Processor
     {
         $mapping = function ($r) {
             $r = (object) $r;
+
             return $r->name;
         };
 
