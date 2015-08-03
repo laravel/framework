@@ -122,7 +122,9 @@ class Handler implements ExceptionHandlerContract
     protected function createSymfonyResponse(Exception $e)
     {
         $e = FlattenException::create($e);
+
         $handler = new SymfonyExceptionHandler(config('app.debug'));
+
         $decorated = $this->decorate($handler->getContent($e), $handler->getStylesheet($e));
 
         return SymfonyResponse::create($decorated, $e->getStatusCode(), $e->getHeaders());
