@@ -29,8 +29,8 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function __construct($memcached, $prefix = '')
     {
+        $this->setPrefix($prefix);
         $this->memcached = $memcached;
-        $this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
     }
 
     /**
@@ -149,5 +149,16 @@ class MemcachedStore extends TaggableStore implements Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 }
