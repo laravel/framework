@@ -39,6 +39,13 @@ abstract class Relation
     protected static $constraints = true;
 
     /**
+     * An array to map class names to their morph names in database.
+     *
+     * @var array
+     */
+    protected static $morphMap = [];
+
+    /**
      * Create a new relation instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -270,6 +277,21 @@ abstract class Relation
     public function wrap($value)
     {
         return $this->parent->newQueryWithoutScopes()->getQuery()->getGrammar()->wrap($value);
+    }
+
+    /**
+     * Set the morph map for polymorphic relations.
+     * 
+     * @param  array|null $map
+     * @return array
+     */
+    public static function morphMap($map = null)
+    {
+        if (! $map) {
+            return static::$morphMap;
+        }
+
+        static::$morphMap = $map;
     }
 
     /**
