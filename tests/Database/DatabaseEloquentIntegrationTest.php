@@ -76,6 +76,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('friends');
         $this->schema()->drop('posts');
         $this->schema()->drop('photos');
+
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([], false);
     }
 
     /**
@@ -338,6 +340,52 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('EloquentTestPost', $photos[2]->imageable);
         $this->assertEquals('taylorotwell@gmail.com', $photos[1]->imageable->email);
         $this->assertEquals('First Post', $photos[3]->imageable->name);
+    }
+
+    public function testMorphMapIsUsedForCreatingAndFetchingThroughRelation()
+    {
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'user' => 'EloquentTestUser',
+            'post' => 'EloquentTestPost',
+        ], false);
+
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->photos()->create(['name' => 'Avatar 1']);
+        $user->photos()->create(['name' => 'Avatar 2']);
+        $post = $user->posts()->create(['name' => 'First Post']);
+        $post->photos()->create(['name' => 'Hero 1']);
+        $post->photos()->create(['name' => 'Hero 2']);
+
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $user->photos);
+        $this->assertInstanceOf('EloquentTestPhoto', $user->photos[0]);
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
+        $this->assertInstanceOf('EloquentTestPhoto', $post->photos[0]);
+        $this->assertEquals(2, $user->photos->count());
+        $this->assertEquals(2, $post->photos->count());
+        $this->assertEquals('Avatar 1', $user->photos[0]->name);
+        $this->assertEquals('Avatar 2', $user->photos[1]->name);
+        $this->assertEquals('Hero 1', $post->photos[0]->name);
+        $this->assertEquals('Hero 2', $post->photos[1]->name);
+
+        $this->assertEquals('user', $user->photos[0]->imageable_type);
+        $this->assertEquals('user', $user->photos[1]->imageable_type);
+        $this->assertEquals('post', $post->photos[0]->imageable_type);
+        $this->assertEquals('post', $post->photos[1]->imageable_type);
+    }
+
+    public function testMorphMapIsUsedWhenFetchingParent()
+    {
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'user' => 'EloquentTestUser',
+            'post' => 'EloquentTestPost',
+        ], false);
+
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->photos()->create(['name' => 'Avatar 1']);
+
+        $photo = EloquentTestPhoto::first();
+        $this->assertEquals('user', $photo->imageable_type);
+        $this->assertInstanceOf('EloquentTestUser', $photo->imageable);
     }
 
     public function testEmptyMorphToRelationship()
