@@ -16,6 +16,13 @@ class MorphTo extends BelongsTo
     protected $morphType;
 
     /**
+     * A map between the morphable type saved to database and the actual class.
+     *
+     * @var array
+     */
+    protected $morphMap = [];
+
+    /**
      * The models whose relations are being eager loaded.
      *
      * @var \Illuminate\Database\Eloquent\Collection
@@ -45,11 +52,14 @@ class MorphTo extends BelongsTo
      * @param  string  $otherKey
      * @param  string  $type
      * @param  string  $relation
+     * @param  array   $morphMap
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation, array $morphMap = [])
     {
         $this->morphType = $type;
+
+        $this->morphMap = $morphMap;
 
         parent::__construct($query, $parent, $foreignKey, $otherKey, $relation);
     }
@@ -213,7 +223,9 @@ class MorphTo extends BelongsTo
      */
     public function createModelByType($type)
     {
-        return new $type;
+        $class = $this->parent->getActualClassName($type, $this->morphMap);
+
+        return new $class;
     }
 
     /**
