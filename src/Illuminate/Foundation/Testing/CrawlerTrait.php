@@ -143,6 +143,21 @@ trait CrawlerTrait
     }
 
     /**
+     * Send the given request through the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return $this
+     */
+    public function handle(Request $request)
+    {
+        $this->currentUri = $request->fullUrl();
+
+        $this->response = $this->app->prepareResponse($this->app->handle($request));
+
+        return $this;
+    }
+
+    /**
      * Make a request to the application and create a Crawler instance.
      *
      * @param  string  $method
