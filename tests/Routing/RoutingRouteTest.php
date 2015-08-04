@@ -66,6 +66,11 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($router->is('bar'));
 
         $router = $this->getRouter();
+        $router->patch('foo/bar', ['as' => 'foo', function () { return 'bar'; }]);
+        $this->assertEquals('bar', $router->dispatch(Request::create('foo/bar', 'PATCH'))->getContent());
+        $this->assertEquals('foo', $router->currentRouteName());
+
+        $router = $this->getRouter();
         $router->get('foo/bar', function () { return 'hello'; });
         $this->assertEquals('', $router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
 
