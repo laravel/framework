@@ -65,20 +65,6 @@ class Router implements RegistrarContract
     protected $middleware = [];
 
     /**
-     * The registered pattern based filters.
-     *
-     * @var array
-     */
-    protected $patternFilters = [];
-
-    /**
-     * The registered regular expression based filters.
-     *
-     * @var array
-     */
-    protected $regexFilters = [];
-
-    /**
      * The registered route value binders.
      *
      * @var array
@@ -622,23 +608,9 @@ class Router implements RegistrarContract
     {
         $this->currentRequest = $request;
 
-        // If no response was returned from the before filter, we will call the proper
-        // route instance to get the response. If no route is found a response will
-        // still get returned based on why no routes were found for this request.
-        $response = $this->callFilter('before', $request);
+        $response = $this->dispatchToRoute($request);
 
-        if (is_null($response)) {
-            $response = $this->dispatchToRoute($request);
-        }
-
-        // Once this route has run and the response has been prepared, we will run the
-        // after filter to do any last work on the response or for this application
-        // before we will return the response back to the consuming code for use.
-        $response = $this->prepareResponse($request, $response);
-
-        $this->callFilter('after', $request, $response);
-
-        return $response;
+        return $this->prepareResponse($request, $response);
     }
 
     /**
@@ -660,25 +632,9 @@ class Router implements RegistrarContract
 
         $this->events->fire('router.matched', [$route, $request]);
 
-        // Once we have successfully matched the incoming request to a given route we
-        // can call the before filters on that route. This works similar to global
-        // filters in that if a response is returned we will not call the route.
-        $response = $this->callRouteBefore($route, $request);
+        $response = $this->runRouteWithinStack($route, $request);
 
-        if (is_null($response)) {
-            $response = $this->runRouteWithinStack(
-                $route, $request
-            );
-        }
-
-        $response = $this->prepareResponse($request, $response);
-
-        // After we have a prepared response from the route or filter we will call to
-        // the "after" filters to do any last minute processing on this request or
-        // response object before the response is returned back to the consumer.
-        $this->callRouteAfter($route, $request, $response);
-
-        return $response;
+        return $this->prepareResponse($request, $response);
     }
 
     /**
@@ -792,44 +748,6 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Register a new "before" filter with the router.
-     *
-     * @param  string|callable  $callback
-     * @return void
-     *
-     * @deprecated since version 5.1.
-     */
-    public function before($callback)
-    {
-        $this->addGlobalFilter('before', $callback);
-    }
-
-    /**
-     * Register a new "after" filter with the router.
-     *
-     * @param  string|callable  $callback
-     * @return void
-     *
-     * @deprecated since version 5.1.
-     */
-    public function after($callback)
-    {
-        $this->addGlobalFilter('after', $callback);
-    }
-
-    /**
-     * Register a new global filter with the router.
-     *
-     * @param  string  $filter
-     * @param  string|callable   $callback
-     * @return void
-     */
-    protected function addGlobalFilter($filter, $callback)
-    {
-        $this->events->listen('router.'.$filter, $this->parseFilter($callback));
-    }
-
-    /**
      * Get all of the defined middleware short-hand names.
      *
      * @return array
@@ -851,73 +769,6 @@ class Router implements RegistrarContract
         $this->middleware[$name] = $class;
 
         return $this;
-    }
-
-    /**
-     * Register a new filter with the router.
-     *
-     * @param  string  $name
-     * @param  string|callable  $callback
-     * @return void
-     *
-     * @deprecated since version 5.1.
-     */
-    public function filter($name, $callback)
-    {
-        $this->events->listen('router.filter: '.$name, $this->parseFilter($callback));
-    }
-
-    /**
-     * Parse the registered filter.
-     *
-     * @param  callable|string  $callback
-     * @return mixed
-     */
-    protected function parseFilter($callback)
-    {
-        if (is_string($callback) && ! Str::contains($callback, '@')) {
-            return $callback.'@filter';
-        }
-
-        return $callback;
-    }
-
-    /**
-     * Register a pattern-based filter with the router.
-     *
-     * @param  string  $pattern
-     * @param  string  $name
-     * @param  array|null  $methods
-     * @return void
-     *
-     * @deprecated since version 5.1.
-     */
-    public function when($pattern, $name, $methods = null)
-    {
-        if (! is_null($methods)) {
-            $methods = array_map('strtoupper', (array) $methods);
-        }
-
-        $this->patternFilters[$pattern][] = compact('name', 'methods');
-    }
-
-    /**
-     * Register a regular expression based filter with the router.
-     *
-     * @param  string     $pattern
-     * @param  string     $name
-     * @param  array|null $methods
-     * @return void
-     *
-     * @deprecated since version 5.1.
-     */
-    public function whenRegex($pattern, $name, $methods = null)
-    {
-        if (! is_null($methods)) {
-            $methods = array_map('strtoupper', (array) $methods);
-        }
-
-        $this->regexFilters[$pattern][] = compact('name', 'methods');
     }
 
     /**
@@ -1018,196 +869,6 @@ class Router implements RegistrarContract
         foreach ($patterns as $key => $pattern) {
             $this->pattern($key, $pattern);
         }
-    }
-
-    /**
-     * Call the given filter with the request and response.
-     *
-     * @param  string  $filter
-     * @param  \Illuminate\Http\Request   $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return mixed
-     */
-    protected function callFilter($filter, $request, $response = null)
-    {
-        return $this->events->until('router.'.$filter, [$request, $response]);
-    }
-
-    /**
-     * Call the given route's before filters.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    public function callRouteBefore($route, $request)
-    {
-        $response = $this->callPatternFilters($route, $request);
-
-        return $response ?: $this->callAttachedBefores($route, $request);
-    }
-
-    /**
-     * Call the pattern based filters for the request.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    protected function callPatternFilters($route, $request)
-    {
-        foreach ($this->findPatternFilters($request) as $filter => $parameters) {
-            $response = $this->callRouteFilter($filter, $parameters, $route, $request);
-
-            if (! is_null($response)) {
-                return $response;
-            }
-        }
-    }
-
-    /**
-     * Find the patterned filters matching a request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     *
-     * @deprecated since version 5.1.
-     */
-    public function findPatternFilters($request)
-    {
-        $results = [];
-
-        list($path, $method) = [$request->path(), $request->getMethod()];
-
-        foreach ($this->patternFilters as $pattern => $filters) {
-            // To find the patterned middlewares for a request, we just need to check these
-            // registered patterns against the path info for the current request to this
-            // applications, and when it matches we will merge into these middlewares.
-            if (Str::is($pattern, $path)) {
-                $merge = $this->patternsByMethod($method, $filters);
-
-                $results = array_merge($results, $merge);
-            }
-        }
-
-        foreach ($this->regexFilters as $pattern => $filters) {
-            // To find the patterned middlewares for a request, we just need to check these
-            // registered patterns against the path info for the current request to this
-            // applications, and when it matches we will merge into these middlewares.
-            if (preg_match($pattern, $path)) {
-                $merge = $this->patternsByMethod($method, $filters);
-
-                $results = array_merge($results, $merge);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Filter pattern filters that don't apply to the request verb.
-     *
-     * @param  string  $method
-     * @param  array   $filters
-     * @return array
-     */
-    protected function patternsByMethod($method, $filters)
-    {
-        $results = [];
-
-        foreach ($filters as $filter) {
-            // The idea here is to check and see if the pattern filter applies to this HTTP
-            // request based on the request methods. Pattern filters might be limited by
-            // the request verb to make it simply to assign to the given verb at once.
-            if ($this->filterSupportsMethod($filter, $method)) {
-                $parsed = Route::parseFilters($filter['name']);
-
-                $results = array_merge($results, $parsed);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Determine if the given pattern filters applies to a given method.
-     *
-     * @param  array  $filter
-     * @param  array  $method
-     * @return bool
-     */
-    protected function filterSupportsMethod($filter, $method)
-    {
-        $methods = $filter['methods'];
-
-        return is_null($methods) || in_array($method, $methods);
-    }
-
-    /**
-     * Call the given route's before (non-pattern) filters.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    protected function callAttachedBefores($route, $request)
-    {
-        foreach ($route->beforeFilters() as $filter => $parameters) {
-            $response = $this->callRouteFilter($filter, $parameters, $route, $request);
-
-            if (! is_null($response)) {
-                return $response;
-            }
-        }
-    }
-
-    /**
-     * Call the given route's after filters.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return mixed
-     *
-     * @deprecated since version 5.1.
-     */
-    public function callRouteAfter($route, $request, $response)
-    {
-        foreach ($route->afterFilters() as $filter => $parameters) {
-            $this->callRouteFilter($filter, $parameters, $route, $request, $response);
-        }
-    }
-
-    /**
-     * Call the given route filter.
-     *
-     * @param  string  $filter
-     * @param  array  $parameters
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response|null $response
-     * @return mixed
-     *
-     * @deprecated since version 5.1.
-     */
-    public function callRouteFilter($filter, $parameters, $route, $request, $response = null)
-    {
-        $data = array_merge([$route, $request, $response], $parameters);
-
-        return $this->events->until('router.filter: '.$filter, $this->cleanFilterParameters($data));
-    }
-
-    /**
-     * Clean the parameters being passed to a filter callback.
-     *
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function cleanFilterParameters(array $parameters)
-    {
-        return array_filter($parameters, function ($p) {
-            return ! is_null($p) && $p !== '';
-        });
     }
 
     /**

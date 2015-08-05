@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Exception;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
@@ -660,6 +661,52 @@ trait CrawlerTrait
         $this->inputs[$element] = $text;
 
         return $this;
+    }
+
+    /**
+     * Assert that an input field contains the given value.
+     *
+     * @param  string $selector
+     * @param  mixed  $expected
+     * @return $this
+     */
+    public function seeInField($selector, $expected)
+    {
+        $this->assertSame(
+            $this->getInputOrTextareaValue($selector),
+            $expected,
+            "The input [{$selector}] has not the value [{$expected}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get an input or textarea value.
+     *
+     * @param  $selector
+     * @return string
+     * @throws Exception
+     */
+    protected function getInputOrTextareaValue($selector)
+    {
+        $field = $this->filterByNameOrId($selector);
+
+        if ($field->count() == 0) {
+            throw new Exception("There are no elements with the name or ID [$selector]");
+        }
+
+        $element = $field->nodeName();
+
+        if ($element == 'input') {
+            return $field->attr('value');
+        }
+
+        if ($element == 'textarea') {
+            return $field->text();
+        }
+
+        throw new Exception("[$selector] is neither an input nor a textarea");
     }
 
     /**

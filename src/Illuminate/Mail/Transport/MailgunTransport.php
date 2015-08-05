@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Mime_Message;
-use GuzzleHttp\Post\PostFile;
 use GuzzleHttp\ClientInterface;
 
 class MailgunTransport extends Transport
@@ -46,8 +45,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->setDomain($domain);
     }
 
@@ -60,17 +59,10 @@ class MailgunTransport extends Transport
 
         $options = ['auth' => ['api', $this->key]];
 
-        if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $options['multipart'] = [
-                ['name' => 'to', 'contents' => $this->getTo($message)],
-                ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
-            ];
-        } else {
-            $options['body'] = [
-                'to' => $this->getTo($message),
-                'message' => new PostFile('message', (string) $message),
-            ];
-        }
+        $options['multipart'] = [
+            ['name' => 'to', 'contents' => $this->getTo($message)],
+            ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
+        ];
 
         return $this->client->post($this->url, $options);
     }
