@@ -12,4 +12,3 @@ trait DatabaseSeeds
         $this->artisan('db:seed');
     }
 }
-
