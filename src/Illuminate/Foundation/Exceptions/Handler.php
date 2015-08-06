@@ -93,7 +93,7 @@ class Handler implements ExceptionHandlerContract
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
         } else {
-            return $this->toIlluminateResponse($this->createSymfonyResponse($e), $e);
+            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
     }
 
@@ -114,12 +114,41 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Create a symfony response for the given exception.
+     * Render an exception to the console.
+     *
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  \Exception  $e
+     * @return void
+     */
+    public function renderForConsole($output, Exception $e)
+    {
+        (new ConsoleApplication)->renderException($e, $output);
+    }
+
+    /**
+     * Render the given HttpException.
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderHttpException(HttpException $e)
+    {
+        $status = $e->getStatusCode();
+
+        if (view()->exists("errors.{$status}")) {
+            return response()->view("errors.{$status}", ['exception' => $e], $status);
+        } else {
+            return $this->convertExceptionToResponse($e);
+        }
+    }
+
+    /**
+     * Create a Symfony response for the given exception.
      *
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function createSymfonyResponse(Exception $e)
+    protected function convertExceptionToResponse(Exception $e)
     {
         $e = FlattenException::create($e);
 
@@ -158,35 +187,6 @@ class Handler implements ExceptionHandlerContract
     </body>
 </html>
 EOF;
-    }
-
-    /**
-     * Render an exception to the console.
-     *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Exception  $e
-     * @return void
-     */
-    public function renderForConsole($output, Exception $e)
-    {
-        (new ConsoleApplication)->renderException($e, $output);
-    }
-
-    /**
-     * Render the given HttpException.
-     *
-     * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderHttpException(HttpException $e)
-    {
-        $status = $e->getStatusCode();
-
-        if (view()->exists("errors.{$status}")) {
-            return response()->view("errors.{$status}", ['exception' => $e], $status);
-        } else {
-            return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
-        }
     }
 
     /**
