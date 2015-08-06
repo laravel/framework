@@ -7,7 +7,7 @@ trait DatabaseSeeds
     /**
      * @before
      */
-    public function runDatabaseSeeds()
+    public function runDatabaseSeeder()
     {
         $this->artisan('db:seed');
     }
