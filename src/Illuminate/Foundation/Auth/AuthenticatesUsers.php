@@ -88,7 +88,7 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Do something when user authenticate failed
+     * Do something when user authenticate failed.
      *
      * @param \Illuminate\Http\Request  $request
      */
@@ -100,7 +100,7 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Get the login validate rules
+     * Get the login validate rules.
      *
      * @return array
      */
@@ -112,7 +112,7 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Get custom login validate messages
+     * Get custom login validate messages.
      *
      * @return array
      */
