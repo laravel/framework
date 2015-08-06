@@ -88,10 +88,6 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
-        if ($e instanceof ModelNotFoundException) {
-            $e = new HttpException(404, $e->getMessage(), $e);
-        }
-
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
         } else {
