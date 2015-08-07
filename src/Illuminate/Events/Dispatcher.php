@@ -254,7 +254,7 @@ class Dispatcher implements DispatcherContract
     {
         if ($this->queueResolver) {
             $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
-            $queue = method_exists($event, 'queueOn') ? $event->queueOn() : null;
+            $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
 
             $this->resolveQueue()->connection($connection)->pushOn($queue, 'Illuminate\Broadcasting\BroadcastEvent', [
                 'event' => serialize($event),
