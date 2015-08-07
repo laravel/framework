@@ -34,31 +34,9 @@ class SesTransport extends Transport
 
         return $this->ses->sendRawEmail([
             'Source' => key($message->getSender() ?: $message->getFrom()),
-            'Destinations' => $this->getTo($message),
             'RawMessage' => [
                 'Data' => (string) $message,
             ],
         ]);
-    }
-
-    /**
-     * Get the "to" payload field for the API request.
-     *
-     * @param  \Swift_Mime_Message  $message
-     * @return array
-     */
-    protected function getTo(Swift_Mime_Message $message)
-    {
-        $destinations = [];
-
-        $contacts = array_merge(
-            (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
-        );
-
-        foreach ($contacts as $address => $display) {
-            $destinations[] = $address;
-        }
-
-        return $destinations;
     }
 }
