@@ -90,7 +90,7 @@ class Handler implements ExceptionHandlerContract
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
         } else {
-            return $this->toIlluminateResponse((new SymfonyDisplayer(config('app.debug')))->createResponse($e), $e);
+            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
     }
 
@@ -135,8 +135,19 @@ class Handler implements ExceptionHandlerContract
         if (view()->exists("errors.{$status}")) {
             return response()->view("errors.{$status}", ['exception' => $e], $status);
         } else {
-            return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
+            return $this->convertExceptionToResponse($e);
         }
+    }
+
+    /**
+     * Convert the given exception into a Response instance.
+     *
+     * @param  \Exception  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertExceptionToResponse(Exception $e)
+    {
+        return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
     }
 
     /**
