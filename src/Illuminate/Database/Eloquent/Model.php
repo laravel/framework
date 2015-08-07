@@ -25,6 +25,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -1922,6 +1923,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function newPivot(Model $parent, array $attributes, $table, $exists)
     {
         return new Pivot($parent, $attributes, $table, $exists);
+    }
+
+    /**
+     * Create a new MorphPivot model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  array   $attributes
+     * @param  string  $table
+     * @param  bool    $exists
+     * @return \Illuminate\Database\Eloquent\Relations\MorphPivot
+     */
+    public function newMorphPivot(Model $parent, array $attributes, $table, $exists)
+    {
+        return new MorphPivot($parent, $attributes, $table, $exists);
     }
 
     /**
