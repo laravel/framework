@@ -113,7 +113,9 @@ class PostgresGrammar extends Grammar
     {
         $columns = $this->columnize($command->columns);
 
-        return "create index {$command->index} on ".$this->wrapTable($blueprint)." ({$columns})";
+        $o = $this->formatIndexOptions($command->options);
+
+        return "create index{$o->concurrently} {$command->index} on ".$this->wrapTable($blueprint)."{$o->using} ({$columns}){$o->with}{$o->tablespace}{$o->where}";
     }
 
     /**
@@ -539,5 +541,81 @@ class PostgresGrammar extends Grammar
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key';
         }
+    }
+
+    /**
+     * Get the SQL for each index option.
+     *
+     * @param  string|array  $options
+     * @return stdObject
+     */
+    protected function formatIndexOptions($options)
+    {
+        $options = (array) $options;
+
+        $this->modifyConcurrentlyOption($options);
+        $this->modifyTablespaceOption($options);
+        $this->modifyUsingOption($options);
+        $this->modifyWhereOption($options);
+        $this->modifyWithOption($options);
+
+        return (object) $options;
+    }
+
+    /**
+     * Receives an array by reference and change its 'concurrently' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyConcurrentlyOption(array &$options)
+    {
+        $options['concurrently'] = (isset($options['concurrently'])
+                                       && $options['concurrently'] === true) ? ' concurrently' : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'tablespace' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyTablespaceOption(array &$options)
+    {
+        $options['tablespace'] = isset($options['tablespace']) ? ' tablespace '.$options['tablespace'] : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'using' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyUsingOption(array &$options)
+    {
+        $options['using'] = isset($options['using']) ? ' using '.$options['using'] : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'where' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyWhereOption(array &$options)
+    {
+        $options['where'] = isset($options['where']) ? ' where '.$options['where'] : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'with' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyWithOption(array &$options)
+    {
+        $option = isset($options['with']) ? (array) $options['with'] : '';
+        $options['with'] = ! empty($option) ? ' with ('.implode(', ', $option).')' : '';
     }
 }

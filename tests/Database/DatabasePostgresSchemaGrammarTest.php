@@ -174,6 +174,26 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithOptions()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['name' => 'baz', 'using' => 'gin', 'concurrently' => true, 'with' => ['fastupdate = off', 'fillfactor = 50'], 'tablespace' => 'not_default', 'where' => 'foo = bar']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create index concurrently baz on "users" using gin ("foo", "bar") with (fastupdate = off, fillfactor = 50) tablespace not_default where foo = bar', $statements[0]);
+    }
+
+    public function testAddingIndexWithOptionsAndDefaultName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['using' => 'hash']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create index users_foo_bar_index on "users" using hash ("foo", "bar")', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

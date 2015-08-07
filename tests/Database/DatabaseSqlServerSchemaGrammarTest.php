@@ -164,6 +164,26 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithOptions()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['name' => 'baz', 'clustered' => true, 'filestream_on' => 'whatever', 'include' => ['something','else'], 'with' => ['two','options'], 'on' => 'top', 'where' => 'foo = bar']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create clustered index baz on "users" ("foo", "bar") include (something, else) where foo = bar with (two, options) on top filestream_on whatever', $statements[0]);
+    }
+
+    public function testAddingIndexWithOptionsAndDefaultName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['clustered' => false]);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create nonclustered index users_foo_bar_index on "users" ("foo", "bar")', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

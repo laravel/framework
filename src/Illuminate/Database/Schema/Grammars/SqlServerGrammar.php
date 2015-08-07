@@ -119,7 +119,9 @@ class SqlServerGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "create index {$command->index} on {$table} ({$columns})";
+        $o = $this->formatIndexOptions($command->options);
+
+        return "create{$o->clustered} index {$command->index} on {$table} ({$columns}){$o->include}{$o->where}{$o->with}{$o->on}{$o->filestream_on}";
     }
 
     /**
@@ -547,5 +549,94 @@ class SqlServerGrammar extends Grammar
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' identity primary key';
         }
+    }
+
+    /**
+     * Get the SQL for each index option.
+     *
+     * @param  string|array  $options
+     * @return stdObject
+     */
+    protected function formatIndexOptions($options)
+    {
+        $options = (array) $options;
+
+        $this->modifyFilestreamOption($options);
+        $this->modifyClusteredOption($options);
+        $this->modifyIncludeOption($options);
+        $this->modifyWhereOption($options);
+        $this->modifyWithOption($options);
+        $this->modifyOnOption($options);
+
+        return (object) $options;
+    }
+
+    /**
+     * Receives an array by reference and change its 'filestream_on' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyFilestreamOption(array &$options)
+    {
+        $options['filestream_on'] = isset($options['filestream_on']) ? ' filestream_on '.$options['filestream_on'] : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'clustered' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyClusteredOption(array &$options)
+    {
+        $option = (isset($options['clustered']) && $options['clustered'] === true) ? ' clustered' : ' nonclustered';
+        $options['clustered'] = isset($options['clustered']) ? $option : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'include' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyIncludeOption(array &$options)
+    {
+        $option = isset($options['include']) ? (array) $options['include'] : '';
+        $options['include'] = ! empty($option) ? ' include ('.implode(', ', $option).')' : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'where' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyWhereOption(array &$options)
+    {
+        $options['where'] = isset($options['where']) ? ' where '.$options['where'] : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'with' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyWithOption(array &$options)
+    {
+        $option = isset($options['with']) ? (array) $options['with'] : '';
+        $options['with'] = ! empty($option) ? ' with ('.implode(', ', $option).')' : '';
+    }
+
+    /**
+     * Receives an array by reference and change its 'on' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyOnOption(array &$options)
+    {
+        $options['on'] = isset($options['on']) ? ' on '.$options['on'] : '';
     }
 }

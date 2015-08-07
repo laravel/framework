@@ -232,6 +232,26 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add index baz(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingIndexWithOptions()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['name' => 'baz', 'using' => 'hash', 'invalid' => 'option']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add index baz(`foo`, `bar`) using hash', $statements[0]);
+    }
+
+    public function testAddingIndexWithOptionsAndDefaultName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], ['using' => 'hash']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add index users_foo_bar_index(`foo`, `bar`) using hash', $statements[0]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');
