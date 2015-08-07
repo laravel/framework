@@ -141,7 +141,7 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
     public function testAddingIndexWithOptionsAndDefaultName()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->index('foo',['where' => 'bar = baz']);
+        $blueprint->index('foo', ['where' => 'bar = baz']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
