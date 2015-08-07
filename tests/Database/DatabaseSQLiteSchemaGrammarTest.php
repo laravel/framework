@@ -128,6 +128,26 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingIndexWithOptions()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index('foo', ['name'=>'baz','where'=>'bar = baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create index baz on "users" ("foo") where bar = baz', $statements[0]);
+    }
+
+    public function testAddingIndexWithOptionsAndDefaultName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index('foo',['where'=>'bar = baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('create index users_foo_index on "users" ("foo") where bar = baz', $statements[0]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

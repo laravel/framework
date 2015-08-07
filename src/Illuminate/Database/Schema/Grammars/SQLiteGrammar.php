@@ -84,11 +84,11 @@ class SQLiteGrammar extends Grammar
         foreach ($foreigns as $foreign) {
             $sql .= $this->getForeignKey($foreign);
 
-            if (! is_null($foreign->onDelete)) {
+            if (!is_null($foreign->onDelete)) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
-            if (! is_null($foreign->onUpdate)) {
+            if (!is_null($foreign->onUpdate)) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
         }
@@ -126,7 +126,7 @@ class SQLiteGrammar extends Grammar
     {
         $primary = $this->getCommandByName($blueprint, 'primary');
 
-        if (! is_null($primary)) {
+        if (!is_null($primary)) {
             $columns = $this->columnize($primary->columns);
 
             return ", primary key ({$columns})";
@@ -184,7 +184,9 @@ class SQLiteGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "create index {$command->index} on {$table} ({$columns})";
+        $o = $this->formatIndexOptions($command->options);
+
+        return "create index {$command->index} on {$table} ({$columns}){$o->where}";
     }
 
     /**
@@ -583,7 +585,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (!is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -600,5 +602,31 @@ class SQLiteGrammar extends Grammar
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
         }
+    }
+
+    /**
+     * Get the SQL for each index option.
+     *
+     * @param  string|array  $options
+     * @return stdObject
+     */
+    protected function formatIndexOptions($options)
+    {
+        $options = (array) $options;
+
+        $this->modifyWhereOption( $options );
+
+        return (object) $options;
+    }
+
+    /**
+     * Receives an array by reference and change its 'where' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyWhereOption(array &$options)
+    {
+        $options['where'] = isset($options['where']) ? ' where '.$options['where'] : '';
     }
 }

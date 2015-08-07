@@ -161,7 +161,9 @@ class MySqlGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} add {$type} {$command->index}($columns)";
+        $o = $this->formatIndexOptions($command->options);
+
+        return "alter table {$table} add {$type} {$command->index}($columns){$o->using}";
     }
 
     /**
@@ -696,5 +698,31 @@ class MySqlGrammar extends Grammar
         }
 
         return '`'.str_replace('`', '``', $value).'`';
+    }
+
+    /**
+     * Get the SQL for each index option.
+     *
+     * @param  string|array  $options
+     * @return stdObject
+     */
+    protected function formatIndexOptions($options)
+    {
+        $options = (array) $options;
+
+        $this->modifyUsingOption( $options );
+
+        return (object) $options;
+    }
+
+    /**
+     * Receives an array by reference and change its 'using' field to SQL.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function modifyUsingOption(array &$options)
+    {
+        $options['using'] = isset($options['using']) ? ' using '.$options['using'] : '';
     }
 }

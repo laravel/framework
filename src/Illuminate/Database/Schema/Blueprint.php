@@ -348,12 +348,12 @@ class Blueprint
      * Specify an index for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
+     * @param  string  $options
      * @return \Illuminate\Support\Fluent
      */
-    public function index($columns, $name = null)
+    public function index($columns, $options = null)
     {
-        return $this->indexCommand('index', $columns, $name);
+        return $this->indexCommand('index', $columns, $options);
     }
 
     /**
@@ -867,12 +867,18 @@ class Blueprint
      *
      * @param  string        $type
      * @param  string|array  $columns
-     * @param  string        $index
+     * @param  string|array  $options
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index)
+    protected function indexCommand($type, $columns, $options = null)
     {
         $columns = (array) $columns;
+
+        $index = is_string($options) ? $options : null;
+
+        if (is_array($options) && isset($options['name'])) {
+             $index = $options['name'];
+        }
 
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
@@ -881,7 +887,7 @@ class Blueprint
             $index = $this->createIndexName($type, $columns);
         }
 
-        return $this->addCommand($type, compact('index', 'columns'));
+        return $this->addCommand($type, compact('index', 'columns', 'options'));
     }
 
     /**
