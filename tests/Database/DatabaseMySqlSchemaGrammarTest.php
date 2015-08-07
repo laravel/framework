@@ -235,7 +235,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
     public function testAddingIndexWithOptions()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->index(['foo', 'bar'], ['name'=>'baz','using'=>'hash','invalid'=>'option']);
+        $blueprint->index(['foo', 'bar'], ['name' => 'baz', 'using' => 'hash', 'invalid' => 'option']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
@@ -245,7 +245,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
     public function testAddingIndexWithOptionsAndDefaultName()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->index(['foo', 'bar'], ['using'=>'hash']);
+        $blueprint->index(['foo', 'bar'], ['using' => 'hash']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));

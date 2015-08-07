@@ -710,7 +710,7 @@ class MySqlGrammar extends Grammar
     {
         $options = (array) $options;
 
-        $this->modifyUsingOption( $options );
+        $this->modifyUsingOption($options);
 
         return (object) $options;
     }

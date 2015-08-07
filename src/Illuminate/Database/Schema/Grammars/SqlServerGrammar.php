@@ -561,12 +561,12 @@ class SqlServerGrammar extends Grammar
     {
         $options = (array) $options;
 
-        $this->modifyFilestreamOption( $options );
-        $this->modifyClusteredOption( $options );
-        $this->modifyIncludeOption( $options );
-        $this->modifyWhereOption( $options );
-        $this->modifyWithOption( $options );
-        $this->modifyOnOption( $options );
+        $this->modifyFilestreamOption($options);
+        $this->modifyClusteredOption($options);
+        $this->modifyIncludeOption($options);
+        $this->modifyWhereOption($options);
+        $this->modifyWithOption($options);
+        $this->modifyOnOption($options);
 
         return (object) $options;
     }
@@ -602,8 +602,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyIncludeOption(array &$options)
     {
-        $option = isset($options['include']) ? (array)$options['include'] : '';
-        $options['include'] = !empty($option) ? ' include ('.implode(', ',$option).')' : '';
+        $option = isset($options['include']) ? (array) $options['include'] : '';
+        $options['include'] = ! empty($option) ? ' include ('.implode(', ', $option).')' : '';
     }
 
     /**
@@ -625,8 +625,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyWithOption(array &$options)
     {
-        $option = isset($options['with']) ? (array)$options['with'] : '';
-        $options['with'] = !empty($option) ? ' with ('.implode(', ',$option).')' : '';
+        $option = isset($options['with']) ? (array) $options['with'] : '';
+        $options['with'] = ! empty($option) ? ' with ('.implode(', ', $option).')' : '';
     }
 
     /**
@@ -639,5 +639,4 @@ class SqlServerGrammar extends Grammar
     {
         $options['on'] = isset($options['on']) ? ' on '.$options['on'] : '';
     }
-
 }

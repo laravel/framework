@@ -877,7 +877,7 @@ class Blueprint
         $index = is_string($options) ? $options : null;
 
         if (is_array($options) && isset($options['name'])) {
-             $index = $options['name'];
+            $index = $options['name'];
         }
 
         // If no name was specified for this index, we will create one using a basic

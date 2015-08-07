@@ -553,11 +553,11 @@ class PostgresGrammar extends Grammar
     {
         $options = (array) $options;
 
-        $this->modifyConcurrentlyOption( $options );
-        $this->modifyTablespaceOption( $options );
-        $this->modifyUsingOption( $options );
-        $this->modifyWhereOption( $options );
-        $this->modifyWithOption( $options );
+        $this->modifyConcurrentlyOption($options);
+        $this->modifyTablespaceOption($options);
+        $this->modifyUsingOption($options);
+        $this->modifyWhereOption($options);
+        $this->modifyWithOption($options);
 
         return (object) $options;
     }
@@ -615,7 +615,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyWithOption(array &$options)
     {
-        $option = isset($options['with']) ? (array)$options['with'] : '';
-        $options['with'] = !empty($option) ? ' with ('.implode(', ',$option).')' : '';
+        $option = isset($options['with']) ? (array) $options['with'] : '';
+        $options['with'] = ! empty($option) ? ' with ('.implode(', ', $option).')' : '';
     }
 }
