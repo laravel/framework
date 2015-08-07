@@ -1929,9 +1929,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Create a new MorphPivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
+     * @param  array  $attributes
      * @param  string  $table
-     * @param  bool    $exists
+     * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\MorphPivot
      */
     public function newMorphPivot(Model $parent, array $attributes, $table, $exists)
