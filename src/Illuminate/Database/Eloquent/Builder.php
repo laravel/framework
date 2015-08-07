@@ -632,12 +632,12 @@ class Builder
      * Add a relationship count condition to the query with where clauses.
      *
      * @param  string    $relation
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @param  string    $operator
      * @param  int       $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'and', $callback);
     }
