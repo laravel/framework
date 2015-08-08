@@ -272,6 +272,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $match[0] = call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
             }
 
+            if (isset($this->customDirectives[$method = 'custom'.ucfirst($match[1])])) {
+                $match = call_user_func($this->customDirectives[$method], $match);
+            }
+
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
         };
 
