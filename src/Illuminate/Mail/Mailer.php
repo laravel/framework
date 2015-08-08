@@ -231,7 +231,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function queueOn($queue, $view, array $data, $callback)
     {
-        return $this->onQueue($view, $data, $callback, $queue);
+        return $this->onQueue($queue, $view, $data, $callback);
     }
 
     /**
