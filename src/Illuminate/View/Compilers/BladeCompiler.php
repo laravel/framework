@@ -148,7 +148,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // template inheritance via the extends keyword that should be appended.
         if (count($this->footer) > 0) {
             $result = ltrim($result, PHP_EOL)
-                    .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
+                .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
         }
 
         return $result;
@@ -266,10 +266,37 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         $callback = function ($match) {
+            $output = '';
+
+            if (isset($this->customDirectives[$method = 'before'.ucfirst($match[1])])) {
+                // If custom directive returns string we simply append it to output. Otherwise
+                // we need to re-set match because of possible changes in directive and
+                // change output to new one. Same thing happens in after directive.
+                if (is_array($result = call_user_func($this->customDirectives[$method], $match))) {
+                    $match = $result;
+                    $output = $result[0];
+                } else {
+                    $output .= $result;
+                }
+            }
+
             if (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
-                $match[0] = $this->$method(Arr::get($match, 3));
+                $output .= $this->$method(Arr::get($match, 3));
             } elseif (isset($this->customDirectives[$match[1]])) {
-                $match[0] = call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
+                $output .= call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
+            }
+
+            if (isset($this->customDirectives[$method = 'after'.ucfirst($match[1])])) {
+                if (is_array($result = call_user_func($this->customDirectives[$method], $match))) {
+                    $match = $result;
+                    $output = $result[0];
+                } else {
+                    $output .= $result;
+                }
+            }
+
+            if ($output) {
+                $match[0] = $output;
             }
 
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
