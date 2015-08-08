@@ -30,13 +30,6 @@ class MailgunTransport extends Transport
     protected $domain;
 
     /**
-     * THe Mailgun API end-point.
-     *
-     * @var string
-     */
-    protected $url;
-
-    /**
      * Create a new Mailgun transport instance.
      *
      * @param  \GuzzleHttp\ClientInterface  $client
@@ -46,8 +39,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
+        $this->setKey($key);
         $this->client = $client;
-        $this->key = $key;
         $this->setDomain($domain);
     }
 
@@ -72,7 +65,7 @@ class MailgunTransport extends Transport
             ];
         }
 
-        return $this->client->post($this->url, $options);
+        return $this->client->post($this->getEndPoint(), $options);
     }
 
     /**
@@ -97,6 +90,16 @@ class MailgunTransport extends Transport
     }
 
     /**
+     * Get the the Mailgun API end-point.
+     *
+     * @return string
+     */
+    protected function getEndPoint()
+    {
+        return 'https://api.mailgun.net/v3/'.$this->getDomain().'/messages.mime';
+    }
+
+    /**
      * Get the API key being used by the transport.
      *
      * @return string
@@ -114,7 +117,7 @@ class MailgunTransport extends Transport
      */
     public function setKey($key)
     {
-        return $this->key = $key;
+        $this->key = $key;
     }
 
     /**
@@ -135,8 +138,6 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
-        $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
-
-        return $this->domain = $domain;
+        $this->domain = $domain;
     }
 }
