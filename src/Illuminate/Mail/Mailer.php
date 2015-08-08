@@ -198,9 +198,25 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Closure|string  $callback
      * @return mixed
      */
-    public function queueOn($queue, $view, array $data, $callback)
+    public function onQueue($queue, $view, array $data, $callback)
     {
         return $this->queue($view, $data, $callback, $queue);
+    }
+
+    /**
+     * Queue a new e-mail message for sending on the given queue.
+     *
+     * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
+     *
+     * @param  string  $queue
+     * @param  string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string  $callback
+     * @return mixed
+     */
+    public function queueOn($queue, $view, array $data, $callback)
+    {
+        return $this->onQueue($queue, $view, $data, $callback);
     }
 
     /**
