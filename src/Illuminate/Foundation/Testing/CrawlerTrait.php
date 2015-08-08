@@ -554,6 +554,17 @@ trait CrawlerTrait
     }
 
     /**
+     * Uncheck a checkbox on the page.
+     *
+     * @param  string  $element
+     * @return $this
+     */
+    protected function uncheck($element)
+    {
+        return $this->storeInput($element, false);
+    }
+
+    /**
      * Select an option from a drop-down.
      *
      * @param  string  $option
