@@ -552,7 +552,7 @@ trait CrawlerTrait
     {
         return $this->storeInput($element, true);
     }
-    
+
     /**
      * Uncheck a checkbox on the page.
      *
