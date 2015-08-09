@@ -281,14 +281,19 @@ abstract class Relation
 
     /**
      * Set the morph map for polymorphic relations.
-     * 
+     *
      * @param  array|null $map
+     * @param  bool $merge
      * @return array
      */
-    public static function morphMap($map = null)
+    public static function morphMap($map = null, $merge = true)
     {
         if (is_array($map)) {
-            static::$morphMap = $map;
+            if ($merge) {
+                array_merge(static::$morphMap, $map);
+            } else {
+                static::$morphMap = $map
+            }
         }
 
         return static::$morphMap;

@@ -77,7 +77,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('posts');
         $this->schema()->drop('photos');
 
-        Illuminate\Database\Eloquent\Relations\Relation::morphMap([]);
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([], false);
     }
 
     /**
