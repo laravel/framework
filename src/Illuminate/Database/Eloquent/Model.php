@@ -2076,8 +2076,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $morphMap = Relation::morphMap();
         $class = get_class($this);
 
-        if (! empty($morphMap) && in_array($class, $morphMap)) {
-            return array_flip($morphMap)[$class];
+        if (! empty($morphMap)) {
+            return array_search($class, $morphMap, true);
         }
 
         return $this->morphClass ?: $class;
