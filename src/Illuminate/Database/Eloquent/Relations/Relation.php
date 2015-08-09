@@ -287,11 +287,11 @@ abstract class Relation
      */
     public static function morphMap($map = null)
     {
-        if (is_null($map)) {
-            return static::$morphMap;
+        if (is_array($map)) {
+            static::$morphMap = $map;
         }
 
-        static::$morphMap = $map;
+        return static::$morphMap;
     }
 
     /**
