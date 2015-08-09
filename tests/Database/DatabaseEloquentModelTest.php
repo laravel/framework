@@ -606,6 +606,23 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Taylor'], $array);
     }
 
+    public function testGetArrayableRelationsFunctionExcludeHiddenRelationships()
+    {
+        $model = new EloquentModelStub;
+
+        $class = new ReflectionClass($model);
+        $method = $class->getMethod('getArrayableRelations');
+        $method->setAccessible(true);
+
+        $model->setRelation('foo', ['bar']);
+        $model->setRelation('bam', ['boom']);
+        $model->setHidden(['foo']);
+
+        $array = $method->invokeArgs($model, []);
+
+        $this->assertSame(['bam' => ['boom']], $array);
+    }
+
     public function testToArraySnakeAttributes()
     {
         $model = new EloquentModelStub;
