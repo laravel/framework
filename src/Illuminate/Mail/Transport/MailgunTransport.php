@@ -46,8 +46,8 @@ class MailgunTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $domain)
     {
+        $this->setKey($key);
         $this->client = $client;
-        $this->key = $key;
         $this->setDomain($domain);
     }
 
@@ -114,7 +114,7 @@ class MailgunTransport extends Transport
      */
     public function setKey($key)
     {
-        return $this->key = $key;
+        $this->key = $key;
     }
 
     /**
@@ -137,6 +137,6 @@ class MailgunTransport extends Transport
     {
         $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
 
-        return $this->domain = $domain;
+        $this->domain = $domain;
     }
 }

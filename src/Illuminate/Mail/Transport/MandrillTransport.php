@@ -30,8 +30,8 @@ class MandrillTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key)
     {
+        $this->setKey($key);
         $this->client = $client;
-        $this->key = $key;
     }
 
     /**
@@ -102,6 +102,6 @@ class MandrillTransport extends Transport
      */
     public function setKey($key)
     {
-        return $this->key = $key;
+        $this->key = $key;
     }
 }
