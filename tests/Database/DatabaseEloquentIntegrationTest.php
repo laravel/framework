@@ -3,6 +3,7 @@
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -347,7 +348,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         Illuminate\Database\Eloquent\Relations\Relation::morphMap([
             'user' => 'EloquentTestUser',
             'post' => 'EloquentTestPost',
-        ], false);
+        ]);
 
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $user->photos()->create(['name' => 'Avatar 1']);
@@ -375,10 +376,10 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testMorphMapIsUsedWhenFetchingParent()
     {
-        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+        Relation::morphMap([
             'user' => 'EloquentTestUser',
             'post' => 'EloquentTestPost',
-        ], false);
+        ]);
 
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $user->photos()->create(['name' => 'Avatar 1']);
@@ -386,6 +387,36 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $photo = EloquentTestPhoto::first();
         $this->assertEquals('user', $photo->imageable_type);
         $this->assertInstanceOf('EloquentTestUser', $photo->imageable);
+    }
+
+    public function testMorphMapIsMergedByDefault()
+    {
+        $map1 = [
+            'user' => 'EloquentTestUser',
+        ];
+        $map2 = [
+            'post' => 'EloquentTestPost',
+        ];
+
+        Relation::morphMap($map1);
+        Relation::morphMap($map2);
+
+        $this->assertEquals(array_merge($map1, $map2), Relation::morphMap());
+    }
+
+    public function testMorphMapOverwritesCurrentMap()
+    {
+        $map1 = [
+            'user' => 'EloquentTestUser',
+        ];
+        $map2 = [
+            'post' => 'EloquentTestPost',
+        ];
+
+        Relation::morphMap($map1, false);
+        $this->assertEquals($map1, Relation::morphMap());
+        Relation::morphMap($map2, false);
+        $this->assertEquals($map2, Relation::morphMap());
     }
 
     public function testEmptyMorphToRelationship()
