@@ -51,7 +51,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        Exception
-     * @expectedExceptionMessage [select] is neither an input nor a textarea
+     * @expectedExceptionMessage Given selector [select] is not an input or textarea
      */
     public function testSeeInFieldWrongElementException()
     {
