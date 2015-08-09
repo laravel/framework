@@ -77,7 +77,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('posts');
         $this->schema()->drop('photos');
 
-        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([]);
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([]);
     }
 
     /**
@@ -344,7 +344,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testMorphMapIsUsedForCreatingAndFetchingThroughRelation()
     {
-        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
             'user' => 'EloquentTestUser',
             'post' => 'EloquentTestPost',
         ]);
@@ -375,7 +375,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testMorphMapIsUsedWhenFetchingParent()
     {
-        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
             'user' => 'EloquentTestUser',
             'post' => 'EloquentTestPost',
         ]);
