@@ -292,7 +292,7 @@ abstract class Relation
             if ($merge) {
                 array_merge(static::$morphMap, $map);
             } else {
-                static::$morphMap = $map
+                static::$morphMap = $map;
             }
         }
 
