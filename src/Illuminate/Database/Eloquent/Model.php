@@ -2499,7 +2499,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $attributes = [];
 
         foreach ($this->getArrayableRelations() as $key => $value) {
-
             // If the values implements the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
