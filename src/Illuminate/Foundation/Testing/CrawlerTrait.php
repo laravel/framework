@@ -76,6 +76,31 @@ trait CrawlerTrait
     }
 
     /**
+     * Visit the given URI with a GET request with content type of application/json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function getJson($uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['CONTENT_LENGTH'] = mb_strlen($content, '8bit');
+
+        if (! isset($headers['Accept'])) {
+            $headers['Accept'] = 'application/json';
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('GET', $uri, [], [], [], $server, $content);
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a POST request.
      *
      * @param  string  $uri
@@ -88,6 +113,31 @@ trait CrawlerTrait
         $server = $this->transformHeadersToServerVars($headers);
 
         $this->call('POST', $uri, $data, [], [], $server);
+
+        return $this;
+    }
+
+    /**
+     * Visit the given URI with a POST request with content type of application/json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function postJson($uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['CONTENT_LENGTH'] = mb_strlen($content, '8bit');
+
+        if (! isset($headers['Accept'])) {
+            $headers['Accept'] = 'application/json';
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('POST', $uri, [], [], [], $server, $content);
 
         return $this;
     }
@@ -110,6 +160,31 @@ trait CrawlerTrait
     }
 
     /**
+     * Visit the given URI with a PUT request with content type of application/json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function putJson($uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['CONTENT_LENGTH'] = mb_strlen($content, '8bit');
+
+        if (! isset($headers['Accept'])) {
+            $headers['Accept'] = 'application/json';
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('PUT', $uri, [], [], [], $server, $content);
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a PATCH request.
      *
      * @param  string  $uri
@@ -127,6 +202,31 @@ trait CrawlerTrait
     }
 
     /**
+     * Visit the given URI with a PATCH request with content type of application/json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function patchJson($uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['CONTENT_LENGTH'] = mb_strlen($content, '8bit');
+
+        if (! isset($headers['Accept'])) {
+            $headers['Accept'] = 'application/json';
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('PATCH', $uri, [], [], [], $server, $content);
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a DELETE request.
      *
      * @param  string  $uri
@@ -139,6 +239,31 @@ trait CrawlerTrait
         $server = $this->transformHeadersToServerVars($headers);
 
         $this->call('DELETE', $uri, $data, [], [], $server);
+
+        return $this;
+    }
+
+    /**
+     * Visit the given URI with a DELETE request with content type of application/json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function deleteJson($uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+        $headers['CONTENT_TYPE'] = 'application/json';
+        $headers['CONTENT_LENGTH'] = mb_strlen($content, '8bit');
+
+        if (! isset($headers['Accept'])) {
+            $headers['Accept'] = 'application/json';
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call('DELETE', $uri, [], [], [], $server, $content);
 
         return $this;
     }
