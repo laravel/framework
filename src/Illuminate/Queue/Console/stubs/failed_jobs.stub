@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFailedJobsTable extends Migration
+class Create{{tableClassName}}Table extends Migration
 {
     /**
      * Run the migrations.
