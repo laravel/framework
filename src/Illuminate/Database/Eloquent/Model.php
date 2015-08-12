@@ -1130,7 +1130,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function delete()
     {
-        if (is_null($this->primaryKey)) {
+        if (is_null($this->getKeyName())) {
             throw new Exception('No primary key defined on model.');
         }
 
