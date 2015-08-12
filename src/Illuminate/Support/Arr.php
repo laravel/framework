@@ -422,7 +422,7 @@ class Arr
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = self::sortRecursive($value);
+                self::sortRecursive($value);
             }
         }
 
