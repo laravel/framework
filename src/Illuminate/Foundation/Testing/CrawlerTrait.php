@@ -301,8 +301,41 @@ trait CrawlerTrait
     public function seeInField($selector, $expected)
     {
         $this->assertSame(
-            $this->getInputOrTextAreaValue($selector), $expected,
-            "The input [{$selector}] does not contain the expected value [{$expected}]."
+            $expected, $this->getInputOrTextAreaValue($selector),
+            "The field [{$selector}] does not contain the expected value [{$expected}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the expected value is selected.
+     *
+     * @param  string  $selector
+     * @param  string  $expected
+     * @return $this
+     */
+    public function seeIsSelected($selector, $expected)
+    {
+        $this->assertSame(
+            $expected, $this->getSelectedValue($selector),
+            "The field [{$selector}] does not contain the selected value [{$expected}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given checkbox is selected.
+     *
+     * @param  string  $selector
+     * @return $this
+     */
+    public function seeIsChecked($selector)
+    {
+        $this->assertTrue(
+            $this->isChecked($selector),
+            "The checkbox [{$selector}] is not checked."
         );
 
         return $this;
@@ -321,7 +354,7 @@ trait CrawlerTrait
         $field = $this->filterByNameOrId($selector);
 
         if ($field->count() == 0) {
-            throw new Exception("There are no elements with the name or ID [$selector]");
+            throw new Exception("There are no elements with the name or ID [$selector].");
         }
 
         $element = $field->nodeName();
@@ -334,7 +367,101 @@ trait CrawlerTrait
             return $field->text();
         }
 
-        throw new Exception("Given selector [$selector] is not an input or textarea");
+        throw new Exception("Given selector [$selector] is not an input or textarea.");
+    }
+
+    /**
+     * Get the selected value of a select field or radio group.
+     *
+     * @param  string  $selector
+     * @return string|null
+     *
+     * @throws \Exception
+     */
+    protected function getSelectedValue($selector)
+    {
+        $field = $this->filterByNameOrId($selector);
+
+        if ($field->count() == 0) {
+            throw new Exception("There are no elements with the name or ID [$selector].");
+        }
+
+        $element = $field->nodeName();
+
+        if ($element == 'select') {
+            return $this->getSelectedValueFromSelect($field);
+        }
+
+        if ($element == 'input') {
+            return $this->getCheckedValueFromRadioGroup($field);
+        }
+
+        throw new Exception("Given selector [$selector] is not a select or radio group.");
+    }
+
+    /**
+     * Get the selected value from a select field.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler  $field
+     * @return string|null
+     *
+     * @throws \Exception
+     */
+    protected function getSelectedValueFromSelect(Crawler $field)
+    {
+        if ($field->nodeName() !== 'select') {
+            throw new Exception('Given element is not a select.');
+        }
+
+        foreach ($field->children() as $option) {
+            if ($option->hasAttribute('selected')) {
+                return $option->getAttribute('value');
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * Get the checked value from a radio group.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler  $radioGroup
+     * @return string|null
+     *
+     * @throws \Exception
+     */
+    protected function getCheckedValueFromRadioGroup(Crawler $radioGroup)
+    {
+        if ($radioGroup->nodeName() !== 'input' || $radioGroup->attr('type') !== 'radio') {
+            throw new Exception('Given element is not a radio button.');
+        }
+
+        foreach ($radioGroup as $radio) {
+            if ($radio->hasAttribute('checked')) {
+                return $radio->getAttribute('value');
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * Return true if the given checkbox is checked, false otherwise.
+     *
+     * @param  string  $selector
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    protected function isChecked($selector)
+    {
+        $checkbox = $this->filterByNameOrId($selector, "input[type='checkbox']");
+
+        if ($checkbox->count() == 0) {
+            throw new Exception("There are no checkbox elements with the name or ID [$selector].");
+        }
+
+        return $checkbox->attr('checked') !== null;
     }
 
     /**
