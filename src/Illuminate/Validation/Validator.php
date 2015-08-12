@@ -147,7 +147,8 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $implicitRules = [
-        'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted',
+        'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf',
+        'RequiredIfPassed', 'RequiredIfPassedAll', 'Accepted'
     ];
 
     /**
@@ -679,6 +680,48 @@ class Validator implements ValidatorContract
         $values = array_slice($parameters, 1);
 
         if (in_array($data, $values)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute exists when another attribute passed rules.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  mixed   $parameters
+     * @return bool
+     */
+    protected function validateRequiredIfPassed($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_passed');
+
+        $failedParameters = array_intersect_key(array_flip($parameters), $this->failedRules);
+
+        if (count($failedParameters) < count($parameters)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute exists when all other attributes passed rules.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  mixed   $parameters
+     * @return bool
+     */
+    protected function validateRequiredIfPassedAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_passed_all');
+
+        $failedParameters = array_intersect_key(array_flip($parameters), $this->failedRules);
+
+        if (count($failedParameters) === 0) {
             return $this->validateRequired($attribute, $value);
         }
 
