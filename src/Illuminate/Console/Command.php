@@ -10,8 +10,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Foundation\Application as LaravelApplication;
 
 class Command extends SymfonyCommand
@@ -384,7 +384,9 @@ class Command extends SymfonyCommand
     public function warn($string)
     {
         $style = new OutputFormatterStyle('yellow');
+
         $this->output->getFormatter()->setStyle('warning', $style);
+
         $this->output->writeln("<warning>$string</warning>");
     }
 
