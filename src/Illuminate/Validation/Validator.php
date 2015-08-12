@@ -1097,11 +1097,11 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Validate the existence of an attribute value in a database table.
+     * Validate the not existence of an attribute value in a database table.
      *
      * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  mixed  $value
+     * @param  array  $parameters
      * @return bool
      */
     protected function validateNotExists($attribute, $value, $parameters)
