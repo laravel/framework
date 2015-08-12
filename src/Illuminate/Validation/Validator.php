@@ -968,7 +968,7 @@ class Validator implements ValidatorContract
             return count(array_diff($value, $parameters)) == 0;
         }
 
-        return in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array((string) $value, $parameters);
     }
 
     /**
