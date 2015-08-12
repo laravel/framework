@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
@@ -58,10 +59,12 @@ class FailedTableCommand extends Command
     {
         $table = $this->laravel['config']['queue.failed.table'];
 
+        $tableClassName = Str::studly($table);
+
         $fullPath = $this->createBaseMigration($table);
 
         $stub = str_replace(
-            '{{table}}', $table, $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
+            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get(__DIR__.'/stubs/failed_jobs.stub')
         );
 
         $this->files->put($fullPath, $stub);
