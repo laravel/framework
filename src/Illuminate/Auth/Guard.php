@@ -457,7 +457,7 @@ class Guard implements GuardContract
      */
     protected function fireLoginEvent($user, $remember = false)
     {
-        if (isset($this->events)) {
+        if ($this->events) {
             $this->events->fire('auth.login', [$user, $remember]);
         }
     }
