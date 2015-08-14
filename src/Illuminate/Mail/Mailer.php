@@ -398,6 +398,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->swift->send($message, $this->failedRecipients);
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
+
+            return 1;
         }
     }
 

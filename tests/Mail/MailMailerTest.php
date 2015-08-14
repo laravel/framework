@@ -138,7 +138,7 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->setLogger($logger);
         $mailer->pretend();
 
-        $mailer->send('foo', ['data'], function ($m) {});
+        $this->assertEquals(1, $mailer->send('foo', ['data'], function ($m) {}));
     }
 
     public function testMailerCanResolveMailerClasses()
