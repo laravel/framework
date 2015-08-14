@@ -64,7 +64,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $tags = [];
 
     /**
-     * The stack of concretions being current built.
+     * The stack of concretions being currently built.
      *
      * @var array
      */
