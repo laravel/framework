@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use ArrayAccess;
 use Carbon\Carbon;
+use InvalidArgumentException;
 use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
@@ -2885,8 +2886,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
-        // Finally, we will fallback to letting Carbon try to parse the string
-        return Carbon::parse($value);
+        try {
+            // We will just assume this date is in the format used by default on
+            // the database connection and use that format to create the Carbon object
+            // that is returned back out to the developers after we convert it here.
+            return Carbon::createFromFormat($this->getDateFormat(), $value);
+        } catch (InvalidArgumentException $e) {
+            // Finally, we will fallback to letting Carbon try to parse the string
+            return Carbon::parse($value);
+        }
     }
 
     /**
