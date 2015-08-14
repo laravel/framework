@@ -998,7 +998,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'unique');
 
-        list($connection, $table) = $this->parseUniqueTable($parameters[0]);
+        list($connection, $table) = $this->parseTable($parameters[0]);
 
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
@@ -1034,12 +1034,12 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Parse the connection / table for the unique rule.
+     * Parse the connection / table for the unique / exists rules.
      *
      * @param  string  $table
      * @return array
      */
-    protected function parseUniqueTable($table)
+    protected function parseTable($table)
     {
         return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
@@ -1084,7 +1084,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'exists');
 
-        $table = $parameters[0];
+        list($connection, $table) = $this->parseTable($parameters[0]);
 
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
@@ -1093,21 +1093,26 @@ class Validator implements ValidatorContract
 
         $expected = (is_array($value)) ? count($value) : 1;
 
-        return $this->getExistCount($table, $column, $value, $parameters) >= $expected;
+        return $this->getExistCount($connection, $table, $column, $value, $parameters) >= $expected;
     }
 
     /**
      * Get the number of records that exist in storage.
      *
+     * @param  mixed   $connection
      * @param  string  $table
      * @param  string  $column
      * @param  mixed   $value
      * @param  array   $parameters
      * @return int
      */
-    protected function getExistCount($table, $column, $value, $parameters)
+    protected function getExistCount($connection, $table, $column, $value, $parameters)
     {
         $verifier = $this->getPresenceVerifier();
+
+        if (! is_null($connection)) {
+            $verifier->setConnection($connection);
+        }
 
         $extra = $this->getExtraExistConditions($parameters);
 
