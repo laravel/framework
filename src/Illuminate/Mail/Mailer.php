@@ -399,7 +399,7 @@ class Mailer implements MailerContract, MailQueueContract
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
 
-            return true;
+            return 1;
         }
     }
 
