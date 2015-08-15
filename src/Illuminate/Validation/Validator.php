@@ -829,6 +829,23 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the attribute is a valid JSON string.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateJson($attribute, $value)
+    {
+        $object = json_decode($value);
+        if($object === null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute has a given number of digits.
      *
      * @param  string  $attribute
