@@ -8,7 +8,6 @@ use InvalidArgumentException;
 
 class FactoryBuilder
 {
-
     /**
      * The container instance.
      *
