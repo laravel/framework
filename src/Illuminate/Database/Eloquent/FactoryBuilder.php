@@ -3,10 +3,19 @@
 namespace Illuminate\Database\Eloquent;
 
 use Faker\Generator as Faker;
+use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
 class FactoryBuilder
 {
+
+    /**
+     * The container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
     /**
      * The model definitions in the container.
      *
@@ -45,16 +54,17 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $definitions
-     * @param  \Faker\Generator  $faker
-     * @return void
+     * @param  string $class
+     * @param  string $name
+     * @param  \Illuminate\Contracts\Container\Container $container
+     * @param  array $definitions
+     * @param  \Faker\Generator $faker
      */
-    public function __construct($class, $name, array $definitions, Faker $faker)
+    public function __construct($class, $name, Container $container, array $definitions, Faker $faker)
     {
         $this->name = $name;
         $this->class = $class;
+        $this->container = $container;
         $this->faker = $faker;
         $this->definitions = $definitions;
     }
@@ -127,7 +137,7 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}].");
             }
 
-            $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker, $attributes);
+            $definition = $this->container->call($this->definitions[$this->class][$this->name], [$this->faker, $attributes]);
 
             return new $this->class(array_merge($definition, $attributes));
         });

@@ -4,10 +4,18 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Faker\Generator as Faker;
+use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Finder\Finder;
 
 class Factory implements ArrayAccess
 {
+    /**
+     * The container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
     /**
      * The Faker instance for the builder.
      *
@@ -18,11 +26,13 @@ class Factory implements ArrayAccess
     /**
      * Create a new factory instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container $container
      * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct(Faker $faker)
+    public function __construct(Container $container, Faker $faker)
     {
+        $this->container = $container;
         $this->faker = $faker;
     }
 
@@ -36,15 +46,16 @@ class Factory implements ArrayAccess
     /**
      * Create a new factory container.
      *
-     * @param  \Faker\Generator  $faker
-     * @param  string|null  $pathToFactories
+     * @param  \Illuminate\Contracts\Container\Container $container
+     * @param  \Faker\Generator $faker
+     * @param  string|null $pathToFactories
      * @return static
      */
-    public static function construct(Faker $faker, $pathToFactories = null)
+    public static function construct(Container $container, Faker $faker, $pathToFactories = null)
     {
         $pathToFactories = $pathToFactories ?: database_path('factories');
 
-        $factory = new static($faker);
+        $factory = new static($container, $faker);
 
         if (is_dir($pathToFactories)) {
             foreach (Finder::create()->files()->in($pathToFactories) as $file) {
@@ -154,7 +165,7 @@ class Factory implements ArrayAccess
      */
     public function raw($class, array $attributes = [], $name = 'default')
     {
-        $raw = call_user_func($this->definitions[$class][$name], $this->faker);
+        $raw = $this->container->call($this->definitions[$class][$name], [$this->faker, $attributes]);
 
         return array_merge($raw, $attributes);
     }
@@ -168,7 +179,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->faker);
+        return new FactoryBuilder($class, $name, $this->container, $this->definitions, $this->faker);
     }
 
     /**
