@@ -5,7 +5,6 @@ namespace Illuminate\Pagination;
 use Countable;
 use ArrayAccess;
 use IteratorAggregate;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\Presenter;
@@ -38,7 +37,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         $this->perPage = $perPage;
         $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = $this->path != '/' ? rtrim($this->path, '/').'/' : $this->path;
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->setItems($items);
 
         $this->checkForMorePages();
     }
