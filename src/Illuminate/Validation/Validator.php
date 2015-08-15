@@ -838,7 +838,7 @@ class Validator implements ValidatorContract
     protected function validateJson($attribute, $value)
     {
         $object = json_decode($value);
-        if($object === null) {
+        if ($object === null) {
             return false;
         }
 
