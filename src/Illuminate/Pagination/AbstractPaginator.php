@@ -4,6 +4,7 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use ArrayIterator;
+use Illuminate\Support\Collection;
 
 abstract class AbstractPaginator
 {
@@ -226,6 +227,17 @@ abstract class AbstractPaginator
     public function items()
     {
         return $this->items->all();
+    }
+
+    /**
+     * Set the items being paginated.
+     *
+     * @param  mixed  $items
+     * @return void
+     */
+    public function setItems($items)
+    {
+        $this->items = $items instanceof Collection ? $items : Collection::make($items);
     }
 
     /**
