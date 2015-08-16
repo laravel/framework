@@ -64,7 +64,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $tags = [];
 
     /**
-     * The stack of concretions being current built.
+     * The stack of concretions currently being built.
      *
      * @var array
      */
@@ -247,7 +247,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a shared binding in the container.
      *
-     * @param  string  $abstract
+     * @param  string|array  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
