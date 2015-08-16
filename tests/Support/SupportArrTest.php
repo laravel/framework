@@ -70,4 +70,31 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
+
+    public function testForget()
+    {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::forget($array, 'products.desk');
+        $this->assertEquals(['products' => []], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::forget($array, 'products.desk.price');
+        $this->assertEquals(['products' => ['desk' => []]], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::forget($array, 'products.final.price');
+        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+
+        $array = ['shop' => ['cart' => [150 => 0]]];
+        Arr::forget($array, 'shop.final.cart');
+        $this->assertEquals(['shop' => ['cart' => [150 => 0]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]];
+        Arr::forget($array, 'products.desk.price.taxes');
+        $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50]]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]];
+        Arr::forget($array, 'products.desk.final.taxes');
+        $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
+    }
 }
