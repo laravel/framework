@@ -837,12 +837,7 @@ class Validator implements ValidatorContract
      */
     protected function validateJson($attribute, $value)
     {
-        $object = json_decode($value);
-        if ($object === null) {
-            return false;
-        }
-
-        return true;
+        return ! is_null(json_decode($value));
     }
 
     /**
