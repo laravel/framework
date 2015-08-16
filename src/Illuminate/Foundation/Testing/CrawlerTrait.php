@@ -415,7 +415,7 @@ trait CrawlerTrait
             $expected = $this->formatToExpectedJson($key, $value);
 
             $this->assertTrue(
-                Str::contains($actual, $this->formatToExpectedJson($key, $value)),
+                Str::contains($actual, $expected),
                 "Unable to find JSON fragment [{$expected}] within [{$actual}]."
             );
         }
