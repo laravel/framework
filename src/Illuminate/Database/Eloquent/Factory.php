@@ -4,8 +4,8 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Faker\Generator as Faker;
-use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Contracts\Container\Container;
 
 class Factory implements ArrayAccess
 {
@@ -26,7 +26,7 @@ class Factory implements ArrayAccess
     /**
      * Create a new factory instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Faker\Generator  $faker
      * @return void
      */
@@ -46,9 +46,9 @@ class Factory implements ArrayAccess
     /**
      * Create a new factory container.
      *
-     * @param  \Illuminate\Contracts\Container\Container $container
-     * @param  \Faker\Generator $faker
-     * @param  string|null $pathToFactories
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Faker\Generator  $faker
+     * @param  string|null  $pathToFactories
      * @return static
      */
     public static function construct(Container $container, Faker $faker, $pathToFactories = null)

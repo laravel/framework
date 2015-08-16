@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent;
 
 use Faker\Generator as Faker;
-use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
+use Illuminate\Contracts\Container\Container;
 
 class FactoryBuilder
 {
@@ -53,11 +53,11 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
-     * @param  string $class
-     * @param  string $name
-     * @param  \Illuminate\Contracts\Container\Container $container
-     * @param  array $definitions
-     * @param  \Faker\Generator $faker
+     * @param  string  $class
+     * @param  string  $name
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  array  $definitions
+     * @param  \Faker\Generator  $faker
      */
     public function __construct($class, $name, Container $container, array $definitions, Faker $faker)
     {
