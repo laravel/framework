@@ -294,9 +294,14 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @return \Illuminate\Contracts\Pagination\Paginator
+     * @throws InvalidArgumentException
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
+        if ($perPage < 0) {
+            throw new InvalidArgumentException("Negative values can't be used to query a result set.");
+        }
+
         $page = Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
