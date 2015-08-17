@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -197,6 +198,10 @@ class BelongsToMany extends Relation
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
+        if ($perPage <= 0) {
+            throw new InvalidArgumentException('Invalid argument $perPage');
+        }
+
         $this->query->addSelect($this->getSelectColumns($columns));
 
         $paginator = $this->query->paginate($perPage, $columns, $pageName);
