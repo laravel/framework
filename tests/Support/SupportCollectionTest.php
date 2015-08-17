@@ -369,20 +369,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([10], $data[3]->toArray());
     }
 
-    public function testEven()
-    {
-        $data = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
-
-        $this->assertEquals(['a', 'c', 'e'], $data->even()->all());
-    }
-
-    public function testOdd()
-    {
-        $data = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
-
-        $this->assertEquals(['b', 'd', 'f'], $data->odd()->all());
-    }
-
     public function testEvery()
     {
         $data = new Collection([
