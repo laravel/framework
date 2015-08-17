@@ -4,6 +4,73 @@ use Illuminate\Support\Arr;
 
 class SupportArrTest extends PHPUnit_Framework_TestCase
 {
+    public function testAdd()
+    {
+        $array = Arr::add(['name' => 'Desk'], 'price', 100);
+        $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+    }
+
+    public function testDivide()
+    {
+        list($keys, $values) = Arr::divide(['name' => 'Desk']);
+        $this->assertEquals(['name'], $keys);
+        $this->assertEquals(['Desk'], $values);
+    }
+
+    public function testDot()
+    {
+        $array = Arr::dot(['foo' => ['bar' => 'baz']]);
+        $this->assertEquals(['foo.bar' => 'baz'], $array);
+    }
+
+    public function testExcept()
+    {
+        $array = ['name' => 'Desk', 'price' => 100];
+        $array = Arr::except($array, ['price']);
+        $this->assertEquals(['name' => 'Desk'], $array);
+    }
+
+    public function testFirst()
+    {
+        $array = [100, 200, 300];
+
+        $value = Arr::first($array, function ($key, $value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(200, $value);
+    }
+
+    public function testLast()
+    {
+        $array = [100, 200, 300];
+        $last = Arr::last($array, function () { return true; });
+        $this->assertEquals(300, $last);
+    }
+
+    public function testFlatten()
+    {
+        $array = ['name' => 'Joe', 'languages' => ['PHP', 'Ruby']];
+        $array = Arr::flatten($array);
+        $this->assertEquals(['Joe', 'PHP', 'Ruby'], $array);
+    }
+
+    public function testGet()
+    {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $value = Arr::get($array, 'products.desk');
+        $this->assertEquals(['price' => 100], $value);
+    }
+
+    public function testHas()
+    {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertTrue(Arr::has($array, 'products.desk'));
+        $this->assertTrue(Arr::has($array, 'products.desk.price'));
+        $this->assertFalse(Arr::has($array, 'products.foo'));
+        $this->assertFalse(Arr::has($array, 'products.desk.foo'));
+    }
+
     public function testIsAssoc()
     {
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));
@@ -11,6 +78,58 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
+    }
+
+    public function testOnly()
+    {
+        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $array = Arr::only($array, ['name', 'price']);
+        $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+    }
+
+    public function testPluck()
+    {
+        $array = [
+            ['developer' => ['name' => 'Taylor']],
+            ['developer' => ['name' => 'Abigail']],
+        ];
+
+        $array = Arr::pluck($array, 'developer.name');
+
+        $this->assertEquals(['Taylor', 'Abigail'], $array);
+    }
+
+    public function testPull()
+    {
+        $array = ['name' => 'Desk', 'price' => 100];
+        $name = Arr::pull($array, 'name');
+        $this->assertEquals('Desk', $name);
+        $this->assertEquals(['price' => 100], $array);
+    }
+
+    public function testSet()
+    {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, 'products.desk.price', 200);
+        $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
+    }
+
+    public function testSort()
+    {
+        $array = [
+            ['name' => 'Desk'],
+            ['name' => 'Chair'],
+        ];
+
+        $array = array_values(Arr::sort($array, function ($value) {
+            return $value['name'];
+        }));
+
+        $expected = [
+            ['name' => 'Chair'],
+            ['name' => 'Desk'],
+        ];
+        $this->assertEquals($expected, $array);
     }
 
     public function testSortRecursive()
@@ -69,6 +188,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
+    }
+
+    public function testWhere()
+    {
+        $array = [100, '200', 300, '400', 500];
+
+        $array = Arr::where($array, function ($key, $value) {
+            return is_string($value);
+        });
+
+        $this->assertEquals([1 => 200, 3 => 400], $array);
     }
 
     public function testForget()
