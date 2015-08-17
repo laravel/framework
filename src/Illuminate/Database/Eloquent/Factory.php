@@ -12,7 +12,7 @@ class Factory implements ArrayAccess
     /**
      * The container instance.
      *
-     * @var Illuminate\Contracts\Container\Container;
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 

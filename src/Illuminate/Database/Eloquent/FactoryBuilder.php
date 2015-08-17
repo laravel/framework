@@ -11,7 +11,7 @@ class FactoryBuilder
     /**
      * The container instance.
      *
-     * @var Illuminate\Contracts\Container\Container;
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
@@ -53,20 +53,20 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Faker\Generator  $faker
+     * @param  array  $definitions
      * @param  string  $class
      * @param  string  $name
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  array  $definitions
-     * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, Container $container, array $definitions, Faker $faker)
+    public function __construct(Container $container, Faker $faker, array $definitions, $class, $name)
     {
-        $this->name = $name;
-        $this->class = $class;
         $this->container = $container;
         $this->faker = $faker;
         $this->definitions = $definitions;
+        $this->class = $class;
+        $this->name = $name;
     }
 
     /**
