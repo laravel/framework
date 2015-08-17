@@ -201,7 +201,7 @@ class BelongsToMany extends Relation
         if ($perPage <= 0) {
             throw new InvalidArgumentException('Invalid argument $perPage');
         }
-        
+
         $this->query->addSelect($this->getSelectColumns($columns));
 
         $paginator = $this->query->paginate($perPage, $columns, $pageName);

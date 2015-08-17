@@ -1402,7 +1402,7 @@ class Builder
         if ($perPage <= 0) {
             throw new InvalidArgumentException('Invalid argument $perPage');
         }
-        
+
         $page = Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination($columns);
