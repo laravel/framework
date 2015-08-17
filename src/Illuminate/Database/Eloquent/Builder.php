@@ -269,8 +269,8 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        if ($perPage < 0) {
-            throw new InvalidArgumentException('$perPage cannot be a negative value.');
+        if ($perPage <= 0) {
+            throw new InvalidArgumentException('Invalid argument $perPage');
         }
 
         $total = $this->query->getCountForPagination();
