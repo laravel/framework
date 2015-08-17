@@ -125,7 +125,7 @@ class Builder
             if (count($result) == count(array_unique($id))) {
                 return $result;
             }
-        } elseif (!is_null($result)) {
+        } elseif (! is_null($result)) {
             return $result;
         }
 
@@ -155,7 +155,7 @@ class Builder
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (!is_null($model = $this->first($columns))) {
+        if (! is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -378,7 +378,7 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (!$this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps()) {
             return $values;
         }
 
@@ -849,7 +849,7 @@ class Builder
         foreach (explode('.', $name) as $segment) {
             $progress[] = $segment;
 
-            if (!isset($results[$last = implode('.', $progress)])) {
+            if (! isset($results[$last = implode('.', $progress)])) {
                 $results[$last] = function () {};
             }
         }
