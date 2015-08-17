@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -268,6 +269,10 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        if ( $perPage < 0 ) {
+            throw new RuntimeException("Invalid argument perpage."); 
+        }
+
         $total = $this->query->getCountForPagination();
 
         $this->query->forPage(
