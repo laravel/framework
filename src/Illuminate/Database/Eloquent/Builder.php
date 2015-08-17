@@ -298,8 +298,6 @@ class Builder
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
-
-
         $page = Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
