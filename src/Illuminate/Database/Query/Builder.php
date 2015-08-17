@@ -173,7 +173,7 @@ class Builder
 
     /**
      * The binding backups currently in use.
-     * 
+     *
      * @var array
      */
     protected $bindingBackups = [];
@@ -1395,17 +1395,19 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = Paginator::resolveCurrentPage($pageName);
-
         $total = $this->getCountForPagination($columns);
 
-        $results = $this->forPage($page, $perPage)->get($columns);
+        $this->forPage(
+            $page = $page ?: Paginator::resolveCurrentPage($pageName),
+            $perPage
+        );
 
-        return new LengthAwarePaginator($results, $total, $perPage, $page, [
+        return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
