@@ -1494,8 +1494,9 @@ class Builder {
      * @return \Illuminate\Pagination\Paginator
      */
     public function paginate($perPage = 15, $columns = array('*')) {
-        if ($perPage < 0)
+        if ($perPage < 0) {
             throw new \RuntimeException("Invalid argument perpage.");
+        }
         $paginator = $this->connection->getPaginator();
 
         if (isset($this->groups)) {

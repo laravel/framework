@@ -171,8 +171,9 @@ class BelongsToMany extends Relation {
      * @return \Illuminate\Pagination\Paginator
      */
     public function paginate($perPage = null, $columns = array('*')) {
-        if ($perPage < 0)
+        if ($perPage < 0) {
             throw new \RuntimeException("Invalid argument perpage.");
+        }
         $this->query->addSelect($this->getSelectColumns($columns));
 
         // When paginating results, we need to add the pivot columns to the query and

@@ -224,8 +224,9 @@ class Builder {
      * @return \Illuminate\Pagination\Paginator
      */
     public function paginate($perPage = null, $columns = array('*')) {
-        if ($perPage < 0)
+        if ($perPage < 0) {
             throw new \RuntimeException("Invalid argument perpage.");
+        }
         $perPage = $perPage ? : $this->model->getPerPage();
 
         $paginator = $this->query->getConnection()->getPaginator();
