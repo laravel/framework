@@ -189,7 +189,7 @@ class Builder
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
-                'not similar to',
+        'not similar to',
     ];
 
     /**
@@ -1400,14 +1400,13 @@ class Builder
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+
         $total = $this->getCountForPagination($columns);
 
-        $this->forPage(
-            $page = $page ?: Paginator::resolveCurrentPage($pageName),
-            $perPage
-        );
+        $results = $this->forPage($page, $perPage)->get($columns);
 
-        return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
+        return new LengthAwarePaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
