@@ -309,6 +309,22 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that the given checkbox is selected.
+     *
+     * @param  string  $selector
+     * @return $this
+     */
+    public function seeIsChecked($selector)
+    {
+        $this->assertTrue(
+            $this->isChecked($selector),
+            "The checkbox [{$selector}] is not checked."
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the expected value is selected.
      *
      * @param  string  $selector
@@ -320,22 +336,6 @@ trait CrawlerTrait
         $this->assertSame(
             $expected, $this->getSelectedValue($selector),
             "The field [{$selector}] does not contain the selected value [{$expected}]."
-        );
-
-        return $this;
-    }
-
-    /**
-     * Assert that the given checkbox is selected.
-     *
-     * @param  string  $selector
-     * @return $this
-     */
-    public function seeIsChecked($selector)
-    {
-        $this->assertTrue(
-            $this->isChecked($selector),
-            "The checkbox [{$selector}] is not checked."
         );
 
         return $this;
@@ -410,7 +410,7 @@ trait CrawlerTrait
     protected function getSelectedValueFromSelect(Crawler $field)
     {
         if ($field->nodeName() !== 'select') {
-            throw new Exception('Given element is not a select.');
+            throw new Exception('Given element is not a select element.');
         }
 
         foreach ($field->children() as $option) {
