@@ -179,7 +179,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->container, $this->definitions, $this->faker);
+        return new FactoryBuilder($this->container, $this->faker, $this->definitions, $class, $name);
     }
 
     /**
