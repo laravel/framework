@@ -269,7 +269,7 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        if ( $perPage < 0 ) {
+        if ($perPage < 0) {
             throw new RuntimeException("Invalid argument perpage."); 
         }
 

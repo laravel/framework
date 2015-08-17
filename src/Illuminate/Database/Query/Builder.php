@@ -1400,7 +1400,7 @@ class Builder
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
     {
-        if ( $perPage < 0 ) {
+        if ($perPage < 0) {
             throw new RuntimeException("Invalid argument perpage."); 
         }
         $page = Paginator::resolveCurrentPage($pageName);

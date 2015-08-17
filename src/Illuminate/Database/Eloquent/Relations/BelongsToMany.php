@@ -198,7 +198,7 @@ class BelongsToMany extends Relation
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
-        if ( $perPage < 0 ) {
+        if ($perPage < 0) {
             throw new RuntimeException("Invalid argument perpage."); 
         }
         $this->query->addSelect($this->getSelectColumns($columns));
