@@ -157,4 +157,27 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravelPhPFramework', Str::camel('Laravel-phP-framework'));
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
     }
+
+    public function testSubstr()
+    {
+        $this->assertEquals('Ё', Str::substr('БГДЖИЛЁ', -1));
+        $this->assertEquals('ЛЁ', Str::substr('БГДЖИЛЁ', -2));
+        $this->assertEquals('И', Str::substr('БГДЖИЛЁ', -3, 1));
+        $this->assertEquals('ДЖИЛ', Str::substr('БГДЖИЛЁ', 2, -1));
+        $this->assertEquals(false, Str::substr('БГДЖИЛЁ', 4, -4));
+        $this->assertEquals('ИЛ', Str::substr('БГДЖИЛЁ', -3, -1));
+        $this->assertEquals('ГДЖИЛЁ', Str::substr('БГДЖИЛЁ', 1));
+        $this->assertEquals('ГДЖ', Str::substr('БГДЖИЛЁ', 1, 3));
+        $this->assertEquals('БГДЖ', Str::substr('БГДЖИЛЁ', 0, 4));
+        $this->assertEquals('Ё', Str::substr('БГДЖИЛЁ', -1, 1));
+        $this->assertEquals(false, Str::substr('Б', 2));
+    }
+
+    public function testUcfirst()
+    {
+        $this->assertEquals('Laravel', Str::ucfirst('laravel'));
+        $this->assertEquals('Laravel framework', Str::ucfirst('laravel framework'));
+        $this->assertEquals('Мама', Str::ucfirst('мама'));
+        $this->assertEquals('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
 }
