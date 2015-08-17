@@ -537,4 +537,22 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($request->request->all(), $body);
     }
+
+    public function testJsonContent()
+    {
+        $body = [
+            'foo' => 'bar',
+            'baz' => ['qux'],
+        ];
+
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+        ];
+
+        $request = Request::create('/', 'GET', [], [], [], $server, json_encode($body));
+
+        $this->assertEquals($request->all(), $body);
+        $this->assertEquals($request->get('foo'), 'bar');
+        $this->assertEquals($request->get('baz'), ['qux']);
+    }
 }
