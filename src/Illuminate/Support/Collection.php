@@ -114,16 +114,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection consisting of even elements.
-     *
-     * @return static
-     */
-    public function even()
-    {
-        return $this->every(2);
-    }
-
-    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step
@@ -133,11 +123,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function every($step, $offset = 0)
     {
         $new = [];
+
         $position = 0;
+
         foreach ($this->items as $key => $item) {
             if ($position % $step === $offset) {
                 $new[] = $item;
             }
+
             $position++;
         }
 
@@ -475,16 +468,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             return is_null($result) || $value < $result ? $value : $result;
         });
-    }
-
-    /**
-     * Create a new collection consisting of odd elements.
-     *
-     * @return static
-     */
-    public function odd()
-    {
-        return $this->every(2, 1);
     }
 
     /**
