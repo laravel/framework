@@ -268,6 +268,10 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        if ($perPage < 0) {
+            throw new \Exception("Negative values can't be used to query a result set");
+        }
+
         $total = $this->query->getCountForPagination();
 
         $this->query->forPage(
