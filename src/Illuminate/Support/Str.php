@@ -166,7 +166,7 @@ class Str
      */
     public static function lower($value)
     {
-        return mb_strtolower($value);
+        return mb_strtolower($value, 'UTF-8');
     }
 
     /**
@@ -323,7 +323,7 @@ class Str
      */
     public static function upper($value)
     {
-        return mb_strtoupper($value);
+        return mb_strtoupper($value, 'UTF-8');
     }
 
     /**
@@ -444,7 +444,7 @@ class Str
      */
     public static function substr($string, $start, $length = null)
     {
-        return mb_substr($string, $start, $length);
+        return mb_substr($string, $start, $length, 'UTF-8');
     }
 
     /**
