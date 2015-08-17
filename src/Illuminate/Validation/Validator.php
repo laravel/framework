@@ -163,8 +163,8 @@ class Validator implements ValidatorContract
     public function __construct(TranslatorInterface $translator, array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
         $this->translator = $translator;
-        $this->customMessages = $messages;
         $this->data = $this->parseData($data);
+        $this->customMessages = $this->parseMessages($messages);
         $this->rules = $this->explodeRules($rules);
         $this->customAttributes = $customAttributes;
     }
@@ -201,6 +201,57 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Parse the array input to dot notation format.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    protected function parseArrayInput(array $array = [])
+    {
+        $indexes = [];
+        $index = 0;
+
+        foreach ($array as $key => $message) {
+            if (strpos($key, '[]') !== false) {
+                $hasEndfix = strpos($key, '.');
+
+                if ($hasEndfix) {
+                    $messagePart = explode('.', $key);
+                }
+
+                $dataKey = str_replace('[]', '', $hasEndfix ? $messagePart[0] : $key);
+                if (isset($this->data[$dataKey])) {
+                    array_push($indexes, $index);
+                    $dottedData = array_dot($this->data[$dataKey]);
+                    foreach ($dottedData as $key => $value) {
+                        $keyEndfix = $hasEndfix ? '.'.$messagePart[1] : '';
+                        $array[$dataKey.'.'.$key.$keyEndfix] = str_replace(':key', $key, $message);
+                    }
+                }
+            }
+
+            $index++;
+        }
+
+        for ($i = 0; $i < count($indexes); $i++) {
+            array_splice($array, $indexes[$i], 1);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Parse the messages if there is an array input to dot notation.
+     *
+     * @param  array  $messages
+     * @return array
+     */
+    protected function parseMessages(array $messages = [])
+    {
+        return $this->parseArrayInput($messages);
+    }
+
+    /**
      * Explode the rules into an array of rules.
      *
      * @param  string|array  $rules
@@ -208,6 +259,8 @@ class Validator implements ValidatorContract
      */
     protected function explodeRules($rules)
     {
+        $rules = $this->parseArrayInput($rules);
+
         foreach ($rules as $key => &$rule) {
             $rule = (is_string($rule)) ? explode('|', $rule) : $rule;
         }
