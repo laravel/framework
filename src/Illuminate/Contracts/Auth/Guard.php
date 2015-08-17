@@ -26,6 +26,13 @@ interface Guard
     public function user();
 
     /**
+     * Get the ID for the currently authenticated user.
+     *
+     * @return int|null
+     */
+    public function id();
+
+    /**
      * Log a user into the application without sessions or cookies.
      *
      * @param  array  $credentials
