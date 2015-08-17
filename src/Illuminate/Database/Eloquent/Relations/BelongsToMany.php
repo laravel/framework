@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use RuntimeException;
+use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -199,7 +199,7 @@ class BelongsToMany extends Relation
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         if ($perPage < 0) {
-            throw new RuntimeException("Invalid argument perpage."); 
+            throw new InvalidArgumentException('$perPage cannot be a negative value.');
         }
         $this->query->addSelect($this->getSelectColumns($columns));
 

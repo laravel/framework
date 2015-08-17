@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
-use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1401,7 +1400,7 @@ class Builder
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
     {
         if ($perPage < 0) {
-            throw new RuntimeException("Invalid argument perpage."); 
+            throw new InvalidArgumentException('$perPage cannot be a negative value.');
         }
         $page = Paginator::resolveCurrentPage($pageName);
 
