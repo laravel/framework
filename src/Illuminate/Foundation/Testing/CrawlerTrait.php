@@ -511,9 +511,10 @@ trait CrawlerTrait
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
+     * @param  bool  $negate
      * @return $this
      */
-    public function seeJson(array $data = null)
+    public function seeJson(array $data = null, $negate = false)
     {
         if (is_null($data)) {
             $this->assertJson(
@@ -523,17 +524,31 @@ trait CrawlerTrait
             return $this;
         }
 
-        return $this->seeJsonContains($data);
+        return $this->seeJsonContains($data, $negate);
+    }
+
+    /**
+     * Assert that the response doesn't contain JSON.
+     *
+     * @param  array|null  $data
+     * @return $this
+     */
+    public function dontSeeJson(array $data = null)
+    {
+        return $this->seeJson($data, true);
     }
 
     /**
      * Assert that the response contains the given JSON.
      *
      * @param  array  $data
+     * @param  bool  $negate
      * @return $this
      */
-    protected function seeJsonContains(array $data)
+    protected function seeJsonContains(array $data, $negate = false)
     {
+        $method = $negate ? 'assertFalse' : 'assertTrue';
+
         $actual = json_encode(array_sort_recursive(
             json_decode($this->response->getContent(), true)
         ));
@@ -541,9 +556,9 @@ trait CrawlerTrait
         foreach (array_sort_recursive($data) as $key => $value) {
             $expected = $this->formatToExpectedJson($key, $value);
 
-            $this->assertTrue(
+            $this->{$method}(
                 Str::contains($actual, $expected),
-                "Unable to find JSON fragment [{$expected}] within [{$actual}]."
+                ($negate ? 'Found' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
             );
         }
 
