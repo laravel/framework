@@ -220,7 +220,7 @@ class Event
      */
     protected function mutexPath()
     {
-        return storage_path().'/framework/schedule-'.md5($this->expression.$this->command);
+        return storage_path('framework/schedule-'.md5($this->expression.$this->command));
     }
 
     /**
