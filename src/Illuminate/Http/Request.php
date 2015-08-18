@@ -728,7 +728,7 @@ class Request extends SymfonyRequest implements ArrayAccess
             $request->cookies->all(), $request->files->all(), $request->server->all()
         );
 
-        // ensure that json is empty
+        // if this isn't explicitly unset, json content will not be read from the body content
         unset($request->json);
 
         $request->content = $content;
@@ -886,17 +886,15 @@ class Request extends SymfonyRequest implements ArrayAccess
      *
      * Order of precedence: GET, PATH, POST, JSON
      *
-     * Avoid using this method in controllers:
-     *
-     *  * slow
-     *  * prefer to get from a "named" source
+     * Avoid using this method in controllers as it may be slow.
      *
      * It is better to explicitly get request parameters from the appropriate
-     * public property instead (query, attributes, request, json).
+     * public property instead (query, attributes, request) or from the appropriate
+     * function (input(), json())
      *
      * @param  string  $key
-     * @param  mixed   $default
-     * @param  bool    $deep
+     * @param  mixed  $default
+     * @param  bool  $deep
      * @return mixed
      */
     public function get($key, $default = null, $deep = false)
