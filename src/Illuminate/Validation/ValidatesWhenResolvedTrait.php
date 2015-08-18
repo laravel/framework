@@ -48,7 +48,7 @@ trait ValidatesWhenResolvedTrait
     }
 
     /**
-     * Deteremine if the request passes the authorization check.
+     * Determine if the request passes the authorization check.
      *
      * @return bool
      */
