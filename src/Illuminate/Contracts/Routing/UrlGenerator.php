@@ -61,4 +61,11 @@ interface UrlGenerator
      * @return $this
      */
     public function setRootControllerNamespace($rootNamespace);
+
+    /**
+     * Get the current URL for the request.
+     *
+     * @return string
+     */
+    public function current();
 }
