@@ -3,9 +3,9 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
-use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -267,7 +267,7 @@ class Builder
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
