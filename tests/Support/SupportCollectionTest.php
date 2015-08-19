@@ -345,12 +345,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection(['zaeed', 'alan']);
         $reversed = $data->reverse();
 
-        $this->assertEquals(['alan', 'zaeed'], array_values($reversed->all()));
+        $this->assertSame([1 => 'alan', 0 => 'zaeed'], $reversed->all());
 
-        $data = new Collection(['zaeed', 'alan']);
-        $reversed = $data->reverse(true);
+        $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $reversed = $data->reverse();
 
-        $this->assertEquals([1 => 'alan', 0 => 'zaeed'], $reversed->all());
+        $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
     }
 
     public function testFlip()
