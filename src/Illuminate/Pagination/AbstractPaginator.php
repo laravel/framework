@@ -113,24 +113,27 @@ abstract class AbstractPaginator
      * @return string
      */
     public function url($page)
-    {
-        if ($page <= 0) {
-            $page = 1;
-        }
+	{
+		if($page > 1) {
+			$parameters = [$this->pageName => $page];
+		}else{
+			$parameters = [];
+		}
 
-        // If we have any extra query string key / value pairs that need to be added
-        // onto the URL, we will put them in query string form and then attach it
-        // to the URL. This allows for extra information like sortings storage.
-        $parameters = [$this->pageName => $page];
+		// If we have any extra query string key / value pairs that need to be added
+		// onto the URL, we will put them in query string form and then attach it
+		// to the URL. This allows for extra information like sortings storage.
 
-        if (count($this->query) > 0) {
-            $parameters = array_merge($this->query, $parameters);
-        }
+		if (count($this->query) > 0)
+		{
+			$parameters = array_merge($this->query, $parameters);
+		}
 
-        return $this->path.'?'
-                        .urldecode(http_build_query($parameters, null, '&'))
-                        .$this->buildFragment();
-    }
+		$q = http_build_query($parameters, null, '&');
+		$fragment = $this->buildFragment();
+
+		return $this->path.(!empty($q) ? '?' : '') . urldecode($q) . $fragment;
+	}
 
     /**
      * Get the URL for the previous page.
