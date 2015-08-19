@@ -272,7 +272,7 @@ class Builder
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         if ($perPage <= 0) {
-            throw new InvalidArgumentException("Negative values can't be used to query results");
+            throw new InvalidArgumentException("Negative 'perPage' value provided to 'paginate' method.");
         }
 
         $total = $this->query->getCountForPagination();
