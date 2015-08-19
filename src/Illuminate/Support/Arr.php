@@ -179,6 +179,8 @@ class Arr
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
+                } else {
+                    $parts = [];
                 }
             }
 

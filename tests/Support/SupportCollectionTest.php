@@ -302,6 +302,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = (new Collection([5, 3, 1, 2, 4]))->sort();
         $this->assertEquals([1, 2, 3, 4, 5], $data->values()->all());
 
+        $data = (new Collection([-1, -3, -2, -4, -5, 0, 5, 3, 1, 2, 4]))->sort();
+        $this->assertEquals([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5], $data->values()->all());
+
         $data = (new Collection(['foo', 'bar-10', 'bar-1']))->sort();
         $this->assertEquals(['bar-1', 'bar-10', 'foo'], $data->values()->all());
     }
@@ -369,6 +372,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, $data->count());
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
         $this->assertEquals([9 => 10], $data[3]->toArray());
+    }
+
+    public function testEvery()
+    {
+        $data = new Collection([
+            6 => 'a',
+            4 => 'b',
+            7 => 'c',
+            1 => 'd',
+            5 => 'e',
+            3 => 'f',
+        ]);
+
+        $this->assertEquals(['a', 'e'], $data->every(4)->all());
+        $this->assertEquals(['b', 'f'], $data->every(4, 1)->all());
+        $this->assertEquals(['c'], $data->every(4, 2)->all());
+        $this->assertEquals(['d'], $data->every(4, 3)->all());
     }
 
     public function testPluckWithArrayAndObjectValues()

@@ -544,6 +544,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateJson()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'aslksd'], ['foo' => 'json']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => '[]'], ['foo' => 'json']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => '{"name":"John","age":"34"}'], ['foo' => 'json']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateBoolean()
     {
         $trans = $this->getRealTranslator();
@@ -902,6 +917,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', ['foo'], [])->andReturn(false);
         $v->setPresenceVerifier($mock3);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:connection.users']);
+        $mock5 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock5->shouldReceive('setConnection')->once()->with('connection');
+        $mock5->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(true);
+        $v->setPresenceVerifier($mock5);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidationExistsIsNotCalledUnnecessarily()
