@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Foundation\Testing\CrawlerTrait;
+use Symfony\Component\DomCrawler\Crawler;
 
 class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 {
@@ -67,6 +68,64 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
             ->andReturn($select);
 
         $this->seeInField('select', 'selected_value');
+    }
+
+    public function testSeeIsSelected()
+    {
+        $optionEmpty = m::mock(Crawler::class)->makePartial();
+        $optionEmpty->shouldReceive('hasAttribute')
+            ->withArgs(['selected'])
+            ->once()
+            ->andReturn(false);
+
+        $optionFullTime = m::mock(Crawler::class)->makePartial();
+        $optionFullTime->shouldReceive('hasAttribute')
+            ->withArgs(['selected'])
+            ->once()
+            ->andReturn(true);
+        $optionFullTime->shouldReceive('getAttribute')
+            ->withArgs(['value'])
+            ->once()
+            ->andReturn('full_time');
+
+        $select = m::mock(Crawler::class)->makePartial();
+        $select->shouldReceive('count')
+            ->once()
+            ->andReturn(1);
+        $select->shouldReceive('nodeName')
+            ->twice()
+            ->andReturn('select');
+        $select->shouldReceive('children')
+            ->once()
+            ->andReturn([$optionEmpty, $optionFullTime]);
+
+        $this->crawler = m::mock(Crawler::class)->makePartial();
+
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["*#availability, *[name='availability']"])
+            ->once()
+            ->andReturn($select);
+
+        $this->seeIsSelected('availability', 'full_time');
+    }
+
+    public function testSeeIsChecked()
+    {
+        $checkbox = m::mock(Crawler::class)->makePartial();
+        $checkbox->shouldReceive('count')->andReturn(1);
+        $checkbox->shouldReceive('attr')
+            ->withArgs(['checked'])
+            ->once()
+            ->andReturn('checked');
+
+        $this->crawler = m::mock(Crawler::class)->makePartial();
+
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["input[type='checkbox']#terms, input[type='checkbox'][name='terms']"])
+            ->once()
+            ->andReturn($checkbox);
+
+        $this->seeIsChecked('terms');
     }
 
     public function testExtractsRequestParametersFromForm()
