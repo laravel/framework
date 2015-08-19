@@ -564,12 +564,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Reverse items order.
      *
-     * @param  bool  $preserveKeys
      * @return static
      */
-    public function reverse($preserveKeys = false)
+    public function reverse()
     {
-        return new static(array_reverse($this->items, $preserveKeys));
+        return new static(array_reverse($this->items, true));
     }
 
     /**
