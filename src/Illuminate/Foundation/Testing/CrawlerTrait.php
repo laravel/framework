@@ -558,7 +558,7 @@ trait CrawlerTrait
 
             $this->{$method}(
                 Str::contains($actual, $expected),
-                ($negate ? 'Found' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
+                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
             );
         }
 
