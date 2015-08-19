@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -265,9 +266,15 @@ class Builder
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     *
+     * @throws \InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        if ($perPage <= 0) {
+            throw new InvalidArgumentException("Negative values can't be used to query results");
+        }
+
         $total = $this->query->getCountForPagination();
 
         $this->query->forPage(
