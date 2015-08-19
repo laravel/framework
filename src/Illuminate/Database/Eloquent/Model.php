@@ -2123,6 +2123,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Make the given, typically hidden, attributes visible.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function withHidden($attributes)
+    {
+        $this->hidden = array_diff($this->hidden, (array) $attributes);
+
+        return $this;
+    }
+
+    /**
      * Get the visible attributes for the model.
      *
      * @return array
