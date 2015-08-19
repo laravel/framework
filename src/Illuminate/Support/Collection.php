@@ -225,7 +225,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Group an associative array by a field or using a callback.
      *
      * @param  callable|string  $groupBy
-     * @param  bool             $preserveKeys
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
@@ -622,26 +621,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  int   $offset
      * @param  int   $length
-     * @param  bool  $preserveKeys
      * @return static
      */
-    public function slice($offset, $length = null, $preserveKeys = false)
+    public function slice($offset, $length = null)
     {
-        return new static(array_slice($this->items, $offset, $length, $preserveKeys));
+        return new static(array_slice($this->items, $offset, $length, true));
     }
 
     /**
      * Chunk the underlying collection array.
      *
      * @param  int   $size
-     * @param  bool  $preserveKeys
      * @return static
      */
-    public function chunk($size, $preserveKeys = false)
+    public function chunk($size)
     {
         $chunks = [];
 
-        foreach (array_chunk($this->items, $size, $preserveKeys) as $chunk) {
+        foreach (array_chunk($this->items, $size, true) as $chunk) {
             $chunks[] = new static($chunk);
         }
 

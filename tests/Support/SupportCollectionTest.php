@@ -368,7 +368,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
         $this->assertEquals(4, $data->count());
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
-        $this->assertEquals([10], $data[3]->toArray());
+        $this->assertEquals([9 => 10], $data[3]->toArray());
     }
 
     public function testPluckWithArrayAndObjectValues()
@@ -432,7 +432,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);
         $data = $data->take(-2);
-        $this->assertEquals(['dayle', 'shawn'], $data->all());
+        $this->assertEquals([1 => 'dayle', 2 => 'shawn'], $data->all());
     }
 
     public function testMakeMethod()
@@ -722,7 +722,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
-        $this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
+        $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
