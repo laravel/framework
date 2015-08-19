@@ -728,6 +728,9 @@ class Request extends SymfonyRequest implements ArrayAccess
             $request->cookies->all(), $request->files->all(), $request->server->all()
         );
 
+        // if this isn't explicitly unset, json content will not be read from the body content
+        unset($request->json);
+
         $request->content = $content;
 
         $request->request = $request->getInputSource();
@@ -876,6 +879,35 @@ class Request extends SymfonyRequest implements ArrayAccess
     public function offsetUnset($offset)
     {
         return $this->getInputSource()->remove($offset);
+    }
+
+    /**
+     * Gets a "parameter" value.
+     *
+     * Order of precedence: GET, PATH, POST, JSON
+     *
+     * Avoid using this method in controllers as it may be slow.
+     *
+     * It is better to explicitly get request parameters from the appropriate
+     * public property instead (query, attributes, request) or from the appropriate
+     * function (input(), json())
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @param  bool  $deep
+     * @return mixed
+     */
+    public function get($key, $default = null, $deep = false)
+    {
+        if ($this !== $result = parent::get($key, $this, $deep)) {
+            return $result;
+        }
+
+        if ($this !== $result = $this->json()->get($key, $this, $deep)) {
+            return $result;
+        }
+
+        return $default;
     }
 
     /**
