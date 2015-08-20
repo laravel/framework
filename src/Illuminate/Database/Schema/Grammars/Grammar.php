@@ -279,6 +279,13 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if (! $connection->isDoctrineAvailable()) {
+            throw new \RuntimeException(sprintf(
+                'Changing columns for table "%s" requires Doctrine DBAL; install "doctrine/dbal".',
+                $blueprint->getTable()
+            ));
+        }
+
         $schema = $connection->getDoctrineSchemaManager();
 
         $tableDiff = $this->getChangedDiff($blueprint, $schema);
