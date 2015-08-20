@@ -678,6 +678,8 @@ class Request extends SymfonyRequest implements ArrayAccess
     public function acceptsJson()
     {
         return $this->accepts('application/json');
+
+        return $this->accepts('application/vnd.api+json');
     }
 
     /**
