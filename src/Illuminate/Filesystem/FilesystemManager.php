@@ -156,7 +156,7 @@ class FilesystemManager implements FactoryContract
         }
 
         return $this->adapt(
-            new Flysystem(new S3Adapter(new S3Client($config), $config['bucket']))
+            new Flysystem(new S3Adapter(new S3Client($config), $config['bucket'], !empty($config['root'])?$config['root']:''))
         );
     }
 
