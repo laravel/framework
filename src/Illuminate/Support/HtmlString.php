@@ -17,7 +17,6 @@ class HtmlString implements Htmlable
      * Create a new HTML string instance.
      *
      * @param  string  $html
-     * @return void
      */
     public function __construct($html)
     {

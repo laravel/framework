@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
+use Stringy\Stringy;
 use RuntimeException;
-use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
@@ -39,7 +39,7 @@ class Str
      */
     public static function ascii($value)
     {
-        return StaticStringy::toAscii($value);
+        return (string) Stringy::create($value)->toAscii();
     }
 
     /**
@@ -189,7 +189,7 @@ class Str
     }
 
     /**
-     * Parse a Class@method style callback into class and method.
+     * Parse a 'Class@method' style callback into class and method.
      *
      * @param  string  $callback
      * @param  string  $default
