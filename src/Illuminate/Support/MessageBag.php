@@ -29,7 +29,6 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      * Create a new message bag instance.
      *
      * @param  array  $messages
-     * @return void
      */
     public function __construct(array $messages = [])
     {

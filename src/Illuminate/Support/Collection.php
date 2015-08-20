@@ -25,7 +25,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Create a new collection.
      *
      * @param  mixed  $items
-     * @return void
      */
     public function __construct($items = [])
     {
@@ -864,13 +863,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function zip($items)
     {
-        $arrayableItems = array_map(function ($items) {
+        $arrayAbleItems = array_map(function ($items) {
             return $this->getArrayableItems($items);
         }, func_get_args());
 
         $params = array_merge([function () {
             return new static(func_get_args());
-        }, $this->items], $arrayableItems);
+        }, $this->items], $arrayAbleItems);
 
         return new static(call_user_func_array('array_map', $params));
     }

@@ -181,7 +181,7 @@ if (! function_exists('array_forget')) {
      */
     function array_forget(&$array, $keys)
     {
-        return Arr::forget($array, $keys);
+        Arr::forget($array, $keys);
     }
 }
 
@@ -442,7 +442,7 @@ if (! function_exists('e')) {
     /**
      * Escape HTML entities in a string.
      *
-     * @param  \Illuminate\Support\Htmlable|string  $value
+     * @param  \Illuminate\Support\HtmlString|string  $value
      * @return string
      */
     function e($value)
