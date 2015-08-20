@@ -1990,7 +1990,7 @@ class Builder
         $var = ($type == 'select') ? 'columns' : "{$type}s";
 
         $array = $this->$var;
-        if (!$array) {
+        if ( !$array) {
             return 0;
         }
 
