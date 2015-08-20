@@ -71,6 +71,13 @@ abstract class AbstractPaginator
     protected static $currentPageResolver;
 
     /**
+     * The URL builder resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $urlBuilderResolver;
+
+    /**
      * The default presenter resolver.
      *
      * @var \Closure
@@ -127,9 +134,13 @@ abstract class AbstractPaginator
             $parameters = array_merge($this->query, $parameters);
         }
 
-        return $this->path.'?'
-                        .urldecode(http_build_query($parameters, null, '&'))
-                        .$this->buildFragment();
+        $url = $this->path.'?'.urldecode(http_build_query($parameters, null, '&')).$this->buildFragment();
+
+        if (isset(static::$urlBuilderResolver)) {
+            return call_user_func(static::$urlBuilderResolver, $url);
+        }
+
+        return $url;
     }
 
     /**
@@ -329,6 +340,17 @@ abstract class AbstractPaginator
     public static function currentPageResolver(Closure $resolver)
     {
         static::$currentPageResolver = $resolver;
+    }
+
+    /**
+     * Set the URL builder resolver.
+     *
+     * @param  \Closure  $resolver
+     * @return void
+     */
+    public static function urlBuilderResolver(Closure $resolver)
+    {
+        static::$urlBuilderResolver = $resolver;
     }
 
     /**
