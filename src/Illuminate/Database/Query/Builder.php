@@ -1888,6 +1888,16 @@ class Builder
      */
     public function getRawBindings()
     {
+        return Arr::collapse($this->bindings);
+    }
+
+    /**
+     * Get the raw array of bindings.
+     *
+     * @return array
+     */
+    public function getRawIndexedBindings()
+    {
         return $this->bindings;
     }
 
@@ -1920,19 +1930,67 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    public function addBinding($value, $type = 'where')
+    public function addBinding($value, $type = 'where', $key = null)
     {
         if (! array_key_exists($type, $this->bindings)) {
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value)) {
-            $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
-        } else {
-            $this->bindings[$type][] = $value;
-        }
+        if(is_null($key)) $key = $this->getLastKeyOfType($type);
+        $this->bindings[$type][$key][] = $value;
 
         return $this;
+    }
+
+    /**
+     * Remove a binding from the query
+     *
+     * @param  string  $type
+     * @param  int $key
+     * @return $this
+     */
+    public function removeBinding($type, $key)
+    {
+        unset($this->bindings[$type][$key]);
+        return $this;
+    }
+
+    /**
+     * Remove a clause and corresponding binding from the query
+     *
+     * @param  string  $type
+     * @param  int $key
+     * @return $this
+     */
+    public function removeClause($type, $key)
+    {
+        $var = ($type == 'select') ? "columns" : "{$type}s";
+
+        $clauses = $this->$var;
+        unset($clauses[$key]);
+        $this->$var = $clauses;
+
+        $this->removeBinding($type, $key);
+
+        return $this;
+    }
+
+    /**
+     * Return the key for the last inserted clause
+     *
+     * @param  string  $type
+     * @return int
+     */
+    public function getLastKeyOfType($type)
+    {
+        $var = ($type == 'select') ? "columns" : "{$type}s";
+        
+        $array = $this->$var;
+        if(is_null($array) || empty($array)) return 0;
+
+        end($array);
+
+        return key($array);
     }
 
     /**
