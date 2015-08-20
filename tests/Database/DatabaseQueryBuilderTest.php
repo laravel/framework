@@ -1184,7 +1184,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // extra clause removed
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->join('othertable', function ($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->where('foo', '=', 'qux')->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', ['bar']); 
+        $builder->select('*')->from('users')->join('othertable', function ($join) { $join->where('bar', '=', 'foo'); })->where('registered', 1)->where('foo', '=', 'qux')->groupBy('city')->having('population', '>', 3)->orderByRaw('match ("foo") against(?)', ['bar']);
         $builder->removeClause('where', 1);
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
@@ -1229,24 +1229,24 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testBindingIndexMatchesWhere()
     {
-		$expectedBindings = [
-			0 => [0 => 'bar'],
-			2 => [0 => ['baz', 'qux']]
-		];
+        $expectedBindings = [
+            0 => [0 => 'bar'],
+            2 => [0 => ['baz', 'qux']],
+        ];
 
         $builder = $this->getBuilder();
         $builder->where('foo', '=', 'bar');
         $builder->whereNull('foo');
         $builder->whereBetween('foo', ['baz', 'qux']);
 
-        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where'] );
+        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where']);
     }
 
     public function testBindingAndClauseRemoval()
     {
         $expectedBindings = [
             0 => [0 => 'bar'],
-            2 => [0 => ['baz', 'qux']]
+            2 => [0 => ['baz', 'qux']],
         ];
 
         $builder = $this->getBuilder();
@@ -1256,7 +1256,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder->removeClause('where', 1);
 
-        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where'] );
+        $this->assertEquals($expectedBindings, $builder->getRawIndexedBindings()['where']);
     }
 
     public function testSubSelect()

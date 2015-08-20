@@ -1892,7 +1892,7 @@ class Builder
     }
 
     /**
-     * Get the raw array of bindings.
+     * Get the raw indexed array of bindings.
      *
      * @return array
      */
@@ -1926,6 +1926,7 @@ class Builder
      *
      * @param  mixed   $value
      * @param  string  $type
+     * @param  int $key
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -1936,14 +1937,16 @@ class Builder
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if(is_null($key)) $key = $this->getLastKeyOfType($type);
+        if (is_null($key)) {
+            $key = $this->getLastKeyOfType($type);
+        }
         $this->bindings[$type][$key][] = $value;
 
         return $this;
     }
 
     /**
-     * Remove a binding from the query
+     * Remove a binding from the query.
      *
      * @param  string  $type
      * @param  int $key
@@ -1952,11 +1955,12 @@ class Builder
     public function removeBinding($type, $key)
     {
         unset($this->bindings[$type][$key]);
+
         return $this;
     }
 
     /**
-     * Remove a clause and corresponding binding from the query
+     * Remove a clause and corresponding binding from the query.
      *
      * @param  string  $type
      * @param  int $key
@@ -1964,7 +1968,7 @@ class Builder
      */
     public function removeClause($type, $key)
     {
-        $var = ($type == 'select') ? "columns" : "{$type}s";
+        $var = ($type == 'select') ? 'columns' : "{$type}s";
 
         $clauses = $this->$var;
         unset($clauses[$key]);
@@ -1976,17 +1980,19 @@ class Builder
     }
 
     /**
-     * Return the key for the last inserted clause
+     * Return the key for the last inserted clause.
      *
      * @param  string  $type
      * @return int
      */
     public function getLastKeyOfType($type)
     {
-        $var = ($type == 'select') ? "columns" : "{$type}s";
-        
+        $var = ($type == 'select') ? 'columns' : "{$type}s";
+
         $array = $this->$var;
-        if(is_null($array) || empty($array)) return 0;
+        if (!$array) {
+            return 0;
+        }
 
         end($array);
 
