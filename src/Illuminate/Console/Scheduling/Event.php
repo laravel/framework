@@ -265,13 +265,13 @@ class Event
     protected function filtersPass(Application $app)
     {
         foreach ($this->filters as $callback) {
-            if(! $app->call($callback)) {
+            if (! $app->call($callback)) {
                 return false;
             }
         }
 
         foreach ($this->rejects as $callback) {
-            if($app->call($callback)) {
+            if ($app->call($callback)) {
                 return false;
             }
         }
