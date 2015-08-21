@@ -1,12 +1,20 @@
 <?php namespace Illuminate\Mail\Transport;
 
 use Swift_Transport;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Swift_Mime_Message;
 use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
 
 class MailgunTransport implements Swift_Transport {
+
+	/**
+	 * Guzzle client instance.
+	 *
+	 * @var \GuzzleHttp\ClientInterface
+	 */
+	protected $client;
+
 
 	/**
 	 * The Mailgun API key.
@@ -32,12 +40,14 @@ class MailgunTransport implements Swift_Transport {
 	/**
 	 * Create a new Mailgun transport instance.
 	 *
+	 * @param ClientInterface $client
 	 * @param  string  $key
 	 * @param  string  $domain
 	 * @return void
 	 */
-	public function __construct($key, $domain)
+	public function __construct(ClientInterface $client, $key, $domain)
 	{
+		$this->client = $client;
 		$this->key = $key;
 		$this->setDomain($domain);
 	}
@@ -71,14 +81,21 @@ class MailgunTransport implements Swift_Transport {
 	 */
 	public function send(Swift_Mime_Message $message, &$failedRecipients = null)
 	{
-		$client = $this->getHttpClient();
+		$options = ['auth' => ['api', $this->key]];
 
-		$client->post($this->url, ['auth' => ['api', $this->key],
-			'body' => [
+		if (version_compare(ClientInterface::VERSION, '6') === 1) {
+			$options['multipart'] = [
+				['name' => 'to', 'contents' => $this->getTo($message)],
+				['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
+			];
+		} else {
+			$options['body'] = [
 				'to' => $this->getTo($message),
 				'message' => new PostFile('message', (string) $message),
-			],
-		]);
+			];
+		}
+
+		return $this->client->post($this->url, $options);
 	}
 
 	/**

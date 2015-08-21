@@ -8,6 +8,7 @@ use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
 use Swift_SendmailTransport as SendmailTransport;
+use GuzzleHttp\Client as HttpClient;
 
 class MailServiceProvider extends ServiceProvider {
 
@@ -214,7 +215,7 @@ class MailServiceProvider extends ServiceProvider {
 
 		$this->app->bindShared('swift.transport', function() use ($mailgun)
 		{
-			return new MailgunTransport($mailgun['secret'], $mailgun['domain']);
+			return new MailgunTransport(new HttpClient, $mailgun['secret'], $mailgun['domain']);
 		});
 	}
 
