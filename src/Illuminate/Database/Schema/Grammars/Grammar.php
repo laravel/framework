@@ -13,6 +13,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
+use RuntimeException;
 
 abstract class Grammar extends BaseGrammar
 {
@@ -279,6 +280,13 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if (! $connection->isDoctrineAvailable()) {
+            throw new RuntimeException(sprintf(
+                'Changing columns for table "%s" requires Doctrine DBAL; install "doctrine/dbal".',
+                $blueprint->getTable()
+            ));
+        }
+
         $schema = $connection->getDoctrineSchemaManager();
 
         $tableDiff = $this->getChangedDiff($blueprint, $schema);
