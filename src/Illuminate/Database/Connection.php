@@ -778,6 +778,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Is Doctrine available?
+     *
+     * @return bool
+     */
+    public function isDoctrineAvailable()
+    {
+        return class_exists('Doctrine\DBAL\Connection');
+    }
+
+    /**
      * Get a Doctrine Schema Column instance.
      *
      * @param  string  $table
