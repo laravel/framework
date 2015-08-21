@@ -2,6 +2,7 @@
 
 use Swift_Transport;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Post\PostFile;
 use Swift_Mime_Message;
 use Swift_Events_EventListener;
 
