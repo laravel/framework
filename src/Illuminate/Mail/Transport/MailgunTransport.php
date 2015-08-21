@@ -3,7 +3,6 @@
 use Swift_Transport;
 use GuzzleHttp\ClientInterface;
 use Swift_Mime_Message;
-use GuzzleHttp\Post\PostFile;
 use Swift_Events_EventListener;
 
 class MailgunTransport implements Swift_Transport {
