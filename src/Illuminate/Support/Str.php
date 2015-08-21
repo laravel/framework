@@ -439,7 +439,7 @@ class Str
      *
      * @param  string  $string
      * @param  int  $start
-     * @param  int  $length
+     * @param  int|null  $length
      * @return string
      */
     public static function substr($string, $start, $length = null)
