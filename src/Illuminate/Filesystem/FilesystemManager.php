@@ -136,7 +136,9 @@ class FilesystemManager implements FactoryContract
      */
     public function createFtpDriver(array $config)
     {
-        $ftpConfig = Arr::only($config, ['host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout']);
+        $ftpConfig = Arr::only($config, [
+            'host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout'
+        ]);
 
         return $this->adapt(new Flysystem(new FtpAdapter($ftpConfig)));
     }
@@ -155,8 +157,10 @@ class FilesystemManager implements FactoryContract
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
         }
 
+        $root = isset($config['root']) ? $config['root'] : null;
+
         return $this->adapt(
-            new Flysystem(new S3Adapter(new S3Client($config), $config['bucket'], empty($config['root']) ? '' : $config['root']))
+            new Flysystem(new S3Adapter(new S3Client($config), $config['bucket'], $root))
         );
     }
 
