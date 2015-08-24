@@ -271,16 +271,15 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $perPage = $perPage ?: $this->model->getPerPage();
+        $total = $this->query->getCountForPagination();
+
         if ($perPage <= 0) {
             throw new InvalidArgumentException("Negative 'perPage' value provided to 'paginate' method.");
         }
 
-        $total = $this->query->getCountForPagination();
-
-        $this->query->forPage(
-            $page = $page ?: Paginator::resolveCurrentPage($pageName),
-            $perPage = $perPage ?: $this->model->getPerPage()
-        );
+        $this->query->forPage($page, $perPage);
 
         return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -301,6 +300,10 @@ class Builder
         $page = Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
+
+        if ($perPage <= 0) {
+            throw new InvalidArgumentException("Negative 'perPage' value provided to 'simplePaginate' method.");
+        }
 
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
