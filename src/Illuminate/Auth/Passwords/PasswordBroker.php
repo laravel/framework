@@ -2,7 +2,10 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Carbon\Carbon;
 use Closure;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use UnexpectedValueException;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -217,6 +220,28 @@ class PasswordBroker implements PasswordBrokerContract
         ];
 
         return $password === $confirm && mb_strlen($password) >= 6;
+    }
+
+    /**
+     * Validates The Password Reset Token
+     *
+     * @param  string  $token
+     * @return boolean
+     */
+    public function validateToken($token)
+    {
+        $token = DB::table(Config::get('auth.password.table'))->select('*')->where('token','=',$token)->first();
+
+        // Return false If No Relevant Password Reset Token Data Found
+        if(empty($token))
+            return false;
+
+        // Calculating Expiration DateTime For Password Reset Token
+        $expiration_date = Carbon::parse($token->created_at)->addSeconds(Config::get('auth.password.expire'))->toDateTimeString();
+        if($expiration_date->lt(Carbon::now()))
+            return false;
+
+        return true;
     }
 
     /**

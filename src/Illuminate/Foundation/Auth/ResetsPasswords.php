@@ -65,6 +65,10 @@ trait ResetsPasswords
             throw new NotFoundHttpException;
         }
 
+        if(!Password::validateToken($token)) {
+            return redirect($this->redirectPath())->with('error',Lang::get(Password::INVALID_TOKEN));
+        }
+
         return view('auth.reset')->with('token', $token);
     }
 
