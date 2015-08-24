@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -63,6 +64,10 @@ trait ResetsPasswords
     {
         if (is_null($token)) {
             throw new NotFoundHttpException;
+        }
+
+        if(! Password::validateToken($token)) {
+            return redirect($this->redirectPath())->with('error', Lang::get(Password::INVALID_TOKEN));
         }
 
         return view('auth.reset')->with('token', $token);
