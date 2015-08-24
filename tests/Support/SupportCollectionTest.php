@@ -386,6 +386,37 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['d'], $data->every(4, 3)->all());
     }
 
+    public function testFillEmpty()
+    {
+        $data = new Collection();
+        $data->fill(2);
+
+        $this->assertEquals([null, null], $data->all());
+        $this->assertEquals([null, null, null, null], $data->fill(2)->all());
+    }
+
+    public function testFillExisting()
+    {
+        $data = new Collection([
+            0 => 'foo',
+            1 => 'bar',
+        ]);
+
+        $this->assertEquals(['foo', 'bar'], $data->all());
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->fill(3, 'baz')->all());
+    }
+
+    public function testFillPrepend()
+    {
+        $data = new Collection([
+            0 => 'foo',
+            1 => 'bar',
+        ]);
+
+        $this->assertEquals(['foo', 'bar'], $data->all());
+        $this->assertEquals(['baz', 'foo', 'bar'], $data->fill(3, 'baz', false)->all());
+    }
+
     public function testPluckWithArrayAndObjectValues()
     {
         $data = new Collection([(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
