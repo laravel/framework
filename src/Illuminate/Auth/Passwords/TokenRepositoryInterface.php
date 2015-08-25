@@ -37,4 +37,12 @@ interface TokenRepositoryInterface
      * @return void
      */
     public function deleteExpired();
+
+    /**
+     * Get & Validate Token Data From Database
+     *
+     * @param string $token
+     * @return array
+     */
+    public function validateTokenData($token);
 }
