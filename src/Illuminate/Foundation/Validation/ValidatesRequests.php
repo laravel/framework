@@ -10,6 +10,13 @@ use Illuminate\Http\Exception\HttpResponseException;
 trait ValidatesRequests
 {
     /**
+     * The default error bag.
+     *
+     * @var string
+     */
+    protected $validatesRequestErrorBag;
+
+    /**
      * Validate the given request with the given rules.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -27,6 +34,25 @@ trait ValidatesRequests
         if ($validator->fails()) {
             $this->throwValidationException($request, $validator);
         }
+    }
+
+    /**
+     * Validate the given request with the given rules.
+     *
+     * @param  string  $errorBag
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return void
+     *
+     * @throws \Illuminate\Http\Exception\HttpResponseException
+     */
+    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
+            $this->validate($request, $rules, $messages, $customAttributes);
+        });
     }
 
     /**
@@ -95,12 +121,28 @@ trait ValidatesRequests
     }
 
     /**
+     * Execute a Closure within with a given error bag set as the default bag.
+     *
+     * @param  string  $errorBag
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function withErrorBag($errorBag, callable $callback)
+    {
+        $this->validatesRequestErrorBag = $errorBag;
+
+        call_user_func($callback);
+
+        $this->validatesRequestErrorBag = null;
+    }
+
+    /**
      * Get the key to be used for the view error bag.
      *
      * @return string
      */
     protected function errorBag()
     {
-        return 'default';
+        return $this->validatesRequestErrorBag ?: 'default';
     }
 }

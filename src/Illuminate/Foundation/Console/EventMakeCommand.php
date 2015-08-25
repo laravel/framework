@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
+use ReflectionClass;
 use Illuminate\Console\GeneratorCommand;
 
 class EventMakeCommand extends GeneratorCommand
@@ -26,6 +28,25 @@ class EventMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $type = 'Event';
+
+    /**
+     * Determine if the class already exists.
+     *
+     * @param  string  $rawName
+     * @return bool
+     */
+    protected function alreadyExists($rawName)
+    {
+        try {
+            $reflection = new ReflectionClass($rawName);
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return parent::alreadyExists($rawName);
+    }
 
     /**
      * Get the stub file for the generator.

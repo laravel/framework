@@ -2,13 +2,11 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Transport;
 use Swift_Mime_Message;
 use GuzzleHttp\Post\PostFile;
-use Swift_Events_EventListener;
 use GuzzleHttp\ClientInterface;
 
-class MailgunTransport implements Swift_Transport
+class MailgunTransport extends Transport
 {
     /**
      * Guzzle client instance.
@@ -56,32 +54,10 @@ class MailgunTransport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function isStarted()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function start()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stop()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $this->beforeSendPerformed($message);
+
         $options = ['auth' => ['api', $this->key]];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
@@ -97,14 +73,6 @@ class MailgunTransport implements Swift_Transport
         }
 
         return $this->client->post($this->url, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        //
     }
 
     /**

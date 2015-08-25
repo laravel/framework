@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 
 class EventGenerateCommand extends Command
@@ -32,13 +33,15 @@ class EventGenerateCommand extends Command
         );
 
         foreach ($provider->listens() as $event => $listeners) {
-            if (!str_contains($event, '\\')) {
+            if (! Str::contains($event, '\\')) {
                 continue;
             }
 
             $this->callSilent('make:event', ['name' => $event]);
 
             foreach ($listeners as $listener) {
+                $listener = preg_replace('/@.+$/', '', $listener);
+
                 $this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
             }
         }

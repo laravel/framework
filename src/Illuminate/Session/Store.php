@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use SessionHandlerInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,7 +91,7 @@ class Store implements SessionInterface
     {
         $this->loadSession();
 
-        if (!$this->has('_token')) {
+        if (! $this->has('_token')) {
             $this->regenerateToken();
         }
 
@@ -168,7 +169,7 @@ class Store implements SessionInterface
      */
     public function setId($id)
     {
-        if (!$this->isValidId($id)) {
+        if (! $this->isValidId($id)) {
             $id = $this->generateSessionId();
         }
 
@@ -193,7 +194,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).str_random(25).microtime(true));
+        return sha1(uniqid('', true).Str::random(25).microtime(true));
     }
 
     /**
@@ -307,7 +308,7 @@ class Store implements SessionInterface
      */
     public function has($name)
     {
-        return !is_null($this->get($name));
+        return ! is_null($this->get($name));
     }
 
     /**
@@ -340,7 +341,7 @@ class Store implements SessionInterface
     {
         $old = $this->getOldInput($key);
 
-        return is_null($key) ? count($old) > 0 : !is_null($old);
+        return is_null($key) ? count($old) > 0 : ! is_null($old);
     }
 
     /**
@@ -377,7 +378,7 @@ class Store implements SessionInterface
      */
     public function put($key, $value = null)
     {
-        if (!is_array($key)) {
+        if (! is_array($key)) {
             $key = [$key => $value];
         }
 
@@ -609,7 +610,7 @@ class Store implements SessionInterface
      */
     public function regenerateToken()
     {
-        $this->put('_token', str_random(40));
+        $this->put('_token', Str::random(40));
     }
 
     /**

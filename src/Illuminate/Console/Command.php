@@ -7,10 +7,10 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Foundation\Application as LaravelApplication;
 
@@ -33,7 +33,7 @@ class Command extends SymfonyCommand
     /**
      * The output interface implementation.
      *
-     * @var \Symfony\Component\Console\Style\SymfonyStyle
+     * @var \Illuminate\Console\OutputStyle
      */
     protected $output;
 
@@ -76,7 +76,7 @@ class Command extends SymfonyCommand
 
         $this->setDescription($this->description);
 
-        if (!isset($this->signature)) {
+        if (! isset($this->signature)) {
             $this->specifyParameters();
         }
     }
@@ -131,7 +131,7 @@ class Command extends SymfonyCommand
     {
         $this->input = $input;
 
-        $this->output = new SymfonyStyle($input, $output);
+        $this->output = new OutputStyle($input, $output);
 
         return parent::run($input, $output);
     }
@@ -373,6 +373,21 @@ class Command extends SymfonyCommand
     public function error($string)
     {
         $this->output->writeln("<error>$string</error>");
+    }
+
+    /**
+     * Write a string as warning output.
+     *
+     * @param  string  $string
+     * @return void
+     */
+    public function warn($string)
+    {
+        $style = new OutputFormatterStyle('yellow');
+
+        $this->output->getFormatter()->setStyle('warning', $style);
+
+        $this->output->writeln("<warning>$string</warning>");
     }
 
     /**

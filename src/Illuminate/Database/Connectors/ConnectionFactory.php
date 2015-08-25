@@ -164,7 +164,7 @@ class ConnectionFactory
      */
     public function createConnector(array $config)
     {
-        if (!isset($config['driver'])) {
+        if (! isset($config['driver'])) {
             throw new InvalidArgumentException('A driver must be specified.');
         }
 

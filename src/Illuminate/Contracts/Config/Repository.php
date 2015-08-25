@@ -22,6 +22,13 @@ interface Repository
     public function get($key, $default = null);
 
     /**
+     * Get all of the configuration items for the application.
+     *
+     * @return array
+     */
+    public function all();
+
+    /**
      * Set a given configuration value.
      *
      * @param  array|string  $key

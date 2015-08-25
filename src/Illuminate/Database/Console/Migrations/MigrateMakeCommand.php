@@ -3,18 +3,19 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Foundation\Composer;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Database\Migrations\MigrationCreator;
 
 class MigrateMakeCommand extends BaseCommand
 {
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'make:migration';
+    protected $signature = 'make:migration {name : The name of the migration.}
+        {--create= : The table to be created.}
+        {--table= : The table to migrate.}
+        {--path= : The location where the migration file should be created.}';
 
     /**
      * The console command description.
@@ -68,7 +69,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create');
 
-        if (!$table && is_string($create)) {
+        if (! $table && is_string($create)) {
             $table = $create;
         }
 
@@ -98,28 +99,16 @@ class MigrateMakeCommand extends BaseCommand
     }
 
     /**
-     * Get the console command arguments.
+     * Get migration path (either specified by '--path' option or default location).
      *
-     * @return array
+     * @return string
      */
-    protected function getArguments()
+    protected function getMigrationPath()
     {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of the migration'],
-        ];
-    }
+        if (! is_null($targetPath = $this->input->getOption('path'))) {
+            return $this->laravel->basePath().'/'.$targetPath;
+        }
 
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['create', null, InputOption::VALUE_OPTIONAL, 'The table to be created.'],
-
-            ['table', null, InputOption::VALUE_OPTIONAL, 'The table to migrate.'],
-        ];
+        return parent::getMigrationPath();
     }
 }

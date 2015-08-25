@@ -83,7 +83,6 @@ return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Bus/DispatchesJobs.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FormRequestServiceProvider.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RouteServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/PaginationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/RouteServiceProvider.php',
@@ -146,7 +145,6 @@ return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Encryption/BaseEncrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Log.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Log/LogServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Log/Writer.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php',
     $basePath.'/vendor/monolog/monolog/src/Monolog/Logger.php',
@@ -198,5 +196,4 @@ return array_map('realpath', [
     $basePath.'/vendor/symfony/finder/Adapter/PhpAdapter.php',
     $basePath.'/vendor/symfony/finder/Adapter/BsdFindAdapter.php',
     $basePath.'/vendor/symfony/finder/Finder.php',
-    $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
 ]);

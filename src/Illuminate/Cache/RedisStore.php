@@ -39,8 +39,8 @@ class RedisStore extends TaggableStore implements Store
     public function __construct(Redis $redis, $prefix = '', $connection = 'default')
     {
         $this->redis = $redis;
+        $this->setPrefix($prefix);
         $this->connection = $connection;
-        $this->prefix = strlen($prefix) > 0 ? $prefix.':' : '';
     }
 
     /**
@@ -51,7 +51,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function get($key)
     {
-        if (!is_null($value = $this->connection()->get($this->prefix.$key))) {
+        if (! is_null($value = $this->connection()->get($this->prefix.$key))) {
             return is_numeric($value) ? $value : unserialize($value);
         }
     }
@@ -86,7 +86,7 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
-     * Increment the value of an item in the cache.
+     * Decrement the value of an item in the cache.
      *
      * @param  string  $key
      * @param  mixed   $value
@@ -182,5 +182,16 @@ class RedisStore extends TaggableStore implements Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 }

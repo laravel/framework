@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 
-if (!function_exists('abort')) {
+if (! function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
      *
@@ -21,7 +21,7 @@ if (!function_exists('abort')) {
     }
 }
 
-if (!function_exists('action')) {
+if (! function_exists('action')) {
     /**
      * Generate a URL to a controller action.
      *
@@ -36,7 +36,7 @@ if (!function_exists('action')) {
     }
 }
 
-if (!function_exists('app')) {
+if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
@@ -54,7 +54,7 @@ if (!function_exists('app')) {
     }
 }
 
-if (!function_exists('app_path')) {
+if (! function_exists('app_path')) {
     /**
      * Get the path to the application folder.
      *
@@ -67,7 +67,7 @@ if (!function_exists('app_path')) {
     }
 }
 
-if (!function_exists('asset')) {
+if (! function_exists('asset')) {
     /**
      * Generate an asset path for the application.
      *
@@ -81,7 +81,7 @@ if (!function_exists('asset')) {
     }
 }
 
-if (!function_exists('auth')) {
+if (! function_exists('auth')) {
     /**
      * Get the available auth instance.
      *
@@ -93,7 +93,7 @@ if (!function_exists('auth')) {
     }
 }
 
-if (!function_exists('base_path')) {
+if (! function_exists('base_path')) {
     /**
      * Get the path to the base of the install.
      *
@@ -106,7 +106,7 @@ if (!function_exists('base_path')) {
     }
 }
 
-if (!function_exists('back')) {
+if (! function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
      *
@@ -120,7 +120,7 @@ if (!function_exists('back')) {
     }
 }
 
-if (!function_exists('bcrypt')) {
+if (! function_exists('bcrypt')) {
     /**
      * Hash the given value.
      *
@@ -134,7 +134,7 @@ if (!function_exists('bcrypt')) {
     }
 }
 
-if (!function_exists('config')) {
+if (! function_exists('config')) {
     /**
      * Get / set the specified configuration value.
      *
@@ -158,7 +158,7 @@ if (!function_exists('config')) {
     }
 }
 
-if (!function_exists('config_path')) {
+if (! function_exists('config_path')) {
     /**
      * Get the configuration path.
      *
@@ -171,7 +171,7 @@ if (!function_exists('config_path')) {
     }
 }
 
-if (!function_exists('cookie')) {
+if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
      *
@@ -196,7 +196,7 @@ if (!function_exists('cookie')) {
     }
 }
 
-if (!function_exists('csrf_field')) {
+if (! function_exists('csrf_field')) {
     /**
      * Generate a CSRF token form field.
      *
@@ -204,11 +204,11 @@ if (!function_exists('csrf_field')) {
      */
     function csrf_field()
     {
-        return '<input type="hidden" name="_token" value="'.csrf_token().'">';
+        return new Illuminate\View\Expression('<input type="hidden" name="_token" value="'.csrf_token().'">');
     }
 }
 
-if (!function_exists('csrf_token')) {
+if (! function_exists('csrf_token')) {
     /**
      * Get the CSRF token value.
      *
@@ -228,7 +228,7 @@ if (!function_exists('csrf_token')) {
     }
 }
 
-if (!function_exists('database_path')) {
+if (! function_exists('database_path')) {
     /**
      * Get the database path.
      *
@@ -241,7 +241,7 @@ if (!function_exists('database_path')) {
     }
 }
 
-if (!function_exists('delete')) {
+if (! function_exists('delete')) {
     /**
      * Register a new DELETE route with the router.
      *
@@ -255,7 +255,7 @@ if (!function_exists('delete')) {
     }
 }
 
-if (!function_exists('factory')) {
+if (! function_exists('factory')) {
     /**
      * Create a model factory builder for a given class, name, and amount.
      *
@@ -278,7 +278,7 @@ if (!function_exists('factory')) {
     }
 }
 
-if (!function_exists('get')) {
+if (! function_exists('get')) {
     /**
      * Register a new GET route with the router.
      *
@@ -292,7 +292,7 @@ if (!function_exists('get')) {
     }
 }
 
-if (!function_exists('info')) {
+if (! function_exists('info')) {
     /**
      * Write some information to the log.
      *
@@ -306,7 +306,7 @@ if (!function_exists('info')) {
     }
 }
 
-if (!function_exists('logger')) {
+if (! function_exists('logger')) {
     /**
      * Log a debug message to the logs.
      *
@@ -324,7 +324,20 @@ if (!function_exists('logger')) {
     }
 }
 
-if (!function_exists('old')) {
+if (! function_exists('method_field')) {
+    /**
+     * Generate a form field to spoof the HTTP verb used by forms.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    function method_field($method)
+    {
+        return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$method.'">');
+    }
+}
+
+if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
      *
@@ -338,7 +351,7 @@ if (!function_exists('old')) {
     }
 }
 
-if (!function_exists('patch')) {
+if (! function_exists('patch')) {
     /**
      * Register a new PATCH route with the router.
      *
@@ -352,7 +365,7 @@ if (!function_exists('patch')) {
     }
 }
 
-if (!function_exists('post')) {
+if (! function_exists('post')) {
     /**
      * Register a new POST route with the router.
      *
@@ -366,7 +379,7 @@ if (!function_exists('post')) {
     }
 }
 
-if (!function_exists('put')) {
+if (! function_exists('put')) {
     /**
      * Register a new PUT route with the router.
      *
@@ -380,7 +393,7 @@ if (!function_exists('put')) {
     }
 }
 
-if (!function_exists('public_path')) {
+if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
      *
@@ -393,7 +406,7 @@ if (!function_exists('public_path')) {
     }
 }
 
-if (!function_exists('redirect')) {
+if (! function_exists('redirect')) {
     /**
      * Get an instance of the redirector.
      *
@@ -413,7 +426,7 @@ if (!function_exists('redirect')) {
     }
 }
 
-if (!function_exists('resource')) {
+if (! function_exists('resource')) {
     /**
      * Route a resource to a controller.
      *
@@ -428,7 +441,7 @@ if (!function_exists('resource')) {
     }
 }
 
-if (!function_exists('response')) {
+if (! function_exists('response')) {
     /**
      * Return a new response from the application.
      *
@@ -449,7 +462,7 @@ if (!function_exists('response')) {
     }
 }
 
-if (!function_exists('route')) {
+if (! function_exists('route')) {
     /**
      * Generate a URL to a named route.
      *
@@ -465,7 +478,7 @@ if (!function_exists('route')) {
     }
 }
 
-if (!function_exists('secure_asset')) {
+if (! function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
      *
@@ -478,7 +491,7 @@ if (!function_exists('secure_asset')) {
     }
 }
 
-if (!function_exists('secure_url')) {
+if (! function_exists('secure_url')) {
     /**
      * Generate a HTTPS url for the application.
      *
@@ -492,7 +505,7 @@ if (!function_exists('secure_url')) {
     }
 }
 
-if (!function_exists('session')) {
+if (! function_exists('session')) {
     /**
      * Get / set the specified session value.
      *
@@ -516,7 +529,7 @@ if (!function_exists('session')) {
     }
 }
 
-if (!function_exists('storage_path')) {
+if (! function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
      *
@@ -529,7 +542,7 @@ if (!function_exists('storage_path')) {
     }
 }
 
-if (!function_exists('trans')) {
+if (! function_exists('trans')) {
     /**
      * Translate the given message.
      *
@@ -549,7 +562,7 @@ if (!function_exists('trans')) {
     }
 }
 
-if (!function_exists('trans_choice')) {
+if (! function_exists('trans_choice')) {
     /**
      * Translates the given message based on a count.
      *
@@ -566,7 +579,7 @@ if (!function_exists('trans_choice')) {
     }
 }
 
-if (!function_exists('url')) {
+if (! function_exists('url')) {
     /**
      * Generate a url for the application.
      *
@@ -581,7 +594,7 @@ if (!function_exists('url')) {
     }
 }
 
-if (!function_exists('view')) {
+if (! function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
      *
@@ -602,7 +615,7 @@ if (!function_exists('view')) {
     }
 }
 
-if (!function_exists('env')) {
+if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable. Supports boolean, empty and null.
      *
@@ -644,7 +657,7 @@ if (!function_exists('env')) {
     }
 }
 
-if (!function_exists('event')) {
+if (! function_exists('event')) {
     /**
      * Fire an event and call the listeners.
      *
@@ -659,7 +672,7 @@ if (!function_exists('event')) {
     }
 }
 
-if (!function_exists('elixir')) {
+if (! function_exists('elixir')) {
     /**
      * Get the path to a versioned Elixir file.
      *
@@ -671,7 +684,7 @@ if (!function_exists('elixir')) {
         static $manifest = null;
 
         if (is_null($manifest)) {
-            $manifest = json_decode(file_get_contents(public_path().'/build/rev-manifest.json'), true);
+            $manifest = json_decode(file_get_contents(public_path('build/rev-manifest.json')), true);
         }
 
         if (isset($manifest[$file])) {

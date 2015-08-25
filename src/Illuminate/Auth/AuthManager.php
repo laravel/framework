@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Support\Manager;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
 
 class AuthManager extends Manager
 {
@@ -19,24 +20,32 @@ class AuthManager extends Manager
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
         // secure, encrypted cookie values to get generated for those cookies.
-        $guard->setCookieJar($this->app['cookie']);
+        if (method_exists($guard, 'setCookieJar')) {
+            $guard->setCookieJar($this->app['cookie']);
+        }
 
-        $guard->setDispatcher($this->app['events']);
+        if (method_exists($guard, 'setDispatcher')) {
+            $guard->setDispatcher($this->app['events']);
+        }
 
-        return $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
+        if (method_exists($guard, 'setRequest')) {
+            $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
+        }
+
+        return $guard;
     }
 
     /**
      * Call a custom driver creator.
      *
      * @param  string  $driver
-     * @return \Illuminate\Auth\Guard
+     * @return \Illuminate\Contracts\Auth\Guard
      */
     protected function callCustomCreator($driver)
     {
         $custom = parent::callCustomCreator($driver);
 
-        if ($custom instanceof Guard) {
+        if ($custom instanceof GuardContract) {
             return $custom;
         }
 

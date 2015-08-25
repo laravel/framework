@@ -70,9 +70,33 @@ class ListFailedCommand extends Command
     {
         $row = array_values(array_except($failed, ['payload']));
 
-        array_splice($row, 3, 0, Arr::get(json_decode($failed['payload'], true), 'job'));
+        array_splice($row, 3, 0, $this->extractJobName($failed['payload']));
 
         return $row;
+    }
+
+    /**
+     * @param array $payload
+     *
+     * @return string
+     */
+    private function extractJobName($payload)
+    {
+        $payload = json_decode($payload, true);
+
+        if ($payload && (! isset($payload['data']['command']))) {
+            return Arr::get($payload, 'job');
+        }
+
+        if ($payload && isset($payload['data']['command'])) {
+            preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
+
+            if (isset($matches[1])) {
+                return $matches[1];
+            } else {
+                return Arr::get($payload, 'job');
+            }
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
+use Zend\Diactoros\Response as PsrResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -23,6 +24,8 @@ class RoutingServiceProvider extends ServiceProvider
         $this->registerRedirector();
 
         $this->registerPsrRequest();
+
+        $this->registerPsrResponse();
 
         $this->registerResponseFactory();
     }
@@ -117,6 +120,18 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->app->bind('Psr\Http\Message\ServerRequestInterface', function ($app) {
             return (new DiactorosFactory)->createRequest($app->make('request'));
+        });
+    }
+
+    /**
+     * Register a binding for the PSR-7 response implementation.
+     *
+     * @return void
+     */
+    protected function registerPsrResponse()
+    {
+        $this->app->bind('Psr\Http\Message\ResponseInterface', function ($app) {
+            return new PsrResponse();
         });
     }
 

@@ -3,6 +3,7 @@
 namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -97,7 +98,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $contents = $this->compileString($this->files->get($this->getPath()));
 
-        if (!is_null($this->cachePath)) {
+        if (! is_null($this->cachePath)) {
             $this->files->put($this->getCompiledPath($this->getPath()), $contents);
         }
     }
@@ -325,12 +326,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEscapedEchos($value)
     {
-        $pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
+        $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
 
         $callback = function ($matches) {
-            $whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
+            $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return '<?php echo e('.$this->compileEchoDefaults($matches[1]).'); ?>'.$whitespace;
+            return $matches[1] ? $matches[0] : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
@@ -390,7 +391,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileShow($expression)
     {
-        return "<?php echo \$__env->yieldSection(); ?>";
+        return '<?php echo $__env->yieldSection(); ?>';
     }
 
     /**
@@ -412,7 +413,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileAppend($expression)
     {
-        return "<?php \$__env->appendSection(); ?>";
+        return '<?php $__env->appendSection(); ?>';
     }
 
     /**
@@ -423,7 +424,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndsection($expression)
     {
-        return "<?php \$__env->stopSection(); ?>";
+        return '<?php $__env->stopSection(); ?>';
     }
 
     /**
@@ -434,7 +435,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileStop($expression)
     {
-        return "<?php \$__env->stopSection(); ?>";
+        return '<?php $__env->stopSection(); ?>';
     }
 
     /**
@@ -445,7 +446,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileOverwrite($expression)
     {
-        return "<?php \$__env->stopSection(true); ?>";
+        return '<?php $__env->stopSection(true); ?>';
     }
 
     /**
@@ -478,7 +479,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileLang($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::get$expression; ?>";
+        return "<?php echo app('translator')->get$expression; ?>";
     }
 
     /**
@@ -489,7 +490,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileChoice($expression)
     {
-        return "<?php echo \\Illuminate\\Support\\Facades\\Lang::choice$expression; ?>";
+        return "<?php echo app('translator')->choice$expression; ?>";
     }
 
     /**
@@ -647,7 +648,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileExtends($expression)
     {
-        if (starts_with($expression, '(')) {
+        if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -666,7 +667,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileInclude($expression)
     {
-        if (starts_with($expression, '(')) {
+        if (Str::startsWith($expression, '(')) {
             $expression = substr($expression, 1, -1);
         }
 
@@ -703,14 +704,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndpush($expression)
     {
-        return "<?php \$__env->appendSection(); ?>";
+        return '<?php $__env->appendSection(); ?>';
     }
 
     /**
-    * Get the extensions used by the compiler.
-    *
-    * @return array
-    */
+     * Get the extensions used by the compiler.
+     *
+     * @return array
+     */
     public function getExtensions()
     {
         return $this->extensions;
@@ -740,10 +741,20 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-    * Gets the raw tags used by the compiler.
-    *
-    * @return array
-    */
+     * Get the list of custom directives.
+     *
+     * @return array
+     */
+    public function getCustomDirectives()
+    {
+        return $this->customDirectives;
+    }
+
+    /**
+     * Gets the raw tags used by the compiler.
+     *
+     * @return array
+     */
     public function getRawTags()
     {
         return $this->rawTags;

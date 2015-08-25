@@ -79,7 +79,7 @@ trait ResetsPasswords
         $this->validate($request, [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed',
+            'password' => 'required|confirmed|min:6',
         ]);
 
         $credentials = $request->only(

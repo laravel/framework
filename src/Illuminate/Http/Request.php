@@ -7,6 +7,7 @@ use ArrayAccess;
 use SplFileInfo;
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -152,7 +153,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     public function is()
     {
         foreach (func_get_args() as $pattern) {
-            if (str_is($pattern, urldecode($this->path()))) {
+            if (Str::is($pattern, urldecode($this->path()))) {
                 return true;
             }
         }
@@ -223,7 +224,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $value) {
-            if (!array_key_exists($value, $input)) {
+            if (! array_key_exists($value, $input)) {
                 return false;
             }
         }
@@ -262,7 +263,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $boolOrArray = is_bool($value) || is_array($value);
 
-        return !$boolOrArray && trim((string) $value) === '';
+        return ! $boolOrArray && trim((string) $value) === '';
     }
 
     /**
@@ -347,7 +348,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasCookie($key)
     {
-        return !is_null($this->cookie($key));
+        return ! is_null($this->cookie($key));
     }
 
     /**
@@ -382,7 +383,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function hasFile($key)
     {
-        if (!is_array($files = $this->file($key))) {
+        if (! is_array($files = $this->file($key))) {
             $files = [$files];
         }
 
@@ -451,7 +452,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function flash($filter = null, $keys = [])
     {
-        $flash = (!is_null($filter)) ? $this->$filter($keys) : $this->input();
+        $flash = (! is_null($filter)) ? $this->$filter($keys) : $this->input();
 
         $this->session()->flashInput($flash);
     }
@@ -540,7 +541,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (!isset($this->json)) {
+        if (! isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
         }
 
@@ -566,13 +567,33 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Determine if the given content types match.
+     *
+     * @return bool
+     */
+    public static function matchesType($actual, $type)
+    {
+        if ($actual === $type) {
+            return true;
+        }
+
+        $split = explode('/', $actual);
+
+        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the request is sending JSON.
      *
      * @return bool
      */
     public function isJson()
     {
-        return str_contains($this->header('CONTENT_TYPE'), '/json');
+        return Str::contains($this->header('CONTENT_TYPE'), '/json');
     }
 
     /**
@@ -584,7 +605,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && $acceptable[0] == 'application/json';
+        return isset($acceptable[0]) && $acceptable[0] === 'application/json';
     }
 
     /**
@@ -604,24 +625,49 @@ class Request extends SymfonyRequest implements ArrayAccess
         $types = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if ($accept === '*/*') {
+            if ($accept === '*/*' || $accept === '*') {
                 return true;
             }
 
             foreach ($types as $type) {
-                if ($accept === $type || $accept === strtok('/', $type).'/*') {
-                    return true;
-                }
-
-                $split = explode('/', $accept);
-
-                if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+                if ($this->matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Return the most suitable content type from the given array based on content negotiation.
+     *
+     * @param  string|array  $contentTypes
+     * @return string|null
+     */
+    public function prefers($contentTypes)
+    {
+        $accepts = $this->getAcceptableContentTypes();
+
+        $contentTypes = (array) $contentTypes;
+
+        foreach ($accepts as $accept) {
+            if (in_array($accept, ['*/*', '*'])) {
+                return $contentTypes[0];
+            }
+
+            foreach ($contentTypes as $contentType) {
+                $type = $contentType;
+
+                if (! is_null($mimeType = $this->getMimeType($contentType))) {
+                    $type = $mimeType;
+                }
+
+                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
+                    return $contentType;
+                }
+            }
+        }
     }
 
     /**
@@ -706,7 +752,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function session()
     {
-        if (!$this->hasSession()) {
+        if (! $this->hasSession()) {
             throw new RuntimeException('Session store not set on request.');
         }
 
@@ -726,14 +772,18 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @return \Illuminate\Routing\Route|null
+     * @param string|null $param
+     *
+     * @return object|string
      */
-    public function route()
+    public function route($param = null)
     {
-        if (func_num_args() == 1) {
-            return $this->route()->parameter(func_get_arg(0));
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($param)) {
+            return $route;
         } else {
-            return call_user_func($this->getRouteResolver());
+            return $route->parameter($param);
         }
     }
 
@@ -840,8 +890,8 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         if (array_key_exists($key, $all)) {
             return $all[$key];
-        } elseif (!is_null($this->route())) {
-            return $this->route()->parameter($key);
+        } else {
+            return $this->route($key);
         }
     }
 }

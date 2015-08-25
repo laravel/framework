@@ -162,7 +162,7 @@ trait ApplicationTrait
      */
     protected function startSession()
     {
-        if (!$this->app['session']->isStarted()) {
+        if (! $this->app['session']->isStarted()) {
             $this->app['session']->start();
         }
     }

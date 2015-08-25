@@ -11,6 +11,8 @@ class Inspiring
      *
      * Taylor & Dayle made this commit from Jungfraujoch. (11,333 ft.)
      *
+     * May McGinnis always control the board. #LaraconUS2015
+     *
      * @return string
      */
     public static function quote()
@@ -25,7 +27,6 @@ class Inspiring
             'Well begun is half done. - Aristotle',
             'He who is contented is rich. - Laozi',
             'Very little is needed to make a happy life. - Marcus Antoninus',
-
 
         ])->random();
     }

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use Illuminate\Encryption\Encrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
@@ -81,7 +82,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
     public function testOpenSslEncrypterCanDecryptMcryptedData()
     {
-        $key = str_random(32);
+        $key = Str::random(32);
         $encrypter = new Illuminate\Encryption\McryptEncrypter($key);
         $encrypted = $encrypter->encrypt('foo');
         $openSslEncrypter = new Illuminate\Encryption\Encrypter($key, 'AES-256-CBC');

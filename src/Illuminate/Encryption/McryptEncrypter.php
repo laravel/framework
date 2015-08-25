@@ -2,7 +2,7 @@
 
 namespace Illuminate\Encryption;
 
-use Exception;
+use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
@@ -29,7 +29,7 @@ class McryptEncrypter extends BaseEncrypter implements EncrypterContract
      * Create a new encrypter instance.
      *
      * @param  string  $key
-     * @param  int     $cipher
+     * @param  string  $cipher
      * @return void
      */
     public function __construct($key, $cipher = MCRYPT_RIJNDAEL_128)

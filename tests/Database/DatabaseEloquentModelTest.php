@@ -606,6 +606,23 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Taylor'], $array);
     }
 
+    public function testGetArrayableRelationsFunctionExcludeHiddenRelationships()
+    {
+        $model = new EloquentModelStub;
+
+        $class = new ReflectionClass($model);
+        $method = $class->getMethod('getArrayableRelations');
+        $method->setAccessible(true);
+
+        $model->setRelation('foo', ['bar']);
+        $model->setRelation('bam', ['boom']);
+        $model->setHidden(['foo']);
+
+        $array = $method->invokeArgs($model, []);
+
+        $this->assertSame(['bam' => ['boom']], $array);
+    }
+
     public function testToArraySnakeAttributes()
     {
         $model = new EloquentModelStub;
@@ -671,6 +688,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testWithHidden()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $model->withHidden('age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
     }
 
     public function testDynamicVisible()
@@ -1159,6 +1187,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->sixth = null;
         $model->seventh = null;
         $model->eighth = null;
+
+        $attributes = $model->getAttributes();
+
+        $this->assertNull($attributes['first']);
+        $this->assertNull($attributes['second']);
+        $this->assertNull($attributes['third']);
+        $this->assertNull($attributes['fourth']);
+        $this->assertNull($attributes['fifth']);
+        $this->assertNull($attributes['sixth']);
+        $this->assertNull($attributes['seventh']);
+        $this->assertNull($attributes['eighth']);
 
         $this->assertNull($model->first);
         $this->assertNull($model->second);

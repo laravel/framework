@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
@@ -111,7 +112,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
 
         $token = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
-        return $token && !$this->tokenExpired($token);
+        return $token && ! $this->tokenExpired($token);
     }
 
     /**
@@ -167,7 +168,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function createNewToken()
     {
-        return hash_hmac('sha256', str_random(40), $this->hashKey);
+        return hash_hmac('sha256', Str::random(40), $this->hashKey);
     }
 
     /**

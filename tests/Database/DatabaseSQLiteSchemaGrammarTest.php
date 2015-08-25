@@ -138,6 +138,26 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
+    public function testAddingSmallIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->smallIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+    }
+
+    public function testAddingMediumIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -411,6 +431,20 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(2, count($statements));
+        $expected = [
+            'alter table "users" add column "created_at" datetime not null',
+            'alter table "users" add column "updated_at" datetime not null',
+        ];
+        $this->assertEquals($expected, $statements);
+    }
+
+    public function testAddingTimeStampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(2, count($statements));

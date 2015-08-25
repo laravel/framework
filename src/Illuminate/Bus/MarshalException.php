@@ -8,7 +8,7 @@ use ReflectionParameter;
 class MarshalException extends RuntimeException
 {
     /**
-     * Throw new a new exception.
+     * Throw a new exception.
      *
      * @param  string  $command
      * @param  \ReflectionParameter  $parameter
