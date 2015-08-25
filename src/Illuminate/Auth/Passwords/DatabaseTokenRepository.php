@@ -190,6 +190,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
 
         return true;
     }
+
     /**
      * Begin a new database query against the table.
      *
