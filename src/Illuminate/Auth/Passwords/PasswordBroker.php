@@ -220,10 +220,10 @@ class PasswordBroker implements PasswordBrokerContract
     }
 
     /**
-     * Validates The Password Reset Token
+     * Validate Reset Password Token
      *
      * @param  string  $token
-     * @return boolean
+     * @return bool
      */
     public function validateToken($token)
     {

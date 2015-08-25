@@ -39,10 +39,10 @@ interface TokenRepositoryInterface
     public function deleteExpired();
 
     /**
-     * Get & Validate Token Data From Database
+     * Get & Validate Token Data From Database.
      *
      * @param string $token
-     * @return array
+     * @return bool
      */
     public function validateTokenData($token);
 }
