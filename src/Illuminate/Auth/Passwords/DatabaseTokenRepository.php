@@ -172,7 +172,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     }
 
     /**
-     * Get The Token Data From Database
+     * Get & Validate Token Data From Database
      *
      * @param string $token
      * @return array
