@@ -131,6 +131,10 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
 
         Paginator::currentPageResolver(function () { return 1; });
+        $models = EloquentTestUser::oldest('id')->paginate();
+
+        $this->assertEquals(3, $models->count());
+
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
         $this->assertEquals(2, $models->count());
@@ -147,6 +151,22 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('EloquentTestUser', $models[0]);
         $this->assertEquals('foo@gmail.com', $models[0]->email);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testPaginateWithNegativePerPageThrowsInvalidArgumentException()
+    {
+        EloquentTestUser::paginate(-3);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSimplePaginateWithNegativePerPageThrowsInvalidArgumentException()
+    {
+        EloquentTestUser::simplePaginate(-3);
     }
 
     public function testCountForPaginationWithGrouping()
