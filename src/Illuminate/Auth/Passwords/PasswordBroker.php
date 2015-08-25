@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Carbon\Carbon;
 use Closure;
 use UnexpectedValueException;
 use Illuminate\Contracts\Auth\UserProvider;
