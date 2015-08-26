@@ -138,6 +138,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Fills a collection with items.
+     *
+     * @param  int  $amount
+     * @param  mixed  $value
+     * @param  bool  $append
+     * @return $this
+     */
+    public function fill($amount, $value = null, $append = true)
+    {
+        $items = ($amount - $this->count()) - 1;
+
+        foreach (range(0, $items) as $range) {
+            if ($append) {
+                $this->push($value);
+            } else {
+                $this->prepend($value);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Fetch a nested element of the collection.
      *
      * @param  string  $key
