@@ -60,7 +60,7 @@ abstract class BaseEncrypter
      */
     protected function invalidPayload($data)
     {
-        return ! is_array($data) || ! isset($data['iv']) || ! isset($data['value']) || ! isset($data['mac']);
+        return ! is_array($data) || ! isset($data['iv']) || ! (strlen(base64_decode($data['iv'])) === $this->getIvSize()) || ! isset($data['value']) || ! isset($data['mac']);
     }
 
     /**
@@ -79,4 +79,11 @@ abstract class BaseEncrypter
 
         return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
     }
+
+    /**
+     * Needs to be implemented by child class to be used in payload validation.
+     *
+     * @return int
+     */
+    abstract protected function getIvSize();
 }
