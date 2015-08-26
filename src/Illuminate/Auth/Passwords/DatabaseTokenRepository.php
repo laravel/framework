@@ -185,8 +185,8 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
             return false;
         }
 
-        $expiration_date = Carbon::parse($token->created_at)->addSeconds($this->expires);
-        if ($expiration_date->lt(Carbon::now())) {
+        $expirationDate = Carbon::parse($token->created_at)->addSeconds($this->expires);
+        if ($expirationDate->lt(Carbon::now())) {
             return false;
         }
 
