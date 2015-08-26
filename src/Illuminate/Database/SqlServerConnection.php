@@ -76,7 +76,7 @@ class SqlServerConnection extends Connection
     /**
      * Get the default post processor instance.
      *
-     * @return \Illuminate\Database\Query\Processors\Processor
+     * @return \Illuminate\Database\Query\Processors\SqlServerProcessor
      */
     protected function getDefaultPostProcessor()
     {
@@ -84,7 +84,7 @@ class SqlServerConnection extends Connection
     }
 
     /**
-     * Get the Doctrine DBAL Driver.
+     * Get the Doctrine DBAL driver.
      *
      * @return \Doctrine\DBAL\Driver\PDOSqlsrv\Driver
      */
