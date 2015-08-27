@@ -85,13 +85,14 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->andReturn($query);
         $mockJobs = [];
-        for ($i = 0; $i < 3; $i++) {
-            $mockJobs[$i] = new StdClass;
+        for ($i = 0; $i < 3; ++$i) {
+            $mockJobs[$i] = new StdClass();
             $mockJobs[$i]->id = $i + 1;
         }
         $query->shouldReceive('get')->andReturn($mockJobs);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
+
             return $query;
         });
         $query->shouldReceive('whereIn')->once()->andReturnUsing(function ($column, $values) use ($query, $mockJobs) {
@@ -99,12 +100,14 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
             foreach ($values as $idx => $v) {
                 $this->assertEquals($mockJobs[$idx]->id, $v);
             }
+
             return $query;
         });
         $query->shouldReceive('update')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals(0, $array['reserved']);
             $this->assertEquals(null, $array['reserved_at']);
             $this->assertEquals('attempts + 1', $array['attempts']->getValue());
+
             return $query;
         });
 
@@ -122,6 +125,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('nofunc')->andReturn(null);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
+
             return $query;
         });
         $query->shouldNotReceive('whereIn');
