@@ -84,20 +84,20 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
         $database->shouldIgnoreMissing();
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->andReturn($query);
-        $mock_jobs = array();
+        $mockJobs = [];
         for ($i = 0; $i < 3; $i++) {
-            $mock_jobs[$i] = new StdClass;
-            $mock_jobs[$i]->id = $i + 1;
+            $mockJobs[$i] = new StdClass;
+            $mockJobs[$i]->id = $i + 1;
         }
-        $query->shouldReceive('get')->andReturn($mock_jobs);
+        $query->shouldReceive('get')->andReturn($mockJobs);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
             return $query;
         });
-        $query->shouldReceive('whereIn')->once()->andReturnUsing(function ($column, $values) use ($query, $mock_jobs) {
+        $query->shouldReceive('whereIn')->once()->andReturnUsing(function ($column, $values) use ($query, $mockJobs) {
             $this->assertEquals('id', $column);
             foreach ($values as $idx => $v) {
-                $this->assertEquals($mock_jobs[$idx]->id, $v);
+                $this->assertEquals($mockJobs[$idx]->id, $v);
             }
             return $query;
         });

@@ -192,7 +192,7 @@ class DatabaseQueue extends Queue implements QueueContract
                     ->where('reserved', 1)
                     ->where('reserved_at', '<=', $expired)
                     ->select(['id'])->get();
-        if (!empty($expired_jobs)) {
+        if (! empty($expired_jobs)) {
             $expired_jobs_ids = array_map(function ($job) {
                                     return $job->id;
                                 }, $expired_jobs);
