@@ -595,7 +595,7 @@ trait CrawlerTrait
 
         foreach ($data as $expected) {
             $this->$method(
-                in_array($expected, $actualKeys),
+                in_array($expected, $actualKeys, true),
                 ($negate ? 'Found unexpected' : 'Unable to find')." JSON key [{$expected}] within [{$actual}]."
             );
         }
