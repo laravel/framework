@@ -185,8 +185,8 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         // If the factory is not a Closure, it means it is just a class name which is
-        // is bound into this container to the abstract type and we will just wrap
-        // it up inside a Closure to make things more convenient when extending.
+        // bound into this container to the abstract type and we will just wrap it
+        // up inside its own Closure to give us more convenience when extending.
         if (! $concrete instanceof Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }
