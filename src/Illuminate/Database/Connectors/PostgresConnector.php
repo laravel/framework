@@ -57,6 +57,14 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $connection->prepare("set search_path to {$schema}")->execute();
         }
 
+        // In Postgres the name of the application can be set by the user.
+        // This is useful for monitoring.
+        if (isset($config['application_name'])) {
+            $applicationName = $config['application_name'];
+
+            $connection->prepare("set application_name to '$applicationName'")->execute();
+        }
+
         return $connection;
     }
 
