@@ -127,13 +127,8 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
 
             return $query;
         });
-        if (method_exists($query, 'shouldNotReceive')) {
-            $query->shouldNotReceive('whereIn');
-            $query->shouldNotReceive('update');
-        } else {
-            $query->shouldReceive('whereIn')->andReturnUsing(function () { $this->fail('Should not call whereIn method'); });
-            $query->shouldReceive('update')->andReturnUsing(function () { $this->fail('Should not cal update method'); });
-        }
+        $query->shouldReceive('whereIn')->never();
+        $query->shouldReceive('update')->never();
 
         $queue->pop();
     }
