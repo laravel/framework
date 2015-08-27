@@ -225,6 +225,17 @@ class PasswordBroker implements PasswordBrokerContract {
 		return $password === $confirm && mb_strlen($password) >= 6;
 	}
 
+    /**
+     * Validate reset password token.
+     *
+     * @param  string  $token
+     * @return bool
+     */
+    public function validateToken($token)
+    {
+        return $this->tokens->validateToken($token);
+    }
+
 	/**
 	 * Get the user for the given credentials.
 	 *
