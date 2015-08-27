@@ -81,7 +81,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
     {
         $queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getNextAvailableJob'], [$database = m::mock('Illuminate\Database\Connection'), 'table', 'default', 1]);
         $queue->expects($this->any())->method('getNextAvailableJob')->will($this->returnValue(null));
-        $database->shouldIgnoreMissing();
+        $database->shouldReceive('commit');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->andReturn($query);
         $mockJobs = [];
@@ -118,18 +118,22 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
     {
         $queue = $this->getMock('Illuminate\Queue\DatabaseQueue', ['getNextAvailableJob'], [$database = m::mock('Illuminate\Database\Connection'), 'table', 'default', 1]);
         $queue->expects($this->any())->method('getNextAvailableJob')->will($this->returnValue(null));
-        $database->shouldIgnoreMissing();
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('StdClass'));
+        $database->shouldReceive('commit');
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('get')->andReturn(null);
-        $query->shouldReceive('nofunc')->andReturn(null);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
 
             return $query;
         });
-        $query->shouldNotReceive('whereIn');
-        $query->shouldNotReceive('update');
+        if (method_exists($query, 'shouldNotReceive')) {
+            $query->shouldNotReceive('whereIn');
+            $query->shouldNotReceive('update');
+        } else {
+            $query->shouldReceive('whereIn')->andReturnUsing(function() { $this->fail('Should not call whereIn method'); });
+            $query->shouldReceive('update')->andReturnUsing(function() { $this->fail('Should not cal update method'); });
+        }
 
         $queue->pop();
     }
