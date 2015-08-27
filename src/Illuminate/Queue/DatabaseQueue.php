@@ -187,15 +187,24 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
 
-        $this->database->table($this->table)
-                    ->where('queue', $this->getQueue($queue))
+        $expired_jobs = $this->database->table($this->table)
+                    ->where('queue', $queue)
                     ->where('reserved', 1)
                     ->where('reserved_at', '<=', $expired)
+                    ->select(['id'])->get();
+        if (!empty($expired_jobs)) {
+            $expired_jobs_ids = array_map(function ($job) {
+                                    return $job->id;
+                                }, $expired_jobs);
+
+            $this->database->table($this->table)
+                    ->whereIn('id', $expired_jobs_ids)
                     ->update([
                         'reserved' => 0,
                         'reserved_at' => null,
                         'attempts' => new Expression('attempts + 1'),
                     ]);
+        }
     }
 
     /**
