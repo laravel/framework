@@ -172,6 +172,29 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     }
 
     /**
+     * Get and validate token data from database.
+     *
+     * @param  string  $token
+     * @return bool
+     */
+    public function validateToken($token)
+    {
+        $token = $this->getTable()->where('token', $token)->first();
+
+        if (empty($token)) {
+            return false;
+        }
+
+        $expirationDate = Carbon::parse($token->created_at)->addSeconds($this->expires);
+
+        if ($expirationDate->lt(Carbon::now())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Begin a new database query against the table.
      *
      * @return \Illuminate\Database\Query\Builder
