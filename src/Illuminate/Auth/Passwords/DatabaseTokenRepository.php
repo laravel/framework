@@ -174,7 +174,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Get and validate token data from database.
      *
-     * @param string $token
+     * @param  string  $token
      * @return bool
      */
     public function validateToken($token)
