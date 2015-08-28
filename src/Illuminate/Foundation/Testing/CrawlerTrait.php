@@ -309,6 +309,23 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that an input field does not contain the given value.
+     *
+     * @param  string  $selector
+     * @param  string  $value
+     * @return $this
+     */
+    public function dontSeeInField($selector, $value)
+    {
+        $this->assertNotSame(
+            $this->getInputOrTextAreaValue($selector), $value,
+            "The input [{$selector}] should not contain the value [{$value}]."
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the given checkbox is selected.
      *
      * @param  string  $selector
@@ -319,6 +336,22 @@ trait CrawlerTrait
         $this->assertTrue(
             $this->isChecked($selector),
             "The checkbox [{$selector}] is not checked."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given checkbox is not selected.
+     *
+     * @param  string  $selector
+     * @return $this
+     */
+    public function dontSeeIsChecked($selector)
+    {
+        $this->assertFalse(
+            $this->isChecked($selector),
+            "The checkbox [{$selector}] is checked."
         );
 
         return $this;
@@ -336,6 +369,23 @@ trait CrawlerTrait
         $this->assertSame(
             $expected, $this->getSelectedValue($selector),
             "The field [{$selector}] does not contain the selected value [{$expected}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given value is not selected.
+     *
+     * @param  string  $selector
+     * @param  string  $value
+     * @return $this
+     */
+    public function dontSeeIsSelected($selector, $value)
+    {
+        $this->assertNotSame(
+            $value, $this->getSelectedValue($selector),
+            "The field [{$selector}] contains the selected value [{$value}]."
         );
 
         return $this;
