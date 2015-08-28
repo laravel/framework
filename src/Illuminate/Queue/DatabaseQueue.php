@@ -191,11 +191,12 @@ class DatabaseQueue extends Queue implements QueueContract
                     ->where('queue', $queue)
                     ->where('reserved', 1)
                     ->where('reserved_at', '<=', $expired)
-                    ->select(['id'])->get();
+                    ->select(['id'])->lockForUpdate()->get();
+
         if (! empty($expiredJobs)) {
             $expiredJobsIds = array_map(function ($job) {
-                                    return $job->id;
-                                }, $expiredJobs);
+                        return $job->id;
+                    }, $expiredJobs);
 
             $this->database->table($this->table)
                     ->whereIn('id', $expiredJobsIds)

@@ -90,6 +90,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
             $mockJobs[$i]->id = $i + 1;
         }
         $query->shouldReceive('get')->andReturn($mockJobs);
+        $query->shouldReceive('lockForUpdate')->andReturn($query);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
 
@@ -122,6 +123,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
         $database->shouldReceive('commit');
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('get')->andReturn(null);
+        $query->shouldReceive('lockForUpdate')->andReturn($query);
         $query->shouldReceive('select')->once()->andReturnUsing(function ($array) use ($query) {
             $this->assertEquals('id', $array[0]);
 
