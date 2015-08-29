@@ -28,9 +28,11 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { $this->assertEquals(1, $user->id);
+        $gate->define('foo', function ($user) {
+            $this->assertEquals(1, $user->id);
 
-return true; });
+            return true;
+        });
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -70,9 +72,11 @@ return true; });
         $gate = $this->getBasicGate();
 
         // Assert that the callback receives the new user with ID of 2 instead of ID of 1...
-        $gate->define('foo', function ($user) { $this->assertEquals(2, $user->id);
+        $gate->define('foo', function ($user) {
+            $this->assertEquals(2, $user->id);
 
-return true; });
+            return true;
+        });
 
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
