@@ -79,6 +79,7 @@ return array_map('realpath', [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Validation/ValidationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Validation/ValidatesRequests.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Validation/ValidatesWhenResolvedTrait.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Auth/Access/AuthorizesRequests.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/FormRequest.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Bus/DispatchesJobs.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
