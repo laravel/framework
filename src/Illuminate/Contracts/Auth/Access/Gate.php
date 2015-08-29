@@ -10,7 +10,7 @@ interface Gate
      * @param  string  $ability
      * @return bool
      */
-	public function has($ability);
+    public function has($ability);
 
     /**
      * Define a new ability.
@@ -19,7 +19,7 @@ interface Gate
      * @param  callable|string  $callback
      * @return $this
      */
-	public function define($ability, $callback);
+    public function define($ability, $callback);
 
     /**
      * Define a policy class for a given class type.
@@ -37,5 +37,5 @@ interface Gate
      * @param  array|mixed  $arguents
      * @return bool
      */
-	public function check($ability, $arguments = []);
+    public function check($ability, $arguments = []);
 }
