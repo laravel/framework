@@ -13,7 +13,6 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->getBasicGate()->define('foo', 'foo');
     }
 
-
     public function test_basic_closures_can_be_defined()
     {
         $gate = $this->getBasicGate();
@@ -25,16 +24,16 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
-
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { $this->assertEquals(1, $user->id); return true; });
+        $gate->define('foo', function ($user) { $this->assertEquals(1, $user->id);
+
+return true; });
 
         $this->assertTrue($gate->check('foo'));
     }
-
 
     public function test_classes_can_be_defined_as_callbacks_using_at_notation()
     {
@@ -45,7 +44,6 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
-
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_type()
     {
         $gate = $this->getBasicGate();
@@ -54,7 +52,6 @@ class GateTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
-
 
     public function test_policies_always_override_closures_with_same_name()
     {
@@ -68,24 +65,23 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
-
     public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance()
     {
         $gate = $this->getBasicGate();
 
         // Assert that the callback receives the new user with ID of 2 instead of ID of 1...
-        $gate->define('foo', function ($user) { $this->assertEquals(2, $user->id); return true; });
+        $gate->define('foo', function ($user) { $this->assertEquals(2, $user->id);
+
+return true; });
 
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
-
 
     protected function getBasicGate()
     {
         return new Gate(new Container, (object) ['id' => 1]);
     }
 }
-
 
 class AccessGateTestClass
 {
@@ -95,12 +91,10 @@ class AccessGateTestClass
     }
 }
 
-
 class AccessGateTestDummy
 {
     //
 }
-
 
 class AccessGateTestPolicy
 {
