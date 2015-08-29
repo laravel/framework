@@ -2,10 +2,8 @@
 
 namespace Illuminate\Auth\Access;
 
-use Closure;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class Gate implements GateContract
