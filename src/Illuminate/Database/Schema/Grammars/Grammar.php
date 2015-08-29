@@ -327,7 +327,7 @@ abstract class Grammar extends BaseGrammar
             $column = $this->getDoctrineColumnForChange($table, $fluent);
 
             // Here we will spin through each fluent column definition and map it to the proper
-            // Doctrine column definitions, which is necessasry because Laravel and Doctrine
+            // Doctrine column definitions - which is necessary because Laravel and Doctrine
             // use some different terminology for various column attributes on the tables.
             foreach ($fluent->getAttributes() as $key => $value) {
                 if (! is_null($option = $this->mapFluentOptionToDoctrine($key))) {
