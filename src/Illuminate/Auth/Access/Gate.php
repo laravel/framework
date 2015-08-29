@@ -137,7 +137,7 @@ class Gate implements GateContract
         } elseif (isset($this->abilities[$ability])) {
             $callback = $this->abilities[$ability];
         } else {
-            throw new InvalidArgumentException("Ability [{$ability}] has not been defined.");
+            return false;
         }
 
         array_unshift($arguments, $this->user);
