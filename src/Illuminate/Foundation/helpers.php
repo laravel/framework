@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 if (! function_exists('abort')) {
     /**
@@ -362,6 +363,21 @@ if (! function_exists('patch')) {
     function patch($uri, $action)
     {
         return app('router')->patch($uri, $action);
+    }
+}
+
+if (! function_exists('policy')) {
+    /**
+     * Get a policy instance for a given class.
+     *
+     * @param  object|string  $class
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    function policy($class)
+    {
+        return app(Gate::class)->getPolicyFor($class);
     }
 }
 
