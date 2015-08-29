@@ -86,7 +86,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-	 * Get the items in the collection that are not present in the given items.
+     * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
      * @return static
