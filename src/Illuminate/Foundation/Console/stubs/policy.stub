@@ -2,9 +2,7 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Auth\Access\Policy;
-
-class DummyClass extends Policy
+class DummyClass
 {
     /**
      * Create a new policy instance.
