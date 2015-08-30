@@ -65,7 +65,7 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerAccessGate()
     {
         $this->app->singleton(GateContract::class, function ($app) {
-            return new Gate($app, $app['auth']->user());
+            return new Gate($app, function () use ($app) { return $app['auth']->user(); });
         });
     }
 
