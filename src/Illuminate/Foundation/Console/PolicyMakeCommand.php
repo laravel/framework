@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Exception;
 use Illuminate\Console\GeneratorCommand;
 
 class PolicyMakeCommand extends GeneratorCommand
