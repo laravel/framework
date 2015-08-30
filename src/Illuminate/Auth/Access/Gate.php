@@ -120,6 +120,30 @@ class Gate implements GateContract
      * @param  array|mixed  $arguents
      * @return bool
      */
+    public function allows($ability, $arguments = [])
+    {
+        return $this->check($ability, $arguments);
+    }
+
+    /**
+     * Determine if the given ability should be denied for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguents
+     * @return bool
+     */
+    public function denies($ability, $arguments = [])
+    {
+        return ! $this->allows($ability, $arguments);
+    }
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguents
+     * @return bool
+     */
     public function check($ability, $arguments = [])
     {
         if (! $this->user) {
