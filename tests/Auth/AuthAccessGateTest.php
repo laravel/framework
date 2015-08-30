@@ -83,7 +83,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
     protected function getBasicGate()
     {
-        return new Gate(new Container, (object) ['id' => 1]);
+        return new Gate(new Container, function () { return (object) ['id' => 1]; });
     }
 }
 

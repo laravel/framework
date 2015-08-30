@@ -16,11 +16,11 @@ class Gate implements GateContract
     protected $container;
 
     /**
-     * The user instance.
+     * The user resolver callable.
      *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
+     * @var callable
      */
-    protected $user;
+    protected $userResolver;
 
     /**
      * All of the defined abilities.
@@ -40,17 +40,17 @@ class Gate implements GateContract
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @param  callable  $userResolver
      * @param  array  $abilities
      * @param  array  $policies
      * @return void
      */
-    public function __construct(Container $container, $user, array $abilities = [], array $policies = [])
+    public function __construct(Container $container, callable $userResolver, array $abilities = [], array $policies = [])
     {
-        $this->user = $user;
         $this->policies = $policies;
         $this->container = $container;
         $this->abilities = $abilities;
+        $this->userResolver = $userResolver;
     }
 
     /**
@@ -146,7 +146,9 @@ class Gate implements GateContract
      */
     public function check($ability, $arguments = [])
     {
-        if (! $this->user) {
+        $user = $this->resolveUser();
+
+        if (! $user) {
             return false;
         }
 
@@ -162,7 +164,7 @@ class Gate implements GateContract
             return false;
         }
 
-        array_unshift($arguments, $this->user);
+        array_unshift($arguments, $user);
 
         return call_user_func_array($callback, $arguments);
     }
@@ -207,7 +209,17 @@ class Gate implements GateContract
     public function forUser($user)
     {
         return new static(
-            $this->container, $user, $this->abilities, $this->policies
+            $this->container, function () use ($user) { return $user; }, $this->abilities, $this->policies
         );
+    }
+
+    /**
+     * Resolve the user from the user resolver.
+     *
+     * @return mixed
+     */
+    protected function resolveUser()
+    {
+        return call_user_func($this->userResolver);
     }
 }
