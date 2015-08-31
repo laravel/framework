@@ -37,6 +37,38 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
+    public function test_a_single_argument_can_be_passed_when_checking_abilities()
+    {
+        $gate = $this->getBasicGate();
+
+        $dummy = new AccessGateTestDummy;
+
+        $gate->define('foo', function ($user, $x) use ($dummy) {
+            $this->assertEquals($dummy, $x);
+
+            return true;
+        });
+
+        $this->assertTrue($gate->check('foo', $dummy));
+    }
+
+    public function test_multiple_arguments_can_be_passed_when_checking_abilities()
+    {
+        $gate = $this->getBasicGate();
+
+        $dummy1 = new AccessGateTestDummy;
+        $dummy2 = new AccessGateTestDummy;
+
+        $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
+            $this->assertEquals($dummy1, $x);
+            $this->assertEquals($dummy2, $y);
+
+            return true;
+        });
+
+        $this->assertTrue($gate->check('foo', [$dummy1, $dummy2]));
+    }
+
     public function test_classes_can_be_defined_as_callbacks_using_at_notation()
     {
         $gate = $this->getBasicGate();
@@ -59,8 +91,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        // Force failure if this is called...
-        $gate->define('update', function () { $this->assertTrue(false); });
+        $gate->define('update', function () { $this->fail(); });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
