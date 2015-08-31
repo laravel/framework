@@ -712,6 +712,8 @@ if (! function_exists('elixir')) {
      *
      * @param  string  $file
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     function elixir($file)
     {

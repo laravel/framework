@@ -70,6 +70,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  callable|string  $callback
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function define($ability, $callback)
     {
@@ -117,7 +119,7 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = [])
@@ -129,7 +131,7 @@ class Gate implements GateContract
      * Determine if the given ability should be denied for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = [])
@@ -141,7 +143,7 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function check($ability, $arguments = [])
