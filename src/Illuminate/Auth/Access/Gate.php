@@ -170,9 +170,9 @@ class Gate implements GateContract
             return [$this->resolvePolicy($this->policies[get_class($arguments[0])]), $ability];
         } elseif (isset($this->abilities[$ability])) {
             return $this->abilities[$ability];
-        } else {
-            return function () { return false; };
         }
+
+        return function () { return false; };
     }
 
     /**

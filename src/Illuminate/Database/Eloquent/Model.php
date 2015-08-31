@@ -869,13 +869,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If we are not eager loading the relationship we will essentially treat this
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
-        else {
-            $instance = new $class;
+        $instance = new $class;
 
-            return new MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
-            );
-        }
+        return new MorphTo(
+            $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+        );
     }
 
     /**

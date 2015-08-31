@@ -65,9 +65,9 @@ class HandlerEventCommand extends GeneratorCommand
     {
         if ($this->option('queued')) {
             return __DIR__.'/stubs/event-handler-queued.stub';
-        } else {
-            return __DIR__.'/stubs/event-handler.stub';
         }
+
+        return __DIR__.'/stubs/event-handler.stub';
     }
 
     /**
