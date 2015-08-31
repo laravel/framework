@@ -11,6 +11,29 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
+    // from https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Test_TLDs
+    private $testIdns = [
+        'xn--mgbh0fb.xn--kgbechtv' => 'مثال.إختبار',
+        'xn--mgbh0fb.xn--hgbk6aj7f53bba' => 'مثال.آزمایشی',
+        'xn--fsqu00a.xn--0zwm56d' => '例子.测试',
+        'xn--fsqu00a.xn--g6w251d' => '例子.測試',
+        'xn--e1afmkfd.xn--80akhbyknj4f' => 'пример.испытание',
+        'xn--p1b6ci4b4b3a.xn--11b5bs3a9aj6g' => 'उदाहरण.परीक्षा',
+        'xn--hxajbheg2az3al.xn--jxalpdlp' => 'παράδειγμα.δοκιμή',
+        'xn--9n2bp8q.xn--9t4b11yi5a' => '실례.테스트',
+        'xn--fdbk5d8ap9b8a8d.xn--deba0ad' => 'בײַשפּיל.טעסט',
+        'xn--r8jz45g.xn--zckzah' => '例え.テスト',
+        'xn--zkc6cc5bi7f6e.xn--hlcj6aya9esc7a' => 'உதாரணம்.பரிட்சை',
+        'xn--derhausberwacher-pzb.de' => 'derhausüberwacher.de',
+        'xn--renangonalves-pgb.com' => 'renangonçalves.com',
+        'xn--p1ai.ru' => 'рф.ru',
+        'xn--jxalpdlp.gr' => 'δοκιμή.gr',
+        'xn--65bj6btb5gwimc.xn--54b7fta0cc' => 'ফাহাদ্১৯.বাংলা',
+        'xn--uba5533kmaba1adkfh6ch2cg.gr' => '𐌀𐌖𐌋𐌄𐌑𐌉·𐌌𐌄𐌕𐌄𐌋𐌉𐌑.gr',
+        'guangdong.xn--xhq521b' => 'guangdong.广东',
+        'xn--gwd-hna98db.pl' => 'gwóźdź.pl',
+    ];
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getRealTranslator();
@@ -971,6 +994,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'Url']);
         $this->assertTrue($v->passes());
+
+        // Test IDNs
+        foreach ($this->testIdns as $idn) {
+            $v = new Validator($trans, ['x' => 'http://'.$idn], ['x' => 'url']);
+            $this->assertTrue($v->passes());
+        }
     }
 
     public function testValidateActiveUrl()

@@ -7,6 +7,7 @@ use DateTime;
 use Countable;
 use Exception;
 use DateTimeZone;
+use TrueBV\Punycode;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1200,7 +1201,7 @@ class Validator implements ValidatorContract
      */
     protected function validateUrl($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        return filter_var((new Punycode())->encode($value), FILTER_VALIDATE_URL) !== false;
     }
 
     /**

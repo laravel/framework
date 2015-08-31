@@ -39,7 +39,8 @@
         "symfony/routing": "2.7.*",
         "symfony/translation": "2.7.*",
         "symfony/var-dumper": "2.7.*",
-        "vlucas/phpdotenv": "~1.0"
+        "vlucas/phpdotenv": "~1.0",
+        "true/punycode": "~2.0"
     },
     "replace": {
         "illuminate/auth": "self.version",
