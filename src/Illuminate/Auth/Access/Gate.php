@@ -156,8 +156,8 @@ class Gate implements GateContract
             $arguments = [$arguments];
         }
 
-        if (isset($arguments[0]) && isset($this->policies[$argumentClass = get_class($arguments[0])])) {
-            $callback = [$this->resolvePolicy($this->policies[$argumentClass]), $ability];
+        if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
+            $callback = [$this->resolvePolicy($this->policies[get_class($arguments[0])]), $ability];
         } elseif (isset($this->abilities[$ability])) {
             $callback = $this->abilities[$ability];
         } else {
@@ -167,6 +167,18 @@ class Gate implements GateContract
         array_unshift($arguments, $user);
 
         return call_user_func_array($callback, $arguments);
+    }
+
+    /**
+     * Determine if the first argument in the array corresponds to a policy.
+     *
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function firstArgumentCorrespondsToPolicy(array $arguments)
+    {
+        return isset($arguments[0]) && is_object($arguments[0]) &&
+               isset($this->policies[get_class($arguments[0])]);
     }
 
     /**
