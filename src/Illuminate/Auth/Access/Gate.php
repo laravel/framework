@@ -70,6 +70,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  callable|string  $callback
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function define($ability, $callback)
     {
@@ -117,7 +119,7 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = [])
@@ -129,7 +131,7 @@ class Gate implements GateContract
      * Determine if the given ability should be denied for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = [])
@@ -141,32 +143,50 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function check($ability, $arguments = [])
     {
-        $user = $this->resolveUser();
-
-        if (! $user) {
+        if (! $user = $this->resolveUser()) {
             return false;
         }
 
-        if (! is_array($arguments)) {
-            $arguments = [$arguments];
-        }
+        $callback = $this->resolveAuthCallback(
+            $ability, $arguments = is_array($arguments) ? $arguments : [$arguments]
+        );
 
-        if (isset($arguments[0]) && isset($this->policies[$argumentClass = get_class($arguments[0])])) {
-            $callback = [$this->resolvePolicy($this->policies[$argumentClass]), $ability];
+        return call_user_func_array($callback, array_merge([$user], $arguments));
+    }
+
+    /**
+     * Resolve the callable for the given ability and arguments.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return callable
+     */
+    protected function resolveAuthCallback($ability, array $arguments)
+    {
+        if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
+            return [$this->resolvePolicy($this->policies[get_class($arguments[0])]), $ability];
         } elseif (isset($this->abilities[$ability])) {
-            $callback = $this->abilities[$ability];
+            return $this->abilities[$ability];
         } else {
-            return false;
+            return function () { return false; };
         }
+    }
 
-        array_unshift($arguments, $user);
-
-        return call_user_func_array($callback, $arguments);
+    /**
+     * Determine if the first argument in the array corresponds to a policy.
+     *
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function firstArgumentCorrespondsToPolicy(array $arguments)
+    {
+        return isset($arguments[0]) && is_object($arguments[0]) &&
+               isset($this->policies[get_class($arguments[0])]);
     }
 
     /**
@@ -201,7 +221,7 @@ class Gate implements GateContract
     }
 
     /**
-     * Get a guard instance for the given uer.
+     * Get a guard instance for the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
      * @return static
