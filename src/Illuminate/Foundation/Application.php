@@ -462,13 +462,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Determine if application is in local production.
+     * Determine if application is in environment environment.
      *
      * @return bool
      */
     public function isProduction()
     {
-        return $this['env'] == 'production';
+        return $this['env'] == 'production' || $this['env'] == 'prod';
     }
 
     /**
