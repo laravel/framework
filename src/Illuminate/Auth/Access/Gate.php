@@ -150,15 +150,11 @@ class Gate implements GateContract
             return false;
         }
 
-        if (! is_array($arguments)) {
-            $arguments = [$arguments];
-        }
+        $callback = $this->resolveAuthCallback(
+            $ability, $arguments = is_array($arguments) ? $arguments : [$arguments]
+        );
 
-        $callback = $this->resolveAuthCallback($ability, $arguments);
-
-        array_unshift($arguments, $user);
-
-        return call_user_func_array($callback, $arguments);
+        return call_user_func_array($callback, array_merge([$user], $arguments));
     }
 
     /**
