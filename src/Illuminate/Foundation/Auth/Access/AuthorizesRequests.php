@@ -19,9 +19,7 @@ trait AuthorizesRequests
     public function authorize($ability, $arguments = [])
     {
         if (func_num_args() === 1) {
-            $arguments = $ability;
-
-            $ability = debug_backtrace(false, 2)[1]['function'];
+            list($arguments, $ability) = [$ability, $this->guessAbilityName()];
         }
 
         if (! app(Gate::class)->check($ability, $arguments)) {
@@ -41,11 +39,25 @@ trait AuthorizesRequests
      */
     public function authorizeForUser($user, $abiility, $arguments = [])
     {
+        if (func_num_args() === 2) {
+            list($arguments, $ability) = [$ability, $this->guessAbilityName()];
+        }
+
         $result = app(Gate::class)->forUser($user)->check($ability, $arguments);
 
         if (! $result) {
             throw $this->createGateUnauthorizedException($ability, $arguments);
         }
+    }
+
+    /**
+     * Guesses the ability's name from the original method name.
+     *
+     * @return string
+     */
+    protected function guessAbilityName()
+    {
+        return debug_backtrace(false, 3)[2]['function'];
     }
 
     /**
