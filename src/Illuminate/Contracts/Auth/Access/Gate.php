@@ -34,7 +34,7 @@ interface Gate
      * Determine if the given ability should be granted.
      *
      * @param  string  $ability
-     * @param  array|mixed  $arguents
+     * @param  array|mixed  $arguments
      * @return bool
      */
     public function check($ability, $arguments = []);
