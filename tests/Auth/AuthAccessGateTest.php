@@ -91,8 +91,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        // Force failure if this is called...
-        $gate->define('update', function () { $this->assertTrue(false); });
+        $gate->define('update', function () { $this->fail(); });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
