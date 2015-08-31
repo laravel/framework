@@ -39,7 +39,7 @@ trait AuthorizesRequests
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function authorizeForUser($user, $abiility, $arguments = [])
+    public function authorizeForUser($user, $ability, $arguments = [])
     {
         $result = app(Gate::class)->forUser($user)->check($ability, $arguments);
 
