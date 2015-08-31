@@ -23,7 +23,7 @@ class Parser
 
         preg_match('/[^\s]+/', $expression, $matches);
 
-        if ( ! isset($matches[0])) {
+        if (! isset($matches[0])) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
 
