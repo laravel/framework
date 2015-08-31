@@ -778,7 +778,7 @@ class BelongsToMany extends Relation
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
 
-            $changes['detached'] = (array) $detach;
+            $changes['detached'] = (array) array_map(function ($v) { return is_numeric($v) ? (int) $v : (string) $v; }, $detach);
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
@@ -835,7 +835,7 @@ class BelongsToMany extends Relation
             if (! in_array($id, $current)) {
                 $this->attach($id, $attributes, $touch);
 
-                $changes['attached'][] = $id;
+                $changes['attached'][] = is_numeric($id) ? (int) $id : (string) $id;
             }
 
             // Now we'll try to update an existing pivot record with the attributes that were
@@ -843,7 +843,7 @@ class BelongsToMany extends Relation
             // list of updated pivot records so we return them back out to the consumer.
             elseif (count($attributes) > 0 &&
                 $this->updateExistingPivot($id, $attributes, $touch)) {
-                $changes['updated'][] = $id;
+                $changes['updated'][] = is_numeric($id) ? (int) $id : (string) $id;
             }
         }
 
