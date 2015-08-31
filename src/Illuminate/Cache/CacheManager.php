@@ -93,9 +93,9 @@ class CacheManager implements FactoryContract
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
         }
+
+        return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
     }
 
     /**

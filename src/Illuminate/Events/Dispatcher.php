@@ -362,9 +362,9 @@ class Dispatcher implements DispatcherContract
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
-        } else {
-            return [$container->make($class), $method];
         }
+
+        return [$container->make($class), $method];
     }
 
     /**

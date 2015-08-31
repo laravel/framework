@@ -25,9 +25,9 @@ class EncryptionServiceProvider extends ServiceProvider
                 return new Encrypter($key, $cipher);
             } elseif (McryptEncrypter::supported($key, $cipher)) {
                 return new McryptEncrypter($key, $cipher);
-            } else {
-                throw new RuntimeException('No supported encrypter found. The cipher and / or key length are invalid.');
             }
+
+            throw new RuntimeException('No supported encrypter found. The cipher and / or key length are invalid.');
         });
     }
 }

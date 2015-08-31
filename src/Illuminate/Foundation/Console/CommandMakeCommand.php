@@ -58,9 +58,9 @@ class CommandMakeCommand extends GeneratorCommand
             return __DIR__.'/stubs/command-queued.stub';
         } elseif ($this->option('handler')) {
             return __DIR__.'/stubs/command-with-handler.stub';
-        } else {
-            return __DIR__.'/stubs/command.stub';
         }
+
+        return __DIR__.'/stubs/command.stub';
     }
 
     /**
