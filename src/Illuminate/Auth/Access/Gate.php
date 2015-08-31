@@ -146,9 +146,7 @@ class Gate implements GateContract
      */
     public function check($ability, $arguments = [])
     {
-        $user = $this->resolveUser();
-
-        if (! $user) {
+        if (! $user = $this->resolveUser()) {
             return false;
         }
 
@@ -156,17 +154,29 @@ class Gate implements GateContract
             $arguments = [$arguments];
         }
 
-        if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
-            $callback = [$this->resolvePolicy($this->policies[get_class($arguments[0])]), $ability];
-        } elseif (isset($this->abilities[$ability])) {
-            $callback = $this->abilities[$ability];
-        } else {
-            return false;
-        }
+        $callback = $this->resolveAuthCallback($ability, $arguments);
 
         array_unshift($arguments, $user);
 
         return call_user_func_array($callback, $arguments);
+    }
+
+    /**
+     * Resolve the callable for the given ability and arguments.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return callable
+     */
+    protected function resolveAuthCallback($ability, array $arguments)
+    {
+        if ($this->firstArgumentCorrespondsToPolicy($arguments)) {
+            return [$this->resolvePolicy($this->policies[get_class($arguments[0])]), $ability];
+        } elseif (isset($this->abilities[$ability])) {
+            return $this->abilities[$ability];
+        } else {
+            return function () { return false; };
+        }
     }
 
     /**
