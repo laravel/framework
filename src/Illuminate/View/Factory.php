@@ -92,6 +92,13 @@ class Factory implements FactoryContract
     protected $sectionStack = [];
 
     /**
+     * The marks for @parent section embedding
+     *
+     * @var array
+     */
+    protected $parentMarks = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
@@ -538,6 +545,24 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Create mark for parent section content.
+     *
+     * @return void
+     */
+    public function appendParent()
+    {
+        $last = array_pop($this->sectionStack);
+
+        if (! isset($this->parentMarks[$last])) {
+            $this->parentMarks[$last] = [];
+        }
+
+        array_unshift($this->parentMarks[$last], ob_get_length());
+
+        $this->sectionStack[] = $last;
+    }
+
+    /**
      * Stop injecting content into a section and return its contents.
      *
      * @return string
@@ -594,10 +619,13 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
+            foreach ($this->parentMarks[$section] as $mark) {
+                $this->sections[$section] = substr_replace($this->sections[$section], $content, $mark, 0);
+            }
+            $this->parentMarks[$section] = [];
+        } else {
+            $this->sections[$section] = $content;
         }
-
-        $this->sections[$section] = $content;
     }
 
     /**
@@ -609,17 +637,7 @@ class Factory implements FactoryContract
      */
     public function yieldContent($section, $default = '')
     {
-        $sectionContent = $default;
-
-        if (isset($this->sections[$section])) {
-            $sectionContent = $this->sections[$section];
-        }
-
-        $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
-
-        return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
-        );
+        return isset($this->sections[$section]) ? $this->sections[$section] : $default;
     }
 
     /**
@@ -632,6 +650,8 @@ class Factory implements FactoryContract
         $this->sections = [];
 
         $this->sectionStack = [];
+
+        $this->parentMarks = [];
     }
 
     /**
