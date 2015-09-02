@@ -20,8 +20,10 @@ trait AuthorizesRequests
     {
         list($ability, $arguments) = $this->parseAbilityAndArguments($ability, $arguments);
 
-        if (! app(Gate::class)->check($ability, $arguments)) {
-            throw $this->createGateUnauthorizedException($ability, $arguments);
+        $admission = app(Gate::class)->getAdmission($ability, $arguments);
+
+        if ($admission->denied()) {
+            throw $this->createGateUnauthorizedException($ability, $arguments, $admission->reason());
         }
     }
 
@@ -39,10 +41,10 @@ trait AuthorizesRequests
     {
         list($ability, $arguments) = $this->parseAbilityAndArguments($ability, $arguments);
 
-        $result = app(Gate::class)->forUser($user)->check($ability, $arguments);
+        $admission = app(Gate::class)->forUser($user)->getAdmission($ability, $arguments);
 
-        if (! $result) {
-            throw $this->createGateUnauthorizedException($ability, $arguments);
+        if ($admission->denied()) {
+            throw $this->createGateUnauthorizedException($ability, $arguments, $admission->reason());
         }
     }
 
@@ -63,14 +65,15 @@ trait AuthorizesRequests
     }
 
     /**
-     * Throw an unauthorized exception based on gate results.
+     * Get an unauthorized exception based on gate results.
      *
      * @param  string  $ability
      * @param  array  $arguments
+     * @param  string  $reason
      * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function createGateUnauthorizedException($ability, $arguments)
+    protected function createGateUnauthorizedException($ability, $arguments, $reason)
     {
-        return new HttpException(403, 'This action is unauthorized.');
+        return new HttpException(403, $reason);
     }
 }
