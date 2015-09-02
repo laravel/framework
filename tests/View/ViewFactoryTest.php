@@ -238,7 +238,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi ';
+        $factory->appendParent();
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
