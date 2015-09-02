@@ -889,8 +889,9 @@ trait CrawlerTrait
     protected function filterByNameOrId($name, $element = '*')
     {
         $name = str_replace('#', '', $name);
+        $id = str_replace(['[', ']'], ['\\[', '\\]'], $name);
 
-        return $this->crawler->filter("{$element}#{$name}, {$element}[name='{$name}']");
+        return $this->crawler->filter("{$element}#{$id}, {$element}[name='{$name}']");
     }
 
     /**

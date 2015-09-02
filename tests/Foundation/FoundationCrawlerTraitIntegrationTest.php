@@ -16,6 +16,15 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         $this->seeInField('framework', 'Laravel');
     }
 
+    public function testSeeInInputArray()
+    {
+        $this->crawler = new Crawler(
+            '<input type="text" name="framework[]" value="Laravel">'
+        );
+
+        $this->seeInField('framework[]', 'Laravel');
+    }
+
     public function testSeeInTextarea()
     {
         $this->crawler = new Crawler(

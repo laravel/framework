@@ -33,6 +33,26 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
         $this->seeInField('framework', 'Laravel');
     }
 
+    public function testSeeInFieldInputArray()
+    {
+        $input = m::mock(Crawler::class)->makePartial();
+        $input->shouldReceive('count')->andReturn(1);
+        $input->shouldReceive('nodeName')->once()->andReturn('input');
+        $input->shouldReceive('attr')
+            ->withArgs(['value'])
+            ->once()
+            ->andReturn('Laravel');
+
+        $this->crawler = m::mock(Crawler::class)->makePartial();
+
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["*#framework\\[\\], *[name='framework[]']"])
+            ->once()
+            ->andReturn($input);
+
+        $this->seeInField('framework[]', 'Laravel');
+    }
+
     public function testSeeInFieldTextarea()
     {
         $textarea = m::mock(Crawler::class)->makePartial();
