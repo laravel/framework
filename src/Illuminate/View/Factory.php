@@ -92,7 +92,7 @@ class Factory implements FactoryContract
     protected $sectionStack = [];
 
     /**
-     * The marks for @parent section embedding
+     * The marks for @parent section embedding.
      *
      * @var array
      */
@@ -557,7 +557,7 @@ class Factory implements FactoryContract
             $this->parentMarks[$last] = [];
         }
 
-        array_unshift($this->parentMarks[$last], ob_get_length());
+        array_push($this->parentMarks[$last], ob_get_length());
 
         $this->sectionStack[] = $last;
     }
@@ -619,10 +619,9 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            foreach ($this->parentMarks[$section] as $mark) {
+            while ($mark = array_pop($this->parentMarks[$section])) {
                 $this->sections[$section] = substr_replace($this->sections[$section], $content, $mark, 0);
             }
-            $this->parentMarks[$section] = [];
         } else {
             $this->sections[$section] = $content;
         }
