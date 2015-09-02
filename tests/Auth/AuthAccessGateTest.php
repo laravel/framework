@@ -29,9 +29,11 @@ class GateTest extends PHPUnit_Framework_TestCase
         $gate = $this->getBasicGate();
 
         $gate->define('foo', function ($user) { return true; });
-        $gate->before(function ($user, $ability) { $this->assertEquals('foo', $ability);
+        $gate->before(function ($user, $ability) {
+            $this->assertEquals('foo', $ability);
 
-return false; });
+            return false;
+        });
 
         $this->assertFalse($gate->check('foo'));
     }
