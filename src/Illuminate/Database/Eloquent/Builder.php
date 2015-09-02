@@ -162,8 +162,6 @@ class Builder
      *
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function firstOrNew($columns = ['*'])
     {
