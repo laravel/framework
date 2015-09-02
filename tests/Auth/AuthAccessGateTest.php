@@ -24,6 +24,26 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_before_callbacks_can_override_result_if_necessary()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->before(function ($user, $ability) { $this->assertEquals('foo', $ability); return false; });
+
+        $this->assertFalse($gate->check('foo'));
+    }
+
+    public function test_before_callbacks_dont_interrupt_gate_check_if_no_value_is_returned()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->before(function () {});
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
     {
         $gate = $this->getBasicGate();
@@ -35,6 +55,38 @@ class GateTest extends PHPUnit_Framework_TestCase
         });
 
         $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_a_single_argument_can_be_passed_when_checking_abilities()
+    {
+        $gate = $this->getBasicGate();
+
+        $dummy = new AccessGateTestDummy;
+
+        $gate->define('foo', function ($user, $x) use ($dummy) {
+            $this->assertEquals($dummy, $x);
+
+            return true;
+        });
+
+        $this->assertTrue($gate->check('foo', $dummy));
+    }
+
+    public function test_multiple_arguments_can_be_passed_when_checking_abilities()
+    {
+        $gate = $this->getBasicGate();
+
+        $dummy1 = new AccessGateTestDummy;
+        $dummy2 = new AccessGateTestDummy;
+
+        $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
+            $this->assertEquals($dummy1, $x);
+            $this->assertEquals($dummy2, $y);
+
+            return true;
+        });
+
+        $this->assertTrue($gate->check('foo', [$dummy1, $dummy2]));
     }
 
     public function test_classes_can_be_defined_as_callbacks_using_at_notation()
@@ -55,12 +107,20 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policies_may_have_before_methods_to_override_checks()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
     public function test_policies_always_override_closures_with_same_name()
     {
         $gate = $this->getBasicGate();
 
-        // Force failure if this is called...
-        $gate->define('update', function () { $this->assertTrue(false); });
+        $gate->define('update', function () { $this->fail(); });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -105,5 +165,17 @@ class AccessGateTestPolicy
     public function update($user, AccessGateTestDummy $dummy)
     {
         return $user instanceof StdClass;
+    }
+}
+
+class AccessGateTestPolicyWithBefore
+{
+    public function before($user, $ability)
+    {
+        return true;
+    }
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return false;
     }
 }
