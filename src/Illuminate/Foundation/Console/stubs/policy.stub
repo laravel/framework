@@ -2,8 +2,12 @@
 
 namespace DummyNamespace;
 
+use Illuminate\Auth\Access\CreatesAdmissions;
+
 class DummyClass
 {
+    use CreatesAdmissions;
+
     /**
      * Create a new policy instance.
      *
