@@ -442,6 +442,24 @@ if (! function_exists('redirect')) {
     }
 }
 
+if (! function_exists('request')) {
+    /**
+     * Get an instance of the current request or an input item from the request.
+     *
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return \Illuminate\Http\Request|string|array
+     */
+    function request($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return app('request');
+        }
+
+        return app('request')->input($key, $default);
+    }
+}
+
 if (! function_exists('resource')) {
     /**
      * Route a resource to a controller.
@@ -694,6 +712,8 @@ if (! function_exists('elixir')) {
      *
      * @param  string  $file
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     function elixir($file)
     {
