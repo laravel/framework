@@ -7,6 +7,26 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
     use CrawlerTrait;
 
+    public function testSeeLink()
+    {
+        $this->crawler = new Crawler(
+            '<a href="https://laravel.com">Laravel</a>'
+        );
+
+        $this->seeLink('Laravel');
+        $this->seeLink('Laravel', 'https://laravel.com');
+    }
+
+    public function testDontSeeLink()
+    {
+        $this->crawler = new Crawler(
+            '<a href="https://laravel.com">Laravel</a>'
+        );
+
+        $this->dontSeeLink('Symfony');
+        $this->dontSeeLink('Symfony', 'https://symfonyc.com');
+    }
+
     protected function getInputHtml()
     {
         return '<input type="text" name="framework" value="Laravel">';
