@@ -64,18 +64,18 @@ class Event
     public $withoutOverlapping = false;
 
     /**
-     * The filter callback.
+     * The array of filter callbacks.
      *
-     * @var \Closure
+     * @var array
      */
-    protected $filter;
+    protected $filters = [];
 
     /**
-     * The reject callback.
+     * The array of reject callbacks.
      *
-     * @var \Closure
+     * @var array
      */
-    protected $reject;
+    protected $rejects = [];
 
     /**
      * The location that output should be sent to.
@@ -264,9 +264,16 @@ class Event
      */
     protected function filtersPass(Application $app)
     {
-        if (($this->filter && ! $app->call($this->filter)) ||
-             $this->reject && $app->call($this->reject)) {
-            return false;
+        foreach ($this->filters as $callback) {
+            if (! $app->call($callback)) {
+                return false;
+            }
+        }
+
+        foreach ($this->rejects as $callback) {
+            if ($app->call($callback)) {
+                return false;
+            }
         }
 
         return true;
@@ -616,7 +623,7 @@ class Event
      */
     public function when(Closure $callback)
     {
-        $this->filter = $callback;
+        $this->filters[] = $callback;
 
         return $this;
     }
@@ -629,7 +636,7 @@ class Event
      */
     public function skip(Closure $callback)
     {
-        $this->reject = $callback;
+        $this->rejects[] = $callback;
 
         return $this;
     }

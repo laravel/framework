@@ -16,7 +16,7 @@
     "require": {
         "php": ">=5.5.9",
         "ext-mbstring": "*",
-        "illuminate/contracts": "5.1.*",
+        "illuminate/contracts": "5.2.*",
         "doctrine/inflector": "~1.0",
         "danielstjules/stringy": "~1.8"
     },
@@ -30,12 +30,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
-        "symfony/var-dumper": "Required to use the dd function (2.7.*)."
+        "symfony/var-dumper": "Required to use the dd function (3.0.*)."
     },
     "minimum-stability": "dev"
 }

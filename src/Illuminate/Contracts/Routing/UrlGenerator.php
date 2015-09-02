@@ -5,6 +5,13 @@ namespace Illuminate\Contracts\Routing;
 interface UrlGenerator
 {
     /**
+     * Get the current URL for the request.
+     *
+     * @return string
+     */
+    public function current();
+
+    /**
      * Generate a absolute URL to the given path.
      *
      * @param  string  $path

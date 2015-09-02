@@ -158,6 +158,21 @@ class Builder
     }
 
     /**
+     * Execute the query and get the first result or instantiate it.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstOrNew($columns = ['*'])
+    {
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return $this->model->newInstance();
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -190,21 +205,6 @@ class Builder
         if ($result) {
             return $result->{$column};
         }
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * This is an alias for the "value" method.
-     *
-     * @param  string  $column
-     * @return mixed
-     *
-     * @deprecated since version 5.1.
-     */
-    public function pluck($column)
-    {
-        return $this->value($column);
     }
 
     /**
