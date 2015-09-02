@@ -306,7 +306,7 @@ class Gate implements GateContract
     }
 
     /**
-     * Get a guard instance for the given uer.
+     * Get a guard instance for the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
      * @return static
