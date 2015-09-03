@@ -247,6 +247,18 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hi there', $factory->yieldContent('foo'));
     }
 
+    public function testParentKeywordEscaping()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hi @parent';
+        $factory->stopSection();
+        $factory->startSection('foo');
+        echo 'there';
+        $factory->stopSection();
+        $this->assertEquals('hi @parent', $factory->yieldContent('foo'));
+    }
+
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();
