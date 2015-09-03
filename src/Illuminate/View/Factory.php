@@ -619,8 +619,10 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            while ($mark = array_pop($this->parentMarks[$section])) {
-                $this->sections[$section] = substr_replace($this->sections[$section], $content, $mark, 0);
+            if (isset($this->parentMarks[$section])) {
+                while ($mark = array_pop($this->parentMarks[$section])) {
+                    $this->sections[$section] = substr_replace($this->sections[$section], $content, $mark, 0);
+                }
             }
         } else {
             $this->sections[$section] = $content;
