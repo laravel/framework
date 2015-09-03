@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~2.0",
-        "danielstjules/stringy": "~2.0",
+        "danielstjules/stringy": "~2.1",
         "doctrine/inflector": "~1.0",
         "jeremeamia/superclosure": "~2.0",
         "league/flysystem": "~1.0",
