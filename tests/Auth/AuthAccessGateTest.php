@@ -24,6 +24,30 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_before_callbacks_can_override_result_if_necessary()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->before(function ($user, $ability) {
+            $this->assertEquals('foo', $ability);
+
+            return false;
+        });
+
+        $this->assertFalse($gate->check('foo'));
+    }
+
+    public function test_before_callbacks_dont_interrupt_gate_check_if_no_value_is_returned()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->before(function () {});
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
     {
         $gate = $this->getBasicGate();
@@ -87,6 +111,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policies_may_have_before_methods_to_override_checks()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
     public function test_policies_always_override_closures_with_same_name()
     {
         $gate = $this->getBasicGate();
@@ -136,5 +169,17 @@ class AccessGateTestPolicy
     public function update($user, AccessGateTestDummy $dummy)
     {
         return $user instanceof StdClass;
+    }
+}
+
+class AccessGateTestPolicyWithBefore
+{
+    public function before($user, $ability)
+    {
+        return true;
+    }
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return false;
     }
 }

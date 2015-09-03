@@ -233,6 +233,18 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testCannotStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@cannot (\'update\', [$post])
+breeze
+@endcannot';
+        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testElseStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -469,6 +481,12 @@ empty
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<?php $__env->stopSection(); ?>', $compiler->compileString('@endsection'));
+    }
+
+    public function testParentsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php $__env->appendParent(); ?>', $compiler->compileString('@parent'));
     }
 
     public function testAppendSectionsAreCompiled()
