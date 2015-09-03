@@ -213,7 +213,7 @@ class MorphTo extends BelongsTo
      */
     public function createModelByType($type)
     {
-        $class = $this->parent->getActualClassName($type);
+        $class = $this->parent->getActualClassNameForMorph($type);
 
         return new $class;
     }

@@ -870,7 +870,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
         else {
-            $class = $this->getActualClassName($class);
+            $class = $this->getActualClassNameForMorph($class);
 
             $instance = new $class;
 
@@ -886,7 +886,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $class
      * @return string
      */
-    protected function getActualClassName($class)
+    protected function getActualClassNameForMorph($class)
     {
         $morphMap = Relation::morphMap();
 
@@ -2074,6 +2074,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function getMorphClass()
     {
         $morphMap = Relation::morphMap();
+
         $class = get_class($this);
 
         if (! empty($morphMap)) {
