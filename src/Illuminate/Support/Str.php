@@ -39,7 +39,7 @@ class Str
      */
     public static function ascii($value)
     {
-        return StaticStringy::toAscii($value);
+        return (string) StaticStringy::toAscii($value);
     }
 
     /**
