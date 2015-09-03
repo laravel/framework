@@ -18,7 +18,7 @@ trait AuthorizesRequests
      */
     public function authorize($ability, $arguments = [])
     {
-        if (func_num_args() === 1) {
+        if (! is_string($ability)) {
             list($arguments, $ability) = [$ability, $this->guessAbilityName()];
         }
 
@@ -39,7 +39,7 @@ trait AuthorizesRequests
      */
     public function authorizeForUser($user, $ability, $arguments = [])
     {
-        if (func_num_args() === 2) {
+        if (! is_string($ability)) {
             list($arguments, $ability) = [$ability, $this->guessAbilityName()];
         }
 
