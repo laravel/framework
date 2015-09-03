@@ -300,9 +300,10 @@ trait CrawlerTrait
      */
     public function seeLink($text, $url = null)
     {
-        $message = "No links were found with the text [$text]";
+        $message = "No links were found with expected text [{$text}].";
+
         if ($url) {
-            $message .= " and the URL [$url]";
+            $message .= " and URL [{$url}]";
         }
 
         $this->assertTrue($this->hasLink($text, $url), $message);
@@ -319,9 +320,10 @@ trait CrawlerTrait
      */
     public function dontSeeLink($text, $url = null)
     {
-        $message = "A link was found with the text [$text]";
+        $message = "A link was found with expected text [{$text}]";
+
         if ($url) {
-            $message .= " and the URL [$url]";
+            $message .= " and URL [{$url}]";
         }
 
         $this->assertFalse($this->hasLink($text, $url), $message);
@@ -338,9 +340,7 @@ trait CrawlerTrait
     protected function addRootToRelativeUrl($url)
     {
         if (! Str::startsWith($url, ['http', 'https'])) {
-            $url = $this->app->make('url')->to($url);
-
-            return $url;
+            return $this->app->make('url')->to($url);
         }
 
         return $url;
@@ -361,9 +361,9 @@ trait CrawlerTrait
             return false;
         }
 
-        // If the URL is null, we assume the developer only wants to
-        // find a link with the given $text regardless of the URL
-        // and since at least one was found we'll return true.
+        // If the URL is null, we assume the developer only wants to find a link
+        // with the given text regardless of the URL. So, if we find the link
+        // we will return true now. Otherwise, we look for the given URL.
         if ($url == null) {
             return true;
         }
