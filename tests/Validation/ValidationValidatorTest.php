@@ -986,7 +986,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function validUrls()
     {
         return [
+            ['http://a.pl'],
+            ['http://localhost/url.php'],
+            ['http://local.dev'],
+            ['http://google.com'],
             ['http://www.google.com'],
+            ['https://google.com'],
+            ['http://illuminate.dev'],
+            ['http://localhost'],
+            ['http://президент.рф/'],
+            ['http://스타벅스코리아.com'],
+            ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
         ];
     }
 
@@ -994,6 +1004,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         return [
             ['aslsdlks'],
+            ['google.com'],
+            ['://google.com'],
+            ['http ://google.com'],
+            ['http:/google.com'],
+            ['http://goog_le.com'],
+            ['http://google.com::aa'],
+            ['http://google.com:aa'],
+            ['http://laravel.com?'],
+            ['http://laravel.com/?'],
+            ['http://laravel.com#'],
+            ['http://127.0.0.1:aa'],
+            ['http://[::1'],
+            ['foo://bar'],
+            ['javascript://test%0Aalert(321)'],
         ];
     }
 
