@@ -730,6 +730,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the parent statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileParent($expression)
+    {
+        return '<?php $__env->appendParent(); ?>';
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression
