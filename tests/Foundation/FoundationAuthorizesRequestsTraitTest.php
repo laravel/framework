@@ -5,96 +5,97 @@ use Illuminate\Contracts\Auth\Access\Gate;
 
 class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
 {
-	public function test_basic_gate_check()
-	{
-		unset($_SERVER['_test.authorizes.trait']);
+    public function test_basic_gate_check()
+    {
+        unset($_SERVER['_test.authorizes.trait']);
 
-		$gate = $this->getBasicGate();
+        $gate = $this->getBasicGate();
 
-		$gate->define('foo', function () {
-			$_SERVER['_test.authorizes.trait'] = true;
-			return true;
-		});
+        $gate->define('foo', function () {
+            $_SERVER['_test.authorizes.trait'] = true;
 
-		(new FoundationTestAuthorizeTraitClass)->authorize('foo');
+            return true;
+        });
 
-		$this->assertTrue($_SERVER['_test.authorizes.trait']);
-	}
+        (new FoundationTestAuthorizeTraitClass)->authorize('foo');
 
+        $this->assertTrue($_SERVER['_test.authorizes.trait']);
+    }
 
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
-	 */
-	public function test_exception_is_thrown_if_gate_check_fails()
-	{
-		$gate = $this->getBasicGate();
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public function test_exception_is_thrown_if_gate_check_fails()
+    {
+        $gate = $this->getBasicGate();
 
-		$gate->define('foo', function () {
-			return false;
-		});
+        $gate->define('foo', function () {
+            return false;
+        });
 
-		(new FoundationTestAuthorizeTraitClass)->authorize('foo');
-	}
+        (new FoundationTestAuthorizeTraitClass)->authorize('foo');
+    }
 
+    public function test_policies_may_be_called()
+    {
+        unset($_SERVER['_test.authorizes.trait.policy']);
 
-	public function test_policies_may_be_called()
-	{
-		unset($_SERVER['_test.authorizes.trait.policy']);
+        $gate = $this->getBasicGate();
 
-		$gate = $this->getBasicGate();
+        $gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
 
-		$gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
+        (new FoundationTestAuthorizeTraitClass)->authorize('update', new FoundationAuthorizesRequestTestClass);
 
-		(new FoundationTestAuthorizeTraitClass)->authorize('update', new FoundationAuthorizesRequestTestClass);
+        $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
+    }
 
-		$this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
-	}
+    public function test_policy_method_may_be_guessed()
+    {
+        unset($_SERVER['_test.authorizes.trait.policy']);
 
+        $gate = $this->getBasicGate();
 
-	public function test_policy_method_may_be_guessed()
-	{
-		unset($_SERVER['_test.authorizes.trait.policy']);
+        $gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
 
-		$gate = $this->getBasicGate();
+        (new FoundationTestAuthorizeTraitClass)->authorize([new FoundationAuthorizesRequestTestClass]);
 
-		$gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
+        $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
+    }
 
-		(new FoundationTestAuthorizeTraitClass)->authorize([new FoundationAuthorizesRequestTestClass]);
+    public function getBasicGate()
+    {
+        $container = new Container;
+        Container::setInstance($container);
 
-		$this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
-	}
+        $gate = new Illuminate\Auth\Access\Gate($container, function () { return (object) ['id' => 1]; });
+        $container->instance(Gate::class, $gate);
 
-
-	public function getBasicGate()
-	{
-		$container = new Container;
-		Container::setInstance($container);
-
-		$gate = new Illuminate\Auth\Access\Gate($container, function () { return (object) ['id' => 1]; });
-		$container->instance(Gate::class, $gate);
-
-		return $gate;
-	}
+        return $gate;
+    }
 }
 
-class FoundationAuthorizesRequestTestClass {
-
+class FoundationAuthorizesRequestTestClass
+{
 }
 
-class FoundationAuthorizesRequestTestPolicy {
-	public function update()
-	{
-		$_SERVER['_test.authorizes.trait.policy'] = true;
-		return true;
-	}
+class FoundationAuthorizesRequestTestPolicy
+{
+    public function update()
+    {
+        $_SERVER['_test.authorizes.trait.policy'] = true;
 
-	public function test_policy_method_may_be_guessed()
-	{
-		$_SERVER['_test.authorizes.trait.policy'] = true;
-		return true;
-	}
+        return true;
+    }
+
+    public function test_policy_method_may_be_guessed()
+    {
+        $_SERVER['_test.authorizes.trait.policy'] = true;
+
+        return true;
+    }
 }
 
-class FoundationTestAuthorizeTraitClass {
-	use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+class FoundationTestAuthorizeTraitClass
+{
+    use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 }
