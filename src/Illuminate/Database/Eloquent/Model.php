@@ -886,7 +886,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $class
      * @return string
      */
-    protected function getActualClassNameForMorph($class)
+    public function getActualClassNameForMorph($class)
     {
         return array_get(Relation::morphMap(), $class, $class);
     }
