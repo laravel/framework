@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Stringy\Stringy;
 use RuntimeException;
+use Stringy\Stringy;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
