@@ -3,7 +3,7 @@
 namespace Illuminate\Support;
 
 use RuntimeException;
-use Stringy\Stringy;
+use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
@@ -39,7 +39,7 @@ class Str
      */
     public static function ascii($value)
     {
-        return (string) Stringy::create($value)->toAscii();
+        return StaticStringy::toAscii($value);
     }
 
     /**
