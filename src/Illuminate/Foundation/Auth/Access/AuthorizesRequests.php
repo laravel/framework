@@ -67,7 +67,7 @@ trait AuthorizesRequests
      *
      * @param  string  $ability
      * @param  array  $arguments
-     * @return void
+     * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function createGateUnauthorizedException($ability, $arguments)
     {
