@@ -1605,8 +1605,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->insertAndSetId($query, $attributes);
         }
 
-        // If the table is not incrementing we'll simply insert this attributes as they
-        // are, as this attributes arrays must contain an "id" column already placed
+        // If the table isn't incrementing we'll simply insert these attributes as they
+        // are. These attribute arrays must contain an "id" column previously placed
         // there by the developer as the manually determined key for these models.
         else {
             $query->insert($attributes);
