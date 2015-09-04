@@ -2604,7 +2604,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->getAttributeValue($key);
         }
 
-        return $this->getRelationValue($key);
+        $relationship = $this->getRelationValue($key);
+        if ($relationship !== false) {
+            return $relationship;
+        }
+
+        throw new LogicException("The field or relationship $key must be defined on model.");
     }
 
     /**
@@ -2664,6 +2669,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (method_exists($this, $key)) {
             return $this->getRelationshipFromMethod($key);
         }
+
+        return false;
     }
 
     /**
