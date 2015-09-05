@@ -300,13 +300,13 @@ trait CrawlerTrait
      */
     public function seeLink($text, $url = null)
     {
-        $message = "No links were found with expected text [{$text}].";
+        $message = "No links were found with expected text [{$text}]";
 
         if ($url) {
             $message .= " and URL [{$url}]";
         }
 
-        $this->assertTrue($this->hasLink($text, $url), $message);
+        $this->assertTrue($this->hasLink($text, $url), "{$message}.");
 
         return $this;
     }
@@ -326,7 +326,7 @@ trait CrawlerTrait
             $message .= " and URL [{$url}]";
         }
 
-        $this->assertFalse($this->hasLink($text, $url), $message);
+        $this->assertFalse($this->hasLink($text, $url), "{$message}.");
 
         return $this;
     }
