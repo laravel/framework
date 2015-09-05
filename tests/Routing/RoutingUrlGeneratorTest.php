@@ -349,10 +349,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+
     public function getRouteKey()
     {
         return $this->{$this->getRouteKeyName()};
     }
+
     public function getRouteKeyName()
     {
         return 'key';

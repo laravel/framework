@@ -84,10 +84,12 @@ class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormReque
     {
         return ['name' => 'required'];
     }
+
     public function authorize(StdClass $dep)
     {
         return true;
     }
+
     public function validated(StdClass $dep)
     {
         $_SERVER['__request.validated'] = true;
@@ -100,6 +102,7 @@ class FoundationTestFormRequestForbiddenStub extends Illuminate\Foundation\Http\
     {
         return ['name' => 'required'];
     }
+
     public function authorize()
     {
         return false;

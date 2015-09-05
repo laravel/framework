@@ -297,5 +297,6 @@ class MigratorTestMigrationStub
     {
         $this->migration = $migration;
     }
+
     public $migration;
 }

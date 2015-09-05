@@ -142,6 +142,7 @@ class TestDispatcherQueuedHandlerCustomQueue implements Illuminate\Contracts\Que
     public function handle()
     {
     }
+
     public function queue($queue, $handler, array $payload)
     {
         $queue->push($handler, $payload);

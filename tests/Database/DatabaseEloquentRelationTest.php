@@ -68,6 +68,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
 class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model
 {
     //Override method call which would normally go through __call()
+
     public function getQuery()
     {
         return $this->newQuery()->getQuery();
@@ -79,15 +80,19 @@ class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relat
     public function addConstraints()
     {
     }
+
     public function addEagerConstraints(array $models)
     {
     }
+
     public function initRelation(array $models, $relation)
     {
     }
+
     public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
     {
     }
+
     public function getResults()
     {
     }
