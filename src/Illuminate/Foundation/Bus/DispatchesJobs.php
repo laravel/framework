@@ -14,7 +14,11 @@ trait DispatchesJobs
      */
     protected function dispatch($job)
     {
-        return app('Illuminate\Contracts\Bus\Dispatcher')->dispatch($job);
+        if (is_string($job)) {
+            return app('Illuminate\Contracts\Bus\Dispatcher')->dispatch(app($job));
+        } else {
+            return app('Illuminate\Contracts\Bus\Dispatcher')->dispatch($job);
+        }
     }
 
     /**
