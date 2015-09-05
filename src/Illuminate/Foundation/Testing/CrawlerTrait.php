@@ -300,7 +300,7 @@ trait CrawlerTrait
      */
     public function seeLink($text, $url = null)
     {
-        $message = "No links were found with expected text [{$text}].";
+        $message = "No links were found with expected text [{$text}]";
 
         if ($url) {
             $message .= " and URL [{$url}]";
