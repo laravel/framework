@@ -84,6 +84,10 @@ class OptimizeCommand extends Command
 
         $compilePath = $this->laravel->getCachedCompilePath();
 
+        if (file_exists($compilePath)) {
+            unlink($compilePath);
+        }
+
         $handle = $preloader->prepareOutput($compilePath.'.tmp');
 
         foreach ($this->getClassFiles() as $file) {
