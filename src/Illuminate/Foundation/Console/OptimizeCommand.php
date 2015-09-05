@@ -82,13 +82,13 @@ class OptimizeCommand extends Command
     {
         $preloader = new ClassPreloader(new PrettyPrinter, new Parser(new Lexer), $this->getTraverser());
 
-        $compilePath = $this->laravel->getCachedCompilePath();
+        $path = $this->laravel->getCachedCompilePath();
 
-        if (file_exists($compilePath)) {
-            unlink($compilePath);
+        if (file_exists($path)) {
+            unlink($path);
         }
 
-        $handle = $preloader->prepareOutput($compilePath.'.tmp');
+        $handle = $preloader->prepareOutput($path.'.tmp');
 
         foreach ($this->getClassFiles() as $file) {
             try {
@@ -100,7 +100,7 @@ class OptimizeCommand extends Command
 
         fclose($handle);
 
-        rename($compilePath.'.tmp', $compilePath);
+        rename($path.'.tmp', $path);
     }
 
     /**
