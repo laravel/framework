@@ -83,6 +83,7 @@ class ApplicationDatabaseMigrationStub extends Application
             $this->instance($abstract, $instance);
         }
     }
+
     public function environment()
     {
         return 'development';

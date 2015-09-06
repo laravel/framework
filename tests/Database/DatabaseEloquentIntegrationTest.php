@@ -513,18 +513,22 @@ class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
     protected $guarded = [];
+
     public function friends()
     {
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
     }
+
     public function posts()
     {
         return $this->hasMany('EloquentTestPost', 'user_id');
     }
+
     public function post()
     {
         return $this->hasOne('EloquentTestPost', 'user_id');
     }
+
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
@@ -535,18 +539,22 @@ class EloquentTestPost extends Eloquent
 {
     protected $table = 'posts';
     protected $guarded = [];
+
     public function user()
     {
         return $this->belongsTo('EloquentTestUser', 'user_id');
     }
+
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
+
     public function childPosts()
     {
         return $this->hasMany('EloquentTestPost', 'parent_id');
     }
+
     public function parentPost()
     {
         return $this->belongsTo('EloquentTestPost', 'parent_id');
@@ -557,6 +565,7 @@ class EloquentTestPhoto extends Eloquent
 {
     protected $table = 'photos';
     protected $guarded = [];
+
     public function imageable()
     {
         return $this->morphTo();
@@ -578,10 +587,12 @@ class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\C
 
         return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
     }
+
     public function getDefaultConnection()
     {
         return 'default';
     }
+
     public function setDefaultConnection($name)
     {
         //

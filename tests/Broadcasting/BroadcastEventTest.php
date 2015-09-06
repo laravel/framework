@@ -52,10 +52,12 @@ class TestBroadcastEvent
     public $lastName = 'Otwell';
     public $collection;
     private $title = 'Developer';
+
     public function __construct()
     {
         $this->collection = collect(['foo' => 'bar']);
     }
+
     public function broadcastOn()
     {
         return ['test-channel'];

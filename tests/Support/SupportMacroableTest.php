@@ -48,6 +48,7 @@ class TestMacroable
 {
     use Illuminate\Support\Traits\Macroable;
     protected $protectedVariable = 'instance';
+
     protected static function getProtectedStatic()
     {
         return 'static';
