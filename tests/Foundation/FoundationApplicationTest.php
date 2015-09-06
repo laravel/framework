@@ -128,6 +128,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider
 {
     protected $defer = true;
+
     public function register()
     {
         $this->app->singleton('foo', function () {
@@ -140,6 +141,7 @@ class ApplicationDeferredServiceProviderCountStub extends Illuminate\Support\Ser
 {
     public static $count = 0;
     protected $defer = true;
+
     public function register()
     {
         static::$count++;
@@ -151,6 +153,7 @@ class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceP
 {
     public static $initialized = false;
     protected $defer = true;
+
     public function register()
     {
         static::$initialized = true;
@@ -161,6 +164,7 @@ class ApplicationDeferredServiceProviderStub extends Illuminate\Support\ServiceP
 class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider
 {
     protected $defer = true;
+
     public function register()
     {
         $this->app->bind('foo', function () {
@@ -174,6 +178,7 @@ class ApplicationFactoryProviderStub extends Illuminate\Support\ServiceProvider
 class ApplicationMultiProviderStub extends Illuminate\Support\ServiceProvider
 {
     protected $defer = true;
+
     public function register()
     {
         $this->app->singleton('foo', function () { return 'foo'; });
