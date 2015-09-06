@@ -965,6 +965,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         EloquentModelStub::observe('EloquentTestObserverStub');
         EloquentModelStub::flushEventListeners();
     }
+
     public function testSetObservableEvents()
     {
         $class = new EloquentModelStub;
@@ -1234,6 +1235,7 @@ class EloquentTestObserverStub
     public function creating()
     {
     }
+
     public function saved()
     {
     }
@@ -1244,46 +1246,57 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = 'EloquentModelSaveStub';
+
     public function getListItemsAttribute($value)
     {
         return json_decode($value, true);
     }
+
     public function setListItemsAttribute($value)
     {
         $this->attributes['list_items'] = json_encode($value);
     }
+
     public function getPasswordAttribute()
     {
         return '******';
     }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password_hash'] = md5($value);
     }
+
     public function publicIncrement($column, $amount = 1)
     {
         return $this->increment($column, $amount);
     }
+
     public function belongsToStub()
     {
         return $this->belongsTo('EloquentModelSaveStub');
     }
+
     public function morphToStub()
     {
         return $this->morphTo();
     }
+
     public function belongsToExplicitKeyStub()
     {
         return $this->belongsTo('EloquentModelSaveStub', 'foo');
     }
+
     public function incorrectRelationStub()
     {
         return 'foo';
     }
+
     public function getDates()
     {
         return [];
     }
+
     public function getAppendableAttribute()
     {
         return 'appended';
@@ -1307,10 +1320,12 @@ class EloquentModelSaveStub extends Model
 {
     protected $table = 'save_stub';
     protected $guarded = ['id'];
+
     public function save(array $options = [])
     {
         $_SERVER['__eloquent.saved'] = true;
     }
+
     public function setIncrementing($value)
     {
         $this->incrementing = $value;
@@ -1359,6 +1374,7 @@ class EloquentModelHydrateRawStub extends Model
     {
         return 'hydrated';
     }
+
     public function getConnection()
     {
         $mock = m::mock('Illuminate\Database\Connection');
@@ -1400,6 +1416,7 @@ class EloquentModelBootingTestStub extends Model
     {
         unset(static::$booted[get_called_class()]);
     }
+
     public static function isBooted()
     {
         return array_key_exists(get_called_class(), static::$booted);
@@ -1409,14 +1426,17 @@ class EloquentModelBootingTestStub extends Model
 class EloquentModelAppendsStub extends Model
 {
     protected $appends = ['is_admin', 'camelCased', 'StudlyCased'];
+
     public function getIsAdminAttribute()
     {
         return 'admin';
     }
+
     public function getCamelCasedAttribute()
     {
         return 'camelCased';
     }
+
     public function getStudlyCasedAttribute()
     {
         return 'StudlyCased';
@@ -1435,6 +1455,7 @@ class EloquentModelCastingStub extends Model
         'seventh' => 'array',
         'eighth' => 'json',
     ];
+
     public function eighthAttributeValue()
     {
         return $this->attributes['eighth'];
@@ -1445,6 +1466,7 @@ class EloquentModelDynamicHiddenStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'stub';
     protected $guarded = [];
+
     public function getHidden()
     {
         return ['age', 'id'];
@@ -1455,6 +1477,7 @@ class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'stub';
     protected $guarded = [];
+
     public function getVisible()
     {
         return ['name', 'id'];

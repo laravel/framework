@@ -178,6 +178,7 @@ class AccessGateTestPolicyWithBefore
     {
         return true;
     }
+
     public function update($user, AccessGateTestDummy $dummy)
     {
         return false;
