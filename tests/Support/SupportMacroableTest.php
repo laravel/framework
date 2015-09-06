@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Traits\Macroable;
+
 class SupportMacroableTest extends PHPUnit_Framework_TestCase
 {
     private $macroable;
@@ -11,9 +13,7 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
 
     private function createObjectForTrait()
     {
-        $traitName = 'Illuminate\Support\Traits\Macroable';
-
-        return $this->getObjectForTrait($traitName);
+        return $this->getObjectForTrait(Macroable::class);
     }
 
     public function testRegisterMacro()
@@ -46,8 +46,10 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
 
 class TestMacroable
 {
-    use Illuminate\Support\Traits\Macroable;
+    use Macroable;
+
     protected $protectedVariable = 'instance';
+
     protected static function getProtectedStatic()
     {
         return 'static';

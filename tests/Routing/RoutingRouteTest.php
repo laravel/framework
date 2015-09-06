@@ -717,6 +717,7 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
         $this->middleware('RouteTestControllerParameterizedMiddlewareTwo:foo,bar');
         $this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
     }
+
     public function index()
     {
         return 'Hello World';
@@ -779,6 +780,7 @@ class RouteBindingStub
     {
         return strtoupper($value);
     }
+
     public function find($value, $route)
     {
         return strtolower($value);
@@ -791,12 +793,14 @@ class RouteModelBindingStub
     {
         return 'id';
     }
+
     public function where($key, $value)
     {
         $this->value = $value;
 
         return $this;
     }
+
     public function first()
     {
         return strtoupper($this->value);
@@ -809,10 +813,12 @@ class RouteModelBindingNullStub
     {
         return 'id';
     }
+
     public function where($key, $value)
     {
         return $this;
     }
+
     public function first()
     {
     }

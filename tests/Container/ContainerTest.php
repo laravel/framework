@@ -486,6 +486,7 @@ class ContainerImplementationStubTwo implements IContainerContractStub
 class ContainerDependentStub
 {
     public $impl;
+
     public function __construct(IContainerContractStub $impl)
     {
         $this->impl = $impl;
@@ -495,6 +496,7 @@ class ContainerDependentStub
 class ContainerNestedDependentStub
 {
     public $inner;
+
     public function __construct(ContainerDependentStub $inner)
     {
         $this->inner = $inner;
@@ -505,6 +507,7 @@ class ContainerDefaultValueStub
 {
     public $stub;
     public $default;
+
     public function __construct(ContainerConcreteStub $stub, $default = 'taylor')
     {
         $this->stub = $stub;
@@ -517,6 +520,7 @@ class ContainerMixedPrimitiveStub
     public $first;
     public $last;
     public $stub;
+
     public function __construct($first, ContainerConcreteStub $stub, $last)
     {
         $this->stub = $stub;
@@ -538,6 +542,7 @@ class ContainerConstructorParameterLoggingStub
 class ContainerLazyExtendStub
 {
     public static $initialized = false;
+
     public function init()
     {
         static::$initialized = true;
@@ -560,6 +565,7 @@ class ContainerTestCallStub
 class ContainerTestContextInjectOne
 {
     public $impl;
+
     public function __construct(IContainerContractStub $impl)
     {
         $this->impl = $impl;
@@ -569,6 +575,7 @@ class ContainerTestContextInjectOne
 class ContainerTestContextInjectTwo
 {
     public $impl;
+
     public function __construct(IContainerContractStub $impl)
     {
         $this->impl = $impl;
