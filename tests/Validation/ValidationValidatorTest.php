@@ -229,6 +229,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('require it please!', $v->messages()->first('name'));
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['name' => ['', 'foo']], ['name[]' => 'Required'], ['name[].required' => 'require it please!']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('require it please!', $v->messages()->first('name.0'));
     }
 
     public function testValidateRequired()
@@ -242,6 +248,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Required']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['Foo', 'Bar']], ['name[]' => 'Required']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['', 'Bar']], ['name[]' => 'Required']);
+        $this->assertFalse($v->passes());
 
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
