@@ -49,34 +49,42 @@ class DatabaseSoftDeletingTraitStub
 {
     use Illuminate\Database\Eloquent\SoftDeletes;
     public $deleted_at;
+
     public function newQuery()
     {
         //
     }
+
     public function getKey()
     {
         return 1;
     }
+
     public function getKeyName()
     {
         return 'id';
     }
+
     public function save()
     {
         //
     }
+
     public function delete()
     {
         return $this->performDeleteOnModel();
     }
+
     public function fireModelEvent()
     {
         //
     }
+
     public function freshTimestamp()
     {
         return Carbon\Carbon::now();
     }
+
     public function fromDateTime()
     {
         return 'date-time';
