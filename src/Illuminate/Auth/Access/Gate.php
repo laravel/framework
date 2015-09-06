@@ -296,6 +296,7 @@ class Gate implements GateContract
 
         return $this->resolvePolicy($this->policies[$class]);
     }
+
     /**
      * Build a policy class instance of the given type.
      *

@@ -202,6 +202,7 @@ class FailingSwiftMailerStub
     {
         $failed[] = 'taylorotwell@gmail.com';
     }
+
     public function getTransport()
     {
         $transport = m::mock('Swift_Transport');

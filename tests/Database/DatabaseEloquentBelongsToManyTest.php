@@ -563,6 +563,7 @@ class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model
 {
     public $pivot;
+
     public function __construct()
     {
         $this->pivot = new EloquentBelongsToManyPivotStub;
