@@ -963,14 +963,62 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidateUrl()
+    /**
+     * @dataProvider validUrls
+     */
+    public function testValidateUrlWithValidUrls($validUrl)
     {
         $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'Url']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'Url']);
+        $v = new Validator($trans, ['x' => $validUrl], ['x' => 'Url']);
         $this->assertTrue($v->passes());
+    }
+
+    /**
+     * @dataProvider invalidUrls
+     */
+    public function testValidateUrlWithInvalidUrls($invalidUrl)
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['x' => $invalidUrl], ['x' => 'Url']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function validUrls()
+    {
+        return [
+            ['http://a.pl'],
+            ['http://localhost/url.php'],
+            ['http://local.dev'],
+            ['http://google.com'],
+            ['http://www.google.com'],
+            ['https://google.com'],
+            ['http://illuminate.dev'],
+            ['http://localhost'],
+            ['http://президент.рф/'],
+            ['http://스타벅스코리아.com'],
+            ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
+        ];
+    }
+
+    public function invalidUrls()
+    {
+        return [
+            ['aslsdlks'],
+            ['google.com'],
+            ['://google.com'],
+            ['http ://google.com'],
+            ['http:/google.com'],
+            ['http://goog_le.com'],
+            ['http://google.com::aa'],
+            ['http://google.com:aa'],
+            ['http://laravel.com?'],
+            ['http://laravel.com/?'],
+            ['http://laravel.com#'],
+            ['http://127.0.0.1:aa'],
+            ['http://[::1'],
+            ['foo://bar'],
+            ['javascript://test%0Aalert(321)'],
+        ];
     }
 
     public function testValidateActiveUrl()
