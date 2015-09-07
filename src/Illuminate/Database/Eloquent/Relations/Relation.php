@@ -280,7 +280,7 @@ abstract class Relation
     }
 
     /**
-     * Set the morph map for polymorphic relations.
+     * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
      * @param  bool  $merge
