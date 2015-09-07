@@ -5,6 +5,7 @@ use Illuminate\Database\Grammar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
@@ -41,6 +42,17 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $relation->touch();
     }
 
+    public function testSettingMorphMapWithNumericArrayUsesTheTableNames()
+    {
+        Relation::morphMap([EloquentRelationResetModelStub::class]);
+
+        $this->assertEquals([
+            'reset' => 'EloquentRelationResetModelStub',
+        ], Relation::morphMap());
+
+        Relation::morphMap([], false);
+    }
+
     /**
      * Testing to ensure loop does not occur during relational queries in global scopes.
      *
@@ -71,7 +83,9 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
 
 class EloquentRelationResetModelStub extends Model
 {
-    //Override method call which would normally go through __call()
+    protected $table = 'reset';
+
+    // Override method call which would normally go through __call()
 
     public function getQuery()
     {
