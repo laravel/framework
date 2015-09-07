@@ -1,7 +1,11 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Database\Grammar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
 {
@@ -21,10 +25,10 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
 
     public function testTouchMethodUpdatesRelatedTimestamps()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $builder = m::mock(Builder::class);
+        $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $builder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+        $builder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
@@ -46,12 +50,12 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
     public function testDonNotRunParentModelGlobalScopes()
     {
         /* @var Mockery\MockInterface $parent */
-        $eloquentBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $queryBuilder = m::mock('Illuminate\Database\Query\Builder');
-        $parent = m::mock('EloquentRelationResetModelStub')->makePartial();
-        $grammar = m::mock('\Illuminate\Database\Grammar');
+        $eloquentBuilder = m::mock(Builder::class);
+        $queryBuilder = m::mock(QueryBuilder::class);
+        $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
+        $grammar = m::mock(Grammar::class);
 
-        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock('StdClass'));
+        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
         $eloquentBuilder->shouldReceive('getQuery')->andReturn($queryBuilder);
         $queryBuilder->shouldReceive('getGrammar')->andReturn($grammar);
         $grammar->shouldReceive('wrap');
@@ -65,7 +69,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model
+class EloquentRelationResetModelStub extends Model
 {
     //Override method call which would normally go through __call()
 
@@ -75,7 +79,7 @@ class EloquentRelationResetModelStub extends Illuminate\Database\Eloquent\Model
     }
 }
 
-class EloquentRelationStub extends \Illuminate\Database\Eloquent\Relations\Relation
+class EloquentRelationStub extends Relation
 {
     public function addConstraints()
     {

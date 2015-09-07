@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -78,7 +78,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('posts');
         $this->schema()->drop('photos');
 
-        Illuminate\Database\Eloquent\Relations\Relation::morphMap([], false);
+        Relation::morphMap([], false);
     }
 
     /**
@@ -345,7 +345,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testMorphMapIsUsedForCreatingAndFetchingThroughRelation()
     {
-        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+        Relation::morphMap([
             'user' => 'EloquentTestUser',
             'post' => 'EloquentTestPost',
         ]);
