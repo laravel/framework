@@ -560,24 +560,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testWalkWithModification()
     {
-        $data = new Collection([['color' => 'red'],['color' => 'blue']]);
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
         $data = $data->walk(function (&$item) { $item['color'] = strrev($item['color']); });
-        $this->assertEquals([['color' => 'der'],['color' => 'eulb']], $data->all());
+        $this->assertEquals([['color' => 'der'], ['color' => 'eulb']], $data->all());
     }
 
     public function testWalkWithoutModification()
     {
-        $data = new Collection([['color' => 'red'],['color' => 'blue']]);
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
         $data = $data->walk(function ($item) { $item['color'] = strrev($item['color']); });
-        $this->assertEquals([['color' => 'red'],['color' => 'blue']], $data->all());
+        $this->assertEquals([['color' => 'red'], ['color' => 'blue']], $data->all());
     }
 
     public function testWalkDoesNotModifyOriginal()
     {
-        $data = new Collection([['color' => 'red'],['color' => 'blue']]);
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
         $modified = $data->walk(function (&$item) { $item['color'] = strrev($item['color']); });
-        $this->assertEquals([['color' => 'red'],['color' => 'blue']], $data->all());
-        $this->assertEquals([['color' => 'der'],['color' => 'eulb']], $modified->all());
+        $this->assertEquals([['color' => 'red'], ['color' => 'blue']], $data->all());
+        $this->assertEquals([['color' => 'der'], ['color' => 'eulb']], $modified->all());
     }
 
     public function testTransform()
