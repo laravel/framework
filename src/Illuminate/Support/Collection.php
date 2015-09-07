@@ -878,6 +878,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function walk(callable $callback)
     {
         array_walk($this->items, $callback);
+        
         return new static($this->items);
     }
 
