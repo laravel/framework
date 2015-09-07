@@ -19,7 +19,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new Test class for example FooTest';
+    protected $description = 'Create a new test class';
 
     /**
      * The type of class being generated.
@@ -35,10 +35,6 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('database_migration')) {
-            return __DIR__.'/stubs/test.database_migration.stub';
-        }
-
         return __DIR__.'/stubs/test.stub';
     }
 
@@ -64,17 +60,5 @@ class TestMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace;
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database_migration', 'd', InputOption::VALUE_NONE, 'Add DatabaseMigration Trait to your Test'],
-        ];
     }
 }
