@@ -870,6 +870,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Walk over each of the items.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function walk(callable $callback)
+    {
+        $items = $this->items;
+
+        array_walk($items, $callback);
+
+        return new static($items);
+    }
+
+    /**
      * Zip the collection together with one or more arrays.
      *
      * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);

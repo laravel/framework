@@ -558,6 +558,28 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testWalkWithModification()
+    {
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
+        $data = $data->walk(function (&$item) { $item['color'] = strrev($item['color']); });
+        $this->assertEquals([['color' => 'der'], ['color' => 'eulb']], $data->all());
+    }
+
+    public function testWalkWithoutModification()
+    {
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
+        $data = $data->walk(function ($item) { $item['color'] = strrev($item['color']); });
+        $this->assertEquals([['color' => 'red'], ['color' => 'blue']], $data->all());
+    }
+
+    public function testWalkDoesNotModifyOriginal()
+    {
+        $data = new Collection([['color' => 'red'], ['color' => 'blue']]);
+        $modified = $data->walk(function (&$item) { $item['color'] = strrev($item['color']); });
+        $this->assertEquals([['color' => 'red'], ['color' => 'blue']], $data->all());
+        $this->assertEquals([['color' => 'der'], ['color' => 'eulb']], $modified->all());
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
