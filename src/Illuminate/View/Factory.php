@@ -311,9 +311,9 @@ class Factory implements FactoryContract
             return Str::endsWith($path, $value);
         });
     }
-    
+
     /**
-     * Bind view engine alias with a given extension
+     * Bind view engine alias with a given extension.
      * @param $extension
      * @param $engineAlias
      */
