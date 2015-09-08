@@ -497,9 +497,10 @@ class Route
      * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
-    public function bind(Request $request)
+    public function bind(Request $request, $compile=false)
     {
-        $this->compileRoute();
+        if($compile)
+            $this->compileRoute();
 
         $this->bindParameters($request);
 
