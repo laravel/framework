@@ -499,7 +499,7 @@ class Route
      */
     public function bind(Request $request, $compile=false)
     {
-        if($compile)
+        if ($compile)
             $this->compileRoute();
 
         $this->bindParameters($request);
