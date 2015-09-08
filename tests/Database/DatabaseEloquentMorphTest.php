@@ -3,12 +3,15 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
+        Relation::morphMap([], false);
+
         m::close();
     }
 
@@ -209,7 +212,7 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 
     protected function getNamespacedRelation($alias)
     {
-        Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+        Relation::morphMap([
             $alias => 'Foo\Bar\EloquentModelNamespacedStub',
         ]);
 
