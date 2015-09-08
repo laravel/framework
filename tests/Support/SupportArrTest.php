@@ -99,6 +99,27 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['Taylor', 'Abigail'], $array);
     }
 
+    public function testPluckWithKeys()
+    {
+        $array = [
+            ['name' => 'Taylor', 'role' => 'developer'],
+            ['name' => 'Abigail', 'role' => 'developer'],
+        ];
+
+        $test1 = Arr::pluck($array, 'role', 'name');
+        $test2 = Arr::pluck($array, null, 'name');
+
+        $this->assertEquals([
+            'Taylor' => 'developer',
+            'Abigail' => 'developer',
+        ], $test1);
+
+        $this->assertEquals([
+            'Taylor' => ['name' => 'Taylor', 'role' => 'developer'],
+            'Abigail' => ['name' => 'Abigail', 'role' => 'developer'],
+        ], $test2);
+    }
+
     public function testPull()
     {
         $array = ['name' => 'Desk', 'price' => 100];
