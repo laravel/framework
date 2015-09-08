@@ -342,7 +342,7 @@ class Arr
      */
     protected static function explodePluckParameters($value, $key)
     {
-        $value = is_array($value) ? $value : explode('.', $value);
+        $value = is_null($value) || is_array($value) ? $value : explode('.', $value);
 
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
