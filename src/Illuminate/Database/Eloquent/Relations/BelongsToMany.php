@@ -528,7 +528,7 @@ class BelongsToMany extends Relation
     /**
      * Get all of the IDs for the related models.
      *
-     * @return array
+     * @return Illuminate\Support\Collection
      */
     public function getRelatedIds()
     {
