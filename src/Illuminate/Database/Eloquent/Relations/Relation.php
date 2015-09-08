@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -280,7 +281,7 @@ abstract class Relation
     }
 
     /**
-     * Set the morph map for polymorphic relations.
+     * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
      * @param  bool  $merge
@@ -288,11 +289,32 @@ abstract class Relation
      */
     public static function morphMap(array $map = null, $merge = true)
     {
+        $map = static::buildMorphMapFromModels($map);
+
         if (is_array($map)) {
             static::$morphMap = $merge ? array_merge(static::$morphMap, $map) : $map;
         }
 
         return static::$morphMap;
+    }
+
+    /**
+     * Builds a table-keyed array from model class names.
+     *
+     * @param  string[]|null  $models
+     * @return array|null
+     */
+    protected static function buildMorphMapFromModels(array $models = null)
+    {
+        if (is_null($models) || Arr::isAssoc($models)) {
+            return $models;
+        }
+
+        $tables = array_map(function ($model) {
+            return (new $model)->getTable();
+        }, $models);
+
+        return array_combine($tables, $models);
     }
 
     /**
