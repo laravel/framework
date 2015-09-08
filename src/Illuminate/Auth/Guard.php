@@ -4,6 +4,7 @@ namespace Illuminate\Auth;
 
 use RuntimeException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\UserProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -529,7 +530,8 @@ class Guard implements GuardContract
      */
     protected function createRecaller($value)
     {
-        return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+        $secure = Config::get('session.secure',false);
+        return $this->getCookieJar()->forever($this->getRecallerName(), $value, null, null, $secure);
     }
 
     /**
