@@ -181,4 +181,11 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testPaginatorRemovesTrailingSlashes()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
+
+        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+    }
 }
