@@ -99,6 +99,24 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Refresh the name look-up table.
+     *
+     * This is done in case any names are fluently defined.
+     *
+     * @return void
+     */
+    public function refreshNameLookups()
+    {
+        $this->nameList = [];
+
+        foreach ($this->allRoutes as $route) {
+            if ($route->getName()) {
+                $this->nameList[$route->getName()] = $route;
+            }
+        }
+    }
+
+    /**
      * Add a route to the controller action dictionary.
      *
      * @param  array  $action

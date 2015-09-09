@@ -19,9 +19,9 @@ $fixers = [
     'function_declaration',
     'include',
     'indentation',
-    'linefeed',
     'join_function',
     'line_after_namespace',
+    'linefeed',
     'list_commas',
     'logical_not_operators_with_successor_space',
     'lowercase_constants',
@@ -70,4 +70,8 @@ $fixers = [
     'whitespacy_lines',
 ];
 
-return Config::create()->level(FixerInterface::NONE_LEVEL)->fixers($fixers)->finder(DefaultFinder::create()->in(__DIR__));
+return Config::create()
+    ->finder(DefaultFinder::create()->in(__DIR__))
+    ->fixers($fixers)
+    ->level(FixerInterface::NONE_LEVEL)
+    ->setUsingCache(true);
