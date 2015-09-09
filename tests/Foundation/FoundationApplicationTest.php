@@ -123,6 +123,15 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($app->environment('qux', 'bar'));
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
+
+    public function testMethodAfterLoadingEnvironmentAddsClosure()
+    {
+        $app = new Application;
+        $closure = function () {};
+        $app->afterLoadingEnvironment($closure);
+        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment'));
+        $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment')[0]);
+    }
 }
 
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider
