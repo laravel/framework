@@ -1216,11 +1216,7 @@ class Validator implements ValidatorContract
             (/?|/\S+)                               # a /, nothing or a / with something
         $~ixu';
 
-        if (preg_match($pattern, $value) == 1) {
-            return true;
-        }
-
-        return false;
+        return preg_match($pattern, $value) === 1;
     }
 
     /**
