@@ -6,6 +6,9 @@ use Illuminate\Encryption\SodiumEncrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @requires extension libsodium
+     */
     public function testSodiumEncryption()
     {
         $e = new SodiumEncrypter(str_repeat('a', 16));
