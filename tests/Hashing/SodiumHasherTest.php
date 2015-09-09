@@ -2,6 +2,9 @@
 
 class SodiumHasherTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @requires extension libsodium
+     */
     public function testBasicHashing()
     {
         $hasher = new Illuminate\Hashing\SodiumHasher;
