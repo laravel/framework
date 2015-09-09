@@ -111,6 +111,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('create', AccessGateTestDummy::class));
+    }
+
     public function test_policies_may_have_before_methods_to_override_checks()
     {
         $gate = $this->getBasicGate();
@@ -166,6 +175,11 @@ class AccessGateTestDummy
 
 class AccessGateTestPolicy
 {
+    public function create($user)
+    {
+        return true;
+    }
+
     public function update($user, AccessGateTestDummy $dummy)
     {
         return $user instanceof StdClass;
