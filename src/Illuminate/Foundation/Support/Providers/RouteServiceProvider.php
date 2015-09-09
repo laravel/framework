@@ -29,10 +29,8 @@ class RouteServiceProvider extends ServiceProvider
         } else {
             $this->loadRoutes();
 
-            // We still want name look-ups to be fast, even if names were specified fluently
-            // on the route itself. This will update the name look-up table just in case.
             $this->app->booted(function () use ($router) {
-                $router->getRoutes()->refreshNameLookup();
+                $router->getRoutes()->refreshNameLookups();
             });
         }
     }

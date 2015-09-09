@@ -99,11 +99,13 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Refresh the name look-up table, in case any names have been defined fluently.
+     * Refresh the name look-up table.
+     *
+     * This is done in case any names are fluently defined.
      *
      * @return void
      */
-    public function refreshNameLookup()
+    public function refreshNameLookups()
     {
         $this->nameList = [];
 
