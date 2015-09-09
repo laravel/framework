@@ -49,11 +49,11 @@ trait CrawlerTrait
     protected $uploads = [];
 
     /**
-     * Additional server variables for all requests.
+     * Additional server variables for the request.
      *
      * @var array
      */
-    protected $server = [];
+    protected $serverVariables = [];
 
     /**
      * Visit the given URI with a GET request.
@@ -1039,6 +1039,19 @@ trait CrawlerTrait
     }
 
     /**
+     * Define a set of server variables to be sent with the requests.
+     *
+     * @param  array  $server
+     * @return $this
+     */
+    protected function withServerVariables(array $server)
+    {
+        $this->serverVariables = $server;
+
+        return $this;
+    }
+
+    /**
      * Call the given URI and return the Response.
      *
      * @param  string  $method
@@ -1056,11 +1069,9 @@ trait CrawlerTrait
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
-        $server = array_replace($this->server, $server);
-
         $request = Request::create(
             $this->currentUri, $method, $parameters,
-            $cookies, $files, $server, $content
+            $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
         $response = $kernel->handle($request);
