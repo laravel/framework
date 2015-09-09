@@ -49,6 +49,13 @@ trait CrawlerTrait
     protected $uploads = [];
 
     /**
+     * Additional server variables for all requests.
+     *
+     * @var array
+     */
+    protected $server = [];
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
@@ -1048,6 +1055,8 @@ trait CrawlerTrait
         $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
+
+        $server = array_replace($this->server, $server);
 
         $request = Request::create(
             $this->currentUri, $method, $parameters,
