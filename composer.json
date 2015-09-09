@@ -38,7 +38,6 @@
         "symfony/process": "3.0.*",
         "symfony/routing": "3.0.*",
         "symfony/translation": "3.0.*",
-        "symfony/validator": "3.0.*",
         "symfony/var-dumper": "3.0.*",
         "vlucas/phpdotenv": "~1.0"
     },
