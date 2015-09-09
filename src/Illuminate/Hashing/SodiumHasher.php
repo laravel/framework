@@ -2,6 +2,7 @@
 
 namespace Illuminate\Hashing;
 
+use Sodium;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
 class SodiumHasher implements HasherContract
@@ -29,10 +30,10 @@ class SodiumHasher implements HasherContract
      */
     public function make($value, array $unusedOptions = [])
     {
-        return \Sodium\crypto_pwhash_scryptsalsa208sha256_str(
+        return Sodium\crypto_pwhash_scryptsalsa208sha256_str(
             $value,
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE
+            Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
+            Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE
         );
     }
 
@@ -46,12 +47,12 @@ class SodiumHasher implements HasherContract
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if (\Sodium\crypto_pwhash_scryptsalsa208sha256_str_verify($hashedValue, $value)) {
-            \Sodium\memzero($value);
+        if (Sodium\crypto_pwhash_scryptsalsa208sha256_str_verify($hashedValue, $value)) {
+            Sodium\memzero($value);
 
             return true;
         } else {
-            \Sodium\memzero($value);
+            Sodium\memzero($value);
 
             return false;
         }
