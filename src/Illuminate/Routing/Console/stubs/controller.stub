@@ -3,6 +3,7 @@
 namespace DummyNamespace;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 use DummyRootNamespaceHttp\Requests;
 use DummyRootNamespaceHttp\Controllers\Controller;
