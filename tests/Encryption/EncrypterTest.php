@@ -2,9 +2,18 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\SodiumEncrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
 {
+    public function testSodiumEncryption()
+    {
+        $e = new SodiumEncrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+        $this->assertNotEquals('foo', $encrypted);
+        $this->assertEquals('foo', $e->decrypt($encrypted));
+    }
+
     public function testEncryption()
     {
         $e = new Encrypter(str_repeat('a', 16));
