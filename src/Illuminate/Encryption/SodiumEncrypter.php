@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use Sodium;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
@@ -15,7 +16,7 @@ class SodiumEncrypter extends BaseEncrypter implements EncrypterContract
      */
     public function __construct($key, $cipher = null)
     {
-        $this->key = \Sodium\crypto_generichash($key);
+        $this->key = Sodium\crypto_generichash($key);
     }
 
     /**
@@ -26,11 +27,11 @@ class SodiumEncrypter extends BaseEncrypter implements EncrypterContract
      */
     public function encrypt($value)
     {
-        $nonce = \Sodium\randombytes_buf(\Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
-        $nonceHex = \Sodium\bin2hex($nonce);
+        $nonce = Sodium\randombytes_buf(Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
+        $nonceHex = Sodium\bin2hex($nonce);
 
-        $encryptedString = \Sodium\crypto_secretbox($value, $nonce, $this->key);
-        $encryptedStringHex = \Sodium\bin2hex($encryptedString);
+        $encryptedString = Sodium\crypto_secretbox($value, $nonce, $this->key);
+        $encryptedStringHex = Sodium\bin2hex($encryptedString);
 
         return sprintf('%s.%s', $nonceHex, $encryptedStringHex);
     }
@@ -45,9 +46,9 @@ class SodiumEncrypter extends BaseEncrypter implements EncrypterContract
     {
         $payload = explode('.', $payload);
 
-        $plaintext = \Sodium\crypto_secretbox_open(
-            \Sodium\hex2bin($payload[1]),
-            \Sodium\hex2bin($payload[0]),
+        $plaintext = Sodium\crypto_secretbox_open(
+            Sodium\hex2bin($payload[1]),
+            Sodium\hex2bin($payload[0]),
             $this->key
         );
 
