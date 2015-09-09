@@ -18,7 +18,13 @@ matrix:
     - php: 5.5.9
       env: setup=stable
 
-sudo: false
+sudo: required
+
+before_install:
+  - sudo add-apt-repository ppa:chris-lea/libsodium
+  - sudo apt-get update
+  - sudo apt-get install libsodium-dev
+  - pecl install libsodium
 
 install:
   - if [[ $setup = 'basic' ]]; then travis_retry composer install --no-interaction --prefer-source; fi
