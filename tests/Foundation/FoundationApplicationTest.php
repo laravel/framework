@@ -123,16 +123,14 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($app->environment('qux', 'bar'));
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
-   
+
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;
-        $closure = function(){};
+        $closure = function() {};
         $app->afterLoadingEnvironment($closure);
-        $eventName = 'bootstrapped: '
-                    .'Illuminate\Foundation\Bootstrap\DetectEnvironment';
-        $this->assertTrue(isset($app['events']->getListeners($eventName)[0]));
-        $this->assertSame($closure, $app['events']->getListeners($eventName)[0]);
+        $this->assertTrue(isset($app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment')[0]));
+        $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\DetectEnvironment')[0]);
     }
 }
 
