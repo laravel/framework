@@ -266,6 +266,24 @@ class Route
     }
 
     /**
+     * Attach middleware(s) to the route.
+     *
+     * @param $middleware
+     *
+     * @return $this
+     */
+    public function withMiddleware($middleware)
+    {
+        if (is_string($middleware)) {
+            $middleware = [$middleware];
+        }
+
+        $this->action['middleware'] = array_merge($this->action['middleware'], $middleware);
+
+        return $this;
+    }
+
+    /**
      * Determine a given parameter exists from the route.
      *
      * @param  string $name
@@ -746,6 +764,20 @@ class Route
     public function getName()
     {
         return isset($this->action['as']) ? $this->action['as'] : null;
+    }
+
+    /**
+     * Add or change the route name.
+     *
+     * @param $name
+     *
+     * @return $this
+     */
+    public function withName($name)
+    {
+        $this->action['as'] = $name;
+
+        return $this;
     }
 
     /**
