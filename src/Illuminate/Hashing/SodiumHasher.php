@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Illuminate\Hashing;
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
@@ -56,6 +55,5 @@ class SodiumHasher implements HasherContract
 
             return false;
         }
-
     }
 }
