@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -71,6 +72,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
         'Serve' => 'command.serve',
+        'TestMake' => 'command.test.make',
         'Tinker' => 'command.tinker',
         'Up' => 'command.up',
         'VendorPublish' => 'command.vendor.publish',
@@ -366,6 +368,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.serve', function () {
             return new ServeCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerTestMakeCommand()
+    {
+        $this->app->singleton('command.test.make', function ($app) {
+            return new TestMakeCommand($app['files']);
         });
     }
 
