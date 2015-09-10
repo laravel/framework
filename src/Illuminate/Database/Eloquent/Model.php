@@ -681,7 +681,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $model->{$model->getKeyName()} = $id;
-        
+
         return $model;
     }
 
