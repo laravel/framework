@@ -150,7 +150,6 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
-    
 }
 
 class ApplicationDeferredSharedServiceProviderStub extends Illuminate\Support\ServiceProvider
