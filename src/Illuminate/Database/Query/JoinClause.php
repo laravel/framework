@@ -46,12 +46,19 @@ class JoinClause
     }
 
     /**
-     * Add an "on" clause to the join.
-     *
-     * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @param  string  $boolean
+     * Add an "on" clause to the join. On clauses can be chained, e.g.
+     * 
+     * $join->on('contacts.user_id', '=', 'users.id')
+     *      ->on('contacts.info_id', '=', 'info.id')
+     * 
+     * will produce the following SQL:
+     * 
+     * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
+     * 
+     * @param  string  $first The first argument (column) to compare with
+     * @param  string  $operator The comparator
+     * @param  string  $second The second argument (column) to compare with
+     * @param  string  $boolean The string to intercalate multiple `on` clauses with
      * @param  bool  $where
      * @return $this
      */
