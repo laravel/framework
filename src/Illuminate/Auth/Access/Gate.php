@@ -150,6 +150,30 @@ class Gate implements GateContract
     }
 
     /**
+     * Determine if any of the given abilites should be granted for the current user.
+     *
+     * @param  array  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function allowsAny($abilities, $arguments = [])
+    {
+        return $this->checkAny($abilities, $arguments);
+    }
+
+    /**
+     * Determine if all of the given abilites should be granted for the current user.
+     *
+     * @param  array  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function allowsAll($abilities, $arguments = [])
+    {
+        return $this->checkAll($abilities, $arguments);
+    }
+
+    /**
      * Determine if the given ability should be denied for the current user.
      *
      * @param  string  $ability
@@ -185,6 +209,42 @@ class Gate implements GateContract
         );
 
         return call_user_func_array($callback, array_merge([$user], $arguments));
+    }
+
+    /**
+     * Determine if any of the given abilities should be granted for the current user.
+     *
+     * @param  array  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function checkAny($abilities, $arguments = [])
+    {
+        foreach ($abilities as $ability) {
+            if ($this->check($ability, $arguments)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if all of the given abilities should be granted for the current user.
+     *
+     * @param  array  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function checkAll($abilities, $arguments = [])
+    {
+        foreach ($abilities as $ability) {
+            if (! $this->check($ability, $arguments)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

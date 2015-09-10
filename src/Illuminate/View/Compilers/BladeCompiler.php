@@ -551,6 +551,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the can-any statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCanany($expression)
+    {
+        return "<?php if (Gate::checkAny{$expression}): ?>";
+    }
+
+    /**
+     * Compile the can-all statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCanall($expression)
+    {
+        return "<?php if (Gate::checkAll{$expression}): ?>";
+    }
+
+    /**
      * Compile the cannot statements into valid PHP.
      *
      * @param  string  $expression
@@ -647,6 +669,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @return string
      */
     protected function compileEndcan($expression)
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-can-any statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndcanany($expression)
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-can-all statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndcanall($expression)
     {
         return '<?php endif; ?>';
     }

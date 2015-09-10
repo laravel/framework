@@ -93,6 +93,17 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo', [$dummy1, $dummy2]));
     }
 
+    public function test_any_or_all_of_specified_abilities_can_be_checked()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->define('bar', function ($user) { return false; });
+
+        $this->assertTrue($gate->checkAny(['foo', 'bar']));
+        $this->assertFalse($gate->checkAll(['foo', 'bar']));
+    }
+
     public function test_classes_can_be_defined_as_callbacks_using_at_notation()
     {
         $gate = $this->getBasicGate();

@@ -233,6 +233,30 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testCanAnyStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@canany ([\'update\', \'delete\'], [$post])
+breeze
+@endcanany';
+        $expected = '<?php if (Gate::checkAny([\'update\', \'delete\'], [$post])): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testCanAllStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@canall ([\'update\', \'delete\'], [$post])
+breeze
+@endcanall';
+        $expected = '<?php if (Gate::checkAll([\'update\', \'delete\'], [$post])): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCannotStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
