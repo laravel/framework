@@ -141,6 +141,15 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
         $this->assertSame($closure, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
+
+    public function testAfterBootstrappingAddsClosure()
+    {
+        $app = new Application;
+        $closure = function () {};
+        $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
+        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
+        $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
+    }
     
 }
 
