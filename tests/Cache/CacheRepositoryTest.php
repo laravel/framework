@@ -68,6 +68,14 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $result);
     }
 
+    public function testPutWithDatetimeInPastOrZeroMinutesDoesntSaveItem()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->never();
+        $repo->put('foo', 'bar', Carbon\Carbon::now()->subMinutes(10));
+        $repo->put('foo', 'bar', Carbon\Carbon::now()->addSeconds(5));
+    }
+
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();

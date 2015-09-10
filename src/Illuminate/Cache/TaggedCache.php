@@ -239,7 +239,7 @@ class TaggedCache implements Store
     protected function getMinutes($duration)
     {
         if ($duration instanceof DateTime) {
-            $fromNow = Carbon::instance($duration)->diffInMinutes();
+            $fromNow = Carbon::now()->diffInMinutes(Carbon::instance($duration), false);
 
             return $fromNow > 0 ? $fromNow : null;
         }
