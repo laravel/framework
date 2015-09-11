@@ -475,6 +475,24 @@ return $obj; });
         $container->forgetInstance("ContainerConcreteStub");
         $this->assertFalse($container->isShared("ContainerConcreteStub"));
     }
+    
+    public function testForgetInstancesForgetsAllInstances()
+    {
+        $container = new Container;
+        $containerConcreteStub1 = new ContainerConcreteStub;
+        $containerConcreteStub2 = new ContainerConcreteStub;
+        $containerConcreteStub3 = new ContainerConcreteStub;
+        $container->instance("Instance1", $containerConcreteStub1);
+        $container->instance("Instance2", $containerConcreteStub2);
+        $container->instance("Instance3", $containerConcreteStub3);
+        $this->assertTrue($container->isShared("Instance1"));
+        $this->assertTrue($container->isShared("Instance2"));
+        $this->assertTrue($container->isShared("Instance3"));
+        $container->forgetInstances();
+        $this->assertFalse($container->isShared("Instance1"));
+        $this->assertFalse($container->isShared("Instance2"));
+        $this->assertFalse($container->isShared("Instance3"));
+    }
 }
 
 class ContainerConcreteStub
