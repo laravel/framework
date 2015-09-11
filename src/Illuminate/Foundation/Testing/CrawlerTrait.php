@@ -496,7 +496,7 @@ trait CrawlerTrait
      */
     protected function getInputOrTextAreaValue($selector)
     {
-        $field = $this->filterByNameOrId($selector);
+        $field = $this->filterByNameOrId($selector, ['input', 'textarea']);
 
         if ($field->count() == 0) {
             throw new Exception("There are no elements with the name or ID [$selector].");
@@ -1027,15 +1027,25 @@ trait CrawlerTrait
     /**
      * Filter elements according to the given name or ID attribute.
      *
-     * @param  string  $name
-     * @param  string  $element
+     * @param  string        $name
+     * @param  array|string  $elements
      * @return \Symfony\Component\DomCrawler\Crawler
      */
-    protected function filterByNameOrId($name, $element = '*')
+    protected function filterByNameOrId($name, $elements = '*')
     {
         $name = str_replace('#', '', $name);
 
-        return $this->crawler->filter("{$element}#{$name}, {$element}[name='{$name}']");
+        if (is_array($elements)) {
+            array_walk($elements, function (&$element) use ($name) {
+                $element = "{$element}#{$name}, {$element}[name='{$name}']";
+            });
+
+            $filter = implode(', ', $elements);
+        } else {
+            $filter = "{$elements}#{$name}, {$elements}[name='{$name}']";
+        }
+
+        return $this->crawler->filter($filter);
     }
 
     /**
