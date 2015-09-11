@@ -54,7 +54,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->singleton('ContainerConcreteStub');
-        $bindings = $container->getBindings();
 
         $var1 = $container->make('ContainerConcreteStub');
         $var2 = $container->make('ContainerConcreteStub');
@@ -465,6 +464,34 @@ return $obj; });
         $this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
 
         $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
+    }
+
+    public function testForgetInstanceForgetsInstance()
+    {
+        $container = new Container;
+        $containerConcreteStub = new ContainerConcreteStub;
+        $container->instance('ContainerConcreteStub', $containerConcreteStub);
+        $this->assertTrue($container->isShared('ContainerConcreteStub'));
+        $container->forgetInstance('ContainerConcreteStub');
+        $this->assertFalse($container->isShared('ContainerConcreteStub'));
+    }
+
+    public function testForgetInstancesForgetsAllInstances()
+    {
+        $container = new Container;
+        $containerConcreteStub1 = new ContainerConcreteStub;
+        $containerConcreteStub2 = new ContainerConcreteStub;
+        $containerConcreteStub3 = new ContainerConcreteStub;
+        $container->instance('Instance1', $containerConcreteStub1);
+        $container->instance('Instance2', $containerConcreteStub2);
+        $container->instance('Instance3', $containerConcreteStub3);
+        $this->assertTrue($container->isShared('Instance1'));
+        $this->assertTrue($container->isShared('Instance2'));
+        $this->assertTrue($container->isShared('Instance3'));
+        $container->forgetInstances();
+        $this->assertFalse($container->isShared('Instance1'));
+        $this->assertFalse($container->isShared('Instance2'));
+        $this->assertFalse($container->isShared('Instance3'));
     }
 }
 
