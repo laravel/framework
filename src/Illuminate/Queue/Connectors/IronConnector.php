@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Connectors;
 
 use IronMQ\IronMQ;
-use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
@@ -17,23 +16,14 @@ class IronConnector implements ConnectorInterface
     protected $crypt;
 
     /**
-     * The current request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
      * Create a new Iron connector instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $crypt
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    public function __construct(EncrypterContract $crypt, Request $request)
+    public function __construct(EncrypterContract $crypt)
     {
         $this->crypt = $crypt;
-        $this->request = $request;
     }
 
     /**
@@ -56,6 +46,6 @@ class IronConnector implements ConnectorInterface
             $iron->ssl_verifypeer = $config['ssl_verifypeer'];
         }
 
-        return new IronQueue($iron, $this->request, $config['queue'], $config['encrypt']);
+        return new IronQueue($iron, $config['queue'], $config['encrypt']);
     }
 }
