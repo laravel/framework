@@ -207,6 +207,8 @@ class Worker
             // the delete method on the job. Otherwise we will just keep moving.
             $job->fire();
 
+            $this->raiseFinishedJobEvent($connection, $job);
+
             return ['job' => $job, 'failed' => false];
         } catch (Exception $e) {
             // If we catch an exception, we will attempt to release the job back onto
@@ -261,6 +263,22 @@ class Worker
             $data = json_decode($job->getRawBody(), true);
 
             $this->events->fire('illuminate.queue.failed', [$connection, $job, $data]);
+        }
+    }
+
+    /**
+     * Raise the finished queue job event.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseFinishedJobEvent($connection, Job $job)
+    {
+        if ($this->events) {
+            $data = json_decode($job->getRawBody(), true);
+
+            $this->events->fire('illuminate.queue.finished', [$connection, $job, $data]);
         }
     }
 
