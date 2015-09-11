@@ -496,7 +496,7 @@ trait CrawlerTrait
      */
     protected function getInputOrTextAreaValue($selector)
     {
-        $field = $this->filterByNameOrId($selector);
+        $field = $this->filterByNameOrId($selector)->filter('input, textarea');
 
         if ($field->count() == 0) {
             throw new Exception("There are no elements with the name or ID [$selector].");
