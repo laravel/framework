@@ -64,6 +64,17 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Register an event listener for the finishing job event.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function finishing($callback)
+    {
+        $this->app['events']->listen('illuminate.queue.finished', $callback);
+    }
+
+    /**
      * Register an event listener for the daemon queue stopping.
      *
      * @param  mixed  $callback
