@@ -27,11 +27,9 @@ use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
-use Illuminate\Foundation\Console\HandlerCommandCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -53,6 +51,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ConfigClear' => 'command.config.clear',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
+        'KeyGenerate' => 'command.key.generate',
         'Optimize' => 'command.optimize',
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
@@ -73,10 +72,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ConsoleMake' => 'command.console.make',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
-        'HandlerCommand' => 'command.handler.command',
-        'HandlerEvent' => 'command.handler.event',
         'JobMake' => 'command.job.make',
-        'KeyGenerate' => 'command.key.generate',
         'ListenerMake' => 'command.listener.make',
         'ModelMake' => 'command.model.make',
         'PolicyMake' => 'command.policy.make',
@@ -235,30 +231,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.environment', function () {
             return new EnvironmentCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerHandlerCommandCommand()
-    {
-        $this->app->singleton('command.handler.command', function ($app) {
-            return new HandlerCommandCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerHandlerEventCommand()
-    {
-        $this->app->singleton('command.handler.event', function ($app) {
-            return new HandlerEventCommand($app['files']);
         });
     }
 
