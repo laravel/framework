@@ -48,11 +48,7 @@ class CacheServiceProvider extends ServiceProvider
             return new ClearCommand($app['cache']);
         });
 
-        $this->app->singleton('command.cache.table', function ($app) {
-            return new CacheTableCommand($app['files'], $app['composer']);
-        });
-
-        $this->commands('command.cache.clear', 'command.cache.table');
+        $this->commands('command.cache.clear');
     }
 
     /**
@@ -63,7 +59,7 @@ class CacheServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'cache', 'cache.store', 'memcached.connector', 'command.cache.clear', 'command.cache.table',
+            'cache', 'cache.store', 'memcached.connector', 'command.cache.clear',
         ];
     }
 }
