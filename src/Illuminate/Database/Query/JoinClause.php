@@ -55,10 +55,10 @@ class JoinClause
      * 
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      * 
-     * @param  string  $first The first argument (column) to compare with
-     * @param  string  $operator The comparator
-     * @param  string  $second The second argument (column) to compare with
-     * @param  string  $boolean The string to intercalate multiple `on` clauses with
+     * @param  string  $first
+     * @param  string  $operator
+     * @param  string  $second
+     * @param  string  $boolean
      * @param  bool  $where
      * @return $this
      */
