@@ -20,6 +20,13 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', $container->make('name'));
     }
 
+    public function testBindIfRegistersIfServiceHasntBeenRegisteredYet()
+    {
+        $container = new Container;
+        $container->bindIf('name', function () { return 'Taylor'; });
+        $this->assertEquals('Taylor', $container->make('name'));
+    }
+
     public function testSharedClosureResolution()
     {
         $container = new Container;
