@@ -8,6 +8,8 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class Gate implements GateContract
 {
+    use HandlesAuthorization;
+
     /**
      * The container instance.
      *
@@ -162,13 +164,13 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be granted for the current user.
+     * Get the raw result for the given ability for the current user.
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function check($ability, $arguments = [])
+    public function approach($ability, $arguments = [])
     {
         if (! $user = $this->resolveUser()) {
             return false;
@@ -185,6 +187,44 @@ class Gate implements GateContract
         );
 
         return call_user_func_array($callback, array_merge([$user], $arguments));
+    }
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Admission
+     *
+     * @throws \Illuminate\Auth\Access\UnauthorizedException
+     */
+    public function authorize($ability, $arguments = [])
+    {
+        $result = $this->approach($ability, $arguments);
+
+        if ($result instanceof Admission) {
+            return $result;
+        }
+
+        return $result ? $this->allow() : $this->deny();
+    }
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function check($ability, $arguments = [])
+    {
+        try {
+            $result = $this->approach($ability, $arguments);
+        } catch (UnauthorizedException $e) {
+            return false;
+        }
+
+        return (bool) $result;
     }
 
     /**
