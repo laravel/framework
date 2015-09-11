@@ -54,7 +54,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $container->singleton('ContainerConcreteStub');
-        $bindings = $container->getBindings();
 
         $var1 = $container->make('ContainerConcreteStub');
         $var2 = $container->make('ContainerConcreteStub');
