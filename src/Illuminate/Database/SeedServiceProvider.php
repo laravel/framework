@@ -4,7 +4,6 @@ namespace Illuminate\Database;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Console\Seeds\SeedCommand;
-use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 
 class SeedServiceProvider extends ServiceProvider
 {
