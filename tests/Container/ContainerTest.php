@@ -465,6 +465,16 @@ return $obj; });
 
         $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
     }
+
+    public function testForgetInstanceForgetsInstance()
+    {
+        $container = new Container;
+        $containerConcreteStub = new ContainerConcreteStub;
+        $container->instance("ContainerConcreteStub", $containerConcreteStub);
+        $this->assertTrue($container->isShared("ContainerConcreteStub"));
+        $container->forgetInstance("ContainerConcreteStub");
+        $this->assertFalse($container->isShared("ContainerConcreteStub"));
+    }
 }
 
 class ContainerConcreteStub
