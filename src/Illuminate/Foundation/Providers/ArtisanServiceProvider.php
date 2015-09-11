@@ -48,35 +48,43 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
-        'AppName' => 'command.app.name',
         'ClearCompiled' => 'command.clear-compiled',
-        'CommandMake' => 'command.command.make',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'Down' => 'command.down',
+        'Environment' => 'command.environment',
+        'Optimize' => 'command.optimize',
+        'RouteCache' => 'command.route.cache',
+        'RouteClear' => 'command.route.clear',
+        'RouteList' => 'command.route.list',
+        'Tinker' => 'command.tinker',
+        'Up' => 'command.up',
+        'ViewClear' => 'command.view.clear',
+    ];
+
+    /**
+     * The commands to be registered.
+     *
+     * @var array
+     */
+    protected $devCommands = [
+        'AppName' => 'command.app.name',
+        'CommandMake' => 'command.command.make',
         'ConsoleMake' => 'command.console.make',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
-        'Down' => 'command.down',
-        'Environment' => 'command.environment',
         'HandlerCommand' => 'command.handler.command',
         'HandlerEvent' => 'command.handler.event',
         'JobMake' => 'command.job.make',
         'KeyGenerate' => 'command.key.generate',
         'ListenerMake' => 'command.listener.make',
         'ModelMake' => 'command.model.make',
-        'Optimize' => 'command.optimize',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'RequestMake' => 'command.request.make',
-        'RouteCache' => 'command.route.cache',
-        'RouteClear' => 'command.route.clear',
-        'RouteList' => 'command.route.list',
         'Serve' => 'command.serve',
         'TestMake' => 'command.test.make',
-        'Tinker' => 'command.tinker',
-        'Up' => 'command.up',
         'VendorPublish' => 'command.vendor.publish',
-        'ViewClear' => 'command.view.clear',
     ];
 
     /**
@@ -86,13 +94,28 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        foreach (array_keys($this->commands) as $command) {
+        $this->registerCommands($this->commands);
+
+        if (! $this->app->environment('production')) {
+            $this->registerCommands($this->devCommands);
+        }
+    }
+
+    /**
+     * Register the given commands.
+     *
+     * @param  array  $commands
+     * @return void
+     */
+    protected function registerCommands(array $commands)
+    {
+        foreach (array_keys($commands) as $command) {
             $method = "register{$command}Command";
 
             call_user_func_array([$this, $method], []);
         }
 
-        $this->commands(array_values($this->commands));
+        $this->commands(array_values($commands));
     }
 
     /**
