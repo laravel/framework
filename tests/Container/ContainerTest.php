@@ -493,6 +493,23 @@ return $obj; });
         $this->assertFalse($container->isShared('Instance2'));
         $this->assertFalse($container->isShared('Instance3'));
     }
+
+    public function testContainerFlushFlushesAllBindingsAliasesAndResolvedInstances()
+    {
+        $container = new Container;
+        $container->bind('ConcreteStub', function () { return new ContainerConcreteStub; }, true);
+        $container->alias('ConcreteStub', 'ContainerConcreteStub');
+        $concreteStubInstance = $container->make('ConcreteStub');
+        $this->assertTrue($container->resolved('ConcreteStub'));
+        $this->assertTrue($container->isAlias('ContainerConcreteStub'));
+        $this->assertArrayHasKey('ConcreteStub', $container->getBindings());
+        $this->assertTrue($container->isShared('ConcreteStub'));
+        $container->flush();
+        $this->assertFalse($container->resolved('ConcreteStub'));
+        $this->assertFalse($container->isAlias('ContainerConcreteStub'));
+        $this->assertEmpty($container->getBindings());
+        $this->assertFalse($container->isShared('ConcreteStub'));
+    }
 }
 
 class ContainerConcreteStub
