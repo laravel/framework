@@ -1027,7 +1027,7 @@ trait CrawlerTrait
     /**
      * Filter elements according to the given name or ID attribute.
      *
-     * @param  string        $name
+     * @param  string  $name
      * @param  array|string  $elements
      * @return \Symfony\Component\DomCrawler\Crawler
      */
