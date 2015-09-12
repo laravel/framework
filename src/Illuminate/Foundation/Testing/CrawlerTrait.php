@@ -1035,17 +1035,13 @@ trait CrawlerTrait
     {
         $name = str_replace('#', '', $name);
 
-        if (is_array($elements)) {
-            array_walk($elements, function (&$element) use ($name) {
-                $element = "{$element}#{$name}, {$element}[name='{$name}']";
-            });
+        $elements = is_array($elements) ? $elements : [$elements];
 
-            $filter = implode(', ', $elements);
-        } else {
-            $filter = "{$elements}#{$name}, {$elements}[name='{$name}']";
-        }
+        array_walk($elements, function (&$element) use ($name) {
+            $element = "{$element}#{$name}, {$element}[name='{$name}']";
+        });
 
-        return $this->crawler->filter($filter);
+        return $this->crawler->filter(implode(', ', $elements));
     }
 
     /**
