@@ -111,6 +111,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function test_policy_default_to_false_if_method_does_not_exist()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertFalse($gate->check('nonexistent_method', new AccessGateTestDummy));
+    }
+
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
     {
         $gate = $this->getBasicGate();
