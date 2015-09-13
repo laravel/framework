@@ -15,9 +15,9 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/container": "5.1.*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
+        "illuminate/container": "5.2.*",
+        "illuminate/contracts": "5.2.*",
+        "illuminate/support": "5.2.*",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~5.1"
     },
@@ -28,12 +28,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (~3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0)."
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~6.0)."
     },
     "minimum-stability": "dev"
 }

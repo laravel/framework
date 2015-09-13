@@ -6,12 +6,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Console\Migrations\ResetCommand;
-use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
-use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class MigrationServiceProvider extends ServiceProvider
@@ -36,6 +35,8 @@ class MigrationServiceProvider extends ServiceProvider
         // all of the migration related commands that are used by the "Artisan" CLI
         // so that they may be easily accessed for registering with the consoles.
         $this->registerMigrator();
+
+        $this->registerCreator();
 
         $this->registerCommands();
     }
@@ -72,13 +73,25 @@ class MigrationServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the migration creator.
+     *
+     * @return void
+     */
+    protected function registerCreator()
+    {
+        $this->app->singleton('migration.creator', function ($app) {
+            return new MigrationCreator($app['files']);
+        });
+    }
+
+    /**
      * Register all of the migration commands.
      *
      * @return void
      */
     protected function registerCommands()
     {
-        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Make', 'Status'];
+        $commands = ['Migrate', 'Rollback', 'Reset', 'Refresh', 'Install', 'Status'];
 
         // We'll simply spin through the list of commands that are migration related
         // and register each one of them with an application container. They will
@@ -91,7 +104,7 @@ class MigrationServiceProvider extends ServiceProvider
         // register them with the Artisan start event so that these are available
         // when the Artisan application actually starts up and is getting used.
         $this->commands(
-            'command.migrate', 'command.migrate.make',
+            'command.migrate',
             'command.migrate.install', 'command.migrate.rollback',
             'command.migrate.reset', 'command.migrate.refresh',
             'command.migrate.status'
@@ -166,39 +179,6 @@ class MigrationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the "make" migration command.
-     *
-     * @return void
-     */
-    protected function registerMakeCommand()
-    {
-        $this->registerCreator();
-
-        $this->app->singleton('command.migrate.make', function ($app) {
-            // Once we have the migration creator registered, we will create the command
-            // and inject the creator. The creator is responsible for the actual file
-            // creation of the migrations, and may be extended by these developers.
-            $creator = $app['migration.creator'];
-
-            $composer = $app['composer'];
-
-            return new MigrateMakeCommand($creator, $composer);
-        });
-    }
-
-    /**
-     * Register the migration creator.
-     *
-     * @return void
-     */
-    protected function registerCreator()
-    {
-        $this->app->singleton('migration.creator', function ($app) {
-            return new MigrationCreator($app['files']);
-        });
-    }
-
-    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -210,7 +190,6 @@ class MigrationServiceProvider extends ServiceProvider
             'command.migrate.rollback', 'command.migrate.reset',
             'command.migrate.refresh', 'command.migrate.install',
             'command.migrate.status', 'migration.creator',
-            'command.migrate.make',
         ];
     }
 }

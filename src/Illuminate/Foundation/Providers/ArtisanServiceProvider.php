@@ -3,9 +3,12 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
@@ -15,9 +18,12 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
+use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\CommandMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
@@ -27,11 +33,11 @@ use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
-use Illuminate\Foundation\Console\HandlerCommandCommand;
+use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -48,35 +54,49 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
-        'AppName' => 'command.app.name',
         'ClearCompiled' => 'command.clear-compiled',
-        'CommandMake' => 'command.command.make',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
-        'ConsoleMake' => 'command.console.make',
-        'EventGenerate' => 'command.event.generate',
-        'EventMake' => 'command.event.make',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
-        'HandlerCommand' => 'command.handler.command',
-        'HandlerEvent' => 'command.handler.event',
-        'JobMake' => 'command.job.make',
         'KeyGenerate' => 'command.key.generate',
-        'ListenerMake' => 'command.listener.make',
-        'ModelMake' => 'command.model.make',
         'Optimize' => 'command.optimize',
-        'PolicyMake' => 'command.policy.make',
-        'ProviderMake' => 'command.provider.make',
-        'RequestMake' => 'command.request.make',
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
-        'Serve' => 'command.serve',
-        'TestMake' => 'command.test.make',
         'Tinker' => 'command.tinker',
         'Up' => 'command.up',
-        'VendorPublish' => 'command.vendor.publish',
         'ViewClear' => 'command.view.clear',
+    ];
+
+    /**
+     * The commands to be registered.
+     *
+     * @var array
+     */
+    protected $devCommands = [
+        'AppName' => 'command.app.name',
+        'CacheTable' => 'command.cache.table',
+        'CommandMake' => 'command.command.make',
+        'ConsoleMake' => 'command.console.make',
+        'ControllerMake' => 'command.controller.make',
+        'EventGenerate' => 'command.event.generate',
+        'EventMake' => 'command.event.make',
+        'JobMake' => 'command.job.make',
+        'ListenerMake' => 'command.listener.make',
+        'MiddlewareMake' => 'command.middleware.make',
+        'MigrationMake' => 'command.migration.make',
+        'ModelMake' => 'command.model.make',
+        'PolicyMake' => 'command.policy.make',
+        'ProviderMake' => 'command.provider.make',
+        'QueueFailedTable' => 'command.queue.failed-table',
+        'QueueTable' => 'command.queue.table',
+        'RequestMake' => 'command.request.make',
+        'SeederMake' => 'command.seeder.make',
+        'SessionTable' => 'command.session.table',
+        'Serve' => 'command.serve',
+        'TestMake' => 'command.test.make',
+        'VendorPublish' => 'command.vendor.publish',
     ];
 
     /**
@@ -86,13 +106,28 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        foreach (array_keys($this->commands) as $command) {
+        $this->registerCommands($this->commands);
+
+        if (! $this->app->environment('production')) {
+            $this->registerCommands($this->devCommands);
+        }
+    }
+
+    /**
+     * Register the given commands.
+     *
+     * @param  array  $commands
+     * @return void
+     */
+    protected function registerCommands(array $commands)
+    {
+        foreach (array_keys($commands) as $command) {
             $method = "register{$command}Command";
 
             call_user_func_array([$this, $method], []);
         }
 
-        $this->commands(array_values($this->commands));
+        $this->commands(array_values($commands));
     }
 
     /**
@@ -104,6 +139,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.app.name', function ($app) {
             return new AppNameCommand($app['composer'], $app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCacheTableCommand()
+    {
+        $this->app->singleton('command.cache.table', function ($app) {
+            return new CacheTableCommand($app['files'], $app['composer']);
         });
     }
 
@@ -172,6 +219,18 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerControllerMakeCommand()
+    {
+        $this->app->singleton('command.controller.make', function ($app) {
+            return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerEventGenerateCommand()
     {
         $this->app->singleton('command.event.generate', function () {
@@ -220,30 +279,6 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerHandlerCommandCommand()
-    {
-        $this->app->singleton('command.handler.command', function ($app) {
-            return new HandlerCommandCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerHandlerEventCommand()
-    {
-        $this->app->singleton('command.handler.event', function ($app) {
-            return new HandlerEventCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerJobMakeCommand()
     {
         $this->app->singleton('command.job.make', function ($app) {
@@ -272,6 +307,37 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.listener.make', function ($app) {
             return new ListenerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMiddlewareMakeCommand()
+    {
+        $this->app->singleton('command.middleware.make', function ($app) {
+            return new MiddlewareMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrationMakeCommand()
+    {
+        $this->app->singleton('command.migration.make', function ($app) {
+            // Once we have the migration creator registered, we will create the command
+            // and inject the creator. The creator is responsible for the actual file
+            // creation of the migrations, and may be extended by these developers.
+            $creator = $app['migration.creator'];
+
+            $composer = $app['composer'];
+
+            return new MigrateMakeCommand($creator, $composer);
         });
     }
 
@@ -316,10 +382,58 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerQueueFailedTableCommand()
+    {
+        $this->app->singleton('command.queue.failed-table', function ($app) {
+            return new FailedTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueTableCommand()
+    {
+        $this->app->singleton('command.queue.table', function ($app) {
+            return new TableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerRequestMakeCommand()
     {
         $this->app->singleton('command.request.make', function ($app) {
             return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerSeederMakeCommand()
+    {
+        $this->app->singleton('command.seeder.make', function ($app) {
+            return new SeederMakeCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerSessionTableCommand()
+    {
+        $this->app->singleton('command.session.table', function ($app) {
+            return new SessionTableCommand($app['files'], $app['composer']);
         });
     }
 
@@ -450,6 +564,10 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array_values($this->commands);
+        if ($this->app->environment('production')) {
+            return array_values($this->commands);
+        } else {
+            return array_merge(array_values($this->commands), array_values($this->devCommands));
+        }
     }
 }

@@ -127,7 +127,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(670, array_last($array, function ($key, $value) { return $value > 320; }));
     }
 
-    public function testArrayFetch()
+    public function testArrayPluck()
     {
         $data = [
             'post-1' => [
@@ -157,11 +157,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                     '#baz',
                 ],
             ],
-        ], array_fetch($data, 'comments'));
+        ], array_pluck($data, 'comments'));
 
-        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_fetch($data, 'comments.tags'));
-        $this->assertEquals([], array_fetch($data, 'foo'));
-        $this->assertEquals([], array_fetch($data, 'foo.bar'));
+        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_pluck($data, 'comments.tags'));
+        $this->assertEquals([null, null], array_pluck($data, 'foo'));
+        $this->assertEquals([null, null], array_pluck($data, 'foo.bar'));
     }
 
     public function testArrayFlatten()
