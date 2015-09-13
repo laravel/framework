@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\BlobValue;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -411,7 +412,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function fill(array $attributes)
     {
         $totallyGuarded = $this->totallyGuarded();
-
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
             $key = $this->removeTableFromKey($key);
 
@@ -2482,7 +2482,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 continue;
             }
 
-            $attributes[$key] = $this->castAttribute(
+            $attributes[$key] = $this->castAttributeToNative(
                 $key, $attributes[$key]
             );
         }
@@ -2627,14 +2627,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If the attribute exists within the cast array, we will convert it to
         // an appropriate native PHP type dependant upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
-        if ($this->hasCast($key)) {
-            $value = $this->castAttribute($key, $value);
-        }
+        $value = $this->castAttributeToNative($key, $value);
 
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        elseif (in_array($key, $this->getDates())) {
+        if (in_array($key, $this->getDates())) {
             if (! is_null($value)) {
                 return $this->asDateTime($value);
             }
@@ -2748,23 +2746,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine whether a value is JSON castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isJsonCastable($key)
-    {
-        if ($this->hasCast($key)) {
-            return in_array(
-                $this->getCastType($key), ['array', 'json', 'object', 'collection'], true
-            );
-        }
-
-        return false;
-    }
-
-    /**
      * Get the type of cast for a model attribute.
      *
      * @param  string  $key
@@ -2782,9 +2763,58 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  mixed   $value
      * @return mixed
      */
-    protected function castAttribute($key, $value)
+    protected function castAttributeToNative($key, $value)
     {
         if (is_null($value)) {
+            return $value;
+        }
+
+        if (!$this->hasCast($key)) {
+            return $value;
+        }
+
+        switch ($this->getCastType($key)) {
+            case 'int':
+            case 'integer':
+                return (int) $value;
+            case 'real':
+            case 'float':
+            case 'double':
+                return (float) $value;
+            case 'string':
+            case 'binary':
+                return (string) $value;
+            case 'bool':
+            case 'boolean':
+                return (bool) $value;
+            case 'object':
+                return json_decode($value);
+            case 'array':
+            case 'json':
+                return json_decode($value, true);
+            case 'timestamp':
+                return $this->asDateTime($value);
+            case 'collection':
+                return new BaseCollection(json_decode($value, true));
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Cast an attribute from a native PHP type.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return mixed
+     */
+    protected function castAttributeFromNative($key, $value)
+    {
+        if (is_null($value)) {
+            return $value;
+        }
+
+        if (!$this->hasCast($key)) {
             return $value;
         }
 
@@ -2802,12 +2832,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'boolean':
                 return (bool) $value;
             case 'object':
-                return json_decode($value);
             case 'array':
             case 'json':
-                return json_decode($value, true);
             case 'collection':
-                return new BaseCollection(json_decode($value, true));
+                return json_encode($value);
+            case 'binary':
+                return new BlobValue($value);
+            case 'timestamp':
+                return $this->asDateTime($value);
             default:
                 return $value;
         }
@@ -2838,11 +2870,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
-            $value = json_encode($value);
-        }
-
-        $this->attributes[$key] = $value;
+        // Cast from PHP native value.
+        $this->attributes[$key] = $this->castAttributeFromNative($key, $value);
     }
 
     /**
@@ -2999,7 +3028,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function setRawAttributes(array $attributes, $sync = false)
     {
-        $this->attributes = $attributes;
+        $this->attributes = [];
+        foreach($attributes as $key => $value){
+            $this->attributes[$key] = $this->castAttributeFromNative($key, $value);
+        }
 
         if ($sync) {
             $this->syncOriginal();
