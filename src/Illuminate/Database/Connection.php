@@ -18,6 +18,7 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
+use Illuminate\Database\BlobValue;
 
 class Connection implements ConnectionInterface
 {
@@ -308,8 +309,7 @@ class Connection implements ConnectionInterface
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
-
-            $statement->execute($me->prepareBindings($bindings));
+            $this->executeStatement($statement, $bindings);
 
             return $statement->fetchAll($me->getFetchMode());
         });
@@ -376,9 +376,10 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            $bindings = $me->prepareBindings($bindings);
+            $statement = $me->getPdo()->prepare($query);
+            $this->executeStatement($statement, $bindings);
 
-            return $me->getPdo()->prepare($query)->execute($bindings);
+            return $statement;
         });
     }
 
@@ -400,8 +401,7 @@ class Connection implements ConnectionInterface
             // by the statement and return that back to the developer. We'll first need
             // to execute the statement and then we'll use PDO to fetch the affected.
             $statement = $me->getPdo()->prepare($query);
-
-            $statement->execute($me->prepareBindings($bindings));
+            $this->executeStatement($statement, $bindings);
 
             return $statement->rowCount();
         });
@@ -446,6 +446,34 @@ class Connection implements ConnectionInterface
         }
 
         return $bindings;
+    }
+
+    /**
+     * Execute statement.
+     *
+     * @param  \PDOStatement $statement
+     * @param  array  $bindings
+     * @return bool
+     */
+    protected function executeStatement($statement, array $bindings)
+    {
+        foreach($this->prepareBindings($bindings) as $key => $value){
+            $data_type = PDO::PARAM_STR;
+            if($value instanceof BlobValue){
+                $data_type = PDO::PARAM_LOB;
+                $value = strval($value);
+            } else if(is_int($value)){
+                $data_type = PDO::PARAM_INT;
+            } else if(is_bool($value)){
+                $data_type = PDO::PARAM_BOOL;
+            } else if(is_null($value)){
+                $data_type = PDO::PARAM_NULL;
+            }
+
+            $statement->bindValue($key + 1, $value, $data_type);
+        }
+
+        return $statement->execute();
     }
 
     /**
