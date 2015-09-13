@@ -43,6 +43,18 @@ class PipelineTest extends PHPUnit_Framework_TestCase
 
         unset($_SERVER['__test.pipe.parameters']);
     }
+
+    public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
+    {
+        $pipelineInstance = new Pipeline(new Illuminate\Container\Container);
+        $result = $pipelineInstance->send('data')
+            ->through('PipelineTestPipeOne')
+            ->via('differentMethod')
+            ->then(function ($piped) {
+                return $piped;
+            });
+        $this->assertEquals('data', $result);
+    }
 }
 
 class PipelineTestPipeOne
@@ -51,6 +63,11 @@ class PipelineTestPipeOne
     {
         $_SERVER['__test.pipe.one'] = $piped;
 
+        return $next($piped);
+    }
+
+    public function differentMethod($piped, $next)
+    {
         return $next($piped);
     }
 }
