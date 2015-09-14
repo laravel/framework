@@ -461,7 +461,7 @@ trait CrawlerTrait
      */
     public function seeIsSelected($selector, $expected)
     {
-        $this->assertSame(
+        $this->assertEquals(
             $expected, $this->getSelectedValue($selector),
             "The field [{$selector}] does not contain the selected value [{$expected}]."
         );
@@ -478,7 +478,7 @@ trait CrawlerTrait
      */
     public function dontSeeIsSelected($selector, $value)
     {
-        $this->assertNotSame(
+        $this->assertNotEquals(
             $value, $this->getSelectedValue($selector),
             "The field [{$selector}] contains the selected value [{$value}]."
         );
