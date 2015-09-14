@@ -172,7 +172,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Dynamically check if an attribute is set.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     public function __isset($key)
     {
