@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Queue\QueueManager;
 use ReflectionClass;
 use RuntimeException;
 use ReflectionParameter;
@@ -42,13 +43,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     protected $pipes = [];
 
     /**
-     * The queue resolver callback.
-     *
-     * @var \Closure|null
-     */
-    protected $queueResolver;
-
-    /**
      * All of the command-to-handler mappings.
      *
      * @var array
@@ -63,17 +57,23 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     protected $mapper;
 
     /**
+     * The queue manager instance.
+     *
+     * @var QueueManager
+     */
+    private $queueManager;
+
+    /**
      * Create a new command dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Closure|null  $queueResolver
-     * @return void
+     * @param  \Illuminate\Contracts\Container\Container $container
+     * @param QueueManager $queueManager
      */
-    public function __construct(Container $container, Closure $queueResolver = null)
+    public function __construct(Container $container, QueueManager $queueManager = null)
     {
         $this->container = $container;
-        $this->queueResolver = $queueResolver;
         $this->pipeline = new Pipeline($container);
+        $this->queueManager = $queueManager;
     }
 
     /**
@@ -172,7 +172,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatch($command, Closure $afterResolving = null)
     {
-        if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
+        if ($this->queueManager && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
         } else {
             return $this->dispatchNow($command, $afterResolving);
@@ -232,11 +232,8 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatchToQueue($command)
     {
-        $queue = call_user_func($this->queueResolver, $command);
-
-        if (! $queue instanceof Queue) {
-            throw new RuntimeException('Queue resolver did not return a Queue implementation.');
-        }
+        $connection = $this->getQueuingConfiguration($command)->connection;
+        $queue = $this->queueManager->connection($connection);
 
         return $this->pushCommandToQueue($queue, $command);
     }
@@ -250,23 +247,35 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if (isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
-            /** @var QueuingConfiguration $config */
-            $config = $command->queue;
-            if (isset($config->queue) && isset($config->delay)) {
-                return $queue->laterOn($config->queue, $config->delay, $command);
-            }
+        $queuingConfiguration = $this->getQueuingConfiguration($command);
+        if (isset($queuingConfiguration->queue) && isset($queuingConfiguration->delay)) {
+            return $queue->laterOn($queuingConfiguration->queue, $queuingConfiguration->delay, $command);
+        }
 
-            if (isset($config->queue)) {
-                return $queue->pushOn($config->queue, $command);
-            }
+        if (isset($queuingConfiguration->queue)) {
+            return $queue->pushOn($queuingConfiguration->queue, $command);
+        }
 
-            if (isset($config->delay)) {
-                return $queue->later($config->delay, $command);
-            }
+        if (isset($queuingConfiguration->delay)) {
+            return $queue->later($queuingConfiguration->delay, $command);
         }
 
         return $queue->push($command);
+    }
+
+    /**
+     * Get the QueingConfiguration of the command.
+     *
+     * @param  mixed  $command
+     * @return QueuingConfiguration
+     */
+    protected function getQueuingConfiguration($command)
+    {
+        if (isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
+            return $command->queue;
+        }
+
+        return new QueuingConfiguration();
     }
 
     /**
