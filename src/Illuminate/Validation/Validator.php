@@ -779,6 +779,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute is a sequential array.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateSequence($attribute, $value)
+    {
+        return is_array($value) && (array_keys($value) === range(0, count($value) - 1));
+    }
+
+    /**
      * Validate that an attribute is a boolean.
      *
      * @param  string  $attribute
