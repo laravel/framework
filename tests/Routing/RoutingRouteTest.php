@@ -739,6 +739,55 @@ return 'foo!'; });
         $this->assertEquals('Namespace\\Controller@action', $action['controller']);
     }
 
+    public function testBreakoutNestedNamespaceInGroup()
+    {
+        $router = $this->getRouter();
+        $router->group(['namespace' => 'Namespace'], function ($router) {
+            $router->get('foo', 'InnerController@action');
+            $router->group(['namespace' => '\OuterNamespace'], function ($router) {
+                $router->get('bar', 'OuterController@action');
+            });
+            $router->group(['namespace' => 'NestedNamespace'], function ($router) {
+                $router->get('foo/bar', 'NestedController@action');
+            });
+        });
+        $routes = $router->getRoutes()->getRoutes();
+
+        $action = $routes[0]->getAction();
+        $this->assertEquals('Namespace\\InnerController@action', $action['controller']);
+
+        $action = $routes[1]->getAction();
+        $this->assertEquals('OuterNamespace\\OuterController@action', $action['controller']);
+
+        $action = $routes[2]->getAction();
+        $this->assertEquals('Namespace\\NestedNamespace\\NestedController@action', $action['controller']);
+
+        // Same test but tested within a macro
+        $router = $this->getRouter();
+        $router->macro('test', function () {
+            $this->group(['namespace' => '\OuterNamespace'], function ($router) {
+                $router->get('bar', 'OuterController@action');
+            });
+            $this->group(['namespace' => 'NestedNamespace'], function ($router) {
+                $router->get('foo/bar', 'NestedController@action');
+            });
+        });
+        $router->group(['namespace' => 'Namespace'], function ($router) {
+            $router->get('foo', 'InnerController@action');
+            $router->test();
+        });
+        $routes = $router->getRoutes()->getRoutes();
+
+        $action = $routes[0]->getAction();
+        $this->assertEquals('Namespace\\InnerController@action', $action['controller']);
+
+        $action = $routes[1]->getAction();
+        $this->assertEquals('OuterNamespace\\OuterController@action', $action['controller']);
+
+        $action = $routes[2]->getAction();
+        $this->assertEquals('Namespace\\NestedNamespace\\NestedController@action', $action['controller']);
+    }
+
     /**
      * @expectedException UnexpectedValueException
      */
