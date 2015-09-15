@@ -186,16 +186,19 @@ class Arr
         return $return;
     }
 
-    /**
-     * Remove one or many array items from a given array using "dot" notation.
+/**
+     * Remove one or many array items from a given array using "dot" notation and return value(s) has been removed.
      *
      * @param  array  $array
      * @param  array|string  $keys
-     * @return void
+     * @param  array|string $defaults
+     * @return mixed
      */
-    public static function forget(&$array, $keys)
+    public static function forget(&$array, $keys, $defaults = [])
     {
         $original = &$array;
+
+        $isKeyString = is_string($keys) ? true : false;
 
         foreach ((array) $keys as $key) {
             $parts = explode('.', $key);
@@ -205,16 +208,22 @@ class Arr
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
-                } else {
-                    $parts = [];
                 }
             }
 
-            unset($array[array_shift($parts)]);
-
+            $value[$key = array_shift($parts)] =  isset($array[$key]) ? $array[$key] : $isKeyString ? $defaults : isset($defaults[$key]) ? $defaults[$key] : null;
+            
+            unset($array[$key]);
+            
             // clean up after each pass
             $array = &$original;
         }
+
+        if(isset($value) && count($value) === 1 && key($value) === 0){
+            return $value[0];
+        }
+        
+        return $value;
     }
 
     /**
