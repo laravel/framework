@@ -250,7 +250,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if(isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
+        if (isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
             /** @var QueuingConfiguration $config */
             $config = $command->queue;
             if (isset($config->queue) && isset($config->delay)) {
@@ -264,7 +264,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
             if (isset($config->delay)) {
                 return $queue->later($config->delay, $command);
             }
-
         }
 
         return $queue->push($command);

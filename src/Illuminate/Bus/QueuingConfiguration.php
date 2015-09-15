@@ -30,7 +30,7 @@ class QueuingConfiguration
      * @param null|string $connection
      * @param null|int $delay
      */
-    function __construct($queue = null, $connection = null, $delay = null)
+    public function __construct($queue = null, $connection = null, $delay = null)
     {
         $this->queue = $queue;
         $this->connection = $connection;

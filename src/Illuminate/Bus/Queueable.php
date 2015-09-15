@@ -5,7 +5,7 @@ namespace Illuminate\Bus;
 trait Queueable
 {
     /**
-     * The queuing configuration
+     * The queuing configuration.
      *
      * @var QueuingConfiguration
      */
@@ -25,7 +25,7 @@ trait Queueable
     }
 
     /**
-     * Set the desired queue connection for the job
+     * Set the desired queue connection for the job.
      *
      * @param $connection
      * @return $this
@@ -55,9 +55,10 @@ trait Queueable
      */
     public function getQueue()
     {
-        if(is_null($this->queue)) {
+        if (is_null($this->queue)) {
             $this->queue = new QueuingConfiguration();
         }
+
         return $this->queue;
     }
 }

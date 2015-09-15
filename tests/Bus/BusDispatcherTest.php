@@ -173,7 +173,7 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contra
      */
     public $queue;
 
-    function __construct()
+    public function __construct()
     {
         $this->queue = new Illuminate\Bus\QueuingConfiguration('foo', 'bar', 10);
     }
