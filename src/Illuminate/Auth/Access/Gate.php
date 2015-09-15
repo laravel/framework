@@ -275,6 +275,10 @@ class Gate implements GateContract
                 }
             }
 
+            if (! method_exists($instance, $ability)) {
+                return false;
+            }
+
             return call_user_func_array(
                 [$instance, $ability], array_merge([$user], $arguments)
             );

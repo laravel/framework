@@ -48,6 +48,15 @@ class JoinClause
     /**
      * Add an "on" clause to the join.
      *
+     * On clauses can be chained, e.g.
+     *
+     *  $join->on('contacts.user_id', '=', 'users.id')
+     *       ->on('contacts.info_id', '=', 'info.id')
+     *
+     * will produce the following SQL:
+     *
+     * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
+     *
      * @param  string  $first
      * @param  string  $operator
      * @param  string  $second
