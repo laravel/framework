@@ -232,17 +232,13 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     public function dispatchToQueue($command)
     {
-        $queue = call_user_func($this->queueResolver);
+        $queue = call_user_func($this->queueResolver, $command);
 
         if (! $queue instanceof Queue) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
 
-        if (method_exists($command, 'queue')) {
-            return $command->queue($queue, $command);
-        } else {
-            return $this->pushCommandToQueue($queue, $command);
-        }
+        return $this->pushCommandToQueue($queue, $command);
     }
 
     /**
@@ -250,20 +246,25 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
      * @param  mixed  $command
-     * @return void
+     * @return mixed
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if (isset($command->queue) && isset($command->delay)) {
-            return $queue->laterOn($command->queue, $command->delay, $command);
-        }
+        if(isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
+            /** @var QueuingConfiguration $config */
+            $config = $command->queue;
+            if (isset($config->queue) && isset($config->delay)) {
+                return $queue->laterOn($config->queue, $config->delay, $command);
+            }
 
-        if (isset($command->queue)) {
-            return $queue->pushOn($command->queue, $command);
-        }
+            if (isset($config->queue)) {
+                return $queue->pushOn($config->queue, $command);
+            }
 
-        if (isset($command->delay)) {
-            return $queue->later($command->delay, $command);
+            if (isset($config->delay)) {
+                return $queue->later($config->delay, $command);
+            }
+
         }
 
         return $queue->push($command);
