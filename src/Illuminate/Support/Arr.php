@@ -67,6 +67,23 @@ class Arr
     }
 
     /**
+     * Create a deep nested array using "dot" notation.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function dig($array)
+    {
+        $results = [];
+
+        foreach($array as $key => $value) {
+            array_set($results, $key, $value);
+        }
+
+        return $results;
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array

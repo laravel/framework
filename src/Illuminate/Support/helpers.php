@@ -71,6 +71,19 @@ if (! function_exists('array_collapse')) {
     }
 }
 
+if (! function_exists('array_dig')) {
+    /**
+     * Create a deep nested array using "dot" notation.
+     *
+     * @param  array   $array
+     * @return array
+     */
+    function array_dig($array)
+    {
+        return Arr::dig($array);
+    }
+}
+
 if (! function_exists('array_divide')) {
     /**
      * Divide an array into two arrays. One with keys and the other with values.
