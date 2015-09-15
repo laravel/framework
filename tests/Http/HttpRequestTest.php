@@ -560,4 +560,17 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
         $request->flashExcept(['key1', 'key2']);
     }
+
+    public function testHttpRequestRouteMethod()
+    {
+        $request = m::mock('Illuminate\Http\Request[getRouteResolver]');
+        $routeMock = m::mock('Illuminate\Routing\Route');
+        $routeMock->shouldReceive('parameter')->once()->with('route_parameter_name')->andReturn('route_parameter_value');
+        $routeResolverCallback = function () use ($routeMock) { return $routeMock; };
+        $request->setRouteResolver($routeResolverCallback);
+        $request->shouldReceive('getRouteResolver')->twice()->andReturn($routeResolverCallback);
+        $routeParamValue = $request->route('route_parameter_name');
+        $this->assertEquals('route_parameter_value', $routeParamValue);
+        $this->assertEquals($routeMock, $request->route());
+    }
 }
