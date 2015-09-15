@@ -76,7 +76,7 @@ class Arr
     {
         $results = [];
 
-        foreach($array as $key => $value) {
+        foreach ($array as $key => $value) {
             array_set($results, $key, $value);
         }
 
