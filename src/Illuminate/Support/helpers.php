@@ -75,7 +75,7 @@ if (! function_exists('array_dig')) {
     /**
      * Create a deep nested array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @return array
      */
     function array_dig($array)
