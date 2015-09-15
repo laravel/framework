@@ -21,7 +21,10 @@ class BusServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('Illuminate\Bus\Dispatcher', function ($app) {
-            return new Dispatcher($app, function () use ($app) {
+            return new Dispatcher($app, function ($command) use ($app) {
+                if(isset($command->queue) && $command->queue instanceof QueuingConfiguration) {
+                    return \Queue::connection($command->queue->connection);
+                }
                 return $app['Illuminate\Contracts\Queue\Queue'];
             });
         });
