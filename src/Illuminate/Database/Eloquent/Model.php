@@ -2073,7 +2073,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $class = get_class($this);
 
-        if (! empty($morphMap)) {
+        if (! empty($morphMap) && in_array($class, $morphMap)) {
             return array_search($class, $morphMap, true);
         }
 

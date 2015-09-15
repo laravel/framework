@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 {
@@ -816,6 +817,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('save_stub.morph_id', $relation->getForeignKey());
         $this->assertEquals('save_stub.morph_type', $relation->getMorphType());
         $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
+    }
+
+    public function testCorrectMorphClassIsReturned()
+    {
+        Relation::morphMap([
+            'alias' => 'AnotherModel',
+        ]);
+        $model = new EloquentModelStub;
+        $this->assertEquals('EloquentModelStub', $model->getMorphClass());
+
+        Relation::morphMap([], false);
     }
 
     public function testHasManyCreatesProperRelation()

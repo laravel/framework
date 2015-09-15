@@ -14,9 +14,11 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = new Pivot($parent, ['foo' => 'bar'], 'table', true);
+        $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $parent->setDateFormat('Y-m-d H:i:s');
+        $pivot = new Pivot($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
-        $this->assertEquals(['foo' => 'bar'], $pivot->getAttributes());
+        $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
         $this->assertEquals('connection', $pivot->getConnectionName());
         $this->assertEquals('table', $pivot->getTable());
         $this->assertTrue($pivot->exists);
