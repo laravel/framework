@@ -537,4 +537,27 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($request->request->all(), $body);
     }
+
+    public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $request->setSession($session);
+        $request->flash();
+    }
+
+    public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
+    {
+        $request = m::mock('Illuminate\Http\Request[flash]');
+        $request->shouldReceive('flash')->once()->with('only', ['key1', 'key2']);
+        $request->flashOnly(['key1', 'key2']);
+    }
+
+    public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
+    {
+        $request = m::mock('Illuminate\Http\Request[flash]');
+        $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
+        $request->flashExcept(['key1', 'key2']);
+    }
 }
