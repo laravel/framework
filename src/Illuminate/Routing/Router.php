@@ -417,7 +417,7 @@ class Router implements RegistrarContract
     protected static function formatUsesPrefix($new, $old)
     {
         if (isset($new['namespace'])) {
-            // If a namespace is provided and prefixed by a '\' character this should
+            // If a namespace is provided and prefixed by a '\' character, this should
             // be interpreted as the start of a new namespace and shouldn't be put
             // upon the stacked namespaces inherited from predescessing groups.
             if (substr(trim($new['namespace']), 0, 1) === '\\') {
