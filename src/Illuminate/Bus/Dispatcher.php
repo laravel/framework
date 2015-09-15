@@ -6,12 +6,10 @@ use Closure;
 use ArrayAccess;
 use Illuminate\Queue\QueueManager;
 use ReflectionClass;
-use RuntimeException;
 use ReflectionParameter;
 use InvalidArgumentException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
@@ -227,8 +225,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      *
      * @param  mixed  $command
      * @return mixed
-     *
-     * @throws \RuntimeException
      */
     public function dispatchToQueue($command)
     {
@@ -264,7 +260,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     }
 
     /**
-     * Get the QueingConfiguration of the command.
+     * Get the QueuingConfiguration of the command.
      *
      * @param  mixed  $command
      * @return QueuingConfiguration
