@@ -535,7 +535,7 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned small integer (2-byte) column on the table.
+     * Create a new unsigned tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
