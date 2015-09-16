@@ -5,18 +5,11 @@ namespace Illuminate\Bus;
 trait Queueable
 {
     /**
-     * The name of the queue the job should be sent to.
+     * The queuing configuration.
      *
-     * @var string
+     * @var QueuingConfiguration
      */
     public $queue;
-
-    /**
-     * The seconds before the job should be made available.
-     *
-     * @var int
-     */
-    public $delay;
 
     /**
      * Set the desired queue for the job.
@@ -26,7 +19,20 @@ trait Queueable
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->getQueue()->queue = $queue;
+
+        return $this;
+    }
+
+    /**
+     * Set the desired queue connection for the job.
+     *
+     * @param $connection
+     * @return $this
+     */
+    public function onConnection($connection)
+    {
+        $this->getQueue()->connection = $connection;
 
         return $this;
     }
@@ -39,8 +45,20 @@ trait Queueable
      */
     public function delay($delay)
     {
-        $this->delay = $delay;
+        $this->getQueue()->delay = $delay;
 
         return $this;
+    }
+
+    /**
+     * @return QueuingConfiguration
+     */
+    public function getQueue()
+    {
+        if (is_null($this->queue)) {
+            $this->queue = new QueuingConfiguration();
+        }
+
+        return $this->queue;
     }
 }
