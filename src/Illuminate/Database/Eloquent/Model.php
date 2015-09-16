@@ -2808,6 +2808,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return json_decode($value, true);
             case 'collection':
                 return new BaseCollection(json_decode($value, true));
+            case 'date':
+            case 'datetime':
+                return $this->asDateTime($value);
             default:
                 return $value;
         }
