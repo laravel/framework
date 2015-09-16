@@ -256,13 +256,26 @@ class Route
     }
 
     /**
-     * Get the middlewares attached to the route.
+     * Get or set the middlewares attached to the route.
      *
+     * @param  array|string|null $middleware
      * @return array
      */
-    public function middleware()
+    public function middleware($middleware = null)
     {
-        return (array) Arr::get($this->action, 'middleware', []);
+        if (is_null($middleware)) {
+            return (array) Arr::get($this->action, 'middleware', []);
+        }
+
+        if (is_string($middleware)) {
+            $middleware = [$middleware];
+        }
+
+        $this->action['middleware'] = array_merge(
+            array_get($this->action['middleware'], []), $middleware
+        );
+
+        return $this;
     }
 
     /**
@@ -903,6 +916,20 @@ class Route
     public function getName()
     {
         return isset($this->action['as']) ? $this->action['as'] : null;
+    }
+
+    /**
+     * Add or change the route name.
+     *
+     * @param $name
+     *
+     * @return $this
+     */
+    public function name($name)
+    {
+        $this->action['as'] = $name;
+
+        return $this;
     }
 
     /**

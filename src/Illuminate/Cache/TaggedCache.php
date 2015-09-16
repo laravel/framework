@@ -199,7 +199,7 @@ class TaggedCache implements Store
     {
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
-        // of that execution for the given number of minutes. It's easy.
+        // of that execution for an indefinite amount of time. It's easy.
         if (! is_null($value = $this->get($key))) {
             return $value;
         }
@@ -239,7 +239,7 @@ class TaggedCache implements Store
     protected function getMinutes($duration)
     {
         if ($duration instanceof DateTime) {
-            $fromNow = Carbon::instance($duration)->diffInMinutes();
+            $fromNow = Carbon::now()->diffInMinutes(Carbon::instance($duration), false);
 
             return $fromNow > 0 ? $fromNow : null;
         }

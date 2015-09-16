@@ -183,10 +183,12 @@ class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate
 
         return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
     }
+
     public function getDefaultConnection()
     {
         return 'default';
     }
+
     public function setDefaultConnection($name)
     {
         //

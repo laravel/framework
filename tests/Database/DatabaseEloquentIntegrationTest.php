@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
@@ -76,6 +77,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('friends');
         $this->schema()->drop('posts');
         $this->schema()->drop('photos');
+
+        Relation::morphMap([], false);
     }
 
     /**
@@ -340,6 +343,82 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('First Post', $photos[3]->imageable->name);
     }
 
+    public function testMorphMapIsUsedForCreatingAndFetchingThroughRelation()
+    {
+        Relation::morphMap([
+            'user' => 'EloquentTestUser',
+            'post' => 'EloquentTestPost',
+        ]);
+
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->photos()->create(['name' => 'Avatar 1']);
+        $user->photos()->create(['name' => 'Avatar 2']);
+        $post = $user->posts()->create(['name' => 'First Post']);
+        $post->photos()->create(['name' => 'Hero 1']);
+        $post->photos()->create(['name' => 'Hero 2']);
+
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $user->photos);
+        $this->assertInstanceOf('EloquentTestPhoto', $user->photos[0]);
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
+        $this->assertInstanceOf('EloquentTestPhoto', $post->photos[0]);
+        $this->assertEquals(2, $user->photos->count());
+        $this->assertEquals(2, $post->photos->count());
+        $this->assertEquals('Avatar 1', $user->photos[0]->name);
+        $this->assertEquals('Avatar 2', $user->photos[1]->name);
+        $this->assertEquals('Hero 1', $post->photos[0]->name);
+        $this->assertEquals('Hero 2', $post->photos[1]->name);
+
+        $this->assertEquals('user', $user->photos[0]->imageable_type);
+        $this->assertEquals('user', $user->photos[1]->imageable_type);
+        $this->assertEquals('post', $post->photos[0]->imageable_type);
+        $this->assertEquals('post', $post->photos[1]->imageable_type);
+    }
+
+    public function testMorphMapIsUsedWhenFetchingParent()
+    {
+        Relation::morphMap([
+            'user' => 'EloquentTestUser',
+            'post' => 'EloquentTestPost',
+        ]);
+
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->photos()->create(['name' => 'Avatar 1']);
+
+        $photo = EloquentTestPhoto::first();
+        $this->assertEquals('user', $photo->imageable_type);
+        $this->assertInstanceOf('EloquentTestUser', $photo->imageable);
+    }
+
+    public function testMorphMapIsMergedByDefault()
+    {
+        $map1 = [
+            'user' => 'EloquentTestUser',
+        ];
+        $map2 = [
+            'post' => 'EloquentTestPost',
+        ];
+
+        Relation::morphMap($map1);
+        Relation::morphMap($map2);
+
+        $this->assertEquals(array_merge($map1, $map2), Relation::morphMap());
+    }
+
+    public function testMorphMapOverwritesCurrentMap()
+    {
+        $map1 = [
+            'user' => 'EloquentTestUser',
+        ];
+        $map2 = [
+            'post' => 'EloquentTestPost',
+        ];
+
+        Relation::morphMap($map1, false);
+        $this->assertEquals($map1, Relation::morphMap());
+        Relation::morphMap($map2, false);
+        $this->assertEquals($map2, Relation::morphMap());
+    }
+
     public function testEmptyMorphToRelationship()
     {
         $photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
@@ -434,18 +513,22 @@ class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
     protected $guarded = [];
+
     public function friends()
     {
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
     }
+
     public function posts()
     {
         return $this->hasMany('EloquentTestPost', 'user_id');
     }
+
     public function post()
     {
         return $this->hasOne('EloquentTestPost', 'user_id');
     }
+
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
@@ -456,18 +539,22 @@ class EloquentTestPost extends Eloquent
 {
     protected $table = 'posts';
     protected $guarded = [];
+
     public function user()
     {
         return $this->belongsTo('EloquentTestUser', 'user_id');
     }
+
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
+
     public function childPosts()
     {
         return $this->hasMany('EloquentTestPost', 'parent_id');
     }
+
     public function parentPost()
     {
         return $this->belongsTo('EloquentTestPost', 'parent_id');
@@ -478,6 +565,7 @@ class EloquentTestPhoto extends Eloquent
 {
     protected $table = 'photos';
     protected $guarded = [];
+
     public function imageable()
     {
         return $this->morphTo();
@@ -499,10 +587,12 @@ class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\C
 
         return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
     }
+
     public function getDefaultConnection()
     {
         return 'default';
     }
+
     public function setDefaultConnection($name)
     {
         //

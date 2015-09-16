@@ -551,6 +551,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the cannot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCannot($expression)
+    {
+        return "<?php if (Gate::denies{$expression}): ?>";
+    }
+
+    /**
      * Compile the if statements into valid PHP.
      *
      * @param  string  $expression
@@ -636,6 +647,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @return string
      */
     protected function compileEndcan($expression)
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-cannot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndcannot($expression)
     {
         return '<?php endif; ?>';
     }

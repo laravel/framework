@@ -921,6 +921,7 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
         $this->beforeFilter('route.test.controller.before.filter');
         $this->afterFilter('route.test.controller.after.filter');
     }
+
     public function index()
     {
         return 'Hello World';
@@ -983,6 +984,7 @@ class RouteBindingStub
     {
         return strtoupper($value);
     }
+
     public function find($value, $route)
     {
         return strtolower($value);
@@ -995,12 +997,14 @@ class RouteModelBindingStub
     {
         return 'id';
     }
+
     public function where($key, $value)
     {
         $this->value = $value;
 
         return $this;
     }
+
     public function first()
     {
         return strtoupper($this->value);
@@ -1013,10 +1017,12 @@ class RouteModelBindingNullStub
     {
         return 'id';
     }
+
     public function where($key, $value)
     {
         return $this;
     }
+
     public function first()
     {
     }
@@ -1036,6 +1042,7 @@ class RouteTestFilterStub
     {
         return 'foo!';
     }
+
     public function handle()
     {
         return 'handling!';

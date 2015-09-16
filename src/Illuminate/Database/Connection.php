@@ -4,11 +4,11 @@ namespace Illuminate\Database;
 
 use PDO;
 use Closure;
-use DateTime;
 use Exception;
 use Throwable;
 use LogicException;
 use RuntimeException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Expression;
@@ -435,10 +435,10 @@ class Connection implements ConnectionInterface
         $grammar = $this->getQueryGrammar();
 
         foreach ($bindings as $key => $value) {
-            // We need to transform all instances of the DateTime class into an actual
+            // We need to transform all instances of DateTimeInterface into the actual
             // date string. Each query grammar maintains its own date string format
             // so we'll just ask the grammar for the format to get from the date.
-            if ($value instanceof DateTime) {
+            if ($value instanceof DateTimeInterface) {
                 $bindings[$key] = $value->format($grammar->getDateFormat());
             } elseif ($value === false) {
                 $bindings[$key] = 0;

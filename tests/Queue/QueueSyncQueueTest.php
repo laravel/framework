@@ -104,6 +104,7 @@ class FailingSyncQueueTestHandler
     {
         throw new Exception();
     }
+
     public function failed()
     {
         $_SERVER['__sync.failed'] = true;
