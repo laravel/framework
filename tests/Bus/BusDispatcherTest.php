@@ -124,11 +124,13 @@ class BusDispatcherTestBasicCommand
 class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfHandling
 {
     public $flag, $emptyString;
+
     public function __construct($flag, $emptyString)
     {
         $this->flag = $flag;
         $this->emptyString = $emptyString;
     }
+
     public function handle()
     {
         return true;
@@ -138,11 +140,13 @@ class BusDispatcherTestArgumentMapping implements Illuminate\Contracts\Bus\SelfH
 class BusDispatcherTestSelfHandlingCommand implements Illuminate\Contracts\Bus\SelfHandling
 {
     public $firstName, $lastName;
+
     public function __construct($firstName, $lastName)
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
     }
+
     public function handle()
     {
         return $this->firstName.' '.$this->lastName;

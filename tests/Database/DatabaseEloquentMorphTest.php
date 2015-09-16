@@ -3,12 +3,15 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
+        Relation::morphMap([], false);
+
         m::close();
     }
 
@@ -165,6 +168,18 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($relation->updateOrCreate(['foo'], ['bar']) instanceof Model);
     }
 
+    public function testCreateFunctionOnNamespacedMorph()
+    {
+        $relation = $this->getNamespacedRelation('namespace');
+        $created = m::mock('Illuminate\Database\Eloquent\Model');
+        $created->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $created->shouldReceive('setAttribute')->once()->with('morph_type', 'namespace');
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
+        $created->shouldReceive('save')->once()->andReturn(true);
+
+        $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+    }
+
     protected function getOneRelation()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -193,6 +208,25 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 
         return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+    }
+
+    protected function getNamespacedRelation($alias)
+    {
+        Relation::morphMap([
+            $alias => 'Foo\Bar\EloquentModelNamespacedStub',
+        ]);
+
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $builder->shouldReceive('getModel')->andReturn($related);
+        $parent = m::mock('Foo\Bar\EloquentModelNamespacedStub');
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getMorphClass')->andReturn($alias);
+        $builder->shouldReceive('where')->once()->with('table.morph_type', $alias);
+
+        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
 }
 

@@ -400,19 +400,19 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('lists')->once()->with('role_id')->andReturn([1, 2, 3]);
-        $relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo([]), $this->equalTo(false));
+        $relation->expects($this->once())->method('attach')->with($this->equalTo('x'), $this->equalTo([]), $this->equalTo(false));
         $relation->expects($this->once())->method('detach')->with($this->equalTo([1]));
         $relation->getRelated()->shouldReceive('touches')->andReturn(false);
         $relation->getParent()->shouldReceive('touches')->andReturn(false);
 
-        $this->assertEquals(['attached' => [4], 'detached' => [1], 'updated' => []], $relation->sync($list));
+        $this->assertEquals(['attached' => ['x'], 'detached' => [1], 'updated' => []], $relation->sync($list));
     }
 
     public function syncMethodListProvider()
     {
         return [
-            [[2, 3, 4]],
-            [['2', '3', '4']],
+            [[2, 3, 'x']],
+            [['2', '3', 'x']],
         ];
     }
 
@@ -563,6 +563,7 @@ class EloquentBelongsToManyModelStub extends Illuminate\Database\Eloquent\Model
 class EloquentBelongsToManyModelPivotStub extends Illuminate\Database\Eloquent\Model
 {
     public $pivot;
+
     public function __construct()
     {
         $this->pivot = new EloquentBelongsToManyPivotStub;

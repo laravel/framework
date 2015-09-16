@@ -518,10 +518,12 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
 class EloquentBuilderTestListsStub
 {
     protected $attributes;
+
     public function __construct($attributes)
     {
         $this->attributes = $attributes;
     }
+
     public function __get($key)
     {
         return 'foo_'.$this->attributes[$key];
@@ -542,6 +544,7 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
     {
         return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
     }
+
     public function baz()
     {
         return $this->hasMany('EloquentBuilderTestModelFarRelatedStub');
