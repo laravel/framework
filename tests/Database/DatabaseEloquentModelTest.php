@@ -821,13 +821,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testCorrectMorphClassIsReturned()
     {
-        Relation::morphMap([
-            'alias' => 'AnotherModel',
-        ]);
+        Relation::morphMap(['alias' => 'AnotherModel']);
         $model = new EloquentModelStub;
-        $this->assertEquals('EloquentModelStub', $model->getMorphClass());
 
-        Relation::morphMap([], false);
+        try {
+            $this->assertEquals('EloquentModelStub', $model->getMorphClass());
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 
     public function testHasManyCreatesProperRelation()
