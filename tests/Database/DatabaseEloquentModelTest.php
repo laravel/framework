@@ -1148,6 +1148,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testModelAttributesAreCastedWhenPresentInCastsArray()
     {
         $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
         $model->first = '3';
         $model->second = '4.0';
         $model->third = 2.5;
