@@ -134,6 +134,13 @@ class Connection implements ConnectionInterface
     protected $config = [];
 
     /**
+     * The query builder resolver callback.
+     *
+     * @var \Closure
+     */
+    protected $queryBuilderResolver;
+
+    /**
      * Create a new database connection instance.
      *
      * @param  \PDO     $pdo
@@ -245,9 +252,14 @@ class Connection implements ConnectionInterface
      */
     public function table($table)
     {
+        $grammar = $this->getQueryGrammar();
         $processor = $this->getPostProcessor();
 
-        $query = new QueryBuilder($this, $this->getQueryGrammar(), $processor);
+        if (isset($this->queryBuilderResolver)) {
+            $query = call_user_func($this->queryBuilderResolver, $this, $grammar, $processor);
+        } else {
+            $query = new QueryBuilder($this, $grammar, $processor);
+        }
 
         return $query->from($table);
     }
@@ -935,6 +947,17 @@ class Connection implements ConnectionInterface
     public function getQueryGrammar()
     {
         return $this->queryGrammar;
+    }
+
+    /**
+     * Set the query builder resolver callback.
+     *
+     * @param  \Closure  $resolver
+     * @return void
+     */
+    public function setQueryBuilderResolver($resolver)
+    {
+        $this->queryBuilderResolver = $resolver;
     }
 
     /**
