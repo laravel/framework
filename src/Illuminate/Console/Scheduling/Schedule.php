@@ -42,7 +42,7 @@ class Schedule
             $artisan = 'artisan';
         }
 
-        return $this->exec(PHP_BINARY.' "'.$artisan.'" '.$command, $parameters);
+        return $this->exec('"'.PHP_BINARY.'" "'.$artisan.'" '.$command, $parameters);
     }
 
     /**
