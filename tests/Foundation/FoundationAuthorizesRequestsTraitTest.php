@@ -22,6 +22,27 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait']);
     }
 
+    public function test_multiple_abilities_gate_check()
+    {
+        unset($_SERVER['_test.authorizes.trait']);
+
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function () {
+            $_SERVER['_test.authorizes.trait'] = true;
+
+            return true;
+        });
+
+        $gate->define('bar', function () {
+            return false;
+        });
+
+        (new FoundationTestAuthorizeTraitClass)->authorizeAny(['foo', 'bar']);
+
+        $this->assertTrue($_SERVER['_test.authorizes.trait']);
+    }
+
     /**
      * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -34,6 +55,24 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         });
 
         (new FoundationTestAuthorizeTraitClass)->authorize('foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public function test_exception_is_thrown_if_gate_check_with_multiple_abilities_fails()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function () {
+            return false;
+        });
+
+        $gate->define('bar', function () {
+            return true;
+        });
+
+        (new FoundationTestAuthorizeTraitClass)->authorizeAll(['foo', 'bar']);
     }
 
     public function test_policies_may_be_called()
