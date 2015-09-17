@@ -34,7 +34,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testSeeInFieldInput()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#framework, *[name='framework']"])
+            ->withArgs(["input#framework, input[name='framework'], textarea#framework, textarea[name='framework']"])
             ->once()
             ->andReturn($this->mockInput('Laravel'));
 
@@ -44,7 +44,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testDontSeeInFieldInput()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#framework, *[name='framework']"])
+            ->withArgs(["input#framework, input[name='framework'], textarea#framework, textarea[name='framework']"])
             ->once()
             ->andReturn($this->mockInput('Laravel'));
 
@@ -54,7 +54,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testSeeInFieldInputArray()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#framework\\[\\], *[name='framework[]']"])
+            ->withArgs(["input#framework\\[\\], input[name='framework[]'], textarea#framework\\[\\], textarea[name='framework[]']"])
             ->once()
             ->andReturn($this->mockInput('Laravel'));
 
@@ -64,7 +64,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testDontSeeInFieldInputArray()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#framework\\[\\], *[name='framework[]']"])
+            ->withArgs(["input#framework\\[\\], input[name='framework[]'], textarea#framework\\[\\], textarea[name='framework[]']"])
             ->once()
             ->andReturn($this->mockInput('Laravel'));
 
@@ -84,7 +84,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testSeeInFieldTextarea()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#description, *[name='description']"])
+            ->withArgs(["input#description, input[name='description'], textarea#description, textarea[name='description']"])
             ->once()
             ->andReturn($this->mockTextarea('Laravel is awesome'));
 
@@ -94,7 +94,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     public function testDontSeeInFieldTextarea()
     {
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#description, *[name='description']"])
+            ->withArgs(["input#description, input[name='description'], textarea#description, textarea[name='description']"])
             ->once()
             ->andReturn($this->mockTextarea('Laravel is awesome'));
 
@@ -112,7 +112,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
         $select->shouldReceive('nodeName')->once()->andReturn('select');
 
         $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#select, *[name='select']"])
+            ->withArgs(["input#select, input[name='select'], textarea#select, textarea[name='select']"])
             ->once()
             ->andReturn($select);
 
