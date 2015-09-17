@@ -38,6 +38,6 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Process\Process', $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals('"'.PHP_BINARY.'" artisan queue:work connection --queue="queue" --delay=1 --memory=2 --sleep=3 --tries=0', $process->getCommandLine());
+        $this->assertEquals('\''.PHP_BINARY.'\''.(defined('HHVM_VERSION') ? ' --php' : '').' artisan queue:work \'connection\' --queue=\'queue\' --delay=1 --memory=2 --sleep=3 --tries=0', $process->getCommandLine());
     }
 }
