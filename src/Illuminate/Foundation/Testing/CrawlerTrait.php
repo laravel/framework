@@ -1060,11 +1060,12 @@ trait CrawlerTrait
     protected function filterByNameOrId($name, $elements = '*')
     {
         $name = str_replace('#', '', $name);
+        $id = str_replace(['[', ']'], ['\\[', '\\]'], $name);
 
         $elements = is_array($elements) ? $elements : [$elements];
 
-        array_walk($elements, function (&$element) use ($name) {
-            $element = "{$element}#{$name}, {$element}[name='{$name}']";
+        array_walk($elements, function (&$element) use ($name, $id) {
+            $element = "{$element}#{$id}, {$element}[name='{$name}']";
         });
 
         return $this->crawler->filter(implode(', ', $elements));

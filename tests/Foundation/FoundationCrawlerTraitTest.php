@@ -51,6 +51,26 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
         $this->dontSeeInField('framework', 'Rails');
     }
 
+    public function testSeeInFieldInputArray()
+    {
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["input#framework\\[\\], input[name='framework[]'], textarea#framework\\[\\], textarea[name='framework[]']"])
+            ->once()
+            ->andReturn($this->mockInput('Laravel'));
+
+        $this->seeInField('framework[]', 'Laravel');
+    }
+
+    public function testDontSeeInFieldInputArray()
+    {
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["input#framework\\[\\], input[name='framework[]'], textarea#framework\\[\\], textarea[name='framework[]']"])
+            ->once()
+            ->andReturn($this->mockInput('Laravel'));
+
+        $this->dontSeeInField('framework[]', 'Rails');
+    }
+
     protected function mockTextarea($value)
     {
         $textarea = m::mock(Crawler::class)->makePartial();
