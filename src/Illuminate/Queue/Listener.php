@@ -4,6 +4,8 @@ namespace Illuminate\Queue;
 
 use Closure;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessUtils;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class Listener
 {
@@ -58,7 +60,31 @@ class Listener
     public function __construct($commandPath)
     {
         $this->commandPath = $commandPath;
-        $this->workerCommand = '"'.PHP_BINARY.'" artisan queue:work %s --queue="%s" --delay=%s --memory=%s --sleep=%s --tries=%s';
+        $this->workerCommand = $this->buildWorkerCommand();
+    }
+
+    /**
+     * Build the environment specific worker command.
+     *
+     * @return string
+     */
+    protected function buildWorkerCommand()
+    {
+        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+
+        if (defined('HHVM_VERSION')) {
+            $binary .= ' --php';
+        }
+
+        if (defined('ARTISAN_BINARY')) {
+            $artisan = ProcessUtils::escapeArgument(ARTISAN_BINARY);
+        } else {
+            $artisan = 'artisan';
+        }
+
+        $command = 'queue:work %s --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
+
+        return "{$binary} {$artisan} {$command}";
     }
 
     /**
@@ -119,15 +145,20 @@ class Listener
         // workers will run under the specified environment. Otherwise, they will
         // just run under the production environment which is not always right.
         if (isset($this->environment)) {
-            $string .= ' --env='.$this->environment;
+            $string .= ' --env='.ProcessUtils::escapeArgument($this->environment);
         }
 
         // Next, we will just format out the worker commands with all of the various
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
         $command = sprintf(
-            $string, $connection, $queue, $delay,
-            $memory, $this->sleep, $this->maxTries
+            $string,
+            ProcessUtils::escapeArgument($connection),
+            ProcessUtils::escapeArgument($queue),
+            $delay,
+            $memory,
+            $this->sleep,
+            $this->maxTries
         );
 
         return new Process($command, $this->commandPath, null, null, $timeout);
