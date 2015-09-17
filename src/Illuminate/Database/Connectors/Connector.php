@@ -5,11 +5,11 @@ namespace Illuminate\Database\Connectors;
 use PDO;
 use Exception;
 use Illuminate\Support\Arr;
-use Illuminate\Database\LostConnectionTrait;
+use Illuminate\Database\DetectsLostConnections;
 
 class Connector
 {
-    use LostConnectionTrait;
+    use DetectsLostConnections;
 
     /**
      * The default PDO connection options.
@@ -51,8 +51,6 @@ class Connector
 
         $password = Arr::get($config, 'password');
 
-        // We will make a new PDO instance. If it failed and caused by a
-        // connection that has been lost, we'll try to re-connect.
         try {
             $pdo = new PDO($dsn, $username, $password, $options);
         } catch (Exception $e) {
