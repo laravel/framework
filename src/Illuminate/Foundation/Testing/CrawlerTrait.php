@@ -67,6 +67,32 @@ trait CrawlerTrait
     }
 
     /**
+     * Visit the given URI with a JSON request.
+     *
+     * @param  string  $method
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return $this
+     */
+    public function json($method, $uri, array $data = [], array $headers = [])
+    {
+        $content = json_encode($data);
+
+        $headers = array_merge([
+            'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
+            'CONTENT_TYPE' => 'application/json',
+            'Accept' => 'application/json',
+        ], $headers);
+
+        $this->call(
+            $method, $uri, [], [], [], $this->transformHeadersToServerVars($headers), $content
+        );
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
