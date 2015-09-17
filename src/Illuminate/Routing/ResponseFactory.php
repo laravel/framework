@@ -138,6 +138,22 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Return a new ok response or JSON response from the application.
+     *
+     * @param  string|array  $content
+     * @param  array  $headers
+     * @return  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function ok($content = '', array $headers = [])
+    {
+        if($this->respondWithJson()){
+            return $this->json($content ?: [], 200, $headers);
+        }
+
+        return $this->make($content, 200, $headers);
+    }
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
@@ -205,5 +221,79 @@ class ResponseFactory implements FactoryContract
     public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null)
     {
         return $this->redirector->intended($default, $status, $headers, $secure);
+    }
+
+    /**
+     * Return a new bad request response or JSON response from the application.
+     *
+     * @param  string|array  $content
+     * @param  array  $headers
+     * @return  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function badRequest($content = '', array $headers = [])
+    {
+        if($this->respondWithJson()){
+            return $this->json($content ?: [], 400, $headers);
+        }
+
+        return $this->make($content ?: 'Bad Request', 400, $headers);
+    }
+
+    /**
+     * Return a new unauthorized response or JSON response from the application.
+     *
+     * @param  string|array  $content
+     * @param  array  $headers
+     * @return  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function unauthorized($content = '', array $headers = [])
+    {
+        if($this->respondWithJson()){
+            return $this->json($content ?: [], 401, $headers);
+        }
+
+        return $this->make($content ?: 'Unauthorized', 401, $headers);
+    }
+
+    /**
+     * Return a new forbidden response or JSON response from the application.
+     *
+     * @param  string|array  $content
+     * @param  array  $headers
+     * @return  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function forbidden($content = '', array $headers = [])
+    {
+        if($this->respondWithJson()){
+            return $this->json($content ?: [], 403, $headers);
+        }
+
+        return $this->make($content ?: 'Forbidden', 403, $headers);
+    }
+
+    /**
+     * Return a new not found response or JSON response from the application.
+     *
+     * @param  string|array  $content
+     * @param  array  $headers
+     * @return  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function notFound($content = '', array $headers = [])
+    {
+        if($this->respondWithJson()){
+            return $this->json($content ?: [], 404, $headers);
+        }
+
+        return $this->make($content ?: 'Not Found', 404, $headers);
+    }
+
+    /**
+     * Determine if client requests for JSON response.
+     *
+     * @return  bool
+     */
+    public function respondWithJson()
+    {
+        return request()->ajax() || request()->wantsJson();
     }
 }
