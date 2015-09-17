@@ -146,7 +146,7 @@ class ResponseFactory implements FactoryContract
      */
     public function ok($content = '', array $headers = [])
     {
-        if($this->respondWithJson()){
+        if ($this->respondWithJson()) {
             return $this->json($content ?: [], 200, $headers);
         }
 
@@ -232,7 +232,7 @@ class ResponseFactory implements FactoryContract
      */
     public function badRequest($content = '', array $headers = [])
     {
-        if($this->respondWithJson()){
+        if ($this->respondWithJson()) {
             return $this->json($content ?: [], 400, $headers);
         }
 
@@ -248,7 +248,7 @@ class ResponseFactory implements FactoryContract
      */
     public function unauthorized($content = '', array $headers = [])
     {
-        if($this->respondWithJson()){
+        if ($this->respondWithJson()) {
             return $this->json($content ?: [], 401, $headers);
         }
 
@@ -264,7 +264,7 @@ class ResponseFactory implements FactoryContract
      */
     public function forbidden($content = '', array $headers = [])
     {
-        if($this->respondWithJson()){
+        if ($this->respondWithJson()) {
             return $this->json($content ?: [], 403, $headers);
         }
 
@@ -280,7 +280,7 @@ class ResponseFactory implements FactoryContract
      */
     public function notFound($content = '', array $headers = [])
     {
-        if($this->respondWithJson()){
+        if ($this->respondWithJson()) {
             return $this->json($content ?: [], 404, $headers);
         }
 
