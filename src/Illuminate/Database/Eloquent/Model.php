@@ -2748,6 +2748,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine whether a value is Date / DateTime castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isDateCastable($key)
+    {
+        return $this->hasCast($key) && in_array($this->getCastType($key), ['date', 'datetime'], true);
+    }
+
+    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2755,13 +2766,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isJsonCastable($key)
     {
-        if ($this->hasCast($key)) {
-            return in_array(
-                $this->getCastType($key), ['array', 'json', 'object', 'collection'], true
-            );
-        }
-
-        return false;
+        return $this->hasCast($key) && in_array($this->getCastType($key), ['array', 'json', 'object', 'collection'], true);
     }
 
     /**
@@ -2808,6 +2813,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return json_decode($value, true);
             case 'collection':
                 return new BaseCollection(json_decode($value, true));
+            case 'date':
+            case 'datetime':
+                return $this->asDateTime($value);
             default:
                 return $value;
         }
@@ -2834,7 +2842,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif (in_array($key, $this->getDates()) && $value) {
+        elseif ((in_array($key, $this->getDates()) || $this->isDateCastable($key)) && $value) {
             $value = $this->fromDateTime($value);
         }
 
