@@ -37,15 +37,7 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        try {
-            $reflection = new ReflectionClass($rawName);
-
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-
-        return parent::alreadyExists($rawName);
+        return class_exists($rawName);
     }
 
     /**
