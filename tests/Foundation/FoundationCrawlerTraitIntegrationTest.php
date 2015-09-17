@@ -44,6 +44,23 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         $this->dontSeeInField('framework', 'Rails');
     }
 
+    protected function getInputArrayHtml()
+    {
+        return '<input type="text" name="framework[]" value="Laravel">';
+    }
+
+    public function testSeeInInputArray()
+    {
+        $this->crawler = new Crawler($this->getInputArrayHtml());
+        $this->seeInField('framework[]', 'Laravel');
+    }
+
+    public function testDontSeeInInputArray()
+    {
+        $this->crawler = new Crawler($this->getInputArrayHtml());
+        $this->dontSeeInField('framework[]', 'Rails');
+    }
+
     protected function getTextareaHtml()
     {
         return '<textarea name="description">Laravel is awesome</textarea>';
