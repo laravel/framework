@@ -15,7 +15,7 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
         $process = m::mock('stdClass');
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
-        $process->shouldReceive('setCommandLine')->once()->with('"'.PHP_BINARY.'" composer.phar dump-autoload');
+        $process->shouldReceive('setCommandLine')->once()->with('\''.PHP_BINARY.'\''.(defined('HHVM_VERSION') ? ' --php' : '').' composer.phar dump-autoload');
         $process->shouldReceive('run')->once();
 
         $composer->dumpAutoloads();
