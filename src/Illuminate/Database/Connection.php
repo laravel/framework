@@ -20,7 +20,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface
 {
-    use LostConnectionTrait;
+    use DetectsLostConnections;
 
     /**
      * The active PDO connection.
