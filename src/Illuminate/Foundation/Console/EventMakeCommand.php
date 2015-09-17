@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Exception;
-use ReflectionClass;
 use Illuminate\Console\GeneratorCommand;
 
 class EventMakeCommand extends GeneratorCommand
