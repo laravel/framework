@@ -1243,7 +1243,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+        return $value->getPath() != '' && in_array($value->getClientOriginalExtension(), $parameters);
     }
 
     /**
