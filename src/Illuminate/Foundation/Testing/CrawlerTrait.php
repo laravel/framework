@@ -1060,6 +1060,7 @@ trait CrawlerTrait
     protected function filterByNameOrId($name, $elements = '*')
     {
         $name = str_replace('#', '', $name);
+
         $id = str_replace(['[', ']'], ['\\[', '\\]'], $name);
 
         $elements = is_array($elements) ? $elements : [$elements];
