@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\Foundation\Artisan
+ * @see \Illuminate\Contracts\Console\Kernel
  */
 class Artisan extends Facade
 {
