@@ -205,6 +205,13 @@ class Builder
     protected $useWritePdo = false;
 
     /**
+     * Index by.
+     *
+     * @var string
+     */
+    protected $indexByColumn;
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -1381,7 +1388,11 @@ class Builder
             $this->columns = $columns;
         }
 
-        return $this->processor->processSelect($this, $this->runSelect());
+        if ($this->indexByColumn !== null && ! in_array($this->indexByColumn, $this->columns)) {
+            throw new \RuntimeException(sprintf('Column "%s" should be in "select" columns list'), $this->indexByColumn);
+        }
+
+        return $this->processor->processSelect($this, $this->runSelect(), $this->indexByColumn);
     }
 
     /**
@@ -1392,6 +1403,21 @@ class Builder
     protected function runSelect()
     {
         return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+    }
+
+    /**
+     * Index by $column
+     * eg. if you need result something like:
+     * [123] => {id: 123, name: 'Joe'}, [321] => {id: 321, name: 'Jane'}.
+     *
+     * @param string $column
+     * @return $this
+     * */
+    public function indexBy($column)
+    {
+        $this->indexByColumn = $column;
+
+        return $this;
     }
 
     /**
