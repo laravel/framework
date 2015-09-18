@@ -16,11 +16,18 @@ class Processor
      */
     public function processSelect(Builder $query, $results, $indexBy = null)
     {
-        if($indexBy !== null && count($results)) {
-            $results = $this->indexResultsByColumn($results, $indexBy);
+        if($column === null) {
+            return $results;
         }
-
-        return $results;
+    
+        return array_combine(array_map(function($row) use ($column) {
+            if(is_array($row)) {
+                return $row[$column];
+            } elseif(is_object($row)) {
+                return $row->{$column};
+            }
+            throw new \InvalidArgumentException("Array or object must be passed to data_get.");
+        }, $results), $results);
     }
     
     /**
