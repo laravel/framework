@@ -22,7 +22,7 @@ class Processor
 
         return $results;
     }
-    
+
     /**
      * Index results by column.
      *
