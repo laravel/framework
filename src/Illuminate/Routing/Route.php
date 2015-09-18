@@ -271,9 +271,13 @@ class Route
             $middleware = [$middleware];
         }
 
-        $this->action['middleware'] = array_merge(
-            array_get($this->action['middleware'], []), $middleware
-        );
+        if (isset($this->action['middleware'])) {
+            $this->action['middleware'] = array_merge(
+                array_get($this->action['middleware'], []), $middleware
+            );
+        } else {
+            $this->action['middleware'] = $middleware;
+        }
 
         return $this;
     }
