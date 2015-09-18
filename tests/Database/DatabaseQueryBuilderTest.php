@@ -1166,6 +1166,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz'], $builder->getBindings());
     }
 
+    public function testSelectWithLockUsesWritePdo()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::any(), m::any(), false);
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
+    }
+
     public function testBindingOrder()
     {
         $expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
