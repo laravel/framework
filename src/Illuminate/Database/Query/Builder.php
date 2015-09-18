@@ -1272,6 +1272,10 @@ class Builder
     {
         $this->lock = $value;
 
+        if ($this->lock) {
+            $this->useWritePdo();
+        }
+
         return $this;
     }
 
