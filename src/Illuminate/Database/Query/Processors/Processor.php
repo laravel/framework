@@ -10,14 +10,35 @@ class Processor
      * Process the results of a "select" query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $results
+     * @param  array   $results
+     * @param  string  $indexBy
      * @return array
      */
-    public function processSelect(Builder $query, $results)
+    public function processSelect(Builder $query, $results, $indexBy = null)
     {
+        if($indexBy !== null && count($results)) {
+            $results = $this->indexResultsByColumn($results, $indexBy);
+        }
+
         return $results;
     }
+    
+    /**
+     * Index results by column
+     *
+     * @param array $results
+     * @param string $column
+     * @return array
+     * */
+    protected function indexResultsByColumn(array $results, $column)
+    {
+        if($column === null) {
+            return $results;
+        }
 
+        return array_combine(array_column($results, $column), $results);
+    }
+    
     /**
      * Process an  "insert get ID" query.
      *
