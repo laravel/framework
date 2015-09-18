@@ -16,7 +16,7 @@ class Processor
      */
     public function processSelect(Builder $query, $results, $indexBy = null)
     {
-        if($indexBy !== null && count($results)) {
+        if ($indexBy !== null && count($results)) {
             $results = $this->indexResultsByColumn($results, $indexBy);
         }
 
@@ -24,7 +24,7 @@ class Processor
     }
     
     /**
-     * Index results by column
+     * Index results by column.
      *
      * @param array $results
      * @param string $column
@@ -32,20 +32,20 @@ class Processor
      * */
     protected function indexResultsByColumn(array $results, $column)
     {
-        if($column === null) {
+        if ($column === null) {
             return $results;
         }
 
-        return array_combine(array_map(function($row) use ($column) {
-            if(is_array($row)) {
+        return array_combine(array_map(function ($row) use ($column) {
+            if (is_array($row)) {
                 return $row[$column];
-            } elseif(is_object($row)) {
+            } elseif (is_object($row)) {
                 return $row->{$column};
             }
-            throw new \InvalidArgumentException("Array or object must be passed to data_get.");
+            throw new \InvalidArgumentException('Array or object must be passed to data_get.');
         }, $results), $results);
     }
-    
+
     /**
      * Process an  "insert get ID" query.
      *
