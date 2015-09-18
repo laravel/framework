@@ -181,7 +181,16 @@ class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate
             return $this->connection;
         }
 
-        return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
+        $driver = 'sqlite';
+        try {
+            return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO("$driver::memory:"));
+        } catch (PDOException $e) {
+            if (ends_with($msg = $e->getMessage(), 'could not find driver')) {
+                throw new PDOException("$msg - please install $driver.", $e->getCode());
+            }
+
+            throw $e;
+        }
     }
 
     public function getDefaultConnection()
