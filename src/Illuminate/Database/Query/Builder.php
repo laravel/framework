@@ -205,7 +205,7 @@ class Builder
     protected $useWritePdo = false;
 
     /**
-     * Index by
+     * Index by.
      *
      * @var string
      */
@@ -1388,7 +1388,7 @@ class Builder
             $this->columns = $columns;
         }
 
-        if($this->indexByColumn !== null && !in_array($this->indexByColumn, $this->columns)) {
+        if ($this->indexByColumn !== null && ! in_array($this->indexByColumn, $this->columns)) {
             throw new \RuntimeException(sprintf('Column "%s" should be in "select" columns list'), $this->indexByColumn);
         }
 
@@ -1404,11 +1404,11 @@ class Builder
     {
         return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
     }
-    
+
     /**
      * Index by $column
      * eg. if you need result something like:
-     * [123] => {id: 123, name: 'Joe'}, [321] => {id: 321, name: 'Jane'}
+     * [123] => {id: 123, name: 'Joe'}, [321] => {id: 321, name: 'Jane'}.
      *
      * @param string $column
      * @return $this
@@ -1416,6 +1416,7 @@ class Builder
     public function indexBy($column)
     {
         $this->indexByColumn = $column;
+
         return $this;
     }
 
