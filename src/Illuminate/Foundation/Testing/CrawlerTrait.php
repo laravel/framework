@@ -14,6 +14,13 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 trait CrawlerTrait
 {
     /**
+     * The  base URL by default to use while testing the application.
+     *
+     * @var string
+     */
+    protected $baseUrl = 'http://localhost';
+
+    /**
      * The last response returned by the application.
      *
      * @var \Illuminate\Http\Response
