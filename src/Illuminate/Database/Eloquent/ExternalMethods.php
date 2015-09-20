@@ -8,9 +8,9 @@ trait ExternalMethods
     /**
      * The methods provided by external packages
      *
-     * @var array
+     * @var Closure[]
      */
-    public static $externalMethods = [];
+    protected static $externalMethods = [];
 
     /**
      * Override Model's __call() Method;
@@ -23,38 +23,54 @@ trait ExternalMethods
     public function __call($method, $parameters)
     {
         if (isset(static::$externalMethods[$method])) {
-            $closure = static::$externalMethods[$method];
 
-            //it's needed for escape conflicts with possible used "$this" in closure
+            //it's needed for escape conflicts with
+            // possible used "$this" in closure
             $model = $this;
 
-            $closure = Closure::bind($closure, $model, static::class);
+            // We bind this context to the closure as $model.
+            // Then we can use it like
+            //
+            // ```
+            // Entity::addMethod('someScope', function($param){
+            //
+            //     return $model->whereParam($param);
+            // });
+            // ```
+            //  or
+            //
+            // ```
+            // Entity::addMethod('relation', function(){
+            //
+            //     return $model->hasMany(\App\SomeOther::class);
+            // });
+            // ```
+            //
+            // This methods can be used in serviceProviders, out of Entity context.
+            // It extend understanding idea of IoC paradigm
+            //
+            $closure = Closure::bind(static::$externalMethods[$method], $model, static::class);
 
             return call_user_func_array($closure, $parameters);
         }
 
-        //Just keep old behavior
-        if (in_array($method, ['increment', 'decrement'])) {
-            return call_user_func_array([$this, $method], $parameters);
-        }
-
-        $query = $this->newQuery();
-
-        return call_user_func_array([$query, $method], $parameters);
+        // For keep old behavior
+        parent::__call($method, $parameters);
     }
 
     /**
-     * Just add external method
+     * Just add an external method
      *
      * @param string $name
-     * @param Closure $function
-     *
+     * @param Closure $method
+
      * @return void
      */
-    public static function addMethod($name, Closure $function)
+    public static function addMethod($name, Closure $method)
     {
-        static::$externalMethods[$name] = $function;
+        static::$externalMethods[$name] = $method;
     }
+
     /**
      * Get an attribute from the model.
      *
@@ -63,11 +79,10 @@ trait ExternalMethods
      */
     public function getAttribute($key)
     {
-
         $attribute = parent::getAttribute($key);
 
-        // If attrubute with this key already exists
-        // we just return this attribute
+        // If attribute with this key already exists
+        // we return this attribute
         if (!is_null($attribute))
         {
             return $attribute;
