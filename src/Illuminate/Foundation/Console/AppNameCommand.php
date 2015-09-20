@@ -254,13 +254,13 @@ class AppNameCommand extends Command
     }
 
     /**
-     * Get the path to the Core User class.
+     * Get the path to the User class.
      *
      * @return string
      */
     protected function getUserClassPath()
     {
-        return $this->laravel['path'].'/Core/User.php';
+        return $this->laravel['path'].'/User.php';
     }
 
     /**
