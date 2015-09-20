@@ -570,12 +570,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the first record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $reference
      * @return static
      */
-    public static function firstOrCreate(array $attributes)
+    public static function firstOrCreate(array $attributes,array $reference=[])
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if ( empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
+        }
+        elseif ( is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
+        return $instance;
         }
 
         return static::create($attributes);
@@ -585,11 +589,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $reference
      * @return static
      */
-    public static function firstOrNew(array $attributes)
+    public static function firstOrNew(array $attributes,array $reference=[])
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if ( empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
+            return $instance;
+        }
+        elseif ( is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
             return $instance;
         }
 
@@ -601,14 +609,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @param  array  $options
      * @return static
      */
-    public static function updateOrCreate(array $attributes, array $values = [], array $options = [])
+    public static function updateOrCreate(array $attributes, array $values = [])
     {
         $instance = static::firstOrNew($attributes);
 
-        $instance->fill($values)->save($options);
+        $instance->fill($values)->save();
 
         return $instance;
     }
@@ -1442,16 +1449,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Update the model in the database.
      *
      * @param  array  $attributes
-     * @param  array  $options
      * @return bool|int
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update(array $attributes = [])
     {
         if (! $this->exists) {
             return $this->newQuery()->update($attributes);
         }
 
-        return $this->fill($attributes)->save($options);
+        return $this->fill($attributes)->save();
     }
 
     /**
