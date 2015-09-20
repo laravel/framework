@@ -577,7 +577,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
-        } elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
+        } elseif (is_array($reference) && count($reference) == 2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
             return $instance;
         }
 
@@ -595,7 +595,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
-        } elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
+        } elseif (is_array($reference) && count($reference) == 2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
             return $instance;
         }
 
