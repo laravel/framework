@@ -601,13 +601,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  $options
      * @return static
      */
-    public static function updateOrCreate(array $attributes, array $values = [])
+    public static function updateOrCreate(array $attributes, array $values = [], array $options = [])
     {
         $instance = static::firstOrNew($attributes);
 
-        $instance->fill($values)->save();
+        $instance->fill($values)->save($options);
 
         return $instance;
     }
@@ -1441,15 +1442,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Update the model in the database.
      *
      * @param  array  $attributes
+     * @param  array  $options
      * @return bool|int
      */
-    public function update(array $attributes = [])
+    public function update(array $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return $this->newQuery()->update($attributes);
         }
 
-        return $this->fill($attributes)->save();
+        return $this->fill($attributes)->save($options);
     }
 
     /**

@@ -206,165 +206,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
     }
 
-    public function testBasicBeforeFilters()
-    {
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->before(function () { return 'foo!'; });
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->before('RouteTestFilterStub');
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->before('RouteTestFilterStub@handle');
-        $this->assertEquals('handling!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo', function () { return 'hello'; }]);
-        $router->filter('foo', function () { return 'foo!'; });
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo:25', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $age) { return $age; });
-        $this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo:0,taylor', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $age, $name) { return $age.$name; });
-        $this->assertEquals('0taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo:bar,baz', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $bar, $baz) { return $bar.$baz; });
-        $this->assertEquals('barbaz', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo:bar,baz|bar:boom', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $bar, $baz) { return; });
-        $router->filter('bar', function ($route, $request, $boom) { return $boom; });
-        $this->assertEquals('boom', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        /*
-         * Basic filter parameter
-         */
-        unset($_SERVER['__route.filter']);
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo:bar', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $value = null) { $_SERVER['__route.filter'] = $value; });
-        $router->dispatch(Request::create('foo/bar', 'GET'));
-        $this->assertEquals('bar', $_SERVER['__route.filter']);
-
-        /*
-         * Optional filter parameter
-         */
-        unset($_SERVER['__route.filter']);
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['before' => 'foo', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $value = null) { $_SERVER['__route.filter'] = $value; });
-        $router->dispatch(Request::create('foo/bar', 'GET'));
-        $this->assertNull($_SERVER['__route.filter']);
-    }
-
-    public function testGlobalAfterFilters()
-    {
-        unset($_SERVER['__filter.after']);
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->after(function () { $_SERVER['__filter.after'] = true;
-
-return 'foo!'; });
-
-        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertTrue($_SERVER['__filter.after']);
-    }
-
-    public function testBasicAfterFilters()
-    {
-        unset($_SERVER['__filter.after']);
-        $router = $this->getRouter();
-        $router->get('foo/bar', ['after' => 'foo', function () { return 'hello'; }]);
-        $router->filter('foo', function () { $_SERVER['__filter.after'] = true;
-
-return 'foo!'; });
-
-        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertTrue($_SERVER['__filter.after']);
-    }
-
-    public function testPatternBasedFilters()
-    {
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->when('foo/*', 'foo:bar');
-        $this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->when('bar/*', 'foo:bar');
-        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->when('foo/*', 'foo:bar', ['post']);
-        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->when('foo/*', 'foo:bar', ['get']);
-        $this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request) {});
-        $router->filter('bar', function ($route, $request) { return 'bar'; });
-        $router->when('foo/*', 'foo|bar', ['get']);
-        $this->assertEquals('bar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-    }
-
-    public function testRegexBasedFilters()
-    {
-        $router = $this->getRouter();
-        $router->get('foo/bar', function () { return 'hello'; });
-        $router->get('bar/foo', function () { return 'hello'; });
-        $router->get('baz/foo', function () { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->whenRegex('/^(foo|bar).*/', 'foo:bar');
-        $this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertEquals('foobar', $router->dispatch(Request::create('bar/foo', 'GET'))->getContent());
-        $this->assertEquals('hello', $router->dispatch(Request::create('baz/foo', 'GET'))->getContent());
-    }
-
-    public function testGroupFiltersAndRouteFilters()
-    {
-        $router = $this->getRouter();
-        $router->group(['before' => ['foo']], function () use ($router) {
-            $router->get('foo/bar', function () { return 'hello'; })->before('bar');
-        });
-        $router->filter('foo', function ($route, $request) { return 'foo'; });
-        $router->filter('bar', function ($route, $request) { return 'bar'; });
-        $this->assertEquals('foo', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-    }
-
-    public function testRegexBasedFiltersWithVariables()
-    {
-        $router = $this->getRouter();
-        $router->get('{var}/bar', function ($var) { return 'hello'; });
-        $router->filter('foo', function ($route, $request, $bar) { return 'foo'.$bar; });
-        $router->whenRegex('/^(foo|bar).*/', 'foo:bar');
-        $this->assertEquals('foobar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertEquals('foobar', $router->dispatch(Request::create('bar/bar', 'GET'))->getContent());
-        $this->assertEquals('hello', $router->dispatch(Request::create('baz/bar', 'GET'))->getContent());
-    }
-
     public function testMatchesMethodAgainstRequests()
     {
         /*
@@ -587,39 +428,6 @@ return 'foo!'; });
 
     public function testRouteGrouping()
     {
-        /*
-         * Inheriting Filters
-         */
-        $router = $this->getRouter();
-        $router->group(['before' => 'foo'], function () use ($router) {
-            $router->get('foo/bar', function () { return 'hello'; });
-        });
-        $router->filter('foo', function () { return 'foo!'; });
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        /*
-         * Merging Filters
-         */
-        $router = $this->getRouter();
-        $router->group(['before' => 'foo'], function () use ($router) {
-            $router->get('foo/bar', ['before' => 'bar', function () { return 'hello'; }]);
-        });
-        $router->filter('foo', function () {});
-        $router->filter('bar', function () { return 'foo!'; });
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
-        /*
-         * Merging Filters
-         */
-        $router = $this->getRouter();
-        $router->group(['before' => 'foo|bar'], function () use ($router) {
-            $router->get('foo/bar', ['before' => 'baz', function () { return 'hello'; }]);
-        });
-        $router->filter('foo', function () {});
-        $router->filter('bar', function () {});
-        $router->filter('baz', function () { return 'foo!'; });
-        $this->assertEquals('foo!', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-
         /*
          * getPrefix() method
          */
@@ -866,20 +674,12 @@ return 'foo!'; });
     public function testControllerRouting()
     {
         unset(
-            $_SERVER['route.test.controller.before.filter'], $_SERVER['route.test.controller.after.filter'],
             $_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
             $_SERVER['route.test.controller.middleware.class'],
             $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
         );
+
         $router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
-
-        $router->filter('route.test.controller.before.filter', function () {
-            $_SERVER['route.test.controller.before.filter'] = true;
-        });
-
-        $router->filter('route.test.controller.after.filter', function () {
-            $_SERVER['route.test.controller.after.filter'] = true;
-        });
 
         $container->singleton('illuminate.route.dispatcher', function ($container) use ($router) {
             return new Illuminate\Routing\ControllerDispatcher($router, $container);
@@ -888,8 +688,6 @@ return 'foo!'; });
         $router->get('foo/bar', 'RouteTestControllerStub@index');
 
         $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
-        $this->assertTrue($_SERVER['route.test.controller.before.filter']);
-        $this->assertTrue($_SERVER['route.test.controller.after.filter']);
         $this->assertTrue($_SERVER['route.test.controller.middleware']);
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
@@ -918,8 +716,6 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
         $this->middleware('RouteTestControllerParameterizedMiddlewareOne:0');
         $this->middleware('RouteTestControllerParameterizedMiddlewareTwo:foo,bar');
         $this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
-        $this->beforeFilter('route.test.controller.before.filter');
-        $this->afterFilter('route.test.controller.after.filter');
     }
 
     public function index()
@@ -1033,18 +829,5 @@ class RouteModelBindingClosureStub
     public function findAlternate($value)
     {
         return strtolower($value).'alt';
-    }
-}
-
-class RouteTestFilterStub
-{
-    public function filter()
-    {
-        return 'foo!';
-    }
-
-    public function handle()
-    {
-        return 'handling!';
     }
 }
