@@ -570,12 +570,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the first record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $reference
      * @return static
      */
-    public static function firstOrCreate(array $attributes)
+    public static function firstOrCreate(array $attributes,array $reference=[])
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if ( empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
+        }
+        elseif ( is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
+        return $instance;
         }
 
         return static::create($attributes);
@@ -585,11 +589,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $reference
      * @return static
      */
-    public static function firstOrNew(array $attributes)
+    public static function firstOrNew(array $attributes,array $reference=[])
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if ( empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
+            return $instance;
+        }
+        elseif ( is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
             return $instance;
         }
 
@@ -601,14 +609,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @param  array  $options
      * @return static
      */
-    public static function updateOrCreate(array $attributes, array $values = [], array $options = [])
+    public static function updateOrCreate(array $attributes, array $values = [])
     {
         $instance = static::firstOrNew($attributes);
 
-        $instance->fill($values)->save($options);
+        $instance->fill($values)->save();
 
         return $instance;
     }
@@ -813,7 +820,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list($current, $caller) = debug_backtrace(false, 2);
+            list(, $caller) = debug_backtrace(false, 2);
 
             $relation = $caller['function'];
         }
@@ -851,7 +858,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
         if (is_null($name)) {
-            list($current, $caller) = debug_backtrace(false, 2);
+            list(, $caller) = debug_backtrace(false, 2);
 
             $name = Str::snake($caller['function']);
         }
@@ -871,25 +878,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // as a belongs-to style relationship since morph-to extends that class and
         // we will pass in the appropriate values so that it behaves as expected.
         else {
-            $class = $this->getActualClassNameForMorph($class);
-
             $instance = new $class;
 
             return new MorphTo(
                 $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
             );
         }
-    }
-
-    /**
-     * Retrieve the fully qualified class name from a slug.
-     *
-     * @param  string  $class
-     * @return string
-     */
-    public function getActualClassNameForMorph($class)
-    {
-        return array_get(Relation::morphMap(), $class, $class);
     }
 
     /**
@@ -1144,7 +1138,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function delete()
     {
-        if (is_null($this->getKeyName())) {
+        if (is_null($this->primaryKey)) {
             throw new Exception('No primary key defined on model.');
         }
 
@@ -1442,16 +1436,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Update the model in the database.
      *
      * @param  array  $attributes
-     * @param  array  $options
      * @return bool|int
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update(array $attributes = [])
     {
         if (! $this->exists) {
             return $this->newQuery()->update($attributes);
         }
 
-        return $this->fill($attributes)->save($options);
+        return $this->fill($attributes)->save();
     }
 
     /**
@@ -1607,8 +1600,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->insertAndSetId($query, $attributes);
         }
 
-        // If the table isn't incrementing we'll simply insert these attributes as they
-        // are. These attribute arrays must contain an "id" column previously placed
+        // If the table is not incrementing we'll simply insert this attributes as they
+        // are, as this attributes arrays must contain an "id" column already placed
         // there by the developer as the manually determined key for these models.
         else {
             $query->insert($attributes);
@@ -2069,15 +2062,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getMorphClass()
     {
-        $morphMap = Relation::morphMap();
-
-        $class = get_class($this);
-
-        if (! empty($morphMap) && in_array($class, $morphMap)) {
-            return array_search($class, $morphMap, true);
-        }
-
-        return $this->morphClass ?: $class;
+        return $this->morphClass ?: get_class($this);
     }
 
     /**
@@ -2143,19 +2128,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $attributes = is_array($attributes) ? $attributes : func_get_args();
 
         $this->hidden = array_merge($this->hidden, $attributes);
-    }
-
-    /**
-     * Make the given, typically hidden, attributes visible.
-     *
-     * @param  array|string  $attributes
-     * @return $this
-     */
-    public function withHidden($attributes)
-    {
-        $this->hidden = array_diff($this->hidden, (array) $attributes);
-
-        return $this;
     }
 
     /**
@@ -2750,18 +2722,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine whether a value is Date / DateTime castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isDateCastable($key)
-    {
-        return $this->hasCast($key) &&
-               in_array($this->getCastType($key), ['date', 'datetime'], true);
-    }
-
-    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param  string  $key
@@ -2769,8 +2729,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key) &&
-               in_array($this->getCastType($key), ['array', 'json', 'object', 'collection'], true);
+        if ($this->hasCast($key)) {
+            return in_array(
+                $this->getCastType($key), ['array', 'json', 'object', 'collection'], true
+            );
+        }
+
+        return false;
     }
 
     /**
@@ -2817,9 +2782,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return json_decode($value, true);
             case 'collection':
                 return new BaseCollection(json_decode($value, true));
-            case 'date':
-            case 'datetime':
-                return $this->asDateTime($value);
             default:
                 return $value;
         }
@@ -2846,7 +2808,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif ($value && (in_array($key, $this->getDates()) || $this->isDateCastable($key))) {
+        elseif (in_array($key, $this->getDates()) && $value) {
             $value = $this->fromDateTime($value);
         }
 
@@ -2877,7 +2839,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
-        return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
+        return array_merge($this->dates, $defaults);
     }
 
     /**
