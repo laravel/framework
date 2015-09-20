@@ -573,12 +573,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $reference
      * @return static
      */
-    public static function firstOrCreate(array $attributes, array $reference=[])
+    public static function firstOrCreate(array $attributes, array $reference = [])
     {
         if (empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
         }
-        elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
+        elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
             return $instance;
         }
 
@@ -592,12 +592,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $reference
      * @return static
      */
-    public static function firstOrNew(array $attributes, array $reference=[])
+    public static function firstOrNew(array $attributes, array $reference = [])
     {
         if (empty($reference) && ! is_null($instance = static::where($attributes)->first())) {
             return $instance;
         }
-        elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0],$reference[1])->first())) {
+        elseif (is_array($reference) && count($reference)==2 && ! is_null($instance = static::where($reference[0], $reference[1])->first())) {
             return $instance;
         }
 
