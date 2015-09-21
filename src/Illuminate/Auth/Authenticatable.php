@@ -25,6 +25,19 @@ trait Authenticatable
     }
 
     /**
+     * Encrypt the password if not hashed already.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setPasswordAttribute($value)
+    {
+        $value = app('hash')->needsRehash($value) ? bcrypt($value) : $value;
+
+        $this->attributes['password'] = $value;
+    }
+
+    /**
      * Get the token value for the "remember me" session.
      *
      * @return string
