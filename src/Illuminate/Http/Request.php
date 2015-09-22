@@ -569,6 +569,8 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Determine if the given content types match.
      *
+     * @param  string  $actual
+     * @param  string  $type
      * @return bool
      */
     public static function matchesType($actual, $type)
