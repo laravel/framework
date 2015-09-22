@@ -108,6 +108,7 @@ class AppNameCommand extends Command
      * Replace the App namespace at the given path.
      *
      * @param  string  $path
+     * @return void
      */
     protected function replaceNamespace($path)
     {
