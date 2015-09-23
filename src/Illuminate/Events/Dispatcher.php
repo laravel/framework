@@ -258,7 +258,7 @@ class Dispatcher implements DispatcherContract
             $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
 
             $this->resolveQueue()->connection($connection)->pushOn($queue, 'Illuminate\Broadcasting\BroadcastEvent', [
-                'event' => serialize($event),
+                'event' => serialize(clone $event),
             ]);
         }
     }
