@@ -106,6 +106,7 @@ class AppNameCommand extends Command
      * Replace the App namespace at the given path.
      *
      * @param  string  $path
+     * @return void
      */
     protected function replaceNamespace($path)
     {
@@ -237,16 +238,6 @@ class AppNameCommand extends Command
     protected function replaceIn($path, $search, $replace)
     {
         $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
-    }
-
-    /**
-     * Get the path to the Core User class.
-     *
-     * @return string
-     */
-    protected function getUserClassPath()
-    {
-        return $this->laravel['path'].'/Core/User.php';
     }
 
     /**
