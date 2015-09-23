@@ -9,8 +9,8 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 use InvalidArgumentException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
-use Illuminate\Contracts\Container\BindingResolutionException as BindingResolutionContractException;
 
 class Container implements ArrayAccess, ContainerContract
 {
@@ -277,20 +277,6 @@ class Container implements ArrayAccess, ContainerContract
 
             return $object;
         };
-    }
-
-    /**
-     * Bind a shared Closure into the container.
-     *
-     * @param  string    $abstract
-     * @param  \Closure  $closure
-     * @return void
-     *
-     * @deprecated since version 5.1. Use singleton instead.
-     */
-    public function bindShared($abstract, Closure $closure)
-    {
-        $this->bind($abstract, $this->share($closure), true);
     }
 
     /**
@@ -742,7 +728,7 @@ class Container implements ArrayAccess, ContainerContract
         if (! $reflector->isInstantiable()) {
             $message = "Target [$concrete] is not instantiable.";
 
-            throw new BindingResolutionContractException($message);
+            throw new BindingResolutionException($message);
         }
 
         $this->buildStack[] = $concrete;
@@ -821,7 +807,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $message = "Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}";
 
-        throw new BindingResolutionContractException($message);
+        throw new BindingResolutionException($message);
     }
 
     /**
@@ -841,7 +827,7 @@ class Container implements ArrayAccess, ContainerContract
         // If we can not resolve the class instance, we will check to see if the value
         // is optional, and if it is we will return the optional parameter value as
         // the value of the dependency, similarly to how we do this with scalars.
-        catch (BindingResolutionContractException $e) {
+        catch (BindingResolutionException $e) {
             if ($parameter->isOptional()) {
                 return $parameter->getDefaultValue();
             }

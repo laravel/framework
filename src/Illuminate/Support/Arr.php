@@ -114,32 +114,6 @@ class Arr
     }
 
     /**
-     * Fetch a flattened array of a nested array element.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public static function fetch($array, $key)
-    {
-        foreach (explode('.', $key) as $segment) {
-            $results = [];
-
-            foreach ($array as $value) {
-                if (array_key_exists($segment, $value = (array) $value)) {
-                    $results[] = $value[$segment];
-                }
-            }
-
-            $array = array_values($results);
-        }
-
-        return array_values($results);
-    }
-
-    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
