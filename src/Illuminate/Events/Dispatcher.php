@@ -256,7 +256,7 @@ class Dispatcher implements DispatcherContract
             $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
 
             $this->resolveQueue()->connection($connection)->push('Illuminate\Broadcasting\BroadcastEvent', [
-                'event' => serialize($event),
+                'event' => serialize(clone $event),
             ]);
         }
     }
