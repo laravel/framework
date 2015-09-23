@@ -912,6 +912,8 @@ class BelongsToMany extends Relation
         $timed = ($this->hasPivotColumn($this->createdAt()) ||
                   $this->hasPivotColumn($this->updatedAt()));
 
+        $ids = $this->normalizeAttachColumnLists($ids);
+
         // To create the attachment records, we will simply spin through the IDs given
         // and create a new record to insert for each ID. Each ID may actually be a
         // key in the array, with extra attributes to be placed in other columns.
@@ -1247,5 +1249,67 @@ class BelongsToMany extends Relation
     public function getRelationName()
     {
         return $this->relationName;
+    }
+
+    /**
+     * Normalize the column list for attaching records
+     *
+     * @param $ids
+     * @return array
+     */
+    protected function normalizeAttachColumnLists($ids)
+    {
+        if ( ! $this->hasExtraAttachColumns($ids)) {
+            return $ids;
+        }
+
+        $normalized = [];
+        $columnList = $this->getAttachColumnList($ids);
+
+        foreach ($ids as $key => $value) {
+            if (is_array($value)) {
+                $normalized[$key] = array_merge($columnList, $value);
+            } else {
+                $normalized[$value] = $columnList;
+            }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Determine whether records being attached have extra columns
+     *
+     * @param $ids
+     * @return bool
+     */
+    protected function hasExtraAttachColumns($ids)
+    {
+        foreach ($ids as $key => $value) {
+            if (is_array($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get list of all columns being attached
+     *
+     * @param $ids
+     * @return array
+     */
+    protected function getAttachColumnList($ids)
+    {
+        $arrayColumns = [];
+
+        foreach ($ids as $key => $value) {
+            if (is_array($value)) {
+                $arrayColumns[] = $value;
+            }
+        }
+
+        return array_fill_keys(array_keys(Arr::collapse($arrayColumns)), null);
     }
 }
