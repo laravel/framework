@@ -30,7 +30,7 @@ trait ThrottlesLogins
      */
     protected function retriesLeft(Request $request)
     {
-        return $this->maxLoginAttempts() - app(RateLimiter::class)->attempts($request->input($this->loginUsername()) . $request->ip()) + 1;
+        return $this->maxLoginAttempts() - app(RateLimiter::class)->attempts($request->input($this->loginUsername()).$request->ip()) + 1;
     }
 
     /**
