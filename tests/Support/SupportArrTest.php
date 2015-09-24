@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class SupportArrTest extends PHPUnit_Framework_TestCase
 {
@@ -50,9 +51,51 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testFlatten()
     {
-        $array = ['name' => 'Joe', 'languages' => ['PHP', 'Ruby']];
-        $array = Arr::flatten($array);
-        $this->assertEquals(['Joe', 'PHP', 'Ruby'], $array);
+        // Flat arrays are unaffected
+        $array = ['#foo', '#bar', '#baz'];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten(['#foo', '#bar', '#baz']));
+
+        // Nested arrays are flattened with existing flat items
+        $array = [['#foo', '#bar'], '#baz'];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Sets of nested arrays are flattened
+        $array = [['#foo', '#bar'], ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Deeply nested arrays are flattened
+        $array = [['#foo', ['#bar']], ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Nested collections are flattened alongside arrays
+        $array = [new Collection(['#foo', '#bar']), ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Nested collections containing plain arrays are flattened
+        $array = [new Collection(['#foo', ['#bar']]), ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Nested arrays containing collections are flattened
+        $array = [['#foo', new Collection(['#bar'])], ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
+
+        // Nested arrays containing collections containing arrays are flattened
+        $array = [['#foo', new Collection(['#bar', ['#zap']])], ['#baz']];
+        $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], Arr::flatten($array));
+    }
+
+    public function testFlattenWithDepth()
+    {
+        // No depth flattens recursively
+        $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], Arr::flatten($array));
+
+        // Specifying a depth only flattens to that depth
+        $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
+        $this->assertEquals(['#foo', ['#bar', ['#baz']], '#zap'], Arr::flatten($array, 1));
+
+        $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
+        $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
     }
 
     public function testGet()
