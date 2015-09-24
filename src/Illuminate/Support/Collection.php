@@ -206,7 +206,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return $this->reduce(function ($return, $item) use ($depth) {
             if ($item instanceof self || is_array($item)) {
                 if ($depth === 1) {
-                    return $return->merge(new static($item));
+                    return $return->merge($item);
                 }
 
                 return $return->merge((new static($item))->flatten($depth - 1));
