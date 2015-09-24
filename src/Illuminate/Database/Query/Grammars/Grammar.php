@@ -622,7 +622,7 @@ class Grammar extends BaseGrammar
     {
         $select = $this->compileSelect($query);
 
-        return "select exists($select) as `exists`";
+        return "select exists($select) as {$this->wrap('exists')}";
     }
 
     /**
