@@ -200,6 +200,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Determine if the grammar supports savepoints.
+     *
+     * @return bool
+     */
+    public function supportsSavepoints()
+    {
+        return false;
+    }
+
+    /**
      * Get the format for database stored dates.
      *
      * @return string
