@@ -756,6 +756,6 @@ class Grammar extends BaseGrammar
      */
     protected function removeLeadingBoolean($value)
     {
-        return preg_replace('/and |or /', '', $value, 1);
+        return preg_replace('/and |or /i', '', $value, 1);
     }
 }
