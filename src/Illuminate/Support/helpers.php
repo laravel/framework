@@ -163,11 +163,12 @@ if (! function_exists('array_flatten')) {
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
+     * @param  int  $depth
      * @return array
      */
-    function array_flatten($array)
+    function array_flatten($array, $depth = INF)
     {
-        return Arr::flatten($array);
+        return Arr::flatten($array, $depth);
     }
 }
 

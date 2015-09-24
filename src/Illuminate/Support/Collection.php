@@ -204,17 +204,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flatten($depth = INF)
     {
-        return $this->reduce(function ($return, $item) use ($depth) {
-            if ($item instanceof self || is_array($item)) {
-                if ($depth === 1) {
-                    return $return->merge($item);
-                }
-
-                return $return->merge((new static($item))->flatten($depth - 1));
-            }
-
-            return $return->push($item);
-        }, new static);
+        return new static(Arr::flatten($this->items, $depth));
     }
 
     /**
