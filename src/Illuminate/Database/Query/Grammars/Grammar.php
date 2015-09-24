@@ -736,6 +736,38 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Determine if the grammar supports savepoints.
+     *
+     * @return bool
+     */
+    public function supportsSavepoints()
+    {
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepoint($name)
+    {
+        return 'SAVEPOINT '.$name;
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint rollback.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepointRollBack($name)
+    {
+        return 'ROLLBACK TO SAVEPOINT '.$name;
+    }
+
+    /**
      * Concatenate an array of segments, removing empties.
      *
      * @param  array   $segments
