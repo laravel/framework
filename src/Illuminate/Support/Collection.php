@@ -237,7 +237,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function forget($key)
     {
-        $this->offsetUnset($key);
+        if (is_array($key)) {
+            foreach ($key as $arrayValue) {
+                $this->offsetUnset($arrayValue);
+            }
+        } else {
+            $this->offsetUnset($key);
+        }
 
         return $this;
     }
