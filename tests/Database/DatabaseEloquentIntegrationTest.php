@@ -450,6 +450,22 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
+    public function testNestedTransactions()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
+        $this->connection()->transaction(function () use ($user) {
+            try {
+                $this->connection()->transaction(function () use ($user) {
+                    $user->email = 'otwell@laravel.com';
+                    $user->save();
+                    throw new Exception;
+                });
+            } catch (Exception $e) {}
+            $user = EloquentTestUser::first();
+            $this->assertEquals('taylor@laravel.com', $user->email);
+        });
+    }
+
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;

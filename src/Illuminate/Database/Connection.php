@@ -505,6 +505,10 @@ class Connection implements ConnectionInterface
 
         if ($this->transactions == 1) {
             $this->pdo->beginTransaction();
+        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
+            $this->statement(
+                $this->queryGrammar->compileSavepoint('trans'.$this->transactions)
+            );
         }
 
         $this->fireConnectionEvent('beganTransaction');
@@ -534,12 +538,14 @@ class Connection implements ConnectionInterface
     public function rollBack()
     {
         if ($this->transactions == 1) {
-            $this->transactions = 0;
-
             $this->pdo->rollBack();
-        } else {
-            --$this->transactions;
+        } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
+            $this->statement(
+                $this->queryGrammar->compileSavepointRollBack('trans'.$this->transactions)
+            );
         }
+
+        $this->transactions = max(0, $this->transactions - 1);
 
         $this->fireConnectionEvent('rollingBack');
     }
