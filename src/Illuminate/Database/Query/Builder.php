@@ -1592,13 +1592,14 @@ class Builder
      */
     public function exists()
     {
-        $limit = $this->limit;
+        $sql = $this->grammar->compileExists($this);
+        $results = $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
 
-        $result = $this->limit(1)->count() > 0;
+        if (isset($results[0])) {
+            $results = (array) $results[0];
 
-        $this->limit($limit);
-
-        return $result;
+            return (bool) $results['exists'];
+        }
     }
 
     /**
