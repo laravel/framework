@@ -460,7 +460,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
                     $user->save();
                     throw new Exception;
                 });
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                // ignore the exception
+            }
             $user = EloquentTestUser::first();
             $this->assertEquals('taylor@laravel.com', $user->email);
         });
@@ -471,8 +473,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $model = new EloquentTestUser;
 
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => '2012-12-05',
+            'created_at' => '2012-12-04',
+            'updated_at' => '2012-12-05',
         ]);
 
         $array = $model->toArray();
@@ -487,8 +489,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $model->setDateFormat('d-m-y');
 
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => '2012-12-05',
+            'created_at' => '2012-12-04',
+            'updated_at' => '2012-12-05',
         ]);
 
         $array = $model->toArray();
