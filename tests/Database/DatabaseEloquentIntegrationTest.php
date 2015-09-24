@@ -460,7 +460,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
                     $user->save();
                     throw new Exception;
                 });
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+            }
             $user = EloquentTestUser::first();
             $this->assertEquals('taylor@laravel.com', $user->email);
         });
