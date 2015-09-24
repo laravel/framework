@@ -199,6 +199,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get a flattened array of the items in the collection.
      *
+     * @param  int  $depth
      * @return static
      */
     public function flatten($depth = INF)
