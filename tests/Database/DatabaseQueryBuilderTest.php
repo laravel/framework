@@ -1262,6 +1262,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
     }
 
+    public function testCaseInsensitiveLeadingBooleansAreRemoved()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'Taylor', 'And');
+        $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
