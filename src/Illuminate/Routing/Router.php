@@ -1370,7 +1370,7 @@ class Router implements RegistrarContract
      */
     public function currentRouteUses($action)
     {
-        return $this->currentRouteAction() == $action;
+        return str_contains($this->currentRouteAction(), $action);
     }
 
     /**
