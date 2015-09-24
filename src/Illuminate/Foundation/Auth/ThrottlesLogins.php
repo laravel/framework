@@ -25,7 +25,7 @@ trait ThrottlesLogins
     /**
      * Determine how many retries left.
      *
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return int
      */
     protected function retriesLeft(Request $request)

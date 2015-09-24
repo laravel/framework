@@ -54,7 +54,7 @@ class RateLimiter
     /**
      * Get the number of attempts using key.
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
     public function attempts($key)
