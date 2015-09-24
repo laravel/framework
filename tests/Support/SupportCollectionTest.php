@@ -221,14 +221,6 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         // Nested arrays containing collections containing arrays are flattened
         $c = new Collection([['#foo', new Collection(['#bar', ['#zap']])], ['#baz']]);
         $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], $c->flatten()->all());
-
-        // Can specify depth to flatten to
-        $c = new Collection([['#foo', ['#bar']], '#baz']);
-        $this->assertEquals(['#foo', ['#bar'], '#baz'], $c->flatten(1)->all());
-
-        // Can specify depth to flatten to
-        $c = new Collection([['#foo', ['#bar']], '#baz']);
-        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten(2)->all());
     }
 
     public function testFlattenWithDepth()
