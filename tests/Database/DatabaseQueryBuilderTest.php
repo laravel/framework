@@ -1166,6 +1166,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz'], $builder->getBindings());
     }
 
+    public function testSelectWithLockUsesWritePdo()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::any(), m::any(), false);
+        $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
+    }
+
     public function testBindingOrder()
     {
         $expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
@@ -1246,6 +1254,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-09-23');
         $this->assertEquals('select * from [users] where cast([created_at] as date) = ?', $builder->toSql());
         $this->assertEquals([0 => '2015-09-23'], $builder->getBindings());
+    }
+
+    public function testUppercaseLeadingBooleansAreRemoved()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'Taylor', 'AND');
+        $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
+    }
+
+    public function testLowercaseLeadingBooleansAreRemoved()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'Taylor', 'and');
+        $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
+    }
+
+    public function testCaseInsensitiveLeadingBooleansAreRemoved()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'Taylor', 'And');
+        $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
     }
 
     protected function getBuilder()

@@ -312,7 +312,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testEmptyStringIsReturnedForNonSections()
     {
         $factory = $this->getFactory();
-        $this->assertEquals('', $factory->yieldContent('foo'));
+        $this->assertEmpty($factory->yieldContent('foo'));
     }
 
     public function testSectionFlushing()

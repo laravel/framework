@@ -143,21 +143,6 @@ if (! function_exists('array_first')) {
     }
 }
 
-if (! function_exists('array_last')) {
-    /**
-     * Return the last element in an array passing a given truth test.
-     *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed
-     */
-    function array_last($array, $callback, $default = null)
-    {
-        return Arr::last($array, $callback, $default);
-    }
-}
-
 if (! function_exists('array_flatten')) {
     /**
      * Flatten a multi-dimensional array into a single level.
@@ -211,6 +196,21 @@ if (! function_exists('array_has')) {
     function array_has($array, $key)
     {
         return Arr::has($array, $key);
+    }
+}
+
+if (! function_exists('array_last')) {
+    /**
+     * Return the last element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function array_last($array, $callback, $default = null)
+    {
+        return Arr::last($array, $callback, $default);
     }
 }
 
