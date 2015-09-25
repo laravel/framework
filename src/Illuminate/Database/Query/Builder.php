@@ -1272,6 +1272,10 @@ class Builder
     {
         $this->lock = $value;
 
+        if ($this->lock) {
+            $this->useWritePdo();
+        }
+
         return $this;
     }
 
@@ -1572,12 +1576,8 @@ class Builder
      * @param  string  $glue
      * @return string
      */
-    public function implode($column, $glue = null)
+    public function implode($column, $glue = '')
     {
-        if (is_null($glue)) {
-            return implode($this->lists($column));
-        }
-
         return implode($glue, $this->lists($column));
     }
 

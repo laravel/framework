@@ -450,13 +450,31 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
+    public function testNestedTransactions()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
+        $this->connection()->transaction(function () use ($user) {
+            try {
+                $this->connection()->transaction(function () use ($user) {
+                    $user->email = 'otwell@laravel.com';
+                    $user->save();
+                    throw new Exception;
+                });
+            } catch (Exception $e) {
+                // ignore the exception
+            }
+            $user = EloquentTestUser::first();
+            $this->assertEquals('taylor@laravel.com', $user->email);
+        });
+    }
+
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;
 
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => '2012-12-05',
+            'created_at' => '2012-12-04',
+            'updated_at' => '2012-12-05',
         ]);
 
         $array = $model->toArray();
@@ -471,8 +489,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $model->setDateFormat('d-m-y');
 
         $model->setRawAttributes([
-            'created_at'    => '2012-12-04',
-            'updated_at'    => '2012-12-05',
+            'created_at' => '2012-12-04',
+            'updated_at' => '2012-12-05',
         ]);
 
         $array = $model->toArray();
