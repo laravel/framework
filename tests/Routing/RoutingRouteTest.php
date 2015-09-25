@@ -72,11 +72,11 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $router = $this->getRouter();
         $router->get('foo/bar', function () { return 'hello'; });
-        $this->assertEquals('', $router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
+        $this->assertEmpty($router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
 
         $router = $this->getRouter();
         $router->any('foo/bar', function () { return 'hello'; });
-        $this->assertEquals('', $router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
+        $this->assertEmpty($router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
 
         $router = $this->getRouter();
         $router->get('foo/bar', function () { return 'first'; });
@@ -142,7 +142,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $response = $router->dispatch(Request::create('foo', 'HEAD'));
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('', $response->getContent());
+        $this->assertEmpty($response->getContent());
 
         $router = $this->getRouter();
         $router->match(['GET'], 'foo', function () { return 'bar'; });

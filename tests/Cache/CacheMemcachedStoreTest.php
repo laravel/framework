@@ -67,6 +67,6 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $store->setPrefix('foo');
         $this->assertEquals('foo:', $store->getPrefix());
         $store->setPrefix(null);
-        $this->assertSame('', $store->getPrefix());
+        $this->assertEmpty($store->getPrefix());
     }
 }
