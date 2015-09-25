@@ -802,16 +802,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testGettingAvgItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(15, $c->avg('foo'));
+        $this->assertEquals(15, $c->average('foo'));
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
-        $this->assertEquals(15, $c->avg('foo'));
+        $this->assertEquals(15, $c->average('foo'));
 
         $c = new Collection([1, 2, 3, 4, 5]);
-        $this->assertEquals(3, $c->avg());
+        $this->assertEquals(3, $c->average());
 
         $c = new Collection();
-        $this->assertNull($c->avg());
+        $this->assertNull($c->average());
     }
 }
 

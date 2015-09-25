@@ -59,7 +59,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  string|null  $key
      * @return mixed
      */
-    public function avg($key = null)
+    public function average($key = null)
     {
         if ($count = $this->count()) {
             return $this->sum($key) / $count;
