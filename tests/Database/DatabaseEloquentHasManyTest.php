@@ -28,7 +28,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn($model = m::mock('StdClass'));
         $model->shouldReceive('setAttribute')->never();
 
-        $this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->findOrNew('foo'));
     }
 
     public function testFindOrNewMethodReturnsNewModelWithForeignKeySet()
@@ -38,7 +38,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('StdClass'));
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertTrue($relation->findOrNew('foo') instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->findOrNew('foo'));
     }
 
     public function testFirstOrNewMethodFindsFirstModel()
@@ -48,7 +48,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock('StdClass'));
         $model->shouldReceive('setAttribute')->never();
 
-        $this->assertTrue($relation->firstOrNew(['foo']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrNew(['foo']));
     }
 
     public function testFirstOrNewMethodReturnsNewModelWithForeignKeySet()
@@ -59,7 +59,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock('StdClass'));
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertTrue($relation->firstOrNew(['foo']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrNew(['foo']));
     }
 
     public function testFirstOrCreateMethodFindsFirstModel()
@@ -71,7 +71,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
 
-        $this->assertTrue($relation->firstOrCreate(['foo']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreate(['foo']));
     }
 
     public function testFirstOrCreateMethodCreatesNewModelWithForeignKeySet()
@@ -83,7 +83,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('save')->once()->andReturn(true);
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertTrue($relation->firstOrCreate(['foo']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->firstOrCreate(['foo']));
     }
 
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
@@ -95,7 +95,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('fill')->once()->with(['bar']);
         $model->shouldReceive('save')->once();
 
-        $this->assertTrue($relation->updateOrCreate(['foo'], ['bar']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
     public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()
@@ -108,7 +108,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('fill')->once()->with(['bar']);
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertTrue($relation->updateOrCreate(['foo'], ['bar']) instanceof StdClass);
+        $this->assertInstanceOf(StdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
     public function testUpdateMethodUpdatesModelsWithTimestamps()
