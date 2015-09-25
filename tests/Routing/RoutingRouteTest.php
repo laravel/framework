@@ -92,6 +92,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('closure', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testFluentRouteNamingWithinAGroup()
+    {
+        $router = $this->getRouter();
+        $router->group(['as' => 'foo.'], function () use ($router) {
+            $router->get('bar', function () { return 'bar'; })->name('bar');
+        });
+        $this->assertEquals('bar', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+        $this->assertEquals('foo.bar', $router->currentRouteName());
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
