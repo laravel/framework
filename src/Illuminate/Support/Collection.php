@@ -232,16 +232,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Remove an item from the collection by key.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return $this
      */
-    public function forget($key)
+    public function forget($keys)
     {
-        if (is_array($key)) {
-            foreach ($key as $arrayValue) {
-                $this->offsetUnset($arrayValue);
-            }
-        } else {
+        foreach ((array) $keys as $key) {
             $this->offsetUnset($key);
         }
 
