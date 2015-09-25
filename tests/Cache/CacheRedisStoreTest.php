@@ -88,7 +88,7 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->setPrefix('foo');
         $this->assertEquals('foo:', $redis->getPrefix());
         $redis->setPrefix(null);
-        $this->assertSame('', $redis->getPrefix());
+        $this->assertEmpty($redis->getPrefix());
     }
 
     protected function getRedis()
