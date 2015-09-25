@@ -64,7 +64,7 @@ trait AssertionsTrait
      *
      * @return void
      */
-    public function assertServerError()
+    public function assertResponseInternalServerError()
     {
         $this->assertResponseStatus(500);
     }
