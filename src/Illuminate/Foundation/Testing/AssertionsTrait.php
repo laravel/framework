@@ -20,6 +20,56 @@ trait AssertionsTrait
     }
 
     /**
+     * Assert that the client response has a Bad Request status code.
+     *
+     * @return void
+     */
+    public function assertResponseBadRequest()
+    {
+        $this->assertResponseStatus(400);
+    }
+
+    /**
+     * Assert that the client response has a Unauthorized status code.
+     *
+     * @return void
+     */
+    public function assertResponseUnauthorized()
+    {
+        $this->assertResponseStatus(401);
+    }
+
+    /**
+     * Assert that the client response has a Forbidden status code.
+     *
+     * @return void
+     */
+    public function assertResponseForbidden()
+    {
+        $this->assertResponseStatus(403);
+    }
+
+    /**
+     * Assert that the client response has a Not Found status code.
+     *
+     * @return void
+     */
+    public function assertResponseNotFound()
+    {
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * Assert that the client response has an Internal Server Error status code.
+     *
+     * @return void
+     */
+    public function assertServerError()
+    {
+        $this->assertResponseStatus(500);
+    }
+
+    /**
      * Assert that the client response has a given code.
      *
      * @param  int  $code
