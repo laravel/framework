@@ -61,7 +61,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->schema()->create('photos', function ($table) {
             $table->increments('id');
-            $table->morphs('imageable');
+            $table->unsignedInteger("imageable_id")->nullable();
+            $table->string("imageable_type")->nullable();
+            $table->index(["imageable_id", "imageable_type"]);
             $table->string('name');
             $table->timestamps();
         });
@@ -418,6 +420,13 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($map1, Relation::morphMap());
         Relation::morphMap($map2, false);
         $this->assertEquals($map2, Relation::morphMap());
+    }
+
+    public function testEmptyMorphToRelationship()
+    {
+        $photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
+
+        $this->assertNull($photo->imageable);
     }
 
     public function testMultiInsertsWithDifferentValues()
