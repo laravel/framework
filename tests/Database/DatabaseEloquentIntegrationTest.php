@@ -61,9 +61,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->schema()->create('photos', function ($table) {
             $table->increments('id');
-            $table->unsignedInteger("imageable_id")->nullable();
-            $table->string("imageable_type")->nullable();
-            $table->index(["imageable_id", "imageable_type"]);
+            $table->unsignedInteger('imageable_id')->nullable();
+            $table->string('imageable_type')->nullable();
+            $table->index(['imageable_id', 'imageable_type']);
             $table->string('name');
             $table->timestamps();
         });
