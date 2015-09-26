@@ -1621,9 +1621,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->wasRecentlyCreated = true;
 
+        // Newly created models might be missing optional fields that have defaults set
+        // by the database. To ensure that those attributes return the correct value
+        // and not null, we refresh the model with the updates from the database.
+        $this->refresh();
+
         $this->fireModelEvent('created', false);
 
         return true;
+    }
+
+    /**
+     * Refresh the current model with the current attributes from the database.
+     * @return void
+     */
+    protected function refresh()
+    {
+        $fresh = $this->fresh();
+        $this->setRawAttributes($fresh->getAttributes());
+        $this->setRelations($fresh->getRelations());
     }
 
     /**

@@ -42,6 +42,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->string('role')->default('standard');
             $table->timestamps();
         });
 
@@ -60,7 +61,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->schema()->create('photos', function ($table) {
             $table->increments('id');
-            $table->morphs('imageable');
+            $table->unsignedInteger('imageable_id')->nullable();
+            $table->string('imageable_type')->nullable();
+            $table->index(['imageable_id', 'imageable_type']);
             $table->string('name');
             $table->timestamps();
         });
@@ -466,6 +469,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $user = EloquentTestUser::first();
             $this->assertEquals('taylor@laravel.com', $user->email);
         });
+    }
+
+    public function testNewlyCreatedModelsInheritDatabaseDefaults()
+    {
+        $model = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->assertEquals('standard', $model->role);
     }
 
     public function testToArrayIncludesDefaultFormattedTimestamps()
