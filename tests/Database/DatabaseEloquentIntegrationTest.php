@@ -42,6 +42,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->string('role')->default('standard');
             $table->timestamps();
         });
 
@@ -419,13 +420,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($map2, Relation::morphMap());
     }
 
-    public function testEmptyMorphToRelationship()
-    {
-        $photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
-
-        $this->assertNull($photo->imageable);
-    }
-
     public function testMultiInsertsWithDifferentValues()
     {
         $date = '1970-01-01';
@@ -464,6 +458,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $user = EloquentTestUser::first();
             $this->assertEquals('taylor@laravel.com', $user->email);
         });
+    }
+
+    public function testNewlyCreatedModelsInheritDatabaseDefaults()
+    {
+        $model = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->assertEquals('standard', $model->role);
     }
 
     public function testToArrayIncludesDefaultFormattedTimestamps()

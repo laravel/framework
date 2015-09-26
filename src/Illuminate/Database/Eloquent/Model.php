@@ -1621,9 +1621,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->wasRecentlyCreated = true;
 
+        $this->refresh();
+
         $this->fireModelEvent('created', false);
 
         return true;
+    }
+
+    protected function refresh()
+    {
+        $fresh = $this->fresh();
+        $this->setRawAttributes($fresh->getAttributes());
+        $this->setRelations($fresh->getRelations());
     }
 
     /**
