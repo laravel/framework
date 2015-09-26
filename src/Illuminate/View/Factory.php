@@ -305,9 +305,7 @@ class Factory implements FactoryContract
      */
     protected function getExtension($path)
     {
-        $extensions = array_keys($this->extensions);
-
-        return Arr::first($extensions, function ($key, $value) use ($path) {
+        return Arr::first(array_keys($this->extensions), function ($key, $value) use ($path) {
             return Str::endsWith($path, $value);
         });
     }
