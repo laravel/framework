@@ -59,6 +59,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('post_id');
+            $table->string('body');
+            $table->string('visibility');
+            $table->timestamps();
+        });
+
         $this->schema()->create('photos', function ($table) {
             $table->increments('id');
             $table->unsignedInteger('imageable_id')->nullable();
@@ -79,6 +87,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('friends');
         $this->schema()->drop('posts');
+        $this->schema()->drop('comments');
         $this->schema()->drop('photos');
 
         Relation::morphMap([], false);
@@ -477,6 +486,18 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('standard', $model->role);
     }
 
+    public function testUnsavedModelsUseDefaultsForUnsetAttributes()
+    {
+        $model = new EloquentTestComment(['id' => 1, 'body' => 'Active Record > Data Mapper']);
+        $this->assertEquals('public', $model->visibility);
+    }
+
+    public function testModelsWithDefaultsBypassRefresh()
+    {
+        $model = EloquentTestComment::create(['id' => 1, 'body' => 'Active Record > Data Mapper']);
+        $this->assertFalse($model->refreshed);
+    }
+
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;
@@ -585,6 +606,22 @@ class EloquentTestPost extends Eloquent
     public function parentPost()
     {
         return $this->belongsTo('EloquentTestPost', 'parent_id');
+    }
+}
+
+class EloquentTestComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    protected $defaults = [
+        'visibility' => 'public'
+    ];
+
+    public $refreshed = false;
+
+    protected function refresh()
+    {
+        $this->refreshed = true;
     }
 }
 

@@ -152,6 +152,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $casts = [];
 
     /**
+     * The default attribute values for unsaved models.
+     *
+     * @var array
+     */
+    protected $defaults;
+
+    /**
      * The relationships that should be touched on save.
      *
      * @var array
@@ -275,7 +282,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->syncOriginal();
 
-        $this->fill($attributes);
+        $this->fill($this->mergeDefaults($attributes));
     }
 
     /**
@@ -398,6 +405,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 static::registerModelEvent($event, $className.'@'.$event, $priority);
             }
         }
+    }
+
+    protected function mergeDefaults($attributes)
+    {
+        if ($this->defaults === null) {
+            return $attributes;
+        }
+
+        return array_merge($this->defaults, $attributes);
     }
 
     /**
@@ -1638,7 +1654,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Newly created models might be missing optional fields that have defaults set
         // by the database. To ensure that those attributes return the correct value
         // and not null, we refresh the model with the updates from this database.
-        $this->refresh();
+        if ($this->defaults === null) {
+            $this->refresh();
+        }
 
         $this->fireModelEvent('created', false);
 
