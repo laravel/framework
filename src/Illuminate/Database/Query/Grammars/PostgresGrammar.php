@@ -177,4 +177,43 @@ class PostgresGrammar extends Grammar
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
     }
+
+    /**
+     * Compile an insert statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileInsert(Builder $query, array $values)
+    {
+        // Essentially we will force every insert to be treated as a batch insert which
+        // simply makes creating the SQL easier for us since we can utilize the same
+        // basic routine regardless of an amount of records given to us to insert.
+        $table = $this->wrapTable($query->from);
+
+        // Postgres needs special syntax if values are not specified
+        if (empty($values)) {
+            return "insert into $table default values";
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $columns = $this->columnize(array_keys(reset($values)));
+
+        // We need to build a list of parameter place-holders of values that are bound
+        // to the query. Each insert should have the exact same amount of parameter
+        // bindings so we will loop through the record and parameterize them all.
+        $parameters = [];
+
+        foreach ($values as $record) {
+            $parameters[] = '('.$this->parameterize($record).')';
+        }
+
+        $parameters = implode(', ', $parameters);
+
+        return "insert into $table ($columns) values $parameters";
+    }
 }
