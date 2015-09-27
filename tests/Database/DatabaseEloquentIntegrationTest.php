@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\RefreshOnCreate;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
@@ -42,6 +43,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->string('role')->default('standard');
             $table->timestamps();
         });
 
@@ -468,6 +470,16 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    public function testNewlyCreatedModelsInheritDatabaseDefaults()
+    {
+        Eloquent::clearBootedModels();
+
+        $model = EloquentTestUserWithRefreshOnCreate::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertEquals('standard', $model->getAttribute('role'));
+        $this->assertEquals('standard', $model->role);
+    }
+
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;
@@ -551,6 +563,11 @@ class EloquentTestUser extends Eloquent
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
+}
+
+class EloquentTestUserWithRefreshOnCreate extends EloquentTestUser
+{
+    use RefreshOnCreate;
 }
 
 class EloquentTestPost extends Eloquent
