@@ -614,7 +614,7 @@ class EloquentTestComment extends Eloquent
     protected $table = 'comments';
     protected $guarded = [];
     protected $defaults = [
-        'visibility' => 'public'
+        'visibility' => 'public',
     ];
 
     public $refreshed = false;

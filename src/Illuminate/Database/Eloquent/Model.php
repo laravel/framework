@@ -407,7 +407,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
     }
 
-    protected function mergeDefaults($attributes)
+    /**
+     * Merge an array of attributes with the model's default attributes.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function mergeDefaults(array $attributes)
     {
         if ($this->defaults === null) {
             return $attributes;
