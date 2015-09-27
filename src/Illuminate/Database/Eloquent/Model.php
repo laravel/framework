@@ -2172,11 +2172,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the visible attributes for the model.
      *
      * @param  array  $visible
-     * @return void
+     * @return $this
      */
     public function setVisible(array $visible)
     {
         $this->visible = $visible;
+
+        return $this;
     }
 
     /**
@@ -2196,11 +2198,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the accessors to append to model arrays.
      *
      * @param  array  $appends
-     * @return void
+     * @return $this
      */
     public function setAppends(array $appends)
     {
         $this->appends = $appends;
+
+        return $this;
     }
 
     /**
