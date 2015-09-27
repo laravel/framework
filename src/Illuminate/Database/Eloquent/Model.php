@@ -2123,11 +2123,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the hidden attributes for the model.
      *
      * @param  array  $hidden
-     * @return void
+     * @return $this
      */
     public function setHidden(array $hidden)
     {
         $this->hidden = $hidden;
+
+        return $this;
     }
 
     /**
