@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\RefreshOnCreate;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
@@ -473,7 +474,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testNewlyCreatedModelsInheritDatabaseDefaults()
     {
-        $model = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        Eloquent::clearBootedModels();
+
+        $model = EloquentTestUserWithRefreshOnCreate::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertEquals('standard', $model->getAttribute('role'));
         $this->assertEquals('standard', $model->role);
     }
 
@@ -560,6 +565,14 @@ class EloquentTestUser extends Eloquent
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
+}
+
+/**
+ * Eloquent Models...
+ */
+class EloquentTestUserWithRefreshOnCreate extends EloquentTestUser
+{
+    use RefreshOnCreate;
 }
 
 class EloquentTestPost extends Eloquent
