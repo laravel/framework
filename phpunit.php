@@ -27,4 +27,4 @@ require __DIR__.'/vendor/autoload.php';
 
 date_default_timezone_set('UTC');
 
-Carbon\Carbon::setTestNow(Carbon\Carbon::now());
+Jenssegers\Date\Date::setTestNow(Jenssegers\Date\Date::now());

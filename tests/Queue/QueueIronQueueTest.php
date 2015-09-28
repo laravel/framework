@@ -59,7 +59,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoIronWithTimestamp()
     {
-        $now = Carbon\Carbon::now();
+        $now = Jenssegers\Date\Date::now();
         $queue = $this->getMock('Illuminate\Queue\IronQueue', ['getTime'], [$iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true]);
         $crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
         $queue->setEncrypter($crypt);

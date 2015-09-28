@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -83,7 +83,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     {
         $this->createUsers();
 
-        $this->assertInstanceOf(Carbon::class, SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+        $this->assertInstanceOf(Date::class, SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
         $this->assertNull(SoftDeletesTestUser::find(2)->deleted_at);
     }
 

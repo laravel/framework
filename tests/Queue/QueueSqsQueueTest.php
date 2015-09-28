@@ -67,7 +67,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
-        $now = Carbon\Carbon::now();
+        $now = Jenssegers\Date\Date::now();
         $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getSeconds', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getSeconds')->with($now)->will($this->returnValue(5));

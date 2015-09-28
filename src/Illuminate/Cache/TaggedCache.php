@@ -4,7 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use DateTime;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache implements Store
@@ -239,7 +239,7 @@ class TaggedCache implements Store
     protected function getMinutes($duration)
     {
         if ($duration instanceof DateTime) {
-            $fromNow = Carbon::now()->diffInMinutes(Carbon::instance($duration), false);
+            $fromNow = Date::now()->diffInMinutes(Date::instance($duration), false);
 
             return $fromNow > 0 ? $fromNow : null;
         }

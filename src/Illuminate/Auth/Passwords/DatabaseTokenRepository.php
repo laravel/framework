@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -96,7 +96,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
+        return ['email' => $email, 'token' => $token, 'created_at' => new Date];
     }
 
     /**
@@ -156,7 +156,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function deleteExpired()
     {
-        $expiredAt = Carbon::now()->subSeconds($this->expires);
+        $expiredAt = Date::now()->subSeconds($this->expires);
 
         $this->getTable()->where('created_at', '<', $expiredAt)->delete();
     }

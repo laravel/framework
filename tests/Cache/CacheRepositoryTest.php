@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 
 class CacheRepositoryTest extends PHPUnit_Framework_TestCase
 {
@@ -51,15 +51,15 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $result);
 
         /*
-         * Use Carbon object...
+         * Use Date object...
          */
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
         $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 9);
-        $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () { return 'bar'; });
+        $result = $repo->remember('foo', Date::now()->addMinutes(10)->addSeconds(2), function () { return 'bar'; });
         $this->assertEquals('bar', $result);
-        $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), function () { return 'qux'; });
+        $result = $repo->remember('baz', Date::now()->addMinutes(10)->subSeconds(2), function () { return 'qux'; });
         $this->assertEquals('qux', $result);
     }
 
@@ -76,17 +76,17 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->never();
-        $repo->put('foo', 'bar', Carbon::now()->subMinutes(10));
-        $repo->put('foo', 'bar', Carbon::now()->addSeconds(5));
+        $repo->put('foo', 'bar', Date::now()->subMinutes(10));
+        $repo->put('foo', 'bar', Date::now()->addSeconds(5));
     }
 
     public function testAddWithDatetimeInPastOrZeroMinutesReturnsImmediately()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('add', 'get', 'put')->never();
-        $result = $repo->add('foo', 'bar', Carbon::now()->subMinutes(10));
+        $result = $repo->add('foo', 'bar', Date::now()->subMinutes(10));
         $this->assertFalse($result);
-        $result = $repo->add('foo', 'bar', Carbon::now()->addSeconds(5));
+        $result = $repo->add('foo', 'bar', Date::now()->addSeconds(5));
         $this->assertFalse($result);
     }
 

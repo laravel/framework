@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use DateTime;
 use Exception;
 use ArrayAccess;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
@@ -1804,11 +1804,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Carbon\Carbon
+     * @return \Jenssegers\Date\Date
      */
     public function freshTimestamp()
     {
-        return new Carbon;
+        return new Date;
     }
 
     /**
@@ -2468,7 +2468,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $attributes = $this->getArrayableAttributes();
 
         // If an attribute is a date, we will cast it to a string after converting it
-        // to a DateTime / Carbon instance. This is so we will get some consistent
+        // to a DateTime / Date instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
         foreach ($this->getDates() as $key) {
             if (! isset($attributes[$key])) {
@@ -2921,14 +2921,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Jenssegers\Date\Date
      */
     protected function asDateTime($value)
     {
-        // If this value is already a Carbon instance, we shall just return it as is.
-        // This prevents us having to reinstantiate a Carbon instance when we know
+        // If this value is already a Date instance, we shall just return it as is.
+        // This prevents us having to reinstantiate a Date instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
-        if ($value instanceof Carbon) {
+        if ($value instanceof Date) {
             return $value;
         }
 
@@ -2936,27 +2936,27 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // these checks since they will be a waste of time, and hinder performance
         // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTime) {
-            return Carbon::instance($value);
+            return Date::instance($value);
         }
 
         // If this value is an integer, we will assume it is a UNIX timestamp's value
-        // and format a Carbon object from this timestamp. This allows flexibility
+        // and format a Date object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
-            return Carbon::createFromTimestamp($value);
+            return Date::createFromTimestamp($value);
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
-        // Carbon instances from that format. Again, this provides for simple date
-        // fields on the database, while still supporting Carbonized conversion.
+        // Date instances from that format. Again, this provides for simple date
+        // fields on the database, while still supporting Dateized conversion.
         if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
-            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+            return Date::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
         // Finally, we will just assume this date is in the format used by default on
-        // the database connection and use that format to create the Carbon object
+        // the database connection and use that format to create the Date object
         // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat($this->getDateFormat(), $value);
+        return Date::createFromFormat($this->getDateFormat(), $value);
     }
 
     /**

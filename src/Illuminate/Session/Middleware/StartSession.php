@@ -3,7 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
@@ -202,7 +202,7 @@ class StartSession
     {
         $config = $this->manager->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
+        return $config['expire_on_close'] ? 0 : Date::now()->addMinutes($config['lifetime']);
     }
 
     /**
