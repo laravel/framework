@@ -690,9 +690,6 @@ class Router implements RegistrarContract
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
-        // First we try to know if middleware is disabled or not, if it is disabled it
-        // means we should skip middleware so we just pass an empty array
-        // otherwise we try to gather route middlewares.
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
