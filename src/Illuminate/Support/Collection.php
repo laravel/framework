@@ -245,12 +245,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Remove an item from the collection by key.
      *
-     * @param  mixed  $key
+     * @param  string|array  $keys
      * @return $this
      */
-    public function forget($key)
+    public function forget($keys)
     {
-        $this->offsetUnset($key);
+        foreach ((array) $keys as $key) {
+            $this->offsetUnset($key);
+        }
 
         return $this;
     }
