@@ -84,7 +84,7 @@ class Message
     }
 
     /**
-     * Add a carbon copy to the message.
+     * Add a date copy to the message.
      *
      * @param  string  $address
      * @param  string|null  $name
@@ -96,7 +96,7 @@ class Message
     }
 
     /**
-     * Add a blind carbon copy to the message.
+     * Add a blind date copy to the message.
      *
      * @param  string  $address
      * @param  string|null  $name

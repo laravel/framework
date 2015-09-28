@@ -96,7 +96,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
+        return ['email' => $email, 'token' => $token, 'created_at' => new Date];
     }
 
     /**

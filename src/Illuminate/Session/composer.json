@@ -17,7 +17,7 @@
         "php": ">=5.5.9",
         "illuminate/contracts": "5.1.*",
         "illuminate/support": "5.1.*",
-        "nesbot/carbon": "~1.19",
+        "jenssegers/date": "^3.0",
         "symfony/finder": "2.7.*",
         "symfony/http-foundation": "2.7.*"
     },

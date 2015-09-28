@@ -19,7 +19,7 @@
         "illuminate/http": "5.1.*",
         "illuminate/session": "5.1.*",
         "illuminate/support": "5.1.*",
-        "nesbot/carbon": "~1.19"
+        "jenssegers/date": "^3.0"
     },
     "autoload": {
         "psr-4": {

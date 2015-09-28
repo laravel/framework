@@ -204,5 +204,5 @@ return array_map('realpath', [
     $basePath.'/vendor/symfony/finder/Finder.php',
     $basePath.'/vendor/symfony/finder/Glob.php',
     $basePath.'/vendor/vlucas/phpdotenv/src/Dotenv.php',
-    $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
+    $basePath.'/vendor/jenssegers/date/src/Lang/Date.php',
 ]);

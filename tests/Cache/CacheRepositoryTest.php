@@ -51,7 +51,7 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $result);
 
         /*
-         * Use Carbon object...
+         * Use Date object...
          */
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);

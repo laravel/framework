@@ -2468,7 +2468,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $attributes = $this->getArrayableAttributes();
 
         // If an attribute is a date, we will cast it to a string after converting it
-        // to a DateTime / Carbon instance. This is so we will get some consistent
+        // to a DateTime / Date instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
         foreach ($this->getDates() as $key) {
             if (! isset($attributes[$key])) {
@@ -2925,10 +2925,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asDateTime($value)
     {
-        // If this value is already a Carbon instance, we shall just return it as is.
-        // This prevents us having to reinstantiate a Carbon instance when we know
+        // If this value is already a Date instance, we shall just return it as is.
+        // This prevents us having to reinstantiate a Date instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
-        if ($value instanceof Carbon) {
+        if ($value instanceof Date) {
             return $value;
         }
 
@@ -2940,21 +2940,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         // If this value is an integer, we will assume it is a UNIX timestamp's value
-        // and format a Carbon object from this timestamp. This allows flexibility
+        // and format a Date object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
             return Date::createFromTimestamp($value);
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
-        // Carbon instances from that format. Again, this provides for simple date
-        // fields on the database, while still supporting Carbonized conversion.
+        // Date instances from that format. Again, this provides for simple date
+        // fields on the database, while still supporting Dateized conversion.
         if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
             return Date::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
         // Finally, we will just assume this date is in the format used by default on
-        // the database connection and use that format to create the Carbon object
+        // the database connection and use that format to create the Date object
         // that is returned back out to the developers after we convert it here.
         return Date::createFromFormat($this->getDateFormat(), $value);
     }
