@@ -1359,11 +1359,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the observable event names.
      *
      * @param  array  $observables
-     * @return void
+     * @return $this
      */
     public function setObservableEvents(array $observables)
     {
         $this->observables = $observables;
+
+        return $this;
     }
 
     /**
@@ -1778,22 +1780,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the value of the "created at" attribute.
      *
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function setCreatedAt($value)
     {
         $this->{static::CREATED_AT} = $value;
+
+        return $this;
     }
 
     /**
      * Set the value of the "updated at" attribute.
      *
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function setUpdatedAt($value)
     {
         $this->{static::UPDATED_AT} = $value;
+
+        return $this;
     }
 
     /**
@@ -1976,11 +1982,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the table associated with the model.
      *
      * @param  string  $table
-     * @return void
+     * @return $this
      */
     public function setTable($table)
     {
         $this->table = $table;
+
+        return $this;
     }
 
     /**
@@ -2017,11 +2025,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the primary key for the model.
      *
      * @param  string  $key
-     * @return void
+     * @return $this
      */
     public function setKeyName($key)
     {
         $this->primaryKey = $key;
+
+        return $this;
     }
 
     /**
@@ -2113,11 +2123,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the number of models to return per page.
      *
      * @param  int   $perPage
-     * @return void
+     * @return $this
      */
     public function setPerPage($perPage)
     {
         $this->perPage = $perPage;
+
+        return $this;
     }
 
     /**
@@ -2144,11 +2156,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the hidden attributes for the model.
      *
      * @param  array  $hidden
-     * @return void
+     * @return $this
      */
     public function setHidden(array $hidden)
     {
         $this->hidden = $hidden;
+
+        return $this;
     }
 
     /**
@@ -2191,11 +2205,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the visible attributes for the model.
      *
      * @param  array  $visible
-     * @return void
+     * @return $this
      */
     public function setVisible(array $visible)
     {
         $this->visible = $visible;
+
+        return $this;
     }
 
     /**
@@ -2215,11 +2231,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the accessors to append to model arrays.
      *
      * @param  array  $appends
-     * @return void
+     * @return $this
      */
     public function setAppends(array $appends)
     {
         $this->appends = $appends;
+
+        return $this;
     }
 
     /**
@@ -2396,11 +2414,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the relationships that are touched on save.
      *
      * @param  array  $touches
-     * @return void
+     * @return $this
      */
     public function setTouchedRelations(array $touches)
     {
         $this->touches = $touches;
+
+        return $this;
     }
 
     /**
@@ -2417,11 +2437,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set whether IDs are incrementing.
      *
      * @param  bool  $value
-     * @return void
+     * @return $this
      */
     public function setIncrementing($value)
     {
         $this->incrementing = $value;
+
+        return $this;
     }
 
     /**
@@ -2849,7 +2871,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return $this
      */
     public function setAttribute($key, $value)
     {
@@ -2874,6 +2896,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $this->attributes[$key] = $value;
+
+        return $this;
     }
 
     /**
@@ -3026,7 +3050,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  bool   $sync
-     * @return void
+     * @return $this
      */
     public function setRawAttributes(array $attributes, $sync = false)
     {
@@ -3035,6 +3059,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($sync) {
             $this->syncOriginal();
         }
+
+        return $this;
     }
 
     /**

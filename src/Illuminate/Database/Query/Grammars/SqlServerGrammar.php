@@ -200,6 +200,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where date" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDate(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'cast('.$this->wrap($where['column']).' as date) '.$where['operator'].' '.$value;
+    }
+
+    /**
      * Determine if the grammar supports savepoints.
      *
      * @return bool

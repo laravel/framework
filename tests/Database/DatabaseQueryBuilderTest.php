@@ -1248,6 +1248,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
+    public function testSqlServerWhereDate()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-09-23');
+        $this->assertEquals('select * from [users] where cast([created_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2015-09-23'], $builder->getBindings());
+    }
+
     public function testUppercaseLeadingBooleansAreRemoved()
     {
         $builder = $this->getBuilder();

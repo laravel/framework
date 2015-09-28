@@ -76,7 +76,7 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $resolver->register('blade', function () use ($app) {
-            return new CompilerEngine($app['blade.compiler'], $app['files']);
+            return new CompilerEngine($app['blade.compiler']);
         });
     }
 
