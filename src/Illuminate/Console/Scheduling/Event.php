@@ -247,7 +247,7 @@ class Event
      */
     protected function expressionPasses()
     {
-        $date = Carbon::now();
+        $date = Date::now();
 
         if ($this->timezone) {
             $date->setTimezone($this->timezone);

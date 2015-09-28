@@ -156,7 +156,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function deleteExpired()
     {
-        $expiredAt = Carbon::now()->subSeconds($this->expires);
+        $expiredAt = Date::now()->subSeconds($this->expires);
 
         $this->getTable()->where('created_at', '<', $expiredAt)->delete();
     }

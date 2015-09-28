@@ -22,7 +22,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
-        Carbon::setTestNow(null);
+        Date::setTestNow(null);
         m::close();
     }
 
@@ -66,7 +66,7 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
-        Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
+        Date::setTestNow(Date::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event('php foo');
         $this->assertEquals('* * * * 4 *', $event->thursdays()->getExpression());

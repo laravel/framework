@@ -185,7 +185,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function releaseJobsThatHaveBeenReservedTooLong($queue)
     {
-        $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
+        $expired = Date::now()->subSeconds($this->expire)->getTimestamp();
 
         $this->database->table($this->table)
                     ->where('queue', $this->getQueue($queue))
@@ -252,7 +252,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function getAvailableAt($delay)
     {
-        $availableAt = $delay instanceof DateTime ? $delay : Carbon::now()->addSeconds($delay);
+        $availableAt = $delay instanceof DateTime ? $delay : Date::now()->addSeconds($delay);
 
         return $availableAt->getTimestamp();
     }
