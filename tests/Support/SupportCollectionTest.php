@@ -142,6 +142,32 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('jason', $c[0]);
     }
 
+    public function testForgetSingleKey()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $c->forget(0);
+        $this->assertFalse(isset($c['foo']));
+
+        $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
+        $c->forget('foo');
+        $this->assertFalse(isset($c['foo']));
+    }
+
+    public function testForgetArrayOfKeys()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $c->forget([0, 2]);
+        $this->assertFalse(isset($c[0]));
+        $this->assertFalse(isset($c[2]));
+        $this->assertTrue(isset($c[1]));
+
+        $c = new Collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
+        $c->forget(['foo', 'baz']);
+        $this->assertFalse(isset($c['foo']));
+        $this->assertFalse(isset($c['baz']));
+        $this->assertTrue(isset($c['name']));
+    }
+
     public function testCountable()
     {
         $c = new Collection(['foo', 'bar']);
