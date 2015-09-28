@@ -471,12 +471,6 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         });
     }
 
-    public function testNewlyCreatedModelsInheritDatabaseDefaults()
-    {
-        $model = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $this->assertEquals('standard', $model->role);
-    }
-
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
         $model = new EloquentTestUser;
