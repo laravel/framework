@@ -11,7 +11,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         m::close();
 
         Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
-        Carbon\Carbon::resetToStringFormat();
+        Jenssegers\Date\Date::resetToStringFormat();
     }
 
     public function testAttributeManipulation()
@@ -245,8 +245,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             'updated_at'    => '2012-12-05',
         ]);
 
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
-        $this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->updated_at);
     }
 
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
@@ -258,15 +258,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             'updated_at'    => time(),
         ]);
 
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
-        $this->assertInstanceOf('Carbon\Carbon', $model->updated_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->updated_at);
     }
 
     public function testTimestampsAreReturnedAsObjectsOnCreate()
     {
         $timestamps = [
-            'created_at' => Carbon\Carbon::now(),
-            'updated_at' => Carbon\Carbon::now(),
+            'created_at' => Jenssegers\Date\Date::now(),
+            'updated_at' => Jenssegers\Date\Date::now(),
         ];
         $model = new EloquentDateModelStub;
         Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -274,15 +274,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
-        $this->assertInstanceOf('Carbon\Carbon', $instance->updated_at);
-        $this->assertInstanceOf('Carbon\Carbon', $instance->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $instance->updated_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $instance->created_at);
     }
 
     public function testDateTimeAttributesReturnNullIfSetToNull()
     {
         $timestamps = [
-            'created_at' => Carbon\Carbon::now(),
-            'updated_at' => Carbon\Carbon::now(),
+            'created_at' => Jenssegers\Date\Date::now(),
+            'updated_at' => Jenssegers\Date\Date::now(),
         ];
         $model = new EloquentDateModelStub;
         Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -299,26 +299,26 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentDateModelStub;
         $model->created_at = '2013-05-22 00:00:00';
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
 
         $model = new EloquentDateModelStub;
         $model->created_at = time();
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
 
         $model = new EloquentDateModelStub;
         $model->created_at = 0;
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
 
         $model = new EloquentDateModelStub;
         $model->created_at = '2012-01-01';
-        $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->created_at);
     }
 
     public function testFromDateTime()
     {
         $model = new EloquentModelStub();
 
-        $value = Carbon\Carbon::parse('2015-04-17 22:59:01');
+        $value = Jenssegers\Date\Date::parse('2015-04-17 22:59:01');
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = new DateTime('2015-04-17 22:59:01');
@@ -1176,8 +1176,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar'], $model->seventh);
         $this->assertEquals(['foo' => 'bar'], $model->eighth);
         $this->assertEquals('{"foo":"bar"}', $model->eighthAttributeValue());
-        $this->assertInstanceOf('Carbon\Carbon', $model->ninth);
-        $this->assertInstanceOf('Carbon\Carbon', $model->tenth);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->ninth);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->tenth);
         $this->assertEquals('1969-07-20', $model->ninth->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->tenth->toDateTimeString());
 
@@ -1195,8 +1195,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($obj, $arr['sixth']);
         $this->assertEquals(['foo' => 'bar'], $arr['seventh']);
         $this->assertEquals(['foo' => 'bar'], $arr['eighth']);
-        $this->assertInstanceOf('Carbon\Carbon', $arr['ninth']);
-        $this->assertInstanceOf('Carbon\Carbon', $arr['tenth']);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $arr['ninth']);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $arr['tenth']);
         $this->assertEquals('1969-07-20', $arr['ninth']->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $arr['tenth']->toDateTimeString());
     }

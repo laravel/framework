@@ -4,7 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use DateTime;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache implements Store

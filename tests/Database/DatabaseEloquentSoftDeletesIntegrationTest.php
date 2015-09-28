@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model as Eloquent;

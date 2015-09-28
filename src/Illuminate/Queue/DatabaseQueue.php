@@ -3,7 +3,7 @@
 namespace Illuminate\Queue;
 
 use DateTime;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Database\Query\Expression;

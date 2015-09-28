@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;

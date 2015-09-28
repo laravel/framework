@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use DateTime;
 use Exception;
 use ArrayAccess;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
@@ -1804,7 +1804,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Carbon\Carbon
+     * @return \Jenssegers\Date\Date
      */
     public function freshTimestamp()
     {
@@ -2921,7 +2921,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Jenssegers\Date\Date
      */
     protected function asDateTime($value)
     {

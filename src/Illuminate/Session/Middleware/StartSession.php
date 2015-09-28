@@ -3,7 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;

@@ -18,7 +18,7 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
         $model->delete();
 
-        $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
+        $this->assertInstanceOf('Jenssegers\Date\Date', $model->deleted_at);
     }
 
     public function testRestore()
@@ -82,7 +82,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return Carbon\Carbon::now();
+        return Jenssegers\Date\Date::now();
     }
 
     public function fromDateTime()

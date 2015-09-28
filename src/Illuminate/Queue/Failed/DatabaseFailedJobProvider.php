@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Carbon\Carbon;
+use Jenssegers\Date\Date;
 use Illuminate\Database\ConnectionResolverInterface;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
