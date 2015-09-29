@@ -2,7 +2,6 @@
 
 namespace Illuminate\View;
 
-use Closure;
 use ArrayAccess;
 use BadMethodCallException;
 use Illuminate\Support\Str;
@@ -73,14 +72,14 @@ class View implements ArrayAccess, ViewContract
     /**
      * Get the string contents of the view.
      *
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return string
      */
-    public function render(Closure $callback = null)
+    public function render(callable $callback = null)
     {
         $contents = $this->renderContents();
 
-        $response = isset($callback) ? $callback($this, $contents) : null;
+        $response = isset($callback) ? call_user_func($callback, $this, $contents) : null;
 
         // Once we have the contents of the view, we will flush the sections if we are
         // done rendering all views so that there is nothing left hanging over when
