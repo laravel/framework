@@ -121,10 +121,8 @@ class View implements ArrayAccess, ViewContract
      */
     public function renderSections()
     {
-        $env = $this->factory;
-
-        return $this->render(function ($view) use ($env) {
-            return $env->getSections();
+        return $this->render(function () {
+            return $this->factory->getSections();
         });
     }
 
