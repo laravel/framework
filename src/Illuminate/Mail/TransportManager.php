@@ -117,7 +117,7 @@ class TransportManager extends Manager
             return new MandrillTransport($client, $config['secret']);
         }
 
-        return new MandrillTransport($client, $config['secret'], $config['subaccount']);        
+        return new MandrillTransport($client, $config['secret'], $config['subaccount']);
     }
 
     /**
