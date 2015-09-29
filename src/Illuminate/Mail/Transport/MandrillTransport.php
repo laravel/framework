@@ -22,7 +22,7 @@ class MandrillTransport extends Transport
     protected $key;
 
     /**
-     * The selected Mandrill subaccount
+     * The Mandrill subaccount.
      *
      * @var bool
      */
