@@ -901,7 +901,7 @@ class Request extends SymfonyRequest implements ArrayAccess
      * Get an input element from the request when isset() or empty() is called on inaccessible properties.
      *
      * @param $key
-     * @return object|string
+     * @return bool
      */
     public function __isset($key)
     {
