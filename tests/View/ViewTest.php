@@ -40,6 +40,29 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('contents', $view->render($callback));
     }
 
+    public function testRenderHandlingCallbackReturnValues()
+    {
+        $view = $this->getView();
+        $view->getFactory()->shouldReceive('incrementRender');
+        $view->getFactory()->shouldReceive('callComposer');
+        $view->getFactory()->shouldReceive('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->andReturn('contents');
+        $view->getFactory()->shouldReceive('decrementRender');
+        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering');
+
+        $this->assertEquals('new contents', $view->render(function () {
+            return 'new contents';
+        }));
+
+        $this->assertEquals('', $view->render(function () {
+            return '';
+        }));
+
+        $this->assertEquals('contents', $view->render(function () {
+            return; // null
+        }));
+    }
+
     public function testRenderSectionsReturnsEnvironmentSections()
     {
         $view = m::mock('Illuminate\View\View[render]', [
