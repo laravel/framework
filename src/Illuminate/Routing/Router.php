@@ -669,9 +669,12 @@ class Router implements RegistrarContract
             $response = $this->runRouteWithinStack(
                 $route, $request
             );
+            $isPrepared = true;
         }
 
-        $response = $this->prepareResponse($request, $response);
+        // If we already have called runRouteWithinStack it means response is prepared now
+        // and we do not need to prepare it again;But if we have not,we have to prepare it.
+        $response = isset($isPrepared) ? $response : $this->prepareResponse($request, $response);
 
         // After we have a prepared response from the route or filter we will call to
         // the "after" filters to do any last minute processing on this request or
