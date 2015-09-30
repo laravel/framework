@@ -312,6 +312,13 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             foreach ($rules as $rule) {
                 $this->validate($attribute, $rule);
+
+                // Check if the current field rule failed.
+                if (count($this->messages->all()) !== 0) {
+                    // Rule failed, skip all other possible rules for
+                    // this field and move on to the next field.
+                    continue 2;
+                }
             }
         }
 
