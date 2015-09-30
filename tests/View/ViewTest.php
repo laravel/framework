@@ -32,10 +32,9 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-        $me = $this;
-        $callback = function (View $rendered, $contents) use ($me, $view) {
-            $me->assertEquals($view, $rendered);
-            $me->assertEquals('contents', $contents);
+        $callback = function (View $rendered, $contents) use ($view) {
+            $this->assertEquals($view, $rendered);
+            $this->assertEquals('contents', $contents);
         };
 
         $this->assertEquals('contents', $view->render($callback));
