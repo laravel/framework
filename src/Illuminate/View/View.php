@@ -86,7 +86,7 @@ class View implements ArrayAccess, ViewContract
         // another view gets rendered in the future by the application developer.
         $this->factory->flushSectionsIfDoneRendering();
 
-        return $response ?: $contents;
+        return ! is_null($response) ? $response : $contents;
     }
 
     /**
