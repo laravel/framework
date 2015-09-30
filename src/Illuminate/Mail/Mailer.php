@@ -83,13 +83,6 @@ class Mailer implements MailerContract, MailQueueContract
     protected $failedRecipients = [];
 
     /**
-     * Array of parsed views containing html and text view name.
-     *
-     * @var array
-     */
-    protected $parsedViews = [];
-
-    /**
      * Create a new Mailer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $views
