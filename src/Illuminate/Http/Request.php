@@ -898,13 +898,18 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
-     * Get an input element from the request when isset() or empty() is called on inaccessible properties.
+     * Determine if an an input element (inaccessible property) triggered by calling isset() or empty() exists or is empty.
      *
      * @param $key
      * @return bool
      */
     public function __isset($key)
     {
-        return isset($key);
+        $all = $this->all();
+
+        if (array_key_exists($key, $all)) {
+            return true;
+        }
+        return false;
     }
 }
