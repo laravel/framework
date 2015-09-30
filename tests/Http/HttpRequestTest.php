@@ -560,8 +560,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
         $request->flashExcept(['key1', 'key2']);
     }
-
-
+    
     public function testMagicMethodsWithRouterResolver()
     {
         $base = SymfonyRequest::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
