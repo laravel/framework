@@ -294,34 +294,45 @@ trait CrawlerTrait
     }
 
     /**
-     * Assert that a given string is seen on the page.
+     * Assert that a given string is seen on the page, or inside an element.
      *
      * @param  string  $text
+     * @param  bool|string|null  $element
      * @param  bool  $negate
      * @return $this
      */
-    protected function see($text, $negate = false)
+    protected function see($text, $element = null, $negate = false)
     {
+        if (is_bool($element)) {
+            $negate = $element;
+            $element = null;
+        }
+
         $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
 
         $rawPattern = preg_quote($text, '/');
 
         $escapedPattern = preg_quote(e($text), '/');
 
-        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $this->response->getContent());
+        $content = is_null($element)
+            ? $this->crawler->html()
+            : $this->crawler->filter($element)->html();
+
+        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $content);
 
         return $this;
     }
 
     /**
-     * Assert that a given string is not seen on the page.
+     * Assert that a given string is not seen on the page, or inside an element.
      *
      * @param  string  $text
+     * @param  string|null  $element
      * @return $this
      */
-    protected function dontSee($text)
+    protected function dontSee($text, $element = null)
     {
-        return $this->see($text, true);
+        return $this->see($text, $element, true);
     }
 
     /**

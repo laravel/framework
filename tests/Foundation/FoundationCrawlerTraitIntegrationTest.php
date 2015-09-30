@@ -7,6 +7,44 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
     use CrawlerTrait;
 
+    public function testSee()
+    {
+        $this->crawler = new Crawler(
+            '<p>Laravel 5.1</p>'
+        );
+
+        $this->see('Laravel 5.1');
+    }
+
+    public function testDontSee()
+    {
+        $this->crawler = new Crawler(
+            '<p>Laravel 5.1</p>'
+        );
+
+        $this->see('Symfony', true);
+        $this->dontSee('Symfony');
+    }
+
+    public function testSeeElement()
+    {
+        $this->crawler = new Crawler(
+            '<div>Laravel was created by <strong>Taylor Otwell</strong></div>'
+        );
+
+        $this->see('Taylor', 'strong');
+    }
+
+    public function testDontSeeElement()
+    {
+        $this->crawler = new Crawler(
+            '<div>Laravel was created by <strong>Taylor Otwell</strong></div>'
+        );
+
+        $this->see('Laravel', 'strong', true);
+        $this->dontSee('Laravel', 'strong');
+    }
+
     public function testSeeLink()
     {
         $this->crawler = new Crawler(
@@ -24,7 +62,7 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         );
 
         $this->dontSeeLink('Symfony');
-        $this->dontSeeLink('Symfony', 'https://symfonyc.com');
+        $this->dontSeeLink('Symfony', 'https://symfony.com');
     }
 
     protected function getInputHtml()
