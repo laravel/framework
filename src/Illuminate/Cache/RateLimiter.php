@@ -52,6 +52,17 @@ class RateLimiter
     }
 
     /**
+     * Get the number of attempts using key.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function attempts($key)
+    {
+        return $this->cache->get($key, 0);
+    }
+
+    /**
      * Increment the counter for a given key for a given decay time.
      *
      * @param  string  $key
