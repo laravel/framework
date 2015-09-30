@@ -564,7 +564,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
     public function testMagicMethodsWithRouterResolver()
     {
-        $base = SymfonyRequest::create('/', 'GET', [ 'foo' => 'bar', 'empty' => '' ]);
+        $base = SymfonyRequest::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
         $request = Request::createFromBase($base);
         $this->assertEquals($request->foo, 'bar');
         $this->assertEquals(isset($request->foo), true);

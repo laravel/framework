@@ -910,6 +910,7 @@ class Request extends SymfonyRequest implements ArrayAccess
         if (array_key_exists($key, $all)) {
             return true;
         }
+
         return false;
     }
 }
