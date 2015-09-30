@@ -23,21 +23,6 @@ trait ThrottlesLogins
     }
 
     /**
-     * Determine how many retries left.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return int
-     */
-    protected function retriesLeft(Request $request)
-    {
-        $key = $request->input($this->loginUsername()).$request->ip();
-
-        $attempts = app(RateLimiter::class)->attempts($key);
-
-        return $this->maxLoginAttempts() - $attempts + 1;
-    }
-
-    /**
      * Increment the login attempts for the user.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -48,6 +33,21 @@ trait ThrottlesLogins
         app(RateLimiter::class)->hit(
             $request->input($this->loginUsername()).$request->ip()
         );
+    }
+
+    /**
+     * Determine how many retries are left for the user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return int
+     */
+    protected function retriesLeft(Request $request)
+    {
+        $attempts = app(RateLimiter::class)->attempts(
+            $request->input($this->loginUsername()).$request->ip()
+        );
+
+        return $this->maxLoginAttempts() - $attempts + 1;
     }
 
     /**
