@@ -896,4 +896,21 @@ class Request extends SymfonyRequest implements ArrayAccess
             return $this->route($key);
         }
     }
+
+    /**
+     * Get an input element from the request when isset() or empty() is called on inaccessible properties.
+     *
+     * @param $key
+     * @return object|string
+     */
+    public function __isset($key)
+    {
+        $all = $this->all();
+
+        if (array_key_exists($key, $all)) {
+            return $all[$key];
+        } else {
+            return $this->route($key);
+        }
+    }
 }
