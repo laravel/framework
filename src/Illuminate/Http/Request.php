@@ -905,12 +905,6 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function __isset($key)
     {
-        $all = $this->all();
-
-        if (array_key_exists($key, $all)) {
-            return $all[$key];
-        } else {
-            return $this->route($key);
-        }
+        return isset($key);
     }
 }
