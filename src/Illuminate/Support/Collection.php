@@ -67,6 +67,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Alias for the avg method.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function average($key = null)
+    {
+        return $this->avg($key);
+    }
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return static

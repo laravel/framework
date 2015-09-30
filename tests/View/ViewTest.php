@@ -32,13 +32,35 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-        $me = $this;
-        $callback = function (View $rendered, $contents) use ($me, $view) {
-            $me->assertEquals($view, $rendered);
-            $me->assertEquals('contents', $contents);
+        $callback = function (View $rendered, $contents) use ($view) {
+            $this->assertEquals($view, $rendered);
+            $this->assertEquals('contents', $contents);
         };
 
         $this->assertEquals('contents', $view->render($callback));
+    }
+
+    public function testRenderHandlingCallbackReturnValues()
+    {
+        $view = $this->getView();
+        $view->getFactory()->shouldReceive('incrementRender');
+        $view->getFactory()->shouldReceive('callComposer');
+        $view->getFactory()->shouldReceive('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->andReturn('contents');
+        $view->getFactory()->shouldReceive('decrementRender');
+        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering');
+
+        $this->assertEquals('new contents', $view->render(function () {
+            return 'new contents';
+        }));
+
+        $this->assertEquals('', $view->render(function () {
+            return '';
+        }));
+
+        $this->assertEquals('contents', $view->render(function () {
+            return; // null
+        }));
     }
 
     public function testRenderSectionsReturnsEnvironmentSections()
