@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\Process\ProcessUtils;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class FoundationComposerTest extends PHPUnit_Framework_TestCase
 {
@@ -15,7 +17,8 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
         $process = m::mock('stdClass');
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
-        $process->shouldReceive('setCommandLine')->once()->with('\''.PHP_BINARY.'\''.(defined('HHVM_VERSION') ? ' --php' : '').' composer.phar dump-autoload');
+        $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        $process->shouldReceive('setCommandLine')->once()->with($binary.(defined('HHVM_VERSION') ? ' --php' : '').' composer.phar dump-autoload');
         $process->shouldReceive('run')->once();
 
         $composer->dumpAutoloads();
