@@ -272,7 +272,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            array_get($this->action, 'middleware', []), $middleware
+            Arr::get($this->action, 'middleware', []), $middleware
         );
 
         return $this;
