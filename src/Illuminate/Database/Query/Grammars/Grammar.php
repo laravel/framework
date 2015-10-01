@@ -612,6 +612,20 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an exists statement into SQL.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     *
+     * @return string
+     */
+    public function compileExists(Builder $query)
+    {
+        $select = $this->compileSelect($query);
+
+        return "select exists($select) as {$this->wrap('exists')}";
+    }
+
+    /**
      * Compile an insert statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
