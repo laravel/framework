@@ -34,10 +34,11 @@ class QueueListenerTest extends PHPUnit_Framework_TestCase
     {
         $listener = new Illuminate\Queue\Listener(__DIR__);
         $process = $listener->makeProcess('connection', 'queue', 1, 2, 3);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
         $this->assertInstanceOf('Symfony\Component\Process\Process', $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals('\''.PHP_BINARY.'\''.(defined('HHVM_VERSION') ? ' --php' : '').' artisan queue:work \'connection\' --queue=\'queue\' --delay=1 --memory=2 --sleep=3 --tries=0', $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape.(defined('HHVM_VERSION') ? ' --php' : '')." artisan queue:work {$escape}connection{$escape} --queue={$escape}queue{$escape} --delay=1 --memory=2 --sleep=3 --tries=0", $process->getCommandLine());
     }
 }
