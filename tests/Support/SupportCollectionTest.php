@@ -837,7 +837,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $c->avg());
 
         $c = new Collection();
-        $this->assertNull($c->avg());
+        $this->assertEquals(0, $c->avg());
     }
 }
 
