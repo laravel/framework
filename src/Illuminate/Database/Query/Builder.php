@@ -1589,6 +1589,7 @@ class Builder
     public function exists()
     {
         $sql = $this->grammar->compileExists($this);
+
         $results = $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
 
         if (isset($results[0])) {
