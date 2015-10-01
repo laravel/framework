@@ -2,6 +2,8 @@
 
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
+use Illuminate\Auth\Access\Admission;
+use Illuminate\Auth\Access\CreatesAdmissions;
 
 class GateTest extends PHPUnit_Framework_TestCase
 {
@@ -122,7 +124,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
     {
-        $gate = $this->getBasicGate();
+        $gate = $this->getBasicGate(true);
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -163,9 +165,67 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
-    protected function getBasicGate()
+    public function test_policy_returns_denied_admission()
     {
-        return new Gate(new Container, function () { return (object) ['id' => 1]; });
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $check = $gate->check('create', new AccessGateTestDummy);
+        $admission = $gate->getAdmission('create', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Admission::class, $admission);
+        $this->assertEquals('You are not an admin.', $admission->reason());
+        $this->assertFalse($check);
+        $this->assertTrue($admission->denied());
+    }
+
+    public function test_policy_returns_allowed_admission()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $check = $gate->check('create', new AccessGateTestDummy);
+        $admission = $gate->getAdmission('create', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Admission::class, $admission);
+        $this->assertNull($admission->reason());
+        $this->assertTrue($check);
+        $this->assertTrue($admission->allowed());
+    }
+
+    public function test_get_admission_returns_an_allowed_admission_for_a_truthy_return()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $admission = $gate->getAdmission('update', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Admission::class, $admission);
+        $this->assertTrue($admission->allowed());
+        $this->assertFalse($admission->denied());
+    }
+
+    public function test_get_admission_returns_a_denied_admission_for_a_falsy_return()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $admission = $gate->getAdmission('update', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Admission::class, $admission);
+        $this->assertFalse($admission->allowed());
+        $this->assertTrue($admission->denied());
+    }
+
+    protected function getBasicGate($isAdmin = false)
+    {
+        return new Gate(new Container, function () use ($isAdmin) {
+            return (object) ['id' => 1, 'isAdmin' => $isAdmin];
+        });
     }
 }
 
@@ -184,14 +244,16 @@ class AccessGateTestDummy
 
 class AccessGateTestPolicy
 {
+    use CreatesAdmissions;
+
     public function create($user)
     {
-        return true;
+        return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
     }
 
     public function update($user, AccessGateTestDummy $dummy)
     {
-        return $user instanceof StdClass;
+        return ! $user->isAdmin;
     }
 }
 

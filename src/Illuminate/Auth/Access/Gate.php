@@ -170,6 +170,30 @@ class Gate implements GateContract
      */
     public function check($ability, $arguments = [])
     {
+        return $this->getAdmission($ability, $arguments)->allowed();
+    }
+
+    /**
+     * Get the admission for the given ability for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Admission
+     */
+    public function getAdmission($ability, $arguments = [])
+    {
+        return Admission::fromValue($this->raw($ability, $arguments));
+    }
+
+    /**
+     * Get the raw result for the given ability for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return mixed
+     */
+    public function raw($ability, $arguments = [])
+    {
         if (! $user = $this->resolveUser()) {
             return false;
         }
