@@ -565,7 +565,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(empty($request->undefined), true);
 
         // Simulates Route parameters.
-        $request = Request::create('/example/bar', 'GET', [ 'xyz' => 'overwrited' ]);
+        $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwrited']);
         $request->setRouteResolver(function () use ($request) {
             $route = new Route('GET', '/example/{foo}/{xyz?}/{undefined?}', []);
             $route->bind($request);
