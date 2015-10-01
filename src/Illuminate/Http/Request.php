@@ -896,4 +896,27 @@ class Request extends SymfonyRequest implements ArrayAccess
             return $this->route($key);
         }
     }
+
+    /**
+     * Check if an input element was set in request.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        $all = $this->all();
+
+        if (array_key_exists($key, $all)) {
+            return true;
+        }
+
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route)) {
+            return false;
+        }
+
+        return array_key_exists($key, $route->parameters());
+    }
 }
