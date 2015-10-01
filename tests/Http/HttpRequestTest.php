@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase
@@ -536,6 +537,47 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::createFromBase($base);
 
         $this->assertEquals($request->request->all(), $body);
+    }
+
+    /**
+     * Tests to issue https://github.com/laravel/framework/issues/10403
+     * @dataProvider magicMethodsProvider
+     */
+    public function testMagicMethods($uri, $route, $parameters, $property, $propertyValue, $propertyIsset, $propertyEmpty)
+    {
+        $request = Request::create($uri, 'GET', $parameters);
+
+        // Allow to simulates when a route is inaccessible or undefined.
+        if (!is_null($route)) {
+            $request->setRouteResolver(function () use ($request, $route) {
+                $route = new Route('GET', $route, []);
+                $route->bind($request);
+
+                return $route;
+            });
+        }
+
+        $this->assertEquals($request->{$property}, $propertyValue);
+        $this->assertEquals(isset($request->{$property}), $propertyIsset);
+        $this->assertEquals(empty($request->{$property}), $propertyEmpty);
+    }
+
+    public function magicMethodsProvider()
+    {
+        return [
+            // Simulates QueryStrings.
+            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'foo', 'bar', true, false ],
+            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'empty', '', true, true ],
+            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'undefined', null, false, true ],
+
+            // Simulates Routes.
+            [ '/example/bar', '/example/{foo}/{undefined?}', [], 'foo', 'bar', true, false ],
+            [ '/example/bar', '/example/{foo}/{undefined?}', [], 'undefined', null, false, true ],
+
+            // Simulates no QueryStrings or Routes.
+            [ '/', '/', [], 'undefined', null, false, true ],
+            [ '/', null, [], 'undefined', null, false, true ],
+        ];
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
