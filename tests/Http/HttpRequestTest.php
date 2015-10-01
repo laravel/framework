@@ -540,7 +540,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests to issue https://github.com/laravel/framework/issues/10403
+     * Tests to https://github.com/laravel/framework/issues/10403 issue.
      * @dataProvider magicMethodsProvider
      */
     public function testMagicMethods($uri, $route, $parameters, $property, $propertyValue, $propertyIsset, $propertyEmpty)
@@ -548,7 +548,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::create($uri, 'GET', $parameters);
 
         // Allow to simulates when a route is inaccessible or undefined.
-        if (!is_null($route)) {
+        if (! is_null($route)) {
             $request->setRouteResolver(function () use ($request, $route) {
                 $route = new Route('GET', $route, []);
                 $route->bind($request);
@@ -566,17 +566,17 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     {
         return [
             // Simulates QueryStrings.
-            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'foo', 'bar', true, false ],
-            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'empty', '', true, true ],
-            [ '/', null, [ 'foo' => 'bar', 'empty' => '' ], 'undefined', null, false, true ],
+            ['/', null, ['foo' => 'bar', 'empty' => ''], 'foo', 'bar', true, false],
+            ['/', null, ['foo' => 'bar', 'empty' => ''], 'empty', '', true, true],
+            ['/', null, ['foo' => 'bar', 'empty' => ''], 'undefined', null, false, true],
 
             // Simulates Routes.
-            [ '/example/bar', '/example/{foo}/{undefined?}', [], 'foo', 'bar', true, false ],
-            [ '/example/bar', '/example/{foo}/{undefined?}', [], 'undefined', null, false, true ],
+            ['/example/bar', '/example/{foo}/{undefined?}', [], 'foo', 'bar', true, false],
+            ['/example/bar', '/example/{foo}/{undefined?}', [], 'undefined', null, false, true],
 
             // Simulates no QueryStrings or Routes.
-            [ '/', '/', [], 'undefined', null, false, true ],
-            [ '/', null, [], 'undefined', null, false, true ],
+            ['/', '/', [], 'undefined', null, false, true],
+            ['/', null, [], 'undefined', null, false, true],
         ];
     }
 
