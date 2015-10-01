@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase
@@ -536,6 +537,80 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::createFromBase($base);
 
         $this->assertEquals($request->request->all(), $body);
+    }
+
+    /**
+     * Tests for Http\Request magic methods `__get()` and `__isset()`.
+     *
+     * @link https://github.com/laravel/framework/issues/10403 Form request object attribute returns empty when have some string.
+     */
+    public function testMagicMethods()
+    {
+        // Simulates QueryStrings.
+        $request = Request::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
+
+        // Parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
+        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Parameter 'empty' is '', then it ISSET and is EMPTY.
+        $this->assertEquals($request->empty, '');
+        $this->assertEquals(isset($request->empty), true);
+        $this->assertEquals(empty($request->empty), true);
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Simulates Route parameters.
+        $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwrited']);
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/example/{foo}/{xyz?}/{undefined?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        // Router parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
+        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Router parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Special case: router parameter 'xyz' is 'overwrited' by QueryString, then it ISSET and is NOT EMPTY.
+        // Basically, QueryStrings have priority over router parameters.
+        $this->assertEquals($request->xyz, 'overwrited');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Simulates empty QueryString and Routes.
+        $request = Request::create('/', 'GET');
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Special case: simulates empty QueryString and Routes, without the Route Resolver.
+        // It'll happen when you try to get a parameter outside a route.
+        $request = Request::create('/', 'GET');
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
