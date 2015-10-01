@@ -74,7 +74,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -86,7 +86,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -98,7 +98,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -110,7 +110,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function error($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -122,7 +122,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -134,7 +134,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -146,7 +146,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function info($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -158,7 +158,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        return $this->writeLog(__FUNCTION__, $message, $context);
+        $this->writeLog(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -171,7 +171,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        return $this->writeLog($level, $message, $context);
+        $this->writeLog($level, $message, $context);
     }
 
     /**
@@ -184,7 +184,7 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     public function write($level, $message, array $context = [])
     {
-        return $this->writeLog($level, $message, $context);
+        $this->writeLog($level, $message, $context);
     }
 
     /**
