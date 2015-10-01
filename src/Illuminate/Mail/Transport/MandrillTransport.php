@@ -22,16 +22,25 @@ class MandrillTransport extends Transport
     protected $key;
 
     /**
+     * The Mandrill subaccount.
+     *
+     * @var string|null
+     */
+    protected $subaccount;
+
+    /**
      * Create a new Mandrill transport instance.
      *
      * @param  \GuzzleHttp\ClientInterface  $client
-     * @param  string  $key
+     * @param  string       $key
+     * @param  string|null  $subaccount
      * @return void
      */
-    public function __construct(ClientInterface $client, $key)
+    public function __construct(ClientInterface $client, $key, $subaccount = null)
     {
         $this->client = $client;
         $this->key = $key;
+        $this->subaccount = $subaccount;
     }
 
     /**
@@ -40,6 +49,10 @@ class MandrillTransport extends Transport
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
         $this->beforeSendPerformed($message);
+
+        if (! is_null($this->subaccount)) {
+            $message->getHeaders()->addTextHeader('X-MC-Subaccount', $this->subaccount);
+        }
 
         $data = [
             'key' => $this->key,
@@ -103,5 +116,26 @@ class MandrillTransport extends Transport
     public function setKey($key)
     {
         return $this->key = $key;
+    }
+
+    /**
+     * Get the subaccount being used by the transport.
+     *
+     * @return string|null
+     */
+    public function getSubaccount()
+    {
+        return $this->subaccount;
+    }
+
+    /**
+     * Set the subaccount being used by the transport.
+     *
+     * @param  string|null  $subaccount
+     * @return void
+     */
+    public function setSubaccount($subaccount)
+    {
+        return $this->subaccount = $subaccount;
     }
 }

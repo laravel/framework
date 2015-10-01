@@ -113,7 +113,11 @@ class TransportManager extends Manager
         $client = new HttpClient;
         $config = $this->app['config']->get('services.mandrill', []);
 
-        return new MandrillTransport($client, $config['secret']);
+        if (empty($config['subaccount'])) {
+            return new MandrillTransport($client, $config['secret']);
+        }
+
+        return new MandrillTransport($client, $config['secret'], $config['subaccount']);
     }
 
     /**
