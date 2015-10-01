@@ -1659,6 +1659,17 @@ class Builder
     }
 
     /**
+     * Alias for the "avg" method.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function average($column)
+    {
+        return $this->avg($key);
+    }
+
+    /**
      * Execute an aggregate function on the database.
      *
      * @param  string  $function
