@@ -540,7 +540,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests to https://github.com/laravel/framework/issues/10403 issue.
+     * Tests for Http\Request magic methods `__get()` and `__isset()`.
+     *
+     * @link https://github.com/laravel/framework/issues/10403 Form request object attribute returns empty when have some string.
      * @dataProvider magicMethodsProvider
      */
     public function testMagicMethods($uri, $route, $parameters, $property, $propertyValue, $propertyIsset, $propertyEmpty)
