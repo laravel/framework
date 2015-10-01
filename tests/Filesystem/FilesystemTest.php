@@ -205,6 +205,9 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
+    /**
+     * @requires extension fileinfo
+     */
     public function testMimeTypeOutputsMimeType()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');
