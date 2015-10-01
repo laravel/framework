@@ -1024,6 +1024,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    /**
+     * @requires extension fileinfo
+     */
     public function testValidateMimetypes()
     {
         $trans = $this->getRealTranslator();
