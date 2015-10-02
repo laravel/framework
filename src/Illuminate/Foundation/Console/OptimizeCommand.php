@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use ClassPreloader\Factory;
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Composer;
+use Illuminate\Foundation\Support\Composer;
 use Symfony\Component\Console\Input\InputOption;
 use ClassPreloader\Exceptions\VisitorExceptionInterface;
 
@@ -27,14 +27,14 @@ class OptimizeCommand extends Command
     /**
      * The composer instance.
      *
-     * @var \Illuminate\Foundation\Composer
+     * @var \Illuminate\Foundation\Support\Composer
      */
     protected $composer;
 
     /**
      * Create a new optimize command instance.
      *
-     * @param  \Illuminate\Foundation\Composer  $composer
+     * @param  \Illuminate\Foundation\Support\Composer  $composer
      * @return void
      */
     public function __construct(Composer $composer)

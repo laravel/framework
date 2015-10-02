@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Foundation\Composer;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Composer;
 
 class ComposerServiceProvider extends ServiceProvider
 {
