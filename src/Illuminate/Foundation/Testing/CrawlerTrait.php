@@ -720,8 +720,14 @@ trait CrawlerTrait
     {
         $method = $negate ? 'assertFalse' : 'assertTrue';
 
+        $actual = json_decode($this->response->getContent(), true);
+
+        if (is_null($actual) || $actual === false) {
+            return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
+        }
+
         $actual = json_encode(array_sort_recursive(
-            json_decode($this->response->getContent(), true)
+            (array) $actual
         ));
 
         foreach (array_sort_recursive($data) as $key => $value) {
