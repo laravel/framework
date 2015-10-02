@@ -18,6 +18,7 @@
         "illuminate/console": "5.2.*",
         "illuminate/contracts": "5.2.*",
         "illuminate/container": "5.2.*",
+        "illuminate/foundation-support": "5.2.*",
         "illuminate/http": "5.2.*",
         "illuminate/support": "5.2.*",
         "symfony/process": "2.8.*|3.0.*",

@@ -56,3 +56,6 @@ split support      src/Illuminate/Support:git@github.com:illuminate/support.git 
 split translation  src/Illuminate/Translation:git@github.com:illuminate/translation.git  "master 5.1 5.0"
 split validation   src/Illuminate/Validation:git@github.com:illuminate/validation.git    "master 5.1 5.0"
 split view         src/Illuminate/View:git@github.com:illuminate/view.git                "master 5.1 5.0"
+
+split foundation-support src/Illuminate/Foundation/Support:git@github.com:illuminate/foundation-support.git "master"
+split foundation-testing src/Illuminate/Foundation/Testing:git@github.com:illuminate/foundation-testing.git "master"
