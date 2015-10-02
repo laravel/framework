@@ -455,6 +455,26 @@ if (! function_exists('e')) {
     }
 }
 
+if (! function_exists('be')) {
+    /**
+     * Escape Blade-specific HTML entities in a string.
+     *
+     * @param  \Illuminate\Support\Htmlable|string  $value
+     * @return string
+     */
+    function be($value)
+    {
+        if ($value instanceof Htmlable) {
+            return $value->toHtml();
+        }
+
+        $value = htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        $value = str_replace('@', '&commat;', $value);
+
+        return $value;
+    }
+}
+
 if (! function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.

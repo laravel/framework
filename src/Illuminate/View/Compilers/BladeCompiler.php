@@ -68,7 +68,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $echoFormat = 'e(%s)';
+    protected $echoFormat = 'be(%s)';
 
     /**
      * Array of footer lines to be added to template.
@@ -331,7 +331,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return $matches[1] ? $matches[0] : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
+            return $matches[1] ? $matches[0] : '<?php echo be('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
