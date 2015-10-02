@@ -231,6 +231,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class TestEloqeuntCollectionModel extends Illuminate\Database\Eloquent\Model {
+class TestEloqeuntCollectionModel extends Illuminate\Database\Eloquent\Model
+{
     protected $hidden = ['hidden'];
 }
