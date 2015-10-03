@@ -139,7 +139,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer'];
+    protected $numericRules = ['Numeric', 'Integer', 'Int'];
 
     /**
      * The validation rules that imply the field is required.
@@ -2600,8 +2600,7 @@ class Validator implements ValidatorContract
     /**
      * Normalizes a rule so that we can accept short types.
      *
-     * @param string $rule
-     *
+     * @param  string $rule
      * @return string
      */
     protected function normalizeRule($rule)
