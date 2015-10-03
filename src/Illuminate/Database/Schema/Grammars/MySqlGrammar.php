@@ -442,6 +442,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a set type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeSet(Fluent $column)
+    {
+        return "set('".implode("', '", $column->allowed)."')";
+    }
+
+    /**
      * Create the column definition for a json type.
      *
      * @param  \Illuminate\Support\Fluent  $column
