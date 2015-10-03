@@ -2600,7 +2600,7 @@ class Validator implements ValidatorContract
     /**
      * Normalizes a rule so that we can accept short types.
      *
-     * @param  string $rule
+     * @param  string  $rule
      * @return string
      */
     protected function normalizeRule($rule)
