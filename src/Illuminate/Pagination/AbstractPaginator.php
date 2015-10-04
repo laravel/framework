@@ -2,8 +2,8 @@
 
 namespace Illuminate\Pagination;
 
-use Closure;
 use ArrayIterator;
+use Closure;
 
 abstract class AbstractPaginator
 {

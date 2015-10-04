@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Mockery as m;
 
 class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
 {

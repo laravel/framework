@@ -3,13 +3,13 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Throwable;
-use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Throwable;
 
 class Worker
 {

@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
+use Mockery as m;
 
 class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 {

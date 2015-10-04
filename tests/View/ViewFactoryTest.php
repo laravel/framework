@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\Factory;
+use Mockery as m;
 
 class ViewFactoryTest extends PHPUnit_Framework_TestCase
 {

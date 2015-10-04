@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {

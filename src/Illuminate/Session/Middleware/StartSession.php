@@ -2,14 +2,14 @@
 
 namespace Illuminate\Session\Middleware;
 
-use Closure;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
+use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Session\SessionManager;
-use Illuminate\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\SessionInterface;
+use Illuminate\Session\SessionManager;
+use Illuminate\Support\Arr;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class StartSession

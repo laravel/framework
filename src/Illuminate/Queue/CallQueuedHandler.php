@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Queue\Job;
 
 class CallQueuedHandler
 {

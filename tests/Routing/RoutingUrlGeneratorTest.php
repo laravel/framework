@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Routing\UrlGenerator;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 {

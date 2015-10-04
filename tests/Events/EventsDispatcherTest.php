@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Events\Dispatcher;
+use Mockery as m;
 
 class EventsDispatcherTest extends PHPUnit_Framework_TestCase
 {

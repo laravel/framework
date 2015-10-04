@@ -3,8 +3,8 @@
 namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Composer;
 
 class CacheTableCommand extends Command
 {

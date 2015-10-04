@@ -2,11 +2,11 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\EncryptException;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class Encrypter extends BaseEncrypter implements EncrypterContract
 {

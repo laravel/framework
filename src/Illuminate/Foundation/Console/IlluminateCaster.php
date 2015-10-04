@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Exception;
-use Illuminate\Support\Collection;
-use Illuminate\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Collection;
 use Symfony\Component\VarDumper\Caster\Caster;
 
 class IlluminateCaster

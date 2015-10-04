@@ -2,9 +2,9 @@
 
 namespace Illuminate\Cache;
 
+use Carbon\Carbon;
 use Closure;
 use DateTime;
-use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache implements Store

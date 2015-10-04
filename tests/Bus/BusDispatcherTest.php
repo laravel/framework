@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
+use Mockery as m;
 
 class BusDispatcherTest extends PHPUnit_Framework_TestCase
 {

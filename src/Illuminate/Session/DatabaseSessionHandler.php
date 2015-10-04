@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
-use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
+use SessionHandlerInterface;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {

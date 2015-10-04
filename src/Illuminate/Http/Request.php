@@ -2,12 +2,12 @@
 
 namespace Illuminate\Http;
 
-use Closure;
 use ArrayAccess;
-use SplFileInfo;
-use RuntimeException;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 

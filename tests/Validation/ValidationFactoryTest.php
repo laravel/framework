@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Validation\Factory;
+use Mockery as m;
 
 class ValidationFactoryTest extends PHPUnit_Framework_TestCase
 {

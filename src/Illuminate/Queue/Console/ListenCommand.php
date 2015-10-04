@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Queue\Listener;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ListenCommand extends Command
 {

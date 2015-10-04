@@ -2,19 +2,19 @@
 
 namespace Illuminate\Database\Query;
 
-use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Traits\Macroable;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Builder
 {

@@ -3,10 +3,10 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\ServiceProvider;
-use Zend\Diactoros\Response as PsrResponse;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
+use Zend\Diactoros\Response as PsrResponse;
 
 class RoutingServiceProvider extends ServiceProvider
 {

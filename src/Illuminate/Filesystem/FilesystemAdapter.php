@@ -2,14 +2,14 @@
 
 namespace Illuminate\Filesystem;
 
-use InvalidArgumentException;
-use Illuminate\Support\Collection;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\FileNotFoundException;
-use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
+use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use League\Flysystem\AdapterInterface;
+use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
 
 class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 {

@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessUtils;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 class Composer
 {

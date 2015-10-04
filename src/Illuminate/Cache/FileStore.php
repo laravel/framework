@@ -3,9 +3,9 @@
 namespace Illuminate\Cache;
 
 use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 
 class FileStore implements Store
 {

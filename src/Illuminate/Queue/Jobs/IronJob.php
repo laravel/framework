@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Arr;
-use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Queue\IronQueue;
+use Illuminate\Support\Arr;
 
 class IronJob extends Job implements JobContract
 {

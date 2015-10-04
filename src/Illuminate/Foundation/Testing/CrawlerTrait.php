@@ -3,13 +3,13 @@
 namespace Illuminate\Foundation\Testing;
 
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Symfony\Component\DomCrawler\Form;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait CrawlerTrait
 {

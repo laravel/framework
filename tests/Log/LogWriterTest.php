@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Log\Writer;
+use Mockery as m;
 
 class LogWriterTest extends PHPUnit_Framework_TestCase
 {

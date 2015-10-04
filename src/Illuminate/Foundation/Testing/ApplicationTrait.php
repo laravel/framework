@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Mockery;
 
 trait ApplicationTrait
 {

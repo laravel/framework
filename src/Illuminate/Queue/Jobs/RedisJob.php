@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Arr;
-use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Queue\RedisQueue;
+use Illuminate\Support\Arr;
 
 class RedisJob extends Job implements JobContract
 {

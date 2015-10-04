@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\View;
+use Mockery as m;
 
 class ViewTest extends PHPUnit_Framework_TestCase
 {

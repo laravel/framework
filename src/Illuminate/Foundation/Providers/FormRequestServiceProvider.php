@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormRequestServiceProvider extends ServiceProvider

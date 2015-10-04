@@ -2,13 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Console\Command;
-use Illuminate\Routing\Controller;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class RouteListCommand extends Command

@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class CacheTableCommandTest extends PHPUnit_Framework_TestCase
 {

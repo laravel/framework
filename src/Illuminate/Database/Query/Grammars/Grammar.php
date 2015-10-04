@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Grammar as BaseGrammar;
+use Illuminate\Database\Query\Builder;
 
 class Grammar extends BaseGrammar
 {

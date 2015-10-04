@@ -2,8 +2,8 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Contracts\Validation\UnauthorizedException;
+use Illuminate\Contracts\Validation\ValidationException;
 
 /**
  * Provides default implementation of ValidatesWhenResolved contract.

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseManager implements ConnectionResolverInterface
 {

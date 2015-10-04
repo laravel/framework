@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessUtils;
 
 class Schedule
 {

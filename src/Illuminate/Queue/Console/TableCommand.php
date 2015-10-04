@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Composer;
+use Illuminate\Support\Str;
 
 class TableCommand extends Command
 {

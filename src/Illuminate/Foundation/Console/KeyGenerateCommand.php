@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command

@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv;
-use InvalidArgumentException;
 use Illuminate\Contracts\Foundation\Application;
+use InvalidArgumentException;
 
 class DetectEnvironment
 {

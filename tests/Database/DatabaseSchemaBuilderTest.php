@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Schema\Builder;
+use Mockery as m;
 
 class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase
 {

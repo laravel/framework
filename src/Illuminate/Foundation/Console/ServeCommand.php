@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Console\Command;
-use Symfony\Component\Process\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessUtils;
 
 class ServeCommand extends Command
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {

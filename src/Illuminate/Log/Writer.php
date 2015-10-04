@@ -3,19 +3,19 @@
 namespace Illuminate\Log;
 
 use Closure;
-use RuntimeException;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Logging\Log as LogContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use InvalidArgumentException;
-use Monolog\Handler\SyslogHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Support\Arrayable;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger as MonologLogger;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-use Illuminate\Contracts\Logging\Log as LogContract;
+use RuntimeException;
 
 class Writer implements LogContract, PsrLoggerInterface
 {

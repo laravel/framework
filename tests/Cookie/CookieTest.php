@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cookie\CookieJar;
+use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends PHPUnit_Framework_TestCase

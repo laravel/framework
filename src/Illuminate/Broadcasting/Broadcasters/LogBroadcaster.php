@@ -2,8 +2,8 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Psr\Log\LoggerInterface;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Psr\Log\LoggerInterface;
 
 class LogBroadcaster implements Broadcaster
 {

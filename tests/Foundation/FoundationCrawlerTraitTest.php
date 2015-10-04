@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Foundation\Testing\CrawlerTrait;
+use Mockery as m;
 use Symfony\Component\DomCrawler\Crawler;
 
 class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase

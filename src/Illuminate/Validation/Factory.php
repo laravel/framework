@@ -3,10 +3,10 @@
 namespace Illuminate\Validation;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\Translation\TranslatorInterface;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Support\Str;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Factory implements FactoryContract
 {

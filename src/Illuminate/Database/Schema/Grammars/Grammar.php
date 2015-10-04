@@ -2,18 +2,18 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use RuntimeException;
-use Doctrine\DBAL\Types\Type;
-use Illuminate\Support\Fluent;
-use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\TableDiff;
-use Illuminate\Database\Connection;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\Type;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Grammar as BaseGrammar;
-use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
+use Illuminate\Support\Fluent;
+use RuntimeException;
 
 abstract class Grammar extends BaseGrammar
 {

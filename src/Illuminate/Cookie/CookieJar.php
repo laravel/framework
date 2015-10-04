@@ -2,9 +2,9 @@
 
 namespace Illuminate\Cookie;
 
+use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 
 class CookieJar implements JarContract
 {

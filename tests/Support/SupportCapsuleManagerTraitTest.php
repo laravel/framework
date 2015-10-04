@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
+use Mockery as m;
 
 class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
 {

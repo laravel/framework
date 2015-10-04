@@ -2,9 +2,9 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Psr\Log\LoggerInterface;
 use Swift_Mime_Message;
 use Swift_Mime_MimeEntity;
-use Psr\Log\LoggerInterface;
 
 class LogTransport extends Transport
 {
