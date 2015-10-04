@@ -660,7 +660,7 @@ class Blueprint
      * Create a new set column on the table.
      *
      * @param  string  $column
-     * @param  array   $allowed
+     * @param  array  $allowed
      * @return \Illuminate\Support\Fluent
      */
     public function set($column, array $allowed)
