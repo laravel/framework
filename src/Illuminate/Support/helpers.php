@@ -112,22 +112,6 @@ if (! function_exists('array_except')) {
     }
 }
 
-if (! function_exists('array_fetch')) {
-    /**
-     * Fetch a flattened array of a nested array element.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     *
-     * @deprecated since version 5.1. Use array_pluck instead.
-     */
-    function array_fetch($array, $key)
-    {
-        return Arr::fetch($array, $key);
-    }
-}
-
 if (! function_exists('array_first')) {
     /**
      * Return the first element in an array passing a given truth test.
