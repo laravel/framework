@@ -76,10 +76,10 @@ class ListFailedCommand extends Command
     }
 
     /**
-     * @param array $payload
+     * Extract the failed job name from payload.
      *
      * @param  string  $payload
-     * @return string
+     * @return string|null
      */
     private function extractJobName($payload)
     {
