@@ -1,10 +1,10 @@
 <?php
 
+use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase

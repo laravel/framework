@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Container\Container;
+use Mockery as m;
 
 class FoundationFormRequestTestCase extends PHPUnit_Framework_TestCase
 {

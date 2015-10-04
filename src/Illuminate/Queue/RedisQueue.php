@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Redis\Database;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Redis\Database;
-use Illuminate\Queue\Jobs\RedisJob;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class RedisQueue extends Queue implements QueueContract
 {

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Str;
 
 if (! function_exists('abort')) {
     /**

@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Foundation\Application;
+use Mockery as m;
 
 class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
 {

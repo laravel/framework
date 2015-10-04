@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Stringy\StaticStringy;
-use Illuminate\Support\Traits\Macroable;
 
 class Str
 {

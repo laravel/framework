@@ -2,21 +2,21 @@
 
 namespace Illuminate\Bus;
 
-use Closure;
 use ArrayAccess;
-use ReflectionClass;
-use RuntimeException;
-use ReflectionParameter;
-use InvalidArgumentException;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Container\Container;
+use Closure;
+use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\HandlerResolver;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Bus\SelfHandling;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionParameter;
+use RuntimeException;
 
 class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver
 {

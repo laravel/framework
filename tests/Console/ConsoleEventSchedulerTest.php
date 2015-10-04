@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Console\Scheduling\Schedule;
+use Mockery as m;
 
 class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
 {

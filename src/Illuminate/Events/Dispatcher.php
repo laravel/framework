@@ -3,13 +3,13 @@
 namespace Illuminate\Events;
 
 use Exception;
-use ReflectionClass;
-use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Support\Str;
+use ReflectionClass;
 
 class Dispatcher implements DispatcherContract
 {

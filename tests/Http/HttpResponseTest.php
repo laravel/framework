@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Mockery as m;
 
 class HttpResponseTest extends PHPUnit_Framework_TestCase
 {

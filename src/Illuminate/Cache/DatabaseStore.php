@@ -5,8 +5,8 @@ namespace Illuminate\Cache;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Database\ConnectionInterface;
 
 class DatabaseStore implements Store
 {

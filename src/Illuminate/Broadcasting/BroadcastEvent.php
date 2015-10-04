@@ -2,11 +2,11 @@
 
 namespace Illuminate\Broadcasting;
 
-use ReflectionClass;
-use ReflectionProperty;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use ReflectionClass;
+use ReflectionProperty;
 
 class BroadcastEvent
 {

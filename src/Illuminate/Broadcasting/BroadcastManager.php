@@ -2,14 +2,14 @@
 
 namespace Illuminate\Broadcasting;
 
-use Pusher;
 use Closure;
+use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
-use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
-use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
-use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
+use Pusher;
 
 class BroadcastManager implements FactoryContract
 {

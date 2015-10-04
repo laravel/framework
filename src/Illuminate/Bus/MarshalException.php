@@ -2,8 +2,8 @@
 
 namespace Illuminate\Bus;
 
-use RuntimeException;
 use ReflectionParameter;
+use RuntimeException;
 
 class MarshalException extends RuntimeException
 {

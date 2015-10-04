@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\DatabaseStore;
+use Mockery as m;
 
 class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase
 {

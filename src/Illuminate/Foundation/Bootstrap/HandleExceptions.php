@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Exception;
 use ErrorException;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\Exception\FatalErrorException;

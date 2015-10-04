@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Mockery as m;
 
 class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase
 {

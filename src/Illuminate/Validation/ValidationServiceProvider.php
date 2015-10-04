@@ -2,8 +2,8 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Support\ServiceProvider;
 
 class ValidationServiceProvider extends ServiceProvider
 {

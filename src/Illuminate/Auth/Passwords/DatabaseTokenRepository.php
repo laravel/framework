@@ -3,9 +3,9 @@
 namespace Illuminate\Auth\Passwords;
 
 use Carbon\Carbon;
-use Illuminate\Support\Str;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Str;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
 {

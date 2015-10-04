@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
 use Illuminate\Support\ServiceProvider;
+use Swift_Mailer;
 
 class MailServiceProvider extends ServiceProvider
 {

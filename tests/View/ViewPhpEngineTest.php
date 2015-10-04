@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\View\Engines\PhpEngine;
+use Mockery as m;
 
 class ViewPhpEngineTest extends PHPUnit_Framework_TestCase
 {

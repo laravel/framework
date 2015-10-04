@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Mockery as m;
 
 class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
 {

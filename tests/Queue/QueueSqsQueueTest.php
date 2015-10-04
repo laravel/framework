@@ -1,8 +1,8 @@
 <?php
 
 use Aws\Result;
-use Mockery as m;
 use Aws\Sqs\SqsClient;
+use Mockery as m;
 
 class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 {

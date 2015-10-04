@@ -2,8 +2,8 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Manager;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
+use Illuminate\Support\Manager;
 
 class AuthManager extends Manager
 {

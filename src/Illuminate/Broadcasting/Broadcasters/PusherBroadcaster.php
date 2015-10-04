@@ -2,8 +2,8 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Pusher;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Pusher;
 
 class PusherBroadcaster implements Broadcaster
 {

@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class MigrationCreator
 {

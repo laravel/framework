@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Queue\QueueManager;
+use Mockery as m;
 
 class QueueManagerTest extends PHPUnit_Framework_TestCase
 {

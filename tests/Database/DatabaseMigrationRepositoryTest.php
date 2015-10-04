@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Mockery as m;
 
 class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
 {

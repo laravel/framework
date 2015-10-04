@@ -2,12 +2,12 @@
 
 namespace Illuminate\Queue;
 
-use DateTime;
 use Carbon\Carbon;
-use Illuminate\Database\Connection;
-use Illuminate\Queue\Jobs\DatabaseJob;
-use Illuminate\Database\Query\Expression;
+use DateTime;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Queue\Jobs\DatabaseJob;
 
 class DatabaseQueue extends Queue implements QueueContract
 {

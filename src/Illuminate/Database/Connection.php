@@ -2,21 +2,21 @@
 
 namespace Illuminate\Database;
 
-use PDO;
 use Closure;
-use Exception;
-use Throwable;
-use LogicException;
-use RuntimeException;
 use DateTimeInterface;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Exception;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Arr;
+use LogicException;
+use PDO;
+use RuntimeException;
+use Throwable;
 
 class Connection implements ConnectionInterface
 {

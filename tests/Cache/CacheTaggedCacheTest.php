@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Cache\ArrayStore;
+use Mockery as m;
 
 class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
 {

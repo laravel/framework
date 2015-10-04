@@ -3,11 +3,11 @@
 namespace Illuminate\Http;
 
 use BadMethodCallException;
-use Illuminate\Support\Str;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\ViewErrorBag;
-use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 

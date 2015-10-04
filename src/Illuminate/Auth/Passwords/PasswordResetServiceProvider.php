@@ -2,8 +2,8 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository as DbRepository;
+use Illuminate\Support\ServiceProvider;
 
 class PasswordResetServiceProvider extends ServiceProvider
 {

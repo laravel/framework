@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Mockery as m;
 
 class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use ReflectionMethod;
 use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
 
 trait RouteDependencyResolverTrait
 {

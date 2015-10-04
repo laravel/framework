@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
+use Mockery as m;
 
 class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 {

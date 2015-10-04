@@ -2,8 +2,8 @@
 
 namespace Illuminate\Encryption;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Str;
 
 abstract class BaseEncrypter
 {

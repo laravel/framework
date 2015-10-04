@@ -1,10 +1,10 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Mockery as m;
 
 class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 {

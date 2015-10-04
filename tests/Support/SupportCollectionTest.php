@@ -1,9 +1,9 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Collection;
+use Mockery as m;
 
 class SupportCollectionTest extends PHPUnit_Framework_TestCase
 {

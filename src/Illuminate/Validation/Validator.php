@@ -2,23 +2,23 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
-use DateTime;
-use Countable;
-use Exception;
-use DateTimeZone;
-use RuntimeException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use BadMethodCallException;
-use InvalidArgumentException;
+use Closure;
+use Countable;
+use DateTime;
+use DateTimeZone;
+use Exception;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Validator implements ValidatorContract
 {

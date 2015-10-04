@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Mockery as m;
 
 class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 {

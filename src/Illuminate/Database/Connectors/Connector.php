@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Support\Arr;
+use PDO;
 
 class Connector
 {

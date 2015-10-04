@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Aws\Sqs\SqsClient;
+use Mockery as m;
 
 class QueueSqsJobTest extends PHPUnit_Framework_TestCase
 {

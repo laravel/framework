@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Psy\Shell;
-use Psy\Configuration;
 use Illuminate\Console\Command;
+use Psy\Configuration;
+use Psy\Shell;
 use Symfony\Component\Console\Input\InputArgument;
 
 class TinkerCommand extends Command

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
 class CookieSessionHandler implements SessionHandlerInterface
 {

@@ -3,14 +3,14 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
-use Psr\Log\LoggerInterface;
-use Illuminate\Http\Response;
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Console\Application as ConsoleApplication;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
+use Illuminate\Http\Response;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler implements ExceptionHandlerContract
 {

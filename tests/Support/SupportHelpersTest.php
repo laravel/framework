@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Support\Str;
+use Mockery as m;
 
 class SupportHelpersTest extends PHPUnit_Framework_TestCase
 {

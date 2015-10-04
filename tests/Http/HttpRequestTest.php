@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Http\Request;
+use Mockery as m;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase

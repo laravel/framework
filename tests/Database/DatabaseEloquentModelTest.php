@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery as m;
 
 class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 {

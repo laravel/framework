@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Mockery as m;
 
 class DatabaseEloquentMorphToManyTest extends PHPUnit_Framework_TestCase
 {

@@ -2,15 +2,15 @@
 
 namespace Illuminate\Foundation\Http;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {

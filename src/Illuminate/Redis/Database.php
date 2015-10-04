@@ -3,9 +3,9 @@
 namespace Illuminate\Redis;
 
 use Closure;
-use Predis\Client;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Database as DatabaseContract;
+use Illuminate\Support\Arr;
+use Predis\Client;
 
 class Database implements DatabaseContract
 {

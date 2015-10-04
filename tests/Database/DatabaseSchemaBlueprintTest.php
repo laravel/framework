@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
+use Mockery as m;
 
 class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
 {

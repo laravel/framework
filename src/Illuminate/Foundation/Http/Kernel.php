@@ -3,13 +3,13 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
-use Throwable;
-use Illuminate\Routing\Router;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Facade;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Kernel implements KernelContract
 {

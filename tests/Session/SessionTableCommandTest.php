@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Application;
+use Illuminate\Session\Console\SessionTableCommand;
 use Mockery as m;
 
 class SessionTableCommandTest extends PHPUnit_Framework_TestCase

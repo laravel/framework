@@ -2,8 +2,8 @@
 
 namespace Illuminate\Events;
 
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Queue\Job;
 
 class CallQueuedHandler
 {

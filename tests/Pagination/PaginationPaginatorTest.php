@@ -1,10 +1,10 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Pagination\UrlWindow;
+use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
-use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
+use Illuminate\Pagination\UrlWindow;
+use Mockery as m;
 
 class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 {

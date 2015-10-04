@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cache\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ClearCommand extends Command

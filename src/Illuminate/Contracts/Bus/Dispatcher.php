@@ -2,8 +2,8 @@
 
 namespace Illuminate\Contracts\Bus;
 
-use Closure;
 use ArrayAccess;
+use Closure;
 
 interface Dispatcher
 {

@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Validation\Validator;
+use Mockery as m;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase

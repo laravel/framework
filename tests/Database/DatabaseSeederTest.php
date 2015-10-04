@@ -1,7 +1,7 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Database\Seeder;
+use Mockery as m;
 
 class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 {
