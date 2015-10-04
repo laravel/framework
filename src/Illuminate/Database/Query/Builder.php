@@ -1668,7 +1668,7 @@ class Builder
      */
     public function average($column)
     {
-        return $this->avg($key);
+        return $this->avg($column);
     }
 
     /**
