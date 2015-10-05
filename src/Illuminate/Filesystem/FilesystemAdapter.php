@@ -140,7 +140,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param  array|mixed  $paths
      * @return bool
      */
     public function delete($paths)

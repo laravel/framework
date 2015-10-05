@@ -540,7 +540,7 @@ class Event
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|dynamic  $days
+     * @param  array|mixed  $days
      * @return $this
      */
     public function days($days)
@@ -579,7 +579,7 @@ class Event
     /**
      * Limit the environments the command should run in.
      *
-     * @param  array|dynamic  $environments
+     * @param  array|mixed  $environments
      * @return $this
      */
     public function environments($environments)
@@ -657,7 +657,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation.
      *
-     * @param  array|dynamic  $addresses
+     * @param  array|mixed  $addresses
      * @return $this
      *
      * @throws \LogicException
