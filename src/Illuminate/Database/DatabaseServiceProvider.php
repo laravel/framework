@@ -60,7 +60,7 @@ class DatabaseServiceProvider extends ServiceProvider
     protected function registerEloquentFactory()
     {
         $this->app->singleton(FakerGenerator::class, function () {
-        	return FakerFactory::create(config('database.faker_locale', 'en_US'));
+        	 return FakerFactory::create(config('database.faker_locale', 'en_US'));
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {
