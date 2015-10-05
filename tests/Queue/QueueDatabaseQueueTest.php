@@ -20,7 +20,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(0, $array['attempts']);
             $this->assertEquals(0, $array['reserved']);
             $this->assertNull($array['reserved_at']);
-            $this->assertTrue(is_int($array['available_at']));
+            $this->assertInternalType('int', $array['available_at']);
         });
 
         $queue->push('foo', ['data']);
@@ -41,7 +41,7 @@ class QueueDatabaseQueueTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(0, $array['attempts']);
             $this->assertEquals(0, $array['reserved']);
             $this->assertNull($array['reserved_at']);
-            $this->assertTrue(is_int($array['available_at']));
+            $this->assertInternalType('int', $array['available_at']);
         });
 
         $queue->later(10, 'foo', ['data']);
