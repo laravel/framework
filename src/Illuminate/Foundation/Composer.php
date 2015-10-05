@@ -37,6 +37,20 @@ class Composer
     }
 
     /**
+     * Update the Composer lock file.
+     *
+     * @return void
+     */
+    public function updateLockFileHash()
+    {
+        $process = $this->getProcess();
+
+        $process->setCommandLine(trim($this->findComposer().' update --lock --no-autoloader --no-scripts'));
+
+        $process->run();
+    }
+
+    /**
      * Regenerate the Composer autoloader files.
      *
      * @param  string  $extra
