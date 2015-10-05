@@ -325,6 +325,41 @@ trait CrawlerTrait
     }
 
     /**
+     * Assert that a given string is seen inside an element.
+     *
+     * @param  bool|string|null  $element
+     * @param  string  $text
+     * @param  bool  $negate
+     * @return $this
+     */
+    protected function seeElement($element, $text, $negate = false)
+    {
+        $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
+
+        $rawPattern = preg_quote($text, '/');
+
+        $escapedPattern = preg_quote(e($text), '/');
+
+        $content = $this->crawler->filter($element)->html();
+
+        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $content);
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given string is not seen inside an element.
+     *
+     * @param  string  $text
+     * @param  string|null  $element
+     * @return $this
+     */
+    protected function dontSeeElement($element, $text)
+    {
+        return $this->seeElement($element, $text, true);
+    }
+
+    /**
      * Assert that a given link is seen on the page.
      *
      * @param  string  $text
