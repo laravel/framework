@@ -53,7 +53,7 @@ trait ApplicationTrait
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|dynamic  $events
+     * @param  array|mixed  $events
      * @return $this
      */
     public function expectsEvents($events)
@@ -106,7 +106,7 @@ trait ApplicationTrait
      *
      * These jobs will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|dynamic  $jobs
+     * @param  array|mixed  $jobs
      * @return $this
      */
     protected function expectsJobs($jobs)

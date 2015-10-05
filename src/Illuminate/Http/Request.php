@@ -214,7 +214,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Determine if the request contains a given input item key.
      *
-     * @param  string|array  $key
+     * @param  array|mixed  $key
      * @return bool
      */
     public function exists($key)
@@ -235,7 +235,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Determine if the request contains a non-empty value for an input item.
      *
-     * @param  string|array  $key
+     * @param  array|mixed  $key
      * @return bool
      */
     public function has($key)
@@ -314,7 +314,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Get all of the input except for a specified array of items.
      *
-     * @param  array  $keys
+     * @param  array|mixed  $keys
      * @return array
      */
     public function except($keys)
@@ -460,7 +460,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Flash only some of the input to the session.
      *
-     * @param  mixed  string
+     * @param  array|mixed  $keys
      * @return void
      */
     public function flashOnly($keys)
@@ -473,7 +473,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Flash only some of the input to the session.
      *
-     * @param  mixed  string
+     * @param  array|mixed  $keys
      * @return void
      */
     public function flashExcept($keys)

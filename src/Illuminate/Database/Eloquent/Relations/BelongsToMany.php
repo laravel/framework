@@ -1142,7 +1142,7 @@ class BelongsToMany extends Relation
     /**
      * Set the columns on the pivot table to retrieve.
      *
-     * @param  mixed  $columns
+     * @param  array|mixed  $columns
      * @return $this
      */
     public function withPivot($columns)
