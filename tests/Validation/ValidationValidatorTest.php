@@ -596,6 +596,43 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateBool()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateNumeric()
     {
         $trans = $this->getRealTranslator();
@@ -625,6 +662,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Integer']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateInt()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Int']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Int']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1'], ['foo' => 'Int']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Int']);
         $this->assertTrue($v->passes());
     }
 
