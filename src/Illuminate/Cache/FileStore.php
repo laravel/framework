@@ -110,12 +110,8 @@ class FileStore implements Store
      */
     protected function createCacheDirectory($path)
     {
-        try {
-            if (! file_exists(dirname($path))) {
-                $this->files->makeDirectory(dirname($path), 0777, true, true);
-            }
-        } catch (Exception $e) {
-            //
+        if (! $this->files->exists(dirname($path))) {
+            $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
     }
 
