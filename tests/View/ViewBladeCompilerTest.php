@@ -193,6 +193,18 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testVarIsCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@var(\'foo\', \'bar\')';
+        $expected = '<?php $foo = \'bar\'; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@var(\'foo\', 1)';
+        $expected = '<?php $foo = 1; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCommentsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

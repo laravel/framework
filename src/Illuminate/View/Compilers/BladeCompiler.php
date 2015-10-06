@@ -685,6 +685,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the var statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileVar($expression)
+    {
+        return preg_replace('/\(\'(.*?)\'\,\s*(.*)\)/', '<?php $$1 = $2; ?>', $expression);
+    }
+
+    /**
      * Compile the extends statements into valid PHP.
      *
      * @param  string  $expression
