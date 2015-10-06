@@ -42,7 +42,7 @@ trait ResponseTrait
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie|dynamic  $cookie
+     * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
      * @return $this
      */
     public function withCookie($cookie)

@@ -224,7 +224,7 @@ class Builder
     /**
      * Set the columns to be selected.
      *
-     * @param  array  $columns
+     * @param  array|mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -283,7 +283,7 @@ class Builder
     /**
      * Add a new select column to the query.
      *
-     * @param  mixed  $column
+     * @param  array|mixed  $column
      * @return $this
      */
     public function addSelect($column)
