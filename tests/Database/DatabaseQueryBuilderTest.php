@@ -367,6 +367,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
     }
 
+    public function testUnionWithJoin()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', function($join) {
+            $join->on('dogs.breed_id', '=', 'breeds.id')
+                ->where('breeds.is_native', '=', 1);
+        }));
+        $this->assertEquals('select * from "users" union select * from "dogs" inner join "breeds" on "dogs"."breed_id" = "breeds"."id" and "breeds"."is_native" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testMySqlUnionOrderBys()
     {
         $builder = $this->getMySqlBuilder();
