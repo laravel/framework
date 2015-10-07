@@ -371,7 +371,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users');
-        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', function($join) {
+        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', function ($join) {
             $join->on('dogs.breed_id', '=', 'breeds.id')
                 ->where('breeds.is_native', '=', 1);
         }));
