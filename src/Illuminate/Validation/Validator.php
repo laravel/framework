@@ -183,7 +183,7 @@ class Validator implements ValidatorContract
         }
 
         foreach ($data as $key => $value) {
-            $key = ($arrayKey) ? "$arrayKey.$key" : $key;
+            $key = ($arrayKey) ? "{$arrayKey}.{$key}" : $key;
 
             // If this value is an instance of the HttpFoundation File class we will
             // remove it from the data array and add it to the files array, which
@@ -273,9 +273,9 @@ class Validator implements ValidatorContract
         foreach ($data as $dataKey => $dataValue) {
             foreach ((array) $rules as $ruleKey => $ruleValue) {
                 if (! is_string($ruleKey)) {
-                    $this->mergeRules("$attribute.$dataKey", $ruleValue);
+                    $this->mergeRules("{$attribute}.{$dataKey}", $ruleValue);
                 } else {
-                    $this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
+                    $this->mergeRules("{$attribute}.{$dataKey}.{$ruleKey}", $ruleValue);
                 }
             }
         }
@@ -2593,7 +2593,7 @@ class Validator implements ValidatorContract
     protected function requireParameterCount($count, $parameters, $rule)
     {
         if (count($parameters) < $count) {
-            throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+            throw new InvalidArgumentException("Validation rule {$rule} requires at least {$count} parameters.");
         }
     }
 
@@ -2632,6 +2632,6 @@ class Validator implements ValidatorContract
             return $this->callExtension($rule, $parameters);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist.");
+        throw new BadMethodCallException("Method [{$method}] does not exist.");
     }
 }
