@@ -1246,7 +1246,7 @@ class Builder
 
         $this->unions[] = compact('query', 'all');
 
-        $this->addBinding(isset($query->bindings) ? $query->bindings : $query->getBindings(), 'union');
+        $this->addBinding($query->getBindings(), 'union');
 
         return $this;
     }
