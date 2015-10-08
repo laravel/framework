@@ -18,7 +18,6 @@ use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
-use Illuminate\Foundation\Console\CommandMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -27,11 +26,9 @@ use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\HandlerEventCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
-use Illuminate\Foundation\Console\HandlerCommandCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -50,7 +47,6 @@ class ArtisanServiceProvider extends ServiceProvider
     protected $commands = [
         'AppName' => 'command.app.name',
         'ClearCompiled' => 'command.clear-compiled',
-        'CommandMake' => 'command.command.make',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
         'ConsoleMake' => 'command.console.make',
@@ -58,8 +54,6 @@ class ArtisanServiceProvider extends ServiceProvider
         'EventMake' => 'command.event.make',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
-        'HandlerCommand' => 'command.handler.command',
-        'HandlerEvent' => 'command.handler.event',
         'JobMake' => 'command.job.make',
         'KeyGenerate' => 'command.key.generate',
         'ListenerMake' => 'command.listener.make',
@@ -116,18 +110,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.clear-compiled', function () {
             return new ClearCompiledCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerCommandMakeCommand()
-    {
-        $this->app->singleton('command.command.make', function ($app) {
-            return new CommandMakeCommand($app['files']);
         });
     }
 
@@ -212,30 +194,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.environment', function () {
             return new EnvironmentCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerHandlerCommandCommand()
-    {
-        $this->app->singleton('command.handler.command', function ($app) {
-            return new HandlerCommandCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerHandlerEventCommand()
-    {
-        $this->app->singleton('command.handler.event', function ($app) {
-            return new HandlerEventCommand($app['files']);
         });
     }
 
