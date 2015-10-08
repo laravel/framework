@@ -2,7 +2,13 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Contracts\Cookie\Factory as CookieFactoryContract;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 if (! function_exists('abort')) {
     /**
@@ -90,7 +96,7 @@ if (! function_exists('auth')) {
      */
     function auth()
     {
-        return app('Illuminate\Contracts\Auth\Guard');
+        return app(Guard::class);
     }
 }
 
@@ -187,7 +193,7 @@ if (! function_exists('cookie')) {
      */
     function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
     {
-        $cookie = app('Illuminate\Contracts\Cookie\Factory');
+        $cookie = app(CookieFactoryContract::class);
 
         if (is_null($name)) {
             return $cookie;
@@ -347,7 +353,7 @@ if (! function_exists('factory')) {
      */
     function factory()
     {
-        $factory = app('Illuminate\Database\Eloquent\Factory');
+        $factory = app(EloquentFactory::class);
 
         $arguments = func_get_args();
 
@@ -568,7 +574,7 @@ if (! function_exists('response')) {
      */
     function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = app('Illuminate\Contracts\Routing\ResponseFactory');
+        $factory = app(ResponseFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
@@ -706,7 +712,7 @@ if (! function_exists('url')) {
      */
     function url($path = null, $parameters = [], $secure = null)
     {
-        return app('Illuminate\Contracts\Routing\UrlGenerator')->to($path, $parameters, $secure);
+        return app(UrlGeneratorContract::class)->to($path, $parameters, $secure);
     }
 }
 
@@ -721,7 +727,7 @@ if (! function_exists('view')) {
      */
     function view($view = null, $data = [], $mergeData = [])
     {
-        $factory = app('Illuminate\Contracts\View\Factory');
+        $factory = app(ViewFactoryContract::class);
 
         if (func_num_args() === 0) {
             return $factory;

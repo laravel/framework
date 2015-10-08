@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Console\Kernel as ConsoelKernelContract;
+
 /**
  * @see \Illuminate\Contracts\Console\Kernel
  */
@@ -14,6 +16,6 @@ class Artisan extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Console\Kernel';
+        return ConsoelKernelContract::class;
     }
 }

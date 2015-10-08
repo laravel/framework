@@ -4,6 +4,7 @@ namespace Illuminate\Queue\Jobs;
 
 use DateTime;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Queue\EntityResolver;
 
 abstract class Job
 {
@@ -214,7 +215,7 @@ abstract class Job
      */
     protected function getEntityResolver()
     {
-        return $this->container->make('Illuminate\Contracts\Queue\EntityResolver');
+        return $this->container->make(EntityResolver::class);
     }
 
     /**

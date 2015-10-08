@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -94,7 +95,7 @@ class WorkCommand extends Command
             $this->worker->setCache($this->laravel['cache']->driver());
 
             $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+                $this->laravel[ExceptionHandler::class]
             );
 
             return $this->worker->daemon(

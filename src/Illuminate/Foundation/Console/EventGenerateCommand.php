@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventGenerateCommand extends Command
 {
@@ -29,7 +30,7 @@ class EventGenerateCommand extends Command
     public function fire()
     {
         $provider = $this->laravel->getProvider(
-            'Illuminate\Foundation\Support\Providers\EventServiceProvider'
+            EventServiceProvider::class
         );
 
         foreach ($provider->listens() as $event => $listeners) {

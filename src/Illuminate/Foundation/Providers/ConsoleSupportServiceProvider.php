@@ -2,7 +2,13 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Database\SeedServiceProvider;
+use Illuminate\Queue\ConsoleServiceProvider;
+use Illuminate\Auth\GeneratorServiceProvider;
+use Illuminate\Console\ScheduleServiceProvider;
+use Illuminate\Session\CommandsServiceProvider;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Database\MigrationServiceProvider;
 
 class ConsoleSupportServiceProvider extends AggregateServiceProvider
 {
@@ -19,13 +25,13 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider
      * @var array
      */
     protected $providers = [
-        'Illuminate\Auth\GeneratorServiceProvider',
-        'Illuminate\Console\ScheduleServiceProvider',
-        'Illuminate\Database\MigrationServiceProvider',
-        'Illuminate\Database\SeedServiceProvider',
-        'Illuminate\Foundation\Providers\ComposerServiceProvider',
-        'Illuminate\Queue\ConsoleServiceProvider',
-        'Illuminate\Routing\GeneratorServiceProvider',
-        'Illuminate\Session\CommandsServiceProvider',
+        GeneratorServiceProvider::class,
+        ScheduleServiceProvider::class,
+        MigrationServiceProvider::class,
+        SeedServiceProvider::class,
+        ComposerServiceProvider::class,
+        ConsoleServiceProvider::class,
+        GeneratorServiceProvider::class,
+        CommandsServiceProvider::class,
     ];
 }
