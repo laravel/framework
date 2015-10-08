@@ -2593,7 +2593,7 @@ class Validator implements ValidatorContract
     protected function requireParameterCount($count, $parameters, $rule)
     {
         if (count($parameters) < $count) {
-            throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+            throw new InvalidArgumentException("Validation rule {$rule} requires at least {$count} parameters.");
         }
     }
 
@@ -2632,6 +2632,6 @@ class Validator implements ValidatorContract
             return $this->callExtension($rule, $parameters);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist.");
+        throw new BadMethodCallException("Method [{$method}] does not exist.");
     }
 }
