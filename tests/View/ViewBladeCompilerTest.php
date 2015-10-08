@@ -233,6 +233,14 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testEchoIsProperlyWrapped()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = 'Hello {{ "@parent" }}';
+        $expected = 'Hello <?php echo be("@parent"); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCannotStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

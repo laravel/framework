@@ -208,6 +208,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($str, e($html));
     }
 
+    public function testBe()
+    {
+        $str = 'A \'@parent\' is escaped';
+        $this->assertEquals('A &#039;&commat;parent&#039; is escaped', be($str));
+        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
+        $html->shouldReceive('toHtml')->andReturn($str);
+        $this->assertEquals($str, be($html));
+    }
+
     public function testEndsWith()
     {
         $this->assertTrue(Str::endsWith('jason', 'on'));
