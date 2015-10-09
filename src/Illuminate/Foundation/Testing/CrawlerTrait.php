@@ -332,7 +332,7 @@ trait CrawlerTrait
      * @param  bool  $negate
      * @return $this
      */
-    protected function seeElement($element, $text, $negate = false)
+    protected function seeInElement($element, $text, $negate = false)
     {
         $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
 
@@ -354,9 +354,9 @@ trait CrawlerTrait
      * @param  string|null  $element
      * @return $this
      */
-    protected function dontSeeElement($element, $text)
+    protected function dontSeeInElement($element, $text)
     {
-        return $this->seeElement($element, $text, true);
+        return $this->seeInElement($element, $text, true);
     }
 
     /**
