@@ -118,7 +118,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
-        $this->assertEquals(json_encode('foo'), $results);
+        $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
     }
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
@@ -126,7 +126,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['toArray']);
         $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
 
-        $this->assertEquals(json_encode('foo'), (string) $c);
+        $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }
 
     public function testOffsetAccess()

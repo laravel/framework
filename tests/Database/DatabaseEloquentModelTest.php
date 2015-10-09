@@ -571,7 +571,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->setRelation('multi', new Illuminate\Database\Eloquent\Collection);
         $array = $model->toArray();
 
-        $this->assertTrue(is_array($array));
+        $this->assertInternalType('array', $array);
         $this->assertEquals('foo', $array['name']);
         $this->assertEquals('baz', $array['names'][0]['bar']);
         $this->assertEquals('boom', $array['names'][1]['bam']);

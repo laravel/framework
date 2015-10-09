@@ -16,7 +16,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         $files = new Filesystem;
         $files->put(__DIR__.'/file.txt', 'Hello World');
-        $this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
+        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
         @unlink(__DIR__.'/file.txt');
     }
 
@@ -34,7 +34,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $files = new Filesystem;
         $files->put(__DIR__.'/file.txt', 'World');
         $files->prepend(__DIR__.'/file.txt', 'Hello ');
-        $this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
+        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
         @unlink(__DIR__.'/file.txt');
     }
 
@@ -42,7 +42,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         $files = new Filesystem;
         $files->prepend(__DIR__.'/file.txt', 'Hello World');
-        $this->assertEquals('Hello World', file_get_contents(__DIR__.'/file.txt'));
+        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
         @unlink(__DIR__.'/file.txt');
     }
 
