@@ -7,23 +7,23 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
     use CrawlerTrait;
 
-    public function testSeeElement()
+    public function testSeeInElement()
     {
         $this->crawler = new Crawler(
             '<div>Laravel was created by <strong>Taylor Otwell</strong></div>'
         );
 
-        $this->seeElement('strong', 'Taylor');
+        $this->seeInElement('strong', 'Taylor');
     }
 
-    public function testDontSeeElement()
+    public function testdontSeeInElement()
     {
         $this->crawler = new Crawler(
             '<div>Laravel was created by <strong>Taylor Otwell</strong></div>'
         );
 
-        $this->seeElement('strong', 'Laravel', true);
-        $this->dontSeeElement('strong', 'Laravel');
+        $this->seeInElement('strong', 'Laravel', true);
+        $this->dontSeeInElement('strong', 'Laravel');
     }
 
     public function testSeeLink()
