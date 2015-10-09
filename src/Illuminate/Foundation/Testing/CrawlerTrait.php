@@ -145,6 +145,8 @@ trait CrawlerTrait
     /**
      * Send the given request through the application.
      *
+     * This method allows you to fully customize the entire Request object.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
