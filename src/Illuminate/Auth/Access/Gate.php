@@ -206,7 +206,7 @@ class Gate implements GateContract
             $result = call_user_func_array($callback, array_merge([$user], $arguments));
         }
 
-        $this->callAfterCallbacks($user, $ability, $result, $arguments);
+        $this->callAfterCallbacks($user, $ability, $arguments, $result);
 
         return $result;
     }
@@ -235,11 +235,11 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
+     * @param  array  $arguments
      * @param  bool  $result
-     * @param  array  $arguments  
      * @return void
      */
-    protected function callAfterCallbacks($user, $ability, $result, array $arguments)
+    protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
         $arguments = array_merge([$user, $ability, $result], $arguments);
 
