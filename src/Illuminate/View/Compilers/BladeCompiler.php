@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -68,7 +69,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $echoFormat = 'be(%s)';
+    protected $echoFormat = '\Illuminate\View\Compilers\BladeCompiler::escapeEntities(%s)';
 
     /**
      * Array of footer lines to be added to template.
@@ -331,7 +332,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return $matches[1] ? $matches[0] : '<?php echo be('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
+            return $matches[1] ? $matches[0] : '<?php echo \Illuminate\View\Compilers\BladeCompiler::escapeEntities('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
@@ -770,6 +771,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function extend(callable $compiler)
     {
         $this->extensions[] = $compiler;
+    }
+
+    /**
+     * Escape Blade-specific HTML entities in a string.
+     *
+     * @param  \Illuminate\Support\Htmlable|string  $value
+     * @return string
+     */
+    public static function escapeEntities($value)
+    {
+        if ($value instanceof Htmlable) {
+            return $value->toHtml();
+        }
+
+        $value = htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        $value = str_replace('@', '&commat;', $value);
+
+        return $value;
     }
 
     /**
