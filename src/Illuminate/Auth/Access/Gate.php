@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -315,6 +316,10 @@ class Gate implements GateContract
                 if (! is_null($result)) {
                     return $result;
                 }
+            }
+
+            if (strpos($ability, '-') !== false) {
+                $ability = Str::camel($ability);
             }
 
             if (! is_callable([$instance, $ability])) {
