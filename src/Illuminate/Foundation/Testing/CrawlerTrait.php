@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Testing;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait CrawlerTrait
