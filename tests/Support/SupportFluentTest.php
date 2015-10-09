@@ -93,7 +93,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $fluent->toJson();
 
-        $this->assertEquals(json_encode('foo'), $results);
+        $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
     }
 }
 

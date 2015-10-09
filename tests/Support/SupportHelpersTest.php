@@ -187,7 +187,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testStrRandom()
     {
         $result = Str::random(20);
-        $this->assertTrue(is_string($result));
+        $this->assertInternalType('string', $result);
         $this->assertEquals(20, strlen($result));
     }
 
