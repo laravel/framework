@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Testing;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait CrawlerTrait
 {
@@ -160,29 +159,6 @@ trait CrawlerTrait
     }
 
     /**
-     * Assert that a given page successfully loaded.
-     *
-     * @param  string  $uri
-     * @param  string|null  $message
-     * @return void
-     */
-    protected function assertPageLoaded($uri, $message = null)
-    {
-        $status = $this->response->getStatusCode();
-
-        try {
-            $this->assertEquals(200, $status);
-        } catch (PHPUnitException $e) {
-            $message = $message ?: "A request to [{$uri}] failed. Received status code [{$status}].";
-
-            $responseException = isset($this->response->exception)
-                    ? $this->response->exception : null;
-
-            throw new HttpException($message, null, $responseException);
-        }
-    }
-
-    /**
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
@@ -236,7 +212,7 @@ trait CrawlerTrait
     {
         if (is_null($data)) {
             $this->assertJson(
-                $this->response->getContent(), "Failed asserting that JSON returned [{$this->currentUri}]."
+                $this->response->getContent(), "JSON was not returned from [{$this->currentUri}]."
             );
 
             return $this;
@@ -320,45 +296,6 @@ trait CrawlerTrait
     protected function seeStatusCode($status)
     {
         $this->assertEquals($status, $this->response->getStatusCode());
-
-        return $this;
-    }
-
-    /**
-     * Assert that the current page matches a given URI.
-     *
-     * @param  string  $uri
-     * @return $this
-     */
-    protected function seePageIs($uri)
-    {
-        return $this->landOn($uri);
-    }
-
-    /**
-     * Assert that the current page matches a given URI.
-     *
-     * @param  string  $uri
-     * @return $this
-     */
-    protected function onPage($uri)
-    {
-        return $this->landOn($uri);
-    }
-
-    /**
-     * Assert that the current page matches a given URI.
-     *
-     * @param  string  $uri
-     * @return $this
-     */
-    protected function landOn($uri)
-    {
-        $this->assertPageLoaded($uri = $this->prepareUrlForRequest($uri));
-
-        $this->assertEquals(
-            $uri, $this->currentUri, "Did not land on expected page [{$uri}].\n"
-        );
 
         return $this;
     }
@@ -561,18 +498,6 @@ trait CrawlerTrait
         }
 
         return $server;
-    }
-
-    /**
-     * Disable middleware for the test.
-     *
-     * @return $this
-     */
-    public function withoutMiddleware()
-    {
-        $this->app->instance('middleware.disable', true);
-
-        return $this;
     }
 
     /**
