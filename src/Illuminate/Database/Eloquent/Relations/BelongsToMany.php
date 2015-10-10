@@ -926,9 +926,7 @@ class BelongsToMany extends Relation
         // creatation through a separate process to make the models,
         // fire their events and save them individually.
         if (class_exists($this->getPivotModel())) {
-
             $this->insertModelRecords($records, $query);
-
         }
 
         // Otherwise we bulk insert them straight to the database.
@@ -954,7 +952,6 @@ class BelongsToMany extends Relation
         // Loop through each of the records, firing their
         // events and saving them.
         foreach ($records as $key => $record) {
-
             $model = $this->newPivot($record);
 
             if ($this->firePivotModelEvent('saving', $model) === false
@@ -1106,7 +1103,6 @@ class BelongsToMany extends Relation
             if (0 === count($ids)) {
                 return [];
             }
-
         }
 
         $query = $this->newPivotQuery();
@@ -1161,7 +1157,7 @@ class BelongsToMany extends Relation
             }
 
             // Fire the models events
-            if (!$this->firePivotModelDeletionEvents($model)) {
+            if (! $this->firePivotModelDeletionEvents($model)) {
 
                 // We don't want to delete this model, so continue
                 // on without adding it's ID to the deleted array.
@@ -1258,15 +1254,11 @@ class BelongsToMany extends Relation
     public function newPivot(array $attributes = [], $exists = false)
     {
         if ($class = $this->getPivotModel()) {
-
             $pivot = new $class($this->parent, $attributes, $this->table, $exists);
-
         } else {
-
             $related = $this->related;
 
             $pivot = $related->newPivot($this->parent, $attributes, $this->table, $exists);
-
         }
 
         return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
@@ -1301,7 +1293,7 @@ class BelongsToMany extends Relation
      * Fire the deleting events for a pivot model.
      *
      * @param  Pivot  $model
-     * @return boolean
+     * @return bool
      */
     protected function firePivotModelDeletionEvents($model)
     {
