@@ -175,7 +175,7 @@ trait CrawlerTrait
         } catch (PHPUnitException $e) {
             $message = $message ?: "A request to [{$uri}] failed. Received status code [{$status}].";
 
-            throw new HttpException($message, null, $this->response->exception);
+            throw new HttpException($message, null, data_get($this->response, 'exception'));
         }
     }
 
