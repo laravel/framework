@@ -69,6 +69,13 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
+     * A custom pivot model class name.
+     *
+     * @var string
+     */
+    protected $pivotModel;
+
+    /**
      * Create a new belongs to many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -87,6 +94,28 @@ class BelongsToMany extends Relation
         $this->relationName = $relationName;
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Set the custom pivot model class.
+     *
+     * @param  string $class
+     */
+    public function setPivotModel($class)
+    {
+        $this->pivotModel = $class;
+
+        return $this;
+    }
+
+    /**
+     * Gets the custom pivot model class.
+     *
+     * @return string
+     */
+    public function getPivotModel()
+    {
+        return $this->pivotModel;
     }
 
     /**
@@ -880,7 +909,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $attributes
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return void
      */
     public function attach($id, array $attributes = [], $touch = true)
@@ -891,10 +920,59 @@ class BelongsToMany extends Relation
 
         $query = $this->newPivotStatement();
 
-        $query->insert($this->createAttachRecords((array) $id, $attributes));
+        $records = $this->createAttachRecords((array) $id, $attributes);
+
+        // If we have a custom pivot model, we route the record
+        // creatation through a separate process to make the models,
+        // fire their events and save them individually.
+        if (class_exists($this->getPivotModel())) {
+
+            $this->insertModelRecords($records, $query);
+
+        }
+
+        // Otherwise we bulk insert them straight to the database.
+        else {
+            $query->insert($records);
+        }
 
         if ($touch) {
             $this->touchIfTouching();
+        }
+    }
+
+    /**
+     * Insert each of the associated records and
+     * fire thier models events.
+     *
+     * @param  array  $records
+     * @param  Query  $query
+     * @return void
+     */
+    protected function insertModelRecords(array $records, $query)
+    {
+        // Loop through each of the records, firing their
+        // events and saving them.
+        foreach ($records as $key => $record) {
+
+            $model = $this->newPivot($record);
+
+            if ($this->firePivotModelEvent('saving', $model) === false
+                || $this->firePivotModelEvent('creating', $model) === false) {
+
+                // We don't want to create this
+                // model, so continue on without inserting.
+                continue;
+            }
+
+            $query->insert([$model->getAttributes()]);
+
+            $this->firePivotModelEvent('created', $model, false);
+            $this->firePivotModelEvent('saved', $model, false);
+
+            $model->exists = true;
+
+            $model->wasRecentlyCreated = true;
         }
     }
 
@@ -1018,6 +1096,19 @@ class BelongsToMany extends Relation
             $ids = (array) $ids->getKey();
         }
 
+        if (class_exists($this->getPivotModel())) {
+
+            // If we have a custom pivot model, we fire the events
+            // for each model and get the resulting id array to parse below.
+            $ids = $this->getDetachableModelIds($ids);
+
+            // Return an empty array if we've deleted nothing
+            if (0 === count($ids)) {
+                return [];
+            }
+
+        }
+
         $query = $this->newPivotQuery();
 
         // If associated IDs were passed to the method we will only delete those
@@ -1039,6 +1130,49 @@ class BelongsToMany extends Relation
         }
 
         return $results;
+    }
+
+    /**
+     * Get a list of model IDs that can be detached.
+     *
+     * @param  mixed  $ids
+     * @return array
+     */
+    protected function getDetachableModelIds($ids)
+    {
+        $deleted = [];
+
+        // If we haven't been given an ID to delete
+        // we get everything and delete the lot.
+        if (count($ids) === 0) {
+            $ids = $this->newPivotQuery()->get();
+        }
+
+        foreach ((array) $ids as $key => $id) {
+
+            // Expect the ID to be a valid record if it's an object.
+            if (is_object($id)) {
+                $model = $this->newPivotModelFromRecord($id);
+            }
+
+            // Otherwise expect the ID to be the otherKey.
+            else {
+                $model = $this->newPivotModelFromId($id);
+            }
+
+            // Fire the models events
+            if (!$this->firePivotModelDeletionEvents($model)) {
+
+                // We don't want to delete this model, so continue
+                // on without adding it's ID to the deleted array.
+                continue;
+            }
+
+            // Add the ID to the array of deleted IDs.
+            $deleted[] = $model->{$this->otherKey};
+        }
+
+        return array_unique($deleted);
     }
 
     /**
@@ -1118,14 +1252,95 @@ class BelongsToMany extends Relation
      * Create a new pivot model instance.
      *
      * @param  array  $attributes
-     * @param  bool   $exists
+     * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
-        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists);
+        if ($class = $this->getPivotModel()) {
+
+            $pivot = new $class($this->parent, $attributes, $this->table, $exists);
+
+        } else {
+
+            $related = $this->related;
+
+            $pivot = $related->newPivot($this->parent, $attributes, $this->table, $exists);
+
+        }
 
         return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
+    }
+
+    /**
+     * Get a pivot mode instance from ID.
+     *
+     * @param  int  $id
+     * @return Pivot
+     */
+    protected function newPivotModelFromId($id)
+    {
+        $record = $this->newPivotStatementForId($id)->first();
+
+        return $this->newPivotModelFromRecord($record);
+    }
+
+    /**
+     * Get a pivot model instance from record.
+     *
+     * @param  object  $record
+     * @return Pivot
+     */
+    protected function newPivotModelFromRecord($record)
+    {
+        // Create a new instance of the model and fire it's events.
+        return $this->newExistingPivot(get_object_vars($record));
+    }
+
+    /**
+     * Fire the deleting events for a pivot model.
+     *
+     * @param  Pivot  $model
+     * @return boolean
+     */
+    protected function firePivotModelDeletionEvents($model)
+    {
+        if ($this->firePivotModelEvent('deleting', $model) === false) {
+
+            // We don't want to delete this model.
+            return false;
+        }
+
+        $model->exists = false;
+
+        $this->firePivotModelEvent('deleted', $model, false);
+
+        return true;
+    }
+
+    /**
+     * Fire the given event for the model.
+     *
+     * @param  string  $event
+     * @param  bool  $halt
+     * @return mixed
+     */
+    protected function firePivotModelEvent($event, $model, $halt = true)
+    {
+        $dispatcher = $model::getEventDispatcher();
+
+        if (! isset($dispatcher)) {
+            return true;
+        }
+
+        // We will append the names of the class to the event to distinguish it from
+        // other model events that are fired, allowing us to listen on each model
+        // event set individually instead of catching event for all the models.
+        $event = "eloquent.{$event}: ".get_class($model);
+
+        $method = $halt ? 'until' : 'fire';
+
+        return $dispatcher->$method($event, $model);
     }
 
     /**
