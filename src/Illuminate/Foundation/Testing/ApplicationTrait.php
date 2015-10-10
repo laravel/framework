@@ -180,6 +180,18 @@ trait ApplicationTrait
     }
 
     /**
+     * Disable middleware for the test.
+     *
+     * @return $this
+     */
+    public function withoutMiddleware()
+    {
+        $this->app->instance('middleware.disable', true);
+
+        return $this;
+    }
+
+    /**
      * Set the currently logged in user for the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user

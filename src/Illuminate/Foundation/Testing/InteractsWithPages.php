@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait InteractsWithPages
 {
@@ -124,6 +125,46 @@ trait InteractsWithPages
         $this->uploads = [];
 
         return $this;
+    }
+
+    /**
+     * Assert that the current page matches a given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
+    protected function seePageIs($uri)
+    {
+        $this->assertPageLoaded($uri = $this->prepareUrlForRequest($uri));
+
+        $this->assertEquals(
+            $uri, $this->currentUri, "Did not land on expected page [{$uri}].\n"
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given page successfully loaded.
+     *
+     * @param  string  $uri
+     * @param  string|null  $message
+     * @return void
+     */
+    protected function assertPageLoaded($uri, $message = null)
+    {
+        $status = $this->response->getStatusCode();
+
+        try {
+            $this->assertEquals(200, $status);
+        } catch (PHPUnitException $e) {
+            $message = $message ?: "A request to [{$uri}] failed. Received status code [{$status}].";
+
+            $responseException = isset($this->response->exception)
+                    ? $this->response->exception : null;
+
+            throw new HttpException($message, null, $responseException);
+        }
     }
 
     /**
