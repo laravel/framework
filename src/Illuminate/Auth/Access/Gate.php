@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -44,6 +45,13 @@ class Gate implements GateContract
     protected $beforeCallbacks = [];
 
     /**
+     * All of the registered after callbacks.
+     *
+     * @var array
+     */
+    protected $afterCallbacks = [];
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -51,15 +59,17 @@ class Gate implements GateContract
      * @param  array  $abilities
      * @param  array  $policies
      * @param  array  $beforeCallbacks
+     * @param  array  $afterCallbacks
      * @return void
      */
-    public function __construct(Container $container, callable $userResolver, array $abilities = [], array $policies = [], array $beforeCallbacks = [])
+    public function __construct(Container $container, callable $userResolver, array $abilities = [], array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [])
     {
         $this->policies = $policies;
         $this->container = $container;
         $this->abilities = $abilities;
         $this->userResolver = $userResolver;
         $this->beforeCallbacks = $beforeCallbacks;
+        $this->afterCallbacks = $afterCallbacks;
     }
 
     /**
@@ -138,6 +148,19 @@ class Gate implements GateContract
     }
 
     /**
+     * Register a callback to run after all Gate checks.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function after(callable $callback)
+    {
+        $this->afterCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
@@ -176,15 +199,17 @@ class Gate implements GateContract
 
         $arguments = is_array($arguments) ? $arguments : [$arguments];
 
-        if (! is_null($result = $this->callBeforeCallbacks($user, $ability, $arguments))) {
-            return $result;
+        if (is_null($result = $this->callBeforeCallbacks($user, $ability, $arguments))) {
+            $callback = $this->resolveAuthCallback(
+                $user, $ability, $arguments
+            );
+
+            $result = call_user_func_array($callback, array_merge([$user], $arguments));
         }
 
-        $callback = $this->resolveAuthCallback(
-            $user, $ability, $arguments
-        );
+        $this->callAfterCallbacks($user, $ability, $arguments, $result);
 
-        return call_user_func_array($callback, array_merge([$user], $arguments));
+        return $result;
     }
 
     /**
@@ -203,6 +228,24 @@ class Gate implements GateContract
             if (! is_null($result = call_user_func_array($before, $arguments))) {
                 return $result;
             }
+        }
+    }
+
+    /**
+     * Call all of the after callbacks with check result.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @param  bool  $result
+     * @return void
+     */
+    protected function callAfterCallbacks($user, $ability, array $arguments, $result)
+    {
+        $arguments = array_merge([$user, $ability, $result], $arguments);
+
+        foreach ($this->afterCallbacks as $after) {
+            call_user_func_array($after, $arguments);
         }
     }
 
@@ -275,6 +318,10 @@ class Gate implements GateContract
                 }
             }
 
+            if (strpos($ability, '-') !== false) {
+                $ability = Str::camel($ability);
+            }
+
             if (! is_callable([$instance, $ability])) {
                 return false;
             }
@@ -326,7 +373,7 @@ class Gate implements GateContract
     public function forUser($user)
     {
         return new static(
-            $this->container, function () use ($user) { return $user; }, $this->abilities, $this->policies, $this->beforeCallbacks
+            $this->container, function () use ($user) { return $user; }, $this->abilities, $this->policies, $this->beforeCallbacks, $this->afterCallbacks
         );
     }
 

@@ -67,7 +67,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Alias for the avg method.
+     * Alias for the "avg" method.
      *
      * @param  string|null  $key
      * @return mixed

@@ -47,7 +47,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
     {
         $length = mb_strlen($key, '8bit');
 
-        return ($cipher === 'AES-128-CBC' && ($length === 16)) || ($cipher === 'AES-256-CBC' && $length === 32);
+        return ($cipher === 'AES-128-CBC' && $length === 16) || ($cipher === 'AES-256-CBC' && $length === 32);
     }
 
     /**

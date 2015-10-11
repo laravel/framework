@@ -48,6 +48,26 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
+    public function test_after_callbacks_are_called_with_result()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function ($user) { return true; });
+        $gate->define('bar', function ($user) { return false; });
+
+        $gate->after(function ($user, $ability, $result) {
+            if ($ability == 'foo') {
+                $this->assertTrue($result, 'After callback on `foo` should receive true as result');
+            } else {
+                $this->assertFalse($result, 'After callback on `bar` or `missing` should receive false as result');
+            }
+        });
+
+        $this->assertTrue($gate->check('foo'));
+        $this->assertFalse($gate->check('bar'));
+        $this->assertFalse($gate->check('missing'));
+    }
+
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
     {
         $gate = $this->getBasicGate();
@@ -109,6 +129,15 @@ class GateTest extends PHPUnit_Framework_TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
+    public function test_policy_converts_dash_to_camel()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
     public function test_policy_default_to_false_if_method_does_not_exist()
@@ -190,6 +219,11 @@ class AccessGateTestPolicy
     }
 
     public function update($user, AccessGateTestDummy $dummy)
+    {
+        return $user instanceof StdClass;
+    }
+
+    public function updateDash($user, AccessGateTestDummy $dummy)
     {
         return $user instanceof StdClass;
     }
