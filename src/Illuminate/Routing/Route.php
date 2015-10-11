@@ -160,6 +160,8 @@ class Route
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function runController(Request $request)
     {
@@ -272,7 +274,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            array_get($this->action, 'middleware', []), $middleware
+            Arr::get($this->action, 'middleware', []), $middleware
         );
 
         return $this;
@@ -345,7 +347,7 @@ class Route
      *
      * @return array
      *
-     * @throws LogicException
+     * @throws \LogicException
      */
     public function parameters()
     {
@@ -764,8 +766,7 @@ class Route
     /**
      * Add or change the route name.
      *
-     * @param $name
-     *
+     * @param  string  $name
      * @return $this
      */
     public function name($name)
@@ -836,7 +837,7 @@ class Route
      *
      * @return void
      *
-     * @throws LogicException
+     * @throws \LogicException
      */
     public function prepareForSerialization()
     {

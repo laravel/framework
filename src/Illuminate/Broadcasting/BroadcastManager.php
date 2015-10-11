@@ -121,7 +121,7 @@ class BroadcastManager implements FactoryContract
     protected function createPusherDriver(array $config)
     {
         return new PusherBroadcaster(
-            new Pusher($config['key'], $config['secret'], $config['app_id'])
+            new Pusher($config['key'], $config['secret'], $config['app_id'], array_get($config, 'options', []))
         );
     }
 

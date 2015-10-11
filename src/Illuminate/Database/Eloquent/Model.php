@@ -656,7 +656,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get all of the models from the database.
      *
-     * @param  array  $columns
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function all($columns = ['*'])
@@ -889,7 +889,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getActualClassNameForMorph($class)
     {
-        return array_get(Relation::morphMap(), $class, $class);
+        return Arr::get(Relation::morphMap(), $class, $class);
     }
 
     /**
@@ -1357,7 +1357,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Add an observable event name.
      *
-     * @param  mixed  $observables
+     * @param  array|mixed  $observables
      * @return void
      */
     public function addObservableEvents($observables)
@@ -1370,7 +1370,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Remove an observable event name.
      *
-     * @param  mixed  $observables
+     * @param  array|mixed  $observables
      * @return void
      */
     public function removeObservableEvents($observables)

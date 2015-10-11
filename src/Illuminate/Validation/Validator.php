@@ -139,7 +139,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer'];
+    protected $numericRules = ['Numeric', 'Integer', 'Int'];
 
     /**
      * The validation rules that imply the field is required.
@@ -357,7 +357,9 @@ class Validator implements ValidatorContract
 
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        $method = "validate{$rule}";
+        $normalizedRule = $this->normalizeRule($rule);
+
+        $method = "validate{$normalizedRule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
@@ -2612,6 +2614,24 @@ class Validator implements ValidatorContract
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+        }
+    }
+
+    /**
+     * Normalizes a rule so that we can accept short types.
+     *
+     * @param  string  $rule
+     * @return string
+     */
+    protected function normalizeRule($rule)
+    {
+        switch ($rule) {
+            case 'Int':
+                return 'Integer';
+            case 'Bool':
+                return 'Boolean';
+            default:
+                return $rule;
         }
     }
 
