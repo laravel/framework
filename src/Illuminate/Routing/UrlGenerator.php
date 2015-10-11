@@ -597,7 +597,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Clear the forced root URL.
      *
-     * @param  string  $root
      * @return $this
      */
     public function clearForceRootUrl($root)
