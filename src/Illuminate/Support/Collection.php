@@ -637,8 +637,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Search the collection for a given value and return the corresponding key if successful.
      *
-     * @param  mixed  $value
-     * @param  bool   $strict
+     * @param  callable|mixed  $value
+     * @param  bool            $strict
      * @return mixed
      */
     public function search($value, $strict = false)
