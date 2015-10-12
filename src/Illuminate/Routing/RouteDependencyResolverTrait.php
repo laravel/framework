@@ -7,7 +7,6 @@ use ReflectionMethod;
 use ReflectionParameter;
 use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
-use Illuminate\Database\Eloquent\Model;
 
 trait RouteDependencyResolverTrait
 {
@@ -83,41 +82,9 @@ trait RouteDependencyResolverTrait
         // If the parameter has a type-hinted class, we will check to see if it is already in
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
-        if ($class && $this->vacantEloquentParameter($class, $parameters)) {
-            return $class->newInstance()->findOrFail(
-                $this->extractModelIdentifier($parameter, $originalParameters)
-            );
-        } elseif ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
+        if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
             return $this->container->make($class->name);
         }
-    }
-
-    /**
-     * Determine if the given type-hinted class is an implict Eloquent binding.
-     *
-     * Must not already be resolved in the parameter list by an explicit model binding.
-     *
-     * @param  \ReflectionClass  $class
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function vacantEloquentParameter(ReflectionClass $class, array $parameters)
-    {
-        return $class->isSubclassOf(Model::class) &&
-             ! $this->alreadyInParameters($class->name, $parameters);
-    }
-
-    /**
-     * Extract an implicit model binding's key out of the parameter list.
-     *
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $originalParameters
-     */
-    protected function extractModelIdentifier(ReflectionParameter $parameter, array $originalParameters)
-    {
-        return array_first($originalParameters, function ($parameterKey) use ($parameter) {
-            return $parameterKey === $parameter->name;
-        });
     }
 
     /**

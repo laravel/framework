@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use LogicException;
+use ReflectionMethod;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -239,9 +240,7 @@ class Route
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri);
 
         $this->compiled = with(
-
             new SymfonyRoute($uri, $optionals, $this->wheres, [], $this->domain() ?: '')
-
         )->compile();
     }
 
@@ -278,6 +277,28 @@ class Route
         );
 
         return $this;
+    }
+
+    /**
+     * Get the parameters that are listed in the route / controller signature.
+     *
+     * @return array
+     */
+    public function callableParameters($subClass = null)
+    {
+        $action = $this->getAction();
+
+        if (is_string($action['uses'])) {
+            list($class, $method) = explode('@', $action['uses']);
+
+            $parameters = (new ReflectionMethod($class, $method))->getParameters();
+        } else {
+            $parameters = (new ReflectionFunction($action['uses']))->getParameters();
+        }
+
+        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
+            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
+        });
     }
 
     /**
