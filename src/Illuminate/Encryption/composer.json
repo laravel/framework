@@ -30,5 +30,8 @@
             "dev-master": "5.1-dev"
         }
     },
+    "suggest": {
+        "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (^1.0.4)."
+    },
     "minimum-stability": "dev"
 }
