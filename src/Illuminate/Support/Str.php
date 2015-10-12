@@ -242,6 +242,8 @@ class Str
      * @return string
      *
      * @throws \RuntimeException
+     *
+     * @deprecated since version 5.2. Use random_bytes instead.
      */
     public static function randomBytes($length = 16)
     {
