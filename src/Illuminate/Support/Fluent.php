@@ -6,14 +6,15 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * @method $this index() Creates index on the column
  * @method $this primary() Creates primery index on the column
- * @method $this unique()Creates unique index on the column
+ * @method $this unique() Creates unique index on the column
  * @method $this first() Place the column "first" in the table (MySQL Only)
- * @method $this after(string $colName)  Place the column "after" another column (MySQL Only)
+ * @method $this after(string $colName) Place the column "after" another column (MySQL Only)
  * @method $this nullable() Allow NULL values to be inserted into the column
- * @method $this default($value)	Specify a "default" value for the column
+ * @method $this default($value) Specify a "default" value for the column
  * @method $this unsigned()	Set integer columns to UNSIGNED
  */
 class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
