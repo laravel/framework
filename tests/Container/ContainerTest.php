@@ -445,6 +445,31 @@ return $obj; });
         $this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
     }
 
+    public function testContextualBindingWorksRegardlessOfLeadingBackslash()
+    {
+        $container = new Container;
+
+        $container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+        $container->when('\ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+        $container->when('ContainerTestContextInjectTwo')->needs('\IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectOne')->impl
+        );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('ContainerTestContextInjectTwo')->impl
+        );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->make('\ContainerTestContextInjectTwo')->impl
+        );
+    }
+
     public function testContainerTags()
     {
         $container = new Container;
