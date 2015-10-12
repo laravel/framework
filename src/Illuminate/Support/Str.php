@@ -245,7 +245,7 @@ class Str
      */
     public static function randomBytes($length = 16)
     {
-        if (PHP_MAJOR_VERSION >= 7) {
+        if (PHP_MAJOR_VERSION >= 7 || defined('RANDOM_COMPAT_READ_BUFFER')) {
             $bytes = random_bytes($length);
         } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes($length, $strong);
@@ -254,7 +254,7 @@ class Str
                 throw new RuntimeException('Unable to generate random string.');
             }
         } else {
-            throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+            throw new RuntimeException('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.');
         }
 
         return $bytes;
@@ -300,9 +300,9 @@ class Str
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLength = mb_strlen($knownString);
+        $knownLength = mb_strlen($knownString, '8bit');
 
-        if (mb_strlen($userInput) !== $knownLength) {
+        if (mb_strlen($userInput, '8bit') !== $knownLength) {
             return false;
         }
 
