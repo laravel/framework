@@ -254,7 +254,7 @@ class Str
                 throw new RuntimeException('Unable to generate random string.');
             }
         } else {
-            throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+            throw new RuntimeException('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.');
         }
 
         return $bytes;
