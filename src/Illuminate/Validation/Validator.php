@@ -275,6 +275,8 @@ class Validator implements ValidatorContract
                 if (! is_string($ruleKey)) {
                     $this->mergeRules("$attribute.$dataKey", $ruleValue);
                 } else {
+                    $ruleValue = is_string($ruleValue) ? str_replace('..', ".$dataKey.", $ruleValue) : $ruleValue;
+
                     $this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
                 }
             }

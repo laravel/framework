@@ -1478,6 +1478,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEachWithRequiredIf()
+    {
+        $trans = $this->getRealTranslator();
+        $data = ['foobar' => [
+            ['key' => 'foo'],
+            ['key' => 'bar'],
+        ]];
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foobar', ['key' => 'required', 'value' => 'required_if:foobar..key,bar']);
+        $this->assertFalse($v->passes());
+
+        $data['foobar'][1]['value'] = 5;
+
+        $v->setData($data);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEachWithNonArrayWithArrayRule()
     {
         $trans = $this->getRealTranslator();
