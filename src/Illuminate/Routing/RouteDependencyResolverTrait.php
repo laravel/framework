@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
 use Illuminate\Support\Arr;
