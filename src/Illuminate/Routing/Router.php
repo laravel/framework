@@ -3,6 +3,8 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use ReflectionMethod;
+use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -10,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -720,7 +723,32 @@ class Router implements RegistrarContract
             }
         }
 
+        $this->substituteImplicitBindings($route);
+
         return $route;
+    }
+
+    /**
+     * Substitute the implicit Eloquent model bindings for the route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function substituteImplicitBindings($route)
+    {
+        $parameters = $route->parameters();
+
+        foreach ($route->callableParameters(Model::class) as $parameter) {
+            $class = $parameter->getClass();
+
+            if (array_key_exists($parameter->name, $parameters) && ! $this->container->bound($class->name)) {
+                $method = $parameter->isDefaultValueAvailable() ? 'find' : 'findOrFail';
+
+                $route->setParameter(
+                    $parameter->name, $class->newInstance()->{$method}($parameters[$parameter->name])
+                );
+            }
+        }
     }
 
     /**
