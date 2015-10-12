@@ -227,7 +227,7 @@ class Str
         while (($len = strlen($string)) < $length) {
             $size = $length - $len;
 
-            $bytes = static::randomBytes($size);
+            $bytes = random_bytes($size);
 
             $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
@@ -242,6 +242,8 @@ class Str
      * @return string
      *
      * @throws \RuntimeException
+     *
+     * @deprecated since version 5.2. Use random_bytes instead.
      */
     public static function randomBytes($length = 16)
     {
