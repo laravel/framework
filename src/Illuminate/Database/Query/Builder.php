@@ -1363,19 +1363,6 @@ class Builder
     }
 
     /**
-     * Execute the query as a fresh "select" statement.
-     *
-     * @param  array  $columns
-     * @return array|static[]
-     *
-     * @deprecated since version 5.1. Use get instead.
-     */
-    public function getFresh($columns = ['*'])
-    {
-        return $this->get($columns);
-    }
-
-    /**
      * Run the query as a "select" statement against the connection.
      *
      * @return array
