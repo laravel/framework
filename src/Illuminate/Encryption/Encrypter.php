@@ -3,7 +3,6 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -58,7 +57,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      */
     public function encrypt($value)
     {
-        $iv = Str::randomBytes($this->getIvSize());
+        $iv = random_bytes($this->getIvSize());
 
         $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
 
