@@ -173,6 +173,7 @@ class Container implements ArrayAccess, ContainerContract
     public function bind($abstract, $concrete = null, $shared = false)
     {
         $abstract = $this->normalize($abstract);
+
         $concrete = $this->normalize($concrete);
 
         // If the given types are actually an array, we will assume an alias is being
@@ -685,21 +686,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Normalize the given class name by removing leading slashes.
+     *
      * @param  mixed  $service
      * @return mixed
      */
     protected function normalize($service)
     {
-        // Whether a class name begins with a backslash or not, it's still the same class,
-        // so they need to be treated as the same class. Reflection doesn't use leading slash,
-        // Reflection doesn't use leading backslash when it reports dependencies, so just
-        // dropping it seems to be the only solution that works consistently for simple and
-        // contextual binding
-        if (is_string($service)) {
-            $service = ltrim($service, '\\');
-        }
-
-        return $service;
+        return is_string($service) ? ltrim($service, '\\') : $service;
     }
 
     /**
@@ -1192,6 +1186,7 @@ class Container implements ArrayAccess, ContainerContract
     public function offsetUnset($key)
     {
         $key = $this->normalize($key);
+
         unset($this->bindings[$key], $this->instances[$key], $this->resolved[$key]);
     }
 
