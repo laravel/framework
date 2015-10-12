@@ -375,6 +375,20 @@ if (! function_exists('get')) {
     }
 }
 
+if (! function_exists('group')) {
+    /**
+     * Register a new route group with the router.
+     *
+     * @param  array  $attributes
+     * @param  \Closure $callback
+     * @return void
+     */
+    function group($attributes, $callback)
+    {
+        app('router')->group($attributes, $callback);
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
