@@ -19,9 +19,9 @@ trait ValidatesWhenResolvedTrait
     {
         $instance = $this->getValidatorInstance();
 
-        if (!$this->passesAuthorization()) {
+        if (! $this->passesAuthorization()) {
             $this->failedAuthorization();
-        } elseif (!$instance->passes()) {
+        } elseif (! $instance->passes()) {
             $this->failedValidation($instance);
         }
     }
@@ -48,7 +48,7 @@ trait ValidatesWhenResolvedTrait
     }
 
     /**
-     * Deteremine if the request passes the authorization check.
+     * Determine if the request passes the authorization check.
      *
      * @return bool
      */

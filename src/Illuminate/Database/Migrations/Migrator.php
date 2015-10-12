@@ -157,20 +157,20 @@ class Migrator
         // of them "down" to reverse the last migration "operation" which ran.
         $migrations = $this->repository->getLast();
 
-        if (count($migrations) == 0) {
+        $count = count($migrations);
+
+        if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
-
-            return count($migrations);
+        } else {
+            // We need to reverse these migrations so that they are "downed" in reverse
+            // to what they run on "up". It lets us backtrack through the migrations
+            // and properly reverse the entire database schema operation that ran.
+            foreach ($migrations as $migration) {
+                $this->runDown((object) $migration, $pretend);
+            }
         }
 
-        // We need to reverse these migrations so that they are "downed" in reverse
-        // to what they run on "up". It lets us backtrack through the migrations
-        // and properly reverse the entire database schema operation that ran.
-        foreach ($migrations as $migration) {
-            $this->runDown((object) $migration, $pretend);
-        }
-
-        return count($migrations);
+        return $count;
     }
 
     /**
@@ -185,17 +185,17 @@ class Migrator
 
         $migrations = array_reverse($this->repository->getRan());
 
-        if (count($migrations) == 0) {
+        $count = count($migrations);
+
+        if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
-
-            return count($migrations);
+        } else {
+            foreach ($migrations as $migration) {
+                $this->runDown((object) ['migration' => $migration], $pretend);
+            }
         }
 
-        foreach ($migrations as $migration) {
-            $this->runDown((object) ['migration' => $migration], $pretend);
-        }
-
-        return count($migrations);
+        return $count;
     }
 
     /**
@@ -364,7 +364,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (!is_null($name)) {
+        if (! is_null($name)) {
             $this->resolver->setDefaultConnection($name);
         }
 

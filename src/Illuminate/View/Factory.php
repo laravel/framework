@@ -138,7 +138,7 @@ class Factory implements FactoryContract
      * @param  string  $view
      * @param  array   $data
      * @param  array   $mergeData
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function make($view, $data = [], $mergeData = [])
     {
@@ -161,7 +161,6 @@ class Factory implements FactoryContract
      * Normalize a view name.
      *
      * @param  string $name
-     *
      * @return string
      */
     protected function normalizeName($name)
@@ -289,7 +288,7 @@ class Factory implements FactoryContract
      */
     public function getEngineFromPath($path)
     {
-        if (!$extension = $this->getExtension($path)) {
+        if (! $extension = $this->getExtension($path)) {
             throw new InvalidArgumentException("Unrecognized extension in file: $path");
         }
 
@@ -309,20 +308,20 @@ class Factory implements FactoryContract
         $extensions = array_keys($this->extensions);
 
         return Arr::first($extensions, function ($key, $value) use ($path) {
-            return ends_with($path, $value);
+            return Str::endsWith($path, $value);
         });
     }
 
     /**
      * Add a piece of shared data to the environment.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param  array|string  $key
+     * @param  mixed  $value
+     * @return mixed
      */
     public function share($key, $value = null)
     {
-        if (!is_array($key)) {
+        if (! is_array($key)) {
             return $this->shared[$key] = $value;
         }
 
@@ -435,7 +434,7 @@ class Factory implements FactoryContract
      *
      * @param  string    $name
      * @param  \Closure  $callback
-     * @param  int      $priority
+     * @param  int|null  $priority
      * @return void
      */
     protected function addEventListener($name, $callback, $priority = null)

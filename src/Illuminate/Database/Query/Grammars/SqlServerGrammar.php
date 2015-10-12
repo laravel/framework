@@ -46,7 +46,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileColumns(Builder $query, $columns)
     {
-        if (!is_null($query->aggregate)) {
+        if (! is_null($query->aggregate)) {
             return;
         }
 
@@ -77,7 +77,7 @@ class SqlServerGrammar extends Grammar
             return $from.' '.$query->lock;
         }
 
-        if (!is_null($query->lock)) {
+        if (! is_null($query->lock)) {
             return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
         }
 
@@ -96,7 +96,7 @@ class SqlServerGrammar extends Grammar
         // An ORDER BY clause is required to make this offset query work, so if one does
         // not exist we'll just create a dummy clause to trick the database and so it
         // does not complain about the queries for not having an "order by" clause.
-        if (!isset($components['orders'])) {
+        if (! isset($components['orders'])) {
             $components['orders'] = 'order by (select 0)';
         }
 
@@ -197,6 +197,30 @@ class SqlServerGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return ['truncate table '.$this->wrapTable($query->from) => []];
+    }
+
+    /**
+     * Compile a "where date" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDate(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'cast('.$this->wrap($where['column']).' as date) '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Determine if the grammar supports savepoints.
+     *
+     * @return bool
+     */
+    public function supportsSavepoints()
+    {
+        return false;
     }
 
     /**

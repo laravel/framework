@@ -89,6 +89,16 @@ class RouteListCommand extends Command
             $results[] = $this->getRouteInformation($route);
         }
 
+        if ($sort = $this->option('sort')) {
+            $results = array_sort($results, function ($value) use ($sort) {
+                return $value[$sort];
+            });
+        }
+
+        if ($this->option('reverse')) {
+            $results = array_reverse($results);
+        }
+
         return array_filter($results);
     }
 
@@ -137,7 +147,7 @@ class RouteListCommand extends Command
 
         $actionName = $route->getActionName();
 
-        if (!empty($actionName) && $actionName !== 'Closure') {
+        if (! empty($actionName) && $actionName !== 'Closure') {
             $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
         }
 
@@ -175,7 +185,7 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($controller->getMiddleware() as $name => $options) {
-            if (!$this->methodExcludedByOptions($method, $options)) {
+            if (! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = Arr::get($middleware, $name, $name);
             }
         }
@@ -192,8 +202,8 @@ class RouteListCommand extends Command
      */
     protected function methodExcludedByOptions($method, array $options)
     {
-        return (!empty($options['only']) && !in_array($method, (array) $options['only'])) ||
-            (!empty($options['except']) && in_array($method, (array) $options['except']));
+        return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
+            (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -240,8 +250,9 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && !Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && !Str::contains($route['uri'], $this->option('path'))) {
+        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
+             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+             $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
             return;
         }
 
@@ -256,9 +267,15 @@ class RouteListCommand extends Command
     protected function getOptions()
     {
         return [
+            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method.'],
+
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+
+            ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
+
+            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by.', 'uri'],
         ];
     }
 }

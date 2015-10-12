@@ -68,6 +68,17 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
         $store->forever('foo', 'Hello World', 10);
     }
 
+    public function testForeversAreNotRemovedOnIncrement()
+    {
+        $files = $this->mockFilesystem();
+        $contents = '9999999999'.serialize('Hello World');
+        $store = new FileStore($files, __DIR__);
+        $store->forever('foo', 'Hello World');
+        $store->increment('foo');
+        $files->expects($this->once())->method('get')->will($this->returnValue($contents));
+        $this->assertEquals('Hello World', $store->get('foo'));
+    }
+
     public function testRemoveDeletesFileDoesntExist()
     {
         $files = $this->mockFilesystem();

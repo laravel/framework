@@ -3,12 +3,13 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
-use RuntimeException;
+use Throwable;
 use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel implements KernelContract
 {
@@ -88,6 +89,12 @@ class Kernel implements KernelContract
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+
+            $this->reportException($e);
+
+            $response = $this->renderException($request, $e);
         }
 
         $this->app['events']->fire('kernel.handled', [$request, $response]);
@@ -109,12 +116,9 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
-        $shouldSkipMiddleware = $this->app->bound('middleware.disable') &&
-                                $this->app->make('middleware.disable') === true;
-
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($shouldSkipMiddleware ? [] : $this->middleware)
+                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
                     ->then($this->dispatchToRouter());
     }
 
@@ -127,9 +131,12 @@ class Kernel implements KernelContract
      */
     public function terminate($request, $response)
     {
-        $routeMiddlewares = $this->gatherRouteMiddlewares($request);
+        $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
+            $this->gatherRouteMiddlewares($request),
+            $this->middleware
+        );
 
-        foreach (array_merge($routeMiddlewares, $this->middleware) as $middleware) {
+        foreach ($middlewares as $middleware) {
             list($name, $parameters) = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
@@ -211,7 +218,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (!$this->app->hasBeenBootstrapped()) {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
     }

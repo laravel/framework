@@ -12,19 +12,19 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testDataCanBeSetOnView()
     {
-        $view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', []);
+        $view = $this->getView();
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
 
-        $view = new View(m::mock('Illuminate\View\Factory'), m::mock('Illuminate\View\Engines\EngineInterface'), 'view', 'path', []);
+        $view = $this->getView();
         $view->withFoo('bar')->withBaz('boom');
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
     }
 
     public function testRenderProperlyRendersView()
     {
-        $view = $this->getView();
+        $view = $this->getView(['foo' => 'bar']);
         $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
         $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
@@ -32,13 +32,35 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
         $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering')->once();
 
-        $me = $this;
-        $callback = function (View $rendered, $contents) use ($me, $view) {
-            $me->assertEquals($view, $rendered);
-            $me->assertEquals('contents', $contents);
+        $callback = function (View $rendered, $contents) use ($view) {
+            $this->assertEquals($view, $rendered);
+            $this->assertEquals('contents', $contents);
         };
 
         $this->assertEquals('contents', $view->render($callback));
+    }
+
+    public function testRenderHandlingCallbackReturnValues()
+    {
+        $view = $this->getView();
+        $view->getFactory()->shouldReceive('incrementRender');
+        $view->getFactory()->shouldReceive('callComposer');
+        $view->getFactory()->shouldReceive('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->andReturn('contents');
+        $view->getFactory()->shouldReceive('decrementRender');
+        $view->getFactory()->shouldReceive('flushSectionsIfDoneRendering');
+
+        $this->assertEquals('new contents', $view->render(function () {
+            return 'new contents';
+        }));
+
+        $this->assertEquals('', $view->render(function () {
+            return '';
+        }));
+
+        $this->assertEquals('contents', $view->render(function () {
+            return; // null
+        }));
     }
 
     public function testRenderSectionsReturnsEnvironmentSections()
@@ -58,7 +80,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testSectionsAreNotFlushedWhenNotDoneRendering()
     {
-        $view = $this->getView();
+        $view = $this->getView(['foo' => 'bar']);
         $view->getFactory()->shouldReceive('incrementRender')->twice();
         $view->getFactory()->shouldReceive('callComposer')->twice()->with($view);
         $view->getFactory()->shouldReceive('getShared')->twice()->andReturn(['shared' => 'foo']);
@@ -84,13 +106,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
         $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
-        $view = new View(
-            m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
-            'view',
-            'path',
-            $arrayable
-        );
+        $view = $this->getView($arrayable);
 
         $this->assertEquals('bar', $view->foo);
         $this->assertEquals(['qux', 'corge'], $view->baz);
@@ -98,7 +114,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testViewGettersSetters()
     {
-        $view = $this->getView();
+        $view = $this->getView(['foo' => 'bar']);
         $this->assertEquals($view->getName(), 'view');
         $this->assertEquals($view->getPath(), 'path');
         $data = $view->getData();
@@ -109,7 +125,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testViewArrayAccess()
     {
-        $view = $this->getView();
+        $view = $this->getView(['foo' => 'bar']);
         $this->assertInstanceOf('ArrayAccess', $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');
@@ -121,7 +137,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
     public function testViewMagicMethods()
     {
-        $view = $this->getView();
+        $view = $this->getView(['foo' => 'bar']);
         $this->assertTrue(isset($view->foo));
         $this->assertEquals($view->foo, 'bar');
         $view->foo = 'baz';
@@ -186,14 +202,14 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($foo[0], 'baz');
     }
 
-    protected function getView()
+    protected function getView($data = [])
     {
         return new View(
             m::mock('Illuminate\View\Factory'),
             m::mock('Illuminate\View\Engines\EngineInterface'),
             'view',
             'path',
-            ['foo' => 'bar']
+            $data
         );
     }
 }

@@ -30,6 +30,20 @@ class ListenerMakeCommand extends GeneratorCommand
     protected $type = 'Listener';
 
     /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        if (! $this->option('event')) {
+            return $this->error('Missing required option: --event');
+        }
+
+        parent::fire();
+    }
+
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -41,7 +55,7 @@ class ListenerMakeCommand extends GeneratorCommand
 
         $event = $this->option('event');
 
-        if (!Str::startsWith($event, $this->laravel->getNamespace())) {
+        if (! Str::startsWith($event, $this->laravel->getNamespace())) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 

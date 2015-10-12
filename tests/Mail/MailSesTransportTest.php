@@ -49,10 +49,6 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
             ->method('sendRawEmail')
             ->with($this->equalTo([
                 'Source' => 'myself@example.com',
-                'Destinations' => [
-                    'me@example.com',
-                    'you@example.com',
-                ],
                 'RawMessage' => ['Data' => (string) $message],
             ]));
 

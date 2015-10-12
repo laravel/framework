@@ -96,7 +96,7 @@ class MigrationCreator
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
-        if (!is_null($table)) {
+        if (! is_null($table)) {
             $stub = str_replace('DummyTable', $table, $stub);
         }
 

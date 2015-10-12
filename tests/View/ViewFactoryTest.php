@@ -246,6 +246,21 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hi there', $factory->yieldContent('foo'));
     }
 
+    public function testSectionMultipleExtending()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hello @parent nice to see you @parent';
+        $factory->stopSection();
+        $factory->startSection('foo');
+        echo 'my @parent';
+        $factory->stopSection();
+        $factory->startSection('foo');
+        echo 'friend';
+        $factory->stopSection();
+        $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
+    }
+
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();
@@ -297,7 +312,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testEmptyStringIsReturnedForNonSections()
     {
         $factory = $this->getFactory();
-        $this->assertEquals('', $factory->yieldContent('foo'));
+        $this->assertEmpty($factory->yieldContent('foo'));
     }
 
     public function testSectionFlushing()

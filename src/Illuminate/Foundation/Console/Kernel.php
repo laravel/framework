@@ -3,11 +3,13 @@
 namespace Illuminate\Foundation\Console;
 
 use Exception;
+use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class Kernel implements KernelContract
 {
@@ -31,6 +33,13 @@ class Kernel implements KernelContract
      * @var \Illuminate\Console\Application
      */
     protected $artisan;
+
+    /**
+     * The Artisan commands provided by the application.
+     *
+     * @var array
+     */
+    protected $commands = [];
 
     /**
      * The bootstrap classes for the application.
@@ -57,6 +66,10 @@ class Kernel implements KernelContract
      */
     public function __construct(Application $app, Dispatcher $events)
     {
+        if (! defined('ARTISAN_BINARY')) {
+            define('ARTISAN_BINARY', 'artisan');
+        }
+
         $this->app = $app;
         $this->events = $events;
 
@@ -98,6 +111,14 @@ class Kernel implements KernelContract
             $this->renderException($output, $e);
 
             return 1;
+        } catch (Throwable $e) {
+            $e = new FatalThrowableError($e);
+
+            $this->reportException($e);
+
+            $this->renderException($output, $e);
+
+            return 1;
         }
     }
 
@@ -134,11 +155,6 @@ class Kernel implements KernelContract
     public function call($command, array $parameters = [])
     {
         $this->bootstrap();
-
-        // If we are calling a arbitary command from within the application, we will load
-        // all of the available deferred providers which will make all of the commands
-        // available to an application. Otherwise the command will not be available.
-        $this->app->loadDeferredProviders();
 
         return $this->getArtisan()->call($command, $parameters);
     }
@@ -182,16 +198,19 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Bootstrap the application for HTTP requests.
+     * Bootstrap the application for artisan commands.
      *
      * @return void
      */
     public function bootstrap()
     {
-        if (!$this->app->hasBeenBootstrapped()) {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
+        // If we are calling a arbitary command from within the application, we will load
+        // all of the available deferred providers which will make all of the commands
+        // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
     }
 

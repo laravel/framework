@@ -96,7 +96,7 @@ class IronJob extends Job implements JobContract
     {
         parent::release($delay);
 
-        if (!$this->pushed) {
+        if (! $this->pushed) {
             $this->delete();
         }
 

@@ -59,4 +59,14 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
         $store = new Illuminate\Cache\MemcachedStore($memcache);
         $store->forget('foo');
     }
+
+    public function testGetAndSetPrefix()
+    {
+        $store = new Illuminate\Cache\MemcachedStore(new Memcached(), 'bar');
+        $this->assertEquals('bar:', $store->getPrefix());
+        $store->setPrefix('foo');
+        $this->assertEquals('foo:', $store->getPrefix());
+        $store->setPrefix(null);
+        $this->assertEmpty($store->getPrefix());
+    }
 }

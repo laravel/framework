@@ -31,7 +31,7 @@ class SQLiteGrammar extends Grammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -71,6 +71,18 @@ class SQLiteGrammar extends Grammar
         $sql['delete from '.$this->wrapTable($query->from)] = [];
 
         return $sql;
+    }
+
+    /**
+     * Compile a "where date" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDate(Builder $query, $where)
+    {
+        return $this->dateBasedWhere('%Y-%m-%d', $query, $where);
     }
 
     /**

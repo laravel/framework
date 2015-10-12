@@ -25,7 +25,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.1.3 (LTS)';
+    const VERSION = '5.1.19 (LTS)';
 
     /**
      * The base path for the Laravel installation.
@@ -517,7 +517,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function register($provider, $options = [], $force = false)
     {
-        if ($registered = $this->getProvider($provider) && !$force) {
+        if ($registered = $this->getProvider($provider) && ! $force) {
             return $registered;
         }
 
@@ -615,7 +615,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function loadDeferredProvider($service)
     {
-        if (!isset($this->deferredServices[$service])) {
+        if (! isset($this->deferredServices[$service])) {
             return;
         }
 
@@ -624,7 +624,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if (!isset($this->loadedProviders[$provider])) {
+        if (! isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -647,7 +647,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->register($instance = new $provider($this));
 
-        if (!$this->booted) {
+        if (! $this->booted) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -780,6 +780,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         return $this['Illuminate\Contracts\Http\Kernel']->handle(Request::createFromBase($request));
+    }
+
+    /**
+     * Determine if middleware has been disabled for the application.
+     *
+     * @return bool
+     */
+    public function shouldSkipMiddleware()
+    {
+        return $this->bound('middleware.disable') &&
+               $this->make('middleware.disable') === true;
     }
 
     /**
@@ -969,7 +980,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function hasMonologConfigurator()
     {
-        return !is_null($this->monologConfigurator);
+        return ! is_null($this->monologConfigurator);
     }
 
     /**
@@ -1035,7 +1046,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
             'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
             'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
-            'paginator'            => 'Illuminate\Pagination\Factory',
             'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
             'queue'                => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory', 'Illuminate\Contracts\Queue\Monitor'],
             'queue.connection'     => 'Illuminate\Contracts\Queue\Queue',
@@ -1092,11 +1102,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getNamespace()
     {
-        if (!is_null($this->namespace)) {
+        if (! is_null($this->namespace)) {
             return $this->namespace;
         }
 
-        $composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
+        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
 
         foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
             foreach ((array) $path as $pathChoice) {

@@ -17,6 +17,7 @@
         "php": ">=5.5.9",
         "illuminate/container": "5.1.*",
         "illuminate/contracts": "5.1.*",
+        "illuminate/events": "5.1.*",
         "illuminate/filesystem": "5.1.*",
         "illuminate/support": "5.1.*"
     },

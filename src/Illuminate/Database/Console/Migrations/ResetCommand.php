@@ -52,13 +52,13 @@ class ResetCommand extends Command
      */
     public function fire()
     {
-        if (!$this->confirmToProceed()) {
+        if (! $this->confirmToProceed()) {
             return;
         }
 
         $this->migrator->setConnection($this->input->getOption('database'));
 
-        if (!$this->migrator->repositoryExists()) {
+        if (! $this->migrator->repositoryExists()) {
             $this->output->writeln('<comment>Migration table not found.</comment>');
 
             return;

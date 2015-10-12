@@ -7,7 +7,6 @@ use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
-use Symfony\Component\Console\Input\InputOption;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class VendorPublishCommand extends Command
@@ -20,11 +19,13 @@ class VendorPublishCommand extends Command
     protected $files;
 
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'vendor:publish';
+    protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
+            {--provider= : The service provider that has assets you want to publish.}
+            {--tag=* : One or many tags that have assets you want to publish.}';
 
     /**
      * The console command description.
@@ -53,12 +54,29 @@ class VendorPublishCommand extends Command
      */
     public function fire()
     {
+        $tags = $this->option('tag');
+
+        $tags = $tags ?: [null];
+
+        foreach ($tags as $tag) {
+            $this->publishTag($tag);
+        }
+    }
+
+    /**
+     * Publishes the assets for a tag.
+     *
+     * @param  string  $tag
+     * @return mixed
+     */
+    private function publishTag($tag)
+    {
         $paths = ServiceProvider::pathsToPublish(
-            $this->option('provider'), $this->option('tag')
+            $this->option('provider'), $tag
         );
 
         if (empty($paths)) {
-            return $this->comment('Nothing to publish.');
+            return $this->comment("Nothing to publish for tag [{$tag}].");
         }
 
         foreach ($paths as $from => $to) {
@@ -71,7 +89,7 @@ class VendorPublishCommand extends Command
             }
         }
 
-        $this->info('Publishing Complete!');
+        $this->info("Publishing complete for tag [{$tag}]!");
     }
 
     /**
@@ -83,7 +101,7 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
-        if ($this->files->exists($to) && !$this->option('force')) {
+        if ($this->files->exists($to) && ! $this->option('force')) {
             return;
         }
 
@@ -109,7 +127,7 @@ class VendorPublishCommand extends Command
         ]);
 
         foreach ($manager->listContents('from://', true) as $file) {
-            if ($file['type'] === 'file' && (!$manager->has('to://'.$file['path']) || $this->option('force'))) {
+            if ($file['type'] === 'file' && (! $manager->has('to://'.$file['path']) || $this->option('force'))) {
                 $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
             }
         }
@@ -125,7 +143,7 @@ class VendorPublishCommand extends Command
      */
     protected function createParentDirectory($directory)
     {
-        if (!$this->files->isDirectory($directory)) {
+        if (! $this->files->isDirectory($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
     }
@@ -145,21 +163,5 @@ class VendorPublishCommand extends Command
         $to = str_replace(base_path(), '', realpath($to));
 
         $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files.'],
-
-            ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish.'],
-
-            ['tag', null, InputOption::VALUE_OPTIONAL, 'The tag that has assets you want to publish.'],
-        ];
     }
 }

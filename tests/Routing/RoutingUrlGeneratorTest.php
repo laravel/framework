@@ -113,6 +113,24 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
     }
 
+    public function testFluentRouteNameDefinitions()
+    {
+        $url = new UrlGenerator(
+            $routes = new Illuminate\Routing\RouteCollection,
+            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+        );
+
+        /*
+         * Named Routes
+         */
+        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', []);
+        $route->name('foo');
+        $routes->add($route);
+        $routes->refreshNameLookups();
+
+        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+    }
+
     public function testControllerRoutesWithADefaultNamespace()
     {
         $url = new UrlGenerator(
@@ -271,6 +289,21 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
     }
 
+    public function testRoutesWithDomainsThroughProxy()
+    {
+        Illuminate\Http\Request::setTrustedProxies(['10.0.0.1']);
+
+        $url = new UrlGenerator(
+            $routes = new Illuminate\Routing\RouteCollection,
+            $request = Illuminate\Http\Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
+        );
+
+        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $routes->add($route);
+
+        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+    }
+
     public function testUrlGenerationForControllers()
     {
         $url = new UrlGenerator(
@@ -334,10 +367,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+
     public function getRouteKey()
     {
         return $this->{$this->getRouteKeyName()};
     }
+
     public function getRouteKeyName()
     {
         return 'key';

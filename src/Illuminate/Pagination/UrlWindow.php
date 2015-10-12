@@ -75,7 +75,7 @@ class UrlWindow
     {
         $window = $onEachSide * 2;
 
-        if (!$this->hasPages()) {
+        if (! $this->hasPages()) {
             return [
                 'first'  => null,
                 'slider' => null,

@@ -159,29 +159,6 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             '));
     }
 
-    public function testReversedEchosAreCompiled()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setEscapedContentTags('{{', '}}');
-        $compiler->setContentTags('{{{', '}}}');
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{$name}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{
-            $name
-        }}}'));
-    }
-
-    public function testShortRawEchosAreCompiled()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setRawTags('{{', '}}');
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{$name}}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{$name}}}'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-    }
-
     public function testExtendsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -239,6 +216,30 @@ this is a comment
 breeze
 @endif';
         $expected = '<?php if(name(foo(bar))): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testCanStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@can (\'update\', [$post])
+breeze
+@endcan';
+        $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testCannotStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@cannot (\'update\', [$post])
+breeze
+@endcannot';
+        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -418,7 +419,7 @@ empty
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = "Foo @lang(function_call('foo(blah)')) bar";
-        $expected = "Foo <?php echo \Illuminate\Support\Facades\Lang::get(function_call('foo(blah)')); ?> bar";
+        $expected = "Foo <?php echo app('translator')->get(function_call('foo(blah)')); ?> bar";
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -453,8 +454,8 @@ empty
     public function testLanguageAndChoicesAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
+        $this->assertEquals('<?php echo app(\'translator\')->get(\'foo\'); ?>', $compiler->compileString("@lang('foo')"));
+        $this->assertEquals('<?php echo app(\'translator\')->choice(\'foo\', 1); ?>', $compiler->compileString("@choice('foo', 1)"));
     }
 
     public function testSectionStartsAreCompiled()
@@ -510,9 +511,11 @@ empty
     public function testCustomStatements()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertCount(0, $compiler->getCustomDirectives());
         $compiler->directive('customControl', function ($expression) {
             return "<?php echo custom_control{$expression}; ?>";
         });
+        $this->assertCount(1, $compiler->getCustomDirectives());
 
         $string = '@if($foo)
 @customControl(10, $foo, \'bar\')
@@ -535,19 +538,6 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testConfiguringContentTags()
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setContentTags('[[', ']]');
-        $compiler->setEscapedContentTags('[[[', ']]]');
-
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[[ $name ]]]'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[ $name ]]'));
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('[[
-            $name
-        ]]'));
-    }
-
     public function testRawTagsCanBeSetToLegacyValues()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -563,7 +553,7 @@ empty
     public function testExpressionsOnTheSameLine()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo \Illuminate\Support\Facades\Lang::get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo \Illuminate\Support\Facades\Lang::get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
+        $this->assertEquals('<?php echo app(\'translator\')->get(foo(bar(baz(qux(breeze()))))); ?> space () <?php echo app(\'translator\')->get(foo(bar)); ?>', $compiler->compileString('@lang(foo(bar(baz(qux(breeze()))))) space () @lang(foo(bar))'));
     }
 
     public function testExpressionWithinHTML()
@@ -571,7 +561,7 @@ empty
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<html <?php echo e($foo); ?>>', $compiler->compileString('<html {{ $foo }}>'));
         $this->assertEquals('<html<?php echo e($foo); ?>>', $compiler->compileString('<html{{ $foo }}>'));
-        $this->assertEquals('<html <?php echo e($foo); ?> <?php echo \Illuminate\Support\Facades\Lang::get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
+        $this->assertEquals('<html <?php echo e($foo); ?> <?php echo app(\'translator\')->get(\'foo\'); ?>>', $compiler->compileString('<html {{ $foo }} @lang(\'foo\')>'));
     }
 
     protected function getFiles()
@@ -603,26 +593,6 @@ test';
         $string = '@extends(name(foo))'.PHP_EOL.'test';
         $expected = 'test'.PHP_EOL.'<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    /**
-     * @dataProvider testGetTagsProvider()
-     */
-    public function testSetAndRetrieveContentTags($openingTag, $closingTag)
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setContentTags($openingTag, $closingTag);
-        $this->assertSame([$openingTag, $closingTag], $compiler->getContentTags());
-    }
-
-    /**
-     * @dataProvider testGetTagsProvider()
-     */
-    public function testSetAndRetrieveEscapedContentTags($openingTag, $closingTag)
-    {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->setEscapedContentTags($openingTag, $closingTag);
-        $this->assertSame([$openingTag, $closingTag], $compiler->getEscapedContentTags());
     }
 
     public function testGetTagsProvider()

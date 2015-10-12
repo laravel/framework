@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Faker\Factory as Faker;
+use Faker\Generator as Faker;
 use InvalidArgumentException;
 
 class FactoryBuilder
@@ -48,13 +48,14 @@ class FactoryBuilder
      * @param  string  $class
      * @param  string  $name
      * @param  array  $definitions
+     * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, array $definitions)
+    public function __construct($class, $name, array $definitions, Faker $faker)
     {
         $this->name = $name;
         $this->class = $class;
-        $this->faker = Faker::create();
+        $this->faker = $faker;
         $this->definitions = $definitions;
     }
 
@@ -122,8 +123,8 @@ class FactoryBuilder
     protected function makeInstance(array $attributes = [])
     {
         return Model::unguarded(function () use ($attributes) {
-            if (!isset($this->definitions[$this->class][$this->name])) {
-                throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}].");
+            if (! isset($this->definitions[$this->class][$this->name])) {
+                throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker, $attributes);

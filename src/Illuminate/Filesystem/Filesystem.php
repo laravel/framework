@@ -123,7 +123,7 @@ class Filesystem
 
         foreach ($paths as $path) {
             try {
-                if (!@unlink($path)) {
+                if (! @unlink($path)) {
                     $success = false;
                 }
             } catch (ErrorException $e) {
@@ -347,7 +347,7 @@ class Filesystem
      */
     public function copyDirectory($directory, $destination, $options = null)
     {
-        if (!$this->isDirectory($directory)) {
+        if (! $this->isDirectory($directory)) {
             return false;
         }
 
@@ -356,7 +356,7 @@ class Filesystem
         // If the destination directory does not actually exist, we will go ahead and
         // create it recursively, which just gets the destination prepared to copy
         // the files over. Once we make the directory we'll proceed the copying.
-        if (!$this->isDirectory($destination)) {
+        if (! $this->isDirectory($destination)) {
             $this->makeDirectory($destination, 0777, true);
         }
 
@@ -371,7 +371,7 @@ class Filesystem
             if ($item->isDir()) {
                 $path = $item->getPathname();
 
-                if (!$this->copyDirectory($path, $target, $options)) {
+                if (! $this->copyDirectory($path, $target, $options)) {
                     return false;
                 }
             }
@@ -380,7 +380,7 @@ class Filesystem
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
             else {
-                if (!$this->copy($item->getPathname(), $target)) {
+                if (! $this->copy($item->getPathname(), $target)) {
                     return false;
                 }
             }
@@ -400,7 +400,7 @@ class Filesystem
      */
     public function deleteDirectory($directory, $preserve = false)
     {
-        if (!$this->isDirectory($directory)) {
+        if (! $this->isDirectory($directory)) {
             return false;
         }
 
@@ -410,7 +410,7 @@ class Filesystem
             // If the item is a directory, we can just recurse into the function and
             // delete that sub-directory otherwise we'll just delete the file and
             // keep iterating through each file until the directory is cleaned.
-            if ($item->isDir() && !$item->isLink()) {
+            if ($item->isDir() && ! $item->isLink()) {
                 $this->deleteDirectory($item->getPathname());
             }
 
@@ -422,7 +422,7 @@ class Filesystem
             }
         }
 
-        if (!$preserve) {
+        if (! $preserve) {
             @rmdir($directory);
         }
 

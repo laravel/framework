@@ -35,9 +35,9 @@ interface Factory
     /**
      * Add a piece of shared data to the environment.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed  $value
-     * @return void
+     * @return mixed
      */
     public function share($key, $value = null);
 

@@ -81,7 +81,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (!in_array(strtolower($column), $tableColumns)) {
+            if (! in_array(strtolower($column), $tableColumns)) {
                 return false;
             }
         }

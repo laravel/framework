@@ -25,16 +25,16 @@ class VerifyPostSize
         return $next($request);
     }
 
-       /**
-        * Determine the server 'post_max_size' as bytes.
-        *
-        * @return int
-        */
-       protected function getPostMaxSize()
-       {
-           $postMaxSize = ini_get('post_max_size');
+    /**
+     * Determine the server 'post_max_size' as bytes.
+     *
+     * @return int
+     */
+    protected function getPostMaxSize()
+    {
+        $postMaxSize = ini_get('post_max_size');
 
-           switch (substr($postMaxSize, -1)) {
+        switch (substr($postMaxSize, -1)) {
             case 'M':
             case 'm':
                 return (int) $postMaxSize * 1048576;
@@ -46,6 +46,6 @@ class VerifyPostSize
                 return (int) $postMaxSize * 1073741824;
         }
 
-           return (int) $postMaxSize;
-       }
+        return (int) $postMaxSize;
+    }
 }

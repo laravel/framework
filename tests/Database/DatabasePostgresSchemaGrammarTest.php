@@ -124,6 +124,16 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
     }
 
+    public function testDropTimestampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropTimestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -168,6 +178,26 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" serial primary key not null', $statements[0]);
+    }
+
+    public function testAddingSmallIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->smallIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" smallserial primary key not null', $statements[0]);
+    }
+
+    public function testAddingMediumIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
@@ -451,6 +481,16 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone not null, add column "updated_at" timestamp(0) without time zone not null', $statements[0]);
+    }
+
+    public function testAddingTimeStampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone not null, add column "updated_at" timestamp(0) with time zone not null', $statements[0]);
     }
 
     public function testAddingBinary()

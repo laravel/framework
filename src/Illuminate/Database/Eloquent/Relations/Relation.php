@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -37,6 +38,13 @@ abstract class Relation
      * @var bool
      */
     protected static $constraints = true;
+
+    /**
+     * An array to map class names to their morph names in database.
+     *
+     * @var array
+     */
+    protected static $morphMap = [];
 
     /**
      * Create a new relation instance.
@@ -159,9 +167,11 @@ abstract class Relation
         // When resetting the relation where clause, we want to shift the first element
         // off of the bindings, leaving only the constraints that the developers put
         // as "extra" on the relationships, and not original relation constraints.
-        $results = call_user_func($callback);
-
-        static::$constraints = $previous;
+        try {
+            $results = call_user_func($callback);
+        } finally {
+            static::$constraints = $previous;
+        }
 
         return $results;
     }
@@ -270,6 +280,43 @@ abstract class Relation
     public function wrap($value)
     {
         return $this->parent->newQueryWithoutScopes()->getQuery()->getGrammar()->wrap($value);
+    }
+
+    /**
+     * Set or get the morph map for polymorphic relations.
+     *
+     * @param  array|null  $map
+     * @param  bool  $merge
+     * @return array
+     */
+    public static function morphMap(array $map = null, $merge = true)
+    {
+        $map = static::buildMorphMapFromModels($map);
+
+        if (is_array($map)) {
+            static::$morphMap = $merge ? array_merge(static::$morphMap, $map) : $map;
+        }
+
+        return static::$morphMap;
+    }
+
+    /**
+     * Builds a table-keyed array from model class names.
+     *
+     * @param  string[]|null  $models
+     * @return array|null
+     */
+    protected static function buildMorphMapFromModels(array $models = null)
+    {
+        if (is_null($models) || Arr::isAssoc($models)) {
+            return $models;
+        }
+
+        $tables = array_map(function ($model) {
+            return (new $model)->getTable();
+        }, $models);
+
+        return array_combine($tables, $models);
     }
 
     /**

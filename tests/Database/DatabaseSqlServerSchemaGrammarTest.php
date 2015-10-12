@@ -114,6 +114,16 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
     }
 
+    public function testDropTimestampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropTimestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -158,6 +168,26 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
+    }
+
+    public function testAddingSmallIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->smallIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "id" smallint identity primary key not null', $statements[0]);
+    }
+
+    public function testAddingMediumIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
@@ -250,6 +280,13 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "foo" int not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumInteger('foo', true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" int identity primary key not null', $statements[0]);
     }
 
     public function testAddingTinyInteger()
@@ -260,6 +297,13 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "foo" tinyint not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyInteger('foo', true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" tinyint identity primary key not null', $statements[0]);
     }
 
     public function testAddingSmallInteger()
@@ -270,6 +314,13 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "foo" smallint not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->smallInteger('foo', true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" smallint identity primary key not null', $statements[0]);
     }
 
     public function testAddingFloat()
@@ -420,6 +471,16 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
+    }
+
+    public function testAddingTimeStampsTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null, "updated_at" datetimeoffset(0) not null', $statements[0]);
     }
 
     public function testAddingRememberToken()

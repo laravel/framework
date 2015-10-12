@@ -133,7 +133,7 @@ class IronQueue extends Queue implements QueueContract
         // If we were able to pop a message off of the queue, we will need to decrypt
         // the message body, as all Iron.io messages are encrypted, since the push
         // queues will be a security hazard to unsuspecting developers using it.
-        if (!is_null($job)) {
+        if (! is_null($job)) {
             $job->body = $this->parseJobBody($job->body);
 
             return new IronJob($this->container, $this, $job);

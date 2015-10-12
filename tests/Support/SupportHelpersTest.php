@@ -187,7 +187,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testStrRandom()
     {
         $result = Str::random(20);
-        $this->assertTrue(is_string($result));
+        $this->assertInternalType('string', $result);
         $this->assertEquals(20, strlen($result));
     }
 
@@ -210,10 +210,10 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testEndsWith()
     {
-        $this->assertTrue(ends_with('jason', 'on'));
-        $this->assertTrue(ends_with('jason', ['on']));
-        $this->assertFalse(ends_with('jason', 'no'));
-        $this->assertFalse(ends_with('jason', ['no']));
+        $this->assertTrue(Str::endsWith('jason', 'on'));
+        $this->assertTrue(Str::endsWith('jason', ['on']));
+        $this->assertFalse(Str::endsWith('jason', 'no'));
+        $this->assertFalse(Str::endsWith('jason', ['no']));
     }
 
     public function testStrContains()
@@ -351,7 +351,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 'bar',
                 'baz',
                 'foo',
-            ]
+            ],
         ];
 
         $this->assertEquals($assumedArray, array_sort_recursive($array));

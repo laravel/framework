@@ -27,7 +27,7 @@ abstract class Grammar
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Database\Query\Expression  $table
      * @return string
      */
     public function wrapTable($table)
@@ -42,7 +42,7 @@ abstract class Grammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  string  $value
+     * @param  string|\Illuminate\Database\Query\Expression  $value
      * @param  bool    $prefixAlias
      * @return string
      */

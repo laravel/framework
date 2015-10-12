@@ -61,7 +61,7 @@ class MorphTo extends BelongsTo
      */
     public function getResults()
     {
-        if (!$this->otherKey) {
+        if (! $this->otherKey) {
             return;
         }
 
@@ -213,7 +213,9 @@ class MorphTo extends BelongsTo
      */
     public function createModelByType($type)
     {
-        return new $type;
+        $class = $this->parent->getActualClassNameForMorph($type);
+
+        return new $class;
     }
 
     /**

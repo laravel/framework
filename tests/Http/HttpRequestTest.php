@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase
@@ -324,6 +325,31 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($payload, $data);
     }
 
+    public function testPrefers()
+    {
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json'])->prefers(['json']));
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json'])->prefers(['html', 'json']));
+        $this->assertEquals('application/foo+json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json'])->prefers('application/foo+json'));
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json'])->prefers('json'));
+        $this->assertEquals('html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.5, text/html;q=1.0'])->prefers(['json', 'html']));
+        $this->assertEquals('txt', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.5, text/plain;q=1.0, text/html;q=1.0'])->prefers(['json', 'txt', 'html']));
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('json'));
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8'])->prefers('json'));
+        $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/xml; charset=utf-8'])->prefers(['html', 'json']));
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json, text/html'])->prefers(['html', 'json']));
+        $this->assertEquals('html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['html', 'json']));
+
+        $this->assertEquals('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8'])->prefers('application/json'));
+        $this->assertEquals('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json, text/html'])->prefers(['text/html', 'application/json']));
+        $this->assertEquals('text/html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['text/html', 'application/json']));
+        $this->assertEquals('text/html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['application/json', 'text/html']));
+
+        $this->assertEquals('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*; charset=utf-8'])->prefers('json'));
+        $this->assertEquals('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('application/json'));
+        $this->assertEquals('application/xml', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('application/xml'));
+        $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('text/html'));
+    }
+
     public function testAllInputReturnsInputAndFiles()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
@@ -511,5 +537,102 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request = Request::createFromBase($base);
 
         $this->assertEquals($request->request->all(), $body);
+    }
+
+    /**
+     * Tests for Http\Request magic methods `__get()` and `__isset()`.
+     *
+     * @link https://github.com/laravel/framework/issues/10403 Form request object attribute returns empty when have some string.
+     */
+    public function testMagicMethods()
+    {
+        // Simulates QueryStrings.
+        $request = Request::create('/', 'GET', ['foo' => 'bar', 'empty' => '']);
+
+        // Parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
+        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Parameter 'empty' is '', then it ISSET and is EMPTY.
+        $this->assertEquals($request->empty, '');
+        $this->assertEquals(isset($request->empty), true);
+        $this->assertEquals(empty($request->empty), true);
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Simulates Route parameters.
+        $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwrited']);
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/example/{foo}/{xyz?}/{undefined?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        // Router parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
+        $this->assertEquals($request->foo, 'bar');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Router parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Special case: router parameter 'xyz' is 'overwrited' by QueryString, then it ISSET and is NOT EMPTY.
+        // Basically, QueryStrings have priority over router parameters.
+        $this->assertEquals($request->xyz, 'overwrited');
+        $this->assertEquals(isset($request->foo), true);
+        $this->assertEquals(empty($request->foo), false);
+
+        // Simulates empty QueryString and Routes.
+        $request = Request::create('/', 'GET');
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+
+        // Special case: simulates empty QueryString and Routes, without the Route Resolver.
+        // It'll happen when you try to get a parameter outside a route.
+        $request = Request::create('/', 'GET');
+
+        // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
+        $this->assertEquals($request->undefined, null);
+        $this->assertEquals(isset($request->undefined), false);
+        $this->assertEquals(empty($request->undefined), true);
+    }
+
+    public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $request->setSession($session);
+        $request->flash();
+    }
+
+    public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
+    {
+        $request = m::mock('Illuminate\Http\Request[flash]');
+        $request->shouldReceive('flash')->once()->with('only', ['key1', 'key2']);
+        $request->flashOnly(['key1', 'key2']);
+    }
+
+    public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
+    {
+        $request = m::mock('Illuminate\Http\Request[flash]');
+        $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
+        $request->flashExcept(['key1', 'key2']);
     }
 }

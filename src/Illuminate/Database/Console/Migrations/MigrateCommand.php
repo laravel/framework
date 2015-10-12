@@ -51,7 +51,7 @@ class MigrateCommand extends BaseCommand
      */
     public function fire()
     {
-        if (!$this->confirmToProceed()) {
+        if (! $this->confirmToProceed()) {
             return;
         }
 
@@ -65,7 +65,7 @@ class MigrateCommand extends BaseCommand
         // Next, we will check to see if a path option has been defined. If it has
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
-        if (!is_null($path = $this->input->getOption('path'))) {
+        if (! is_null($path = $this->input->getOption('path'))) {
             $path = $this->laravel->basePath().'/'.$path;
         } else {
             $path = $this->getMigrationPath();
@@ -97,7 +97,7 @@ class MigrateCommand extends BaseCommand
     {
         $this->migrator->setConnection($this->input->getOption('database'));
 
-        if (!$this->migrator->repositoryExists()) {
+        if (! $this->migrator->repositoryExists()) {
             $options = ['--database' => $this->input->getOption('database')];
 
             $this->call('migrate:install', $options);

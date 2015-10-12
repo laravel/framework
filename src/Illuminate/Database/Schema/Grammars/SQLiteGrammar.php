@@ -84,11 +84,11 @@ class SQLiteGrammar extends Grammar
         foreach ($foreigns as $foreign) {
             $sql .= $this->getForeignKey($foreign);
 
-            if (!is_null($foreign->onDelete)) {
+            if (! is_null($foreign->onDelete)) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
-            if (!is_null($foreign->onUpdate)) {
+            if (! is_null($foreign->onUpdate)) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
         }
@@ -126,7 +126,7 @@ class SQLiteGrammar extends Grammar
     {
         $primary = $this->getCommandByName($blueprint, 'primary');
 
-        if (!is_null($primary)) {
+        if (! is_null($primary)) {
             $columns = $this->columnize($primary->columns);
 
             return ", primary key ({$columns})";
@@ -583,7 +583,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (!is_null($column->default)) {
+        if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

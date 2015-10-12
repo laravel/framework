@@ -82,7 +82,7 @@ class ResponseFactory implements FactoryContract
      */
     public function json($data = [], $status = 200, array $headers = [], $options = 0)
     {
-        if ($data instanceof Arrayable && !$data instanceof JsonSerializable) {
+        if ($data instanceof Arrayable && ! $data instanceof JsonSerializable) {
             $data = $data->toArray();
         }
 
@@ -130,7 +130,7 @@ class ResponseFactory implements FactoryContract
     {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
-        if (!is_null($name)) {
+        if (! is_null($name)) {
             return $response->setContentDisposition($disposition, $name, str_replace('%', '', Str::ascii($name)));
         }
 

@@ -10,7 +10,7 @@ trait BootstrapThreeNextPreviousButtonRendererTrait
      * @param  string  $text
      * @return string
      */
-    protected function getPreviousButton($text = '&laquo;')
+    public function getPreviousButton($text = '&laquo;')
     {
         // If the current page is less than or equal to one, it means we can't go any
         // further back in the pages, so we will render a disabled previous button
@@ -32,12 +32,12 @@ trait BootstrapThreeNextPreviousButtonRendererTrait
      * @param  string  $text
      * @return string
      */
-    protected function getNextButton($text = '&raquo;')
+    public function getNextButton($text = '&raquo;')
     {
         // If the current page is greater than or equal to the last page, it means we
         // can't go any further into the pages, as we're already on this last page
         // that is available, so we will make it the "next" link style disabled.
-        if (!$this->paginator->hasMorePages()) {
+        if (! $this->paginator->hasMorePages()) {
             return $this->getDisabledTextWrapper($text);
         }
 

@@ -39,7 +39,7 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
     {
         $this->router->get($this->setCookiePath, [
             'middleware' => 'EncryptCookiesTestMiddleware',
-            'uses' => 'EncryptCookiesTestController@setCookies'
+            'uses' => 'EncryptCookiesTestController@setCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->setCookiePath, 'GET'));
@@ -56,7 +56,7 @@ class EncryptCookiesTest extends PHPUnit_Framework_TestCase
     {
         $this->router->get($this->queueCookiePath, [
             'middleware' => ['EncryptCookiesTestMiddleware', 'AddQueuedCookiesToResponseTestMiddleware'],
-            'uses' => 'EncryptCookiesTestController@queueCookies'
+            'uses' => 'EncryptCookiesTestController@queueCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->queueCookiePath, 'GET'));

@@ -3,11 +3,13 @@
 namespace Illuminate\Queue;
 
 use Exception;
+use Throwable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Queue\Failed\FailedJobProviderInterface;
-use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Queue\Failed\FailedJobProviderInterface;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
 {
@@ -111,6 +113,10 @@ class Worker
             if ($this->exceptions) {
                 $this->exceptions->report($e);
             }
+        } catch (Throwable $e) {
+            if ($this->exceptions) {
+                $this->exceptions->report(new FatalThrowableError($e));
+            }
         }
     }
 
@@ -147,7 +153,7 @@ class Worker
         // If we're able to pull a job off of the stack, we will process it and
         // then immediately return back out. If there is no job on the queue
         // we will "sleep" the worker for the specified number of seconds.
-        if (!is_null($job)) {
+        if (! is_null($job)) {
             return $this->process(
                 $this->manager->getName($connectionName), $job, $maxTries, $delay
             );
@@ -172,7 +178,7 @@ class Worker
         }
 
         foreach (explode(',', $queue) as $queue) {
-            if (!is_null($job = $connection->pop($queue))) {
+            if (! is_null($job = $connection->pop($queue))) {
                 return $job;
             }
         }
@@ -187,7 +193,7 @@ class Worker
      * @param  int  $delay
      * @return void
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function process($connection, Job $job, $maxTries = 0, $delay = 0)
     {
@@ -201,16 +207,40 @@ class Worker
             // the delete method on the job. Otherwise we will just keep moving.
             $job->fire();
 
+            $this->raiseAfterJobEvent($connection, $job);
+
             return ['job' => $job, 'failed' => false];
         } catch (Exception $e) {
             // If we catch an exception, we will attempt to release the job back onto
             // the queue so it is not lost. This will let is be retried at a later
             // time by another listener (or the same one). We will do that here.
-            if (!$job->isDeleted()) {
+            if (! $job->isDeleted()) {
                 $job->release($delay);
             }
 
             throw $e;
+        } catch (Throwable $e) {
+            if (! $job->isDeleted()) {
+                $job->release($delay);
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Raise the after queue job event.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseAfterJobEvent($connection, Job $job)
+    {
+        if ($this->events) {
+            $data = json_decode($job->getRawBody(), true);
+
+            $this->events->fire('illuminate.queue.after', [$connection, $job, $data]);
         }
     }
 

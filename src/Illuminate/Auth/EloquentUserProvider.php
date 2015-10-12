@@ -92,7 +92,7 @@ class EloquentUserProvider implements UserProvider
         $query = $this->createModel()->newQuery();
 
         foreach ($credentials as $key => $value) {
-            if (!Str::contains($key, 'password')) {
+            if (! Str::contains($key, 'password')) {
                 $query->where($key, $value);
             }
         }
@@ -124,5 +124,51 @@ class EloquentUserProvider implements UserProvider
         $class = '\\'.ltrim($this->model, '\\');
 
         return new $class;
+    }
+
+    /**
+     * Gets the hasher implementation.
+     *
+     * @return \Illuminate\Contracts\Hashing\Hasher
+     */
+    public function getHasher()
+    {
+        return $this->hasher;
+    }
+
+    /**
+     * Sets the hasher implementation.
+     *
+     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
+     * @return $this
+     */
+    public function setHasher(HasherContract $hasher)
+    {
+        $this->hasher = $hasher;
+
+        return $this;
+    }
+
+    /**
+     * Gets the name of the Eloquent user model.
+     *
+     * @return string
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Sets the name of the Eloquent user model.
+     *
+     * @param  string  $model
+     * @return $this
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+
+        return $this;
     }
 }

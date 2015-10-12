@@ -118,7 +118,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
-        $this->assertEquals(json_encode('foo'), $results);
+        $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
     }
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
@@ -126,7 +126,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['toArray']);
         $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
 
-        $this->assertEquals(json_encode('foo'), (string) $c);
+        $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }
 
     public function testOffsetAccess()
@@ -140,6 +140,32 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($c['name']));
         $c[] = 'jason';
         $this->assertEquals('jason', $c[0]);
+    }
+
+    public function testForgetSingleKey()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $c->forget(0);
+        $this->assertFalse(isset($c['foo']));
+
+        $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
+        $c->forget('foo');
+        $this->assertFalse(isset($c['foo']));
+    }
+
+    public function testForgetArrayOfKeys()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $c->forget([0, 2]);
+        $this->assertFalse(isset($c[0]));
+        $this->assertFalse(isset($c[2]));
+        $this->assertTrue(isset($c[1]));
+
+        $c = new Collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
+        $c->forget(['foo', 'baz']);
+        $this->assertFalse(isset($c['foo']));
+        $this->assertFalse(isset($c['baz']));
+        $this->assertTrue(isset($c['name']));
     }
 
     public function testCountable()
@@ -302,6 +328,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = (new Collection([5, 3, 1, 2, 4]))->sort();
         $this->assertEquals([1, 2, 3, 4, 5], $data->values()->all());
 
+        $data = (new Collection([-1, -3, -2, -4, -5, 0, 5, 3, 1, 2, 4]))->sort();
+        $this->assertEquals([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5], $data->values()->all());
+
         $data = (new Collection(['foo', 'bar-10', 'bar-1']))->sort();
         $this->assertEquals(['bar-1', 'bar-10', 'foo'], $data->values()->all());
     }
@@ -364,6 +393,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, $data->count());
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
         $this->assertEquals([10], $data[3]->toArray());
+    }
+
+    public function testEvery()
+    {
+        $data = new Collection([
+            6 => 'a',
+            4 => 'b',
+            7 => 'c',
+            1 => 'd',
+            5 => 'e',
+            3 => 'f',
+        ]);
+
+        $this->assertEquals(['a', 'e'], $data->every(4)->all());
+        $this->assertEquals(['b', 'f'], $data->every(4, 1)->all());
+        $this->assertEquals(['c'], $data->every(4, 2)->all());
+        $this->assertEquals(['d'], $data->every(4, 3)->all());
     }
 
     public function testPluckWithArrayAndObjectValues()
@@ -694,7 +740,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $c->search(2));
         $this->assertEquals('foo', $c->search('bar'));
         $this->assertEquals(4, $c->search(function ($value) { return $value > 4; }));
-        $this->assertEquals('foo', $c->search(function ($value) { return !is_numeric($value); }));
+        $this->assertEquals('foo', $c->search(function ($value) { return ! is_numeric($value); }));
     }
 
     public function testSearchReturnsFalseWhenItemIsNotFound()
@@ -778,6 +824,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection();
         $this->assertNull($c->min());
     }
+
+    public function testGettingAvgItemsFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(15, $c->avg('foo'));
+
+        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $this->assertEquals(15, $c->avg('foo'));
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals(3, $c->avg());
+
+        $c = new Collection();
+        $this->assertNull($c->avg());
+    }
 }
 
 class TestAccessorEloquentTestStub
@@ -804,7 +865,7 @@ class TestAccessorEloquentTestStub
         $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return !is_null($this->$accessor());
+            return ! is_null($this->$accessor());
         }
 
         return isset($this->$attribute);

@@ -42,7 +42,7 @@ class CallQueuedHandler
             $this->setJobInstanceIfNecessary($job, $handler);
         });
 
-        if (!$job->isDeletedOrReleased()) {
+        if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
     }

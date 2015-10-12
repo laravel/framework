@@ -128,7 +128,7 @@ abstract class AbstractPaginator
         }
 
         return $this->path.'?'
-                        .http_build_query($parameters, null, '&')
+                        .urldecode(http_build_query($parameters, null, '&'))
                         .$this->buildFragment();
     }
 
@@ -275,7 +275,7 @@ abstract class AbstractPaginator
      */
     public function hasPages()
     {
-        return !($this->currentPage() == 1 && !$this->hasMorePages());
+        return ! ($this->currentPage() == 1 && ! $this->hasMorePages());
     }
 
     /**

@@ -48,6 +48,15 @@ class JoinClause
     /**
      * Add an "on" clause to the join.
      *
+     * On clauses can be chained, e.g.
+     *
+     *  $join->on('contacts.user_id', '=', 'users.id')
+     *       ->on('contacts.info_id', '=', 'info.id')
+     *
+     * will produce the following SQL:
+     *
+     * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
+     *
      * @param  string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -57,11 +66,15 @@ class JoinClause
      */
     public function on($first, $operator, $second, $boolean = 'and', $where = false)
     {
-        $this->clauses[] = compact('first', 'operator', 'second', 'boolean', 'where');
-
         if ($where) {
             $this->bindings[] = $second;
         }
+
+        if ($where && ($operator === 'in' || $operator === 'not in') && is_array($second)) {
+            $second = count($second);
+        }
+
+        $this->clauses[] = compact('first', 'operator', 'second', 'boolean', 'where');
 
         return $this;
     }
@@ -150,5 +163,53 @@ class JoinClause
     public function orWhereNotNull($column)
     {
         return $this->whereNotNull($column, 'or');
+    }
+
+    /**
+     * Add an "on where in (...)" clause to the join.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function whereIn($column, array $values)
+    {
+        return $this->on($column, 'in', $values, 'and', true);
+    }
+
+    /**
+     * Add an "on where not in (...)" clause to the join.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function whereNotIn($column, array $values)
+    {
+        return $this->on($column, 'not in', $values, 'and', true);
+    }
+
+    /**
+     * Add an "or on where in (...)" clause to the join.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function orWhereIn($column, array $values)
+    {
+        return $this->on($column, 'in', $values, 'or', true);
+    }
+
+    /**
+     * Add an "or on where not in (...)" clause to the join.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function orWhereNotIn($column, array $values)
+    {
+        return $this->on($column, 'not in', $values, 'or', true);
     }
 }

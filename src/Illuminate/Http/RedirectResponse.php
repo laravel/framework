@@ -32,8 +32,8 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash a piece of data to the session.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string|array  $key
+     * @param  mixed  $value
      * @return \Illuminate\Http\RedirectResponse
      */
     public function with($key, $value = null)
@@ -77,7 +77,7 @@ class RedirectResponse extends BaseRedirectResponse
                 $value = array_filter($value, $callback);
             }
 
-            return !$value instanceof UploadedFile;
+            return ! $value instanceof UploadedFile;
         }));
 
         return $this;

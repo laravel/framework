@@ -62,4 +62,46 @@ class ConsoleParserTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
     }
+
+    public function testShortcutNameParsing()
+    {
+        $results = Parser::parse('command:name {--o|option}');
+
+        $this->assertEquals('o', $results[2][0]->getShortcut());
+        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertFalse($results[2][0]->acceptValue());
+
+        $results = Parser::parse('command:name {--o|option=}');
+
+        $this->assertEquals('o', $results[2][0]->getShortcut());
+        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertTrue($results[2][0]->acceptValue());
+
+        $results = Parser::parse('command:name {--o|option=*}');
+
+        $this->assertEquals('command:name', $results[0]);
+        $this->assertEquals('o', $results[2][0]->getShortcut());
+        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertTrue($results[2][0]->isArray());
+
+        $results = Parser::parse('command:name {--o|option=* : The option description.}');
+
+        $this->assertEquals('command:name', $results[0]);
+        $this->assertEquals('o', $results[2][0]->getShortcut());
+        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertTrue($results[2][0]->isArray());
+
+        $results = Parser::parse('command:name
+            {--o|option=* : The option description.}');
+
+        $this->assertEquals('command:name', $results[0]);
+        $this->assertEquals('o', $results[2][0]->getShortcut());
+        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertTrue($results[2][0]->isArray());
+    }
 }

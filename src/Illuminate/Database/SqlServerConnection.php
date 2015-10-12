@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Closure;
 use Exception;
+use Throwable;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
@@ -17,7 +18,7 @@ class SqlServerConnection extends Connection
      * @param  \Closure  $callback
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function transaction(Closure $callback)
     {
@@ -40,6 +41,10 @@ class SqlServerConnection extends Connection
         // up in the database. Then we'll re-throw the exception so it can
         // be handled how the developer sees fit for their applications.
         catch (Exception $e) {
+            $this->pdo->exec('ROLLBACK TRAN');
+
+            throw $e;
+        } catch (Throwable $e) {
             $this->pdo->exec('ROLLBACK TRAN');
 
             throw $e;
@@ -71,7 +76,7 @@ class SqlServerConnection extends Connection
     /**
      * Get the default post processor instance.
      *
-     * @return \Illuminate\Database\Query\Processors\Processor
+     * @return \Illuminate\Database\Query\Processors\SqlServerProcessor
      */
     protected function getDefaultPostProcessor()
     {
@@ -79,7 +84,7 @@ class SqlServerConnection extends Connection
     }
 
     /**
-     * Get the Doctrine DBAL Driver.
+     * Get the Doctrine DBAL driver.
      *
      * @return \Doctrine\DBAL\Driver\PDOSqlsrv\Driver
      */
