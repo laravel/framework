@@ -193,6 +193,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function queue($view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $data = array_map('serialize', $data);
 
         return $this->queue->push('mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
     }
@@ -240,6 +241,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function later($delay, $view, array $data, $callback, $queue = null)
     {
         $callback = $this->buildQueueCallable($callback);
+        $data = array_map('serialize', $data);
 
         return $this->queue->later($delay, 'mailer@handleQueuedMessage', compact('view', 'data', 'callback'), $queue);
     }
@@ -283,7 +285,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function handleQueuedMessage($job, $data)
     {
-        $this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
+        $this->send($data['view'], array_map('unserialize', $data['data']), $this->getQueuedCallable($data));
 
         $job->delete();
     }
