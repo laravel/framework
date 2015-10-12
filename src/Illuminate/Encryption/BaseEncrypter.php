@@ -73,7 +73,7 @@ abstract class BaseEncrypter
      */
     protected function validMac(array $payload)
     {
-        $bytes = Str::randomBytes(16);
+        $bytes = random_bytes(16);
 
         $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 

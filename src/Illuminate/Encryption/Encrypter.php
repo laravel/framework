@@ -58,7 +58,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      */
     public function encrypt($value)
     {
-        $iv = Str::randomBytes($this->getIvSize());
+        $iv = random_bytes($this->getIvSize());
 
         $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
 
