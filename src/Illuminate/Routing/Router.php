@@ -3,8 +3,6 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use ReflectionMethod;
-use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
