@@ -1355,7 +1355,11 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        return $this->getFresh($columns);
+        if (is_null($this->columns)) {
+            $this->columns = $columns;
+        }
+
+        return $this->processor->processSelect($this, $this->runSelect());
     }
 
     /**
@@ -1363,14 +1367,12 @@ class Builder
      *
      * @param  array  $columns
      * @return array|static[]
+     *
+     * @deprecated since version 5.1. Use get instead.
      */
     public function getFresh($columns = ['*'])
     {
-        if (is_null($this->columns)) {
-            $this->columns = $columns;
-        }
-
-        return $this->processor->processSelect($this, $this->runSelect());
+        return $this->get($columns);
     }
 
     /**
