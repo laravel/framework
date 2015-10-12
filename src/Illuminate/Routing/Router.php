@@ -736,7 +736,7 @@ class Router implements RegistrarContract
     {
         $parameters = $route->parameters();
 
-        foreach ($route->callableParameters(Model::class) as $parameter) {
+        foreach ($route->signatureParameters(Model::class) as $parameter) {
             $class = $parameter->getClass();
 
             if (array_key_exists($parameter->name, $parameters)) {

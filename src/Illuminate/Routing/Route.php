@@ -284,7 +284,7 @@ class Route
      *
      * @return array
      */
-    public function callableParameters($subClass = null)
+    public function signatureParameters($subClass = null)
     {
         $action = $this->getAction();
 
