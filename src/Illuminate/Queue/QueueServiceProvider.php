@@ -14,6 +14,7 @@ use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\DatabaseConnector;
+use Illuminate\Queue\Connectors\MongodbConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
@@ -163,7 +164,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs', 'Iron'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Mongodb', 'Beanstalkd', 'Redis', 'Sqs', 'Iron'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -217,6 +218,19 @@ class QueueServiceProvider extends ServiceProvider
     {
         $manager->addConnector('database', function () {
             return new DatabaseConnector($this->app['db']);
+        });
+    }
+
+    /**
+     * Register the mongodb queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerMongodbConnector($manager)
+    {
+        $manager->addConnector('mongodb', function () {
+            return new MongodbConnector($this->app['db']);
         });
     }
 
