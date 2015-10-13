@@ -5,25 +5,25 @@ namespace Illuminate\Auth\Access;
 trait HandlesAuthorization
 {
     /**
-     * Create a new admission instance.
+     * Create a new access response.
      *
-     * @return \Illuminate\Auth\Access\Admission
+     * @return \Illuminate\Auth\Access\Response
      */
-    protected function allow($reason = null)
+    protected function allow($message = null)
     {
-        return new Admission($reason);
+        return new Response($message);
     }
 
     /**
      * Throws an unauthorized exception.
      *
-     * @param  string  $reason
+     * @param  string  $message
      * @return void
      *
      * @throws \Illuminate\Auth\Access\UnauthorizedException
      */
-    protected function deny($reason = 'This action is unauthorized.')
+    protected function deny($message = 'This action is unauthorized.')
     {
-        throw new UnauthorizedException($reason);
+        throw new UnauthorizedException($message);
     }
 }

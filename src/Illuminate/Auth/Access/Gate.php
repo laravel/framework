@@ -168,9 +168,9 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return bool
+     * @return mixed
      */
-    public function approach($ability, $arguments = [])
+    public function raw($ability, $arguments = [])
     {
         if (! $user = $this->resolveUser()) {
             return false;
@@ -194,15 +194,15 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return \Illuminate\Auth\Access\Admission
+     * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\UnauthorizedException
      */
     public function authorize($ability, $arguments = [])
     {
-        $result = $this->approach($ability, $arguments);
+        $result = $this->raw($ability, $arguments);
 
-        if ($result instanceof Admission) {
+        if ($result instanceof Response) {
             return $result;
         }
 
@@ -219,7 +219,7 @@ class Gate implements GateContract
     public function check($ability, $arguments = [])
     {
         try {
-            $result = $this->approach($ability, $arguments);
+            $result = $this->raw($ability, $arguments);
         } catch (UnauthorizedException $e) {
             return false;
         }
