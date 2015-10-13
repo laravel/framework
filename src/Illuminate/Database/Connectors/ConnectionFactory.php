@@ -98,8 +98,6 @@ class ConnectionFactory
     {
         $readConfig = $this->getReadWriteConfig($config, 'read');
 
-        // Check if we have multiple slave hosts
-        // in which case select one at randon
         if (isset($readConfig['host']) && is_array($readConfig['host'])) {
             $readConfig['host'] = count($readConfig['host']) > 1 ?
                 $readConfig['host'][array_rand($readConfig['host'])] : $readConfig['host'][0];
