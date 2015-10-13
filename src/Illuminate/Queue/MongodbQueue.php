@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\MongodbJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
-use MongoId;
 
 class MongodbQueue extends Queue implements QueueContract
 {
