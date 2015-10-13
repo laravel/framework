@@ -2,6 +2,8 @@
 
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class GateTest extends PHPUnit_Framework_TestCase
 {
@@ -122,7 +124,7 @@ class GateTest extends PHPUnit_Framework_TestCase
 
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
     {
-        $gate = $this->getBasicGate();
+        $gate = $this->getBasicGate(true);
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -163,9 +165,49 @@ class GateTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
-    protected function getBasicGate()
+    /**
+     * @expectedException \Illuminate\Auth\Access\UnauthorizedException
+     */
+    public function test_authorize_throws_unauthorized_exception()
     {
-        return new Gate(new Container, function () { return (object) ['id' => 1]; });
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $gate->authorize('create', new AccessGateTestDummy);
+    }
+
+    public function test_authorize_returns_allowed_response()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $check = $gate->check('create', new AccessGateTestDummy);
+        $response = $gate->authorize('create', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertNull($response->message());
+        $this->assertTrue($check);
+    }
+
+    public function test_authorize_returns_an_allowed_response_for_a_truthy_return()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $response = $gate->authorize('update', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertNull($response->message());
+    }
+
+    protected function getBasicGate($isAdmin = false)
+    {
+        return new Gate(new Container, function () use ($isAdmin) {
+            return (object) ['id' => 1, 'isAdmin' => $isAdmin];
+        });
     }
 }
 
@@ -184,14 +226,16 @@ class AccessGateTestDummy
 
 class AccessGateTestPolicy
 {
+    use HandlesAuthorization;
+
     public function create($user)
     {
-        return true;
+        return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
     }
 
     public function update($user, AccessGateTestDummy $dummy)
     {
-        return $user instanceof StdClass;
+        return ! $user->isAdmin;
     }
 }
 
