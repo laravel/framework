@@ -84,11 +84,12 @@ trait AuthorizesRequests
      * Throw an unauthorized exception based on gate results.
      *
      * @param  string  $ability
-     * @param  array  $arguments
+     * @param  mixed|array  $arguments
+     * @param  string  $message
      * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function createGateUnauthorizedException($ability, $arguments, $reason = 'This action is unauthorized.')
+    protected function createGateUnauthorizedException($ability, $arguments, $message = 'This action is unauthorized.')
     {
-        return new HttpException(403, $reason);
+        return new HttpException(403, $message);
     }
 }
