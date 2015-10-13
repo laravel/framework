@@ -766,6 +766,12 @@ return 'foo!'; });
         $this->assertCount(8, $routes);
 
         $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['update']]);
+        $routes = $router->getRoutes();
+
+        $this->assertCount(1, $routes);
+
+        $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['only' => ['show', 'destroy']]);
         $routes = $router->getRoutes();
 
