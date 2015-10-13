@@ -68,8 +68,8 @@ class Gate implements GateContract
         $this->container = $container;
         $this->abilities = $abilities;
         $this->userResolver = $userResolver;
-        $this->beforeCallbacks = $beforeCallbacks;
         $this->afterCallbacks = $afterCallbacks;
+        $this->beforeCallbacks = $beforeCallbacks;
     }
 
     /**
