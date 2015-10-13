@@ -187,13 +187,51 @@ class Gate implements GateContract
     }
 
     /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function check($ability, $arguments = [])
+    {
+        try {
+            $result = $this->raw($ability, $arguments);
+        } catch (UnauthorizedException $e) {
+            return false;
+        }
+
+        return (bool) $result;
+    }
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\UnauthorizedException
+     */
+    public function authorize($ability, $arguments = [])
+    {
+        $result = $this->raw($ability, $arguments);
+
+        if ($result instanceof Response) {
+            return $result;
+        }
+
+        return $result ? $this->allow() : $this->deny();
+    }
+
+    /**
      * Get the raw result for the given ability for the current user.
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return mixed
      */
-    public function raw($ability, $arguments = [])
+    protected function raw($ability, $arguments = [])
     {
         if (! $user = $this->resolveUser()) {
             return false;
@@ -229,44 +267,6 @@ class Gate implements GateContract
         return call_user_func_array(
             $callback, array_merge([$user], $arguments)
         );
-    }
-
-    /**
-     * Determine if the given ability should be granted for the current user.
-     *
-     * @param  string  $ability
-     * @param  array|mixed  $arguments
-     * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\UnauthorizedException
-     */
-    public function authorize($ability, $arguments = [])
-    {
-        $result = $this->raw($ability, $arguments);
-
-        if ($result instanceof Response) {
-            return $result;
-        }
-
-        return $result ? $this->allow() : $this->deny();
-    }
-
-    /**
-     * Determine if the given ability should be granted for the current user.
-     *
-     * @param  string  $ability
-     * @param  array|mixed  $arguments
-     * @return bool
-     */
-    public function check($ability, $arguments = [])
-    {
-        try {
-            $result = $this->raw($ability, $arguments);
-        } catch (UnauthorizedException $e) {
-            return false;
-        }
-
-        return (bool) $result;
     }
 
     /**

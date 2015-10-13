@@ -14,7 +14,7 @@ class Response
     /**
      * Create a new response.
      *
-     * @param string|null  $message
+     * @param  string|null  $message
      */
     public function __construct($message = null)
     {
@@ -29,5 +29,15 @@ class Response
     public function message()
     {
         return $this->message;
+    }
+
+    /**
+     * Get the string representation of the message.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->message();
     }
 }

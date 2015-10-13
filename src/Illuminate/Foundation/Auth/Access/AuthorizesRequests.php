@@ -59,7 +59,7 @@ trait AuthorizesRequests
             return $gate->authorize($ability, $arguments);
         } catch (UnauthorizedException $e) {
             throw $this->createGateUnauthorizedException(
-                $ability, $arguments, $e->getMessage()
+                $ability, $arguments, $e->getMessage(), $e
             );
         }
     }
@@ -86,10 +86,11 @@ trait AuthorizesRequests
      * @param  string  $ability
      * @param  mixed|array  $arguments
      * @param  string  $message
+     * @param  \Exception  $previousException
      * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function createGateUnauthorizedException($ability, $arguments, $message = 'This action is unauthorized.')
+    protected function createGateUnauthorizedException($ability, $arguments, $message = 'This action is unauthorized.', $previousException = null)
     {
-        return new HttpException(403, $message);
+        return new HttpException(403, $message, $previousException);
     }
 }
