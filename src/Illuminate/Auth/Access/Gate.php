@@ -200,16 +200,33 @@ class Gate implements GateContract
         $arguments = is_array($arguments) ? $arguments : [$arguments];
 
         if (is_null($result = $this->callBeforeCallbacks($user, $ability, $arguments))) {
-            $callback = $this->resolveAuthCallback(
-                $user, $ability, $arguments
-            );
-
-            $result = call_user_func_array($callback, array_merge([$user], $arguments));
+            $result = $this->callAuthCallback($user, $ability, $arguments);
         }
 
-        $this->callAfterCallbacks($user, $ability, $arguments, $result);
+        $this->callAfterCallbacks(
+            $user, $ability, $arguments, $result
+        );
 
         return $result;
+    }
+
+    /**
+     * Resolve and call the appropriate authorization callback.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function callAuthCallback($user, $ability, array $arguments)
+    {
+        $callback = $this->resolveAuthCallback(
+            $user, $ability, $arguments
+        );
+
+        return call_user_func_array(
+            $callback, array_merge([$user], $arguments)
+        );
     }
 
     /**
