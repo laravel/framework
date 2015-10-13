@@ -13,7 +13,7 @@ trait AuthorizesRequests
      *
      * @param  mixed  $ability
      * @param  mixed|array  $arguments
-     * @return void
+     * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -21,7 +21,7 @@ trait AuthorizesRequests
     {
         list($ability, $arguments) = $this->parseAbilityAndArguments($ability, $arguments);
 
-        $this->authorizeAtGate(app(Gate::class), $ability, $arguments);
+        return $this->authorizeAtGate(app(Gate::class), $ability, $arguments);
     }
 
     /**
@@ -30,7 +30,7 @@ trait AuthorizesRequests
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
      * @param  mixed  $ability
      * @param  mixed|array  $arguments
-     * @return void
+     * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -40,7 +40,7 @@ trait AuthorizesRequests
 
         $gate = app(Gate::class)->forUser($user);
 
-        $this->authorizeAtGate($gate, $ability, $arguments);
+        return $this->authorizeAtGate($gate, $ability, $arguments);
     }
 
     /**
@@ -49,14 +49,14 @@ trait AuthorizesRequests
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  mixed  $ability
      * @param  mixed|array  $arguments
-     * @return void
+     * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function authorizeAtGate(Gate $gate, $ability, $arguments)
     {
         try {
-            $gate->authorize($ability, $arguments);
+            return $gate->authorize($ability, $arguments);
         } catch (UnauthorizedException $e) {
             throw $this->createGateUnauthorizedException(
                 $ability, $arguments, $e->getMessage()
