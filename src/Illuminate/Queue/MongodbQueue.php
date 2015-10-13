@@ -3,11 +3,11 @@
 namespace Illuminate\Queue;
 
 use DateTime;
-use MongoId;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\MongodbJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use MongoId;
 
 class MongodbQueue extends Queue implements QueueContract
 {
@@ -168,14 +168,12 @@ class MongodbQueue extends Queue implements QueueContract
 
             $this->markJobAsReserved($job->_id);
 
-            //$this->database->commit();
-
             return new MongodbJob(
                 $this->container, $this, $job, $queue
             );
         }
 
-      //  $this->database->commit();
+        $this->database->commit();
     }
 
     /**
@@ -192,9 +190,9 @@ class MongodbQueue extends Queue implements QueueContract
                     ->where('reserved', 1)
                     ->where('reserved_at', '<=', $expired)->get();
 
-        foreach( $reserved as $job ){
-           $attempts = $job['attempts'] + 1;
-           $this->releaseJob($job['_id'],$attempts);
+        foreach ($reserved as $job) {
+            $attempts = $job['attempts'] + 1;
+            $this->releaseJob($job['_id'], $attempts);
         }
     }
 
@@ -238,7 +236,7 @@ class MongodbQueue extends Queue implements QueueContract
      * @param  string  $id
      * @return void
      */
-    protected function releaseJob($id,$attempts)
+    protected function releaseJob($id, $attempts)
     {
         $this->database->table($this->table)->where('_id', $id)->update([
           'reserved' => 0,
@@ -246,7 +244,6 @@ class MongodbQueue extends Queue implements QueueContract
           'attempts' => $attempts,
         ]);
     }
-
 
     /**
      * Delete a reserved job from the queue.
