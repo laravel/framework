@@ -165,7 +165,6 @@ class MongodbQueue extends Queue implements QueueContract
         }
 
         if ($job = $this->getNextAvailableJob($queue)) {
-
             $this->markJobAsReserved($job->_id);
 
             return new MongodbJob(
@@ -204,8 +203,6 @@ class MongodbQueue extends Queue implements QueueContract
      */
     protected function getNextAvailableJob($queue)
     {
-      //  $this->database->beginTransaction();
-
         $job = $this->database->table($this->table)
                     ->lockForUpdate()
                     ->where('queue', $this->getQueue($queue))
