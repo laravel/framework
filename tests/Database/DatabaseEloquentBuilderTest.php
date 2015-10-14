@@ -433,6 +433,21 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
+    public function testHasWithContraintsAndJoinAndHavingInSubquery()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->where('bar', 'baz');
+        $builder->whereHas('foo', function ($q) {
+            $q->join('quuuux', function ($j) {
+               $j->on('quuuuux', '=', 'quuuuuux', 'and', true);
+            });
+            $q->having('bam', '>', 'qux');
+        })->where('quux', 'quuux');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and (select count(*) from "eloquent_builder_test_model_close_related_stubs" inner join "quuuux" on "quuuuux" = ? where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) >= 1 and "quux" = ?', $builder->toSql());
+        $this->assertEquals(['baz', 'quuuuuux', 'qux', 'quuux'], $builder->getBindings());
+    }
+
     public function testHasNestedWithConstraints()
     {
         $model = new EloquentBuilderTestModelParentStub;
