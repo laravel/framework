@@ -2,9 +2,12 @@
 
 namespace Illuminate\Routing;
 
+use ReflectionClass;
 use ReflectionMethod;
+use ReflectionParameter;
 use Illuminate\Support\Arr;
 use ReflectionFunctionAbstract;
+use Illuminate\Database\Eloquent\Model;
 
 trait RouteDependencyResolverTrait
 {
@@ -50,20 +53,67 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        foreach ($reflector->getParameters() as $key => $parameter) {
-            // If the parameter has a type-hinted class, we will check to see if it is already in
-            // the list of parameters. If it is we will just skip it as it is probably a model
-            // binding and we do not want to mess with those; otherwise, we resolve it here.
-            $class = $parameter->getClass();
+        $originalParameters = $parameters;
 
-            if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
-                array_splice(
-                    $parameters, $key, 0, [$this->container->make($class->name)]
-                );
+        foreach ($reflector->getParameters() as $key => $parameter) {
+            $instance = $this->transformDependency(
+                $parameter, $parameters, $originalParameters
+            );
+
+            if (! is_null($instance)) {
+                $this->spliceIntoParameters($parameters, $key, $instance);
             }
         }
 
         return $parameters;
+    }
+
+    /**
+     * Attempt to transform the given parameter into a class instance.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @param  array  $parameters
+     * @param  array  $originalParameters
+     * @return mixed|null
+     */
+    protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
+    {
+        $class = $parameter->getClass();
+
+        // If the parameter has a type-hinted class, we will check to see if it is already in
+        // the list of parameters. If it is we will just skip it as it is probably a model
+        // binding and we do not want to mess with those; otherwise, we resolve it here.
+        if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
+            return $this->container->make($class->name);
+        }
+    }
+
+    /**
+     * Determine if the given type-hinted class is an implict Eloquent binding.
+     *
+     * Must not already be resolved in the parameter list by an explicit model binding.
+     *
+     * @param  \ReflectionClass  $class
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function vacantEloquentParameter(ReflectionClass $class, array $parameters)
+    {
+        return $class->isSubclassOf(Model::class) &&
+             ! $this->alreadyInParameters($class->name, $parameters);
+    }
+
+    /**
+     * Extract an implicit model binding's key out of the parameter list.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @param  array  $originalParameters
+     */
+    protected function extractModelIdentifier(ReflectionParameter $parameter, array $originalParameters)
+    {
+        return array_first($originalParameters, function ($parameterKey) use ($parameter) {
+            return $parameterKey === $parameter->name;
+        });
     }
 
     /**
@@ -78,5 +128,20 @@ trait RouteDependencyResolverTrait
         return ! is_null(Arr::first($parameters, function ($key, $value) use ($class) {
             return $value instanceof $class;
         }));
+    }
+
+    /**
+     * Splice the given value into the parameter list.
+     *
+     * @param  array  $parameters
+     * @param  string  $key
+     * @param  mixed  $instance
+     * @return void
+     */
+    protected function spliceIntoParameters(array &$parameters, $key, $instance)
+    {
+        array_splice(
+            $parameters, $key, 0, [$instance]
+        );
     }
 }

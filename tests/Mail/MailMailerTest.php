@@ -173,9 +173,8 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $this->setSwiftMailer($mailer);
         $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
-        $me = $this;
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), [])->andReturnUsing(function ($message) use ($me) {
-            $me->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), [])->andReturnUsing(function ($message) {
+            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
         $mailer->send('foo', ['data'], function ($m) {});
     }

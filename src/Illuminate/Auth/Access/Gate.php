@@ -9,6 +9,8 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class Gate implements GateContract
 {
+    use HandlesAuthorization;
+
     /**
      * The container instance.
      *
@@ -68,8 +70,8 @@ class Gate implements GateContract
         $this->container = $container;
         $this->abilities = $abilities;
         $this->userResolver = $userResolver;
-        $this->beforeCallbacks = $beforeCallbacks;
         $this->afterCallbacks = $afterCallbacks;
+        $this->beforeCallbacks = $beforeCallbacks;
     }
 
     /**
@@ -193,6 +195,44 @@ class Gate implements GateContract
      */
     public function check($ability, $arguments = [])
     {
+        try {
+            $result = $this->raw($ability, $arguments);
+        } catch (UnauthorizedException $e) {
+            return false;
+        }
+
+        return (bool) $result;
+    }
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\UnauthorizedException
+     */
+    public function authorize($ability, $arguments = [])
+    {
+        $result = $this->raw($ability, $arguments);
+
+        if ($result instanceof Response) {
+            return $result;
+        }
+
+        return $result ? $this->allow() : $this->deny();
+    }
+
+    /**
+     * Get the raw result for the given ability for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return mixed
+     */
+    protected function raw($ability, $arguments = [])
+    {
         if (! $user = $this->resolveUser()) {
             return false;
         }
@@ -200,16 +240,33 @@ class Gate implements GateContract
         $arguments = is_array($arguments) ? $arguments : [$arguments];
 
         if (is_null($result = $this->callBeforeCallbacks($user, $ability, $arguments))) {
-            $callback = $this->resolveAuthCallback(
-                $user, $ability, $arguments
-            );
-
-            $result = call_user_func_array($callback, array_merge([$user], $arguments));
+            $result = $this->callAuthCallback($user, $ability, $arguments);
         }
 
-        $this->callAfterCallbacks($user, $ability, $arguments, $result);
+        $this->callAfterCallbacks(
+            $user, $ability, $arguments, $result
+        );
 
         return $result;
+    }
+
+    /**
+     * Resolve and call the appropriate authorization callback.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function callAuthCallback($user, $ability, array $arguments)
+    {
+        $callback = $this->resolveAuthCallback(
+            $user, $ability, $arguments
+        );
+
+        return call_user_func_array(
+            $callback, array_merge([$user], $arguments)
+        );
     }
 
     /**
@@ -373,7 +430,8 @@ class Gate implements GateContract
     public function forUser($user)
     {
         return new static(
-            $this->container, function () use ($user) { return $user; }, $this->abilities, $this->policies, $this->beforeCallbacks
+            $this->container, function () use ($user) { return $user; }, $this->abilities,
+            $this->policies, $this->beforeCallbacks, $this->afterCallbacks
         );
     }
 

@@ -35,6 +35,7 @@
     },
     "suggest": {
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
+        "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (^1.0.4).",
         "symfony/var-dumper": "Required to use the dd function (2.7.*)."
     },
     "minimum-stability": "dev"

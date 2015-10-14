@@ -125,7 +125,11 @@ class FilesystemManager implements FactoryContract
      */
     public function createLocalDriver(array $config)
     {
-        return $this->adapt(new Flysystem(new LocalAdapter($config['root'])));
+        $permissions = isset($config['permissions']) ? $config['permissions'] : [];
+
+        return $this->adapt(new Flysystem(new LocalAdapter(
+            $config['root'], LOCK_EX, LocalAdapter::DISALLOW_LINKS, $permissions
+        )));
     }
 
     /**
