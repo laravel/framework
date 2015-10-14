@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
-use Illuminate\Auth\Access\UnauthorizedException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -94,7 +94,7 @@ class Handler implements ExceptionHandlerContract
     {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof UnauthorizedException) {
+        } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
         } elseif ($e instanceof ValidationException && $e->response) {
             return $e->response;

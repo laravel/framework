@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Auth\Access\UnauthorizedException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait AuthorizesRequests
@@ -57,8 +57,8 @@ trait AuthorizesRequests
     {
         try {
             return $gate->authorize($ability, $arguments);
-        } catch (UnauthorizedException $e) {
-            throw $this->createGateUnauthorizedException(
+        } catch (AuthorizationException $e) {
+            throw $this->createGateAuthorizationException(
                 $ability, $arguments, $e->getMessage(), $e
             );
         }
@@ -89,7 +89,7 @@ trait AuthorizesRequests
      * @param  \Exception  $previousException
      * @return \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function createGateUnauthorizedException($ability, $arguments, $message = 'This action is unauthorized.', $previousException = null)
+    protected function createGateAuthorizationException($ability, $arguments, $message = 'This action is unauthorized.', $previousException = null)
     {
         return new HttpException(403, $message, $previousException);
     }
