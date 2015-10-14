@@ -108,9 +108,15 @@ class Migrator
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
-        foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
-        }
+        // This is done as a transaction so that if any of the migrations fail
+        // before they are completely finished, you can fix and rerun them.
+        $db = $this->resolveConnection($this->connection);
+        
+        $db->transaction(function () {
+            foreach ($migrations as $file) {
+                $this->runUp($file, $batch, $pretend);
+            }
+        });
     }
 
     /**
