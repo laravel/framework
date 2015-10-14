@@ -112,13 +112,11 @@ class Migrator
         // before they are completely finished, you can fix and rerun them.
         $db = $this->resolveConnection($this->connection);
         
-        $db->beginTransaction();
-        
-        foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
-        }
-        
-        $db->commit();
+        $db->transaction(function () {
+            foreach ($migrations as $file) {
+                $this->runUp($file, $batch, $pretend);
+            }
+        });
     }
 
     /**
