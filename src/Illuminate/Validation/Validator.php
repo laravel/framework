@@ -960,7 +960,7 @@ class Validator implements ValidatorContract
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return Arr::get($this->data, $attribute);
+            return $value;
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
