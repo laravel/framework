@@ -3,6 +3,14 @@
 use Mockery as m;
 use Illuminate\Database\Seeder;
 
+class TestSeeder extends Seeder
+{
+    public function run()
+    {
+        //
+    }
+}
+
 class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
@@ -12,7 +20,7 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 
     public function testCallResolveTheClassAndCallsRun()
     {
-        $seeder = new Seeder;
+        $seeder = new TestSeeder;
         $seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
         $output = m::mock('Symfony\Component\Console\Output\OutputInterface');
         $output->shouldReceive('writeln')->once()->andReturn('foo');
@@ -29,14 +37,14 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
 
     public function testSetContainer()
     {
-        $seeder = new Seeder;
+        $seeder = new TestSeeder;
         $container = m::mock('Illuminate\Container\Container');
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
-        $seeder = new Seeder;
+        $seeder = new TestSeeder;
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
