@@ -201,7 +201,9 @@ abstract class Facade
     public static function __callStatic($method, $args)
     {
         $instance = static::getFacadeRoot();
-        if(!$instance) throw new \RuntimeException('Facade Root not found.');
+        if(!$instance){
+            throw new \RuntimeException('Facade Root not found.');
+        } 
         switch (count($args)) {
             case 0:
                 return $instance->$method();
