@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Auth\Access\UnauthorizedException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Foundation\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
@@ -92,6 +93,10 @@ class Handler implements ExceptionHandlerContract
     {
         if ($this->isUnauthorizedException($e)) {
             $e = new HttpException(403, $e->getMessage());
+        }
+
+        if ($this->isValidationException($e) && $e->response) {
+            return $e->response;
         }
 
         if ($this->isHttpException($e)) {
@@ -202,6 +207,17 @@ EOF;
     protected function isUnauthorizedException(Exception $e)
     {
         return $e instanceof UnauthorizedException;
+    }
+
+    /**
+     * Determine if the given exception is a data validation exception.
+     *
+     * @param  \Exception  $e
+     * @return bool
+     */
+    protected function isValidationException(Exception $e)
+    {
+        return $e instanceof ValidationException;
     }
 
     /**
