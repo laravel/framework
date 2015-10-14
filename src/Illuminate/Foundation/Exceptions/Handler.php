@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\UnauthorizedException;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Foundation\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -91,11 +92,15 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
-        if ($this->isUnauthorizedException($e)) {
+        if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        }
+
+        if ($e instanceof UnauthorizedException) {
             $e = new HttpException(403, $e->getMessage());
         }
 
-        if ($this->isValidationException($e) && $e->response) {
+        if ($e instanceof ValidationException && $e->response) {
             return $e->response;
         }
 
@@ -196,28 +201,6 @@ class Handler implements ExceptionHandlerContract
     </body>
 </html>
 EOF;
-    }
-
-    /**
-     * Determine if the given exception is an access unauthorized exception.
-     *
-     * @param  \Exception  $e
-     * @return bool
-     */
-    protected function isUnauthorizedException(Exception $e)
-    {
-        return $e instanceof UnauthorizedException;
-    }
-
-    /**
-     * Determine if the given exception is a data validation exception.
-     *
-     * @param  \Exception  $e
-     * @return bool
-     */
-    protected function isValidationException(Exception $e)
-    {
-        return $e instanceof ValidationException;
     }
 
     /**
