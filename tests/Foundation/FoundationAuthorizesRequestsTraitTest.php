@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     * @expectedException Illuminate\Auth\Access\AuthorizationException
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {
@@ -71,8 +72,8 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $container = new Container;
         Container::setInstance($container);
 
-        $gate = new Illuminate\Auth\Access\Gate($container, function () { return (object) ['id' => 1]; });
-        $container->instance(Gate::class, $gate);
+        $gate = new Gate($container, function () { return (object) ['id' => 1]; });
+        $container->instance(GateContract::class, $gate);
 
         return $gate;
     }
