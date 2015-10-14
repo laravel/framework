@@ -1131,11 +1131,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testTimestampsAreNotUpdatedWithTimestampsFalseSaveOption()
     {
-        $model = m::mock('EloquentModelStub[newQueryWithoutScopes]');
-        $query = m::mock('Illuminate\Database\Eloquent\Builder');
-        $query->shouldReceive('where')->once()->with('id', '=', 1);
-        $query->shouldReceive('update')->once()->with(['name' => 'taylor']);
-        $model->shouldReceive('newQueryWithoutScopes')->once()->andReturn($query);
+        $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'getDateFormat']);
+
+        $base_query = m::mock('Illuminate\Database\Query\Builder');
+        $base_query->shouldReceive('update')->once()->with(['name' => 'taylor']);
+        $base_query->shouldReceive('where')->once()->with('id', '=', 1);
+        $base_query->shouldReceive('from')->with('stub');
+
+        $query = new Illuminate\Database\Eloquent\Builder($base_query);
+        $query->setModel($model);
+
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
 
         $model->id = 1;
         $model->syncOriginal();

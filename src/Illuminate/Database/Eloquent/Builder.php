@@ -54,7 +54,7 @@ class Builder
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
+        'insert', 'insertGetId', 'update', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum',
     ];
 
@@ -288,17 +288,6 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
-    }
-
-    /**
-     * Update a record in the database.
-     *
-     * @param  array  $values
-     * @return int
-     */
-    public function update(array $values)
-    {
-        return $this->query->update($this->addUpdatedAtColumn($values));
     }
 
     /**
