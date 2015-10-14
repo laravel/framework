@@ -367,6 +367,18 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
     }
 
+    public function testUnionWithJoin()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getBuilder()->select('*')->from('dogs')->join('breeds', function ($join) {
+            $join->on('dogs.breed_id', '=', 'breeds.id')
+                ->where('breeds.is_native', '=', 1);
+        }));
+        $this->assertEquals('select * from "users" union select * from "dogs" inner join "breeds" on "dogs"."breed_id" = "breeds"."id" and "breeds"."is_native" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testMySqlUnionOrderBys()
     {
         $builder = $this->getMySqlBuilder();
@@ -1109,21 +1121,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getBuilder();
 
         $builder->noValidMethodHere();
-    }
-
-    public function setupCacheTestQuery($cache, $driver)
-    {
-        $connection = m::mock('Illuminate\Database\ConnectionInterface');
-        $connection->shouldReceive('getName')->andReturn('connection_name');
-        $connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
-        $cache->shouldReceive('driver')->once()->andReturn($driver);
-        $grammar = new Illuminate\Database\Query\Grammars\Grammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
-
-        $builder = $this->getMock('Illuminate\Database\Query\Builder', ['getFresh'], [$connection, $grammar, $processor]);
-        $builder->expects($this->once())->method('getFresh')->with($this->equalTo(['*']))->will($this->returnValue(['results']));
-
-        return $builder->select('*')->from('users')->where('email', 'foo@bar.com');
     }
 
     public function testMySqlLock()
