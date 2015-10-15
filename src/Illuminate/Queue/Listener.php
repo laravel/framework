@@ -40,7 +40,7 @@ class Listener
     /**
      * The limit of seconds a listener may run before timing out.
      * 
-     * @var integer
+     * @var int
      */
     protected $runtimeLimit = 0;
 
