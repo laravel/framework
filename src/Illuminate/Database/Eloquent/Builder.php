@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -254,7 +255,7 @@ class Builder
             }
         }
 
-        return collect($results);
+        return new Collection($results);
     }
 
     /**
