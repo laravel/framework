@@ -112,6 +112,21 @@ if (! function_exists('array_except')) {
     }
 }
 
+if (! function_exists('array_every')) {
+    /**
+     * Create a new array consisting of every n-th element.
+     *
+     * @param  array  $array
+     * @param  int  $step
+     * @param  int  $offset
+     * @return array
+     */
+    function array_every($array, $step, $offset = 0)
+    {
+        return Arr::every($array, $step, $offset);
+    }
+}
+
 if (! function_exists('array_fetch')) {
     /**
      * Fetch a flattened array of a nested array element.

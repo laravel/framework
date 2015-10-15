@@ -30,6 +30,23 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk'], $array);
     }
 
+    public function testEvery()
+    {
+        $data = [
+            6 => 'a',
+            4 => 'b',
+            7 => 'c',
+            1 => 'd',
+            5 => 'e',
+            3 => 'f',
+        ];
+
+        $this->assertEquals(['a', 'e'], Arr::every($data, 4));
+        $this->assertEquals(['b', 'f'], Arr::every($data, 4, 1));
+        $this->assertEquals(['c'], Arr::every($data, 4, 2));
+        $this->assertEquals(['d'], Arr::every($data, 4, 3));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];

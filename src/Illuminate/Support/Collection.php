@@ -146,19 +146,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function every($step, $offset = 0)
     {
-        $new = [];
-
-        $position = 0;
-
-        foreach ($this->items as $key => $item) {
-            if ($position % $step === $offset) {
-                $new[] = $item;
-            }
-
-            $position++;
-        }
-
-        return new static($new);
+        return new static(Arr::every($this->values(), $step, $offset));
     }
 
     /**
