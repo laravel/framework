@@ -8,7 +8,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Bootstrap\BootProviders;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -18,6 +17,7 @@ use Illuminate\Foundation\Bootstrap\DetectEnvironment;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
 class Kernel implements KernelContract
 {
@@ -274,7 +274,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app[ExceptionHandler::class]->report($e);
+        $this->app[ExceptionHandlerContract::class]->report($e);
     }
 
     /**
@@ -286,7 +286,7 @@ class Kernel implements KernelContract
      */
     protected function renderException($request, Exception $e)
     {
-        return $this->app[ExceptionHandler::class]->render($request, $e);
+        return $this->app[ExceptionHandlerContract::class]->render($request, $e);
     }
 
     /**

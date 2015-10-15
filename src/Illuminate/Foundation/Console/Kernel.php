@@ -7,7 +7,6 @@ use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\BootProviders;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
@@ -20,6 +19,7 @@ use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Bootstrap\SetRequestForConsole;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
 class Kernel implements KernelContract
 {
@@ -257,7 +257,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app[ExceptionHandler::class]->report($e);
+        $this->app[ExceptionHandlerContract::class]->report($e);
     }
 
     /**
@@ -269,6 +269,6 @@ class Kernel implements KernelContract
      */
     protected function renderException($output, Exception $e)
     {
-        $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
+        $this->app[ExceptionHandlerContract::class]->renderForConsole($output, $e);
     }
 }
