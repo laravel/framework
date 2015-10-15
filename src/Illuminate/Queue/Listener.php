@@ -38,6 +38,13 @@ class Listener
     protected $maxTries = 0;
 
     /**
+     * The limit of seconds a listener may run before timing out.
+     * 
+     * @var integer
+     */
+    protected $runtimeLimit = 0;
+
+    /**
      * The queue worker command line.
      *
      * @var string
@@ -99,10 +106,16 @@ class Listener
      */
     public function listen($connection, $queue, $delay, $memory, $timeout = 60)
     {
+        $startTime = time();
+
         $process = $this->makeProcess($connection, $queue, $delay, $memory, $timeout);
 
         while (true) {
             $this->runProcess($process, $memory);
+
+            if (time() - $startTime >= $this->runtimeLimit) {
+                $this->stop();
+            }
         }
     }
 
@@ -261,5 +274,16 @@ class Listener
     public function setMaxTries($tries)
     {
         $this->maxTries = $tries;
+    }
+
+    /**
+     * Set the amount of seconds the listener may run before timing out.
+     * 
+     * @param  int  $runtimeLimit
+     * @return void
+     */
+    public function setRuntimeLimit($runtimeLimit)
+    {
+        $this->runtimeLimit = $runtimeLimit;
     }
 }
