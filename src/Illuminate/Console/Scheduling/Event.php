@@ -85,11 +85,11 @@ class Event
     public $output = '/dev/null';
 
     /**
-     * Whether to append output to destination.
+     * Indicates whether output should be appended.
      *
      * @var bool
      */
-    protected $appendOutput = false;
+    protected $shouldAppendOutput = false;
 
     /**
      * The array of callbacks to be run before the event is started.
@@ -211,7 +211,7 @@ class Event
      */
     public function buildCommand()
     {
-        $redirect = $this->appendOutput ? ' >> ' : ' > ';
+        $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
             $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$this->output.' 2>&1 &';
@@ -647,26 +647,27 @@ class Event
      * Send the output of the command to a given location.
      *
      * @param  string  $location
+     * @param  bool  $append
      * @return $this
      */
-    public function sendOutputTo($location)
+    public function sendOutputTo($location, $append = false)
     {
         $this->output = $location;
+
+        $this->shouldAppendOutput = $append;
 
         return $this;
     }
 
     /**
-     * Whether to append output to destination.
+     * Append the output of the command to a given location.
      *
-     * @param  bool  $append
+     * @param  string  $location
      * @return $this
      */
-    public function appendOutput($append = true)
+    public function appendOutputTo($location)
     {
-        $this->appendOutput = $append;
-
-        return $this;
+        return $this->sendOutputTo($location, true);
     }
 
     /**
