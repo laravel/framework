@@ -1253,6 +1253,40 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['tenth']);
     }
 
+    public function testAliasesCanRetrieveValues()
+    {
+        $model = new EloquentModelAliasingStub;
+
+        $model->street_line_1 = '123 Fake St.';
+
+        $this->assertEquals('123 Fake St.', $model->name);
+    }
+
+    public function testAliasesCanSetValues()
+    {
+        $model = new EloquentModelAliasingStub;
+
+        $model->state = 'Tennessee';
+
+        $this->assertEquals('Tennessee', $model->subdivision);
+        $this->assertEquals('Tennessee', $model->province);
+    }
+
+    public function testAliasesCanBeFilled()
+    {
+        $model = new EloquentModelAliasingStub;
+
+        $model->fill([
+            'name' => '742 Evergreen Terrace',
+            'subdivision' => 'MU',
+            'zip' => '12345',
+        ]);
+
+        $this->assertEquals('742 Evergreen Terrace', $model->street_line_1);
+        $this->assertEquals('MU', $model->state);
+        $this->assertNull($model->zip);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1516,4 +1550,14 @@ class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model
     {
         return ['name', 'id'];
     }
+}
+
+class EloquentModelAliasingStub extends Model
+{
+    protected $aliases = [
+        'street_line_1' => 'name',
+        'subdivision'   => ['state', 'province'],
+        'postal_code'   => 'zip',
+    ];
+    protected $fillable = ['name', 'subdivision'];
 }

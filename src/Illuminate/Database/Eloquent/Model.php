@@ -131,6 +131,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $guarded = ['*'];
 
     /**
+     * The attributes which may be get and set via other keys.
+     *
+     * @var array
+     */
+    protected $aliases = [];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -2622,7 +2629,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getAttribute($key)
     {
-        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
+        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key) || $this->isAlias($key)) {
             return $this->getAttributeValue($key);
         }
 
@@ -2644,6 +2651,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // retrieval from the model to a form that is more useful for usage.
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
+        }
+
+        // If the attribute is actually an alias for another field, make a call
+        // to that field instead.
+        if ($this->isAlias($key)) {
+            return $this->aliasAttribute($key);
         }
 
         // If the attribute exists within the cast array, we will convert it to
@@ -2759,6 +2772,58 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the given key is actually an alias for another field.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isAlias($key)
+    {
+        return (bool) $this->getFieldForAlias($key);
+    }
+
+    /**
+     * Find the original field for an alias.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getFieldForAlias($key)
+    {
+        if ($this->aliases) {
+            $aliases = array_map(function ($value) {
+                return is_array($value) ? $value : [$value];
+            }, $this->aliases);
+
+            $alternatesIndex = [];
+
+            // Swap the keys and values.
+            foreach ($aliases as $target => $alternates) {
+                foreach ($alternates as $alternate) {
+                    $alternatesIndex[$alternate] = $target;
+                }
+            }
+
+            return isset($alternatesIndex[$key]) ? $alternatesIndex[$key] : false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the value of the actual field for an aliased key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function aliasAttribute($key)
+    {
+        $key = $this->getFieldForAlias($key);
+
+        return $this->getAttributeValue($key);
+    }
+
+    /**
      * Determine whether an attribute should be casted to a native type.
      *
      * @param  string  $key
@@ -2868,6 +2933,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the connection grammar's date format. We will auto set the values.
         elseif ($value && (in_array($key, $this->getDates()) || $this->isDateCastable($key))) {
             $value = $this->fromDateTime($value);
+        }
+
+        // If an attribute is actually an alias for another field, use that field
+        // for this setting action.
+        elseif ($this->isAlias($key)) {
+            $actualKey = $this->getFieldForAlias($key);
+
+            return $this->setAttribute($actualKey, $value);
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
