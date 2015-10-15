@@ -4,8 +4,10 @@ namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
 trait ValidatesRequests
 {
@@ -107,7 +109,7 @@ trait ValidatesRequests
      */
     protected function getRedirectUrl()
     {
-        return app('Illuminate\Routing\UrlGenerator')->previous();
+        return app(UrlGenerator::class)->previous();
     }
 
     /**
@@ -117,7 +119,7 @@ trait ValidatesRequests
      */
     protected function getValidationFactory()
     {
-        return app('Illuminate\Contracts\Validation\Factory');
+        return app(ValidationFactoryContract::class);
     }
 
     /**

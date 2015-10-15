@@ -5,6 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Psy\Shell;
 use Psy\Configuration;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
+use Illuminate\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Input\InputArgument;
 
 class TinkerCommand extends Command
@@ -80,9 +83,9 @@ class TinkerCommand extends Command
     protected function getCasters()
     {
         return [
-            'Illuminate\Foundation\Application' => 'Illuminate\Foundation\Console\IlluminateCaster::castApplication',
-            'Illuminate\Support\Collection' => 'Illuminate\Foundation\Console\IlluminateCaster::castCollection',
-            'Illuminate\Database\Eloquent\Model' => 'Illuminate\Foundation\Console\IlluminateCaster::castModel',
+            Application::class => 'Illuminate\Foundation\Console\IlluminateCaster::castApplication',
+            Collection::class => 'Illuminate\Foundation\Console\IlluminateCaster::castCollection',
+            Model::class => 'Illuminate\Foundation\Console\IlluminateCaster::castModel',
         ];
     }
 

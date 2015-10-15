@@ -5,6 +5,9 @@ namespace Illuminate\Foundation\Testing;
 use Mockery;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcherContract;
 
 trait ApplicationTrait
 {
@@ -60,7 +63,7 @@ trait ApplicationTrait
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::spy('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::spy(EventDispatcherContract::class);
 
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) use (&$events) {
             foreach ($events as $key => $event) {
@@ -92,7 +95,7 @@ trait ApplicationTrait
      */
     protected function withoutEvents()
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::mock(EventDispatcherContract::class);
 
         $mock->shouldReceive('fire');
 
@@ -121,7 +124,7 @@ trait ApplicationTrait
         }
 
         $this->app->instance(
-            'Illuminate\Contracts\Bus\Dispatcher', $mock
+            BusDispatcherContract::class, $mock
         );
 
         return $this;
@@ -296,6 +299,6 @@ trait ApplicationTrait
      */
     public function artisan($command, $parameters = [])
     {
-        return $this->code = $this->app['Illuminate\Contracts\Console\Kernel']->call($command, $parameters);
+        return $this->code = $this->app[ConsoleKernelContract::class]->call($command, $parameters);
     }
 }

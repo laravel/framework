@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
+use Psr\Log\LoggerInterface;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
@@ -123,7 +124,7 @@ class TransportManager extends Manager
      */
     protected function createLogDriver()
     {
-        return new LogTransport($this->app->make('Psr\Log\LoggerInterface'));
+        return new LogTransport($this->app->make(LoggerInterface::class));
     }
 
     /**

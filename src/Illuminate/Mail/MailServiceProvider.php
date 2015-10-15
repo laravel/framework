@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
+use Psr\Log\LoggerInterface;
 use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
@@ -70,8 +71,8 @@ class MailServiceProvider extends ServiceProvider
     {
         $mailer->setContainer($app);
 
-        if ($app->bound('Psr\Log\LoggerInterface')) {
-            $mailer->setLogger($app->make('Psr\Log\LoggerInterface'));
+        if ($app->bound(LoggerInterface::class)) {
+            $mailer->setLogger($app->make(LoggerInterface::class));
         }
 
         if ($app->bound('queue')) {

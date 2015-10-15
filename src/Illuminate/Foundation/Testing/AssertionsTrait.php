@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Illuminate\Http\RedirectResponse;
 
 trait AssertionsTrait
 {
@@ -97,7 +98,7 @@ trait AssertionsTrait
      */
     public function assertRedirectedTo($uri, $with = [])
     {
-        PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $this->response);
+        PHPUnit::assertInstanceOf(RedirectResponse::class, $this->response);
 
         PHPUnit::assertEquals($this->app['url']->to($uri), $this->response->headers->get('Location'));
 

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 
 trait CrawlerTrait
 {
@@ -382,7 +382,7 @@ trait CrawlerTrait
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
-        $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
+        $kernel = $this->app->make(HttpKernelContract::class);
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
