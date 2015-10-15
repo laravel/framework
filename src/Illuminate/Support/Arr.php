@@ -114,6 +114,31 @@ class Arr
     }
 
     /**
+     * Create a new array consisting of every n-th element.
+     *
+     * @param  array  $array
+     * @param  int  $step
+     * @param  int  $offset
+     * @return array
+     */
+    public static function every($array, $step, $offset = 0)
+    {
+        $new = [];
+
+        $position = 0;
+
+        foreach ($array as $key => $item) {
+            if ($position % $step === $offset) {
+                $new[] = $item;
+            }
+
+            $position++;
+        }
+
+        return $new;
+    }
+
+    /**
      * Fetch a flattened array of a nested array element.
      *
      * @param  array   $array
