@@ -202,7 +202,7 @@ abstract class Facade
     {
         $instance = static::getFacadeRoot();
         if(!$instance){
-            throw new \RuntimeException('Facade Root not found.');
+            throw new \RuntimeException('Facade root not found.');
         } 
         switch (count($args)) {
             case 0:
