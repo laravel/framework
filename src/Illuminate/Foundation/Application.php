@@ -175,7 +175,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->instance('app', $this);
 
-        $this->instance(Container::class, $this);
+        $this->instance(parent::class, $this);
     }
 
     /**
