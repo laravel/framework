@@ -22,7 +22,7 @@ trait DetectsLostConnections
             'no connection to the server',
             'Lost connection',
             'is dead or not enabled',
-            'Error while sending STMT_PREPARE packet',
+            'Error while sending',
         ]);
     }
 }
