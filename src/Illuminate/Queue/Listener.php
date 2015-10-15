@@ -113,7 +113,7 @@ class Listener
         while (true) {
             $this->runProcess($process, $memory);
 
-            if (time() - $startTime >= $this->runtimeLimit) {
+            if ($this->runtimeLimit and (time() - $startTime >= $this->runtimeLimit)) {
                 $this->stop();
             }
         }
