@@ -121,7 +121,7 @@ if (! function_exists('array_every')) {
      * @param  int  $offset
      * @return array
      */
-    function every($array, $step, $offset = 0)
+    function array_every($array, $step, $offset = 0)
     {
         return Arr::every($array, $step, $offset);
     }
