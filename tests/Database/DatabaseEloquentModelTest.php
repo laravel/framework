@@ -1333,6 +1333,11 @@ class EloquentModelStub extends Model
     {
         return 'appended';
     }
+
+    public function id()
+    {
+        return $this->id;
+    }
 }
 
 class EloquentModelCamelStub extends EloquentModelStub

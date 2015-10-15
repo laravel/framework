@@ -2673,6 +2673,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getRelationValue($key)
     {
+        // Relationships aren't defined with the primary key
+        if ($key == $this->primaryKey) {
+            return;
+        }
+
         // If the key already exists in the relationships array, it just means the
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.
