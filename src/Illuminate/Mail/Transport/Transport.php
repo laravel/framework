@@ -62,7 +62,7 @@ abstract class Transport implements Swift_Transport
         $event = new Swift_Events_SendEvent($this, $message);
 
         foreach ($this->plugins as $plugin) {
-            if (method_exists($plugin, $event)) {
+            if (method_exists($plugin, 'beforeSendPerformed')) {
                 $plugin->beforeSendPerformed($event);
             }
         }
