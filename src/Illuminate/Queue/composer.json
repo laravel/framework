@@ -20,7 +20,7 @@
         "illuminate/container": "5.2.*",
         "illuminate/http": "5.2.*",
         "illuminate/support": "5.2.*",
-        "symfony/process": "3.0.*",
+        "symfony/process": "2.8.*|3.0.*",
         "nesbot/carbon": "~1.20"
     },
     "autoload": {
