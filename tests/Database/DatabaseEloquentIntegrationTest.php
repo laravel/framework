@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
@@ -41,7 +42,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->timestamps();
         });
 
@@ -162,6 +163,20 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $query = EloquentTestUser::groupBy('email')->getQuery();
 
         $this->assertEquals(3, $query->getCountForPagination());
+    }
+
+    public function testCountForPaginationWithHaving()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::create(['id' => 5, 'email' => 'bar@gmail.com']);
+        EloquentTestUser::create(['id' => 6, 'email' => 'bar@gmail.com']);
+
+        $query = EloquentTestUser::selectRaw('count("id") as total')->groupBy('email')->having('total', '>', new Raw('1'))->getQuery();
+
+        $this->assertEquals(2, $query->getCountForPagination());
     }
 
     public function testListsRetrieval()
