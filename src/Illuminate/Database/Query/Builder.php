@@ -1461,19 +1461,28 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $columns];
+        // If the query contains any "group by" or "having" clauses
+        // we cannot use a simple aggregate function to count the
+        // results. We will need to create a sub query instead.
+        if ($this->groups || $this->havings) {
+            $subQuery = new Expression('('.$this->toSql().') as '.$this->grammar->wrap('aggregate_table'));
 
-        $results = $this->get();
+            $result = $this->newQuery()
+                ->from($subQuery)
+                ->mergeBindings($this)
+                ->count($columns);
+        }
 
-        $this->aggregate = null;
+        // Otherwise we can simply call the count aggregate function
+        // on the current query instance. That will give us the
+        // total number of results we can use for pagination.
+        else {
+            $result = $this->count($columns);
+        }
 
         $this->restoreFieldsForCount();
 
-        if (isset($this->groups)) {
-            return count($results);
-        }
-
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
+        return $result;
     }
 
     /**
@@ -1483,17 +1492,15 @@ class Builder
      */
     protected function backupFieldsForCount()
     {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
+        foreach (['orders', 'limit', 'offset'] as $field) {
             $this->backups[$field] = $this->{$field};
 
             $this->{$field} = null;
         }
 
-        foreach (['order', 'select'] as $key) {
-            $this->bindingBackups[$key] = $this->bindings[$key];
+        $this->bindingBackups['order'] = $this->bindings['order'];
 
-            $this->bindings[$key] = [];
-        }
+        $this->bindings['order'] = [];
     }
 
     /**
@@ -1503,13 +1510,11 @@ class Builder
      */
     protected function restoreFieldsForCount()
     {
-        foreach (['orders', 'limit', 'offset', 'columns'] as $field) {
+        foreach (['orders', 'limit', 'offset'] as $field) {
             $this->{$field} = $this->backups[$field];
         }
 
-        foreach (['order', 'select'] as $key) {
-            $this->bindings[$key] = $this->bindingBackups[$key];
-        }
+        $this->bindings['order'] = $this->bindingBackups['order'];
 
         $this->backups = [];
         $this->bindingBackups = [];
