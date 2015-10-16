@@ -33,7 +33,7 @@
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the thenPing method on schedules (~6.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
-        "symfony/process": "Required to use scheduling component (3.0.*)."
+        "symfony/process": "Required to use scheduling component (2.8.*|3.0.*)."
     },
     "minimum-stability": "dev"
 }
