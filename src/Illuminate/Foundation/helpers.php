@@ -287,7 +287,7 @@ if (! function_exists('env')) {
      *
      * @param  string  $key
      * @param  mixed   $default
-     * @return mixed
+     * @return mixed|null
      */
     function env($key, $default = null)
     {

@@ -1052,7 +1052,7 @@ class Router implements RegistrarContract
      *
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return mixed|null
      */
     protected function callPatternFilters($route, $request)
     {
@@ -1148,7 +1148,7 @@ class Router implements RegistrarContract
      *
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return mixed|null
      */
     protected function callAttachedBefores($route, $request)
     {

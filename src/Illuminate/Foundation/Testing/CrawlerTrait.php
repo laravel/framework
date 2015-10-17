@@ -173,7 +173,7 @@ trait CrawlerTrait
      * Assert that the response contains JSON.
      *
      * @param  array|null  $data
-     * @return $this
+     * @return $this|null
      */
     protected function receiveJson($data = null)
     {

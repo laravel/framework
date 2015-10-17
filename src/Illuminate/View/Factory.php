@@ -316,8 +316,8 @@ class Factory implements FactoryContract
      * Add a piece of shared data to the environment.
      *
      * @param  array|string  $key
-     * @param  mixed  $value
-     * @return mixed
+     * @param  mixed|null  $value
+     * @return mixed|null
      */
     public function share($key, $value = null)
     {
@@ -391,7 +391,7 @@ class Factory implements FactoryContract
      * @param  \Closure|string  $callback
      * @param  string  $prefix
      * @param  int|null  $priority
-     * @return \Closure
+     * @return \Closure|null
      */
     protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
     {

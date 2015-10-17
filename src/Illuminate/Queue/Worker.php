@@ -191,7 +191,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @param  int  $delay
-     * @return void
+     * @return array|null
      *
      * @throws \Throwable
      */

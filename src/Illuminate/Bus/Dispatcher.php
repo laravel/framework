@@ -143,7 +143,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      * @param  \ArrayAccess  $source
      * @param  \ReflectionParameter  $parameter
      * @param  array  $extras
-     * @return mixed
+     * @return mixed|null
      */
     protected function getParameterValueForCommand($command, ArrayAccess $source,
         ReflectionParameter $parameter, array $extras = [])
@@ -250,7 +250,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
      * @param  mixed  $command
-     * @return void
+     * @return mixed
      */
     protected function pushCommandToQueue($queue, $command)
     {

@@ -181,7 +181,7 @@ class Builder
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
-     * @return mixed
+     * @return mixed|null
      */
     public function value($column)
     {

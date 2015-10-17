@@ -80,7 +80,7 @@ class PostgresGrammar extends Grammar
      * Compile the "from" clause for an update with a join.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
+     * @return string|null
      */
     protected function compileUpdateFrom(Builder $query)
     {

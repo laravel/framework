@@ -57,7 +57,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the average value of a given key.
      *
      * @param  string|null  $key
-     * @return mixed
+     * @return mixed|null
      */
     public function avg($key = null)
     {
