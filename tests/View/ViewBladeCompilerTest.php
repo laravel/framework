@@ -221,6 +221,18 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testGuestStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@guest
+breeze
+@endguest';
+        $expected = '<?php if (Auth::guest()): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCanStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
