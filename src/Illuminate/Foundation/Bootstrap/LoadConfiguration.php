@@ -50,10 +50,10 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Config\Repository  $config
      * @return void
      */
-    protected function loadConfigurationFiles(Application $app, RepositoryContract $config)
+    protected function loadConfigurationFiles(Application $app, RepositoryContract $configRepo)
     {
         foreach ($this->getConfigurationFiles($app) as $key => $path) {
-            $config->set($key, require $path);
+            $configRepo->set($key, require $path);
         }
     }
 
