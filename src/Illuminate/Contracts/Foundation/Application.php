@@ -97,4 +97,12 @@ interface Application extends Container
      * @return string
      */
     public function getCachedServicesPath();
+
+    /**
+     * Resolve a service provider instance from the class name.
+     *
+     * @param  string  $provider
+     * @return \Illuminate\Support\ServiceProvider
+     */
+    public function resolveProviderClass($provider);
 }
