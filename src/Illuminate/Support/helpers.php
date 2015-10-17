@@ -287,6 +287,22 @@ if (! function_exists('array_sort_recursive')) {
     }
 }
 
+if (! function_exists('array_check')) {
+    /**
+     * Check each element with a callback and throw an exception on fail.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  string  $exceptionClass
+     *
+     * @return array
+     */
+    function array_check($array, callable $callback, $exceptionClass = UnexpectedValueException::class)
+    {
+        return Arr::check($array, $callback, $exceptionClass);
+    }
+}
+
 if (! function_exists('array_where')) {
     /**
      * Filter the array using the given callback.

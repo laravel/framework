@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use UnexpectedValueException;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -440,5 +441,25 @@ class Arr
         }
 
         return $filtered;
+    }
+
+    /**
+     * Check each element with a callback and throw an exception on fail.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  string  $exceptionClass
+     *
+     * @return array
+     */
+    public static function check($array, callable $callback, $exceptionClass = UnexpectedValueException::class)
+    {
+        foreach ($array as $key => $value) {
+            if (! call_user_func($callback, $value)) {
+                throw new $exceptionClass('Invalid array element at offset '.$key);
+            }
+        }
+
+        return $array;
     }
 }
