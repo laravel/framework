@@ -47,7 +47,7 @@ class RedisStore extends TaggableStore implements Store
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @return mixed
+     * @return mixed|null
      */
     public function get($key)
     {

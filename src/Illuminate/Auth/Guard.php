@@ -193,7 +193,7 @@ class Guard implements GuardContract
      * Pull a user from the repository by its recaller ID.
      *
      * @param  string  $recaller
-     * @return mixed
+     * @return mixed|null
      */
     protected function getUserByRecaller($recaller)
     {
@@ -221,7 +221,7 @@ class Guard implements GuardContract
     /**
      * Get the user ID from the recaller cookie.
      *
-     * @return string
+     * @return string|null
      */
     protected function getRecallerId()
     {

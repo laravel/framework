@@ -171,7 +171,7 @@ class ControllerDispatcher
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $method
-     * @return mixed
+     * @return mixed|null
      */
     protected function before($instance, $route, $request, $method)
     {

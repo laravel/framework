@@ -57,7 +57,7 @@ class MorphTo extends BelongsTo
     /**
      * Get the results of the relationship.
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getResults()
     {

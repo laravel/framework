@@ -414,7 +414,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string    $abstract
      * @param  \Closure  $callback
-     * @return mixed
+     * @return mixed|null
      */
     public function rebinding($abstract, Closure $callback)
     {
@@ -681,7 +681,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the contextual concrete binding for the given abstract.
      *
      * @param  string  $abstract
-     * @return string
+     * @return string|null
      */
     protected function getContextualConcrete($abstract)
     {
@@ -940,7 +940,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the type hint for this closure's first argument.
      *
      * @param  \Closure  $callback
-     * @return mixed
+     * @return mixed|null
      */
     protected function getFunctionHint(Closure $callback)
     {
