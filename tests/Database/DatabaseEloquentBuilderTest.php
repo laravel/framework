@@ -73,7 +73,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$this->getMockModel()]));
         $result = $builder->findOrFail([1, 2], ['column']);
     }
 
@@ -101,24 +101,29 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testFirstMethod()
     {
+        $m = $this->getMockModel();
+
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get,take]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('take')->with(1)->andReturn($builder);
-        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
+        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection([$m]));
 
         $result = $builder->first();
-        $this->assertEquals('bar', $result);
+        $this->assertEquals($m, $result);
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
+        $bar = $this->getMockModel();
+        $baz = $this->getMockModel();
+
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('getModels')->with(['foo'])->andReturn(['bar']);
-        $builder->shouldReceive('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
+        $builder->shouldReceive('getModels')->with(['foo'])->andReturn([$bar]);
+        $builder->shouldReceive('eagerLoadRelations')->with([$bar])->andReturn([$bar, $baz]);
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('newCollection')->with(['bar', 'baz'])->andReturn(new Collection(['bar', 'baz']));
+        $builder->getModel()->shouldReceive('newCollection')->with([$bar, $baz])->andReturn(new Collection([$bar, $baz]));
 
         $results = $builder->get(['foo']);
-        $this->assertEquals(['bar', 'baz'], $results->all());
+        $this->assertEquals([$bar, $baz], $results->all());
     }
 
     public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
@@ -244,10 +249,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->once()->andReturn('foo_table');
         $builder->setModel($model);
         $model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-        $model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection(['hydrated']));
+        $hydrated = $this->getMockModel();
+        $model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection([$hydrated]));
         $models = $builder->getModels(['foo']);
 
-        $this->assertEquals($models, ['hydrated']);
+        $this->assertEquals($models, [$hydrated]);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()

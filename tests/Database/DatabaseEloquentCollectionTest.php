@@ -12,20 +12,25 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testAddingItemsToCollection()
     {
-        $c = new Collection(['foo']);
-        $c->add('bar')->add('baz');
-        $this->assertEquals(['foo', 'bar', 'baz'], $c->all());
+        $foo = $this->createModelStub('foo');
+        $bar = $this->createModelStub('bar');
+        $baz = $this->createModelStub('baz');
+
+        $c = new Collection([$foo]);
+        $c->add($bar)->add($baz);
+        $this->assertEquals(3, $c->count());
+        $this->assertEquals([$foo, $bar, $baz], $c->all());
     }
 
     public function testGettingMaxItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([$this->createModelStub(['foo' => 10]), $this->createModelStub(['foo' => 20])]);
         $this->assertEquals(20, $c->max('foo'));
     }
 
     public function testGettingMinItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([$this->createModelStub(['foo' => 10]), $this->createModelStub(['foo' => 20])]);
         $this->assertEquals(10, $c->min('foo'));
     }
 
@@ -97,12 +102,13 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [['foo']]);
+        $foo = $this->createModelStub('foo');
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [[$foo]]);
         $mockItem = m::mock('StdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
-        $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);
+        $mockItem->shouldReceive('eagerLoadRelations')->once()->with([$foo])->andReturn(['results']);
         $c->load('bar', 'baz');
 
         $this->assertEquals(['results'], $c->all());
@@ -229,9 +235,22 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([], $c[0]->getHidden());
     }
+
+    protected function createModelStub($values)
+    {
+        $model = new TestEloquentCollectionModel;
+        if (is_array($values)) {
+            $model->fill($values);
+        } else {
+            $model->setAttribute($model->getKeyName(), $values);
+        }
+
+        return $model;
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
     protected $hidden = ['hidden'];
+    protected $guarded = [];
 }

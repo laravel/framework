@@ -43,9 +43,9 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
     public function testModelsAreProperlyMatchedToParents()
     {
         $relation = $this->getRelation();
-        $result1 = m::mock('stdClass');
+        $result1 = m::mock('Illuminate\Database\Eloquent\Model');
         $result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $result2 = m::mock('stdClass');
+        $result2 = m::mock('Illuminate\Database\Eloquent\Model');
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $model1 = new EloquentBelongsToModelStub;
         $model1->foreign_key = 1;

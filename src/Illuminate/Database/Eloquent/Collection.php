@@ -3,10 +3,25 @@
 namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Support\Arr;
+use UnexpectedValueException;
 use Illuminate\Support\Collection as BaseCollection;
 
 class Collection extends BaseCollection
 {
+    /**
+     * Fill the collection with new items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function fill($items = [])
+    {
+        $items = is_array($items) ? $items : $this->getArrayableItems($items);
+        $this->items = Arr::check($items, [$this, 'checkItem']);
+
+        return $this;
+    }
+
     /**
      * Find a model in the collection by key.
      *
@@ -20,7 +35,7 @@ class Collection extends BaseCollection
             $key = $key->getKey();
         }
 
-        return Arr::first($this->items, function ($itemKey, $model) use ($key) {
+        return Arr::first($this->items, function ($itemKey, Model $model) use ($key) {
             return $model->getKey() == $key;
 
         }, $default);
@@ -50,10 +65,10 @@ class Collection extends BaseCollection
     /**
      * Add an item to the collection.
      *
-     * @param  mixed  $item
+     * @param  Model  $item
      * @return $this
      */
-    public function add($item)
+    public function add(Model $item)
     {
         $this->items[] = $item;
 
@@ -79,7 +94,7 @@ class Collection extends BaseCollection
 
         $key = $key instanceof Model ? $key->getKey() : $key;
 
-        return parent::contains(function ($k, $m) use ($key) {
+        return parent::contains(function ($k, Model $m) use ($key) {
             return $m->getKey() == $key;
         });
     }
@@ -91,7 +106,7 @@ class Collection extends BaseCollection
      */
     public function modelKeys()
     {
-        return array_map(function ($m) { return $m->getKey(); }, $this->items);
+        return array_map(function (Model $m) { return $m->getKey(); }, $this->items);
     }
 
     /**
@@ -103,6 +118,8 @@ class Collection extends BaseCollection
     public function merge($items)
     {
         $dictionary = $this->getDictionary();
+
+        Arr::check($items, [$this, 'checkItem']);
 
         foreach ($items as $item) {
             $dictionary[$item->getKey()] = $item;
@@ -189,7 +206,7 @@ class Collection extends BaseCollection
      */
     public function except($keys)
     {
-        $dictionary = array_except($this->getDictionary(), $keys);
+        $dictionary = Arr::except($this->getDictionary(), $keys);
 
         return new static(array_values($dictionary));
     }
@@ -202,7 +219,7 @@ class Collection extends BaseCollection
      */
     public function withHidden($attributes)
     {
-        $this->each(function ($model) use ($attributes) {
+        $this->each(function (Model $model) use ($attributes) {
             $model->withHidden($attributes);
         });
 
@@ -217,7 +234,7 @@ class Collection extends BaseCollection
      */
     public function getDictionary($items = null)
     {
-        $items = is_null($items) ? $this->items : $items;
+        $items = is_null($items) ? $this->items : Arr::check($items, [$this, 'checkItem']);
 
         $dictionary = [];
 
@@ -236,5 +253,34 @@ class Collection extends BaseCollection
     public function toBase()
     {
         return new BaseCollection($this->items);
+    }
+
+    /**
+     * Check if an item can be put into collection.
+     *
+     * @param  mixed  $item
+     * @return bool
+     */
+    public function checkItem($item)
+    {
+        return $item instanceof Model;
+    }
+
+    /**
+     * Set the item at a given offset.
+     *
+     * @param  mixed  $key
+     * @param  Model  $value
+     * @return void
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function offsetSet($key, $value)
+    {
+        if (! $this->checkItem($value)) {
+            throw new UnexpectedValueException('Eloquent collection can be filled with models only');
+        }
+
+        parent::offsetSet($key, $value);
     }
 }

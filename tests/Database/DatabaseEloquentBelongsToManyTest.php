@@ -264,10 +264,10 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     public function testFirstMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([new StdClass]));
+        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([new EloquentBelongsToManyModelStub]));
         $relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
 
-        $this->assertInstanceOf(StdClass::class, $relation->first());
+        $this->assertInstanceOf(EloquentBelongsToManyModelStub::class, $relation->first());
     }
 
     public function testFindMethod()
@@ -285,7 +285,8 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     public function testFindManyMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\BelongsToMany[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([new StdClass, new StdClass]));
+        $relation->shouldReceive('get')->once()
+            ->andReturn(new Illuminate\Database\Eloquent\Collection([new EloquentBelongsToManyModelStub, new EloquentBelongsToManyModelStub]));
         $relation->shouldReceive('whereIn')->with('roles.id', ['foo', 'bar'])->once()->andReturn($relation);
 
         $related = $relation->getRelated();
@@ -294,7 +295,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $result = $relation->findMany(['foo', 'bar']);
 
         $this->assertEquals(2, count($result));
-        $this->assertInstanceOf(StdClass::class, $result->first());
+        $this->assertInstanceOf(EloquentBelongsToManyModelStub::class, $result->first());
     }
 
     public function testCreateMethodCreatesNewModelAndInsertsAttachmentRecord()

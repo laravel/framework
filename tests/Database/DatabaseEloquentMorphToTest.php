@@ -15,9 +15,9 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
         $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
-            $two = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
-            $three = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2'],
+            $one = new EloquentMorphToEmptyModelStub(['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1']),
+            $two = new EloquentMorphToEmptyModelStub(['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1']),
+            $three = new EloquentMorphToEmptyModelStub(['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2']),
         ]);
 
         $dictionary = $relation->getDictionary();
@@ -41,17 +41,18 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
 
-        $one = m::mock('StdClass');
-        $one->morph_type = 'morph_type_1';
-        $one->foreign_key = 'foreign_key_1';
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $three = m::mock('Illuminate\Database\Eloquent\Model');
 
-        $two = m::mock('StdClass');
-        $two->morph_type = 'morph_type_1';
-        $two->foreign_key = 'foreign_key_1';
+        $one->shouldReceive('getAttribute')->with('morph_type')->andReturn('morph_type_1');
+        $one->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign_key_1');
 
-        $three = m::mock('StdClass');
-        $three->morph_type = 'morph_type_2';
-        $three->foreign_key = 'foreign_key_2';
+        $two->shouldReceive('getAttribute')->with('morph_type')->andReturn('morph_type_1');
+        $two->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign_key_1');
+
+        $three->shouldReceive('getAttribute')->with('morph_type')->andReturn('morph_type_2');
+        $three->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign_key_2');
 
         $relation->addEagerConstraints([$one, $two, $three]);
 
@@ -64,11 +65,11 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $secondQuery->shouldReceive('newQuery')->once()->andReturn($secondQuery);
 
         $firstQuery->shouldReceive('whereIn')->once()->with('id', ['foreign_key_1'])->andReturn($firstQuery);
-        $firstQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultOne = m::mock('StdClass')]));
+        $firstQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultOne = m::mock('Illuminate\Database\Eloquent\Model')]));
         $resultOne->shouldReceive('getKey')->andReturn('foreign_key_1');
 
         $secondQuery->shouldReceive('whereIn')->once()->with('id', ['foreign_key_2'])->andReturn($secondQuery);
-        $secondQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultTwo = m::mock('StdClass')]));
+        $secondQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultTwo = m::mock('Illuminate\Database\Eloquent\Model')]));
         $resultTwo->shouldReceive('getKey')->andReturn('foreign_key_2');
 
         $one->shouldReceive('setRelation')->once()->with('relation', $resultOne);
@@ -152,4 +153,9 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
 class EloquentMorphToModelStub extends Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value';
+}
+
+class EloquentMorphToEmptyModelStub  extends Illuminate\Database\Eloquent\Model
+{
+    protected $guarded = [];
 }
