@@ -47,7 +47,7 @@ class LoadConfiguration
      * Load the configuration items from all of the files.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepo
      * @return void
      */
     protected function loadConfigurationFiles(Application $app, RepositoryContract $configRepo)
