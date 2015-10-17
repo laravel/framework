@@ -540,6 +540,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the guest statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileGuest()
+    {
+        return '<?php if (Auth::guest()): ?>';
+    }
+
+    /**
      * Compile the can statements into valid PHP.
      *
      * @param  string  $expression
@@ -638,6 +648,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileEndforeach($expression)
     {
         return '<?php endforeach; ?>';
+    }
+
+    /**
+     * Compile the end-guest statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndguest()
+    {
+        return '<?php endif; ?>';
     }
 
     /**
