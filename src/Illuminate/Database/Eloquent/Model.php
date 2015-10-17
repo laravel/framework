@@ -2873,7 +2873,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
-            $value = json_encode($value);
+            $options = (strtolower($this->getConnection()->getConfig('charset')) == 'utf8') ? JSON_UNESCAPED_UNICODE : 0;
+            $value = json_encode($value, $options);
         }
 
         $this->attributes[$key] = $value;

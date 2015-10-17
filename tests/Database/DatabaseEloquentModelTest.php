@@ -1149,6 +1149,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentModelCastingStub;
         $model->setDateFormat('Y-m-d H:i:s');
+        $this->addMockConnection($model);
+        $model->getConnection()->shouldReceive('getConfig')->with('charset')->andReturn('utf8');
         $model->first = '3';
         $model->second = '4.0';
         $model->third = 2.5;
@@ -1251,6 +1253,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['eighth']);
         $this->assertNull($array['ninth']);
         $this->assertNull($array['tenth']);
+    }
+
+    public function testJsonCastingEncoding()
+    {
+        $model = new EloquentModelCastingStub;
+        $this->addMockConnection($model);
+        $model->getConnection()->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $model->getConnection()->shouldReceive('getConfig')->once()->with('charset')->andReturn('latin1');
+        $model->sixth = ['юникод'];
+        $this->assertEquals($model->getAttributes()['sixth'], '["юникод"]');
+        $model->sixth = ['юникод'];
+        $this->assertEquals($model->getAttributes()['sixth'], '["\u044e\u043d\u0438\u043a\u043e\u0434"]');
     }
 
     protected function addMockConnection($model)
