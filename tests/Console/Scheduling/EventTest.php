@@ -8,7 +8,8 @@ class EventTest extends PHPUnit_Framework_TestCase
     {
         $event = new Event('php -i');
 
-        $this->assertSame('php -i > /dev/null 2>&1 &', $event->buildCommand());
+        $defaultOutput = (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+        $this->assertSame("php -i > {$defaultOutput} 2>&1 &", $event->buildCommand());
     }
 
     public function testBuildCommandAppendOutput()
