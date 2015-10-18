@@ -1461,7 +1461,7 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $columns];
+        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
 
         $results = $this->get();
 
@@ -2055,5 +2055,22 @@ class Builder
         $className = get_class($this);
 
         throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+    }
+
+    /**
+     * Clear column aliases.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function clearSelectAliases(array $columns)
+    {
+        foreach ($columns as &$column) {
+            if (is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false) {
+                $column = substr($column, 0, $aliasPosition);
+            }
+        }
+
+        return $columns;
     }
 }
