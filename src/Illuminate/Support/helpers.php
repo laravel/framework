@@ -479,7 +479,7 @@ if (! function_exists('hash_equals')) {
      * @param  string  $userInput
      * @return bool
      */
-    function hash_equals($array)
+    function hash_equals($knownString, $userInput)
     {
         if (! is_string($knownString)) {
             $knownString = (string) $knownString;
