@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Application;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -108,7 +107,7 @@ class VerifyCsrfToken
             $token = $this->encrypter->decrypt($header);
         }
 
-        return Str::equals($request->session()->token(), $token);
+        return hash_equals($request->session()->token(), $token);
     }
 
     /**
