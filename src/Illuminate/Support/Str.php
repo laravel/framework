@@ -287,34 +287,12 @@ class Str
      * @param  string  $knownString
      * @param  string  $userInput
      * @return bool
+     *
+     * @deprecated since version 5.2. Use hash_equals instead.
      */
     public static function equals($knownString, $userInput)
     {
-        if (! is_string($knownString)) {
-            $knownString = (string) $knownString;
-        }
-
-        if (! is_string($userInput)) {
-            $userInput = (string) $userInput;
-        }
-
-        if (function_exists('hash_equals')) {
-            return hash_equals($knownString, $userInput);
-        }
-
-        $knownLength = mb_strlen($knownString, '8bit');
-
-        if (mb_strlen($userInput, '8bit') !== $knownLength) {
-            return false;
-        }
-
-        $result = 0;
-
-        for ($i = 0; $i < $knownLength; ++$i) {
-            $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
-        }
-
-        return 0 === $result;
+        return hash_equals($knownString, $userInput);
     }
 
     /**
