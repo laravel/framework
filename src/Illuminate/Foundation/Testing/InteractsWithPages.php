@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Exception;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
