@@ -467,6 +467,44 @@ if (! function_exists('head')) {
     }
 }
 
+if (! function_exists('hash_equals')) {
+    /**
+     * Compares two strings using a constant-time algorithm.
+     *
+     * Note: This method will leak length information.
+     *
+     * Note: Adapted from Symfony\Component\Security\Core\Util\StringUtils.
+     *
+     * @param  string  $knownString
+     * @param  string  $userInput
+     * @return bool
+     */
+    function hash_equals($array)
+    {
+        if (! is_string($knownString)) {
+            $knownString = (string) $knownString;
+        }
+
+        if (! is_string($userInput)) {
+            $userInput = (string) $userInput;
+        }
+
+        $knownLength = mb_strlen($knownString, '8bit');
+
+        if (mb_strlen($userInput, '8bit') !== $knownLength) {
+            return false;
+        }
+
+        $result = 0;
+
+        for ($i = 0; $i < $knownLength; ++$i) {
+            $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
+        }
+
+        return 0 === $result;
+    }
+}
+
 if (! function_exists('last')) {
     /**
      * Get the last element from an array.
