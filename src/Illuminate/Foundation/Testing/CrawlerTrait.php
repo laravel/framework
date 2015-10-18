@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
