@@ -44,7 +44,7 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
         // bar mock is added to eagers since it's not reserved
         $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock = m::mock('Illuminate\Support\ServiceProvider'));
         $barMock->shouldReceive('isDeferred')->once()->andReturn(false);
-        $repo->shouldReceive('writeManifest')->once()->andReturn([0 => 'foo', 'when' => []]);
+        $repo->shouldReceive('writeManifest')->once()->andReturnUsing(function ($manifest) { return $manifest; });
 
         // bar mock should be registered with the application since it's eager
         $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock);
@@ -80,6 +80,6 @@ class FoundationProviderRepositoryTest extends PHPUnit_Framework_TestCase
 
         $result = $repo->writeManifest(['foo']);
 
-        $this->assertEquals(['foo'], $result);
+        $this->assertEquals(['foo', 'when' => []], $result);
     }
 }
