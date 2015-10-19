@@ -9,10 +9,20 @@ trait DatabaseTransactions
      */
     public function beginDatabaseTransaction()
     {
-        $this->app->make('db')->beginTransaction();
+        $db = $this->app->make('db');
+        $names = array_keys($this->app['config']['database.connections']);
+
+        foreach ($names as $name) {
+            $db->connection($name)->beginTransaction();
+        }
 
         $this->beforeApplicationDestroyed(function () {
-            $this->app->make('db')->rollBack();
+            $db = $this->app->make('db');
+            $names = array_keys($this->app['config']['database.connections']);
+
+            foreach ($names as $name) {
+                $db->connection($name)->rollBack();
+            }
         });
     }
 }
