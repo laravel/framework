@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Testing\CrawlerTrait;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Foundation\Testing\MakesHttpRequests;
 
 class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
-    use CrawlerTrait;
+    use MakesHttpRequests;
 
     public function testSeeInElement()
     {
