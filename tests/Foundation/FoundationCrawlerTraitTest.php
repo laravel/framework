@@ -1,12 +1,12 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Foundation\Testing\CrawlerTrait;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Foundation\Testing\MakesHttpRequests;
 
 class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 {
-    use CrawlerTrait;
+    use MakesHttpRequests;
 
     public function setUp()
     {
