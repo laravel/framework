@@ -243,7 +243,7 @@ class IronQueue extends Queue implements QueueContract
     /**
      * Get the request instance.
      *
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Illuminate\Http\Request
      */
     public function getRequest()
     {
@@ -253,7 +253,7 @@ class IronQueue extends Queue implements QueueContract
     /**
      * Set the request instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function setRequest(Request $request)

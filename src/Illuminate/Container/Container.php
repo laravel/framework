@@ -681,7 +681,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the contextual concrete binding for the given abstract.
      *
      * @param  string  $abstract
-     * @return string
+     * @return string|null
      */
     protected function getContextualConcrete($abstract)
     {

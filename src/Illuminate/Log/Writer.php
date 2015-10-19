@@ -238,7 +238,7 @@ class Writer implements LogContract, PsrLoggerInterface
      *
      * @param  string  $name
      * @param  string  $level
-     * @return void
+     * @return \Psr\Log\LoggerInterface
      */
     public function useSyslog($name = 'laravel', $level = 'debug')
     {
@@ -300,7 +300,7 @@ class Writer implements LogContract, PsrLoggerInterface
      * Format the parameters for the logger.
      *
      * @param  mixed  $message
-     * @return void
+     * @return mixed
      */
     protected function formatMessage($message)
     {

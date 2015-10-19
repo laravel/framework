@@ -726,7 +726,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Boot the given service provider.
      *
      * @param  \Illuminate\Support\ServiceProvider  $provider
-     * @return void
+     * @return mixed
      */
     protected function bootProvider(ServiceProvider $provider)
     {
