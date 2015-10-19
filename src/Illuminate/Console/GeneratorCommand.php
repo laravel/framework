@@ -45,7 +45,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return bool|null
      */
     public function fire()
     {

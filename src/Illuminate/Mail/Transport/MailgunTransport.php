@@ -110,7 +110,7 @@ class MailgunTransport extends Transport
      * Set the API key being used by the transport.
      *
      * @param  string  $key
-     * @return void
+     * @return string
      */
     public function setKey($key)
     {

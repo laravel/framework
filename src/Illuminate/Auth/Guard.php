@@ -221,7 +221,7 @@ class Guard implements GuardContract
     /**
      * Get the user ID from the recaller cookie.
      *
-     * @return string
+     * @return string|null
      */
     protected function getRecallerId()
     {

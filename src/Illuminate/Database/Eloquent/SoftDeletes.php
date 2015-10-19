@@ -38,7 +38,7 @@ trait SoftDeletes
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @return void
+     * @return mixed
      */
     protected function performDeleteOnModel()
     {
