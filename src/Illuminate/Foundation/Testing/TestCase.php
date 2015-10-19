@@ -7,7 +7,14 @@ use PHPUnit_Framework_TestCase;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
-    use ApplicationTrait, AssertionsTrait, CrawlerTrait;
+    use InteractsWithContainer,
+        AssertionsTrait,
+        MakesHttpRequests,
+        ImpersonatesUsers,
+        InteractsWithConsole,
+        InteractsWithDatabase,
+        InteractsWithSession,
+        MocksApplicationServices;
 
     /**
      * The callbacks that should be run before the application is destroyed.

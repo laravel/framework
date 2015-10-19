@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
-trait CrawlerTrait
+trait MakesHttpRequests
 {
     use InteractsWithPages;
 
@@ -30,6 +30,18 @@ trait CrawlerTrait
      * @var array
      */
     protected $serverVariables = [];
+
+    /**
+     * Disable middleware for the test.
+     *
+     * @return $this
+     */
+    public function withoutMiddleware()
+    {
+        $this->app->instance('middleware.disable', true);
+
+        return $this;
+    }
 
     /**
      * Visit the given URI with a JSON request.
