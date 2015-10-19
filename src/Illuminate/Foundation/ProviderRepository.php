@@ -187,7 +187,7 @@ class ProviderRepository
             $this->manifestPath, json_encode($manifest, JSON_PRETTY_PRINT)
         );
 
-        return $manifest;
+        return array_merge(['when' => []], $manifest);
     }
 
     /**
