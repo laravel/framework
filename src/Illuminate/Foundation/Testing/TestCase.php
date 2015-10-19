@@ -17,6 +17,13 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         MocksApplicationServices;
 
     /**
+     * The Illuminate application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The callbacks that should be run before the application is destroyed.
      *
      * @var array
@@ -42,6 +49,18 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         if (! $this->app) {
             $this->refreshApplication();
         }
+    }
+
+    /**
+     * Refresh the application instance.
+     *
+     * @return void
+     */
+    protected function refreshApplication()
+    {
+        putenv('APP_ENV=testing');
+
+        $this->app = $this->createApplication();
     }
 
     /**
