@@ -1594,7 +1594,7 @@ class Builder
     /**
      * Determine if any rows exist for the current query.
      *
-     * @return bool
+     * @return bool|null
      */
     public function exists()
     {

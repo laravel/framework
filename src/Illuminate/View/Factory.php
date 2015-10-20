@@ -391,7 +391,7 @@ class Factory implements FactoryContract
      * @param  \Closure|string  $callback
      * @param  string  $prefix
      * @param  int|null  $priority
-     * @return \Closure
+     * @return \Closure|null
      */
     protected function addViewEvent($view, $callback, $prefix = 'composing: ', $priority = null)
     {
