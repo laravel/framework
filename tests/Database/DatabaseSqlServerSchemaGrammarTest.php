@@ -503,6 +503,16 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add "foo" varbinary(max) not null', $statements[0]);
     }
 
+    public function testAddingUuid()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuid('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" uniqueidentifier not null', $statements[0]);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
