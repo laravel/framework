@@ -724,7 +724,7 @@ class Builder
             $relationQuery->wheres, $relationQuery->getBindings()
         );
 
-        $this->query->mergeBindings($hasQuery->getQuery());
+        $this->query->addBinding($hasQuery->getQuery()->getBindings(), 'where');
     }
 
     /**
