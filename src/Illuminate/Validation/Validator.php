@@ -1606,7 +1606,7 @@ class Validator implements ValidatorContract
      * @param  string  $attribute
      * @param  string  $lowerRule
      * @param  array   $source
-     * @return string
+     * @return string|null
      */
     protected function getInlineMessage($attribute, $lowerRule, $source = null)
     {
@@ -2537,7 +2537,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $rule
      * @param  array   $parameters
-     * @return bool
+     * @return bool|null
      */
     protected function callExtension($rule, $parameters)
     {
@@ -2571,7 +2571,7 @@ class Validator implements ValidatorContract
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array   $parameters
-     * @return string
+     * @return string|null
      */
     protected function callReplacer($message, $attribute, $rule, $parameters)
     {

@@ -13,6 +13,8 @@ class MarshalException extends RuntimeException
      * @param  string  $command
      * @param  \ReflectionParameter  $parameter
      * @return void
+     *
+     * @throws static
      */
     public static function whileMapping($command, ReflectionParameter $parameter)
     {

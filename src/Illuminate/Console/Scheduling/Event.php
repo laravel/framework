@@ -131,7 +131,7 @@ class Event
      */
     protected function getDefaultOutput()
     {
-        return (strpos(strtoupper(PHP_OS), 'WIN') === 0) ? 'NUL' : '/dev/null';
+        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
     }
 
     /**
