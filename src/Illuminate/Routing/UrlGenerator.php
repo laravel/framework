@@ -641,7 +641,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the request instance.
      *
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Illuminate\Http\Request
      */
     public function getRequest()
     {

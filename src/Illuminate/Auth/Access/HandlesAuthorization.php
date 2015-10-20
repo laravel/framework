@@ -7,6 +7,7 @@ trait HandlesAuthorization
     /**
      * Create a new access response.
      *
+     * @param  string|null  $message
      * @return \Illuminate\Auth\Access\Response
      */
     protected function allow($message = null)
