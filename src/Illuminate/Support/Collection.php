@@ -29,7 +29,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __construct($items = [])
     {
-        $this->items = is_array($items) ? $items : $this->getArrayableItems($items);
+        $this->fill($items);
     }
 
     /**
@@ -41,6 +41,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public static function make($items = [])
     {
         return new static($items);
+    }
+
+    /**
+     * Fill the collection with new items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function fill($items = [])
+    {
+        $this->items = is_array($items) ? $items : $this->getArrayableItems($items);
+
+        return $this;
     }
 
     /**
@@ -823,9 +836,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function transform(callable $callback)
     {
-        $this->items = $this->map($callback)->all();
-
-        return $this;
+        return $this->fill($this->map($callback)->all());
     }
 
     /**

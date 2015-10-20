@@ -130,10 +130,12 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
     public function testFirstMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+        $first = new EloquentHasManyThroughModelStub;
+        $second = new EloquentHasManyThroughModelStub;
+        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([$first, $second]));
         $relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
 
-        $this->assertEquals('first', $relation->first());
+        $this->assertEquals($first, $relation->first());
     }
 
     public function testFindMethod()
@@ -151,7 +153,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
     public function testFindManyMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection(['first', 'second']));
+        $first = new EloquentHasManyThroughModelStub;
+        $second = new EloquentHasManyThroughModelStub;
+        $relation->shouldReceive('get')->once()->andReturn(new Illuminate\Database\Eloquent\Collection([$first, $second]));
         $relation->shouldReceive('whereIn')->with('posts.id', ['foo', 'bar'])->once()->andReturn($relation);
 
         $related = $relation->getRelated();
