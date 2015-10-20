@@ -61,70 +61,6 @@ class Collection extends BaseCollection
     }
 
     /**
-     * Get an array with the values of a given key.
-     *
-     * @param  string  $value
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function pluck($value, $key = null)
-    {
-        return $this->toBase()->pluck($value, $key);
-    }
-
-    /**
-     * Get the keys of the collection items.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function keys()
-    {
-        return $this->toBase()->keys();
-    }
-
-    /**
-     * Zip the collection together with one or more arrays.
-     *
-     * @param  mixed ...$items
-     * @return \Illuminate\Support\Collection
-     */
-    public function zip($items)
-    {
-        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
-    }
-
-    /**
-     * Collapse the collection of items into a single array.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function collapse()
-    {
-        return $this->toBase()->collapse();
-    }
-
-    /**
-     * Get a flattened array of the items in the collection.
-     *
-     * @param  int  $depth
-     * @return \Illuminate\Support\Collection
-     */
-    public function flatten($depth = INF)
-    {
-        return $this->toBase()->flatten($depth);
-    }
-
-    /**
-     * Flip the items in the collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function flip()
-    {
-        return $this->toBase()->flip();
-    }
-
-    /**
      * Determine if a key exists in the collection.
      *
      * @param  mixed  $key
@@ -290,6 +226,74 @@ class Collection extends BaseCollection
         }
 
         return $dictionary;
+    }
+
+    /**
+     * The following methods are intercepted to always return base collections.
+     */
+
+    /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function pluck($value, $key = null)
+    {
+        return $this->toBase()->pluck($value, $key);
+    }
+
+    /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function keys()
+    {
+        return $this->toBase()->keys();
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @param  mixed ...$items
+     * @return \Illuminate\Support\Collection
+     */
+    public function zip($items)
+    {
+        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
+    }
+
+    /**
+     * Collapse the collection of items into a single array.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collapse()
+    {
+        return $this->toBase()->collapse();
+    }
+
+    /**
+     * Get a flattened array of the items in the collection.
+     *
+     * @param  int  $depth
+     * @return \Illuminate\Support\Collection
+     */
+    public function flatten($depth = INF)
+    {
+        return $this->toBase()->flatten($depth);
+    }
+
+    /**
+     * Flip the items in the collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function flip()
+    {
+        return $this->toBase()->flip();
     }
 
     /**
