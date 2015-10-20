@@ -198,7 +198,15 @@ class Worker
     public function process($connection, Job $job, $maxTries = 0, $delay = 0)
     {
         if ($maxTries > 0 && $job->attempts() > $maxTries) {
-            return $this->logFailedJob($connection, $job);
+            $job->delete();
+
+            $job->failed();
+
+            $this->raiseFailedJobEvent($connection, $job);
+
+            $this->logFailedJob($connection, $job);
+
+            return ['job' => $job, 'failed' => true];
         }
 
         try {
@@ -249,21 +257,13 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @return array
+     * @return void
      */
     protected function logFailedJob($connection, Job $job)
     {
         if ($this->failer) {
             $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
-
-            $job->delete();
-
-            $job->failed();
-
-            $this->raiseFailedJobEvent($connection, $job);
         }
-
-        return ['job' => $job, 'failed' => true];
     }
 
     /**
