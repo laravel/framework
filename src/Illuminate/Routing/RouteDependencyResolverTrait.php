@@ -72,7 +72,7 @@ trait RouteDependencyResolverTrait
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $originalParameters
-     * @return mixed|null
+     * @return mixed
      */
     protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
     {

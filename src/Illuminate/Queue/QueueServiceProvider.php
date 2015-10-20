@@ -12,6 +12,7 @@ use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
@@ -256,7 +257,11 @@ class QueueServiceProvider extends ServiceProvider
         $this->app->singleton('queue.failer', function ($app) {
             $config = $app['config']['queue.failed'];
 
-            return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+            if (isset($config['table'])) {
+                return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+            } else {
+                return new NullFailedJobProvider;
+            }
         });
     }
 

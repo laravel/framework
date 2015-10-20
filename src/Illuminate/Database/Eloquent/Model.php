@@ -688,7 +688,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Reload a fresh model instance from the database.
      *
      * @param  array  $with
-     * @return $this
+     * @return $this|null
      */
     public function fresh(array $with = [])
     {
@@ -1176,7 +1176,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * This method protects developers from running forceDelete when trait is missing.
      *
-     * @return void
+     * @return bool|null
      */
     public function forceDelete()
     {
