@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 {
@@ -228,6 +229,18 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $c = $c->withHidden(['hidden']);
 
         $this->assertEquals([], $c[0]->getHidden());
+    }
+
+    public function testNonModelRelatedMethods()
+    {
+        $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
+        $b = new Collection(['a', 'b', 'c']);
+        $this->assertInstanceOf(BaseCollection::class, $a->pluck('foo'));
+        $this->assertInstanceOf(BaseCollection::class, $a->keys());
+        $this->assertInstanceOf(BaseCollection::class, $a->collapse());
+        $this->assertInstanceOf(BaseCollection::class, $a->flatten());
+        $this->assertInstanceOf(BaseCollection::class, $a->zip(['a', 'b'], ['c', 'd']));
+        $this->assertInstanceOf(BaseCollection::class, $b->flip());
     }
 }
 
