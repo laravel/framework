@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use PHPUnit_Framework_Assert as PHPUnit;
+
 trait InteractsWithSession
 {
     /**
