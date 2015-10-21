@@ -218,7 +218,10 @@ trait InteractsWithPages
 
         $content = $this->crawler->filter($element)->html();
 
-        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $content);
+        $pattern = $rawPattern == $escapedPattern
+                ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+
+        $this->$method("/$pattern/i", $content);
 
         return $this;
     }
