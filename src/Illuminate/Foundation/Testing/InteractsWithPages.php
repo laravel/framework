@@ -181,7 +181,10 @@ trait InteractsWithPages
 
         $escapedPattern = preg_quote(e($text), '/');
 
-        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $this->response->getContent());
+        $pattern = $rawPattern == $escapedPattern
+                ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+
+        $this->$method("/$pattern/i", $this->response->getContent());
 
         return $this;
     }
