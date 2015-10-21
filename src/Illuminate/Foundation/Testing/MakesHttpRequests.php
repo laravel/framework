@@ -642,6 +642,20 @@ trait MakesHttpRequests
      * @param  mixed  $value
      * @return void
      */
+    public function seeInSession($key, $value = null)
+    {
+        $this->assertSessionHas($key, $value);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the session has a given list of values.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return void
+     */
     public function assertSessionHas($key, $value = null)
     {
         if (is_array($key)) {
