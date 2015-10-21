@@ -235,12 +235,12 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertInstanceOf(BaseCollection::class, $a->pluck('foo'));
-        $this->assertInstanceOf(BaseCollection::class, $a->keys());
-        $this->assertInstanceOf(BaseCollection::class, $a->collapse());
-        $this->assertInstanceOf(BaseCollection::class, $a->flatten());
-        $this->assertInstanceOf(BaseCollection::class, $a->zip(['a', 'b'], ['c', 'd']));
-        $this->assertInstanceOf(BaseCollection::class, $b->flip());
+        $this->assertEquals(get_class($a->pluck('foo')), BaseCollection::class);
+        $this->assertEquals(get_class($a->keys()), BaseCollection::class);
+        $this->assertEquals(get_class($a->collapse()), BaseCollection::class);
+        $this->assertEquals(get_class($a->flatten()), BaseCollection::class);
+        $this->assertEquals(get_class($a->zip(['a', 'b'], ['c', 'd'])), BaseCollection::class);
+        $this->assertEquals(get_class($b->flip()), BaseCollection::class);
     }
 }
 
