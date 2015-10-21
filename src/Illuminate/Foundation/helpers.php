@@ -229,6 +229,23 @@ if (! function_exists('csrf_token')) {
     }
 }
 
+if (! function_exists('method_field')) {
+    /**
+     * Generate the method form field.
+     *
+     * @param  string  $type
+     * @return string
+     */
+    function method_field($type)
+    {
+        if (! in_array($type, ['PUT', 'PATCH', 'DELETE'])) {
+            return;
+        }
+
+        return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$type.'">');
+    }
+}
+
 if (! function_exists('database_path')) {
     /**
      * Get the database path.
