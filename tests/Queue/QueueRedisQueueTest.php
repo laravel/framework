@@ -89,7 +89,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
         $transaction = m::mock('StdClass');
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('transaction')->with(m::any(), m::type('Closure'))->andReturnUsing(function ($options, $callback) use ($transaction) {
-            $callback($transaction);
+            call_user_func($callback, $transaction);
         });
         $transaction->shouldReceive('zrangebyscore')->once()->with('from', '-inf', 1)->andReturn(['foo', 'bar']);
         $transaction->shouldReceive('multi')->once();
