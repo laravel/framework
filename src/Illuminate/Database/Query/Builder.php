@@ -264,7 +264,7 @@ class Builder
         if ($query instanceof Closure) {
             $callback = $query;
 
-            $callback($query = $this->newQuery());
+            call_user_func($callback, $query = $this->newQuery());
         }
 
         if ($query instanceof self) {

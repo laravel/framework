@@ -97,7 +97,7 @@ class BroadcastManager implements FactoryContract
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         } else {
-            return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
+            return call_user_func([$this, 'create'.ucfirst($config['driver']).'Driver'], $config);
         }
     }
 

@@ -879,7 +879,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function resolving($abstract, Closure $callback = null)
     {
-        if ($callback === null && $abstract instanceof Closure) {
+        if (is_null($callback) && $abstract instanceof Closure) {
             $this->resolvingCallback($abstract);
         } else {
             $this->resolvingCallbacks[$abstract][] = $callback;
@@ -895,7 +895,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function afterResolving($abstract, Closure $callback = null)
     {
-        if ($abstract instanceof Closure && $callback === null) {
+        if ($abstract instanceof Closure && is_null($callback)) {
             $this->afterResolvingCallback($abstract);
         } else {
             $this->afterResolvingCallbacks[$abstract][] = $callback;
@@ -1017,7 +1017,7 @@ class Container implements ArrayAccess, ContainerContract
     protected function fireCallbackArray($object, array $callbacks)
     {
         foreach ($callbacks as $callback) {
-            $callback($object, $this);
+            call_user_func($callback, $object, $this);
         }
     }
 

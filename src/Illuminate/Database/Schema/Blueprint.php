@@ -58,8 +58,8 @@ class Blueprint
     {
         $this->table = $table;
 
-        if (! is_null($callback)) {
-            $callback($this);
+        if ($callback instanceof Closure) {
+            call_user_func($callback, $this);
         }
     }
 

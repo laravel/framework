@@ -473,7 +473,7 @@ class Connection implements ConnectionInterface
         // and if we catch any exception we can rollback the transaction
         // so that none of the changes are persisted to the database.
         try {
-            $result = $callback($this);
+            $result = call_user_func($callback, $this);
 
             $this->commit();
         }
@@ -579,7 +579,7 @@ class Connection implements ConnectionInterface
         // Basically to make the database connection "pretend", we will just return
         // the default values for all the query methods, then we will return an
         // array of queries that were "executed" within the Closure callback.
-        $callback($this);
+        call_user_func($callback, $this);
 
         $this->pretending = false;
 
@@ -641,7 +641,7 @@ class Connection implements ConnectionInterface
         // run the SQL against the PDO connection. Then we can calculate the time it
         // took to execute and log the query SQL, bindings and time in our memory.
         try {
-            $result = $callback($this, $query, $bindings);
+            $result = call_user_func($callback, $this, $query, $bindings);
         }
 
         // If an exception occurs when attempting to run a query, we'll format the error

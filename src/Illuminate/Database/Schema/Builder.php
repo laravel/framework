@@ -129,7 +129,7 @@ class Builder
 
         $blueprint->create();
 
-        $callback($blueprint);
+        call_user_func($callback, $blueprint);
 
         $this->build($blueprint);
     }
