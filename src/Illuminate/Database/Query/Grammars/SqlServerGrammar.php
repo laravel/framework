@@ -204,6 +204,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile an exists statement into SQL.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     *
+     * @return string
+     */
+    public function compileExists(Builder $query)
+    {
+        $select = $this->compileSelect($query);
+
+        return "select cast(case when exists($select) then 1 else 0 end as bit) as {$this->wrap('exists')}";
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
