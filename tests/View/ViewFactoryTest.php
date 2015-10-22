@@ -139,7 +139,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $callback = $factory->composer('foo', function () { return 'bar'; });
         $callback = $callback[0];
 
-        $this->assertEquals('bar', $callback());
+        $this->assertEquals('bar', call_user_func($callback));
     }
 
     public function testComposersAreProperlyRegisteredWithPriority()
@@ -149,7 +149,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $callback = $factory->composer('foo', function () { return 'bar'; }, 1);
         $callback = $callback[0];
 
-        $this->assertEquals('bar', $callback());
+        $this->assertEquals('bar', call_user_func($callback));
     }
 
     public function testComposersCanBeMassRegistered()
@@ -182,7 +182,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $callback = $factory->composer('foo', 'FooComposer');
         $callback = $callback[0];
 
-        $this->assertEquals('composed', $callback('view'));
+        $this->assertEquals('composed', call_user_func($callback, 'view'));
     }
 
     public function testClassCallbacksWithMethods()
@@ -195,7 +195,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $callback = $factory->composer('foo', 'FooComposer@doComposer');
         $callback = $callback[0];
 
-        $this->assertEquals('composed', $callback('view'));
+        $this->assertEquals('composed', call_user_func($callback, 'view'));
     }
 
     public function testCallComposerCallsProperEvent()

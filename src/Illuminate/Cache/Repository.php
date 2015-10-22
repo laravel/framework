@@ -202,7 +202,9 @@ class Repository implements CacheContract, ArrayAccess
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $minutes);
+        $value = call_user_func($callback);
+
+        $this->put($key, $value, $minutes);
 
         return $value;
     }
@@ -235,7 +237,9 @@ class Repository implements CacheContract, ArrayAccess
             return $value;
         }
 
-        $this->forever($key, $value = $callback());
+        $value = call_user_func($callback);
+
+        $this->forever($key, $value);
 
         return $value;
     }

@@ -582,7 +582,7 @@ class Builder
 
         $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
-        if ($callback) {
+        if ($callback instanceof Closure) {
             call_user_func($callback, $query);
         }
 
