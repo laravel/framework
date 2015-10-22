@@ -71,18 +71,18 @@ interface Application extends Container
     /**
      * Register a new boot listener.
      *
-     * @param  mixed  $callback
+     * @param  callable  $callback
      * @return void
      */
-    public function booting($callback);
+    public function booting(callable $callback);
 
     /**
      * Register a new "booted" listener.
      *
-     * @param  mixed  $callback
+     * @param  callable  $callback
      * @return void
      */
-    public function booted($callback);
+    public function booted(callable $callback);
 
     /**
      * Get the path to the cached "compiled.php" file.
