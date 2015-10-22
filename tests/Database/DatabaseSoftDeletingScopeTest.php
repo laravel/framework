@@ -46,7 +46,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('delete')->once();
 
-        $callback($givenBuilder);
+        call_user_func($callback, $givenBuilder);
     }
 
     public function testRestoreExtension()
@@ -62,7 +62,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
         $givenBuilder->shouldReceive('update')->once()->with(['deleted_at' => null]);
 
-        $callback($givenBuilder);
+        call_user_func($callback, $givenBuilder);
     }
 
     public function testWithTrashedExtension()
@@ -75,7 +75,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
         $givenBuilder->shouldReceive('getModel')->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
         $scope->shouldReceive('remove')->once()->with($givenBuilder, $model);
-        $result = $callback($givenBuilder);
+        $result = call_user_func($callback, $givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
     }
@@ -95,7 +95,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
         $query->shouldReceive('whereNotNull')->once()->with('table.deleted_at');
-        $result = $callback($givenBuilder);
+        $result = call_user_func($callback, $givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
     }
