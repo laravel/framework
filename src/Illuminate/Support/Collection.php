@@ -129,7 +129,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function each(callable $callback)
     {
         foreach ($this->items as $key => $item) {
-            if ($callback($item, $key) === false) {
+            if (call_user_func($callback, $item, $key) === false) {
                 break;
             }
         }
@@ -182,7 +182,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function filter(callable $callback = null)
     {
-        if ($callback) {
+        if (is_callable($callback)) {
             return new static(array_filter($this->items, $callback));
         }
 
@@ -615,7 +615,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($this->useAsCallable($callback)) {
             return $this->filter(function ($item) use ($callback) {
-                return ! $callback($item);
+                return ! call_user_func($callback, $item);
             });
         }
 

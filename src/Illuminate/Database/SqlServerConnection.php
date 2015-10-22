@@ -32,7 +32,7 @@ class SqlServerConnection extends Connection
         // and if we catch any exception we can rollback the transaction
         // so that none of the changes are persisted to the database.
         try {
-            $result = $callback($this);
+            $result = call_user_func($callback, $this);
 
             $this->pdo->exec('COMMIT TRAN');
         }

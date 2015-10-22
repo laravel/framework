@@ -162,7 +162,7 @@ class DatabaseStore implements Store
 
             if (is_numeric($current)) {
                 $this->table()->where('key', $prefixed)->update([
-                    'value' => $this->encrypter->encrypt($callback($current)),
+                    'value' => $this->encrypter->encrypt(call_user_func($callback, $current)),
                 ]);
             }
         }

@@ -2305,12 +2305,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function unguarded(callable $callback)
     {
         if (static::$unguarded) {
-            return $callback();
+            return call_user_func($callback);
         }
 
         static::unguard();
 
-        $result = $callback();
+        $result = call_user_func($callback);
 
         static::reguard();
 

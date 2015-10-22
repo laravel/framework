@@ -218,10 +218,10 @@ class Validator implements ValidatorContract
     /**
      * After an after validation callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable  $callback
      * @return $this
      */
-    public function after($callback)
+    public function after(callable $callback)
     {
         $this->after[] = function () use ($callback) {
             return call_user_func_array($callback, [$this]);
