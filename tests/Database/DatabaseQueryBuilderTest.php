@@ -560,7 +560,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([4], $builder->getBindings());
     }
 
-    public function testGetCountForPaginationWithColumns()
+    public function testGetCountForPaginationWithColumnAliases()
     {
         $builder = $this->getBuilder();
         $columns = ['body as post_body', 'teaser', 'posts.created as published'];

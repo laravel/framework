@@ -1497,6 +1497,20 @@ class Builder
     }
 
     /**
+     * Remove the column aliases since they will break count queries.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function clearSelectAliases(array $columns)
+    {
+        return array_map(function ($column) {
+            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
+                    ? substr($column, 0, $aliasPosition) : $column;
+        }, $columns);
+    }
+
+    /**
      * Restore some fields after the pagination count.
      *
      * @return void
@@ -2055,22 +2069,5 @@ class Builder
         $className = get_class($this);
 
         throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
-    }
-
-    /**
-     * Clear column aliases.
-     *
-     * @param  array  $columns
-     * @return array
-     */
-    protected function clearSelectAliases(array $columns)
-    {
-        foreach ($columns as &$column) {
-            if (is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false) {
-                $column = substr($column, 0, $aliasPosition);
-            }
-        }
-
-        return $columns;
     }
 }
