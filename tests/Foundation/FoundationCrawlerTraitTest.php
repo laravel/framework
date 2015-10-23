@@ -2,7 +2,7 @@
 
 use Mockery as m;
 use Symfony\Component\DomCrawler\Crawler;
-use Illuminate\Foundation\Testing\MakesHttpRequests;
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 
 class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 {
