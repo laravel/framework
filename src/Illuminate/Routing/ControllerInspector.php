@@ -122,7 +122,7 @@ class ControllerInspector
 
 
     /**
-     * Gets the parameters from the method and adds it to the uri
+     * Gets the parameters from the method and adds it to the uri.
      *
      * @param  ReflectionMethod  $method
      * @param  string  $uri
@@ -131,15 +131,14 @@ class ControllerInspector
      */
     public function addUriParameters(ReflectionMethod $method, $uri)
     {
-        foreach ($method->getParameters() as $parameter)
-        {
+        foreach ($method->getParameters() as $parameter) {
             //if the parameter has a class we assume it is
             //not part of the the uri
             if ($parameter->getClass()) {
                 continue;
             }
 
-            $uri .= sprintf("/{%s%s}",
+            $uri .= sprintf('/{%s%s}',
                 $parameter->name,
                 ($parameter->isDefaultValueAvailable()) ? '?' : ''
             );
