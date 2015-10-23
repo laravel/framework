@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Foundation\Testing\Concerns;
 
 use PHPUnit_Framework_Assert as PHPUnit;
 

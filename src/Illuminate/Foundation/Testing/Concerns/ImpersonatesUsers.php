@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 

@@ -7,13 +7,13 @@ use PHPUnit_Framework_TestCase;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
-    use InteractsWithContainer,
-        MakesHttpRequests,
-        ImpersonatesUsers,
-        InteractsWithConsole,
-        InteractsWithDatabase,
-        InteractsWithSession,
-        MocksApplicationServices;
+    use Concerns\InteractsWithContainer,
+        Concerns\MakesHttpRequests,
+        Concerns\ImpersonatesUsers,
+        Concerns\InteractsWithConsole,
+        Concerns\InteractsWithDatabase,
+        Concerns\InteractsWithSession,
+        Concerns\MocksApplicationServices;
 
     /**
      * The Illuminate application instance.
