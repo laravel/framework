@@ -1,7 +1,7 @@
 <?php
 
 use Symfony\Component\DomCrawler\Crawler;
-use Illuminate\Foundation\Testing\MakesHttpRequests;
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 
 class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
