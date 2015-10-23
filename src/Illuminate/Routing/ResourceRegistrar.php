@@ -14,6 +14,13 @@ class ResourceRegistrar
     protected $router;
 
     /**
+     * Whether or not this resource is nested.
+     *
+     * @var bool
+     */
+    protected $isNested;
+
+    /**
      * The default actions for a resourceful controller.
      *
      * @var array
@@ -37,15 +44,18 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
+     * @param  bool    $nested
      * @return void
      */
-    public function register($name, $controller, array $options = [])
+    public function register($name, $controller, array $options = [], $nested = false)
     {
+        $this->nested = $nested;
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
         if (Str::contains($name, '/')) {
-            $this->prefixedResource($name, $controller, $options);
+            $this->prefixedResource($name, $controller, $options, $nested);
 
             return;
         }
@@ -78,7 +88,7 @@ class ResourceRegistrar
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route wildcards, which should be the base resources.
         $callback = function ($me) use ($name, $controller, $options) {
-            $me->resource($name, $controller, $options);
+            $me->resource($name, $controller, $options, true);
         };
 
         return $this->router->group(compact('prefix'), $callback);
@@ -212,12 +222,32 @@ class ResourceRegistrar
     protected function getGroupResourceName($prefix, $resource, $method)
     {
         $group = trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
+        $parentGroup = $this->getParentGroupName();
 
-        if (empty($group)) {
+        if (empty($group) || ! $this->nested) {
             return trim("{$prefix}{$resource}.{$method}", '.');
         }
 
+        if (str_contains($group, $parentGroup)) {
+            $group = ltrim($group, "{$parentGroup}.");
+        }
+
         return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
+    }
+
+    /**
+     * Get the name of a nested resource's parent group.
+     *
+     * @return string
+     */
+    protected function getParentGroupName()
+    {
+        $stack = $this->router->getGroupStack();
+
+        end($stack);
+        $parentGroup = prev($stack);
+
+        return isset($parentGroup['prefix']) ? trim(str_replace('/', '.', $parentGroup['prefix']), '.') : '';
     }
 
     /**

@@ -834,6 +834,41 @@ return 'foo!'; });
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
     }
 
+    public function testGroupedResourceRouteNaming()
+    {
+        $router = $this->getRouter();
+        $router->group([
+            'prefix' => 'group',
+            'as' => 'group::',
+        ], function () use ($router) {
+            $router->resource('foo', 'FooController');
+        });
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.destroy'));
+
+        $router = $this->getRouter();
+        $router->group([
+            'prefix' => 'group',
+            'as' => 'group::',
+        ], function () use ($router) {
+            $router->resource('foo.bar', 'FooController');
+        });
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('group::foo.bar.destroy'));
+    }
+
     public function testRouterFiresRoutedEvent()
     {
         $events = new Illuminate\Events\Dispatcher();
