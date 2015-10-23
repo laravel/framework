@@ -54,7 +54,7 @@ interface ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return int
+     * @return int Number of rows affected by the query
      */
     public function update($query, $bindings = []);
 
@@ -63,7 +63,7 @@ interface ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return int
+     * @return int Number of rows affected by the query
      */
     public function delete($query, $bindings = []);
 

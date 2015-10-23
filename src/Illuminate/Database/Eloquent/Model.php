@@ -1542,11 +1542,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  array  $options
-     * @return bool|null
+     * @return bool
      */
     protected function performUpdate(Builder $query, array $options = [])
     {
         $dirty = $this->getDirty();
+        $updated = false;
 
         if (count($dirty) > 0) {
             // If the updating event returns false, we will cancel the update operation so
@@ -1569,13 +1570,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $dirty = $this->getDirty();
 
             if (count($dirty) > 0) {
-                $this->setKeysForSaveQuery($query)->update($dirty);
+                $numRows = $this->setKeysForSaveQuery($query)->update($dirty);
+                $updated = $numRows == 1;
 
                 $this->fireModelEvent('updated', false);
             }
         }
 
-        return true;
+        return $updated;
     }
 
     /**
