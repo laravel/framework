@@ -1789,7 +1789,7 @@ class Builder
      * Update a record in the database.
      *
      * @param  array  $values
-     * @return int Number of rows affected by the query
+     * @return int
      */
     public function update(array $values)
     {

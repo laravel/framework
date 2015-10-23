@@ -352,7 +352,7 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return int Number of rows affected by the query
+     * @return int
      */
     public function update($query, $bindings = [])
     {
@@ -364,7 +364,7 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return int Number of rows affected by the query
+     * @return int
      */
     public function delete($query, $bindings = [])
     {
