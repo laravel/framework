@@ -1,12 +1,13 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Foundation\Testing\Concerns;
 
 use Exception;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Foundation\Testing\HttpException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
