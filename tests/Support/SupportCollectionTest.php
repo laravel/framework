@@ -112,10 +112,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo.array', 'bar.array'], $results);
     }
 
-    public function testToJsonEncodesTheToArrayResult()
+    public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection()
     {
-        $c = $this->getMock('Illuminate\Support\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $item1 = m::mock('JsonSerializable');
+        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
+        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $c = new Collection([$item1, $item2]);
+        $results = $c->jsonSerialize();
+
+        $this->assertEquals(['foo.json', 'bar.array'], $results);
+    }
+
+    public function testToJsonEncodesTheJsonSerializeResult()
+    {
+        $c = $this->getMock('Illuminate\Support\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
@@ -123,8 +135,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }
