@@ -45,12 +45,16 @@ class ServeCommand extends Command
 
         $this->info("Laravel development server started on http://{$host}:{$port}/");
 
-		$platform = strtolower(substr(PHP_OS, 0, 3));
-		$commands = array('dar' => 'open', 'win' => 'start ""');
-		if(isset($commands[$platform]))
-		{
-			passthru(sprintf('%s "http://%s:%s"', $commands[$platform], $host, $port));
-		}
+        if($this->input->getOption('open')){
+            $commands = [
+                'dar' => 'open',
+                'win' => 'start ""',
+            ];
+            $platform = strtolower(substr(PHP_OS, 0, 3));
+            if(isset($commands[$platform])){
+                passthru(sprintf('%s "http://%s:%s"', $commands[$platform], $host, $port));
+            }
+        }
 
         if (defined('HHVM_VERSION')) {
             if (version_compare(HHVM_VERSION, '3.8.0') >= 0) {
@@ -74,6 +78,8 @@ class ServeCommand extends Command
             ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', 'localhost'],
 
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000],
+
+            ['open', null, InputOption::VALUE_NONE, 'Open the site in the default browser.'],
         ];
     }
 }
