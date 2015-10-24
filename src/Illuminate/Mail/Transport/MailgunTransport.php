@@ -61,8 +61,10 @@ class MailgunTransport extends Transport
         $options = ['auth' => ['api', $this->key]];
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
+            $to = $this->getTo($message);
+            $message->setBcc([]);
             $options['multipart'] = [
-                ['name' => 'to', 'contents' => $this->getTo($message)],
+                ['name' => 'to', 'contents' => $to],
                 ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
             ];
         } else {
