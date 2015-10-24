@@ -45,13 +45,13 @@ class ServeCommand extends Command
 
         $this->info("Laravel development server started on http://{$host}:{$port}/");
 
-        if($this->input->getOption('open')){
+        if($this->input->getOption('open')) {
             $commands = [
                 'dar' => 'open',
                 'win' => 'start ""',
             ];
             $platform = strtolower(substr(PHP_OS, 0, 3));
-            if(isset($commands[$platform])){
+            if(isset($commands[$platform])) {
                 passthru(sprintf('%s "http://%s:%s"', $commands[$platform], $host, $port));
             }
         }
