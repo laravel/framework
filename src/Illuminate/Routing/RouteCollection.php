@@ -261,6 +261,17 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Get a route instance by its method.
+     *
+     * @param  string  $method
+     * @return \Illuminate\Routing\Route|null
+     */
+    public function getByMethod($method)
+    {
+        return isset($this->routes[$method]) ? $this->routes[$method] : null;
+    }
+
+    /**
      * Get a route instance by its name.
      *
      * @param  string  $name
