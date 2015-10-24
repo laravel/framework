@@ -48,6 +48,14 @@ trait ConfirmableTrait
      */
     protected function getDefaultConfirmCallback()
     {
-        return function () { return $this->getLaravel()->environment() == 'production'; };
+        if ($this instanceof Command) {
+            return function () {
+                return $this->getLaravel()->environment() == 'production';
+            };
+        } else {
+            return function () {
+                return true;
+            };
+        }
     }
 }
