@@ -59,7 +59,9 @@ class MailgunTransport extends Transport
         $this->beforeSendPerformed($message);
 
         $options = ['auth' => ['api', $this->key]];
+
         $to = $this->getTo($message);
+
         $message->setBcc([]);
 
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
