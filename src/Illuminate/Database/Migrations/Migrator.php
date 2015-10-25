@@ -8,6 +8,8 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
 {
+    use Loggable;
+
     /**
      * The migration repository implementation.
      *
@@ -64,23 +66,34 @@ class Migrator
      * Run the outstanding migrations at a given path.
      *
      * @param  string  $path
-     * @param  bool    $pretend
+     * @param  bool $pretend
+     *  @param bool $logging
      * @return void
      */
-    public function run($path, $pretend = false)
+    public function run($path, $pretend = false, $logging = true)
     {
         $this->notes = [];
 
         $files = $this->getMigrationFiles($path);
 
-        // Once we grab all of the migration files for the path, we will compare them
-        // against the migrations that have already been run for this package then
-        // run each of the outstanding migrations against a database connection.
-        $ran = $this->repository->getRan();
+        // Once we grab all of the migration files for the path, if logging has not
+        // been disabled, we will compare them against the migrations that have already
+        // been run for this package then run each of the outstanding migrations against
+        // a database connection.
+
+        if($logging == false)
+        {
+            $this->disableLogging();
+            $ran = [];
+        }
+        else
+        {
+            $ran = $this->repository->getRan();
+        }
 
         $migrations = array_diff($files, $ran);
 
-        $this->requireFiles($path, $migrations);
+        $this->requireFiles(is_dir($path) ? $path : dirname($path), $migrations);
 
         $this->runMigrationList($migrations, $pretend);
     }
@@ -134,10 +147,13 @@ class Migrator
 
         $migration->up();
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+        if($this->shouldLog())
+        {
+            // Once we have run a migrations class, we will log that it was run in this
+            // repository so that we don't try to run it next time we do a migration
+            // in the application. A migration repository keeps the migrate order.
+            $this->repository->log($file, $batch);
+        }
 
         $this->note("<info>Migrated:</info> $file");
     }
@@ -236,7 +252,14 @@ class Migrator
      */
     public function getMigrationFiles($path)
     {
-        $files = $this->files->glob($path.'/*_*.php');
+        if(is_dir($path))
+        {
+            $files = $this->files->glob($path.'/*_*.php');
+        }
+        else
+        {
+            $files = [$path];
+        }
 
         // Once we have the array of files in the directory we will just remove the
         // extension and take the basename of the file which is all we need when
@@ -267,8 +290,10 @@ class Migrator
      */
     public function requireFiles($path, array $files)
     {
+        $dir = is_dir($path) ? $path : dirname($path);
+
         foreach ($files as $file) {
-            $this->files->requireOnce($path.'/'.$file.'.php');
+            $this->files->requireOnce($dir .'/'.$file.'.php');
         }
     }
 

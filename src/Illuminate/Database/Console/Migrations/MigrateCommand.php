@@ -34,8 +34,7 @@ class MigrateCommand extends BaseCommand
     /**
      * Create a new migration command instance.
      *
-     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @return void
+     * @param Migrator $migrator
      */
     public function __construct(Migrator $migrator)
     {
@@ -51,6 +50,7 @@ class MigrateCommand extends BaseCommand
      */
     public function fire()
     {
+
         if (! $this->confirmToProceed()) {
             return;
         }
@@ -71,7 +71,26 @@ class MigrateCommand extends BaseCommand
             $path = $this->getMigrationPath();
         }
 
-        $this->migrator->run($path, $pretend);
+        // Now check to see if a file option has been defined.
+        if( ! is_null($this->input->getOption('file')))
+        {
+            $file = $this->getMigrationFile($this->input->getOption('file'), $path);
+
+            if(empty($file))
+            {
+                $this->info('Nothing to migrate.');
+                return;
+            }
+
+            $path = "$path/$file";
+        }
+
+        // Now check to see if a logging option has been defined
+        $logging = ! is_null($this->input->getOption('logging'))
+            ? (bool)$this->input->getOption('logging')
+            : true;
+
+        $this->migrator->run($path, $pretend, $logging);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -105,6 +124,40 @@ class MigrateCommand extends BaseCommand
     }
 
     /**
+     * Resolves a migration file from a specified path.
+     *
+     * @param $migration
+     * @param $path
+     * @return mixed
+     */
+    protected function getMigrationFile($migration, $path)
+    {
+        // Ensure that migration has a file extension
+        $migration = preg_replace('/(?<!\.php)$/', '.php', $migration);
+
+        if(file_exists("$path/$migration"))
+        {
+            return $migration;
+        }
+        else
+        {
+            $file = collect($this->migrator->getFilesystem()->files($path));
+
+            $file = $file->first(function($key, $file) use($migration)
+            {
+                $matches   = [];
+                $file_name = last(explode('/', $file));
+                preg_match("/^\d*_\d*_\d*_\d*_$migration$/", $file_name, $matches);
+                return ! empty($matches);
+            });
+
+            $file_name = last(explode('/', $file));
+
+            return $file_name;
+        }
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -121,6 +174,10 @@ class MigrateCommand extends BaseCommand
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
+
+            ['logging', null, InputOption::VALUE_OPTIONAL, 'Whether logging is enabled; default of 1 (true)'],
+
+            ['file', null, InputOption::VALUE_OPTIONAL, 'The migration file that should be run'],
         ];
     }
 }
