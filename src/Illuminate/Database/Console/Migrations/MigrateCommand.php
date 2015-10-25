@@ -72,11 +72,12 @@ class MigrateCommand extends BaseCommand
         }
 
         // Now check to see if a file option has been defined.
-        if( ! is_null($this->input->getOption('file'))) {
+        if (! is_null($this->input->getOption('file'))) {
             $file = $this->getMigrationFile($this->input->getOption('file'), $path);
 
-            if(empty($file)) {
+            if (empty($file)) {
                 $this->info('Nothing to migrate.');
+
                 return;
             }
 
@@ -133,13 +134,13 @@ class MigrateCommand extends BaseCommand
         // Ensure that migration has a file extension
         $migration = preg_replace('/(?<!\.php)$/', '.php', $migration);
 
-        if(file_exists("$path/$migration")) {
+        if (file_exists("$path/$migration")) {
             return $migration;
         } else {
             $file = collect($this->migrator->getFilesystem()->files($path));
 
             $file = $file->first(function($key, $file) use($migration) {
-                $matches   = [];
+                $matches = [];
                 $file_name = last(explode('/', $file));
                 preg_match("/^\d*_\d*_\d*_\d*_$migration$/", $file_name, $matches);
                 return ! empty($matches);

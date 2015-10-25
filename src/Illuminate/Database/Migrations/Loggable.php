@@ -1,10 +1,9 @@
-<?php namespace Illuminate\Database\Migrations;
+<?php
+
+namespace Illuminate\Database\Migrations;
 
 /**
  * Introduces logging features into a class.
- *
- * @package App\Libraries\Traits
- * @since 25.10.2015
  */
 trait Loggable
 {
