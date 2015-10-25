@@ -138,7 +138,7 @@ class MigrateCommand extends BaseCommand
         } else {
             $file = collect($this->migrator->getFilesystem()->files($path));
 
-            $file = $file->first(function ($key, $file) use($migration) {
+            $file = $file->first(function ($key, $file) use ($migration) {
                 $matches = [];
                 $file_name = last(explode('/', $file));
                 preg_match("/^\d*_\d*_\d*_\d*_$migration$/", $file_name, $matches);

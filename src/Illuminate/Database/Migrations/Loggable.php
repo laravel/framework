@@ -29,5 +29,4 @@ trait Loggable
     {
         $this->logging = false;
     }
-
 }
