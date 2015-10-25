@@ -407,7 +407,8 @@ if (! function_exists('data_get')) {
 
                 $target = $target[$segment];
             } elseif (is_object($target)) {
-                if (! isset($target->{$segment})) {
+                $obj = $target->{$segment};
+                if (! isset($obj)) {
                     return value($default);
                 }
 
