@@ -66,10 +66,11 @@ class LoadConfiguration
     protected function getConfigurationFiles(Application $app)
     {
         $files = [];
-        $path = realpath($app->configPath());
 
-        foreach (Finder::create()->files()->name('*.php')->in($path) as $file) {
-            $nesting = $this->getConfigurationNesting($file, $path);
+        $configPath = realpath($app->configPath());
+
+        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
+            $nesting = $this->getConfigurationNesting($file, $configPath);
 
             $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
@@ -81,14 +82,14 @@ class LoadConfiguration
      * Get the configuration file nesting path.
      *
      * @param  \Symfony\Component\Finder\SplFileInfo  $file
-     * @param  string  $path
+     * @param  string  $configPath
      * @return string
      */
-    protected function getConfigurationNesting(SplFileInfo $file, $path)
+    protected function getConfigurationNesting(SplFileInfo $file, $configPath)
     {
         $directory = dirname($file->getRealPath());
 
-        if ($tree = trim(str_replace($path, '', $directory), DIRECTORY_SEPARATOR)) {
+        if ($tree = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
             $tree = str_replace(DIRECTORY_SEPARATOR, '.', $tree).'.';
         }
 
