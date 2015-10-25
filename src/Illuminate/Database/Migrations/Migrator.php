@@ -81,7 +81,7 @@ class Migrator
         // been run for this package then run each of the outstanding migrations against
         // a database connection.
 
-        if ($logging == false){
+        if ($logging == false) {
             $this->disableLogging();
             $ran = [];
         } else {
@@ -248,7 +248,7 @@ class Migrator
      */
     public function getMigrationFiles($path)
     {
-        if (is_dir($path)){
+        if (is_dir($path)) {
             $files = $this->files->glob($path.'/*_*.php');
         } else {
             $files = [$path];

@@ -50,7 +50,6 @@ class MigrateCommand extends BaseCommand
      */
     public function fire()
     {
-
         if (! $this->confirmToProceed()) {
             return;
         }
@@ -139,10 +138,11 @@ class MigrateCommand extends BaseCommand
         } else {
             $file = collect($this->migrator->getFilesystem()->files($path));
 
-            $file = $file->first(function($key, $file) use($migration) {
+            $file = $file->first(function ($key, $file) use($migration) {
                 $matches = [];
                 $file_name = last(explode('/', $file));
                 preg_match("/^\d*_\d*_\d*_\d*_$migration$/", $file_name, $matches);
+
                 return ! empty($matches);
             });
 
