@@ -81,13 +81,10 @@ class Migrator
         // been run for this package then run each of the outstanding migrations against
         // a database connection.
 
-        if($logging == false)
-        {
+        if($logging == false){
             $this->disableLogging();
             $ran = [];
-        }
-        else
-        {
+        } else {
             $ran = $this->repository->getRan();
         }
 
@@ -147,8 +144,7 @@ class Migrator
 
         $migration->up();
 
-        if($this->shouldLog())
-        {
+        if($this->shouldLog()) {
             // Once we have run a migrations class, we will log that it was run in this
             // repository so that we don't try to run it next time we do a migration
             // in the application. A migration repository keeps the migrate order.
@@ -252,12 +248,9 @@ class Migrator
      */
     public function getMigrationFiles($path)
     {
-        if(is_dir($path))
-        {
+        if(is_dir($path)){
             $files = $this->files->glob($path.'/*_*.php');
-        }
-        else
-        {
+        } else {
             $files = [$path];
         }
 
@@ -293,7 +286,7 @@ class Migrator
         $dir = is_dir($path) ? $path : dirname($path);
 
         foreach ($files as $file) {
-            $this->files->requireOnce($dir .'/'.$file.'.php');
+            $this->files->requireOnce($dir.'/'.$file.'.php');
         }
     }
 
