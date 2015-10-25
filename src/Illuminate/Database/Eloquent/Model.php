@@ -2831,12 +2831,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'boolean':
                 return (bool) $value;
             case 'object':
-                return json_decode($value);
+                return $this->fromJson($value, true);
             case 'array':
             case 'json':
-                return json_decode($value, true);
+                return $this->fromJson($value);
             case 'collection':
-                return new BaseCollection(json_decode($value, true));
+                return new BaseCollection($this->fromJson($value));
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
@@ -2871,7 +2871,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
-            $value = json_encode($value);
+            $value = $this->asJson($value);
         }
 
         $this->attributes[$key] = $value;
@@ -2991,6 +2991,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->dateFormat = $format;
 
         return $this;
+    }
+
+    /**
+     * Encode the given value as JSON.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asJson($value)
+    {
+        return json_encode($value);
+    }
+
+    /**
+     * Decode the given JSON back into an array or object.
+     *
+     * @param  string  $value
+     * @param  bool  $asObject
+     * @return mixed
+     */
+    public function fromJson($value, $asObject = false)
+    {
+        return json_decode($value, ! $asObject);
     }
 
     /**
