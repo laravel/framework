@@ -1547,7 +1547,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function performUpdate(Builder $query, array $options = [])
     {
         $dirty = $this->getDirty();
-        $updated = false;
 
         if (count($dirty) > 0) {
             // If the updating event returns false, we will cancel the update operation so
@@ -1571,13 +1570,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             if (count($dirty) > 0) {
                 $numRows = $this->setKeysForSaveQuery($query)->update($dirty);
-                $updated = $numRows == 1;
 
                 $this->fireModelEvent('updated', false);
             }
         }
 
-        return $updated;
+        return isset($numRows) ? $numRows === 1 : false;
     }
 
     /**
