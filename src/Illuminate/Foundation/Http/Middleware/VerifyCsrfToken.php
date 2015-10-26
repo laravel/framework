@@ -84,7 +84,7 @@ class VerifyCsrfToken
             $token = $this->encrypter->decrypt($header);
         }
 
-        return Str::equals($request->session()->token(), $token);
+        return Str::equals((string) $request->session()->token(), $token);
     }
 
     /**
