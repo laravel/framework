@@ -303,8 +303,8 @@ trait ApplicationTrait
     /**
      * Call artisan command and return code.
      *
-     * @param string  $command
-     * @param array   $parameters
+     * @param  string  $command
+     * @param  array  $parameters
      * @return int
      */
     public function artisan($command, $parameters = [])
