@@ -139,7 +139,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer', 'Int'];
+    protected $numericRules = ['Numeric', 'Integer'];
 
     /**
      * The validation rules that imply the field is required.
@@ -357,9 +357,7 @@ class Validator implements ValidatorContract
 
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        $normalizedRule = $this->normalizeRule($rule);
-
-        $method = "validate{$normalizedRule}";
+        $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
@@ -2086,10 +2084,14 @@ class Validator implements ValidatorContract
     protected function parseRule($rules)
     {
         if (is_array($rules)) {
-            return $this->parseArrayRule($rules);
+            $rules = $this->parseArrayRule($rules);
+        } else {
+            $rules = $this->parseStringRule($rules);
         }
 
-        return $this->parseStringRule($rules);
+        $rules[0] = $this->normalizeRule($rules[0]);
+
+        return $rules;
     }
 
     /**
@@ -2139,6 +2141,24 @@ class Validator implements ValidatorContract
         }
 
         return str_getcsv($parameter);
+    }
+
+    /**
+     * Normalizes a rule so that we can accept short types.
+     *
+     * @param  string  $rule
+     * @return string
+     */
+    protected function normalizeRule($rule)
+    {
+        switch ($rule) {
+            case 'Int':
+                return 'Integer';
+            case 'Bool':
+                return 'Boolean';
+            default:
+                return $rule;
+        }
     }
 
     /**
@@ -2614,24 +2634,6 @@ class Validator implements ValidatorContract
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
-        }
-    }
-
-    /**
-     * Normalizes a rule so that we can accept short types.
-     *
-     * @param  string  $rule
-     * @return string
-     */
-    protected function normalizeRule($rule)
-    {
-        switch ($rule) {
-            case 'Int':
-                return 'Integer';
-            case 'Bool':
-                return 'Boolean';
-            default:
-                return $rule;
         }
     }
 
