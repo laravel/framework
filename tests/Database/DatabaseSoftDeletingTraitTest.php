@@ -13,7 +13,8 @@ class DatabaseSoftDeletingTraitTest extends PHPUnit_Framework_TestCase
     {
         $model = m::mock('DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
-        $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+        // $model->shouldReceive('newQuery')->andReturn($query = m::mock('StdClass'));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('StdClass'));
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with(['deleted_at' => 'date-time']);
         $model->delete();

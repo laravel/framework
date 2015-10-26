@@ -560,6 +560,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([4], $builder->getBindings());
     }
 
+    public function testGetCountForPaginationWithColumnAliases()
+    {
+        $builder = $this->getBuilder();
+        $columns = ['body as post_body', 'teaser', 'posts.created as published'];
+        $builder->from('posts')->select($columns);
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
+
+        $count = $builder->getCountForPagination($columns);
+        $this->assertEquals(1, $count);
+    }
+
     public function testWhereShortcut()
     {
         $builder = $this->getBuilder();
@@ -816,6 +829,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
         $results = $builder->from('users')->sum('id');
         $this->assertEquals(1, $results);
+    }
+
+    public function testSqlServerExists()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select cast(case when exists(select * from [users]) then 1 else 0 end as bit) as [exists]', [], true)->andReturn([['exists' => 1]]);
+        $results = $builder->from('users')->exists();
+        $this->assertTrue($results);
     }
 
     public function testAggregateResetFollowedByGet()

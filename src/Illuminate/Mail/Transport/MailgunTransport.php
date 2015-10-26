@@ -59,8 +59,12 @@ class MailgunTransport extends Transport
 
         $options = ['auth' => ['api', $this->key]];
 
+        $to = $this->getTo($message);
+
+        $message->setBcc([]);
+
         $options['multipart'] = [
-            ['name' => 'to', 'contents' => $this->getTo($message)],
+            ['name' => 'to', 'contents' => $to],
             ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
         ];
 

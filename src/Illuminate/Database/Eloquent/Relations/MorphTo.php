@@ -180,7 +180,7 @@ class MorphTo extends BelongsTo
     {
         $instance = $this->createModelByType($type);
 
-        $key = $instance->getKeyName();
+        $key = $instance->getTable().'.'.$instance->getKeyName();
 
         $query = $instance->newQuery();
 

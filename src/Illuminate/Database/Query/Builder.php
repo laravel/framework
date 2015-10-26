@@ -1433,7 +1433,7 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $columns];
+        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
 
         $results = $this->get();
 
@@ -1466,6 +1466,20 @@ class Builder
 
             $this->bindings[$key] = [];
         }
+    }
+
+    /**
+     * Remove the column aliases since they will break count queries.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function clearSelectAliases(array $columns)
+    {
+        return array_map(function ($column) {
+            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
+                    ? substr($column, 0, $aliasPosition) : $column;
+        }, $columns);
     }
 
     /**

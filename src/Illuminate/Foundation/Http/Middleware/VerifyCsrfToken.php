@@ -107,7 +107,7 @@ class VerifyCsrfToken
             $token = $this->encrypter->decrypt($header);
         }
 
-        return hash_equals($request->session()->token(), $token);
+        return hash_equals((string) $request->session()->token(), $token);
     }
 
     /**
