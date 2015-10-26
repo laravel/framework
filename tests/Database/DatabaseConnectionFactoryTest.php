@@ -83,6 +83,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Database\Connectors\PostgresConnector', $factory->createConnector(['driver' => 'pgsql']));
         $this->assertInstanceOf('Illuminate\Database\Connectors\SQLiteConnector', $factory->createConnector(['driver' => 'sqlite']));
         $this->assertInstanceOf('Illuminate\Database\Connectors\SqlServerConnector', $factory->createConnector(['driver' => 'sqlsrv']));
+        $this->assertInstanceOf('Illuminate\Database\Connectors\OdbcConnector', $factory->createConnector(['driver' => 'odbc']));
     }
 
     /**

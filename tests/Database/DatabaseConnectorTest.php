@@ -157,6 +157,19 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testOdbcConnectCallsCreateConnectionWithProperArguments()
+    {
+        $config = ['dsn' => ['Driver' => 'ODBC Driver 11', 'Server' => 'example.server.com', 'App' => 'UnitTest']];
+        $dsn = 'odbc:Driver={ODBC Driver 11};Server=example.server.com;App=UnitTest';
+        $connector = $this->getMock('Illuminate\Database\Connectors\OdbcConnector', ['createConnection', 'getOptions']);
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     protected function getDsn(array $config)
     {
         extract($config);

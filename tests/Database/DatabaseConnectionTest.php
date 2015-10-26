@@ -234,6 +234,44 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertSame($connection, $schema->getConnection());
     }
 
+    public function testOdbConnectionWrappingSqlServerConnection()
+    {
+        $pdoMock = new DatabaseConnectionTestMockPDO;
+        $config = ['connectionType' => Illuminate\Database\SqlServerConnection::class];
+
+        $connection = new Illuminate\Database\OdbcConnection($pdoMock, 'foobar', '', $config);
+        $connection->getSchemaBuilder();
+
+        $this->assertInstanceOf('Illuminate\Database\Schema\Grammars\SqlServerGrammar', $connection->getSchemaGrammar());
+        $this->assertInstanceOf('Illuminate\Database\Query\Grammars\SqlServerGrammar', $connection->getQueryGrammar());
+        $this->assertInstanceOf('Illuminate\Database\Query\Processors\SqlServerProcessor', $connection->getPostProcessor());
+    }
+
+    public function testOdbConnectionWrappingMySqlConnection()
+    {
+        $pdoMock = new DatabaseConnectionTestMockPDO;
+        $config = ['connectionType' => Illuminate\Database\MySqlConnection::class];
+
+        $connection = new Illuminate\Database\OdbcConnection($pdoMock, 'foobar', '', $config);
+        $connection->getSchemaBuilder();
+
+        $this->assertInstanceOf('Illuminate\Database\Schema\Grammars\MySqlGrammar', $connection->getSchemaGrammar());
+        $this->assertInstanceOf('Illuminate\Database\Query\Grammars\MySqlGrammar', $connection->getQueryGrammar());
+        $this->assertInstanceOf('Illuminate\Database\Query\Processors\MySqlProcessor', $connection->getPostProcessor());
+    }
+
+    public function testOdbConnectionShouldFailWrappingOdbcConnection()
+    {
+        $pdoMock = new DatabaseConnectionTestMockPDO;
+        $config = ['connectionType' => Illuminate\Database\OdbcConnection::class];
+
+        try {
+            $connection = new Illuminate\Database\OdbcConnection($pdoMock, 'foobar', '', $config);
+        } catch (Exception $e) {
+            $this->assertEquals('Can\'t use Illuminate\Database\OdbcConnection as connection type.', $e->getMessage());
+        }
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
