@@ -242,6 +242,19 @@ if (! function_exists('database_path')) {
     }
 }
 
+if (! function_exists('decrypt')) {
+    /**
+     * Decrypt the given value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function decrypt($value)
+    {
+        return app('encrypter')->decrypt($value);
+    }
+}
+
 if (! function_exists('delete')) {
     /**
      * Register a new DELETE route with the router.
@@ -278,6 +291,19 @@ if (! function_exists('elixir')) {
         }
 
         throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
+    }
+}
+
+if (! function_exists('encrypt')) {
+    /**
+     * Encrypt the given value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function encrypt($value)
+    {
+        return app('encrypter')->encrypt($value);
     }
 }
 
