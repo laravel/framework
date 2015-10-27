@@ -3,7 +3,9 @@
 namespace Illuminate\Session;
 
 use SessionHandlerInterface;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Container\Container;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
@@ -22,6 +24,13 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected $table;
 
     /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * The existence state of the session.
      *
      * @var bool
@@ -33,11 +42,13 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table)
+    public function __construct(ConnectionInterface $connection, $table, Container $container = null)
     {
         $this->table = $table;
+        $this->container = $container;
         $this->connection = $connection;
     }
 
@@ -76,17 +87,38 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     public function write($sessionId, $data)
     {
+        $payload = $this->getDefaultPayload($data);
+
         if ($this->exists) {
-            $this->getQuery()->where('id', $sessionId)->update([
-                'payload' => base64_encode($data), 'last_activity' => time(),
-            ]);
+            $this->getQuery()->where('id', $sessionId)->update($payload);
         } else {
-            $this->getQuery()->insert([
-                'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
-            ]);
+            $payload['id'] = $sessionId;
+
+            $this->getQuery()->insert($payload);
         }
 
         $this->exists = true;
+    }
+
+    /**
+     * Get the default paylaod for the session.
+     *
+     * @param  string  $data
+     * @return array
+     */
+    protected function getDefaultPayload($data)
+    {
+        $payload = ['payload' => base64_encode($data), 'last_activity' => time()];
+
+        if ($this->container && $this->container->bound(Guard::class)) {
+            $payload['user_id'] = $this->container->make(Guard::class)->id();
+        }
+
+        if ($this->container && $this->container->bound('request')) {
+            $payload['ip_address'] = $this->container->make('request')->ip();
+        }
+
+        return $payload;
     }
 
     /**
