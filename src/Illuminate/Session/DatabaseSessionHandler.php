@@ -110,12 +110,20 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $payload = ['payload' => base64_encode($data), 'last_activity' => time()];
 
-        if ($this->container && $this->container->bound(Guard::class)) {
-            $payload['user_id'] = $this->container->make(Guard::class)->id();
+        if (! $container = $this->container) {
+            return $payload;
         }
 
-        if ($this->container && $this->container->bound('request')) {
-            $payload['ip_address'] = $this->container->make('request')->ip();
+        if ($container->bound(Guard::class)) {
+            $payload['user_id'] = $container->make(Guard::class)->id();
+        }
+
+        if ($container->bound('request')) {
+            $payload['ip_address'] = $container->make('request')->ip();
+
+            $payload['user_agent'] = substr(
+                (string) $container->make('request')->header('User-Agent'), 0, 500
+            );
         }
 
         return $payload;
