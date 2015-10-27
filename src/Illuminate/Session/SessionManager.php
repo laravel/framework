@@ -73,7 +73,21 @@ class SessionManager extends Manager
 
         $table = $this->app['config']['session.table'];
 
-        return $this->buildSession(new DatabaseSessionHandler($connection, $table));
+        return $this->buildSession(new DatabaseSessionHandler($connection, $table, $this->app));
+    }
+
+    /**
+     * Create an instance of the legacy database session driver.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    protected function createLegacyDatabaseDriver()
+    {
+        $connection = $this->getDatabaseConnection();
+
+        $table = $this->app['config']['session.table'];
+
+        return $this->buildSession(new DatabaseSessionHandler($connection, $table, $this->app));
     }
 
     /**
