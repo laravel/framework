@@ -53,7 +53,13 @@ class PostgresGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        $sql = 'create';
+        if ($blueprint->temporary === true) {
+            $sql .= ' temporary';
+        }
+        $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
+
+        return $sql;
     }
 
     /**
