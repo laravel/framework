@@ -54,7 +54,11 @@ class SQLiteGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        $sql = 'create table '.$this->wrapTable($blueprint)." ($columns";
+        $sql = 'create';
+        if ($blueprint->temporary === true) {
+            $sql .= ' temporary';
+        }
+        $sql .= ' table '.$this->wrapTable($blueprint)." ($columns";
 
         // SQLite forces primary keys to be added when the table is initially created
         // so we will need to check for a primary key commands and add the columns
