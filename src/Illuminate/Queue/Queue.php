@@ -121,13 +121,13 @@ abstract class Queue
         }
 
         if (is_array($data)) {
-            array_walk($data, $callback = function (&$d) use (&$callback) {
+            $data = array_map(function ($d) {
                 if (is_array($d)) {
-                    array_walk($d, $callback);
+                    return $this->prepareQueueableEntities($d);
                 }
 
-                $d = $this->prepareQueueableEntity($d);
-            });
+                return $this->prepareQueueableEntity($d);
+            }, $data);
         }
 
         return $data;
