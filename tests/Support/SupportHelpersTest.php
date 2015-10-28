@@ -84,12 +84,21 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testArrayPluckWithNestedArrays()
     {
-        $array = [['account' => 'a', 'users' => [
-            ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
-        ]],['account' => 'b', 'users' => [
-            ['first' => 'abigail', 'last' => 'otwell'],
-            ['first' => 'dayle', 'last' => 'rees'],
-        ]]];
+        $array = [
+            [
+                'account' => 'a',
+                'users' => [
+                    ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ],
+            ],
+            [
+                'account' => 'b',
+                'users' => [
+                    ['first' => 'abigail', 'last' => 'otwell'],
+                    ['first' => 'dayle', 'last' => 'rees'],
+                ],
+            ],
+        ];
 
         $this->assertEquals([['taylor'], ['abigail', 'dayle']], array_pluck($array, 'users.*.first'));
         $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], array_pluck($array, 'users.*.first', 'account'));
@@ -327,16 +336,23 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testDataGetWithNestedArrays()
     {
-        $array = [['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'], ['name' => 'abigail'], ['name' => 'dayle']];
+        $array = [
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ];
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
 
-        $array = ['users' => [
-            ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'abigail', 'last' => 'otwell'],
-            ['first' => 'dayle', 'last' => 'rees'],
-        ], 'posts' => null];
+        $array = [
+            'users' => [
+                ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ['first' => 'abigail', 'last' => 'otwell'],
+                ['first' => 'dayle', 'last' => 'rees'],
+            ],
+            'posts' => null,
+        ];
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
@@ -346,15 +362,28 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testDataGetWithDoubleNestedArraysCollapsesResult()
     {
-        $array = ['posts' => [
-            ['comments' => [
-                ['author' => 'taylor', 'likes' => 4], ['author' => 'abigail', 'likes' => 3],
-            ]], ['comments' => [
-                ['author' => 'abigail', 'likes' => 2], ['author' => 'dayle'],
-            ]], ['comments' => [
-                ['author' => 'dayle'], ['author' => 'taylor', 'likes' => 1],
-            ]],
-        ]];
+        $array = [
+            'posts' => [
+                [
+                    'comments' => [
+                        ['author' => 'taylor', 'likes' => 4],
+                        ['author' => 'abigail', 'likes' => 3],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'abigail', 'likes' => 2],
+                        ['author' => 'dayle'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'dayle'],
+                        ['author' => 'taylor', 'likes' => 1],
+                    ],
+                ],
+            ],
+        ];
 
         $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
