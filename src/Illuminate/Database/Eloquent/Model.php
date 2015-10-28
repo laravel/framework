@@ -1575,7 +1575,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
         }
 
-        return isset($numRows) ? $numRows === 1 : false;
+        return true;
     }
 
     /**
