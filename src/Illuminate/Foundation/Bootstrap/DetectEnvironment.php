@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Foundation\Bootstrap;
+use Illuminate\Foundation as help;
 
 use Dotenv;
 use InvalidArgumentException;
@@ -23,7 +24,7 @@ class DetectEnvironment
         }
 
         $app->detectEnvironment(function () {
-            return env('APP_ENV', 'production');
+            return help\env('APP_ENV', 'production');
         });
     }
 }

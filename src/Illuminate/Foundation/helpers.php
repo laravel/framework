@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Foundation;
+
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
