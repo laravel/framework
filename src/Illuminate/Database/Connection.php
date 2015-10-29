@@ -746,7 +746,9 @@ class Connection implements ConnectionInterface
     public function listen(Closure $callback)
     {
         if (isset($this->events)) {
-            $this->events->listen(Events\QueryExecuted::class, $callback);
+            $this->events->listen(Events\QueryExecuted::class, function ($e) use ($callback) {
+                call_user_func($callback, $e->sql, $e->bindings, $e->time, $e->connectionName);
+            });
         }
     }
 
