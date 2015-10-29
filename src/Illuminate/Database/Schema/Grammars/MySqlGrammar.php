@@ -54,10 +54,8 @@ class MySqlGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        $sql = 'create';
-        if ($blueprint->temporary === true) {
-            $sql .= ' temporary';
-        }
+        $sql = $blueprint->temporary ? 'create temporary' : 'create';
+
         $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
 
         // Once we have the primary SQL, we can add the encoding option to the SQL for
