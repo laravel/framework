@@ -166,8 +166,12 @@ class Validator implements ValidatorContract
         $this->translator = $translator;
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
-        $this->rules = $this->explodeRules($rules);
         $this->customAttributes = $customAttributes;
+
+        // Explode the rules first so that the implicit ->each calls are made...
+        $rules = $this->explodeRules($rules);
+
+        $this->rules = array_merge((array) $this->rules, $rules);
     }
 
     /**
@@ -209,8 +213,14 @@ class Validator implements ValidatorContract
      */
     protected function explodeRules($rules)
     {
-        foreach ($rules as $key => &$rule) {
-            $rule = (is_string($rule)) ? explode('|', $rule) : $rule;
+        foreach ($rules as $key => $rule) {
+            if (Str::contains($key, '*')) {
+                $this->each($key, $rule);
+
+                unset($rules[$key]);
+            } else {
+                $rules[$key] = (is_string($rule)) ? explode('|', $rule) : $rule;
+            }
         }
 
         return $rules;
@@ -261,22 +271,14 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::get($this->data, $attribute);
+        $data = Arr::dot($this->data);
 
-        if (! is_array($data)) {
-            if ($this->hasRule($attribute, 'Array')) {
-                return;
-            }
-
-            throw new InvalidArgumentException('Attribute for each() must be an array.');
-        }
-
-        foreach ($data as $dataKey => $dataValue) {
-            foreach ((array) $rules as $ruleKey => $ruleValue) {
-                if (! is_string($ruleKey)) {
-                    $this->mergeRules("$attribute.$dataKey", $ruleValue);
-                } else {
-                    $this->mergeRules("$attribute.$dataKey.$ruleKey", $ruleValue);
+        foreach ($data as $key => $value) {
+            if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
+                foreach ((array) $rules as $ruleKey => $ruleValue) {
+                    if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
+                        $this->mergeRules($key, $ruleValue);
+                    }
                 }
             }
         }
@@ -1655,7 +1657,7 @@ class Validator implements ValidatorContract
     {
         $shortKey = str_replace('validation.custom.', '', $customKey);
 
-        $customMessages = array_dot(
+        $customMessages = Arr::dot(
             (array) $this->translator->trans('validation.custom')
         );
 
