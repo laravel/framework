@@ -54,7 +54,9 @@ class MySqlGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        $sql = 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        $sql = $blueprint->temporary ? 'create temporary' : 'create';
+
+        $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
 
         // Once we have the primary SQL, we can add the encoding option to the SQL for
         // the table.  Then, we can check if a storage engine has been supplied for
