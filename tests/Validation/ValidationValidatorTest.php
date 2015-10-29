@@ -1772,6 +1772,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => 'Numeric|Min:4|Max:16']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => 'Required|String']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => 'Required|Numeric']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateEachWithNonIndexedArray()
