@@ -1589,7 +1589,7 @@ class Validator implements ValidatorContract
 
         $customKey = "validation.custom.{$attribute}.{$lowerRule}";
 
-        $customMessage = $this->translator->trans($customKey);
+        $customMessage = $this->getCustomMessageFromTranslator($customKey);
 
         // First we check for a custom defined validation message for the attribute
         // and rule. This allows the developer to specify specific messages for
@@ -1637,10 +1637,35 @@ class Validator implements ValidatorContract
         // message for the fields, then we will check for a general custom line
         // that is not attribute specific. If we find either we'll return it.
         foreach ($keys as $key) {
-            if (isset($source[$key])) {
-                return $source[$key];
+            foreach (array_flip($source) as $value => $sourceKey) {
+                if (Str::is($sourceKey, $key)) {
+                    return $value;
+                }
             }
         }
+    }
+
+    /**
+     * Get the custom error message from translator.
+     *
+     * @param  string  $customKey
+     * @return string
+     */
+    protected function getCustomMessageFromTranslator($customKey)
+    {
+        $shortKey = str_replace('validation.custom.', '', $customKey);
+
+        $customMessages = array_dot(
+            (array) $this->translator->trans('validation.custom')
+        );
+
+        foreach ($customMessages as $key => $message) {
+            if ($key === $shortKey || (Str::contains($key, ['*']) && Str::is($key, $shortKey))) {
+                return $message;
+            }
+        }
+
+        return $customKey;
     }
 
     /**
