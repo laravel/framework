@@ -1788,9 +1788,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testValidateEachWithNonArrayWithoutArrayRule()
     {
         $trans = $this->getRealTranslator();
