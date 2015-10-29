@@ -214,7 +214,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             'custom' => [
                 'name' => [
                     'required' => 'really required!',
-                ]
+                ],
             ],
         ]);
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
@@ -231,7 +231,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             'custom' => [
                 'name.*' => [
                     'required' => 'all are really required!',
-                ]
+                ],
             ],
         ]);
         $v = new Validator($trans, ['name' => ['', '']], []);
@@ -1824,7 +1824,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testInlineMessagesMayUseAsteriskForEachRules()
     {
-
     }
 
     protected function getTranslator()
