@@ -403,7 +403,9 @@ class Guard implements GuardContract
         if ($this->events) {
             $payload = [$credentials, $remember, $login];
 
-            $this->events->fire('auth.attempt', $payload);
+            $this->events->fire(new Events\Attempting(
+                $credentials, $remember, $login
+            ));
         }
     }
 
@@ -416,7 +418,7 @@ class Guard implements GuardContract
     public function attempting($callback)
     {
         if ($this->events) {
-            $this->events->listen('auth.attempt', $callback);
+            $this->events->listen(Events\Attempting::class, $callback);
         }
     }
 
@@ -458,7 +460,7 @@ class Guard implements GuardContract
     protected function fireLoginEvent($user, $remember = false)
     {
         if (isset($this->events)) {
-            $this->events->fire('auth.login', [$user, $remember]);
+            $this->events->fire(new Events\Login($user, $remember));
         }
     }
 
@@ -551,7 +553,7 @@ class Guard implements GuardContract
         }
 
         if (isset($this->events)) {
-            $this->events->fire('auth.logout', [$user]);
+            $this->events->fire(new Events\Logout($user));
         }
 
         // Once we have fired the logout event we will clear the users out of memory
