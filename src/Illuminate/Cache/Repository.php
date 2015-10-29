@@ -69,8 +69,19 @@ class Repository implements CacheContract, ArrayAccess
      */
     protected function fireCacheEvent($event, $payload)
     {
-        if (isset($this->events)) {
-            $this->events->fire('cache.'.$event, $payload);
+        if (! isset($this->events)) {
+            return;
+        }
+
+        switch ($event) {
+            case 'hit':
+                return $this->events->fire(new Events\CacheHit($payload[0], $payload[1]));
+            case 'missed':
+                return $this->events->fire(new Events\CacheMissed($payload[0]));
+            case 'delete':
+                return $this->events->fire(new Events\KeyForgotten($payload[0]));
+            case 'write':
+                return $this->events->fire(new Events\KeyWritten($payload[0], $payload[1], $payload[2]));
         }
     }
 

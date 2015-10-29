@@ -660,9 +660,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $_SERVER['__router.request'] = null;
         $_SERVER['__router.route'] = null;
 
-        $router->matched(function ($route, $request) {
-            $_SERVER['__router.request'] = $request;
-            $_SERVER['__router.route'] = $route;
+        $router->matched(function ($event) {
+            $_SERVER['__router.request'] = $event->request;
+            $_SERVER['__router.route'] = $event->route;
         });
 
         $router->dispatchToRoute($request);

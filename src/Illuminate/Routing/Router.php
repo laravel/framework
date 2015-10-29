@@ -631,7 +631,7 @@ class Router implements RegistrarContract
             return $route;
         });
 
-        $this->events->fire('router.matched', [$route, $request]);
+        $this->events->fire(new Events\RouteMatched($route, $request));
 
         $response = $this->runRouteWithinStack($route, $request);
 
@@ -770,7 +770,7 @@ class Router implements RegistrarContract
      */
     public function matched($callback)
     {
-        $this->events->listen('router.matched', $callback);
+        $this->events->listen(Events\RouteMatched::class, $callback);
     }
 
     /**
