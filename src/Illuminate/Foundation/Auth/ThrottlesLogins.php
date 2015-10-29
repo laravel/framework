@@ -62,7 +62,7 @@ trait ThrottlesLogins
             $request->input($this->loginUsername()).$request->ip()
         );
 
-        return redirect($this->loginPath())
+        return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
