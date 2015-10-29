@@ -82,6 +82,29 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
     }
 
+    public function testArrayPluckWithNestedArrays()
+    {
+        $array = [
+            [
+                'account' => 'a',
+                'users' => [
+                    ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ],
+            ],
+            [
+                'account' => 'b',
+                'users' => [
+                    ['first' => 'abigail', 'last' => 'otwell'],
+                    ['first' => 'dayle', 'last' => 'rees'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals([['taylor'], ['abigail', 'dayle']], array_pluck($array, 'users.*.first'));
+        $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], array_pluck($array, 'users.*.first', 'account'));
+        $this->assertEquals([['taylorotwell@gmail.com'], [null, null]], array_pluck($array, 'users.*.email'));
+    }
+
     public function testArrayExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
@@ -309,6 +332,63 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
         $this->assertNull(data_get($arrayAccess, 'foo'));
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
+    }
+
+    public function testDataGetWithNestedArrays()
+    {
+        $array = [
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $array = [
+            'users' => [
+                ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ['first' => 'abigail', 'last' => 'otwell'],
+                ['first' => 'dayle', 'last' => 'rees'],
+            ],
+            'posts' => null,
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
+        $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
+        $this->assertEquals(null, data_get($array, 'posts.*.date'));
+    }
+
+    public function testDataGetWithDoubleNestedArraysCollapsesResult()
+    {
+        $array = [
+            'posts' => [
+                [
+                    'comments' => [
+                        ['author' => 'taylor', 'likes' => 4],
+                        ['author' => 'abigail', 'likes' => 3],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'abigail', 'likes' => 2],
+                        ['author' => 'dayle'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'dayle'],
+                        ['author' => 'taylor', 'likes' => 1],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
+        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
     }
 
     public function testArraySort()
