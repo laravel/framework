@@ -21,7 +21,7 @@ class VerifyCsrfToken
     /**
      * The event dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Event\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $events;
 
@@ -36,7 +36,7 @@ class VerifyCsrfToken
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-     * @param  \Illuminate\Contracts\Event\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function __construct(Encrypter $encrypter, Dispatcher $events)
