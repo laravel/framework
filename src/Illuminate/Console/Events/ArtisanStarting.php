@@ -19,6 +19,6 @@ class ArtisanStarting
 	 */
 	public function __construct($artisan)
 	{
-		$this->artisan;
+		$this->artisan = $artisan;
 	}
 }
