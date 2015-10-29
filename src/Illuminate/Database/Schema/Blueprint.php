@@ -31,6 +31,13 @@ class Blueprint
     protected $commands = [];
 
     /**
+     * Whether to make the table temporary.
+     *
+     * @var bool
+     */
+    public $temporary = false;
+
+    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -178,6 +185,16 @@ class Blueprint
     public function create()
     {
         return $this->addCommand('create');
+    }
+
+    /**
+     * Indicate that the table needs to be temporary.
+     *
+     * @return void
+     */
+    public function temporary()
+    {
+        $this->temporary = true;
     }
 
     /**
