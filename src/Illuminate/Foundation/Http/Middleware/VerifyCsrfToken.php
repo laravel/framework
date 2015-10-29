@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
@@ -18,6 +19,13 @@ class VerifyCsrfToken
     protected $encrypter;
 
     /**
+     * The event dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Event\Dispatcher
+     */
+    protected $events;
+
+    /**
      * The URIs that should be excluded from CSRF verification.
      *
      * @var array
@@ -28,11 +36,13 @@ class VerifyCsrfToken
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+     * @param  \Illuminate\Contracts\Event\Dispatcher  $events
      * @return void
      */
-    public function __construct(Encrypter $encrypter)
+    public function __construct(Encrypter $encrypter, Dispatcher $events)
     {
         $this->encrypter = $encrypter;
+        $this->events = $events;
     }
 
     /**
@@ -50,7 +60,11 @@ class VerifyCsrfToken
             return $this->addCookieToResponse($request, $next($request));
         }
 
-        throw new TokenMismatchException;
+        $this->events->listen('router.matched', function () {
+            throw new TokenMismatchException;
+        });
+
+        return $next($request);
     }
 
     /**
