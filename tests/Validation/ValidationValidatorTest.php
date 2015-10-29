@@ -208,12 +208,38 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testCustomValidationLinesAreRespected()
     {
-        $trans = $this->getRealTranslator();
-        $trans->addResource('array', ['validation.required' => 'required!', 'validation.custom.name.required' => 'really required!'], 'en', 'messages');
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'name' => [
+                    'required' => 'really required!',
+                ]
+            ],
+        ]);
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('really required!', $v->messages()->first('name'));
+    }
+
+    public function testCustomValidationLinesAreRespectedWithAsterisks()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'name.*' => [
+                    'required' => 'all are really required!',
+                ]
+            ],
+        ]);
+        $v = new Validator($trans, ['name' => ['', '']], []);
+        $v->each('name', 'required|max:255');
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('all are really required!', $v->messages()->first('name.0'));
+        $this->assertEquals('all are really required!', $v->messages()->first('name.1'));
     }
 
     public function testInlineValidationMessagesAreRespected()
@@ -229,6 +255,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('require it please!', $v->messages()->first('name'));
+    }
+
+    public function testInlineValidationMessagesAreRespectedWithAsterisks()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['name' => ['', '']], [], ['name.*.required' => 'all must be required!']);
+        $v->each('name', 'required|max:255');
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('all must be required!', $v->messages()->first('name.0'));
+        $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
     }
 
     public function testValidateRequired()
@@ -1785,6 +1822,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testInlineMessagesMayUseAsteriskForEachRules()
+    {
+
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');
@@ -1796,5 +1838,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 
         return $trans;
+    }
+
+    public function getIlluminateArrayTranslator()
+    {
+        return new \Illuminate\Translation\Translator(
+            new \Illuminate\Translation\ArrayLoader, 'en'
+        );
     }
 }
