@@ -1762,6 +1762,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateImplicitEachWithAsterisks()
+    {
+        $trans = $this->getRealTranslator();
+        $data = ['foo' => [5, 10, 15]];
+
+        $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => 'Numeric|Min:6|Max:16']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => 'Numeric|Min:4|Max:16']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEachWithNonIndexedArray()
     {
         $trans = $this->getRealTranslator();
