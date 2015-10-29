@@ -31,13 +31,6 @@ class Blueprint
     protected $commands = [];
 
     /**
-     * Whether to make the table temporary.
-     *
-     * @var bool
-     */
-    public $temporary = false;
-
-    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -53,6 +46,13 @@ class Blueprint
      * The collation that should be used for the table.
      */
     public $collation;
+
+    /**
+     * Whether to make the table temporary.
+     *
+     * @var bool
+     */
+    public $temporary = false;
 
     /**
      * Create a new schema blueprint.
