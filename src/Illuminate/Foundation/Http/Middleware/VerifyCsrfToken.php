@@ -41,8 +41,8 @@ class VerifyCsrfToken
      */
     public function __construct(Encrypter $encrypter, Dispatcher $events)
     {
-        $this->encrypter = $encrypter;
         $this->events = $events;
+        $this->encrypter = $encrypter;
     }
 
     /**
