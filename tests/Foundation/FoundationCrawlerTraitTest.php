@@ -205,7 +205,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
 
     public function testExtractsRequestParametersFromForm()
     {
-        $form = m::mock('\Symfony\Component\DomCrawler\Form');
+        $form = m::mock('Symfony\Component\DomCrawler\Form');
 
         $form->shouldReceive('getValues')->once()->andReturn([]);
         $this->assertEquals([], $this->extractParametersFromForm($form));

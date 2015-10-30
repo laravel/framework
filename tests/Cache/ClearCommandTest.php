@@ -17,7 +17,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
         );
 
-        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
         $app = new Application();
         $command->setLaravel($app);
@@ -34,7 +34,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
         );
 
-        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
         $app = new Application();
         $command->setLaravel($app);
@@ -51,7 +51,7 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
             $cacheManager = m::mock('Illuminate\Cache\CacheManager')
         );
 
-        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
         $app = new Application();
         $command->setLaravel($app);
