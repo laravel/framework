@@ -60,11 +60,7 @@ class VerifyCsrfToken
             return $this->addCookieToResponse($request, $next($request));
         }
 
-        $this->events->listen('router.matched', function () {
-            throw new TokenMismatchException;
-        });
-
-        return $next($request);
+        throw new TokenMismatchException;
     }
 
     /**
