@@ -321,6 +321,30 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Register the typical authenticatino routes for an application.
+     *
+     * @return void
+     */
+    public function auth()
+    {
+        // Authentication Routes...
+        $this->get('login', 'Auth\AuthController@getLogin');
+        $this->post('login', 'Auth\AuthController@postLogin');
+        $this->get('logout', 'Auth\AuthController@getLogout');
+
+        // Registration Routes...
+        $this->get('register', 'Auth\AuthController@getRegister');
+        $this->post('register', 'Auth\AuthController@postRegister');
+
+        // Password Reset Routes...
+        $this->get('password/email', 'Auth\PasswordController@getEmail');
+        $this->post('password/email', 'Auth\PasswordController@postEmail');
+
+        $this->get('password/reset/{token}', 'Auth\PasswordController@getReset');
+        $this->post('password/reset', 'Auth\PasswordController@postReset');
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
      * @param  array     $attributes
