@@ -1,6 +1,6 @@
 <?php
 
-$path = __DIR__.'/../../../../../../'
+$path = __DIR__.'/../../../../../../';
 
 return [
     $path.'laravel/framework/src/Illuminate/Contracts/Container/Container.php',
