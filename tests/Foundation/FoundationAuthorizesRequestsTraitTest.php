@@ -25,7 +25,7 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     * @expectedException Illuminate\Auth\Access\UnauthorizedException
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {
