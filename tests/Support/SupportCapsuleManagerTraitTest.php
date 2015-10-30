@@ -27,7 +27,7 @@ class SupportCapsuleManagerTraitTest extends PHPUnit_Framework_TestCase
     {
         $this->container = null;
         $app = new Container;
-        $app['config'] = m::mock('\Illuminate\Config\Repository');
+        $app['config'] = m::mock('Illuminate\Config\Repository');
 
         $this->assertNull($this->setupContainer($app));
         $this->assertEquals($app, $this->getContainer());
