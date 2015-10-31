@@ -52,11 +52,23 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     }
 
     /**
+     * Determine if a translation exists for a given locale.
+     *
+     * @param  string  $key
+     * @param  string  $locale
+     * @return bool
+     */
+    public function hasForLocale($key, $locale = null)
+    {
+        return $this->has($key, $locale, false);
+    }
+
+    /**
      * Determine if a translation exists.
      *
      * @param  string  $key
      * @param  string  $locale
-     * @param  bool    $fallback
+     * @param  bool  $fallback
      * @return bool
      */
     public function has($key, $locale = null, $fallback = true)
@@ -70,7 +82,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $key
      * @param  array   $replace
      * @param  string  $locale
-     * @param  bool    $fallback
+     * @param  bool  $fallback
      * @return string
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
