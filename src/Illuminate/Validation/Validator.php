@@ -691,8 +691,8 @@ class Validator implements ValidatorContract
      * Validate that an attribute exists when another attribute does not have a given value.
      *
      * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $parameters
+     * @param  mixed  $value
+     * @param  mixed  $parameters
      * @return bool
      */
     protected function validateRequiredUnless($attribute, $value, $parameters)
