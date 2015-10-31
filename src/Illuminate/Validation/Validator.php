@@ -147,7 +147,7 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $implicitRules = [
-        'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'Accepted',
+        'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted',
     ];
 
     /**
@@ -679,6 +679,29 @@ class Validator implements ValidatorContract
         $values = array_slice($parameters, 1);
 
         if (in_array($data, $values)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute exists when another attribute does not have a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    protected function validateRequiredUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'required_unless');
+
+        $data = Arr::get($this->data, $parameters[0]);
+
+        $values = array_slice($parameters, 1);
+
+        if (! in_array($data, $values)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1943,6 +1966,22 @@ class Validator implements ValidatorContract
         $parameters[0] = $this->getAttribute($parameters[0]);
 
         return str_replace([':other', ':value'], $parameters, $message);
+    }
+
+    /**
+     * Replace all place-holders for the required_unless rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
+    {
+        $other = $this->getAttribute(array_shift($parameters));
+
+        return str_replace([':other', ':values'], [$other, implode(', ', $parameters)], $message);
     }
 
     /**
