@@ -304,7 +304,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testUrlGenerationForControllers()
+    /**
+     * @expectedException Illuminate\Routing\Exceptions\UrlGenerationException
+     */
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
         $url = new UrlGenerator(
             $routes = new Illuminate\Routing\RouteCollection,
