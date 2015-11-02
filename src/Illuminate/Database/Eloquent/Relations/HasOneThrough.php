@@ -83,6 +83,7 @@ class HasOneThrough extends Relation
         $this->setJoin($query);
         $query->select(new Expression('count(*)'));
         $key = $this->wrap($parentTable.'.'.$this->firstKey);
+
         return $query->where($this->getHasCompareKey(), '=', new Expression($key));
     }
 
@@ -137,6 +138,7 @@ class HasOneThrough extends Relation
         foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
+
         return $models;
     }
 
@@ -161,6 +163,7 @@ class HasOneThrough extends Relation
                 $model->setRelation($relation, $value);
             }
         }
+
         return $models;
     }
 
@@ -180,6 +183,7 @@ class HasOneThrough extends Relation
         foreach ($results as $result) {
             $dictionary[$result->{$foreign}][] = $result;
         }
+
         return $dictionary;
     }
 
@@ -202,6 +206,7 @@ class HasOneThrough extends Relation
     public function first($columns = ['*'])
     {
         $results = $this->take(1)->get($columns);
+
         return count($results) > 0 ? $results->first() : null;
     }
 
@@ -234,6 +239,7 @@ class HasOneThrough extends Relation
             return $this->findMany($id, $columns);
         }
         $this->where($this->getRelated()->getQualifiedKeyName(), '=', $id);
+
         return $this->first($columns);
     }
 
@@ -250,6 +256,7 @@ class HasOneThrough extends Relation
             return $this->getRelated()->newCollection();
         }
         $this->whereIn($this->getRelated()->getQualifiedKeyName(), $ids);
+
         return $this->get($columns);
     }
 
@@ -295,6 +302,7 @@ class HasOneThrough extends Relation
         if (count($models) > 0) {
             $models = $this->query->eagerLoadRelations($models);
         }
+
         return $this->related->newCollection($models);
     }
 
@@ -309,6 +317,7 @@ class HasOneThrough extends Relation
         if ($columns == ['*']) {
             $columns = [$this->related->getTable().'.*'];
         }
+
         return array_merge($columns, [$this->parent->getTable().'.'.$this->firstKey]);
     }
 
@@ -323,6 +332,7 @@ class HasOneThrough extends Relation
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         $this->query->addSelect($this->getSelectColumns($columns));
+
         return $this->query->paginate($perPage, $columns, $pageName);
     }
 
@@ -336,6 +346,7 @@ class HasOneThrough extends Relation
     public function simplePaginate($perPage = null, $columns = ['*'])
     {
         $this->query->addSelect($this->getSelectColumns($columns));
+
         return $this->query->simplePaginate($perPage, $columns);
     }
 
