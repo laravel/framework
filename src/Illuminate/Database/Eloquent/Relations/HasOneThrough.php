@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -35,6 +34,7 @@ class HasOneThrough extends Relation
      * @var string
      */
     protected $localKey;
+
     /**
      * Create a new has many through relationship instance.
      *
@@ -54,6 +54,7 @@ class HasOneThrough extends Relation
         $this->farParent = $farParent;
         parent::__construct($query, $parent);
     }
+
     /**
      * Set the base constraints on the relation query.
      *
@@ -68,6 +69,7 @@ class HasOneThrough extends Relation
             $this->query->where($parentTable.'.'.$this->firstKey, '=', $localValue);
         }
     }
+
     /**
      * Add the constraints for a relationship count query.
      *
@@ -83,6 +85,7 @@ class HasOneThrough extends Relation
         $key = $this->wrap($parentTable.'.'.$this->firstKey);
         return $query->where($this->getHasCompareKey(), '=', new Expression($key));
     }
+
     /**
      * Set the join clause on the query.
      *
@@ -99,6 +102,7 @@ class HasOneThrough extends Relation
             $query->whereNull($this->parent->getQualifiedDeletedAtColumn());
         }
     }
+
     /**
      * Determine whether close parent of the relation uses Soft Deletes.
      *
@@ -108,6 +112,7 @@ class HasOneThrough extends Relation
     {
         return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_class($this->parent)));
     }
+
     /**
      * Set the constraints for an eager load of the relation.
      *
@@ -119,6 +124,7 @@ class HasOneThrough extends Relation
         $table = $this->parent->getTable();
         $this->query->whereIn($table.'.'.$this->firstKey, $this->getKeys($models));
     }
+
     /**
      * Initialize the relation on a set of models.
      *
@@ -133,6 +139,7 @@ class HasOneThrough extends Relation
         }
         return $models;
     }
+
     /**
      * Match the eagerly loaded results to their parents.
      *
@@ -156,6 +163,7 @@ class HasOneThrough extends Relation
         }
         return $models;
     }
+
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
@@ -174,6 +182,7 @@ class HasOneThrough extends Relation
         }
         return $dictionary;
     }
+
     /**
      * Get the results of the relationship.
      *
@@ -183,6 +192,7 @@ class HasOneThrough extends Relation
     {
         return $this->first();
     }
+
     /**
      * Execute the query and get the first related model.
      *
@@ -194,6 +204,7 @@ class HasOneThrough extends Relation
         $results = $this->take(1)->get($columns);
         return count($results) > 0 ? $results->first() : null;
     }
+
     /**
      * Execute the query and get the first result or throw an exception.
      *
@@ -209,6 +220,7 @@ class HasOneThrough extends Relation
         }
         throw new ModelNotFoundException;
     }
+
     /**
      * Find a related model by its primary key.
      *
@@ -224,6 +236,7 @@ class HasOneThrough extends Relation
         $this->where($this->getRelated()->getQualifiedKeyName(), '=', $id);
         return $this->first($columns);
     }
+
     /**
      * Find multiple related models by their primary keys.
      *
@@ -239,6 +252,7 @@ class HasOneThrough extends Relation
         $this->whereIn($this->getRelated()->getQualifiedKeyName(), $ids);
         return $this->get($columns);
     }
+
     /**
      * Find a related model by its primary key or throw an exception.
      *
@@ -260,6 +274,7 @@ class HasOneThrough extends Relation
         }
         throw (new ModelNotFoundException)->setModel(get_class($this->parent));
     }
+
     /**
      * Execute the query as a "select" statement.
      *
@@ -282,6 +297,7 @@ class HasOneThrough extends Relation
         }
         return $this->related->newCollection($models);
     }
+
     /**
      * Set the select clause for the relation query.
      *
@@ -295,6 +311,7 @@ class HasOneThrough extends Relation
         }
         return array_merge($columns, [$this->parent->getTable().'.'.$this->firstKey]);
     }
+
     /**
      * Get a paginator for the "select" statement.
      *
@@ -308,6 +325,7 @@ class HasOneThrough extends Relation
         $this->query->addSelect($this->getSelectColumns($columns));
         return $this->query->paginate($perPage, $columns, $pageName);
     }
+
     /**
      * Paginate the given query into a simple paginator.
      *
@@ -320,6 +338,7 @@ class HasOneThrough extends Relation
         $this->query->addSelect($this->getSelectColumns($columns));
         return $this->query->simplePaginate($perPage, $columns);
     }
+
     /**
      * Get the key for comparing against the parent key in "has" query.
      *
@@ -329,6 +348,7 @@ class HasOneThrough extends Relation
     {
         return $this->farParent->getQualifiedKeyName();
     }
+
     /**
      * Get the qualified foreign key on the related model.
      *
@@ -338,6 +358,7 @@ class HasOneThrough extends Relation
     {
         return $this->related->getTable().'.'.$this->secondKey;
     }
+
     /**
      * Get the qualified foreign key on the "through" model.
      *

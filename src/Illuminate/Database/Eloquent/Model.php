@@ -784,6 +784,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     * @param  string|null  $secondKey
     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
     */
+
     public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
     {
         $through = app($through);
