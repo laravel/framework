@@ -349,15 +349,13 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function replaceRouteParameters($path, array &$parameters)
     {
-        if (count($parameters)) {
-            $path = $this->replaceNamedParameters($path, $parameters);
+        $path = $this->replaceNamedParameters($path, $parameters);
 
-            $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
-                return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
-                            ? $match[0]
-                            : array_shift($parameters);
-            }, $path);
-        }
+        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+            return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
+                        ? $match[0]
+                        : array_shift($parameters);
+        }, $path);
 
         return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
     }
