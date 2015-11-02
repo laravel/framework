@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract
@@ -310,10 +311,16 @@ class UrlGenerator implements UrlGeneratorContract
 
         $domain = $this->getRouteDomain($route, $parameters);
 
-        $uri = strtr(rawurlencode($this->addQueryString($this->trimUrl(
+        $uri = $this->addQueryString($this->trimUrl(
             $root = $this->replaceRoot($route, $domain, $parameters),
             $this->replaceRouteParameters($route->uri(), $parameters)
-        ), $parameters)), $this->dontEncode);
+        ), $parameters);
+
+        if (preg_match('/\{.*?\}/', $uri)) {
+            throw UrlGenerationException::forMissingParameters($route);
+        }
+
+        $uri = strtr(urlencode($uri), $this->dontEncode);
 
         return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
     }
@@ -328,7 +335,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function replaceRoot($route, $domain, &$parameters)
     {
-        return $this->replaceRouteParameters($this->getRouteRoot($route, $domain), $parameters);
+        return $this->replaceRouteParameters(
+            $this->getRouteRoot($route, $domain), $parameters
+        );
     }
 
     /**
@@ -341,9 +350,17 @@ class UrlGenerator implements UrlGeneratorContract
     protected function replaceRouteParameters($path, array &$parameters)
     {
         if (count($parameters)) {
-            $path = preg_replace_sub(
-                '/\{.*?\}/', $parameters, $this->replaceNamedParameters($path, $parameters)
-            );
+            $path = $this->replaceNamedParameters($path, $parameters);
+
+            $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+                if (empty($parameters) && ! Str::endsWith($match[0], '?}')) {
+                    return $match[0];
+                }
+
+                foreach ($parameters as $key => $value) {
+                    return array_shift($parameters);
+                }
+            }, $path);
         }
 
         return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
