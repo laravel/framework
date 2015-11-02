@@ -357,9 +357,7 @@ class UrlGenerator implements UrlGeneratorContract
                     return $match[0];
                 }
 
-                foreach ($parameters as $key => $value) {
-                    return array_shift($parameters);
-                }
+                return array_shift($parameters);
             }, $path);
         }
 
