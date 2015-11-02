@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -772,6 +773,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /*
+    * Define a has-one-through relationship.
+    *
+    * @param  string  $related
+    * @param  string  $through
+    * @param  string|null  $firstKey
+    * @param  string|null  $secondKey
+    * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    */
+    public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
+    {
+        $through = app($through);
+        $firstKey = $firstKey ?: $this->getForeignKey();
+        $secondKey = $secondKey ?: $through->getForeignKey();
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new HasOneThrough(app($related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
 
     /**
