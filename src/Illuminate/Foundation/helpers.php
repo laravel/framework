@@ -549,7 +549,7 @@ if (! function_exists('resource')) {
      * @param  string  $name
      * @param  string  $controller
      * @param  array   $options
-     * @return void
+     * @return \Illuminate\Routing\Route
      */
     function resource($name, $controller, array $options = [])
     {
