@@ -80,7 +80,7 @@ class ControllerInspector
     {
         $verb = $this->getVerb($name = $method->name);
 
-        $uri = $this->addUriWildcards($plain = $this->getPlainUri($name, $prefix));
+        $uri = $this->addUriParameters($method, $plain = $this->getPlainUri($name, $prefix));
 
         return compact('verb', 'plain', 'uri');
     }
@@ -121,13 +121,27 @@ class ControllerInspector
     }
 
     /**
-     * Add wildcards to the given URI.
+     * Gets the parameters from a method in the controller.
      *
-     * @param  string  $uri
+     * @param  ReflectionMethod  $method
+     * @param  string            $uri
      * @return string
      */
-    public function addUriWildcards($uri)
+    public function addUriParameters(ReflectionMethod $method, $uri)
     {
-        return $uri.'/{one?}/{two?}/{three?}/{four?}/{five?}';
+        foreach ($method->getParameters() as $parameter) {
+            //if the parameter has a class we assume it is
+            //not part of the the uri
+            if ($parameter->getClass()) {
+                continue;
+            }
+
+            $uri .= sprintf('/{%s%s}',
+                $parameter->name,
+                ($parameter->isDefaultValueAvailable()) ? '?' : ''
+            );
+        }
+
+        return $uri;
     }
 }
