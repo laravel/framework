@@ -5,6 +5,9 @@ namespace Illuminate\Session;
 use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 
+/**
+ * @deprecated since version 5.2. Use Illuminate\Session\DatabaseSessionHandler.
+ */
 class LegacyDatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
     /**
