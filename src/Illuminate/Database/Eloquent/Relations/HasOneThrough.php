@@ -380,4 +380,4 @@ class HasOneThrough extends Relation
         return $this->parent->getTable().'.'.$this->firstKey;
     }
 }
-}
+
