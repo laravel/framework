@@ -314,7 +314,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Illuminate\Routing\Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {}]);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
+        $this->assertEquals('http://www.foo.com:8080/foo/%7Bone%7D', $url->route('foo'));
     }
 
     public function testForceRootUrl()
