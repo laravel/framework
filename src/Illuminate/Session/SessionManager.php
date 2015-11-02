@@ -80,6 +80,8 @@ class SessionManager extends Manager
      * Create an instance of the legacy database session driver.
      *
      * @return \Illuminate\Session\Store
+     *
+     * @deprecated since version 5.2.
      */
     protected function createLegacyDatabaseDriver()
     {
