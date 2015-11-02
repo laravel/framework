@@ -110,6 +110,17 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Merge items into specific config branch.
+     *
+     * @param  string  $key
+     * @param  array  $items
+     */
+    public function merge($key, array $items)
+    {
+        $this->set($key, array_merge($this->get($key, []), $items));
+    }
+
+    /**
      * Determine if the given configuration option exists.
      *
      * @param  string  $key
