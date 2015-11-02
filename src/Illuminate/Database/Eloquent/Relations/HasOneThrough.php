@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 class HasOneThrough extends Relation
 {
     /**
@@ -34,7 +35,6 @@ class HasOneThrough extends Relation
      * @var string
      */
     protected $localKey;
-    
     /**
      * Create a new has many through relationship instance.
      *

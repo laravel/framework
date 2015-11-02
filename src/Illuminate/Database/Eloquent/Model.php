@@ -924,16 +924,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null)
     {
         $through = new $through;
-
         $firstKey = $firstKey ?: $this->getForeignKey();
-
         $secondKey = $secondKey ?: $through->getForeignKey();
-
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey);
     }
-
     /*
     * Define a has-one-through relationship.
     *
