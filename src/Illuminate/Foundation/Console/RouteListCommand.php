@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
