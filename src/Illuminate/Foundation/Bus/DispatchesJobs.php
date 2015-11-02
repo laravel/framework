@@ -14,7 +14,7 @@ trait DispatchesJobs
      */
     protected function dispatch($job)
     {
-        return app('Illuminate\Contracts\Bus\Dispatcher')->dispatch($job);
+        return app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatch($job);
     }
 
     /**
@@ -26,7 +26,7 @@ trait DispatchesJobs
      */
     protected function dispatchFromArray($job, array $array)
     {
-        return app('Illuminate\Contracts\Bus\Dispatcher')->dispatchFromArray($job, $array);
+        return app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatchFromArray($job, $array);
     }
 
     /**
@@ -39,6 +39,6 @@ trait DispatchesJobs
      */
     protected function dispatchFrom($job, ArrayAccess $source, $extras = [])
     {
-        return app('Illuminate\Contracts\Bus\Dispatcher')->dispatchFrom($job, $source, $extras);
+        return app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatchFrom($job, $source, $extras);
     }
 }
