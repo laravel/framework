@@ -732,7 +732,7 @@ if (! function_exists('url')) {
      */
     function url($path = null, $parameters = [], $secure = null)
     {
-        return app(Illuminate\Contracts\Routing\UrlGenerator::class)->to($path, $parameters, $secure);
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 
