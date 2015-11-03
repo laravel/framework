@@ -37,13 +37,14 @@ class HandlerCommandCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $stub = parent::buildClass($name);
-
+        $command = $this->option('command');
+        
         $stub = str_replace(
-            'DummyCommand', class_basename($this->option('command')), $stub
+            'DummyCommand', class_basename($command), $stub
         );
 
         $stub = str_replace(
-            'DummyFullCommand', $this->option('command'), $stub
+            'DummyFullCommand', $command, $stub
         );
 
         return $stub;
