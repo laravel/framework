@@ -716,7 +716,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', '=', 'contacts.id')->where(function($j) {
+            $j->on('users.id', '=', 'contacts.id')->where(function ($j) {
                 $j->where('contacts.country', '=', 'US')->orWhere('contacts.is_partner', '=', 1);
             });
         });
@@ -725,10 +725,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
-            $j->on('users.id', '=', 'contacts.id')->where('contacts.is_active', '=', 1)->orOn(function($j) {
-                $j->orWhere(function($j) {
+            $j->on('users.id', '=', 'contacts.id')->where('contacts.is_active', '=', 1)->orOn(function ($j) {
+                $j->orWhere(function ($j) {
                     $j->where('contacts.country', '=', 'UK')->orOn('contacts.type', '=', 'users.type');
-                })->where(function($j) {
+                })->where(function ($j) {
                     $j->where('contacts.country', '=', 'US')->orWhereNull('contacts.is_partner');
                 });
             });
