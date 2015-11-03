@@ -76,7 +76,7 @@ abstract class GeneratorCommand extends Command
     {
         $name = $this->parseName($rawName);
 
-        return $this->files->exists($path = $this->getPath($name));
+        return $this->files->exists($this->getPath($name));
     }
 
     /**
