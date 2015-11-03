@@ -1,8 +1,25 @@
 <?php
 
 use Illuminate\Support\Str;
+use Psr\Log\LoggerInterface;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Session\SessionManager;
+use Illuminate\Translation\Translator;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illiminate\View\Expression as ViewExpression;
+use Illuminate\Contracts\Routing\Registrar as Router;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\Cookie\Factory as CookieFactory;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 if (! function_exists('abort')) {
     /**
@@ -33,7 +50,7 @@ if (! function_exists('action')) {
      */
     function action($name, $parameters = [], $absolute = true)
     {
-        return app('url')->action($name, $parameters, $absolute);
+        return app(UrlGenerator::class)->action($name, $parameters, $absolute);
     }
 }
 
@@ -78,7 +95,7 @@ if (! function_exists('asset')) {
      */
     function asset($path, $secure = null)
     {
-        return app('url')->asset($path, $secure);
+        return app(UrlGenerator::class)->asset($path, $secure);
     }
 }
 
@@ -90,7 +107,7 @@ if (! function_exists('auth')) {
      */
     function auth()
     {
-        return app(Illuminate\Contracts\Auth\Guard::class);
+        return app(Guard::class);
     }
 }
 
@@ -104,7 +121,7 @@ if (! function_exists('back')) {
      */
     function back($status = 302, $headers = [])
     {
-        return app('redirect')->back($status, $headers);
+        return app(Redirector::class)->back($status, $headers);
     }
 }
 
@@ -131,7 +148,7 @@ if (! function_exists('bcrypt')) {
      */
     function bcrypt($value, $options = [])
     {
-        return app('hash')->make($value, $options);
+        return app(Hasher::class)->make($value, $options);
     }
 }
 
@@ -148,14 +165,14 @@ if (! function_exists('config')) {
     function config($key = null, $default = null)
     {
         if (is_null($key)) {
-            return app('config');
+            return app(Repository::class);
         }
 
         if (is_array($key)) {
-            return app('config')->set($key);
+            return app(Repository::class)->set($key);
         }
 
-        return app('config')->get($key, $default);
+        return app(Repository::class)->get($key, $default);
     }
 }
 
@@ -187,7 +204,7 @@ if (! function_exists('cookie')) {
      */
     function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
     {
-        $cookie = app(Illuminate\Contracts\Cookie\Factory::class);
+        $cookie = app(CookieFactory::class);
 
         if (is_null($name)) {
             return $cookie;
@@ -205,7 +222,7 @@ if (! function_exists('csrf_field')) {
      */
     function csrf_field()
     {
-        return new Illuminate\View\Expression('<input type="hidden" name="_token" value="'.csrf_token().'">');
+        return new ViewExpression('<input type="hidden" name="_token" value="'.csrf_token().'">');
     }
 }
 
@@ -219,7 +236,7 @@ if (! function_exists('csrf_token')) {
      */
     function csrf_token()
     {
-        $session = app('session');
+        $session = app(SessionManager::class);
 
         if (isset($session)) {
             return $session->getToken();
@@ -251,7 +268,7 @@ if (! function_exists('decrypt')) {
      */
     function decrypt($value)
     {
-        return app('encrypter')->decrypt($value);
+        return app(Encrypter::class)->decrypt($value);
     }
 }
 
@@ -265,7 +282,7 @@ if (! function_exists('delete')) {
      */
     function delete($uri, $action)
     {
-        return app('router')->delete($uri, $action);
+        return app(Router::class)->delete($uri, $action);
     }
 }
 
@@ -303,7 +320,7 @@ if (! function_exists('encrypt')) {
      */
     function encrypt($value)
     {
-        return app('encrypter')->encrypt($value);
+        return app(Encrypter::class)->encrypt($value);
     }
 }
 
@@ -360,7 +377,7 @@ if (! function_exists('event')) {
      */
     function event($event, $payload = [], $halt = false)
     {
-        return app('events')->fire($event, $payload, $halt);
+        return app(EventDispatcher::class)->fire($event, $payload, $halt);
     }
 }
 
@@ -373,7 +390,7 @@ if (! function_exists('factory')) {
      */
     function factory()
     {
-        $factory = app(Illuminate\Database\Eloquent\Factory::class);
+        $factory = app(EloquentFactory::class);
 
         $arguments = func_get_args();
 
@@ -397,7 +414,7 @@ if (! function_exists('get')) {
      */
     function get($uri, $action)
     {
-        return app('router')->get($uri, $action);
+        return app(Router::class)->get($uri, $action);
     }
 }
 
@@ -411,7 +428,7 @@ if (! function_exists('info')) {
      */
     function info($message, $context = [])
     {
-        return app('log')->info($message, $context);
+        return app(LoggerInterface::class)->info($message, $context);
     }
 }
 
@@ -426,10 +443,10 @@ if (! function_exists('logger')) {
     function logger($message = null, array $context = [])
     {
         if (is_null($message)) {
-            return app('log');
+            return app(LoggerInterface::class);
         }
 
-        return app('log')->debug($message, $context);
+        return app(LoggerInterface::class)->debug($message, $context);
     }
 }
 
@@ -442,7 +459,7 @@ if (! function_exists('method_field')) {
      */
     function method_field($method)
     {
-        return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$method.'">');
+        return new ViewExpression('<input type="hidden" name="_method" value="'.$method.'">');
     }
 }
 
@@ -456,7 +473,7 @@ if (! function_exists('old')) {
      */
     function old($key = null, $default = null)
     {
-        return app('request')->old($key, $default);
+        return app(Request::class)->old($key, $default);
     }
 }
 
@@ -470,7 +487,7 @@ if (! function_exists('patch')) {
      */
     function patch($uri, $action)
     {
-        return app('router')->patch($uri, $action);
+        return app(Router::class)->patch($uri, $action);
     }
 }
 
@@ -499,7 +516,7 @@ if (! function_exists('post')) {
      */
     function post($uri, $action)
     {
-        return app('router')->post($uri, $action);
+        return app(Router::class)->post($uri, $action);
     }
 }
 
@@ -526,7 +543,7 @@ if (! function_exists('put')) {
      */
     function put($uri, $action)
     {
-        return app('router')->put($uri, $action);
+        return app(Router::class)->put($uri, $action);
     }
 }
 
@@ -543,10 +560,10 @@ if (! function_exists('redirect')) {
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
         if (is_null($to)) {
-            return app('redirect');
+            return app(Redirector::class);
         }
 
-        return app('redirect')->to($to, $status, $headers, $secure);
+        return app(Redirector::class)->to($to, $status, $headers, $secure);
     }
 }
 
@@ -561,10 +578,10 @@ if (! function_exists('request')) {
     function request($key = null, $default = null)
     {
         if (is_null($key)) {
-            return app('request');
+            return app(Request::class);
         }
 
-        return app('request')->input($key, $default);
+        return app(Request::class)->input($key, $default);
     }
 }
 
@@ -579,7 +596,7 @@ if (! function_exists('resource')) {
      */
     function resource($name, $controller, array $options = [])
     {
-        return app('router')->resource($name, $controller, $options);
+        return app(Router::class)->resource($name, $controller, $options);
     }
 }
 
@@ -594,7 +611,7 @@ if (! function_exists('response')) {
      */
     function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = app(Illuminate\Contracts\Routing\ResponseFactory::class);
+        $factory = app(ResponseFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
@@ -616,7 +633,7 @@ if (! function_exists('route')) {
      */
     function route($name, $parameters = [], $absolute = true, $route = null)
     {
-        return app('url')->route($name, $parameters, $absolute, $route);
+        return app(UrlGenerator::class)->route($name, $parameters, $absolute, $route);
     }
 }
 
@@ -660,14 +677,14 @@ if (! function_exists('session')) {
     function session($key = null, $default = null)
     {
         if (is_null($key)) {
-            return app('session');
+            return app(SessionManager::class);
         }
 
         if (is_array($key)) {
-            return app('session')->put($key);
+            return app(SessionManager::class)->put($key);
         }
 
-        return app('session')->get($key, $default);
+        return app(SessionManager::class)->get($key, $default);
     }
 }
 
@@ -697,10 +714,10 @@ if (! function_exists('trans')) {
     function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
         if (is_null($id)) {
-            return app('translator');
+            return app(Translator::class);
         }
 
-        return app('translator')->trans($id, $parameters, $domain, $locale);
+        return app(Translator::class)->trans($id, $parameters, $domain, $locale);
     }
 }
 
@@ -717,7 +734,7 @@ if (! function_exists('trans_choice')) {
      */
     function trans_choice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        return app('translator')->transChoice($id, $number, $parameters, $domain, $locale);
+        return app(Translator::class)->transChoice($id, $number, $parameters, $domain, $locale);
     }
 }
 
@@ -732,7 +749,7 @@ if (! function_exists('url')) {
      */
     function url($path = null, $parameters = [], $secure = null)
     {
-        return app(Illuminate\Contracts\Routing\UrlGenerator::class)->to($path, $parameters, $secure);
+        return app(UrlGenerator::class)->to($path, $parameters, $secure);
     }
 }
 
@@ -747,7 +764,7 @@ if (! function_exists('view')) {
      */
     function view($view = null, $data = [], $mergeData = [])
     {
-        $factory = app(Illuminate\Contracts\View\Factory::class);
+        $factory = app(ViewFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
