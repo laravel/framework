@@ -38,7 +38,7 @@ class HandlerCommandCommand extends GeneratorCommand
     {
         $stub = parent::buildClass($name);
         $command = $this->option('command');
-        
+
         $stub = str_replace(
             'DummyCommand', class_basename($command), $stub
         );
