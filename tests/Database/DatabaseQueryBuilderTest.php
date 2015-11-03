@@ -712,6 +712,31 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([48, 'baz', null], $builder->getBindings());
     }
 
+    public function testJoinsWithNestedConditions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', '=', 'contacts.id')->where(function($j) {
+                $j->where('contacts.country', '=', 'US')->orWhere('contacts.is_partner', '=', 1);
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and ("contacts"."country" = ? or "contacts"."is_partner" = ?)', $builder->toSql());
+        $this->assertEquals(['US', 1], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', '=', 'contacts.id')->where('contacts.is_active', '=', 1)->orOn(function($j) {
+                $j->orWhere(function($j) {
+                    $j->where('contacts.country', '=', 'UK')->orOn('contacts.type', '=', 'users.type');
+                })->where(function($j) {
+                    $j->where('contacts.country', '=', 'US')->orWhereNull('contacts.is_partner');
+                });
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and "contacts"."is_active" = ? or (("contacts"."country" = ? or "contacts"."type" = "users"."type") and ("contacts"."country" = ? or "contacts"."is_partner" is null))', $builder->toSql());
+        $this->assertEquals([1, 'UK', 'US'], $builder->getBindings());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();

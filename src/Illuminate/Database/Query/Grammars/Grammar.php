@@ -169,6 +169,20 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoinConstraint(array $clause)
     {
+        if ($clause['nested']) {
+            $clauses = [];
+
+            foreach ($clause['join']->clauses as $nestedClause) {
+                $clauses[] = $this->compileJoinConstraint($nestedClause);
+            }
+
+            $clauses[0] = $this->removeLeadingBoolean($clauses[0]);
+
+            $clauses = implode(' ', $clauses);
+
+            return "{$clause['boolean']} ({$clauses})";
+        }
+
         $first = $this->wrap($clause['first']);
 
         if ($clause['where']) {
