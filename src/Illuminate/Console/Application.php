@@ -61,7 +61,11 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->setCatchExceptions(false);
 
-        return $this->run(new ArrayInput($parameters->toArray()), $this->lastOutput);
+        $result = $this->run(new ArrayInput($parameters->toArray()), $this->lastOutput);
+
+        $this->setCatchExceptions(true);
+
+        return $result;
     }
 
     /**
