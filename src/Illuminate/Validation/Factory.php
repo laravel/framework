@@ -169,6 +169,19 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Register a custom validator extension Class.
+     *
+     * @param  string  $rule
+     * @param  \Closure|string  $extension
+     * @param  string  $message
+     * @return void
+     */
+    public function extendWith($extension)
+    {
+        $this->classExtensions = $extension;
+    }
+
+    /**
      * Register a custom implicit validator extension.
      *
      * @param  string   $rule
