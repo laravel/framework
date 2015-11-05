@@ -497,28 +497,4 @@ class Arr
             $result[] = $toSave;
         }
     }
-
-    /**
-     * Converts array of arrays to one-dimensional array, where key is $keyName and value is $valueName.
-     *
-     * @param  array  $array
-     * @param  string  $keyName
-     * @param  string|array  $valueName
-     * @return array
-     */
-    public static function getIndexedValues(array $array, $keyName, $valueName)
-    {
-        $result = [];
-        foreach ($array as $value) {
-            if (is_array($valueName)) {
-                foreach ($valueName as $valueKey) {
-                    $result[$value[$keyName]][$valueKey] = $value[$valueKey];
-                }
-            } else {
-                $result[$value[$keyName]] = $value[$valueName];
-            }
-        }
-
-        return $result;
-    }
 }

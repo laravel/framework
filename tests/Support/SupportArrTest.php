@@ -348,42 +348,4 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
             Arr::getIndexedByKeys($this->testData, $keysToIndexBy, false)
         );
     }
-
-    public function testGetIndexedValuesString()
-    {
-        $this->assertEquals(
-            [
-                'php'   => 5,
-                'js'    => 6,
-                'css'   => 4,
-                'scss'  => 4,
-            ],
-            Arr::getIndexedValues($this->testData, 'language', 'stars')
-        );
-    }
-
-    public function testGetIndexedValuesArray()
-    {
-        $this->assertEquals(
-            [
-                'php' => [
-                    'rating'    => 5,
-                    'stars'     => 5,
-                ],
-                'js' => [
-                    'rating'    => 5,
-                    'stars'     => 6,
-                ],
-                'css' => [
-                    'rating'    => 4,
-                    'stars'     => 4,
-                ],
-                'scss' => [
-                    'rating'    => 4,
-                    'stars'     => 4,
-                ],
-            ],
-            Arr::getIndexedValues($this->testData, 'language', ['stars', 'rating'])
-        );
-    }
 }
