@@ -62,7 +62,7 @@ class ClassLoader
     public static function register()
     {
         if (! static::$registered) {
-            static::$registered = spl_autoload_register(['\Illuminate\Support\ClassLoader', 'load']);
+            static::$registered = spl_autoload_register([static::class, 'load']);
         }
     }
 
