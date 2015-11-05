@@ -527,11 +527,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function prepend($value, $key = null)
     {
-        if (is_null($key)) {
-            array_unshift($this->items, $value);
-        } else {
-            $this->items = [$key => $value] + $this->items;
-        }
+        $this->items = Arr::prepend($this->items, $value, $key);
 
         return $this;
     }
