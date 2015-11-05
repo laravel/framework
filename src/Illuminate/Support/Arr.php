@@ -460,9 +460,9 @@ class Arr
     /**
      * Index the array by array of keys.
      *
-     * @param array $data
-     * @param array $keys
-     * @param bool|true $unique
+     * @param  array  $data
+     * @param  array  $keys
+     * @param  bool|true  $unique
      * @return array
      */
     public static function getIndexedByKeys(array $data, array $keys, $unique = true)
@@ -477,10 +477,10 @@ class Arr
     }
 
     /**
-     * @param array $result
-     * @param array $toSave
-     * @param array $keys
-     * @param bool|true $unique
+     * @param  array  $result
+     * @param  array  $toSave
+     * @param  array  $keys
+     * @param  bool|true $unique
      */
     protected static function indexByKeys(array &$result, array $toSave, array $keys, $unique = true)
     {
@@ -501,9 +501,9 @@ class Arr
     /**
      * Converts array of arrays to one-dimensional array, where key is $keyName and value is $valueName.
      *
-     * @param array $array
-     * @param string $keyName
-     * @param string|array $valueName
+     * @param  array  $array
+     * @param  string  $keyName
+     * @param  string|array  $valueName
      * @return array
      */
     public static function getIndexedValues(array $array, $keyName, $valueName)
