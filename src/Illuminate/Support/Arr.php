@@ -518,6 +518,7 @@ class Arr
                 $result[$value[$keyName]] = $value[$valueName];
             }
         }
+
         return $result;
     }
 }
