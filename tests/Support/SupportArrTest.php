@@ -381,7 +381,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
                 'scss' => [
                     'rating'    => 4,
                     'stars'     => 4,
-                ]
+                ],
             ],
             Arr::getIndexedValues($this->testData, 'language', ['stars', 'rating'])
         );

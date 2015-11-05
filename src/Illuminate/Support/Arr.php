@@ -458,7 +458,7 @@ class Arr
     }
 
     /**
-     * Index the array by array of keys
+     * Index the array by array of keys.
      *
      * @param array $data
      * @param array $keys
@@ -485,7 +485,7 @@ class Arr
     protected static function indexByKeys(array &$result, array $toSave, array $keys, $unique = true)
     {
         foreach ($keys as $key) {
-            if (!isset($result[$toSave[$key]])) {
+            if (! isset($result[$toSave[$key]])) {
                 $result[$toSave[$key]] = [];
             }
             $result = &$result[$toSave[$key]];
@@ -499,7 +499,7 @@ class Arr
     }
 
     /**
-     * Converts array of arrays to one-dimensional array, where key is $keyName and value is $valueName
+     * Converts array of arrays to one-dimensional array, where key is $keyName and value is $valueName.
      *
      * @param array $array
      * @param string $keyName
