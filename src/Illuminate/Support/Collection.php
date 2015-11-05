@@ -522,11 +522,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push an item onto the beginning of the collection.
      *
      * @param  mixed  $value
+     * @param  mixed  $key
      * @return $this
      */
-    public function prepend($value)
+    public function prepend($value, $key = null)
     {
-        array_unshift($this->items, $value);
+        if (is_null($key)) {
+            array_unshift($this->items, $value);
+        } else {
+            $this->items = [$key => $value] + $this->items;
+        }
 
         return $this;
     }
