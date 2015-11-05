@@ -478,17 +478,18 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testMacroable()
     {
-        // Macro : unique values starting with A
-        Collection::macro('foo', function ($items) {
-            return (new Collection($items))
-                ->filter(function ($item) {
+        // Foo() macro : unique values starting with A
+        Collection::macro('foo', function () {
+            return $this->filter(function ($item) {
                     return strpos($item, 'a') === 0;
                 })
                 ->unique()
                 ->values();
         });
 
-        $this->assertSame(['a', 'aa', 'aaa'], (new Collection)->foo(['a', 'a', 'aa', 'aaa', 'bar'])->toArray());
+        $c = new Collection(['a', 'a', 'aa', 'aaa', 'bar']);
+
+        $this->assertSame(['a', 'aa', 'aaa'], $c->foo()->all());
     }
 
     public function testMakeMethod()
