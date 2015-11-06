@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Console\Scheduling\ScheduleRunCommand;
 
 class ScheduleServiceProvider extends ServiceProvider
 {
@@ -20,7 +21,7 @@ class ScheduleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands('Illuminate\Console\Scheduling\ScheduleRunCommand');
+        $this->commands(ScheduleRunCommand::class);
     }
 
     /**
@@ -31,7 +32,7 @@ class ScheduleServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Console\Scheduling\ScheduleRunCommand',
+            ScheduleRunCommand::class,
         ];
     }
 }
