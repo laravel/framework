@@ -39,6 +39,8 @@ class RefreshCommand extends Command
 
         $force = $this->input->getOption('force');
 
+        $path = $this->input->getOption('path');
+
         $this->call('migrate:reset', [
             '--database' => $database, '--force' => $force,
         ]);
@@ -47,7 +49,9 @@ class RefreshCommand extends Command
         // the migration commands and just provides a convenient wrapper to execute
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', [
-            '--database' => $database, '--force' => $force,
+            '--database' => $database,
+            '--force' => $force,
+            '--path' => $path,
         ]);
 
         if ($this->needsSeeding()) {
@@ -93,6 +97,8 @@ class RefreshCommand extends Command
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+
+            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
