@@ -23,8 +23,7 @@ interface Application extends Container
     /**
      * Get or check the current application environment.
      *
-     * @param  mixed
-     * @return string
+     * @param  mixed  * @return string
      */
     public function environment();
 
@@ -47,7 +46,7 @@ interface Application extends Container
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
      * @param  array  $options
-     * @param  bool   $force
+     * @param  bool  $force
      * @return \Illuminate\Support\ServiceProvider
      */
     public function register($provider, $options = [], $force = false);

@@ -65,7 +65,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
      *
      * Chooses socket or host/port based on the 'unix_socket' config value.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @return string
      */
     protected function getDsn(array $config)

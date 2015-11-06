@@ -90,7 +90,7 @@ interface Log
      * Register a daily file log handler.
      *
      * @param  string  $path
-     * @param  int     $days
+     * @param  int  $days
      * @param  string  $level
      * @return void
      */

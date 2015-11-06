@@ -29,7 +29,7 @@ trait ResponseTrait
      *
      * @param  string  $key
      * @param  string  $value
-     * @param  bool    $replace
+     * @param  bool  $replace
      * @return $this
      */
     public function header($key, $value, $replace = true)

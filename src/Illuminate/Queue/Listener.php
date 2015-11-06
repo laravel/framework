@@ -94,7 +94,7 @@ class Listener
      * @param  string  $queue
      * @param  string  $delay
      * @param  string  $memory
-     * @param  int     $timeout
+     * @param  int  $timeout
      * @return void
      */
     public function listen($connection, $queue, $delay, $memory, $timeout = 60)
@@ -132,9 +132,9 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
-     * @param  int     $timeout
+     * @param  int  $delay
+     * @param  int  $memory
+     * @param  int  $timeout
      * @return \Symfony\Component\Process\Process
      */
     public function makeProcess($connection, $queue, $delay, $memory, $timeout)

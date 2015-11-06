@@ -43,7 +43,7 @@ abstract class Grammar
      * Wrap a value in keyword identifiers.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $value
-     * @param  bool    $prefixAlias
+     * @param  bool  $prefixAlias
      * @return string
      */
     public function wrap($value, $prefixAlias = false)
@@ -101,7 +101,7 @@ abstract class Grammar
     /**
      * Convert an array of column names into a delimited string.
      *
-     * @param  array   $columns
+     * @param  array  $columns
      * @return string
      */
     public function columnize(array $columns)
@@ -112,7 +112,7 @@ abstract class Grammar
     /**
      * Create query parameter place-holders for an array.
      *
-     * @param  array   $values
+     * @param  array  $values
      * @return string
      */
     public function parameterize(array $values)
@@ -123,7 +123,7 @@ abstract class Grammar
     /**
      * Get the appropriate query parameter place-holder for a value.
      *
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return string
      */
     public function parameter($value)

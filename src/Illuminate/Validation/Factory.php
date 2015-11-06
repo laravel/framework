@@ -171,7 +171,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
      * @return void
@@ -188,7 +188,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom implicit validator message replacer.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $replacer
      * @return void
      */

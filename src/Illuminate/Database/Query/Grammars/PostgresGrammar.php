@@ -59,7 +59,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the columns for the update statement.
      *
-     * @param  array   $values
+     * @param  array  $values
      * @return string
      */
     protected function compileUpdateColumns($values)
@@ -154,7 +154,7 @@ class PostgresGrammar extends Grammar
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array   $values
+     * @param  array  $values
      * @param  string  $sequence
      * @return string
      */

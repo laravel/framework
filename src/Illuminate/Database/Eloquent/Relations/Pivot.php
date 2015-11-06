@@ -39,9 +39,9 @@ class Pivot extends Model
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
+     * @param  array  $attributes
      * @param  string  $table
-     * @param  bool    $exists
+     * @param  bool  $exists
      * @return void
      */
     public function __construct(Model $parent, $attributes, $table, $exists = false)
