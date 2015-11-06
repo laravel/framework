@@ -121,13 +121,6 @@ class Validator implements ValidatorContract
     protected $extensions = [];
 
     /**
-     * All of the custom validator class extensions.
-     *
-     * @var array
-     */
-    protected $classExtensions = [];
-
-    /**
      * All of the custom replacer extensions.
      *
      * @var array
@@ -1692,8 +1685,6 @@ class Validator implements ValidatorContract
             $message = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
             $message = $this->$replacer($message, $attribute, $rule, $parameters);
-        } elseif ($extension = $this->extensionHasReplacer($rule)) {
-            // $message = 
         }
 
         return $message;
@@ -2581,41 +2572,6 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Check if the rule is available through a class extension.
-     * 
-     * @param  string  $rule
-     * @return boolean|string
-     */
-    protected function isAvailableThroughExtension($rule)
-    {
-        foreach ($this->classExtensions as $extension) {
-            if (in_array($rule, $extension::getRules())) {
-                return $extension;
-            }
-        }
-        
-        return false;
-    }
-
-    protected function extensionHasReplacer($rule)
-    {
-        foreach ($this->classExtensions as $extension) {
-            if (in_array($rule, $extension::getReplacers())) {
-                return $extension;
-            }
-        }
-        
-        return false;
-    }
-
-    protected function callExtensionClass($class, $rule, $parameters)
-    {
-        $extension = $this->container->make($extension, ['data' => $this->data]);
-
-        return call_user_func_array([$extension, 'validate' . Str::studly_case($rule)], $parameters);
-    }
-
-    /**
      * Call a custom validator extension.
      *
      * @param  string  $rule
@@ -2715,8 +2671,6 @@ class Validator implements ValidatorContract
 
         if (isset($this->extensions[$rule])) {
             return $this->callExtension($rule, $parameters);
-        } elseif ($extension = $this->isAvailableThroughExtenstion($rule)) {
-            return $this->callExtensionClass($extension, $rule, $parameters);
         }
 
         throw new BadMethodCallException("Method [$method] does not exist.");
