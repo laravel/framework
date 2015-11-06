@@ -821,7 +821,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @param  string  $openTag
      * @param  string  $closeTag
-     * @param  bool    $escaped
+     * @param  bool  $escaped
      * @return void
      */
     public function setContentTags($openTag, $closeTag, $escaped = false)

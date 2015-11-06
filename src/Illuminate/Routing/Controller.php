@@ -42,7 +42,7 @@ abstract class Controller
      * Register middleware on the controller.
      *
      * @param  string  $middleware
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     public function middleware($middleware, array $options = [])
@@ -179,7 +179,7 @@ abstract class Controller
      * Remove the given controller filter from the provided filter array.
      *
      * @param  string  $removing
-     * @param  array   $current
+     * @param  array  $current
      * @return array
      */
     protected function removeFilter($removing, $current)
@@ -248,7 +248,7 @@ abstract class Controller
      * Execute an action on the controller.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters)
@@ -259,7 +259,7 @@ abstract class Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -273,7 +273,7 @@ abstract class Controller
      * Handle calls to missing methods on the controller.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \BadMethodCallException

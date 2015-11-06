@@ -38,8 +38,7 @@ abstract class Facade
     /**
      * Initiate a mock expectation on the facade.
      *
-     * @param  mixed
-     * @return \Mockery\Expectation
+     * @param  mixed  * @return \Mockery\Expectation
      */
     public static function shouldReceive()
     {
@@ -197,7 +196,7 @@ abstract class Facade
      * Handle dynamic, static calls to the object.
      *
      * @param  string  $method
-     * @param  array   $args
+     * @param  array  $args
      * @return mixed
      */
     public static function __callStatic($method, $args)

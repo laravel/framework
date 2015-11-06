@@ -88,7 +88,7 @@ class ControllerInspector
     /**
      * Get the routable data for an index method.
      *
-     * @param  array   $data
+     * @param  array  $data
      * @param  string  $prefix
      * @return array
      */

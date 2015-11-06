@@ -8,7 +8,7 @@ interface Queue
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string  $queue
      * @return mixed
      */
@@ -19,7 +19,7 @@ interface Queue
      *
      * @param  string  $payload
      * @param  string  $queue
-     * @param  array   $options
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []);
@@ -29,7 +29,7 @@ interface Queue
      *
      * @param  \DateTime|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string  $queue
      * @return mixed
      */
@@ -40,7 +40,7 @@ interface Queue
      *
      * @param  string  $queue
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '');
@@ -51,7 +51,7 @@ interface Queue
      * @param  string  $queue
      * @param  \DateTime|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '');

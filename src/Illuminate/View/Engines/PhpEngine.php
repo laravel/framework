@@ -12,7 +12,7 @@ class PhpEngine implements EngineInterface
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array   $data
+     * @param  array  $data
      * @return string
      */
     public function get($path, array $data = [])
@@ -24,7 +24,7 @@ class PhpEngine implements EngineInterface
      * Get the evaluated contents of the view at the given path.
      *
      * @param  string  $__path
-     * @param  array   $__data
+     * @param  array  $__data
      * @return string
      */
     protected function evaluatePath($__path, $__data)

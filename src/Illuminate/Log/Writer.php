@@ -220,7 +220,7 @@ class Writer implements LogContract, PsrLoggerInterface
      * Register a daily file log handler.
      *
      * @param  string  $path
-     * @param  int     $days
+     * @param  int  $days
      * @param  string  $level
      * @return void
      */
@@ -283,7 +283,7 @@ class Writer implements LogContract, PsrLoggerInterface
      *
      * @param  string  $level
      * @param  string  $message
-     * @param  array   $context
+     * @param  array  $context
      * @return void
      */
     protected function fireLogEvent($level, $message, array $context = [])

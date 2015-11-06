@@ -39,7 +39,7 @@ class EncryptCookies
     /**
      * Disable encryption for the given cookie name(s).
      *
-     * @param string|array $cookieName
+     * @param  string|array  $cookieName
      * @return void
      */
     public function disableFor($cookieName)
@@ -151,7 +151,7 @@ class EncryptCookies
     /**
      * Determine whether encryption has been disabled for the given cookie.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function isDisabled($name)

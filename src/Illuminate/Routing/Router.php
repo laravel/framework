@@ -237,7 +237,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $uri
      * @param  string  $controller
-     * @param  array   $names
+     * @param  array  $names
      * @return void
      */
     public function controller($uri, $controller, $names = [])
@@ -269,10 +269,10 @@ class Router implements RegistrarContract
     /**
      * Register an inspected controller route.
      *
-     * @param  array   $route
+     * @param  array  $route
      * @param  string  $controller
      * @param  string  $method
-     * @param  array   $names
+     * @param  array  $names
      * @return void
      */
     protected function registerInspected($route, $controller, $method, &$names)
@@ -319,7 +319,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     public function resource($name, $controller, array $options = [])
@@ -336,7 +336,7 @@ class Router implements RegistrarContract
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array     $attributes
+     * @param  array  $attributes
      * @param  \Closure  $callback
      * @return void
      */
@@ -477,7 +477,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function createRoute($methods, $uri, $action)
@@ -510,7 +510,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute($methods, $uri, $action)
@@ -821,7 +821,7 @@ class Router implements RegistrarContract
      * Register a new global filter with the router.
      *
      * @param  string  $filter
-     * @param  string|callable   $callback
+     * @param  string|callable  $callback
      * @return void
      */
     protected function addGlobalFilter($filter, $callback)
@@ -904,9 +904,9 @@ class Router implements RegistrarContract
     /**
      * Register a regular expression based filter with the router.
      *
-     * @param  string     $pattern
-     * @param  string     $name
-     * @param  array|null $methods
+     * @param  string  $pattern
+     * @param  string  $name
+     * @param  array|null  $methods
      * @return void
      *
      * @deprecated since version 5.1.
@@ -976,7 +976,7 @@ class Router implements RegistrarContract
     /**
      * Create a class based binding using the IoC container.
      *
-     * @param  string    $binding
+     * @param  string  $binding
      * @return \Closure
      */
     public function createClassBinding($binding)
@@ -1024,7 +1024,7 @@ class Router implements RegistrarContract
      * Call the given filter with the request and response.
      *
      * @param  string  $filter
-     * @param  \Illuminate\Http\Request   $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Http\Response  $response
      * @return mixed
      */
@@ -1108,7 +1108,7 @@ class Router implements RegistrarContract
      * Filter pattern filters that don't apply to the request verb.
      *
      * @param  string  $method
-     * @param  array   $filters
+     * @param  array  $filters
      * @return array
      */
     protected function patternsByMethod($method, $filters)
@@ -1185,7 +1185,7 @@ class Router implements RegistrarContract
      * @param  array  $parameters
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response|null $response
+     * @param  \Illuminate\Http\Response|null  $response
      * @return mixed
      *
      * @deprecated since version 5.1.

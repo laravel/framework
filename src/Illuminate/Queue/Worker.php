@@ -70,10 +70,10 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $memory
-     * @param  int     $sleep
-     * @param  int     $maxTries
+     * @param  int  $delay
+     * @param  int  $memory
+     * @param  int  $sleep
+     * @param  int  $maxTries
      * @return array
      */
     public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
@@ -139,9 +139,9 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  int     $delay
-     * @param  int     $sleep
-     * @param  int     $maxTries
+     * @param  int  $delay
+     * @param  int  $sleep
+     * @param  int  $maxTries
      * @return array
      */
     public function pop($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
@@ -285,7 +285,7 @@ class Worker
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int   $memoryLimit
+     * @param  int  $memoryLimit
      * @return bool
      */
     public function memoryExceeded($memoryLimit)
@@ -308,7 +308,7 @@ class Worker
     /**
      * Sleep the script for a given number of seconds.
      *
-     * @param  int   $seconds
+     * @param  int  $seconds
      * @return void
      */
     public function sleep($seconds)

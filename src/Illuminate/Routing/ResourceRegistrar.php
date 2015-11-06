@@ -36,7 +36,7 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     public function register($name, $controller, array $options = [])
@@ -67,7 +67,7 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     protected function prefixedResource($name, $controller, array $options)
@@ -145,7 +145,7 @@ class ResourceRegistrar
     /**
      * Get the URI for a nested resource segment array.
      *
-     * @param  array   $segments
+     * @param  array  $segments
      * @return string
      */
     protected function getNestedResourceUri(array $segments)
@@ -165,7 +165,7 @@ class ResourceRegistrar
      * @param  string  $resource
      * @param  string  $controller
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return array
      */
     protected function getResourceAction($resource, $controller, $method, $options)
@@ -180,7 +180,7 @@ class ResourceRegistrar
      *
      * @param  string  $resource
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return string
      */
     protected function getResourceName($resource, $method, $options)
@@ -237,7 +237,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceIndex($name, $base, $controller, $options)
@@ -255,7 +255,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceCreate($name, $base, $controller, $options)
@@ -273,7 +273,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceStore($name, $base, $controller, $options)
@@ -291,7 +291,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceShow($name, $base, $controller, $options)
@@ -309,7 +309,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceEdit($name, $base, $controller, $options)
@@ -327,7 +327,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
@@ -343,7 +343,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addPutResourceUpdate($name, $base, $controller, $options)
@@ -376,7 +376,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
