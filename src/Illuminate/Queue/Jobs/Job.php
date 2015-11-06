@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
-use Illuminate\Contracts\Queue\EntityResolver as EntityResolverContract;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Queue\EntityResolver as EntityResolverContract;
 
 abstract class Job
 {
