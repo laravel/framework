@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Illuminate\Contracts\Queue\EntityResolver as EntityResolverContract;
 use Illuminate\Support\Str;
 
 abstract class Job
@@ -220,7 +221,7 @@ abstract class Job
      */
     protected function getEntityResolver()
     {
-        return $this->container->make('Illuminate\Contracts\Queue\EntityResolver');
+        return $this->container->make(EntityResolverContract::class);
     }
 
     /**
