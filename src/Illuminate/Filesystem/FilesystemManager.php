@@ -128,8 +128,12 @@ class FilesystemManager implements FactoryContract
     {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
 
+        $links = (array_get($config, 'links') === 'skip')
+            ? LocalAdapter::SKIP_LINKS
+            : LocalAdapter::DISALLOW_LINKS;
+
         return $this->adapt($this->createFlysystem(new LocalAdapter(
-            $config['root'], LOCK_EX, LocalAdapter::DISALLOW_LINKS, $permissions
+            $config['root'], LOCK_EX, $links, $permissions
         ), $config));
     }
 
