@@ -21,7 +21,7 @@ class QueueIronJobTest extends PHPUnit_Framework_TestCase
     public function testDeleteRemovesTheJobFromIron()
     {
         $job = $this->getJob();
-        $job->getIron()->shouldReceive('deleteMessage')->once()->with('default', 1);
+        $job->getIron()->shouldReceive('deleteMessage')->once()->with('default', 1, null);
 
         $job->delete();
     }
