@@ -827,6 +827,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
+    public function testPrepend()
+    {
+        $c = new Collection(['one', 'two', 'three', 'four']);
+        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $c->prepend('zero')->all());
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $c->prepend(0, 'zero')->all());
+    }
+
     public function testZip()
     {
         $c = new Collection([1, 2, 3]);

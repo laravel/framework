@@ -33,7 +33,7 @@ class ViewErrorBag implements Countable
      */
     public function getBag($key)
     {
-        return Arr::get($this->bags, $key, new MessageBag);
+        return Arr::get($this->bags, $key) ?: new MessageBag;
     }
 
     /**
@@ -90,7 +90,7 @@ class ViewErrorBag implements Countable
      */
     public function __get($key)
     {
-        return Arr::get($this->bags, $key, new MessageBag);
+        return $this->getBag($key);
     }
 
     /**
@@ -102,6 +102,6 @@ class ViewErrorBag implements Countable
      */
     public function __set($key, $value)
     {
-        Arr::set($this->bags, $key, $value);
+        $this->put($key, $value);
     }
 }

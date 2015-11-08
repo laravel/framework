@@ -228,6 +228,21 @@ if (! function_exists('array_pluck')) {
     }
 }
 
+if (! function_exists('array_prepend')) {
+    /**
+     * Push an item onto the beginning of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    function array_prepend($array, $value, $key = null)
+    {
+        return Arr::prepend($array, $value, $key);
+    }
+}
+
 if (! function_exists('array_pull')) {
     /**
      * Get a value from the array, and remove it.
