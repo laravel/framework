@@ -103,7 +103,7 @@ class OptimizeCommand extends Command
     /**
      * Get the class preloader used by the command.
      *
-     * @return \ClassPreloader\Parser\NodeTraverser
+     * @return \ClassPreloader\ClassPreloader
      */
     protected function getClassPreloader()
     {
