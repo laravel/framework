@@ -4,15 +4,18 @@ namespace Illuminate\Foundation\Console;
 
 use PhpParser\Lexer;
 use PhpParser\Parser;
+use PhpParser\ParserFactory;
 use Illuminate\Console\Command;
 use ClassPreloader\ClassPreloader;
 use Illuminate\Foundation\Composer;
 use ClassPreloader\Parser\DirVisitor;
 use ClassPreloader\Parser\FileVisitor;
 use ClassPreloader\Parser\NodeTraverser;
+use ClassPreloader\Parser\StrictTypesVisitor;
 use ClassPreloader\Exceptions\SkipFileException;
 use Symfony\Component\Console\Input\InputOption;
 use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
+use ClassPreloader\Exceptions\VisitorExceptionInterface;
 
 class OptimizeCommand extends Command
 {
@@ -80,7 +83,7 @@ class OptimizeCommand extends Command
      */
     protected function compileClasses()
     {
-        $preloader = new ClassPreloader(new PrettyPrinter, new Parser(new Lexer), $this->getTraverser());
+        $preloader = $this->getClassPreloader();
 
         $handle = $preloader->prepareOutput($this->laravel->getCachedCompilePath());
 
@@ -88,7 +91,9 @@ class OptimizeCommand extends Command
             try {
                 fwrite($handle, $preloader->getCode($file, false)."\n");
             } catch (SkipFileException $ex) {
-                //
+                // Class Preloader 2.x
+            } catch (VisitorExceptionInterface $e) {
+                // Class Preloader 3.x
             }
         }
 
@@ -96,19 +101,24 @@ class OptimizeCommand extends Command
     }
 
     /**
-     * Get the node traverser used by the command.
+     * Get the class preloader used by the command.
      *
      * @return \ClassPreloader\Parser\NodeTraverser
      */
-    protected function getTraverser()
+    protected function getClassPreloader()
     {
         $traverser = new NodeTraverser();
-
         $traverser->addVisitor(new DirVisitor(true));
-
         $traverser->addVisitor(new FileVisitor(true));
 
-        return $traverser;
+        if (class_exists(StrictTypesVisitor::class)) {
+            $traverser->addVisitor(new StrictTypesVisitor);
+            $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        } else {
+            $parser = new Parser(new Lexer);
+        }
+
+        return new ClassPreloader(new PrettyPrinter, $parser, $traverser);
     }
 
     /**
