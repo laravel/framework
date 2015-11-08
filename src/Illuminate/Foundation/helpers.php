@@ -265,16 +265,16 @@ if (! function_exists('elixir')) {
      *
      * @throws \InvalidArgumentException
      */
-    function elixir($file)
+    function elixir($file, $manifestPath = 'build/')
     {
         static $manifest = null;
 
         if (is_null($manifest)) {
-            $manifest = json_decode(file_get_contents(public_path('build/rev-manifest.json')), true);
+            $manifest = json_decode(file_get_contents(public_path($manifestPath.'rev-manifest.json')), true);
         }
 
         if (isset($manifest[$file])) {
-            return '/build/'.$manifest[$file];
+            return '/'.$manifestPath.$manifest[$file];
         }
 
         throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
