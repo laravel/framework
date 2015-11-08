@@ -39,7 +39,7 @@
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver (~3.0).",
         "illuminate/redis": "Required to use the redis queue driver (5.1.*).",
-        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0|~4.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0)."
     },
     "minimum-stability": "dev"
