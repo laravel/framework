@@ -71,12 +71,10 @@ class MigrateCommand extends BaseCommand
             $path = $this->getMigrationPath();
         }
 
-        // The step option can be used for running several migrations one at at time instead
-        // of in one batch. When this is set, each entry in the migration table will have
-        // an incremental batch number, so that they can be rolled back one at a time.
-        $step = $this->input->getOption('step');
-
-        $this->migrator->run($path, $pretend, $step);
+        $this->migrator->run($path, [
+            'pretend' => $pretend,
+            'step' => $this->input->getOption('step')
+        ]);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having

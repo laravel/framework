@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -64,11 +65,10 @@ class Migrator
      * Run the outstanding migrations at a given path.
      *
      * @param  string  $path
-     * @param  bool    $pretend
-     * @param  bool    $step
+     * @param  array  $options
      * @return void
      */
-    public function run($path, $pretend = false, $step = false)
+    public function run($path, array $options = [])
     {
         $this->notes = [];
 
@@ -83,18 +83,17 @@ class Migrator
 
         $this->requireFiles($path, $migrations);
 
-        $this->runMigrationList($migrations, $pretend, $step);
+        $this->runMigrationList($migrations, $options);
     }
 
     /**
      * Run an array of migrations.
      *
      * @param  array  $migrations
-     * @param  bool   $pretend
-     * @param  bool   $step
+     * @param  array  $options
      * @return void
      */
-    public function runMigrationList($migrations, $pretend = false, $step = false)
+    public function runMigrationList($migrations, array $options = [])
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
@@ -106,6 +105,10 @@ class Migrator
         }
 
         $batch = $this->repository->getNextBatchNumber();
+
+        $pretend = Arr::get($options, 'pretend', false);
+
+        $step = Arr::get($options, 'step', false);
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log

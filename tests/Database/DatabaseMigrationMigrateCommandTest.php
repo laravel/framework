@@ -18,7 +18,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false, false);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
@@ -33,7 +33,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false, false);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
         $command->expects($this->once())->method('call')->with($this->equalTo('migrate:install'), $this->equalTo(['--database' => null]));
@@ -48,7 +48,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', true, false);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => true, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
@@ -62,7 +62,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false, false);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
@@ -76,7 +76,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', false, true);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => true]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
