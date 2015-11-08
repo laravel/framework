@@ -71,7 +71,12 @@ class MigrateCommand extends BaseCommand
             $path = $this->getMigrationPath();
         }
 
-        $this->migrator->run($path, $pretend);
+        // The step option can be used for running several migrations one at at time instead
+        // of in one batch. When this is set, each entry in the migration table will have
+        // an incremental batch number, so that they can be rolled back one at a time.
+        $step = $this->input->getOption('step');
+
+        $this->migrator->run($path, $pretend, $step);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -121,6 +126,8 @@ class MigrateCommand extends BaseCommand
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
+
+            ['step', null, InputOption::VALUE_NONE, 'Force the migrations to be run so they can be rolled back individually.'],
         ];
     }
 }
