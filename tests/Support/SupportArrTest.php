@@ -163,6 +163,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         ], $test2);
     }
 
+    public function testPrepend()
+    {
+        $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
+        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $array);
+
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
+        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
+    }
+
     public function testPull()
     {
         $array = ['name' => 'Desk', 'price' => 100];
