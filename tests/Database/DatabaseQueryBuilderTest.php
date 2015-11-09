@@ -566,7 +566,24 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $columns = ['body as post_body', 'teaser', 'posts.created as published'];
         $builder->from('posts')->select($columns);
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with('select count("body", "teaser", "posts"."created") as aggregate, "body" as "post_body", "posts"."created" as "published" from "posts"', [], true)
+            ->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
+
+        $count = $builder->getCountForPagination($columns);
+        $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithColumnAliasesAndExpressions()
+    {
+        $builder = $this->getBuilder();
+        $columns = ['body as post_body', 'teaser', new \Illuminate\Database\Query\Expression('"test" as "foo"')];
+        $builder->from('posts')->select($columns);
+
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with('select count("body", "teaser") as aggregate, "body" as "post_body", "test" as "foo" from "posts"', [], true)
+            ->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) { return $results; });
 
         $count = $builder->getCountForPagination($columns);

@@ -1461,7 +1461,13 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
+        // Split columns into aliased ones and with original names
+        // so we don't break "count()" compatibility and "where" dependencies
+        $this->aggregate = [
+            'function' => 'count',
+            'columns' => $this->clearSelectForCount($columns),
+            'helpers' => $this->rawSelectForCount($columns),
+        ];
 
         $results = $this->get();
 
@@ -1502,12 +1508,29 @@ class Builder
      * @param  array  $columns
      * @return array
      */
-    protected function clearSelectAliases(array $columns)
+    protected function clearSelectForCount(array $columns)
     {
-        return array_map(function ($column) {
-            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
+        return array_filter(array_map(function ($column) {
+            if (! is_string($column)) {
+                return;
+            }
+
+            return ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
-        }, $columns);
+        }, $columns));
+    }
+
+    /**
+     * Return only columns containing select aliases.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function rawSelectForCount(array $columns)
+    {
+        return array_filter($columns, function ($column) {
+            return ! is_string($column) || strpos(strtolower($column), ' as ') !== false;
+        });
     }
 
     /**
