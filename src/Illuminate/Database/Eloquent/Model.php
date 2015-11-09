@@ -510,6 +510,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = (new static)->setConnection($connection);
 
         $items = array_map(function ($item) use ($instance) {
+
+            // This loop unwraps content in stream resource objects.
+            // PostgreSQL will return binary data as a stream, which does not
+            // cache correctly. Doing this allows proper attribute mutation and
+            // type casting without any headache or checking which database
+            // system we are using before doing business logic.
+            // 
+            // See: https://github.com/laravel/framework/issues/10847
+            foreach ($item as $column => &$datum) {
+                if (is_resource($datum)) {
+                    $datum = stream_get_contents($datum);
+                }
+            }
+
             return $instance->newFromBuilder($item);
         }, $items);
 
