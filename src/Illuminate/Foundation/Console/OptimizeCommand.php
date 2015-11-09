@@ -112,9 +112,11 @@ class OptimizeCommand extends Command
         $traverser->addVisitor(new FileVisitor(true));
 
         if (class_exists(StrictTypesVisitor::class)) {
+            // Class Preloader 3.x
             $traverser->addVisitor(new StrictTypesVisitor);
             $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         } else {
+            // Class Preloader 2.x
             $parser = new Parser(new Lexer);
         }
 
