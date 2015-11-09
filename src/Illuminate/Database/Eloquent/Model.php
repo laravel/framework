@@ -2842,6 +2842,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'date':
             case 'datetime':
                 return $this->asDateTime($value);
+            case 'timestamp':
+                return $this->asTimeStamp($value);
             default:
                 return $value;
         }
@@ -2959,6 +2961,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
         return Carbon::createFromFormat($this->getDateFormat(), $value);
+    }
+
+    /**
+     * Return a timestamp as unix timestamp.
+     *
+     * @param  mixed  $value
+     * @return int
+     */
+    protected function asTimeStamp($value)
+    {
+        return (int) $this->asDateTime($value)->timestamp;
     }
 
     /**
