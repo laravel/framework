@@ -4,14 +4,13 @@ namespace Illuminate\Foundation\Console;
 
 use PhpParser\Lexer;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
+use ClassPreloader\Factory;
 use Illuminate\Console\Command;
 use ClassPreloader\ClassPreloader;
 use Illuminate\Foundation\Composer;
 use ClassPreloader\Parser\DirVisitor;
 use ClassPreloader\Parser\FileVisitor;
 use ClassPreloader\Parser\NodeTraverser;
-use ClassPreloader\Parser\StrictTypesVisitor;
 use ClassPreloader\Exceptions\SkipFileException;
 use Symfony\Component\Console\Input\InputOption;
 use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
@@ -107,20 +106,16 @@ class OptimizeCommand extends Command
      */
     protected function getClassPreloader()
     {
+        // Class Preloader 3.x provides us with a factory class
+        if (class_exists(Factory::class)) {
+            return (new Factory)->create(['skip' => true])
+        }
+
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new DirVisitor(true));
         $traverser->addVisitor(new FileVisitor(true));
 
-        if (class_exists(StrictTypesVisitor::class)) {
-            // Class Preloader 3.x
-            $traverser->addVisitor(new StrictTypesVisitor);
-            $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        } else {
-            // Class Preloader 2.x
-            $parser = new Parser(new Lexer);
-        }
-
-        return new ClassPreloader(new PrettyPrinter, $parser, $traverser);
+        return new ClassPreloader(new PrettyPrinter, new Parser(new Lexer), $traverser);
     }
 
     /**
