@@ -108,7 +108,7 @@ class OptimizeCommand extends Command
     {
         // Class Preloader 3.x provides us with a factory class
         if (class_exists(Factory::class)) {
-            return (new Factory)->create(['skip' => true])
+            return (new Factory)->create(['skip' => true]);
         }
 
         $traverser = new NodeTraverser();
