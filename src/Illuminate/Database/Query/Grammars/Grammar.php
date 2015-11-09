@@ -84,7 +84,14 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+        $select = 'select '.$aggregate['function'].'('.$column.') as aggregate';
+
+        // Append fields for "where" conditions that depend on them
+        if (isset($aggregate['helpers']) && ! empty($aggregate['helpers'])) {
+            $select .= ', '.$this->columnize($aggregate['helpers']);
+        }
+
+        return $select;
     }
 
     /**

@@ -1461,7 +1461,13 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
+        // Split columns into aliased ones and with original names
+        // so we don't break "count()" compatibility and "where" dependencies
+        $this->aggregate = [
+            'function' => 'count',
+            'columns' => $this->clearSelectAliases($columns),
+            'helpers' => $this->onlySelectAliases($columns),
+        ];
 
         $results = $this->get();
 
@@ -1508,6 +1514,19 @@ class Builder
             return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
+    }
+
+    /**
+     * Return only columns containing select aliases.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function onlySelectAliases(array $columns)
+    {
+        return array_filter($columns, function ($column) {
+            return strpos(strtolower($column), ' as ') !== false;
+        });
     }
 
     /**
