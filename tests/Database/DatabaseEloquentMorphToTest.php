@@ -77,7 +77,7 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $two->shouldReceive('setRelation')->once()->with('relation', $resultOne);
         $three->shouldReceive('setRelation')->once()->with('relation', $resultTwo);
 
-        $relation->getEager();
+        $relation->match([$one, $two, $three], Collection::make([$resultOne, $resultTwo]), 'relation');
     }
 
     public function testModelsWithSoftDeleteAreProperlyPulled()
