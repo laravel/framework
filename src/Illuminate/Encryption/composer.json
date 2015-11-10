@@ -31,7 +31,7 @@
         }
     },
     "suggest": {
-        "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (^1.0.6)."
+        "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (~1.1)."
     },
     "minimum-stability": "dev"
 }
