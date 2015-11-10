@@ -73,7 +73,7 @@ class MigrateCommand extends BaseCommand
 
         $this->migrator->run($path, [
             'pretend' => $pretend,
-            'step' => $this->input->getOption('step')
+            'step' => $this->input->getOption('step'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
