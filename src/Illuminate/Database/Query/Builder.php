@@ -1586,7 +1586,7 @@ class Builder
      */
     public function implode($column, $glue = '')
     {
-        return implode($glue, $this->lists($column));
+        return implode($glue, $this->pluck($column));
     }
 
     /**
