@@ -1379,6 +1379,8 @@ class Builder
         if (is_null($this->columns)) {
             $this->columns = $columns;
         }
+        else // In case addSelect used before fleunt chain
+			$this->columns = array_merge((array) $this->columns, $columns);
 
         return $this->processor->processSelect($this, $this->runSelect());
     }
