@@ -1161,6 +1161,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->eighth = ['foo' => 'bar'];
         $model->ninth = '1969-07-20';
         $model->tenth = '1969-07-20 22:56:00';
+        $model->eleventh = '1969-07-20 22:56:00';
 
         $this->assertInternalType('int', $model->first);
         $this->assertInternalType('float', $model->second);
@@ -1180,6 +1181,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Carbon\Carbon', $model->tenth);
         $this->assertEquals('1969-07-20', $model->ninth->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->tenth->toDateTimeString());
+        $this->assertEquals(-14173440, $model->eleventh);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['first']);
@@ -1199,6 +1201,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Carbon\Carbon', $arr['tenth']);
         $this->assertEquals('1969-07-20', $arr['ninth']->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $arr['tenth']->toDateTimeString());
+        $this->assertEquals(-14173440, $arr['eleventh']);
     }
 
     public function testModelAttributeCastingPreservesNull()
@@ -1214,6 +1217,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->eighth = null;
         $model->ninth = null;
         $model->tenth = null;
+        $model->eleventh = null;
 
         $attributes = $model->getAttributes();
 
@@ -1227,6 +1231,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($attributes['eighth']);
         $this->assertNull($attributes['ninth']);
         $this->assertNull($attributes['tenth']);
+        $this->assertNull($attributes['eleventh']);
 
         $this->assertNull($model->first);
         $this->assertNull($model->second);
@@ -1238,6 +1243,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($model->eighth);
         $this->assertNull($model->ninth);
         $this->assertNull($model->tenth);
+        $this->assertNull($model->eleventh);
 
         $array = $model->toArray();
 
@@ -1251,6 +1257,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['eighth']);
         $this->assertNull($array['ninth']);
         $this->assertNull($array['tenth']);
+        $this->assertNull($array['eleventh']);
     }
 
     protected function addMockConnection($model)
@@ -1488,6 +1495,7 @@ class EloquentModelCastingStub extends Model
         'eighth' => 'json',
         'ninth' => 'date',
         'tenth' => 'datetime',
+        'eleventh' => 'timestamp',
     ];
 
     public function eighthAttributeValue()
