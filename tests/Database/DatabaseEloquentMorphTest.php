@@ -233,10 +233,3 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 class EloquentMorphResetModelStub extends Illuminate\Database\Eloquent\Model
 {
 }
-
-class EloquentMorphQueryStub extends Illuminate\Database\Query\Builder
-{
-    public function __construct()
-    {
-    }
-}
