@@ -162,6 +162,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get all items except for those with the specified keys.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function except($keys)
+    {
+        return new static(Arr::except($this->items, $keys));
+    }
+
+    /**
      * Fetch a nested element of the collection.
      *
      * @param  string  $key
@@ -494,6 +505,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             return is_null($result) || $value < $result ? $value : $result;
         });
+    }
+
+    /**
+     * Get the items with the specified keys.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function only($keys)
+    {
+        return new static(Arr::only($this->items, $keys));
     }
 
     /**
