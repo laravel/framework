@@ -106,12 +106,12 @@ class OptimizeCommand extends Command
      */
     protected function getClassPreloader()
     {
-        // Class Preloader 3.x provides us with a factory class
+        // Class Preloader 3.x
         if (class_exists(Factory::class)) {
             return (new Factory)->create(['skip' => true]);
         }
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor(new DirVisitor(true));
         $traverser->addVisitor(new FileVisitor(true));
 
