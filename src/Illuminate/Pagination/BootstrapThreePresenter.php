@@ -2,7 +2,7 @@
 
 namespace Illuminate\Pagination;
 
-use Illuminate\View\Expression;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Contracts\Pagination\Presenter as PresenterContract;
 
@@ -55,7 +55,7 @@ class BootstrapThreePresenter implements PresenterContract
     public function render()
     {
         if ($this->hasPages()) {
-            return new Expression(sprintf(
+            return new HtmlString(sprintf(
                 '<ul class="pagination">%s %s %s</ul>',
                 $this->getPreviousButton(),
                 $this->getLinks(),
