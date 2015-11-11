@@ -19,7 +19,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
         $query->shouldReceive('orderBy')->once()->with('migration', 'asc')->andReturn($query);
-        $query->shouldReceive('lists')->once()->with('migration')->andReturn('bar');
+        $query->shouldReceive('pluck')->once()->with('migration')->andReturn('bar');
 
         $this->assertEquals('bar', $repo->getRan());
     }

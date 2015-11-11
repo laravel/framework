@@ -513,7 +513,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertEquals(2, count($model->relationMany));
-        $this->assertEquals([2, 3], $model->relationMany->lists('id')->all());
+        $this->assertEquals([2, 3], $model->relationMany->pluck('id')->all());
     }
 
     public function testNewQueryReturnsEloquentQueryBuilder()
