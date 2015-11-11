@@ -29,7 +29,7 @@ class EventGenerateCommand extends Command
     public function fire()
     {
         $provider = $this->laravel->getProvider(
-            'Illuminate\Foundation\Support\Providers\EventServiceProvider'
+            \Illuminate\Foundation\Support\Providers\EventServiceProvider::class
         );
 
         foreach ($provider->listens() as $event => $listeners) {

@@ -19,10 +19,10 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider
      * @var array
      */
     protected $providers = [
-        'Illuminate\Console\ScheduleServiceProvider',
-        'Illuminate\Database\MigrationServiceProvider',
-        'Illuminate\Database\SeedServiceProvider',
-        'Illuminate\Foundation\Providers\ComposerServiceProvider',
-        'Illuminate\Queue\ConsoleServiceProvider',
+        \Illuminate\Console\ScheduleServiceProvider::class,
+        \Illuminate\Database\MigrationServiceProvider::class,
+        \Illuminate\Database\SeedServiceProvider::class,
+        \Illuminate\Foundation\Providers\ComposerServiceProvider::class,
+        \Illuminate\Queue\ConsoleServiceProvider::class,
     ];
 }

@@ -220,7 +220,7 @@ abstract class Job
      */
     protected function getEntityResolver()
     {
-        return $this->container->make('Illuminate\Contracts\Queue\EntityResolver');
+        return $this->container->make(\Illuminate\Contracts\Queue\EntityResolver::class);
     }
 
     /**

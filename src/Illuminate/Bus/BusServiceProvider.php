@@ -20,18 +20,18 @@ class BusServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Illuminate\Bus\Dispatcher', function ($app) {
+        $this->app->singleton(\Illuminate\Bus\Dispatcher::class, function ($app) {
             return new Dispatcher($app, function () use ($app) {
-                return $app['Illuminate\Contracts\Queue\Queue'];
+                return $app[\Illuminate\Contracts\Queue\Queue::class];
             });
         });
 
         $this->app->alias(
-            'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\Dispatcher'
+            \Illuminate\Bus\Dispatcher::class, \Illuminate\Contracts\Bus\Dispatcher::class
         );
 
         $this->app->alias(
-            'Illuminate\Bus\Dispatcher', 'Illuminate\Contracts\Bus\QueueingDispatcher'
+            \Illuminate\Bus\Dispatcher::class, \Illuminate\Contracts\Bus\QueueingDispatcher::class
         );
     }
 
@@ -43,9 +43,9 @@ class BusServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Bus\Dispatcher',
-            'Illuminate\Contracts\Bus\Dispatcher',
-            'Illuminate\Contracts\Bus\QueueingDispatcher',
+            \Illuminate\Bus\Dispatcher::class,
+            \Illuminate\Contracts\Bus\Dispatcher::class,
+            \Illuminate\Contracts\Bus\QueueingDispatcher::class,
         ];
     }
 }

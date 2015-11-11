@@ -14,6 +14,6 @@ class Artisan extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Console\Kernel';
+        return \Illuminate\Contracts\Console\Kernel::class;
     }
 }

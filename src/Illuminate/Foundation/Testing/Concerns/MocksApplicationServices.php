@@ -19,7 +19,7 @@ trait MocksApplicationServices
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::spy('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::spy(\Illuminate\Contracts\Events\Dispatcher::class);
 
         $mock->shouldReceive('fire')->andReturnUsing(function ($called) use (&$events) {
             foreach ($events as $key => $event) {
@@ -51,7 +51,7 @@ trait MocksApplicationServices
      */
     protected function withoutEvents()
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $mock = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
 
         $mock->shouldReceive('fire');
 
@@ -80,7 +80,7 @@ trait MocksApplicationServices
         }
 
         $this->app->instance(
-            'Illuminate\Contracts\Bus\Dispatcher', $mock
+            \Illuminate\Contracts\Bus\Dispatcher::class, $mock
         );
 
         return $this;

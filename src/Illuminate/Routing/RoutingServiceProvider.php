@@ -116,7 +116,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrRequest()
     {
-        $this->app->bind('Psr\Http\Message\ServerRequestInterface', function ($app) {
+        $this->app->bind(\Psr\Http\Message\ServerRequestInterface::class, function ($app) {
             return (new DiactorosFactory)->createRequest($app->make('request'));
         });
     }
@@ -128,7 +128,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrResponse()
     {
-        $this->app->bind('Psr\Http\Message\ResponseInterface', function ($app) {
+        $this->app->bind(\Psr\Http\Message\ResponseInterface::class, function ($app) {
             return new PsrResponse();
         });
     }
@@ -140,8 +140,8 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerResponseFactory()
     {
-        $this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app) {
-            return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
+        $this->app->singleton(\Illuminate\Contracts\Routing\ResponseFactory::class, function ($app) {
+            return new ResponseFactory($app[\Illuminate\Contracts\View\Factory::class], $app['redirect']);
         });
     }
 }

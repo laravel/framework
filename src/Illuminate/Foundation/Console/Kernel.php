@@ -47,14 +47,14 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $bootstrappers = [
-        'Illuminate\Foundation\Bootstrap\DetectEnvironment',
-        'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-        'Illuminate\Foundation\Bootstrap\ConfigureLogging',
-        'Illuminate\Foundation\Bootstrap\HandleExceptions',
-        'Illuminate\Foundation\Bootstrap\RegisterFacades',
-        'Illuminate\Foundation\Bootstrap\SetRequestForConsole',
-        'Illuminate\Foundation\Bootstrap\RegisterProviders',
-        'Illuminate\Foundation\Bootstrap\BootProviders',
+        \Illuminate\Foundation\Bootstrap\DetectEnvironment::class,
+        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        \Illuminate\Foundation\Bootstrap\ConfigureLogging::class,
+        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
+        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
@@ -86,7 +86,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
+            \Illuminate\Console\Scheduling\Schedule::class, $schedule = new Schedule
         );
 
         $this->schedule($schedule);
@@ -168,8 +168,8 @@ class Kernel implements KernelContract
      */
     public function queue($command, array $parameters = [])
     {
-        $this->app['Illuminate\Contracts\Queue\Queue']->push(
-            'Illuminate\Foundation\Console\QueuedJob', func_get_args()
+        $this->app[\Illuminate\Contracts\Queue\Queue::class]->push(
+            \Illuminate\Foundation\Console\QueuedJob::class, func_get_args()
         );
     }
 
@@ -247,7 +247,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+        $this->app[\Illuminate\Contracts\Debug\ExceptionHandler::class]->report($e);
     }
 
     /**
@@ -259,6 +259,6 @@ class Kernel implements KernelContract
      */
     protected function renderException($output, Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+        $this->app[\Illuminate\Contracts\Debug\ExceptionHandler::class]->renderForConsole($output, $e);
     }
 }

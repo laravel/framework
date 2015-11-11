@@ -394,7 +394,7 @@ trait MakesHttpRequests
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
-        $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
+        $kernel = $this->app->make(\Illuminate\Contracts\Http\Kernel::class);
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
@@ -602,7 +602,7 @@ trait MakesHttpRequests
      */
     public function assertRedirectedTo($uri, $with = [])
     {
-        PHPUnit::assertInstanceOf('Illuminate\Http\RedirectResponse', $this->response);
+        PHPUnit::assertInstanceOf(\Illuminate\Http\RedirectResponse::class, $this->response);
 
         PHPUnit::assertEquals($this->app['url']->to($uri), $this->response->headers->get('Location'));
 

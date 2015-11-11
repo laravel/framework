@@ -123,7 +123,7 @@ class HasManyThrough extends Relation
      */
     public function parentSoftDeletes()
     {
-        return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_class($this->parent)));
+        return in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(get_class($this->parent)));
     }
 
     /**
