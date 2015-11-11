@@ -50,7 +50,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         return $this->table()
                 ->orderBy('batch', 'asc')
                 ->orderBy('migration', 'asc')
-                ->lists('migration');
+                ->pluck('migration');
     }
 
     /**

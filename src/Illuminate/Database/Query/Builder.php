@@ -1535,9 +1535,9 @@ class Builder
      * @param  string  $key
      * @return array
      */
-    public function lists($column, $key = null)
+    public function pluck($column, $key = null)
     {
-        $columns = $this->getListSelect($column, $key);
+        $columns = $this->getPluckSelect($column, $key);
 
         $results = new Collection($this->get($columns));
 
@@ -1545,17 +1545,29 @@ class Builder
     }
 
     /**
-     * Get the columns that should be used in a list array.
+     * Alias for the "pluck" method.
      *
      * @param  string  $column
      * @param  string  $key
      * @return array
      */
-    protected function getListSelect($column, $key)
+    public function lists($column, $key = null)
+    {
+        return $this->pluck($column, $key);
+    }
+
+    /**
+     * Get the columns that should be used in a pluck select.
+     *
+     * @param  string  $column
+     * @param  string  $key
+     * @return array
+     */
+    protected function getPluckSelect($column, $key)
     {
         $select = is_null($key) ? [$column] : [$column, $key];
 
-        // If the selected column contains a "dot", we will remove it so that the list
+        // If the selected columns contain "dots", we will remove it so that the pluck
         // operation can run normally. Specifying the table is not needed, since we
         // really want the names of the columns as it is in this resulting array.
         return array_map(function ($column) {
@@ -1574,7 +1586,7 @@ class Builder
      */
     public function implode($column, $glue = '')
     {
-        return implode($glue, $this->lists($column));
+        return implode($glue, $this->pluck($column));
     }
 
     /**

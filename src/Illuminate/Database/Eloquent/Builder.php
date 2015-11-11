@@ -224,9 +224,9 @@ class Builder
      * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
-    public function lists($column, $key = null)
+    public function pluck($column, $key = null)
     {
-        $results = $this->query->lists($column, $key);
+        $results = $this->query->pluck($column, $key);
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -240,6 +240,18 @@ class Builder
         }
 
         return collect($results);
+    }
+
+    /**
+     * Alias for the "pluck" method.
+     *
+     * @param  string  $column
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function lists($column, $key = null)
+    {
+        return $this->pluck($column, $key);
     }
 
     /**
