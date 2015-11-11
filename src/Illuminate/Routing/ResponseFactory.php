@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Contracts\Routing\Redirector as RedirectorContract;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 
 class ResponseFactory implements FactoryContract
@@ -27,7 +28,7 @@ class ResponseFactory implements FactoryContract
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var \Illuminate\Contracts\Routing\Redirector
      */
     protected $redirector;
 
@@ -35,10 +36,10 @@ class ResponseFactory implements FactoryContract
      * Create a new response factory instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param  \Illuminate\Contracts\Routing\Redirector  $redirector
      * @return void
      */
-    public function __construct(ViewFactory $view, Redirector $redirector)
+    public function __construct(ViewFactory $view, RedirectorContract $redirector)
     {
         $this->view = $view;
         $this->redirector = $redirector;
