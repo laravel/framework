@@ -5,7 +5,7 @@ namespace Illuminate\Cache;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements Store
@@ -13,7 +13,7 @@ class DatabaseStore implements Store
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $connection;
 
@@ -41,13 +41,13 @@ class DatabaseStore implements Store
     /**
      * Create a new database store.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Contracts\Database\Connection  $connection
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @param  string  $table
      * @param  string  $prefix
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, EncrypterContract $encrypter, $table, $prefix = '')
+    public function __construct(ConnectionContract $connection, EncrypterContract $encrypter, $table, $prefix = '')
     {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -226,7 +226,7 @@ class DatabaseStore implements Store
     /**
      * Get the underlying database connection.
      *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Contracts\Database\Connection
      */
     public function getConnection()
     {

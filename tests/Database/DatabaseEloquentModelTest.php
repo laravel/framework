@@ -269,7 +269,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             'updated_at' => Carbon\Carbon::now(),
         ];
         $model = new EloquentDateModelStub;
-        Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver'));
         $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
@@ -285,7 +285,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
             'updated_at' => Carbon\Carbon::now(),
         ];
         $model = new EloquentDateModelStub;
-        Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver'));
         $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('StdClass'));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
         $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
@@ -523,7 +523,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
         $conn->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
         $conn->shouldReceive('getPostProcessor')->once()->andReturn($processor);
-        EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver'));
         $resolver->shouldReceive('connection')->andReturn($conn);
         $model = new EloquentModelStub;
         $builder = $model->newQuery();
@@ -548,7 +548,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testConnectionManagement()
     {
-        EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver'));
         $model = new EloquentModelStub;
         $model->setConnection('foo');
         $resolver->shouldReceive('connection')->once()->with('foo')->andReturn('bar');
@@ -1262,7 +1262,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     protected function addMockConnection($model)
     {
-        $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $model->setConnectionResolver($resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver'));
         $resolver->shouldReceive('connection')->andReturn(m::mock('Illuminate\Database\Connection'));
         $model->getConnection()->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
         $model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));

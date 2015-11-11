@@ -6,8 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Contracts\Database\ConnectionResolver as ResolverContract;
 
-class DatabaseManager implements ConnectionResolverInterface
+class DatabaseManager implements ResolverContract
 {
     /**
      * The application instance.

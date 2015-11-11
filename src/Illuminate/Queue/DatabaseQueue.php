@@ -4,9 +4,9 @@ namespace Illuminate\Queue;
 
 use DateTime;
 use Carbon\Carbon;
-use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Contracts\Database\Connection;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class DatabaseQueue extends Queue implements QueueContract
@@ -14,7 +14,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $database;
 
@@ -42,7 +42,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Create a new database queue instance.
      *
-     * @param  \Illuminate\Database\Connection  $database
+     * @param  \Illuminate\Contracts\Database\Connection  $database
      * @param  string  $table
      * @param  string  $default
      * @param  int  $expire
@@ -293,7 +293,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Get the underlying database instance.
      *
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Contracts\Database\Connection
      */
     public function getDatabase()
     {

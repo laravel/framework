@@ -3,7 +3,7 @@
 namespace Illuminate\Session;
 
 use SessionHandlerInterface;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
 /**
  * @deprecated since version 5.2. Use Illuminate\Session\DatabaseSessionHandler.
@@ -13,7 +13,7 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $connection;
 
@@ -34,11 +34,11 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
     /**
      * Create a new database session handler instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Contracts\Database\Connection  $connection
      * @param  string  $table
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table)
+    public function __construct(ConnectionContract $connection, $table)
     {
         $this->table = $table;
         $this->connection = $connection;
