@@ -21,7 +21,7 @@ class PipelineServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(
-            'Illuminate\Contracts\Pipeline\Hub', 'Illuminate\Pipeline\Hub'
+            \Illuminate\Contracts\Pipeline\Hub::class, \Illuminate\Pipeline\Hub::class
         );
     }
 
@@ -33,7 +33,7 @@ class PipelineServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Contracts\Pipeline\Hub',
+            \Illuminate\Contracts\Pipeline\Hub::class,
         ];
     }
 }

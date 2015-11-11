@@ -20,16 +20,16 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Illuminate\Broadcasting\BroadcastManager', function ($app) {
+        $this->app->singleton(\Illuminate\Broadcasting\BroadcastManager::class, function ($app) {
             return new BroadcastManager($app);
         });
 
-        $this->app->singleton('Illuminate\Contracts\Broadcasting\Broadcaster', function ($app) {
-            return $app->make('Illuminate\Broadcasting\BroadcastManager')->connection();
+        $this->app->singleton(\Illuminate\Contracts\Broadcasting\Broadcaster::class, function ($app) {
+            return $app->make(\Illuminate\Broadcasting\BroadcastManager::class)->connection();
         });
 
         $this->app->alias(
-            'Illuminate\Broadcasting\BroadcastManager', 'Illuminate\Contracts\Broadcasting\Factory'
+            \Illuminate\Broadcasting\BroadcastManager::class, \Illuminate\Contracts\Broadcasting\Factory::class
         );
     }
 
@@ -41,9 +41,9 @@ class BroadcastServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Broadcasting\BroadcastManager',
-            'Illuminate\Contracts\Broadcasting\Factory',
-            'Illuminate\Contracts\Broadcasting\Broadcaster',
+            \Illuminate\Broadcasting\BroadcastManager::class,
+            \Illuminate\Contracts\Broadcasting\Factory::class,
+            \Illuminate\Contracts\Broadcasting\Broadcaster::class,
         ];
     }
 }

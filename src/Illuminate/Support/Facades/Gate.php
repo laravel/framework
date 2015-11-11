@@ -14,6 +14,6 @@ class Gate extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Auth\Access\Gate';
+        return \Illuminate\Contracts\Auth\Access\Gate::class;
     }
 }

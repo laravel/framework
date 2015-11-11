@@ -94,7 +94,7 @@ class WorkCommand extends Command
             $this->worker->setCache($this->laravel['cache']->driver());
 
             $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+                $this->laravel[\Illuminate\Contracts\Debug\ExceptionHandler::class]
             );
 
             return $this->worker->daemon(

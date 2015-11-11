@@ -14,6 +14,6 @@ class Bus extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Bus\Dispatcher';
+        return \Illuminate\Contracts\Bus\Dispatcher::class;
     }
 }

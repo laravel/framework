@@ -257,7 +257,7 @@ class Dispatcher implements DispatcherContract
 
             $queue = method_exists($event, 'onQueue') ? $event->onQueue() : null;
 
-            $this->resolveQueue()->connection($connection)->pushOn($queue, 'Illuminate\Broadcasting\BroadcastEvent', [
+            $this->resolveQueue()->connection($connection)->pushOn($queue, \Illuminate\Broadcasting\BroadcastEvent::class, [
                 'event' => serialize(clone $event),
             ]);
         }
@@ -390,7 +390,7 @@ class Dispatcher implements DispatcherContract
     {
         try {
             return (new ReflectionClass($class))->implementsInterface(
-                'Illuminate\Contracts\Queue\ShouldQueue'
+                \Illuminate\Contracts\Queue\ShouldQueue::class
             );
         } catch (Exception $e) {
             return false;

@@ -62,7 +62,7 @@ class ControllerInspector
      */
     public function isRoutable(ReflectionMethod $method)
     {
-        if ($method->class == 'Illuminate\Routing\Controller') {
+        if ($method->class == \Illuminate\Routing\Controller::class) {
             return false;
         }
 

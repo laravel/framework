@@ -147,7 +147,7 @@ class BroadcastManager implements FactoryContract
     protected function createLogDriver(array $config)
     {
         return new LogBroadcaster(
-            $this->app->make('Psr\Log\LoggerInterface')
+            $this->app->make(\Psr\Log\LoggerInterface::class)
         );
     }
 

@@ -68,7 +68,7 @@ class ConfigCacheCommand extends Command
     {
         $app = require $this->laravel->basePath().'/bootstrap/app.php';
 
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         return $app['config']->all();
     }

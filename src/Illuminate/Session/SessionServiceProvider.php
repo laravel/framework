@@ -17,7 +17,7 @@ class SessionServiceProvider extends ServiceProvider
 
         $this->registerSessionDriver();
 
-        $this->app->singleton('Illuminate\Session\Middleware\StartSession');
+        $this->app->singleton(\Illuminate\Session\Middleware\StartSession::class);
     }
 
     /**
