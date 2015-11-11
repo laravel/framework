@@ -167,7 +167,7 @@ class Worker
     /**
      * Get the next job from the queue connection.
      *
-     * @param  \Illuminate\Queue\Queue  $connection
+     * @param  \Illuminate\Contracts\Queue\Queue  $connection
      * @param  string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
@@ -191,7 +191,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @param  int  $delay
-     * @return void
+     * @return array|null
      *
      * @throws \Throwable
      */

@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Exception;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
@@ -182,7 +181,10 @@ trait InteractsWithPages
 
         $escapedPattern = preg_quote(e($text), '/');
 
-        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $this->response->getContent());
+        $pattern = $rawPattern == $escapedPattern
+                ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+
+        $this->$method("/$pattern/i", $this->response->getContent());
 
         return $this;
     }
@@ -216,7 +218,10 @@ trait InteractsWithPages
 
         $content = $this->crawler->filter($element)->html();
 
-        $this->$method("/({$rawPattern}|{$escapedPattern})/i", $content);
+        $pattern = $rawPattern == $escapedPattern
+                ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+
+        $this->$method("/$pattern/i", $content);
 
         return $this;
     }

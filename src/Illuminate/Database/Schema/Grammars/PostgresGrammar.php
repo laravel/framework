@@ -53,7 +53,11 @@ class PostgresGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        $sql = $blueprint->temporary ? 'create temporary' : 'create';
+
+        $sql .= ' table '.$this->wrapTable($blueprint)." ($columns)";
+
+        return $sql;
     }
 
     /**
@@ -499,6 +503,17 @@ class PostgresGrammar extends Grammar
     protected function typeBinary(Fluent $column)
     {
         return 'bytea';
+    }
+
+    /**
+     * Create the column definition for a uuid type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeUuid(Fluent $column)
+    {
+        return 'uuid';
     }
 
     /**

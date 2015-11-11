@@ -2,7 +2,7 @@
 
 $basePath = $app['path.base'];
 
-return array_map('realpath', [
+return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/Container.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Container/ContextualBindingBuilder.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Foundation/Application.php',
@@ -205,4 +205,4 @@ return array_map('realpath', [
     $basePath.'/vendor/symfony/finder/Glob.php',
     $basePath.'/vendor/vlucas/phpdotenv/src/Dotenv.php',
     $basePath.'/vendor/nesbot/carbon/src/Carbon/Carbon.php',
-]);
+];

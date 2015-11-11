@@ -233,13 +233,28 @@ if (! function_exists('array_pluck')) {
      * Pluck an array of values from an array.
      *
      * @param  array   $array
-     * @param  string  $value
-     * @param  string  $key
+     * @param  string|array  $value
+     * @param  string|array|null  $key
      * @return array
      */
     function array_pluck($array, $value, $key = null)
     {
         return Arr::pluck($array, $value, $key);
+    }
+}
+
+if (! function_exists('array_prepend')) {
+    /**
+     * Push an item onto the beginning of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    function array_prepend($array, $value, $key = null)
+    {
+        return Arr::prepend($array, $value, $key);
     }
 }
 
@@ -442,7 +457,7 @@ if (! function_exists('e')) {
     /**
      * Escape HTML entities in a string.
      *
-     * @param  \Illuminate\Support\Htmlable|string  $value
+     * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
      * @return string
      */
     function e($value)

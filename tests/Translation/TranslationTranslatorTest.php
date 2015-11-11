@@ -18,6 +18,14 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
         $t = $this->getMock('Illuminate\Translation\Translator', ['get'], [$this->getLoader(), 'en', 'sp']);
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->will($this->returnValue('bar'));
         $this->assertTrue($t->has('foo', 'bar'));
+
+        $t = $this->getMock('Illuminate\Translation\Translator', ['get'], [$this->getLoader(), 'en']);
+        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->will($this->returnValue('bar'));
+        $this->assertTrue($t->hasForLocale('foo', 'bar'));
+
+        $t = $this->getMock('Illuminate\Translation\Translator', ['get'], [$this->getLoader(), 'en']);
+        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->will($this->returnValue('foo'));
+        $this->assertFalse($t->hasForLocale('foo', 'bar'));
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItem()

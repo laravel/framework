@@ -224,14 +224,14 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testWithHiddenSetsHiddenOnEntireCollection()
     {
-        $c = new Collection([new TestEloqeuntCollectionModel]);
+        $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->withHidden(['hidden']);
 
         $this->assertEquals([], $c[0]->getHidden());
     }
 }
 
-class TestEloqeuntCollectionModel extends Illuminate\Database\Eloquent\Model
+class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
     protected $hidden = ['hidden'];
 }

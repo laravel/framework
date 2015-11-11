@@ -2,8 +2,12 @@
 
 namespace DummyNamespace;
 
+use Illuminate\Auth\Access\HandlesAuthorization;
+
 class DummyClass
 {
+    use HandlesAuthorization;
+
     /**
      * Create a new policy instance.
      *

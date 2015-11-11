@@ -60,14 +60,18 @@ class MailgunTransport extends Transport
 
         $options = ['auth' => ['api', $this->key]];
 
+        $to = $this->getTo($message);
+
+        $message->setBcc([]);
+
         if (version_compare(ClientInterface::VERSION, '6') === 1) {
             $options['multipart'] = [
-                ['name' => 'to', 'contents' => $this->getTo($message)],
+                ['name' => 'to', 'contents' => $to],
                 ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
             ];
         } else {
             $options['body'] = [
-                'to' => $this->getTo($message),
+                'to' => $to,
                 'message' => new PostFile('message', (string) $message),
             ];
         }
@@ -110,7 +114,7 @@ class MailgunTransport extends Transport
      * Set the API key being used by the transport.
      *
      * @param  string  $key
-     * @return void
+     * @return string
      */
     public function setKey($key)
     {

@@ -261,6 +261,19 @@ trait ApplicationTrait
      * @param  string  $connection
      * @return $this
      */
+    protected function dontSeeInDatabase($table, array $data, $connection = null)
+    {
+        return $this->notSeeInDatabase($table, $data, $connection);
+    }
+
+    /**
+     * Assert that a given where condition does not exist in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
     protected function notSeeInDatabase($table, array $data, $connection = null)
     {
         $database = $this->app->make('db');
@@ -290,8 +303,8 @@ trait ApplicationTrait
     /**
      * Call artisan command and return code.
      *
-     * @param string  $command
-     * @param array   $parameters
+     * @param  string  $command
+     * @param  array  $parameters
      * @return int
      */
     public function artisan($command, $parameters = [])

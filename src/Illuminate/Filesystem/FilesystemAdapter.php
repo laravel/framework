@@ -69,7 +69,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function put($path, $contents, $visibility = null)
     {
-        $config = ['visibility' => $this->parseVisibility($visibility)];
+        if ($visibility = $this->parseVisibility($visibility)) {
+            $config = ['visibility' => $visibility];
+        } else {
+            $config = [];
+        }
 
         if (is_resource($contents)) {
             return $this->driver->putStream($path, $contents, $config);
@@ -313,7 +317,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Parse the given visibility value.
      *
      * @param  string|null  $visibility
-     * @return string
+     * @return string|null
      * @throws \InvalidArgumentException
      */
     protected function parseVisibility($visibility)

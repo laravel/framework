@@ -57,17 +57,19 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
 
         $relation->shouldReceive('createModelByType')->once()->with('morph_type_1')->andReturn($firstQuery = m::mock('Illuminate\Database\Eloquent\Builder'));
         $relation->shouldReceive('createModelByType')->once()->with('morph_type_2')->andReturn($secondQuery = m::mock('Illuminate\Database\Eloquent\Builder'));
+        $firstQuery->shouldReceive('getTable')->andReturn('foreign_table_1');
         $firstQuery->shouldReceive('getKeyName')->andReturn('id');
+        $secondQuery->shouldReceive('getTable')->andReturn('foreign_table_2');
         $secondQuery->shouldReceive('getKeyName')->andReturn('id');
 
         $firstQuery->shouldReceive('newQuery')->once()->andReturn($firstQuery);
         $secondQuery->shouldReceive('newQuery')->once()->andReturn($secondQuery);
 
-        $firstQuery->shouldReceive('whereIn')->once()->with('id', ['foreign_key_1'])->andReturn($firstQuery);
+        $firstQuery->shouldReceive('whereIn')->once()->with('foreign_table_1.id', ['foreign_key_1'])->andReturn($firstQuery);
         $firstQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultOne = m::mock('StdClass')]));
         $resultOne->shouldReceive('getKey')->andReturn('foreign_key_1');
 
-        $secondQuery->shouldReceive('whereIn')->once()->with('id', ['foreign_key_2'])->andReturn($secondQuery);
+        $secondQuery->shouldReceive('whereIn')->once()->with('foreign_table_2.id', ['foreign_key_2'])->andReturn($secondQuery);
         $secondQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultTwo = m::mock('StdClass')]));
         $resultTwo->shouldReceive('getKey')->andReturn('foreign_key_2');
 
