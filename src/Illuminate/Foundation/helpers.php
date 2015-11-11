@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 
@@ -205,7 +206,7 @@ if (! function_exists('csrf_field')) {
      */
     function csrf_field()
     {
-        return new Illuminate\View\Expression('<input type="hidden" name="_token" value="'.csrf_token().'">');
+        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'">');
     }
 }
 
@@ -442,7 +443,7 @@ if (! function_exists('method_field')) {
      */
     function method_field($method)
     {
-        return new Illuminate\View\Expression('<input type="hidden" name="_method" value="'.$method.'">');
+        return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
     }
 }
 
