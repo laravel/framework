@@ -7,7 +7,7 @@ interface Presenter
     /**
      * Render the given paginator.
      *
-     * @return \Illuminate\View\Expression
+     * @return \Illuminate\View\Expression|string
      */
     public function render();
 
