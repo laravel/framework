@@ -1371,17 +1371,6 @@ class EloquentModelSaveStub extends Model
     }
 }
 
-class EloquentModelFindStub extends Model
-{
-    public function newQuery()
-    {
-        $mock = m::mock('Illuminate\Database\Eloquent\Builder');
-        $mock->shouldReceive('find')->once()->with(1, ['*'])->andReturn('foo');
-
-        return $mock;
-    }
-}
-
 class EloquentModelFindWithWritePdoStub extends Model
 {
     public function newQuery()
@@ -1418,17 +1407,6 @@ class EloquentModelHydrateRawStub extends Model
     {
         $mock = m::mock('Illuminate\Database\Connection');
         $mock->shouldReceive('select')->once()->with('SELECT ?', ['foo'])->andReturn([]);
-
-        return $mock;
-    }
-}
-
-class EloquentModelFindManyStub extends Model
-{
-    public function newQuery()
-    {
-        $mock = m::mock('Illuminate\Database\Eloquent\Builder');
-        $mock->shouldReceive('find')->once()->with([1, 2], ['*'])->andReturn('foo');
 
         return $mock;
     }
