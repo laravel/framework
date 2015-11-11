@@ -820,6 +820,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Split the collection into several pieces.
+     *
+     * @param  int  $amount
+     * @return static
+     */
+    public function split($amount)
+    {
+        $pieces = [];
+
+        $size = ceil($this->count() / $amount);
+
+        foreach (range(1, $amount) as $page) {
+            $pieces[] = $this->forPage($page, $size);
+        }
+
+        return new static($pieces);
+    }
+
+    /**
      * Get the sum of the given values.
      *
      * @param  callable|string|null  $callback

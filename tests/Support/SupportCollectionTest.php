@@ -568,6 +568,27 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz'], $cut->all());
     }
 
+    public function testSplit()
+    {
+        $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->split(3);
+        $this->assertInstanceOf('Illuminate\Support\Collection', $data);
+        $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
+        $this->assertEquals(3, $data->count());
+        $this->assertEquals([1, 2, 3, 4], $data[0]->toArray());
+        $this->assertEquals([5, 6, 7, 8], $data[1]->toArray());
+        $this->assertEquals([9, 10], $data[2]->toArray());
+
+        $data = new Collection([1, 2]);
+        $data = $data->split(3);
+        $this->assertInstanceOf('Illuminate\Support\Collection', $data);
+        $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
+        $this->assertEquals(3, $data->count());
+        $this->assertEquals([1], $data[0]->toArray());
+        $this->assertEquals([2], $data[1]->toArray());
+        $this->assertEquals([], $data[2]->toArray());
+    }
+
     public function testGetPluckValueWithAccessors()
     {
         $model = new TestAccessorEloquentTestStub(['some' => 'foo']);
