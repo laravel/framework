@@ -421,6 +421,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  string  $value
      * @param  string  $key
      * @return static
+     *
+     * @deprecated since version 5.2. Use the "pluck" method directly.
      */
     public function lists($value, $key = null)
     {

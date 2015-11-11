@@ -1550,6 +1550,8 @@ class Builder
      * @param  string  $column
      * @param  string  $key
      * @return array
+     *
+     * @deprecated since version 5.2. Use the "pluck" method directly.
      */
     public function lists($column, $key = null)
     {
