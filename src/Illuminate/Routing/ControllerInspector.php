@@ -6,6 +6,9 @@ use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Str;
 
+/**
+ * @deprecated since version 5.1.
+ */
 class ControllerInspector
 {
     /**
