@@ -169,6 +169,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function except($keys)
     {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
         return new static(Arr::except($this->items, $keys));
     }
 
@@ -515,6 +517,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function only($keys)
     {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
         return new static(Arr::only($this->items, $keys));
     }
 
