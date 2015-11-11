@@ -332,6 +332,20 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Write a string as verbose output depending on verbosity level.
+     *
+     * @param  string  $string
+     * @param  int  $verbosity
+     * @return void
+     */
+    public function verbose($string, $verbosity = OutputInterface::VERBOSITY_VERBOSE)
+    {
+        if ($this->getOutput()->getVerbosity() >= $verbosity) {
+            $this->comment($string);
+        }
+    }
+
+    /**
      * Write a string as standard output.
      *
      * @param  string  $string
