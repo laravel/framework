@@ -49,9 +49,11 @@ class StringBuffer implements ArrayAccess
      */
     public function lcfirst()
     {
-        if(!$this->length()) return $this;
+        if (! $this->length()) {
+            return $this;
+        }
 
-        return new static(mb_strtolower($this[0]) . $this->substring(1));
+        return new static(mb_strtolower($this[0]).$this->substring(1));
     }
 
     /**
@@ -87,7 +89,6 @@ class StringBuffer implements ArrayAccess
         return Str::contains($this->string, $needles);
     }
 
-
     /**
      * Determine if the string equals the given input.
      *
@@ -118,11 +119,11 @@ class StringBuffer implements ArrayAccess
      */
     public function explode($delimiters)
     {
-        $delimiters = array_map(function ($delimiter){
+        $delimiters = array_map(function ($delimiter) {
             return preg_quote($delimiter, '/');
-        }, (array)$delimiters);
+        }, (array) $delimiters);
 
-        $strings = preg_split("/(" . implode('|', $delimiters) . ")/", $this->string);
+        $strings = preg_split('/('.implode('|', $delimiters).')/', $this->string);
 
         return collect($strings);
     }
@@ -164,19 +165,19 @@ class StringBuffer implements ArrayAccess
     {
         $string = new static($this->string);
 
-        if(is_array($search)) {
-            foreach($search as $char) {
+        if (is_array($search)) {
+            foreach ($search as $char) {
                 $string = $string->replace($char, $replace, $count, $index++);
             }
 
             return $string;
         }
 
-        if(is_array($replace)) {
-            $replace = isset($replace[$index]) ? $replace[$index] : $replace[count($replace)-1];
+        if (is_array($replace)) {
+            $replace = isset($replace[$index]) ? $replace[$index] : $replace[count($replace) - 1];
         }
 
-        while(($pos = $string->indexOf($search)) !== false) {
+        while (($pos = $string->indexOf($search)) !== false) {
             $count++;
 
             $string = $string->substring(0, $pos)->append($replace)
@@ -362,7 +363,7 @@ class StringBuffer implements ArrayAccess
      */
     public function trim($chars = null)
     {
-        if(is_null($chars)) {
+        if (is_null($chars)) {
             return new static(trim($this->string));
         }
 
@@ -379,7 +380,7 @@ class StringBuffer implements ArrayAccess
      */
     public function ltrim($chars = null)
     {
-        if(is_null($chars)) {
+        if (is_null($chars)) {
             return new static(ltrim($this->string));
         }
 
@@ -396,7 +397,7 @@ class StringBuffer implements ArrayAccess
      */
     public function rtrim($chars = null)
     {
-        if(is_null($chars)) {
+        if (is_null($chars)) {
             return new static(rtrim($this->string));
         }
 
@@ -472,7 +473,7 @@ class StringBuffer implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        $this->string = mb_substr($this->string, 0, $offset) . $value . mb_substr($this->string, $offset+1);
+        $this->string = mb_substr($this->string, 0, $offset).$value.mb_substr($this->string, $offset + 1);
     }
 
     /**
@@ -482,7 +483,7 @@ class StringBuffer implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        $this->string = mb_substr($this->string, 0, $offset) . mb_substr($this->string, $offset+1);
+        $this->string = mb_substr($this->string, 0, $offset).mb_substr($this->string, $offset + 1);
     }
 
     /**

@@ -168,7 +168,7 @@ class SupportStringBufferTest extends PHPUnit_Framework_TestCase
         $this->assertTrue((new StringBuffer('hello world'))->contains('world'));
         $this->assertTrue((new StringBuffer('hello world'))->equals('hello world'));
         $this->assertTrue((new StringBuffer('hello/world'))->matches('*/*'));
-        $this->assertEquals('Hell', (new StringBuffer('Hello world'))->substring(0,4)->get());
+        $this->assertEquals('Hell', (new StringBuffer('Hello world'))->substring(0, 4)->get());
         $this->assertEquals('CcZzSs', (new StringBuffer('ČčŽžŠš'))->toAscii()->get());
         $this->assertEquals('helloWorld', (new StringBuffer('hello world'))->toCamel()->get());
         $this->assertEquals('hello world', (new StringBuffer('HELLO WORLD'))->toLower()->get());
@@ -193,4 +193,6 @@ class TestToStringObject
     }
 }
 
-class TestObjectWithoutToString {}
+class TestObjectWithoutToString
+{
+}
