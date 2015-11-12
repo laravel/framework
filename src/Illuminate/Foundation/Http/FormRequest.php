@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Http;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exception\HttpResponseException;
@@ -27,7 +27,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var \Illuminate\Contracts\Routing\Redirector
      */
     protected $redirector;
 
@@ -182,7 +182,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Set the Redirector instance.
      *
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param  \Illuminate\Contracts\Routing\Redirector  $redirector
      * @return \Illuminate\Foundation\Http\FormRequest
      */
     public function setRedirector(Redirector $redirector)

@@ -539,7 +539,7 @@ if (! function_exists('redirect')) {
      * @param  int     $status
      * @param  array   $headers
      * @param  bool    $secure
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Contracts\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {

@@ -1049,7 +1049,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
             'queue'                => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory', 'Illuminate\Contracts\Queue\Monitor'],
             'queue.connection'     => 'Illuminate\Contracts\Queue\Queue',
-            'redirect'             => 'Illuminate\Routing\Redirector',
+            'redirect'             => ['Illuminate\Routing\Redirector', 'Illuminate\Contracts\Routing\Redirector'],
             'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
             'request'              => ['Illuminate\Http\Request', 'Symfony\Component\HttpFoundation\Request'],
             'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],

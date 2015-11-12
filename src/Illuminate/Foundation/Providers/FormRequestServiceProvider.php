@@ -31,7 +31,7 @@ class FormRequestServiceProvider extends ServiceProvider
                 $this->initializeRequest($request, $app['request']);
 
                 $request->setContainer($app)
-                        ->setRedirector($app['Illuminate\Routing\Redirector']);
+                        ->setRedirector($app['Illuminate\Contracts\Routing\Redirector']);
             });
         });
     }
