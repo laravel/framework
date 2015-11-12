@@ -31,7 +31,7 @@ class SimpleBootstrapThreePresenter extends BootstrapThreePresenter
     /**
      * Convert the URL window into Bootstrap HTML.
      *
-     * @return \Illuminate\View\Expression
+     * @return \Illuminate\Support\HtmlString
      */
     public function render()
     {
