@@ -472,6 +472,17 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['d'], $data->every(4, 3)->all());
     }
 
+    public function testExcept()
+    {
+        $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertEquals(['first' => 'Taylor'], $data->except(['last', 'email', 'missing'])->all());
+        $this->assertEquals(['first' => 'Taylor'], $data->except('last', 'email', 'missing')->all());
+
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(['last'])->all());
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
+    }
+
     public function testPluckWithArrayAndObjectValues()
     {
         $data = new Collection([(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
@@ -892,6 +903,17 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection();
         $this->assertNull($c->min());
+    }
+
+    public function testOnly()
+    {
+        $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertEquals(['first' => 'Taylor'], $data->only(['first', 'missing'])->all());
+        $this->assertEquals(['first' => 'Taylor'], $data->only('first', 'missing')->all());
+
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(['first', 'email'])->all());
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only('first', 'email')->all());
     }
 
     public function testGettingAvgItemsFromCollection()
