@@ -465,6 +465,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Render the contents of the paginator to HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return (string) $this->render();
+    }
+
+    /**
      * Make dynamic calls into the collection.
      *
      * @param  string  $method
@@ -482,16 +492,6 @@ abstract class AbstractPaginator implements Htmlable
      * @return string
      */
     public function __toString()
-    {
-        return (string) $this->render();
-    }
-
-    /**
-     * Render the contents of the paginator to HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
     {
         return (string) $this->render();
     }
