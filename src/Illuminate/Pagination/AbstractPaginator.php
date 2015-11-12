@@ -493,6 +493,6 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function toHtml()
     {
-        return (string) $this->__toString();
+        return (string) $this->render();
     }
 }
