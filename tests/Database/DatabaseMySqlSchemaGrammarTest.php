@@ -2,12 +2,38 @@
 
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Database\Schema\Grammars\MySqlLegacyGrammar;
 
 class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
         m::close();
+    }
+
+    public function testGrammarVersionResolving()
+    {
+        $new = MySqlGrammar::class;
+        $legacy = MySqlLegacyGrammar::class;
+
+        $pdo = m::mock(PDO::class);
+        $conn = new Illuminate\Database\MySqlConnection($pdo);
+
+        $versions = [
+            '5.7.1' => $new,
+            '5.6.0' => $legacy,
+            '5.6.19-0ubuntu0.14.04.1' => $legacy,
+            '5.5.44-MariaDB' => $legacy,
+            '10.0.2-MariaDB' => $legacy,
+            'Drizzle Ver 7.2.3 for ubuntu-linux' => $legacy,
+        ];
+
+        foreach ($versions as $version => $grammar) {
+            $pdo->shouldReceive('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->once()->andReturn($version);
+            $conn->useDefaultSchemaGrammar();
+            $this->assertEquals($grammar, get_class($conn->getSchemaGrammar()));
+        }
     }
 
     public function testBasicCreateTable()
@@ -485,7 +511,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` json not null', $statements[0]);
     }
 
     public function testAddingJsonb()
@@ -493,6 +519,23 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $blueprint = new Blueprint('users');
         $blueprint->jsonb('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` json not null', $statements[0]);
+    }
+
+    public function testAddingJsonLegacy()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->json('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getLegacyGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->jsonb('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getLegacyGrammar());
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
@@ -645,6 +688,11 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
     public function getGrammar()
     {
-        return new Illuminate\Database\Schema\Grammars\MySqlGrammar;
+        return new MySqlGrammar;
+    }
+
+    public function getLegacyGrammar()
+    {
+        return new MySqlLegacyGrammar;
     }
 }
