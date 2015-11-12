@@ -80,7 +80,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will
         // need to establish the PDO connections and return them back for use.
-        extract($config);
+        $host = $database = $port = $sslmode = null;
+        extract($config, EXTR_IF_EXISTS);
 
         $host = isset($host) ? "host={$host};" : '';
 
@@ -89,11 +90,11 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
-        if (isset($config['port'])) {
+        if (isset($port)) {
             $dsn .= ";port={$port}";
         }
 
-        if (isset($config['sslmode'])) {
+        if (isset($sslmode)) {
             $dsn .= ";sslmode={$sslmode}";
         }
 
