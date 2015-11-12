@@ -62,7 +62,6 @@ class VerifyCsrfToken
     protected function shouldPassThrough($request)
     {
         foreach ($this->except as $except) {
-
             if ($except !== '/') {
                 $except = trim($except, '/');
             }
