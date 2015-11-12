@@ -167,7 +167,14 @@ class UrlGenerator implements UrlGeneratorContract
         // for passing the array of parameters to this URL as a list of segments.
         $root = $this->getRootUrl($scheme);
 
-        return $this->trimUrl($root, $path, $tail);
+        if (($queryStart = strpos($path, '?')) !== false) {
+            $query = mb_substr($path, $queryStart);
+            $path = mb_substr($path, 0, $queryStart);
+        } else {
+            $query = null;
+        }
+
+        return $this->trimUrl($root, $path, $tail).$query;
     }
 
     /**

@@ -15,6 +15,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
         $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar', [], true));
         $this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
+        $this->assertEquals('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
 
         /*
          * Test HTTPS request URL generation...
