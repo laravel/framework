@@ -78,7 +78,7 @@ class StatusCommand extends BaseCommand
     /**
      * Get all of the migration files.
      *
-     * @param string  $path
+     * @param  string  $path
      * @return array
      */
     protected function getAllMigrationFiles($path)
