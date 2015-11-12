@@ -18,7 +18,7 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "classpreloader/classpreloader": "~2.0|~3.0",
+        "classpreloader/classpreloader": "~3.0",
         "danielstjules/stringy": "~2.1",
         "doctrine/inflector": "~1.0",
         "jeremeamia/superclosure": "~2.0",

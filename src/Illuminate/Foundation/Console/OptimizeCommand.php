@@ -2,18 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
-use PhpParser\Lexer;
-use PhpParser\Parser;
 use ClassPreloader\Factory;
 use Illuminate\Console\Command;
-use ClassPreloader\ClassPreloader;
 use Illuminate\Foundation\Composer;
-use ClassPreloader\Parser\DirVisitor;
-use ClassPreloader\Parser\FileVisitor;
-use ClassPreloader\Parser\NodeTraverser;
-use ClassPreloader\Exceptions\SkipFileException;
 use Symfony\Component\Console\Input\InputOption;
-use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
 use ClassPreloader\Exceptions\VisitorExceptionInterface;
 
 class OptimizeCommand extends Command
@@ -82,40 +74,19 @@ class OptimizeCommand extends Command
      */
     protected function compileClasses()
     {
-        $preloader = $this->getClassPreloader();
+        $preloader = (new Factory)->create(['skip' => true]);
 
         $handle = $preloader->prepareOutput($this->laravel->getCachedCompilePath());
 
         foreach ($this->getClassFiles() as $file) {
             try {
                 fwrite($handle, $preloader->getCode($file, false)."\n");
-            } catch (SkipFileException $ex) {
-                // Class Preloader 2.x
             } catch (VisitorExceptionInterface $e) {
-                // Class Preloader 3.x
+                //
             }
         }
 
         fclose($handle);
-    }
-
-    /**
-     * Get the class preloader used by the command.
-     *
-     * @return \ClassPreloader\ClassPreloader
-     */
-    protected function getClassPreloader()
-    {
-        // Class Preloader 3.x
-        if (class_exists(Factory::class)) {
-            return (new Factory)->create(['skip' => true]);
-        }
-
-        $traverser = new NodeTraverser;
-        $traverser->addVisitor(new DirVisitor(true));
-        $traverser->addVisitor(new FileVisitor(true));
-
-        return new ClassPreloader(new PrettyPrinter, new Parser(new Lexer), $traverser);
     }
 
     /**
