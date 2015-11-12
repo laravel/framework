@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Connectors;
 
-class MySqlConnector extends Connector implements ConnectorInterface
+class MySqlConnector extends Connector
 {
     /**
      * Establish a database connection.

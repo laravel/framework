@@ -218,7 +218,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__test.builder']);
         $builder = new Illuminate\Database\Eloquent\Builder(new Illuminate\Database\Query\Builder(
-            m::mock('Illuminate\Database\ConnectionInterface'),
+            m::mock('Illuminate\Contracts\Database\Connection'),
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
         ));
@@ -499,8 +499,8 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $grammar = new $grammarClass;
         $processor = new $processorClass;
-        $connection = m::mock('Illuminate\Database\ConnectionInterface', ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
-        $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface', ['connection' => $connection]);
+        $connection = m::mock('Illuminate\Contracts\Database\Connection', ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $resolver = m::mock('Illuminate\Contracts\Database\ConnectionResolver', ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
     }

@@ -5,7 +5,7 @@ namespace Illuminate\Database\Migrations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Contracts\Database\ConnectionResolver as Resolver;
 
 class Migrator
 {
@@ -26,7 +26,7 @@ class Migrator
     /**
      * The connection resolver instance.
      *
-     * @var \Illuminate\Database\ConnectionResolverInterface
+     * @var \Illuminate\Contracts\Database\ConnectionResolver
      */
     protected $resolver;
 
@@ -48,7 +48,7 @@ class Migrator
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+     * @param  \Illuminate\Contracts\Database\ConnectionResolver  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */

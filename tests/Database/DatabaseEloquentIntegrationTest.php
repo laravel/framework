@@ -596,7 +596,7 @@ class EloquentTestPhoto extends Eloquent
 /**
  * Connection Resolver.
  */
-class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
+class DatabaseIntegrationTestConnectionResolver implements Illuminate\Contracts\Database\ConnectionResolver
 {
     protected $connection;
 

@@ -4,16 +4,16 @@ namespace Illuminate\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
 class DatabaseUserProvider implements UserProvider
 {
     /**
      * The active database connection.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $conn;
 
@@ -34,12 +34,12 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $conn
+     * @param  \Illuminate\Contracts\Database\Connection  $conn
      * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $table
      * @return void
      */
-    public function __construct(ConnectionInterface $conn, HasherContract $hasher, $table)
+    public function __construct(ConnectionContract $conn, HasherContract $hasher, $table)
     {
         $this->conn = $conn;
         $this->table = $table;

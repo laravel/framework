@@ -50,6 +50,11 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->app->singleton('db', function ($app) {
             return new DatabaseManager($app, $app['db.factory']);
         });
+
+        // The default database connection
+        $this->app->singleton('db.connection', function ($app) {
+            return $app['db']->connection();
+        });
     }
 
     /**

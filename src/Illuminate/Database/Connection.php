@@ -17,8 +17,9 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
-class Connection implements ConnectionInterface
+class Connection implements ConnectionContract
 {
     use DetectsLostConnections;
 
@@ -179,7 +180,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Query\Grammars\Grammar
      */
-    protected function getDefaultQueryGrammar()
+    public function getDefaultQueryGrammar()
     {
         return new QueryGrammar;
     }
@@ -199,7 +200,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Schema\Grammars\Grammar
      */
-    protected function getDefaultSchemaGrammar()
+    public function getDefaultSchemaGrammar()
     {
         //
     }
@@ -219,7 +220,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Query\Processors\Processor
      */
-    protected function getDefaultPostProcessor()
+    public function getDefaultPostProcessor()
     {
         return new Processor;
     }
@@ -330,7 +331,7 @@ class Connection implements ConnectionInterface
      * @param  bool  $useReadPdo
      * @return \PDO
      */
-    protected function getPdoForSelect($useReadPdo = true)
+    public function getPdoForSelect($useReadPdo = true)
     {
         return $useReadPdo ? $this->getReadPdo() : $this->getPdo();
     }
@@ -598,7 +599,7 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function run($query, $bindings, Closure $callback)
+    public function run($query, $bindings, Closure $callback)
     {
         $this->reconnectIfMissingConnection();
 
@@ -635,7 +636,7 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function runQueryCallback($query, $bindings, Closure $callback)
+    public function runQueryCallback($query, $bindings, Closure $callback)
     {
         // To execute the statement, we'll simply call the callback, which will actually
         // run the SQL against the PDO connection. Then we can calculate the time it
@@ -756,7 +757,7 @@ class Connection implements ConnectionInterface
      * @param  string  $event
      * @return void
      */
-    protected function fireConnectionEvent($event)
+    public function fireConnectionEvent($event)
     {
         if (! isset($this->events)) {
             return;
@@ -778,7 +779,7 @@ class Connection implements ConnectionInterface
      * @param  int    $start
      * @return float
      */
-    protected function getElapsedTime($start)
+    public function getElapsedTime($start)
     {
         return round((microtime(true) - $start) * 1000, 2);
     }

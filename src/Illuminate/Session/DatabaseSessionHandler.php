@@ -4,15 +4,15 @@ namespace Illuminate\Session;
 
 use SessionHandlerInterface;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $connection;
 
@@ -40,12 +40,12 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Create a new database session handler instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Contracts\Database\Connection  $connection
      * @param  string  $table
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table, Container $container = null)
+    public function __construct(ConnectionContract $connection, $table, Container $container = null)
     {
         $this->table = $table;
         $this->container = $container;

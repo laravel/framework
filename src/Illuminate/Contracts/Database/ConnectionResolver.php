@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Database;
+namespace Illuminate\Contracts\Database;
 
-interface ConnectionResolverInterface
+interface ConnectionResolver
 {
     /**
      * Get a database connection instance.
      *
      * @param  string  $name
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Contracts\Database\Connection
      */
     public function connection($name = null);
 

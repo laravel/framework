@@ -53,7 +53,7 @@ class ConnectionFactory
      * Create a single database connection instance.
      *
      * @param  array  $config
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Contracts\Database\Connection
      */
     protected function createSingleConnection(array $config)
     {
@@ -66,7 +66,7 @@ class ConnectionFactory
      * Create a single database connection instance.
      *
      * @param  array  $config
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Contracts\Database\Connection
      */
     protected function createReadWriteConnection(array $config)
     {
@@ -164,7 +164,7 @@ class ConnectionFactory
      * Create a connector instance based on the configuration.
      *
      * @param  array  $config
-     * @return \Illuminate\Database\Connectors\ConnectorInterface
+     * @return \Illuminate\Contracts\Database\Connector
      *
      * @throws \InvalidArgumentException
      */
@@ -203,7 +203,7 @@ class ConnectionFactory
      * @param  string   $database
      * @param  string   $prefix
      * @param  array    $config
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Contracts\Database\Connection
      *
      * @throws \InvalidArgumentException
      */

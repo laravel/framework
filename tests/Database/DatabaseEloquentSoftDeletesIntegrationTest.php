@@ -171,7 +171,7 @@ class SoftDeletesTestUser extends Eloquent
 /**
  * Connection Resolver.
  */
-class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
+class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate\Contracts\Database\ConnectionResolver
 {
     protected $connection;
 

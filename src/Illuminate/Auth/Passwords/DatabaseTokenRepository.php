@@ -4,7 +4,7 @@ namespace Illuminate\Auth\Passwords;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Contracts\Database\Connection as ConnectionContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
@@ -12,7 +12,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\ConnectionInterface
+     * @var \Illuminate\Contracts\Database\Connection
      */
     protected $connection;
 
@@ -40,13 +40,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Create a new token repository instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Contracts\Database\Connection  $connection
      * @param  string  $table
      * @param  string  $hashKey
      * @param  int  $expires
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table, $hashKey, $expires = 60)
+    public function __construct(ConnectionContract $connection, $table, $hashKey, $expires = 60)
     {
         $this->table = $table;
         $this->hashKey = $hashKey;
@@ -184,7 +184,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Get the database connection instance.
      *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Contracts\Database\Connection
      */
     public function getConnection()
     {
