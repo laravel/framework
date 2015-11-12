@@ -227,7 +227,7 @@ class Writer implements LogContract, PsrLoggerInterface
     public function useDailyFiles($path, $days = 0, $level = 'debug')
     {
         $this->monolog->pushHandler(
-            $handler = new RotatingFileHandler($path, $days, $this->parseLevel($level))
+            $handler = new RotatingFileHandler($path, $days, $this->parseLevel($level), true, 0777)
         );
 
         $handler->setFormatter($this->getDefaultFormatter());
