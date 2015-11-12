@@ -451,7 +451,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
-        return 'text';
+        return 'json';
     }
 
     /**
@@ -462,7 +462,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'text';
+        return 'json';
     }
 
     /**

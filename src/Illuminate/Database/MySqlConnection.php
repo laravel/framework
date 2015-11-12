@@ -2,11 +2,13 @@
 
 namespace Illuminate\Database;
 
+use PDO;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
+use Illuminate\Database\Schema\Grammars\MySqlLegacyGrammar as LegacySchemaGrammar;
 
 class MySqlConnection extends Connection
 {
@@ -41,6 +43,16 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
+        $version = strtolower($this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION));
+
+        if (
+            version_compare($version, '5.7.0', 'lt') ||
+            strpos($version, 'maria') !== false ||
+            strpos($version, 'drizzle') !== false
+        ) {
+            return $this->withTablePrefix(new LegacySchemaGrammar());
+        }
+
         return $this->withTablePrefix(new SchemaGrammar);
     }
 
