@@ -603,7 +603,8 @@ class Guard implements GuardContract
     }
 
     /**
-     * Discards remember token for the user.
+     * Discard "remember me" token for the user.
+     *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
