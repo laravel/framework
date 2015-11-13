@@ -189,11 +189,7 @@ trait MakesHttpRequests
      */
     protected function receiveJson($data = null)
     {
-        $this->seeJson();
-
-        if (! is_null($data)) {
-            return $this->seeJson($data);
-        }
+        return $this->seeJson($data);
     }
 
     /**
