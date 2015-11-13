@@ -3,6 +3,7 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\StringBuffer;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -360,6 +361,19 @@ if (! function_exists('class_uses_recursive')) {
         }
 
         return array_unique($results);
+    }
+}
+
+if (! function_exists('str')) {
+    /**
+     * Create a string buffer from the given value.
+     *
+     * @param  mixed $value
+     * @return \Illuminate\Support\StringBuffer
+     */
+    function str($value)
+    {
+        return new StringBuffer($value);
     }
 }
 
