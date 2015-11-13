@@ -77,7 +77,8 @@
         "mockery/mockery": "~0.9.2",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~4.0",
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.0",
+        "symfony/dom-crawler": "2.8.*|3.0.*"
     },
     "autoload": {
         "classmap": [
