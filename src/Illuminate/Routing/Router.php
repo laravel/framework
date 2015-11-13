@@ -329,7 +329,7 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Register the typical authenticatino routes for an application.
+     * Register the typical authentication routes for an application.
      *
      * @return void
      */
