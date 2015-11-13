@@ -360,10 +360,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.bar.com/');
-        $this->assertEquals('http://www.bar.com/', $url->previous());
+        $this->assertEquals('http://www.bar.com/', (string) $url->previous());
 
         $url->getRequest()->headers->remove('referer');
-        $this->assertEquals($url->to('/'), $url->previous());
+
+        $this->assertEquals((string) $url->to('/'), (string) $url->previous());
     }
 }
 

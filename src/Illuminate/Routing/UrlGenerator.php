@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use League\Uri\Schemes\Http as HttpUri;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
@@ -107,11 +108,11 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the full URL for the current request.
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function full()
     {
-        return $this->request->fullUrl();
+        return $this->createUriObject($this->request->fullUrl());
     }
 
     /**
@@ -127,7 +128,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL for the previous request.
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function previous()
     {
@@ -135,7 +136,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        return $url ?: $this->to('/');
+        return $url ? $this->createUriObject($url) : $this->to('/');
     }
 
     /**
@@ -168,7 +169,7 @@ class UrlGenerator implements UrlGeneratorContract
         // for passing the array of parameters to this URL as a list of segments.
         $root = $this->getRootUrl($scheme);
 
-        return $this->trimUrl($root, $path, $tail);
+        return $this->createUriObject($this->trimUrl($root, $path, $tail));
     }
 
     /**
@@ -176,7 +177,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $path
      * @param  array   $parameters
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function secure($path, $parameters = [])
     {
@@ -188,7 +189,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $path
      * @param  bool|null  $secure
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function asset($path, $secure = null)
     {
@@ -201,7 +202,7 @@ class UrlGenerator implements UrlGeneratorContract
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->getRootUrl($this->getScheme($secure));
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        return $this->createUriObject($this->removeIndex($root).'/'.trim($path, '/'));
     }
 
     /**
@@ -210,7 +211,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $root
      * @param  string  $path
      * @param  bool|null  $secure
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function assetFrom($root, $path, $secure = null)
     {
@@ -219,7 +220,7 @@ class UrlGenerator implements UrlGeneratorContract
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->getRootUrl($this->getScheme($secure), $root);
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        return $this->createUriObject($this->removeIndex($root).'/'.trim($path, '/'));
     }
 
     /**
@@ -239,7 +240,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Generate a URL to a secure asset.
      *
      * @param  string  $path
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     public function secureAsset($path)
     {
@@ -284,7 +285,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $name
      * @param  mixed   $parameters
      * @param  bool  $absolute
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      *
      * @throws \InvalidArgumentException
      */
@@ -303,7 +304,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \Illuminate\Routing\Route  $route
      * @param  mixed  $parameters
      * @param  bool   $absolute
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
     protected function toRoute($route, $parameters, $absolute)
     {
@@ -322,7 +323,9 @@ class UrlGenerator implements UrlGeneratorContract
 
         $uri = strtr(urlencode($uri), $this->dontEncode);
 
-        return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
+        $uri = $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
+
+        return $this->createUriObject($uri);
     }
 
     /**
@@ -647,6 +650,17 @@ class UrlGenerator implements UrlGeneratorContract
     protected function trimUrl($root, $path, $tail = '')
     {
         return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
+    }
+
+    /**
+     * Create Uri object from string.
+     *
+     * @param  string  $uri
+     * @return \Psr\Http\Message\UriInterface
+     */
+    protected function createUriObject($uri)
+    {
+        return HttpUri::createFromString($uri);
     }
 
     /**
