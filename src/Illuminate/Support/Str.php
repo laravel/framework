@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use RuntimeException;
 use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
