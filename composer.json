@@ -30,9 +30,7 @@
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "2.8.*|3.0.*",
-        "symfony/css-selector": "2.8.*|3.0.*",
         "symfony/debug": "2.8.*|3.0.*",
-        "symfony/dom-crawler": "2.8.*|3.0.*",
         "symfony/finder": "2.8.*|3.0.*",
         "symfony/http-foundation": "2.8.*|3.0.*",
         "symfony/http-kernel": "2.8.*|3.0.*",
@@ -108,7 +106,9 @@
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (2.8.*|3.0.*).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (2.8.*|3.0.*)."
     },
     "minimum-stability": "dev"
 }
