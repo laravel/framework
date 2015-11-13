@@ -609,11 +609,9 @@ class Guard implements GuardContract
      */
     protected function discardRememberToken(UserContract $user)
     {
-        if (! empty($user->getRememberToken())) {
-            // Calls updateRememberToken on UserProvider contract as stated in Authentication documentation
-            $this->provider->updateRememberToken($user, null);
-            $user->setRememberToken(null);
-        }
+        // Calls updateRememberToken on UserProvider contract as stated in Authentication documentation
+        $this->provider->updateRememberToken($user, null);
+        $user->setRememberToken(null);
     }
 
     /**
