@@ -548,9 +548,7 @@ class Guard implements GuardContract
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user)) {
-            $this->refreshRememberToken($user);
-        }
+        $this->discardRememberToken($user);
 
         if (isset($this->events)) {
             $this->events->fire(new Events\Logout($user));
@@ -602,6 +600,19 @@ class Guard implements GuardContract
         if (empty($user->getRememberToken())) {
             $this->refreshRememberToken($user);
         }
+    }
+
+    /**
+     * Discard "remember me" token for the user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    protected function discardRememberToken(UserContract $user)
+    {
+        // Calls updateRememberToken on UserProvider contract with null $token
+        $this->provider->updateRememberToken($user, null);
+        $user->setRememberToken(null);
     }
 
     /**
