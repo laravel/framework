@@ -1361,11 +1361,17 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        if (is_null($this->columns)) {
+        $original = $this->columns;
+
+        if (is_null($original)) {
             $this->columns = $columns;
         }
 
-        return $this->processor->processSelect($this, $this->runSelect());
+        $results = $this->processor->processSelect($this, $this->runSelect());
+
+        $this->columns = $original;
+
+        return $results;
     }
 
     /**

@@ -18,6 +18,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users"', $builder->toSql());
     }
 
+    public function testBasicSelectWithGetColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select * from "users"', $sql);
+        });
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "foo", "bar" from "users"', $sql);
+        });
+
+        $builder->from('users')->get();
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get(['foo', 'bar']);
+        $this->assertNull($builder->columns);
+
+        $this->assertEquals('select * from "users"', $builder->toSql());
+        $this->assertNull($builder->columns);
+    }
+
     public function testBasicSelectUseWritePdo()
     {
         $builder = $this->getMySqlBuilderWithProcessor();
