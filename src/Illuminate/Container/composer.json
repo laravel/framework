@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/contracts": "5.2.*"
+        "illuminate/contracts": "5.3.*"
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +24,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.2-dev"
+            "dev-master": "5.3-dev"
         }
     },
     "minimum-stability": "dev"
