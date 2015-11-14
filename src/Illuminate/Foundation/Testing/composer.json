@@ -17,8 +17,8 @@
         "php": ">=5.5.9",
         "illuminate/contracts": "5.2.*",
         "illuminate/http": "5.2.*",
-        "symfony/css-selector": "3.0.*",
-        "symfony/dom-crawler": "3.0.*"
+        "symfony/css-selector": "2.8.*|3.0.*",
+        "symfony/dom-crawler": "2.8.*|3.0.*"
     },
     "autoload": {
         "psr-4": {
