@@ -28,20 +28,40 @@ class RetryCommand extends Command
      */
     public function fire()
     {
-        $failed = $this->laravel['queue.failer']->find($this->argument('id'));
+        $ids = $this->argument('id');
+
+        if (count($ids) === 1 && $ids[0] === 'all') {
+            $ids = collect($this->laravel['queue.failer']->all())->pluck('id')->all();
+        }
+
+        foreach ($ids as $id) {
+            $this->retryJob($id);
+        }
+    }
+
+    /**
+     * Retry the queue job with the given ID.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    protected function retryJob($id)
+    {
+        $failed = $this->laravel['queue.failer']->find($id);
 
         if (! is_null($failed)) {
             $failed = (object) $failed;
 
             $failed->payload = $this->resetAttempts($failed->payload);
 
-            $this->laravel['queue']->connection($failed->connection)->pushRaw($failed->payload, $failed->queue);
+            $this->laravel['queue']->connection($failed->connection)
+                                ->pushRaw($failed->payload, $failed->queue);
 
             $this->laravel['queue.failer']->forget($failed->id);
 
-            $this->info('The failed job has been pushed back onto the queue!');
+            $this->info('The failed job [{$id}] has been pushed back onto the queue!');
         } else {
-            $this->error('No failed job matches the given ID.');
+            $this->error('No failed job matches the given ID [{$id}].');
         }
     }
 
@@ -70,7 +90,7 @@ class RetryCommand extends Command
     protected function getArguments()
     {
         return [
-            ['id', InputArgument::REQUIRED, 'The ID of the failed job'],
+            ['id', InputArgument::IS_ARRAY, 'The ID of the failed job'],
         ];
     }
 }
