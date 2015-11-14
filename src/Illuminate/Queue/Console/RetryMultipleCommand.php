@@ -28,7 +28,7 @@ class RetryMultipleCommand extends Command
      */
     public function handle()
     {
-        collect($this->argument('ids'))->each(function($id) {
+        collect($this->argument('ids'))->each(function ($id) {
             $this->call('queue:retry', ['id' => $id]);
         });
     }
@@ -43,7 +43,8 @@ class RetryMultipleCommand extends Command
         return [[
             'ids',
             InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-            'IDs of the failed-jobs you would like released (separate multiple ids with a space).'],
+            'IDs of the failed-jobs you would like released (separate multiple ids with a space).', ],
         ];
     }
+
 }
