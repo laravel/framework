@@ -77,7 +77,7 @@ class ConsoleServiceProvider extends ServiceProvider
         return [
             'command.queue.table', 'command.queue.failed', 'command.queue.retry',
             'command.queue.retry-all', 'command.queue.forget', 'command.queue.flush',
-            'command.queue.failed-table', 'command.queue.retry-multiple'
+            'command.queue.failed-table', 'command.queue.retry-multiple',
         ];
     }
 }

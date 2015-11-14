@@ -37,11 +37,12 @@ class RetryAllCommand extends Command
         $failed = $this->laravel['queue.failer']->all();
 
         if (! empty($failed)) {
-            collect($failed)->each(function($value) {
+            collect($failed)->each(function ($value) {
                 $this->call('queue:retry', ['id' => $value->id]);
             });
         } else {
             $this->error('No failed jobs.');
         }
     }
+
 }
