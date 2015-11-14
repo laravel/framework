@@ -35,7 +35,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
     public function testPaginatorCanGenerateUrls()
     {
-        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/', 'pageName' => 'foo']);
 
         $this->assertEquals('http://website.com?foo=2', $p->url($p->currentPage()));
         $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 1));
