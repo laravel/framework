@@ -44,5 +44,4 @@ class RetryAllCommand extends Command
             $this->error('No failed jobs.');
         }
     }
-
 }

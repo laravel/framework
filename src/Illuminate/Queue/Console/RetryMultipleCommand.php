@@ -46,5 +46,4 @@ class RetryMultipleCommand extends Command
             'IDs of the failed-jobs you would like released (separate multiple ids with a space).', ],
         ];
     }
-
 }
