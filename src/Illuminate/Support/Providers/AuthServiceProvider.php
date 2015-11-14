@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Foundation\Support\Providers;
+namespace Illuminate\Support\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -20,7 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function registerPolicies(GateContract $gate)
+    public function registerPolicies(Gate $gate)
     {
         foreach ($this->policies as $key => $value) {
             $gate->policy($key, $value);

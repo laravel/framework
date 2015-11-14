@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Foundation\Support\Providers;
+namespace Illuminate\Support\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -27,7 +27,7 @@ class EventServiceProvider extends ServiceProvider
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
-    public function boot(DispatcherContract $events)
+    public function boot(Dispatcher $events)
     {
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
