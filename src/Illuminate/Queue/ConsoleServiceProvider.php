@@ -5,12 +5,10 @@ namespace Illuminate\Queue;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\RetryCommand;
-use Illuminate\Queue\Console\RetryAllCommand;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Console\FlushFailedCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
-use Illuminate\Queue\Console\RetryMultipleCommand;
 
 class ConsoleServiceProvider extends ServiceProvider
 {
@@ -40,10 +38,6 @@ class ConsoleServiceProvider extends ServiceProvider
             return new RetryCommand;
         });
 
-        $this->app->singleton('command.queue.retry-all', function () {
-            return new RetryAllCommand;
-        });
-
         $this->app->singleton('command.queue.forget', function () {
             return new ForgetFailedCommand;
         });
@@ -52,18 +46,13 @@ class ConsoleServiceProvider extends ServiceProvider
             return new FlushFailedCommand;
         });
 
-        $this->app->singleton('command.queue.retry-multiple', function () {
-            return new RetryMultipleCommand;
-        });
-
         $this->app->singleton('command.queue.failed-table', function ($app) {
             return new FailedTableCommand($app['files'], $app['composer']);
         });
 
         $this->commands(
             'command.queue.table', 'command.queue.failed', 'command.queue.retry',
-            'command.queue.retry-all', 'command.queue.forget', 'command.queue.flush',
-            'command.queue.failed-table', 'command.queue.retry-multiple'
+            'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table'
         );
     }
 
@@ -76,8 +65,7 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         return [
             'command.queue.table', 'command.queue.failed', 'command.queue.retry',
-            'command.queue.retry-all', 'command.queue.forget', 'command.queue.flush',
-            'command.queue.failed-table', 'command.queue.retry-multiple',
+            'command.queue.forget', 'command.queue.flush', 'command.queue.failed-table',
         ];
     }
 }
