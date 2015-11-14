@@ -175,9 +175,6 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         ], $p->toArray());
     }
 
-    /**
-     * This test is useful when integrating with illuminate/database
-     */
     public function testPaginatorDontMainipulateUrlIssue10909()
     {
         Paginator::currentPageResolver(function ($pageName) {
