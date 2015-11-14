@@ -240,7 +240,7 @@ trait MakesHttpRequests
     {
         return $this->seeJson($data, true);
     }
-    
+
     /**
      * Assert that the json response has a certain structure.
      *
