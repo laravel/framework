@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Foundation\Providers\FormRequestServiceProvider;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -12,6 +13,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * @var array
      */
     protected $providers = [
-        'Illuminate\Foundation\Providers\FormRequestServiceProvider',
+        FormRequestServiceProvider::class,
     ];
 }
