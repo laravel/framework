@@ -211,8 +211,6 @@ class FileStore implements Store
     {
         $time = time() + ($minutes * 60);
 
-        // If the minutes are zero or the calculated expiration is longer than
-        // 10 digits we return an expiration way in the future (Sat, 20 Nov 2286).
         if ($minutes === 0 || $time > 9999999999) {
             return 9999999999;
         }
