@@ -36,8 +36,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         }
 
         $this->perPage = $perPage;
-        $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = empty($this->path) ? '/' : $this->path;
+        $this->currentPage = $this->setCurrentPage($currentPage);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
 
         $this->checkForMorePages();
