@@ -35,7 +35,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 
     public function testPaginatorCanGenerateUrls()
     {
-        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/', 'pageName' => 'foo']);
 
         $this->assertEquals('http://website.com/?foo=2', $p->url($p->currentPage()));
         $this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 1));
@@ -173,5 +173,19 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
             'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
             'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4'],
         ], $p->toArray());
+    }
+
+    public function testPaginatorDontMainipulateUrlIssue10909()
+    {
+        Paginator::currentPageResolver(function ($pageName) {
+            return 2;
+        });
+        Paginator::currentPathResolver(function () {
+            return '/posts';
+        });
+
+        $p = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 2, Paginator::resolveCurrentPage(), ['path' => Paginator::resolveCurrentPath()]);
+        $this->assertEquals('/posts?page=2', $p->url($p->currentPage()));
+        $this->assertEquals('/posts?page=1', $p->url($p->currentPage() - 1));
     }
 }
