@@ -244,8 +244,8 @@ trait MakesHttpRequests
     /**
      * Assert that the json response has a certain structure.
      *
-     * @param array|null $structure
-     * @param array|null $responseData
+     * @param  array|null $structure
+     * @param  array|null $responseData
      * @return $this
      */
     public function seeJsonStructure(array $structure = null, $responseData = null)
