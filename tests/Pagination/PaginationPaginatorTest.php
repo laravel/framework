@@ -37,9 +37,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/', 'pageName' => 'foo']);
 
-        $this->assertEquals('http://website.com/?foo=2', $p->url($p->currentPage()));
-        $this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 1));
-        $this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 2));
+        $this->assertEquals('http://website.com?foo=2', $p->url($p->currentPage()));
+        $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 1));
+        $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 2));
     }
 
     public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
@@ -175,17 +175,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         ], $p->toArray());
     }
 
-    public function testPaginatorDontMainipulateUrlIssue10909()
+    public function testPaginatorRemovesTrailingSlashes()
     {
-        Paginator::currentPageResolver(function ($pageName) {
-            return 2;
-        });
-        Paginator::currentPathResolver(function () {
-            return '/posts';
-        });
-
-        $p = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 2, Paginator::resolveCurrentPage(), ['path' => Paginator::resolveCurrentPath()]);
-        $this->assertEquals('/posts?page=2', $p->url($p->currentPage()));
-        $this->assertEquals('/posts?page=1', $p->url($p->currentPage() - 1));
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
+        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+    }
+    public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 }
