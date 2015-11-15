@@ -214,22 +214,26 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$this->output.' 2>&1 &';
-        } else {
-            $command = $this->command.$redirect.$this->output.' 2>&1 &';
+            $this->cache->put($this->mutexName(), now());
+        }
+        
+        $command = $this->command.$redirect.$this->output.' 2>&1 &';
+        
+        if ($this->withoutOverlapping) {
+            $this->cache->forget($this->mutexName());
         }
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
     }
 
     /**
-     * Get the mutex path for the scheduled command.
+     * Get the mutex name for the scheduled command.
      *
      * @return string
      */
-    protected function mutexPath()
+    protected function mutexName()
     {
-        return storage_path('framework/schedule-'.md5($this->expression.$this->command));
+        return 'schedule-'.md5($this->expression.$this->command);
     }
 
     /**
@@ -620,7 +624,7 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->skip(function () {
-            return file_exists($this->mutexPath());
+            return $this->cache->has($this->mutexName());
         });
     }
 
