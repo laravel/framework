@@ -216,9 +216,9 @@ class Event
         if ($this->withoutOverlapping) {
             $this->cache->put($this->mutexName(), now());
         }
-        
+
         $command = $this->command.$redirect.$this->output.' 2>&1 &';
-        
+
         if ($this->withoutOverlapping) {
             $this->cache->forget($this->mutexName());
         }
