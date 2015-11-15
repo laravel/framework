@@ -151,10 +151,18 @@ class Event
      */
     public function run(Container $container)
     {
+        if ($this->withoutOverlapping) {
+            $this->cache->put($this->mutexName(), now());
+        }
+
         if (count($this->afterCallbacks) > 0 || count($this->beforeCallbacks) > 0) {
             $this->runCommandInForeground($container);
         } else {
             $this->runCommandInBackground();
+        }
+
+        if ($this->withoutOverlapping) {
+            $this->cache->forget($this->mutexName());
         }
     }
 
@@ -222,15 +230,7 @@ class Event
     {
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
-        if ($this->withoutOverlapping) {
-            $this->cache->put($this->mutexName(), now());
-        }
-
         $command = $this->command.$redirect.$this->output.' 2>&1 &';
-
-        if ($this->withoutOverlapping) {
-            $this->cache->forget($this->mutexName());
-        }
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
     }
