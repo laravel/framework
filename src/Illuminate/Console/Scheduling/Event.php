@@ -11,6 +11,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
