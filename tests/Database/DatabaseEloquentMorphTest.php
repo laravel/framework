@@ -212,6 +212,8 @@ class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase
 
     protected function getNamespacedRelation($alias)
     {
+        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+
         Relation::morphMap([
             $alias => 'Foo\Bar\EloquentModelNamespacedStub',
         ]);
