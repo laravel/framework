@@ -41,6 +41,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
+            $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->string('role')->default('standard');
             $table->timestamps();
@@ -181,16 +182,17 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testPluckWithJoin()
     {
-        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        $user1 = EloquentTestUser::create(['id' => 1, 'name' => 'Taylor', 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'name' => 'Abigail', 'email' => 'abigailotwell@gmail.com']);
 
         $user2->posts()->create(['id' => 1, 'name' => 'First post']);
         $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
 
         $query = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id');
 
-        $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('name', 'posts.id')->all());
-        $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('name', 'users.id')->all());
+        $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('posts.name', 'posts.id')->all());
+        $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('posts.name', 'users.id')->all());
+        $this->assertEquals(['Abigail' => 'First post', 'Taylor' => 'Second post'], $query->pluck('posts.name', 'users.name as user_name')->all());
     }
 
     public function testFindOrFail()

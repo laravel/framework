@@ -1562,14 +1562,14 @@ class Builder
     }
 
     /**
-     * Strip off the table name from a column identifier.
+     * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
      * @return string
      */
     protected function stripTable($column)
     {
-        return is_null($column) ? $column : last(explode('.', $column));
+        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
