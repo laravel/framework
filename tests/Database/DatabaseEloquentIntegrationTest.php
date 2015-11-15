@@ -179,6 +179,20 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
     }
 
+    public function testPluckWithJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user2->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+
+        $query = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id');
+
+        $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('name', 'posts.id')->all());
+        $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('name', 'users.id')->all());
+    }
+
     public function testFindOrFail()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
