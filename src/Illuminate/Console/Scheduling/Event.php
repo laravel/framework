@@ -62,7 +62,7 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
-    
+
     /**
      * Cache object used for $withoutOverlapping lock file.
      * 
