@@ -1537,7 +1537,7 @@ class Builder
      * Get an array with the values of a given column.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      */
     public function pluck($column, $key = null)
@@ -1551,7 +1551,7 @@ class Builder
      * Alias for the "pluck" method.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      *
      * @deprecated since version 5.2. Use the "pluck" method directly.
@@ -1565,7 +1565,7 @@ class Builder
      * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @return string
+     * @return string|null
      */
     protected function stripTable($column)
     {
