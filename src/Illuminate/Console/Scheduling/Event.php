@@ -65,10 +65,10 @@ class Event
 
     /**
      * Cache object used for $withoutOverlapping lock file.
-     * 
+     *
      * @var Illuminate\Contracts\Cache\Repository
      */
-    public $cache = null;
+    public $cache;
 
     /**
      * The array of filter callbacks.
@@ -125,11 +125,11 @@ class Event
      * @param  string  $command
      * @return void
      */
-    public function __construct($command)
+    public function __construct($command, Cache $cache)
     {
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
-        $this->cache = new Illuminate\Contracts\Cache\Repository;
+        $this->cache = $cache;
     }
 
     /**
