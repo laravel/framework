@@ -62,6 +62,13 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
+    
+    /**
+     * Cache object used for $withoutOverlapping lock file.
+     * 
+     * @var Illuminate\Contracts\Cache\Repository
+     */
+    public $cache = null;
 
     /**
      * The array of filter callbacks.
@@ -122,6 +129,7 @@ class Event
     {
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
+        $this->cache = new Illuminate\Contracts\Cache\Repository;
     }
 
     /**
