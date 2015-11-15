@@ -263,6 +263,8 @@ if (! function_exists('delete')) {
      * @param  string  $uri
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->delete() instead.
      */
     function delete($uri, $action)
     {
@@ -395,6 +397,8 @@ if (! function_exists('get')) {
      * @param  string  $uri
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->get() instead.
      */
     function get($uri, $action)
     {
@@ -468,6 +472,8 @@ if (! function_exists('patch')) {
      * @param  string  $uri
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->patch() instead.
      */
     function patch($uri, $action)
     {
@@ -497,6 +503,8 @@ if (! function_exists('post')) {
      * @param  string  $uri
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->post() instead.
      */
     function post($uri, $action)
     {
@@ -524,6 +532,8 @@ if (! function_exists('put')) {
      * @param  string  $uri
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->put() instead.
      */
     function put($uri, $action)
     {
@@ -577,6 +587,8 @@ if (! function_exists('resource')) {
      * @param  string  $controller
      * @param  array   $options
      * @return \Illuminate\Routing\Route
+     *
+     * @deprecated since version 5.2. Use router()->resource() instead.
      */
     function resource($name, $controller, array $options = [])
     {
@@ -618,6 +630,35 @@ if (! function_exists('route')) {
     function route($name, $parameters = [], $absolute = true, $route = null)
     {
         return app('url')->route($name, $parameters, $absolute, $route);
+    }
+}
+
+if (! function_exists('router')) {
+    /**
+     * Register a new route with the router.
+     *
+     * @param  string|null  $method
+     * @param  string|null  $uri
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route|\Illuminate\Routing\Router
+     * @return string
+     */
+    function router($method = null, $uri = null, $action = null)
+    {
+        $router = app('router');
+        if ($method) {
+            if (! in_array(strtoupper($method), $router->getVerbs())) {
+                throw new InvalidArgumentException('Method ['.$method.'] is invalid.');
+            }
+            if (empty($uri) || empty($action)) {
+                throw new BadFunctionCallException('Uri and Action are required to make a route');
+            }
+            $method = strtolower($method);
+
+            return $router->$method($uri, $action);
+        }
+
+        return $router;
     }
 }
 

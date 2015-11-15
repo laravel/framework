@@ -1138,4 +1138,14 @@ class Router implements RegistrarContract
     {
         return $this->patterns;
     }
+
+    /**
+     * Get available verbs.
+     *
+     * @return array
+     */
+    public function getVerbs()
+    {
+        return static::$verbs;
+    }
 }
