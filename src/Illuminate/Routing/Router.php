@@ -211,8 +211,6 @@ class Router implements RegistrarContract
      *
      * @param  array  $controllers
      * @return void
-     *
-     * @deprecated since version 5.1.
      */
     public function controllers(array $controllers)
     {
@@ -228,8 +226,6 @@ class Router implements RegistrarContract
      * @param  string  $controller
      * @param  array   $names
      * @return void
-     *
-     * @deprecated since version 5.1.
      */
     public function controller($uri, $controller, $names = [])
     {
@@ -265,8 +261,6 @@ class Router implements RegistrarContract
      * @param  string  $method
      * @param  array   $names
      * @return void
-     *
-     * @deprecated since version 5.1.
      */
     protected function registerInspected($route, $controller, $method, &$names)
     {
@@ -286,8 +280,6 @@ class Router implements RegistrarContract
      * @param  string  $controller
      * @param  string  $uri
      * @return void
-     *
-     * @deprecated since version 5.1.
      */
     protected function addFallthroughRoute($controller, $uri)
     {
