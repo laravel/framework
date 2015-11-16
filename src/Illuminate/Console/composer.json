@@ -17,7 +17,7 @@
         "php": ">=5.5.9",
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
-        "symfony/console": "3.1.*",
+        "symfony/console": "3.0.*",
         "nesbot/carbon": "~1.20"
     },
     "autoload": {
@@ -33,7 +33,7 @@
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the thenPing method on schedules (~6.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
-        "symfony/process": "Required to use scheduling component (3.1.*)."
+        "symfony/process": "Required to use scheduling component (3.0.*)."
     },
     "minimum-stability": "dev"
 }
