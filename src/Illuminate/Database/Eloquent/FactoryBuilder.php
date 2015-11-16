@@ -49,7 +49,6 @@ class FactoryBuilder
      * @param  string  $name
      * @param  array  $definitions
      * @param  \Faker\Generator  $faker
-     * @return void
      */
     public function __construct($class, $name, array $definitions, Faker $faker)
     {
