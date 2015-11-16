@@ -236,7 +236,7 @@ class Builder
      * Get an array with the values of a given column.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function lists($column, $key = null)
