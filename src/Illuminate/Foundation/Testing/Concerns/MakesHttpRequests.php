@@ -242,6 +242,37 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the json response has a certain structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function seeJsonStructure(array $structure = null, $responseData = null)
+    {
+        if (is_null($structure)) {
+            $this->assertJson(
+                $this->response->getContent(), "JSON was not returned from [{$this->currentUri}]."
+            );
+
+            return $this;
+        }
+
+        if (! $responseData) {
+            $responseData = json_decode($this->response->getContent(), true);
+        }
+
+        foreach ($structure as $key => $value) {
+            if (is_array($value)) {
+                $this->assertArrayHasKey($key, $responseData);
+                $this->seeJsonStructure($structure[$key], $responseData[$key]);
+            } else {
+                $this->assertArrayHasKey($value, $responseData);
+            }
+        }
+    }
+
+    /**
      * Assert that the response contains the given JSON.
      *
      * @param  array  $data
