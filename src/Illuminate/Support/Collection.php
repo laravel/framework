@@ -420,7 +420,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the values of a given key.
      *
      * @param  string  $value
-     * @param  string  $key
+     * @param  string|null  $key
      * @return static
      */
     public function pluck($value, $key = null)
@@ -432,7 +432,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Alias for the "pluck" method.
      *
      * @param  string  $value
-     * @param  string  $key
+     * @param  string|null  $key
      * @return static
      *
      * @deprecated since version 5.2. Use the "pluck" method directly.
