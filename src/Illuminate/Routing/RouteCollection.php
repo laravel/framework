@@ -149,7 +149,7 @@ class RouteCollection implements Countable, IteratorAggregate
             return $route->bind($request);
         }
 
-        // If no route was found, we will check if a matching is route is specified on
+        // If no route was found we will now check if a matching route is specified by
         // another HTTP verb. If it is we will need to throw a MethodNotAllowed and
         // inform the user agent of which HTTP verb it should use for this route.
         $others = $this->checkForAlternateVerbs($request);
