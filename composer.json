@@ -29,15 +29,15 @@
         "paragonie/random_compat": "~1.1",
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "3.1.*",
-        "symfony/debug": "3.1.*",
-        "symfony/finder": "3.1.*",
-        "symfony/http-foundation": "3.1.*",
-        "symfony/http-kernel": "3.1.*",
-        "symfony/process": "3.1.*",
-        "symfony/routing": "3.1.*",
-        "symfony/translation": "3.1.*",
-        "symfony/var-dumper": "3.1.*",
+        "symfony/console": "3.0.*",
+        "symfony/debug": "3.0.*",
+        "symfony/finder": "3.0.*",
+        "symfony/http-foundation": "3.0.*",
+        "symfony/http-kernel": "3.0.*",
+        "symfony/process": "3.0.*",
+        "symfony/routing": "3.0.*",
+        "symfony/translation": "3.0.*",
+        "symfony/var-dumper": "3.0.*",
         "vlucas/phpdotenv": "~1.0"
     },
     "replace": {
@@ -78,8 +78,8 @@
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~4.0",
         "predis/predis": "~1.0",
-        "symfony/css-selector": "3.1.*",
-        "symfony/dom-crawler": "3.1.*"
+        "symfony/css-selector": "3.0.*",
+        "symfony/dom-crawler": "3.0.*"
     },
     "autoload": {
         "classmap": [
