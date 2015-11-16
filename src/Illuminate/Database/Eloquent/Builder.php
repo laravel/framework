@@ -243,20 +243,6 @@ class Builder
     }
 
     /**
-     * Alias for the "pluck" method.
-     *
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     *
-     * @deprecated since version 5.2. Use the "pluck" method directly.
-     */
-    public function lists($column, $key = null)
-    {
-        return $this->pluck($column, $key);
-    }
-
-    /**
      * Paginate the given query.
      *
      * @param  int  $perPage

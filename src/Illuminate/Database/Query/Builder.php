@@ -1555,20 +1555,6 @@ class Builder
     }
 
     /**
-     * Alias for the "pluck" method.
-     *
-     * @param  string  $column
-     * @param  string|null  $key
-     * @return array
-     *
-     * @deprecated since version 5.2. Use the "pluck" method directly.
-     */
-    public function lists($column, $key = null)
-    {
-        return $this->pluck($column, $key);
-    }
-
-    /**
      * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
