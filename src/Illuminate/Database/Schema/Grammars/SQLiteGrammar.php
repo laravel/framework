@@ -539,7 +539,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->defaultCurrentTimestamp) {
+        if ($column->useCurrent) {
             return 'datetime default CURRENT_TIMESTAMP';
         }
 
@@ -554,7 +554,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->defaultCurrentTimestamp) {
+        if ($column->useCurrent) {
             return 'datetime default CURRENT_TIMESTAMP';
         }
 

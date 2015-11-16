@@ -3,8 +3,8 @@
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
-use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
@@ -55,7 +55,7 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
     public function testDefaultCurrentTimestamp()
     {
         $base = new Blueprint('users', function ($table) {
-            $table->timestamp('created')->defaultCurrentTimestamp();
+            $table->timestamp('created')->useCurrent();
         });
 
         $connection = m::mock('Illuminate\Database\Connection');
