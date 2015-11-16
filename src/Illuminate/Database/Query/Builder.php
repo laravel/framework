@@ -7,7 +7,6 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1538,23 +1537,24 @@ class Builder
      * Get an array with the values of a given column.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      */
     public function pluck($column, $key = null)
     {
-        $columns = $this->getPluckSelect($column, $key);
+        $results = $this->get(func_get_args());
 
-        $results = new Collection($this->get($columns));
-
-        return $results->pluck($columns[0], Arr::get($columns, 1))->all();
+        // If the columns are qualified with a table or have an alias, we cannot use
+        // those directly in the "pluck" operation, since the results from the DB
+        // are only keyed by the column itself. We will strip everything else.
+        return Arr::pluck($results, $this->stripTable($column), $this->stripTable($key));
     }
 
     /**
      * Alias for the "pluck" method.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      *
      * @deprecated since version 5.2. Use the "pluck" method directly.
@@ -1565,24 +1565,14 @@ class Builder
     }
 
     /**
-     * Get the columns that should be used in a pluck select.
+     * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @param  string  $key
-     * @return array
+     * @return string|null
      */
-    protected function getPluckSelect($column, $key)
+    protected function stripTable($column)
     {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
-        // If the selected columns contain "dots", we will remove it so that the pluck
-        // operation can run normally. Specifying the table is not needed, since we
-        // really want the names of the columns as it is in this resulting array.
-        return array_map(function ($column) {
-            $dot = strpos($column, '.');
-
-            return $dot === false ? $column : substr($column, $dot + 1);
-        }, $select);
+        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
