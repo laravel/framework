@@ -607,7 +607,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && $acceptable[0] === 'application/json';
+        return isset($acceptable[0]) && Str::contains($acceptable[0], ['/json', '+json']);
     }
 
     /**
