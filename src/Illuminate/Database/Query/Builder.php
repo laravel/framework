@@ -1544,6 +1544,9 @@ class Builder
     {
         $results = $this->get(func_get_args());
 
+        // If the columns are qualified with a table or have an alias, we cannot use
+        // those directly in the "pluck" operation, since the results from the DB
+        // are only keyed by the column itself. We will strip everything else.
         return Arr::pluck($results, $this->stripTable($column), $this->stripTable($key));
     }
 
