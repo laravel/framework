@@ -242,7 +242,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Assert that the json response has a certain structure.
+     * Assert that the JSON response has a given structure.
      *
      * @param  array|null  $structure
      * @param  array|null  $responseData
@@ -251,11 +251,7 @@ trait MakesHttpRequests
     public function seeJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            $this->assertJson(
-                $this->response->getContent(), "JSON was not returned from [{$this->currentUri}]."
-            );
-
-            return $this;
+            return $this->seeJson();
         }
 
         if (! $responseData) {
