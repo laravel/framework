@@ -16,7 +16,7 @@
     "require": {
         "php": ">=5.5.9",
         "ext-mbstring": "*",
-        "illuminate/contracts": "5.2.*",
+        "illuminate/contracts": "5.3.*",
         "doctrine/inflector": "~1.0",
         "danielstjules/stringy": "~2.1"
     },
@@ -30,15 +30,15 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.2-dev"
+            "dev-master": "5.3-dev"
         }
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
         "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (~1.1).",
-        "symfony/process": "Required to use the composer class (2.8.*|3.0.*).",
-        "symfony/var-dumper": "Required to use the dd function (2.8.*|3.0.*)."
+        "symfony/process": "Required to use the composer class (3.0.*).",
+        "symfony/var-dumper": "Required to use the dd function (3.0.*)."
     },
     "minimum-stability": "dev"
 }
