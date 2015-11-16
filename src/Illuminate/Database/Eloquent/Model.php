@@ -2943,7 +2943,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($this->dateFormat) {
             return Carbon::createFromFormat($this->dateFormat, $value);
         }
-        
+
         // If this value is an integer, we will assume it is a UNIX timestamp's value
         // and format a Carbon object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
