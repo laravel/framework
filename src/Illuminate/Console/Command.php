@@ -59,6 +59,18 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * The mapping between human readable verbosity levels and Symfony's
+     * OutputInterface.
+     *
+     * @var int[]
+     */
+    protected $verbosity = [
+        'v'   => OutputInterface::VERBOSITY_VERBOSE,
+        'vv'  => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        'vvv' => OutputInterface::VERBOSITY_DEBUG,
+    ];
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -321,73 +333,99 @@ class Command extends SymfonyCommand
     }
 
     /**
-     * Write a string as information output.
+     * Check if verbosity level is in bounds.
      *
-     * @param  string  $string
-     * @return void
+     * @param  string|int  $level
+     * @return bool
      */
-    public function info($string)
+    public function inVerbosity($level)
     {
-        $this->output->writeln("<info>$string</info>");
+        if (isset($this->verbosity[$level])) {
+            $level = $this->verbosity[$level];
+        } elseif (! is_int($level)) {
+            $level = OutputInterface::VERBOSITY_NORMAL;
+        }
+
+        return $this->getOutput()->getVerbosity() >= $level;
     }
 
     /**
-     * Write a string as standard output.
+     * Write a string as output.
      *
      * @param  string  $string
+     * @param  string|null  $style The output style of the string
+     * @param  int|string  $verbosityLevel
      * @return void
      */
-    public function line($string)
+    public function line($string, $style = null, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
     {
-        $this->output->writeln($string);
+        if ($this->inVerbosity($verbosityLevel)) {
+            $this->output->writeln($style ? "<$style>$string</$style>" : $string);
+        }
+    }
+
+    /**
+     * Write a string as information output.
+     *
+     * @param  string  $string
+     * @param  int|string  $verbosityLevel
+     * @return void
+     */
+    public function info($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    {
+        $this->line($string, 'info', $verbosityLevel);
     }
 
     /**
      * Write a string as comment output.
      *
      * @param  string  $string
+     * @param  int|string  $verbosityLevel
      * @return void
      */
-    public function comment($string)
+    public function comment($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
     {
-        $this->output->writeln("<comment>$string</comment>");
+        $this->line($string, 'comment', $verbosityLevel);
     }
 
     /**
      * Write a string as question output.
      *
      * @param  string  $string
+     * @param  int|string  $verbosityLevel
      * @return void
      */
-    public function question($string)
+    public function question($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
     {
-        $this->output->writeln("<question>$string</question>");
+        $this->line($string, 'question', $verbosityLevel);
     }
 
     /**
      * Write a string as error output.
      *
      * @param  string  $string
+     * @param  int|string  $verbosityLevel
      * @return void
      */
-    public function error($string)
+    public function error($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
     {
-        $this->output->writeln("<error>$string</error>");
+        $this->line($string, 'error', $verbosityLevel);
     }
 
     /**
      * Write a string as warning output.
      *
      * @param  string  $string
+     * @param  int|string  $verbosityLevel
      * @return void
      */
-    public function warn($string)
+    public function warn($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
     {
         $style = new OutputFormatterStyle('yellow');
 
         $this->output->getFormatter()->setStyle('warning', $style);
 
-        $this->output->writeln("<warning>$string</warning>");
+        $this->line($string, 'warning', $verbosityLevel);
     }
 
     /**
