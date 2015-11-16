@@ -528,7 +528,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->defaultCurrentTimestamp) {
+        if ($column->useCurrent) {
             return 'timestamp default CURRENT_TIMESTAMP';
         }
 
@@ -547,7 +547,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->defaultCurrentTimestamp) {
+        if ($column->useCurrent) {
             return 'timestamp default CURRENT_TIMESTAMP';
         }
 
