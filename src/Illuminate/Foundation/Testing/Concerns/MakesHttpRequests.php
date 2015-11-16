@@ -339,8 +339,8 @@ trait MakesHttpRequests
     /**
      * Asserts that the response contains the given header and equals the optional value.
      *
-     * @param  string $headerName
-     * @param  mixed $value
+     * @param  string  $headerName
+     * @param  mixed  $value
      * @return $this
      */
     protected function seeHeader($headerName, $value = null)
@@ -362,8 +362,8 @@ trait MakesHttpRequests
     /**
      * Asserts that the response contains the given cookie and equals the optional value.
      *
-     * @param  string $cookieName
-     * @param  mixed $value
+     * @param  string  $cookieName
+     * @param  mixed  $value
      * @return $this
      */
     protected function seeCookie($cookieName, $value = null)
