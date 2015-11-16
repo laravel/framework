@@ -2,6 +2,10 @@
 
 use Mockery as m;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Database\Schema\Grammars\PostgresGrammar;
+use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
 {
@@ -46,5 +50,26 @@ class DatabaseSchemaBlueprintTest extends PHPUnit_Framework_TestCase
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
+    }
+
+    public function testDefaultCurrentTimestamp()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->timestamp('created')->useCurrent();
+        });
+
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP(0) not null'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 }

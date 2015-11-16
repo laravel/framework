@@ -482,6 +482,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
+        if ($column->useCurrent) {
+            return 'datetime default CURRENT_TIMESTAMP';
+        }
+
         return 'datetime';
     }
 
@@ -495,6 +499,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
+        if ($column->useCurrent) {
+            return 'datetimeoffset(0) default CURRENT_TIMESTAMP';
+        }
+
         return 'datetimeoffset(0)';
     }
 
