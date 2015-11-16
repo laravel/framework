@@ -903,10 +903,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testModelsAssumeTheirName()
     {
+        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+
         $model = new EloquentModelWithoutTableStub;
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
         $namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
