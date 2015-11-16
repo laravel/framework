@@ -11,6 +11,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
@@ -62,6 +63,13 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
+
+    /**
+     * Cache object used for $withoutOverlapping lock file.
+     *
+     * @var Illuminate\Contracts\Cache\Repository
+     */
+    public $cache;
 
     /**
      * The array of filter callbacks.
@@ -118,10 +126,11 @@ class Event
      * @param  string  $command
      * @return void
      */
-    public function __construct($command)
+    public function __construct($command, Cache $cache)
     {
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
+        $this->cache = $cache;
     }
 
     /**
@@ -142,10 +151,18 @@ class Event
      */
     public function run(Container $container)
     {
+        if ($this->withoutOverlapping) {
+            $this->cache->put($this->mutexName(), now());
+        }
+
         if (count($this->afterCallbacks) > 0 || count($this->beforeCallbacks) > 0) {
             $this->runCommandInForeground($container);
         } else {
             $this->runCommandInBackground();
+        }
+
+        if ($this->withoutOverlapping) {
+            $this->cache->forget($this->mutexName());
         }
     }
 
@@ -213,23 +230,19 @@ class Event
     {
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
-        if ($this->withoutOverlapping) {
-            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$this->output.' 2>&1 &';
-        } else {
-            $command = $this->command.$redirect.$this->output.' 2>&1 &';
-        }
+        $command = $this->command.$redirect.$this->output.' 2>&1 &';
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
     }
 
     /**
-     * Get the mutex path for the scheduled command.
+     * Get the mutex name for the scheduled command.
      *
      * @return string
      */
-    protected function mutexPath()
+    protected function mutexName()
     {
-        return storage_path('framework/schedule-'.md5($this->expression.$this->command));
+        return 'schedule-'.md5($this->expression.$this->command);
     }
 
     /**
@@ -620,7 +633,7 @@ class Event
         $this->withoutOverlapping = true;
 
         return $this->skip(function () {
-            return file_exists($this->mutexPath());
+            return $this->cache->has($this->mutexName());
         });
     }
 
