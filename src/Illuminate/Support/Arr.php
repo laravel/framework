@@ -46,6 +46,21 @@ class Arr
     }
 
     /**
+     * Checks if an item can be cast to string.
+     *
+     * @param  mixed  $item
+     * @return bool
+     */
+    protected static function canBeString($item)
+    {
+        if ((is_object($item) && method_exists($item, '__toString'))) {
+            return true;
+        }
+
+        return is_scalar($item);
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array|\ArrayAccess  $array
@@ -73,7 +88,7 @@ class Arr
      * @param  bool  $includeKeyDeprivedValues
      * @return array
      */
-    public function combine($keys, $values, $includeKeyDeprivedValues = true)
+    public static function combine($keys, $values, $includeKeyDeprivedValues = true)
     {
         $combined = [];
 

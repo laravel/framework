@@ -1098,19 +1098,4 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return (array) $items;
     }
-
-    /**
-     * Checks if an item can be cast to string.
-     *
-     * @param  mixed  $item
-     * @return bool
-     */
-    protected function canBeString($item)
-    {
-        if ((is_object($item) && method_exists($item, '__toString'))) {
-            return true;
-        }
-
-        return is_scalar($item);
-    }
 }
