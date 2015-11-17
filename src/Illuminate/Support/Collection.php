@@ -92,14 +92,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * using the collection as keys.
      *
      * @param  mixed  $items
-     * @param  boolean
+     * @param  bool
      * @return static
      */
     public function combine($items, $includeKeyDeprivedValues = true)
     {
         $combined = new static;
         $values = $this->getArrayableItems($items);
-        
+
         for ($i = 0; $i < count($values); $i++) {
             if (isset($this->items[$i]) && $this->canBeString($this->items[$i]) && (string) $this->items[$i] !== '') {
                 $combined->put((string) $this->items[$i], $values[$i]);
@@ -109,7 +109,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 break;
             }
         }
-        
+
         return $combined;
     }
 
@@ -1117,14 +1117,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Checks if an item can be cast to string.
      *
      * @param  mixed $item
-     * @return boolean
+     * @return bool
      */
     protected function canBeString($item)
     {
         if ((is_object($item) && method_exists($item, '__toString'))) {
             return true;
         }
-        
+
         return is_scalar($item);
     }
 }

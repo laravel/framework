@@ -248,7 +248,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection([null]);
         $this->assertEquals(['foo'], $c->combine(['foo'])->all());
-        
+
         $c = new Collection([null]);
         $this->assertEquals([], $c->combine(['foo'], false)->all());
     }
@@ -257,7 +257,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['foo']);
         $this->assertEquals(['foo' => 'bar', 'baz'], $c->combine(['bar', 'baz'])->all());
-        
+
         $c = new Collection(['foo']);
         $this->assertEquals(['foo' => 'bar'], $c->combine(['bar', 'baz'], false)->all());
     }
