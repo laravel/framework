@@ -7,5 +7,6 @@
 .gitignore export-ignore
 .php_cs export-ignore
 .travis.yml export-ignore
+nitpick.json export-ignore
 phpunit.php export-ignore
 phpunit.xml export-ignore
