@@ -96,20 +96,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function combine($items, $includeKeyDeprivedValues = true)
     {
-        $combined = new static;
-        $values = $this->getArrayableItems($items);
-
-        for ($i = 0; $i < count($values); $i++) {
-            if (isset($this->items[$i]) && $this->canBeString($this->items[$i]) && (string) $this->items[$i] !== '') {
-                $combined->put((string) $this->items[$i], $values[$i]);
-            } elseif ($includeKeyDeprivedValues) {
-                $combined->push($values[$i]);
-            } else {
-                break;
-            }
-        }
-
-        return $combined;
+        return new static(Arr::combine($this->items, $items, $includeKeyDeprivedValues));
     }
 
     /**

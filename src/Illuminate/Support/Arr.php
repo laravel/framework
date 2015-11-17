@@ -67,6 +67,38 @@ class Arr
     }
 
     /**
+     * Creates an array by using one array for keys and another for its values.
+     *
+     * @param  array|\ArrayAccess  $items
+     * @param  bool  $includeKeyDeprivedValues
+     * @return array
+     */
+    public function combine($keys, $values, $includeKeyDeprivedValues = true)
+    {
+        $combined = [];
+
+        if ($keys instanceof Collection) {
+            $keys = $keys->all();
+        }
+
+        if ($values instanceof Collection) {
+            $values = $values->all();
+        }
+
+        for ($i = 0; $i < count($values); $i++) {
+            if (isset($keys[$i]) && $this->canBeString($keys[$i]) && (string) $keys[$i] !== '') {
+                static::put($combined, (string) $keys[$i], $values[$i]);
+            } elseif ($includeKeyDeprivedValues) {
+                array_push($combined, $values[$i]);
+            } else {
+                break;
+            }
+        }
+
+        return $combined;
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
