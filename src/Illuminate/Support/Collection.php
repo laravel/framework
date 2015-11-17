@@ -105,6 +105,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $combined->put((string) $this->items[$i], $values[$i]);
             } elseif ($includeKeyDeprivedValues) {
                 $combined->push($values[$i]);
+            } else {
+                break;
             }
         }
         
