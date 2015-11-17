@@ -86,7 +86,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return new static(Arr::collapse($this->items));
     }
-    
+
     /**
      * Combine the collection with the given items
      * using the collection as keys.
