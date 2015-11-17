@@ -101,8 +101,8 @@ class Arr
         }
 
         for ($i = 0; $i < count($values); $i++) {
-            if (isset($keys[$i]) && $this->canBeString($keys[$i]) && (string) $keys[$i] !== '') {
-                static::put($combined, (string) $keys[$i], $values[$i]);
+            if (isset($keys[$i]) && static::canBeString($keys[$i]) && (string) $keys[$i] !== '') {
+                static::set($combined, (string) $keys[$i], $values[$i]);
             } elseif ($includeKeyDeprivedValues) {
                 array_push($combined, $values[$i]);
             } else {
