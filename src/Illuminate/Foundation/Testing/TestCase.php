@@ -50,7 +50,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-                call_user_func($callback);
+                $callback();
             }
 
             $this->app->flush();
