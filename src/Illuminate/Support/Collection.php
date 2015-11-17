@@ -88,11 +88,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Combine the collection with the given items
-     * using the collection as keys.
+     * Combine the collection with the given items using the collection as keys.
      *
      * @param  mixed  $items
-     * @param  bool
+     * @param  bool  $includeKeyDeprivedValues
      * @return static
      */
     public function combine($items, $includeKeyDeprivedValues = true)
@@ -1116,7 +1115,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Checks if an item can be cast to string.
      *
-     * @param  mixed $item
+     * @param  mixed  $item
      * @return bool
      */
     protected function canBeString($item)
