@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -55,7 +56,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function call($command, array $parameters = [])
     {
-        $parameters = collect($parameters)->prepend($command);
+        $parameters = (new Collection($parameters))->prepend($command);
 
         $this->lastOutput = new BufferedOutput;
 
