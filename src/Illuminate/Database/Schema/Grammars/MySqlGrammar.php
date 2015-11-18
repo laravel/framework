@@ -547,10 +547,6 @@ class MySqlGrammar extends Grammar
             return 'timestamp default CURRENT_TIMESTAMP';
         }
 
-        if (! $column->nullable && $column->default === null) {
-            return 'timestamp default 0';
-        }
-
         return 'timestamp';
     }
 
