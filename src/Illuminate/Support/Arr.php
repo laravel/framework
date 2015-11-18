@@ -350,6 +350,18 @@ class Arr
     }
 
     /**
+     * Map an array and flatten the result by a single level.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function flatMap($array, callable $callback)
+    {
+        return (new Collection($array))->flatMap($callback)->all();
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

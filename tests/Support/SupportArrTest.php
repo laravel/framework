@@ -55,6 +55,16 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['Joe', 'PHP', 'Ruby'], $array);
     }
 
+    public function testFlatMap()
+    {
+        $data = [
+            ['name' => 'taylor', 'hobbies' => ['programming', 'basketball']],
+            ['name' => 'adam', 'hobbies' => ['music', 'powerlifting']],
+        ];
+        $value = Arr::flatMap($data, function ($person) { return $person['hobbies']; });
+        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $value);
+    }
+
     public function testGet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
