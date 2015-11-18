@@ -163,7 +163,7 @@ class MySqlGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} add {$type} {$command->index}($columns)";
+        return "alter table {$table} add {$type} `{$command->index}`($columns)";
     }
 
     /**
@@ -229,7 +229,7 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop index {$command->index}";
+        return "alter table {$table} drop index `{$command->index}`";
     }
 
     /**
@@ -243,7 +243,7 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop index {$command->index}";
+        return "alter table {$table} drop index `{$command->index}`";
     }
 
     /**
@@ -257,7 +257,7 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        return "alter table {$table} drop foreign key {$command->index}";
+        return "alter table {$table} drop foreign key `{$command->index}`";
     }
 
     /**
