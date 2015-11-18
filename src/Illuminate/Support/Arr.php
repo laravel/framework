@@ -25,7 +25,6 @@ class Arr
         return $array;
     }
 
-
     /**
      * Collapse an array of arrays into a single array.
      *
