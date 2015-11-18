@@ -6,12 +6,15 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract
 {
+    use Macroable;
+
     /**
      * The route collection.
      *
