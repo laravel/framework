@@ -595,6 +595,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testFlatMap()
+    {
+        $data = new Collection([
+            ['name' => 'taylor', 'hobbies' => ['programming', 'basketball']],
+            ['name' => 'adam', 'hobbies' => ['music', 'powerlifting']],
+        ]);
+        $data = $data->flatMap(function ($person) { return $person['hobbies']; });
+        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
