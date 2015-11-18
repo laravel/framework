@@ -21,6 +21,13 @@ interface Application extends Container
     public function basePath();
 
     /**
+     * Get the path to the storage directory.
+     *
+     * @return string
+     */
+    public function storagePath();
+
+    /**
      * Get or check the current application environment.
      *
      * @param  mixed
