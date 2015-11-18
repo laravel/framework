@@ -574,7 +574,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function firstOrCreate(array $attributes)
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
             return $instance;
         }
 
@@ -589,7 +589,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function firstOrNew(array $attributes)
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
             return $instance;
         }
 
@@ -3374,14 +3374,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Here we will extract all of the mutated attributes so that we can quickly
         // spin through them after we export models to their array form, which we
         // need to be fast. This'll let us know the attributes that can mutate.
-        foreach (get_class_methods($class) as $method) {
-            if (strpos($method, 'Attribute') !== false &&
-                        preg_match('/^get(.+)Attribute$/', $method, $matches)) {
+        if (preg_match_all('/get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches)) {
+            foreach ($matches[1] as $match) {
                 if (static::$snakeAttributes) {
-                    $matches[1] = Str::snake($matches[1]);
+                    $match = Str::snake($match);
                 }
 
-                $mutatedAttributes[] = lcfirst($matches[1]);
+                $mutatedAttributes[] = lcfirst($match);
             }
         }
 
