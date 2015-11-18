@@ -31,6 +31,8 @@ class Arr
      * @param  array  $array
      * @param  callable  $callback
      * @return array
+     *
+     * @deprecated since version 5.2.
      */
     public static function build($array, callable $callback)
     {
