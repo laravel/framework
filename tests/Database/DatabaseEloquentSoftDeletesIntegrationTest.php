@@ -124,6 +124,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, $users->first()->id);
     }
 
+    public function testFirstOrNewIgnoresSoftDelete()
+    {
+        $this->createUsers();
+
+        $taylor = SoftDeletesTestUser::firstOrNew(['id' => 1]);
+        $this->assertEquals('taylorotwell@gmail.com', $taylor->email);
+    }
+
     /**
      * Helpers...
      */
