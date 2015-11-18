@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo
 {
@@ -187,7 +188,7 @@ class MorphTo extends BelongsTo
     {
         $foreign = $this->foreignKey;
 
-        return collect($this->dictionary[$type])->map(function ($models) use ($foreign) {
+        return (new BaseCollection($this->dictionary[$type]))->map(function ($models) use ($foreign) {
             return head($models)->{$foreign};
 
         })->values()->unique();

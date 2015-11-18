@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Collection;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -79,7 +80,7 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
+        return (new Collection($parameters))->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key.'='.(is_numeric($value) ? $value : ProcessUtils::escapeArgument($value));
         })->implode(' ');
     }
