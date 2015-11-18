@@ -383,9 +383,11 @@ class Command extends SymfonyCommand
      */
     public function warn($string)
     {
-        $style = new OutputFormatterStyle('yellow');
+        if (! $this->output->getFormatter()->hasStyle($name)) {
+            $style = new OutputFormatterStyle('yellow');
 
-        $this->output->getFormatter()->setStyle('warning', $style);
+            $this->output->getFormatter()->setStyle('warning', $style);
+        }
 
         $this->output->writeln("<warning>$string</warning>");
     }
