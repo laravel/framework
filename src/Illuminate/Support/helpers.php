@@ -51,6 +51,8 @@ if (! function_exists('array_build')) {
      * @param  array  $array
      * @param  callable  $callback
      * @return array
+     *
+     * @deprecated since version 5.2.
      */
     function array_build($array, callable $callback)
     {
