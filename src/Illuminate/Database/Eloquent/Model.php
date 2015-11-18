@@ -3364,6 +3364,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 if (static::$snakeAttributes) {
                     $match = Str::snake($match);
                 }
+
                 $mutatedAttributes[] = lcfirst($match);
             }
         }
