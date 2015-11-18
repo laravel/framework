@@ -3359,8 +3359,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Here we will extract all of the mutated attributes so that we can quickly
         // spin through them after we export models to their array form, which we
         // need to be fast. This'll let us know the attributes that can mutate.
-        if(preg_match_all('/get(.+?)Attribute/', implode(';', get_class_methods($class)), $matches)){
-            foreach ($matches[1] as $match){
+        if (preg_match_all('/get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches)) {
+            foreach ($matches[1] as $match) {
                 if (static::$snakeAttributes) {
                     $match = Str::snake($match);
                 }
