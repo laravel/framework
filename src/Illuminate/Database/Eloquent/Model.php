@@ -574,7 +574,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function firstOrCreate(array $attributes)
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
             return $instance;
         }
 
@@ -589,7 +589,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function firstOrNew(array $attributes)
     {
-        if (! is_null($instance = static::where($attributes)->first())) {
+        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
             return $instance;
         }
 
