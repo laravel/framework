@@ -84,6 +84,14 @@ interface Guard
     public function login(Authenticatable $user, $remember = false);
 
     /**
+     * Log the given user ID into the application without sessions or cookies.
+     *
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function onceUsingId($id);
+
+    /**
      * Log the given user ID into the application.
      *
      * @param  mixed  $id
