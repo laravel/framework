@@ -47,7 +47,7 @@ interface Application extends Container
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
      * @param  array  $options
-     * @param  bool   $force
+     * @param  bool  $force
      * @return \Illuminate\Support\ServiceProvider
      */
     public function register($provider, $options = [], $force = false);

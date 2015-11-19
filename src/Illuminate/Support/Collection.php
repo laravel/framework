@@ -301,7 +301,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Group an associative array by a field or using a callback.
      *
      * @param  callable|string  $groupBy
-     * @param  bool             $preserveKeys
+     * @param  bool  $preserveKeys
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
@@ -635,7 +635,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed     $initial
+     * @param  mixed  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -676,7 +676,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Search the collection for a given value and return the corresponding key if successful.
      *
      * @param  mixed  $value
-     * @param  bool   $strict
+     * @param  bool  $strict
      * @return mixed
      */
     public function search($value, $strict = false)
@@ -721,8 +721,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Slice the underlying collection array.
      *
-     * @param  int   $offset
-     * @param  int   $length
+     * @param  int  $offset
+     * @param  int  $length
      * @param  bool  $preserveKeys
      * @return static
      */
@@ -734,7 +734,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Chunk the underlying collection array.
      *
-     * @param  int   $size
+     * @param  int  $size
      * @param  bool  $preserveKeys
      * @return static
      */
@@ -775,7 +775,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback
-     * @param  int   $options
+     * @param  int  $options
      * @param  bool  $descending
      * @return static
      */
@@ -939,7 +939,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
      *      => [[1, 4], [2, 5], [3, 6]]
      *
-     * @param  mixed ...$items
+     * @param  mixed  ...$items
      * @return static
      */
     public function zip($items)

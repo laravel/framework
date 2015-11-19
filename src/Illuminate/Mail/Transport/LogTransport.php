@@ -39,7 +39,7 @@ class LogTransport extends Transport
     /**
      * Get a loggable string out of a Swiftmailer entity.
      *
-     * @param  \Swift_Mime_MimeEntity $entity
+     * @param  \Swift_Mime_MimeEntity  $entity
      * @return string
      */
     protected function getMimeEntityString(Swift_Mime_MimeEntity $entity)

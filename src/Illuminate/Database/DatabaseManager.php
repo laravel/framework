@@ -265,7 +265,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Register an extension connection resolver.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  callable  $resolver
      * @return void
      */
@@ -288,7 +288,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

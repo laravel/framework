@@ -51,7 +51,7 @@ class TaggedCache implements Store
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -65,7 +65,7 @@ class TaggedCache implements Store
      * Store an item in the cache for a given number of minutes.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTime|int  $minutes
      * @return void
      */
@@ -82,7 +82,7 @@ class TaggedCache implements Store
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTime|int  $minutes
      * @return bool
      */
@@ -101,7 +101,7 @@ class TaggedCache implements Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function increment($key, $value = 1)
@@ -113,7 +113,7 @@ class TaggedCache implements Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function decrement($key, $value = 1)
@@ -125,7 +125,7 @@ class TaggedCache implements Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function forever($key, $value)
@@ -179,7 +179,7 @@ class TaggedCache implements Store
     /**
      * Get an item from the cache, or store the default value forever.
      *
-     * @param  string    $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -191,7 +191,7 @@ class TaggedCache implements Store
     /**
      * Get an item from the cache, or store the default value forever.
      *
-     * @param  string    $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */

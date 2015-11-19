@@ -97,7 +97,7 @@ class MorphTo extends BelongsTo
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -143,9 +143,9 @@ class MorphTo extends BelongsTo
     /**
      * Match the results for a given type to their parents.
      *
-     * @param  string $type
-     * @param  \Illuminate\Database\Eloquent\Collection $results
-     * @param string $relation
+     * @param  string  $type
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
      */
     protected function matchToMorphParents($type, Collection $results, $relation)
     {

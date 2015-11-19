@@ -232,7 +232,7 @@ class JoinClause
      * Add a nested where statement to the query.
      *
      * @param  \Closure  $callback
-     * @param  string   $boolean
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\JoinClause
      */
     public function nest(Closure $callback, $boolean = 'and')

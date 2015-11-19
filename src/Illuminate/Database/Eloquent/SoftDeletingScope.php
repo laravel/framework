@@ -144,7 +144,7 @@ class SoftDeletingScope implements ScopeInterface
     /**
      * Determine if the given where clause is a soft delete constraint.
      *
-     * @param  array   $where
+     * @param  array  $where
      * @param  string  $column
      * @return bool
      */

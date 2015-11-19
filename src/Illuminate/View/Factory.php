@@ -119,8 +119,8 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $path
-     * @param  array   $data
-     * @param  array   $mergeData
+     * @param  array  $data
+     * @param  array  $mergeData
      * @return \Illuminate\View\View
      */
     public function file($path, $data = [], $mergeData = [])
@@ -136,8 +136,8 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  array   $data
-     * @param  array   $mergeData
+     * @param  array  $data
+     * @param  array  $mergeData
      * @return \Illuminate\Contracts\View\View
      */
     public function make($view, $data = [], $mergeData = [])
@@ -160,7 +160,7 @@ class Factory implements FactoryContract
     /**
      * Normalize a view name.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string
      */
     protected function normalizeName($name)
@@ -191,7 +191,7 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for a named view.
      *
      * @param  string  $view
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return \Illuminate\View\View
      */
     public function of($view, $data = [])
@@ -244,7 +244,7 @@ class Factory implements FactoryContract
      * Get the rendered contents of a partial from a loop.
      *
      * @param  string  $view
-     * @param  array   $data
+     * @param  array  $data
      * @param  string  $iterator
      * @param  string  $empty
      * @return string
@@ -333,7 +333,7 @@ class Factory implements FactoryContract
     /**
      * Register a view creator event.
      *
-     * @param  array|string     $views
+     * @param  array|string  $views
      * @param  \Closure|string  $callback
      * @return array
      */
@@ -409,9 +409,9 @@ class Factory implements FactoryContract
     /**
      * Register a class based view composer.
      *
-     * @param  string    $view
-     * @param  string    $class
-     * @param  string    $prefix
+     * @param  string  $view
+     * @param  string  $class
+     * @param  string  $prefix
      * @param  int|null  $priority
      * @return \Closure
      */
@@ -432,7 +432,7 @@ class Factory implements FactoryContract
     /**
      * Add a listener to the event dispatcher.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  \Closure  $callback
      * @param  int|null  $priority
      * @return void
@@ -714,8 +714,8 @@ class Factory implements FactoryContract
     /**
      * Register a valid view extension and its engine.
      *
-     * @param  string    $extension
-     * @param  string    $engine
+     * @param  string  $extension
+     * @param  string  $engine
      * @param  \Closure  $resolver
      * @return void
      */
@@ -819,7 +819,7 @@ class Factory implements FactoryContract
      * Get an item from the shared data.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function shared($key, $default = null)

@@ -9,11 +9,11 @@ interface Factory
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  int     $minutes
+     * @param  int  $minutes
      * @param  string  $path
      * @param  string  $domain
-     * @param  bool    $secure
-     * @param  bool    $httpOnly
+     * @param  bool  $secure
+     * @param  bool  $httpOnly
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true);
@@ -25,8 +25,8 @@ interface Factory
      * @param  string  $value
      * @param  string  $path
      * @param  string  $domain
-     * @param  bool    $secure
-     * @param  bool    $httpOnly
+     * @param  bool  $secure
+     * @param  bool  $httpOnly
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true);

@@ -320,8 +320,8 @@ class Builder
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  int  $amount
+     * @param  array  $extra
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = [])
@@ -335,8 +335,8 @@ class Builder
      * Decrement a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  int  $amount
+     * @param  array  $extra
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])
@@ -436,8 +436,8 @@ class Builder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array     $models
-     * @param  string    $name
+     * @param  array  $models
+     * @param  string  $name
      * @param  \Closure  $constraints
      * @return array
      */
@@ -530,7 +530,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -554,7 +554,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -567,7 +567,7 @@ class Builder
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -594,7 +594,7 @@ class Builder
      *
      * @param  string  $relations
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -633,10 +633,10 @@ class Builder
     /**
      * Add a relationship count condition to the query with where clauses.
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -661,7 +661,7 @@ class Builder
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orHas($relation, $operator = '>=', $count = 1)
@@ -672,10 +672,10 @@ class Builder
     /**
      * Add a relationship count condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -794,7 +794,7 @@ class Builder
      * Parse the nested relationships in a relation.
      *
      * @param  string  $name
-     * @param  array   $results
+     * @param  array  $results
      * @return array
      */
     protected function parseNested($name, $results)
@@ -819,7 +819,7 @@ class Builder
      * Call the given model scope on the underlying model.
      *
      * @param  string  $scope
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return \Illuminate\Database\Query\Builder
      */
     protected function callScope($scope, $parameters)
@@ -903,7 +903,7 @@ class Builder
     /**
      * Extend the builder with a given callback.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  \Closure  $callback
      * @return void
      */
@@ -927,7 +927,7 @@ class Builder
      * Dynamically handle calls into the query instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

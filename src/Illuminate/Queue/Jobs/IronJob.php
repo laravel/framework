@@ -36,7 +36,7 @@ class IronJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Queue\IronQueue  $iron
      * @param  object  $job
-     * @param  bool    $pushed
+     * @param  bool  $pushed
      * @return void
      */
     public function __construct(Container $container,
@@ -93,7 +93,7 @@ class IronJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0)

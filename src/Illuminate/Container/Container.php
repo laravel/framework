@@ -282,7 +282,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Bind a shared Closure into the container.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure  $closure
      * @return void
      *
@@ -296,7 +296,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure  $closure
      * @return void
      *
@@ -317,7 +317,7 @@ class Container implements ArrayAccess, ContainerContract
      * Register an existing instance as shared in the container.
      *
      * @param  string  $abstract
-     * @param  mixed   $instance
+     * @param  mixed  $instance
      * @return void
      */
     public function instance($abstract, $instance)
@@ -349,7 +349,7 @@ class Container implements ArrayAccess, ContainerContract
      * Assign a set of tags to a given binding.
      *
      * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
+     * @param  array|mixed  ...$tags
      * @return void
      */
     public function tag($abstracts, $tags)
@@ -412,7 +412,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Bind a new callback to an abstract's rebind event.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -429,7 +429,7 @@ class Container implements ArrayAccess, ContainerContract
      * Refresh an instance on the given target and method.
      *
      * @param  string  $abstract
-     * @param  mixed   $target
+     * @param  mixed  $target
      * @param  string  $method
      * @return mixed
      */
@@ -604,7 +604,7 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function make($abstract, array $parameters = [])
@@ -654,7 +654,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the concrete type for a given abstract.
      *
      * @param  string  $abstract
-     * @return mixed   $concrete
+     * @return mixed  $concrete
      */
     protected function getConcrete($abstract)
     {
@@ -720,7 +720,7 @@ class Container implements ArrayAccess, ContainerContract
      * Instantiate a concrete instance of the given type.
      *
      * @param  string  $concrete
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -873,7 +873,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
+     * @param  string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -889,8 +889,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a new after resolving callback for all types.
      *
-     * @param  string   $abstract
-     * @param  \Closure|null $callback
+     * @param  string  $abstract
+     * @param  \Closure|null  $callback
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null)
@@ -963,7 +963,7 @@ class Container implements ArrayAccess, ContainerContract
      * Fire all of the resolving callbacks.
      *
      * @param  string  $abstract
-     * @param  mixed   $object
+     * @param  mixed  $object
      * @return void
      */
     protected function fireResolvingCallbacks($abstract, $object)
@@ -990,7 +990,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  object  $object
-     * @param  array   $callbacksPerType
+     * @param  array  $callbacksPerType
      *
      * @return array
      */
@@ -1041,7 +1041,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Determine if the given concrete is buildable.
      *
-     * @param  mixed   $concrete
+     * @param  mixed  $concrete
      * @param  string  $abstract
      * @return bool
      */
@@ -1163,7 +1163,7 @@ class Container implements ArrayAccess, ContainerContract
      * Set the value at a given offset.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function offsetSet($key, $value)
@@ -1206,7 +1206,7 @@ class Container implements ArrayAccess, ContainerContract
      * Dynamically set container services.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)
