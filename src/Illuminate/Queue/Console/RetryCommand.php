@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -31,7 +32,7 @@ class RetryCommand extends Command
         $ids = $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
-            $ids = collect($this->laravel['queue.failer']->all())->pluck('id')->all();
+            $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
         }
 
         foreach ($ids as $id) {
