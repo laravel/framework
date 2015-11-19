@@ -290,7 +290,7 @@ class Command extends SymfonyCommand
      * @param  string  $default
      * @param  mixed   $attempts
      * @param  bool    $multiple
-     * @return bool
+     * @return string
      */
     public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
     {
