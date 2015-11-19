@@ -186,4 +186,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testPaginatorWhenCurrentPageStartWithZero()
+    {
+        Paginator::currentPageResolver(function () { return '03'; });
+        $p = new LengthAwarePaginator($array = ['item1', 'item2'], 100, 2);
+        $this->assertEquals(3, $p->currentPage());
+    }
+
+    public function testPaginatorWhenCurrentPageIsGarbagetext()
+    {
+        Paginator::currentPageResolver(function () { return 'garbagetext'; });
+        $p = new LengthAwarePaginator($array = ['item1', 'item2'], 100, 2);
+        $this->assertEquals(1, $p->currentPage());
+    }
 }

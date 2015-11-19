@@ -499,6 +499,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
+    public function testPaginatedModelCollectionRetrievalWhenCurrentPageGreaterThanTotalPages()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'trinhquanghuy95@gmail.com']);
+
+        Paginator::currentPageResolver(function () { return 3; });
+        $models = EloquentTestUser::oldest('id')->paginate(2);
+
+        $this->assertEquals(1, $models->count());
+        $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
+        $this->assertInstanceOf('EloquentTestUser', $models[0]);
+        $this->assertEquals('trinhquanghuy95@gmail.com', $models[0]->email);
+    }
+
     /**
      * Helpers...
      */
