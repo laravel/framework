@@ -118,7 +118,7 @@ trait ResetsPasswords
     }
 
     /**
-     * Get the post register / login redirect path.
+     * Get the post password reset redirect path.
      *
      * @return string
      */
