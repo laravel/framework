@@ -4,34 +4,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * Bootstrap Eloquent.
-     *
-     * @return void
-     */
-    public static function setUpBeforeClass()
-    {
-        Eloquent::setConnectionResolver(
-            new DatabaseIntegrationTestConnectionResolver
-        );
-
-        Eloquent::setEventDispatcher(
-            new Illuminate\Events\Dispatcher
-        );
-    }
-
-    /**
-     * Tear down Eloquent.
-     */
-    public static function tearDownAfterClass()
-    {
-        Eloquent::unsetEventDispatcher();
-        Eloquent::unsetConnectionResolver();
-    }
-
     /**
      * Setup the database schema.
      *
@@ -39,6 +15,14 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        $db = new DB;
+        $db->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+            ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
@@ -587,32 +571,5 @@ class EloquentTestPhoto extends Eloquent
     public function imageable()
     {
         return $this->morphTo();
-    }
-}
-
-/**
- * Connection Resolver.
- */
-class DatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
-{
-    protected $connection;
-
-    public function connection($name = null)
-    {
-        if (isset($this->connection)) {
-            return $this->connection;
-        }
-
-        return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
-    }
-
-    public function getDefaultConnection()
-    {
-        return 'default';
-    }
-
-    public function setDefaultConnection($name)
-    {
-        //
     }
 }
