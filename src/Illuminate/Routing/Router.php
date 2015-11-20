@@ -118,6 +118,8 @@ class Router implements RegistrarContract
         $this->events = $events;
         $this->routes = new RouteCollection;
         $this->container = $container ?: new Container;
+        
+        $this->bind('_missing', function($v) { return explode('/', $v); });
     }
 
     /**
