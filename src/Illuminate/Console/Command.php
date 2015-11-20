@@ -290,7 +290,7 @@ class Command extends SymfonyCommand
      * @param  string  $default
      * @param  mixed   $attempts
      * @param  bool    $multiple
-     * @return bool
+     * @return string
      */
     public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
     {
@@ -383,9 +383,11 @@ class Command extends SymfonyCommand
      */
     public function warn($string)
     {
-        $style = new OutputFormatterStyle('yellow');
+        if (! $this->output->getFormatter()->hasStyle('warning')) {
+            $style = new OutputFormatterStyle('yellow');
 
-        $this->output->getFormatter()->setStyle('warning', $style);
+            $this->output->getFormatter()->setStyle('warning', $style);
+        }
 
         $this->output->writeln("<warning>$string</warning>");
     }
