@@ -19,7 +19,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $db->addConnection([
             'driver'    => 'sqlite',
             'database'  => ':memory:',
-            ]);
+        ]);
         $db->bootEloquent();
         $db->setAsGlobal();
 
