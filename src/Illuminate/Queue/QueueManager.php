@@ -182,7 +182,11 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["queue.connections.{$name}"];
+        $nullConfig = [
+            'driver' => 'null'
+        ];
+
+        return $this->app['config']["queue.connections.{$name}"] ?: $nullConfig;
     }
 
     /**
@@ -192,7 +196,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['queue.default'];
+        return $this->app['config']['queue.default'] ?: 'null';
     }
 
     /**
@@ -203,7 +207,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['queue.default'] = $name;
+        $this->app['config']['queue.default'] = is_null($name) ? 'null' : $name;
     }
 
     /**
