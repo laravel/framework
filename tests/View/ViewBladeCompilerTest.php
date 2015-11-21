@@ -595,6 +595,114 @@ test';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testInjectAnnotationsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@inject Some\\DependencyInView $varName'.PHP_EOL;
+        $expected = '<?php $varName = app(Some\\DependencyInView::class); ?>'.PHP_EOL;
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@inject auth $varName'.PHP_EOL;
+        $expected = '<?php $varName = app(auth::class); ?>'.PHP_EOL;
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@inject auth.driver $varName'.PHP_EOL;
+        $expected = '<?php $varName = app(\'auth.driver\'); ?>'.PHP_EOL;
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testUseAnnotationsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $string = '@use Some\Namespaced\Class'.PHP_EOL;
+        $expected = '<?php use Some\Namespaced\Class; ?>'.PHP_EOL;
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@use Some\Namespaced\Class as AliasedClass'.PHP_EOL;
+        $expected = '<?php use Some\Namespaced\Class as AliasedClass; ?>'.PHP_EOL;
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    /**
+     * @dataProvider paramAnnotationsCompileTestProvider
+     */
+    public function testParamAnnotationsAreCompiled($stringToCompile, $expectedCompiled)
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $this->assertEquals($expectedCompiled, $compiler->compileString($stringToCompile));
+    }
+
+    public function paramAnnotationsCompileTestProvider()
+    {
+        return [
+            [
+                '@param $variable'.PHP_EOL,
+                "<?php if( ! (array_key_exists('variable', get_defined_vars()))) { "
+                .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                .'('
+                ."NULL, 'variable', 'mixed', array_key_exists('variable', get_defined_vars()) ? type_of(\$variable) : 'none'"
+                .'); '
+                .'} ?>'.PHP_EOL,
+            ],
+            [
+                '@param Some\\ClassName $variable'.PHP_EOL,
+                "<?php if( ! (array_key_exists('variable', get_defined_vars()) && (\$variable instanceof Some\\ClassName))) { "
+                .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                .'('
+                ."NULL, 'variable', 'Some\\\\ClassName', array_key_exists('variable', get_defined_vars()) ? type_of(\$variable) : 'none'"
+                .'); '
+                .'} ?>'.PHP_EOL,
+            ],
+            [
+                '@param int $var'.PHP_EOL,
+                "<?php if( ! (array_key_exists('var', get_defined_vars()) && (is_int(\$var)))) { "
+                .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                .'('
+                ."NULL, 'var', 'int', array_key_exists('var', get_defined_vars()) ? type_of(\$var) : 'none'"
+                .'); '
+                .'} ?>'.PHP_EOL,
+            ],
+            [
+                '@param int|string $var'.PHP_EOL,
+                "<?php if( ! (array_key_exists('var', get_defined_vars()) && (is_int(\$var) || is_string(\$var)))) { "
+                .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                .'('
+                ."NULL, 'var', 'int|string', array_key_exists('var', get_defined_vars()) ? type_of(\$var) : 'none'"
+                .'); '
+                .'} ?>'.PHP_EOL,
+            ],
+            [
+                '@param ClassName|string $var'.PHP_EOL,
+                "<?php if( ! (array_key_exists('var', get_defined_vars()) && (\$var instanceof ClassName || is_string(\$var)))) { "
+                .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                .'('
+                ."NULL, 'var', 'ClassName|string', array_key_exists('var', get_defined_vars()) ? type_of(\$var) : 'none'"
+                .'); '
+                .'} ?>'.PHP_EOL,
+            ],
+            [
+                    '@param numeric $var'.PHP_EOL,
+                    "<?php if( ! (array_key_exists('var', get_defined_vars()) && (is_numeric(\$var)))) { "
+                    .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                    .'('
+                    ."NULL, 'var', 'numeric', array_key_exists('var', get_defined_vars()) ? type_of(\$var) : 'none'"
+                    .'); '
+                    .'} ?>'.PHP_EOL,
+            ],
+            [
+                    '@param ClassName|null $var'.PHP_EOL,
+                    "<?php if( ! (array_key_exists('var', get_defined_vars()) && (\$var instanceof ClassName || is_null(\$var)))) { "
+                    .'throw Illuminate\\View\\Exception\\ViewParamException::forVariable'
+                    .'('
+                    ."NULL, 'var', 'ClassName|null', array_key_exists('var', get_defined_vars()) ? type_of(\$var) : 'none'"
+                    .'); '
+                    .'} ?>'.PHP_EOL,
+            ],
+        ];
+    }
+
     public function testGetTagsProvider()
     {
         return [

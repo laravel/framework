@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\Exception\ViewParamException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -24,6 +25,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $customDirectives = [];
 
     /**
+     * All custom annotation handlers.
+     *
+     * @var array
+     */
+    protected $customAnnotations = [];
+
+    /**
      * The file currently being compiled.
      *
      * @var string
@@ -37,6 +45,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected $compilers = [
         'Extensions',
+        'Annotations',
         'Statements',
         'Comments',
         'Echos',
@@ -276,6 +285,35 @@ class BladeCompiler extends Compiler implements CompilerInterface
         };
 
         return preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', $callback, $value);
+    }
+
+    /**
+     * Compile Blade annotations that start with "@".
+     *
+     * Blade Annotations are similar to PHPDoc annotations. They
+     * are different to regular blade statements such that
+     * they do not require brackets and must encompass
+     * an entire line excluding whitespace chars.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function compileAnnotations($value)
+    {
+        $callback = function ($match) {
+            list($matchString, $nameGroup, $paramGroup) = $match;
+            $params = array_map('trim', explode(' ', $paramGroup));
+
+            if (method_exists($this, $method = 'compile'.ucfirst($nameGroup).'Annotation')) {
+                $compiled = $this->$method($params);
+            } elseif (isset($this->customDirectives[$nameGroup])) {
+                $compiled = call_user_func($this->customAnnotations[$nameGroup], Arr::get($match, 3));
+            }
+
+            return isset($compiled) ? $compiled.PHP_EOL : $matchString;
+        };
+
+        return preg_replace_callback('/^[^\S\n]*@(\w+)[^\S\n]+([^\n\(\)]+)[\n\r]$/xm', $callback, $value);
     }
 
     /**
@@ -752,6 +790,105 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the inject annotations into valid PHP.
+     *
+     * @param  string[]  $segments
+     * @return string
+     */
+    protected function compileInjectAnnotation(array $segments)
+    {
+        list($injectClass, $variableName) = $segments;
+
+        $phpIdentifierRegex = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\\\\]*$/';
+
+        if (preg_match($phpIdentifierRegex, $injectClass)) {
+            $injectClass .= '::class';
+        } else {
+            $injectClass = var_export($injectClass, true);
+        }
+
+        return "<?php {$variableName} = app({$injectClass}); ?>";
+    }
+
+    /**
+     * Compile the use annotations into valid PHP.
+     *
+     * @param  string[]  $segments
+     * @return string
+     */
+    protected function compileUseAnnotation(array $segments)
+    {
+        return '<?php use '.implode(' ', $segments).'; ?>';
+    }
+
+    /**
+     * Compile the inject annotations into valid PHP.
+     *
+     * @param  string[]  $segments
+     * @return string
+     */
+    protected function compileParamAnnotation(array $segments)
+    {
+        static $primitives = [
+                'string'   => 'is_string',
+                'int'      => 'is_int',
+                'integer'  => 'is_int',
+                'float'    => 'is_float',
+                'double'   => 'is_float',
+                'real'     => 'is_float',
+                'bool'     => 'is_bool',
+                'boolean'  => 'is_bool',
+                'object'   => 'is_object',
+                'array'    => 'is_array',
+                'resource' => 'is_resource',
+                'null'     => 'is_null',
+                'numeric'  => 'is_numeric',
+        ];
+
+        if (count($segments) > 1) {
+            $allowedTypes = explode('|', $segments[0]);
+            $variable = $segments[1];
+        } else {
+            $allowedTypes = null;
+            $variable = $segments[0];
+        }
+
+        // Remove leading '$'
+        $variableName = substr($variable, 1);
+
+        $variableIsDefined = sprintf('array_key_exists(%s, get_defined_vars())', var_export($variableName, true));
+
+        $paramCheck = $variableIsDefined;
+        if ($allowedTypes) {
+            $typeChecks = [];
+            foreach ($allowedTypes as $type) {
+                $lowerType = strtolower($type);
+
+                if (isset($primitives[$lowerType])) {
+                    $typeChecks[] = $primitives[$lowerType].'('.$variable.')';
+                } else {
+                    $typeChecks[] = $variable.' instanceof '.$type;
+                }
+            }
+
+            $paramCheck .= ' && (';
+            $paramCheck .= implode(' || ', $typeChecks);
+            $paramCheck .= ')';
+        }
+
+        $exceptionFactoryMethod = ViewParamException::class.'::forVariable';
+        $arguments = [
+                var_export($this->path, true),
+                var_export($variableName, true),
+                var_export($allowedTypes ? implode('|', $allowedTypes) : 'mixed', true),
+                $variableIsDefined.' ? type_of($'.$variableName.') : \'none\'',
+        ];
+        $arguments = implode(', ', $arguments);
+
+        return "<?php if( ! ({$paramCheck})) { throw {$exceptionFactoryMethod}({$arguments}); } ?>";
+    }
+
+    /**
      * Get the extensions used by the compiler.
      *
      * @return array
@@ -792,6 +929,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Register a handler for custom annotation.
+     *
+     * @param  string  $name
+     * @param  callable  $handler
+     * @return void
+     */
+    public function annotation($name, callable $handler)
+    {
+        $this->customAnnotations[$name] = $handler;
+    }
+
+    /**
+     * Get the list of custom annotations.
+     *
+     * @return array
+     */
+    public function getCustomAnnotations()
+    {
+        return $this->customAnnotations;
     }
 
     /**

@@ -781,6 +781,19 @@ if (! function_exists('trait_uses_recursive')) {
     }
 }
 
+if (! function_exists('type_of')) {
+    /**
+     * Returns the type of the given variable.
+     *
+     * @param  mixed  $object
+     * @return string
+     */
+    function type_of($object)
+    {
+        return is_object($object) ? get_class($object) : gettype($object);
+    }
+}
+
 if (! function_exists('value')) {
     /**
      * Return the default value of the given value.
