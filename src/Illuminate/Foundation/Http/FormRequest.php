@@ -226,12 +226,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Get the key to be used for the view error bag
+     * Get the key to be used for the view error bag.
      *
      * @return string
      */
     public function getErrorBagName()
     {
-        return $this->errorBag;
+        $this->dontFlash[] = '_error_bag';
+        return $this->input('_error_bag', $this->errorBag);
     }
 }
