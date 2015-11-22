@@ -183,7 +183,7 @@ class QueueManager implements FactoryContract, MonitorContract
     protected function getConfig($name)
     {
         $nullConfig = [
-            'driver' => 'null'
+            'driver' => 'null',
         ];
 
         return $this->app['config']["queue.connections.{$name}"] ?: $nullConfig;
