@@ -233,6 +233,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function getErrorBagName()
     {
         $this->dontFlash[] = '_error_bag';
+
         return $this->input('_error_bag', $this->errorBag);
     }
 }
