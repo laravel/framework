@@ -135,7 +135,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         return $this->redirector->to($this->getRedirectUrl())
                                         ->withInput($this->except($this->dontFlash))
-                                        ->withErrors($errors, $this->errorBag);
+                                        ->withErrors($errors, $this->getErrorBagName());
     }
 
     /**
@@ -223,5 +223,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Get the key to be used for the view error bag
+     *
+     * @return string
+     */
+    public function getErrorBagName()
+    {
+        return $this->errorBag;
     }
 }
