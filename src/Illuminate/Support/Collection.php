@@ -393,6 +393,27 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if there are any items that pass a given truth test.
+     *
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function any(callable $callback = null)
+    {
+        if (is_null($callback)) {
+            return ! $this->isEmpty();
+        }
+
+        foreach ($this->items as $key => $item) {
+            if ($callback($item, $key) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the given value is callable, but not a string.
      *
      * @param  mixed  $value
