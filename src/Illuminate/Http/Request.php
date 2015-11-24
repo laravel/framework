@@ -911,11 +911,13 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Get a subset of the items from the input data.
      *
-     * @param  mixed string
+     * @param  array|mixed  $keys
      * @return array
      */
-    public function __invoke()
+    public function __invoke($keys)
     {
-        return $this->only(func_get_args());
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        return $this->only($keys);
     }
 }
