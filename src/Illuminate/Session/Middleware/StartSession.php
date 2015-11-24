@@ -68,8 +68,12 @@ class StartSession
             $this->storeCurrentUrl($request, $session);
 
             $this->collectGarbage($session);
-
-            $this->addCookieToResponse($response, $session);
+			//cookie to add to response,only when session id changed
+			$sessionCookieName = $session->getName();
+			$sessionCookieValue = $session->getId();
+			if (($oldCookie = $request->cookie($sessionCookieName)) == null || $oldCookie !== $sessionCookieValue) {
+				$this->addCookieToResponse($response, $session);
+			}
         }
 
         return $response;
@@ -198,12 +202,11 @@ class StartSession
      *
      * @return int
      */
-    protected function getCookieExpirationDate()
-    {
-        $config = $this->manager->getSessionConfig();
-
-        return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
-    }
+    protected function getCookieExpirationDate() {
+		//only sesssion can be expired. cookie will not
+		//when session is invalid,return a new session id
+		return 0;
+	}
 
     /**
      * Determine if a session driver has been configured.
