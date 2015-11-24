@@ -399,7 +399,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
-        $this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
+        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 

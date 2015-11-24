@@ -59,6 +59,13 @@ class Builder
     ];
 
     /**
+     * Applied global scopes.
+     *
+     * @var array
+     */
+    protected $scopes = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -67,6 +74,55 @@ class Builder
     public function __construct(QueryBuilder $query)
     {
         $this->query = $query;
+    }
+
+    /**
+     * Register a new global scope.
+     *
+     * @param  string  $identifier
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @return $this
+     */
+    public function applyGlobalScope($identifier, $scope)
+    {
+        $this->scopes[$identifier] = $scope;
+
+        return $this;
+    }
+
+    /**
+     * Remove a registered global scope.
+     *
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
+     * @return $this
+     */
+    public function removeGlobalScope($scope)
+    {
+        if (is_string($scope)) {
+            unset($this->scopes[$scope]);
+
+            return $this;
+        }
+
+        foreach ($this->scopes as $key => $value) {
+            if ($scope instanceof $value) {
+                unset($this->scopes[$key]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove all registered global scopes.
+     *
+     * @return $this
+     */
+    public function removeGlobalScopes()
+    {
+        $this->scopes = [];
+
+        return $this;
     }
 
     /**
@@ -405,7 +461,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->query->get($columns);
+        $results = $this->getQueryWithScopes()->get($columns);
 
         $connection = $this->model->getConnectionName();
 
@@ -829,6 +885,32 @@ class Builder
     }
 
     /**
+     * Get the underlying query builder instance with applied global scopes.
+     *
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function getQueryWithScopes()
+    {
+        if (! $this->scopes) {
+            return $this->getQuery();
+        }
+
+        $builder = clone $this;
+
+        foreach ($this->scopes as $scope) {
+            if ($scope instanceof Closure) {
+                $scope($builder);
+            }
+
+            if ($scope instanceof ScopeInterface) {
+                $scope->apply($builder, $this->getModel());
+            }
+        }
+
+        return $builder->getQuery();
+    }
+
+    /**
      * Get the underlying query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder|static
@@ -935,13 +1017,19 @@ class Builder
             array_unshift($parameters, $this);
 
             return call_user_func_array($this->macros[$method], $parameters);
-        } elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
+        }
+
+        if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
             return $this->callScope($scope, $parameters);
         }
 
-        $result = call_user_func_array([$this->query, $method], $parameters);
+        if (in_array($method, $this->passthru)) {
+            return call_user_func_array([$this->getQueryWithScopes(), $method], $parameters);
+        }
 
-        return in_array($method, $this->passthru) ? $result : $this;
+        call_user_func_array([$this->query, $method], $parameters);
+
+        return $this;
     }
 
     /**
