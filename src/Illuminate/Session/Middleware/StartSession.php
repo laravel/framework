@@ -201,7 +201,7 @@ class StartSession
      *
      * @return int
      */
-    protected function getCookieExpirationDate() 
+    protected function getCookieExpirationDate()
     {
         //only sesssion can be expired. cookie will not
         //when session is invalid,return a new session id
