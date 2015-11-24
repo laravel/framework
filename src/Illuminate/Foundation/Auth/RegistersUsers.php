@@ -10,13 +10,20 @@ trait RegistersUsers
     use RedirectsUsers;
 
     /**
+     * Name of view used to render registration form.
+     *
+     * @var string
+     */
+    protected $registerView = 'auth.register';
+
+    /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
     public function getRegister()
     {
-        return view('auth.register');
+        return view($this->registerView);
     }
 
     /**

@@ -11,17 +11,20 @@ trait AuthenticatesUsers
     use RedirectsUsers;
 
     /**
+     * Name of view used to render authentication form.
+     *
+     * @var string
+     */
+    protected $authenticateView = 'auth.authenticate';
+
+    /**
      * Show the application login form.
      *
      * @return \Illuminate\Http\Response
      */
     public function getLogin()
     {
-        if (view()->exists('auth.authenticate')) {
-            return view('auth.authenticate');
-        }
-
-        return view('auth.login');
+        return view($this->authenticateView);
     }
 
     /**
