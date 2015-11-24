@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use DateTime;
 use Exception;
 use ArrayAccess;
@@ -10,6 +11,7 @@ use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -335,18 +337,31 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Register a new global scope on the model.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure|string  $scope
+     * @param  \Closure|null  $implementation
      * @return void
      */
-    public static function addGlobalScope(ScopeInterface $scope)
+    public static function addGlobalScope($scope, Closure $implementation = null)
     {
-        static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
+        if (is_string($scope) && $implementation) {
+            return static::$globalScopes[get_called_class()][$scope] = $implementation;
+        }
+
+        if ($scope instanceof Closure) {
+            return static::$globalScopes[get_called_class()][uniqid('scope')] = $scope;
+        }
+
+        if ($scope instanceof ScopeInterface) {
+            return static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
+        }
+
+        throw new InvalidArgumentException('Global scope must be an instance of Closure or ScopeInterface');
     }
 
     /**
      * Determine if a model has a global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
      * @return bool
      */
     public static function hasGlobalScope($scope)
@@ -357,12 +372,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a global scope registered with the model.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
-     * @return \Illuminate\Database\Eloquent\ScopeInterface|null
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
+     * @return \Illuminate\Database\Eloquent\ScopeInterface|\Closure|null
      */
     public static function getGlobalScope($scope)
     {
-        return Arr::first(static::$globalScopes[get_called_class()], function ($key, $value) use ($scope) {
+        $modelScopes = static::$globalScopes[get_called_class()];
+
+        if (is_string($scope)) {
+            return isset($modelScopes[$scope]) ? $modelScopes[$scope] : null;
+        }
+
+        return Arr::first($modelScopes, function ($key, $value) use ($scope) {
             return $scope instanceof $value;
         });
     }
@@ -1839,14 +1860,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a new query instance without a given scope.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface  $scope
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function newQueryWithoutScope($scope)
     {
-        $this->getGlobalScope($scope)->remove($builder = $this->newQuery(), $this);
+        $builder = $this->newQuery();
 
-        return $builder;
+        return $builder->removeGlobalScope($scope);
     }
 
     /**
@@ -1874,8 +1895,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function applyGlobalScopes($builder)
     {
-        foreach ($this->getGlobalScopes() as $scope) {
-            $scope->apply($builder, $this);
+        foreach ($this->getGlobalScopes() as $identifier => $scope) {
+            $builder->applyGlobalScope($identifier, $scope);
         }
 
         return $builder;
@@ -1889,11 +1910,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function removeGlobalScopes($builder)
     {
-        foreach ($this->getGlobalScopes() as $scope) {
-            $scope->remove($builder, $this);
-        }
-
-        return $builder;
+        return $builder->removeGlobalScopes();
     }
 
     /**

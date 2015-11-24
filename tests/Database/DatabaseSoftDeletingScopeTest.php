@@ -21,20 +21,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $scope->apply($builder, $model);
     }
 
-    public function testScopeCanRemoveDeletedAtConstraints()
-    {
-        $scope = new Illuminate\Database\Eloquent\SoftDeletingScope;
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $builder->shouldReceive('getModel')->andReturn($model);
-        $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $builder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
-        $query->wheres = [['type' => 'Null', 'column' => 'foo'], ['type' => 'Null', 'column' => 'table.deleted_at']];
-        $scope->remove($builder, $model);
-
-        $this->assertEquals($query->wheres, [['type' => 'Null', 'column' => 'foo']]);
-    }
-
     public function testForceDeleteExtension()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -74,7 +60,7 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $callback = $builder->getMacro('withTrashed');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
         $givenBuilder->shouldReceive('getModel')->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
-        $scope->shouldReceive('remove')->once()->with($givenBuilder, $model);
+        $givenBuilder->shouldReceive('removeGlobalScope')->with($scope)->andReturn($givenBuilder);
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
@@ -90,9 +76,9 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('onlyTrashed');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $scope->shouldReceive('remove')->once()->with($givenBuilder, $model);
         $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock('StdClass'));
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
+        $givenBuilder->shouldReceive('removeGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
         $query->shouldReceive('whereNotNull')->once()->with('table.deleted_at');
         $result = $callback($givenBuilder);
