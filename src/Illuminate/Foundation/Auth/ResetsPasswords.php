@@ -11,13 +11,27 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 trait ResetsPasswords
 {
     /**
+     * Name of view used to render password restore form.
+     *
+     * @var string
+     */
+    protected $passwordView = 'auth.password';
+
+    /**
+     * Name of view used to render password reset form.
+     *
+     * @var string
+     */
+    protected $resetView = 'auth.reset';
+
+    /**
      * Display the form to request a password reset link.
      *
      * @return \Illuminate\Http\Response
      */
     public function getEmail()
     {
-        return view('auth.password');
+        return view($this->passwordView);
     }
 
     /**
@@ -65,7 +79,7 @@ trait ResetsPasswords
             throw new NotFoundHttpException;
         }
 
-        return view('auth.reset')->with('token', $token);
+        return view($this->resetView)->with('token', $token);
     }
 
     /**
