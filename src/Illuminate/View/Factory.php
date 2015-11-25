@@ -544,6 +544,10 @@ class Factory implements FactoryContract
      */
     public function yieldSection()
     {
+        if (empty($this->sectionStack)) {
+            return '';
+        }
+
         return $this->yieldContent($this->stopSection());
     }
 
@@ -552,11 +556,12 @@ class Factory implements FactoryContract
      *
      * @param  bool  $overwrite
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function stopSection($overwrite = false)
     {
         if (empty($this->sectionStack)) {
-            return '';
+            throw new InvalidArgumentException('Cannot end a section without first starting one.');
         }
 
         $last = array_pop($this->sectionStack);
@@ -574,11 +579,12 @@ class Factory implements FactoryContract
      * Stop injecting content into a section and append it.
      *
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function appendSection()
     {
         if (empty($this->sectionStack)) {
-            return '';
+            throw new InvalidArgumentException('Cannot end a section without first starting one.');
         }
 
         $last = array_pop($this->sectionStack);
