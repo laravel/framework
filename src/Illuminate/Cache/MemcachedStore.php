@@ -60,13 +60,13 @@ class MemcachedStore extends TaggableStore implements Store
         $prefixedKeys = [];
 
         foreach($keys as $keyToPrefix) {
-            $prefixedKeys[] = $this->prefix . $keyToPrefix;
+            $prefixedKeys[] = $this->prefix.$keyToPrefix;
         }
 
         $cas = null;
         $cacheValues = $this->memcached->getMulti($prefixedKeys, $cas, \Memcached::GET_PRESERVE_ORDER);
 
-        $returnValues = array_combine($keys,$cacheValues);
+        $returnValues = array_combine($keys, $cacheValues);
 
         return $returnValues;
     }

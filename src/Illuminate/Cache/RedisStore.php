@@ -69,7 +69,7 @@ class RedisStore extends TaggableStore implements Store
         $prefixedKeys = [];
 
         foreach ($keys as $keyToPrefix) {
-            $prefixedKeys[] = $this->prefix . $keyToPrefix;
+            $prefixedKeys[] = $this->prefix.$keyToPrefix;
         }
 
         $cacheValues = $this->connection()->mget($prefixedKeys);
