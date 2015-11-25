@@ -555,7 +555,7 @@ class Factory implements FactoryContract
      */
     public function stopSection($overwrite = false)
     {
-        if(empty($this->sectionStack)) {
+        if (empty($this->sectionStack)) {
             return '';
         }
 
@@ -577,7 +577,7 @@ class Factory implements FactoryContract
      */
     public function appendSection()
     {
-        if(empty($this->sectionStack)) {
+        if (empty($this->sectionStack)) {
             return '';
         }
 
