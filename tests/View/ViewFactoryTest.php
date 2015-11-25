@@ -396,6 +396,26 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->make('view')->render();
     }
 
+    public function testExtraStopSectionCallThrowsException()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        $factory->stopSection();
+
+        $this->setExpectedException('InvalidArgumentException', 'Cannot end a section without first starting one.');
+        $factory->stopSection();
+    }
+
+    public function testExtraAppendSectionCallThrowsException()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        $factory->stopSection();
+
+        $this->setExpectedException('InvalidArgumentException', 'Cannot end a section without first starting one.');
+        $factory->appendSection();
+    }
+
     protected function getFactory()
     {
         return new Factory(
