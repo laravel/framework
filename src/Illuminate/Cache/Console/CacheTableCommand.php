@@ -37,9 +37,8 @@ class CacheTableCommand extends Command
     /**
      * Create a new session table command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Foundation\Composer  $composer
-     * @return void
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param \Illuminate\Foundation\Composer   $composer
      */
     public function __construct(Filesystem $files, Composer $composer)
     {
@@ -51,8 +50,6 @@ class CacheTableCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function fire()
     {

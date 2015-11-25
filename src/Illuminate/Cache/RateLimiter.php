@@ -16,8 +16,7 @@ class RateLimiter
     /**
      * Create a new rate limiter instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
+     * @param \Illuminate\Contracts\Cache\Repository $cache
      */
     public function __construct(Cache $cache)
     {
@@ -27,9 +26,10 @@ class RateLimiter
     /**
      * Determine if the given key has been "accessed" too many times.
      *
-     * @param  string  $key
-     * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param string $key
+     * @param int    $maxAttempts
+     * @param int    $decayMinutes
+     *
      * @return bool
      */
     public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
@@ -37,7 +37,7 @@ class RateLimiter
         $lockedOut = $this->cache->has($key.':lockout');
 
         if ($this->attempts($key) > $maxAttempts || $lockedOut) {
-            if (! $lockedOut) {
+            if (!$lockedOut) {
                 $this->cache->add($key.':lockout', time() + ($decayMinutes * 60), $decayMinutes);
             }
 
@@ -50,8 +50,9 @@ class RateLimiter
     /**
      * Increment the counter for a given key for a given decay time.
      *
-     * @param  string  $key
-     * @param  int  $decayMinutes
+     * @param string $key
+     * @param int    $decayMinutes
+     *
      * @return int
      */
     public function hit($key, $decayMinutes = 1)
@@ -64,7 +65,8 @@ class RateLimiter
     /**
      * Get the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function attempts($key)
@@ -75,8 +77,7 @@ class RateLimiter
     /**
      * Clear the hits and lockout for the given key.
      *
-     * @param  string  $key
-     * @return void
+     * @param string $key
      */
     public function clear($key)
     {
@@ -88,7 +89,8 @@ class RateLimiter
     /**
      * Get the number of seconds until the "key" is accessible again.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return int
      */
     public function availableIn($key)

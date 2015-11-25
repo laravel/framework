@@ -7,7 +7,8 @@ abstract class TaggableStore
     /**
      * Begin executing a new tags operation.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Illuminate\Cache\TaggedCache
      *
      * @deprecated since version 5.1. Use tags instead.
@@ -20,7 +21,8 @@ abstract class TaggableStore
     /**
      * Begin executing a new tags operation.
      *
-     * @param  array|mixed  $names
+     * @param array|mixed $names
+     *
      * @return \Illuminate\Cache\TaggedCache
      */
     public function tags($names)

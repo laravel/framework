@@ -41,8 +41,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Create a new cache repository instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
-     * @return void
+     * @param \Illuminate\Contracts\Cache\Store $store
      */
     public function __construct(Store $store)
     {
@@ -52,8 +51,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
+     * @param \Illuminate\Contracts\Events\Dispatcher $events
      */
     public function setEventDispatcher(Dispatcher $events)
     {
@@ -63,9 +61,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Fire an event for this cache instance.
      *
-     * @param  string  $event
-     * @param  array  $payload
-     * @return void
+     * @param string $event
+     * @param array  $payload
      */
     protected function fireCacheEvent($event, $payload)
     {
@@ -77,19 +74,21 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Determine if an item exists in the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function has($key)
     {
-        return ! is_null($this->get($key));
+        return !is_null($this->get($key));
     }
 
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null)
@@ -110,8 +109,9 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function pull($key, $default = null)
@@ -126,16 +126,15 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
-     * @return void
+     * @param string        $key
+     * @param mixed         $value
+     * @param \DateTime|int $minutes
      */
     public function put($key, $value, $minutes)
     {
         $minutes = $this->getMinutes($minutes);
 
-        if (! is_null($minutes)) {
+        if (!is_null($minutes)) {
             $this->store->put($key, $value, $minutes);
 
             $this->fireCacheEvent('write', [$key, $value, $minutes]);
@@ -145,9 +144,10 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Store an item in the cache if the key does not exist.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param string        $key
+     * @param mixed         $value
+     * @param \DateTime|int $minutes
+     *
      * @return bool
      */
     public function add($key, $value, $minutes)
@@ -174,9 +174,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param string $key
+     * @param mixed  $value
      */
     public function forever($key, $value)
     {
@@ -188,9 +187,10 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get an item from the cache, or store the default value.
      *
-     * @param  string  $key
-     * @param  \DateTime|int  $minutes
-     * @param  \Closure  $callback
+     * @param string        $key
+     * @param \DateTime|int $minutes
+     * @param \Closure      $callback
+     *
      * @return mixed
      */
     public function remember($key, $minutes, Closure $callback)
@@ -198,7 +198,7 @@ class Repository implements CacheContract, ArrayAccess
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes in storage.
-        if (! is_null($value = $this->get($key))) {
+        if (!is_null($value = $this->get($key))) {
             return $value;
         }
 
@@ -210,8 +210,9 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get an item from the cache, or store the default value forever.
      *
-     * @param  string   $key
-     * @param  \Closure  $callback
+     * @param string   $key
+     * @param \Closure $callback
+     *
      * @return mixed
      */
     public function sear($key, Closure $callback)
@@ -222,8 +223,9 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get an item from the cache, or store the default value forever.
      *
-     * @param  string   $key
-     * @param  \Closure  $callback
+     * @param string   $key
+     * @param \Closure $callback
+     *
      * @return mixed
      */
     public function rememberForever($key, Closure $callback)
@@ -231,7 +233,7 @@ class Repository implements CacheContract, ArrayAccess
         // If the item exists in the cache we will just return this immediately
         // otherwise we will execute the given Closure and cache the result
         // of that execution for the given number of minutes. It's easy.
-        if (! is_null($value = $this->get($key))) {
+        if (!is_null($value = $this->get($key))) {
             return $value;
         }
 
@@ -243,7 +245,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Remove an item from the cache.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -268,8 +271,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Set the default cache time in minutes.
      *
-     * @param  int   $minutes
-     * @return void
+     * @param int $minutes
      */
     public function setDefaultCacheTime($minutes)
     {
@@ -289,7 +291,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Determine if a cached value exists.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function offsetExists($key)
@@ -300,7 +303,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function offsetGet($key)
@@ -311,9 +315,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Store an item in the cache for the default time.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param string $key
+     * @param mixed  $value
      */
     public function offsetSet($key, $value)
     {
@@ -323,8 +326,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
-     * @return void
+     * @param string $key
      */
     public function offsetUnset($key)
     {
@@ -334,7 +336,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTime|int  $duration
+     * @param \DateTime|int $duration
+     *
      * @return int|null
      */
     protected function getMinutes($duration)
@@ -351,8 +354,9 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Handle dynamic calls into macros or pass missing methods to the store.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -366,8 +370,6 @@ class Repository implements CacheContract, ArrayAccess
 
     /**
      * Clone cache repository instance.
-     *
-     * @return void
      */
     public function __clone()
     {
