@@ -16,8 +16,7 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Create a new WinCache store.
      *
-     * @param  string  $prefix
-     * @return void
+     * @param string $prefix
      */
     public function __construct($prefix = '')
     {
@@ -27,7 +26,8 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function get($key)
@@ -41,16 +41,17 @@ class XCacheStore extends TaggableStore implements Store
 
     /**
      * Retrieve multiple items from the cache by key,
-     * items not found in the cache will have a null value for the key
+     * items not found in the cache will have a null value for the key.
      *
      * @param string[] $keys
+     *
      * @return array
      */
     public function getMulti(array $keys)
     {
         $returnValues = [];
 
-        foreach($keys as $singleKey) {
+        foreach ($keys as $singleKey) {
             $returnValues[$singleKey] = $this->get($singleKey);
         }
 
@@ -60,10 +61,9 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $minutes
-     * @return void
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $minutes
      */
     public function put($key, $value, $minutes)
     {
@@ -71,24 +71,24 @@ class XCacheStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes
+     * Store multiple items in the cache for a set number of minutes.
      *
-     * @param array $values array of key => value pairs
+     * @param array $values  array of key => value pairs
      * @param int   $minutes
-     * @return void
      */
     public function putMulti(array $values, $minutes)
     {
-        foreach($values as $key => $singleValue) {
-            $this->put($key,$singleValue,$minutes);
+        foreach ($values as $key => $singleValue) {
+            $this->put($key, $singleValue, $minutes);
         }
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1)
@@ -99,8 +99,9 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1)
@@ -111,9 +112,8 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param string $key
+     * @param mixed  $value
      */
     public function forever($key, $value)
     {
@@ -123,7 +123,8 @@ class XCacheStore extends TaggableStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -133,8 +134,6 @@ class XCacheStore extends TaggableStore implements Store
 
     /**
      * Remove all items from the cache.
-     *
-     * @return void
      */
     public function flush()
     {

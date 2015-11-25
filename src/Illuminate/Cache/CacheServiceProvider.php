@@ -17,8 +17,6 @@ class CacheServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register()
     {
@@ -31,7 +29,7 @@ class CacheServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('memcached.connector', function () {
-            return new MemcachedConnector;
+            return new MemcachedConnector();
         });
 
         $this->registerCommands();
@@ -39,8 +37,6 @@ class CacheServiceProvider extends ServiceProvider
 
     /**
      * Register the cache related console commands.
-     *
-     * @return void
      */
     public function registerCommands()
     {

@@ -23,9 +23,8 @@ class TagSet
     /**
      * Create a new TagSet instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
-     * @param  array  $names
-     * @return void
+     * @param \Illuminate\Contracts\Cache\Store $store
+     * @param array                             $names
      */
     public function __construct(Store $store, array $names = [])
     {
@@ -35,8 +34,6 @@ class TagSet
 
     /**
      * Reset all tags in the set.
-     *
-     * @return void
      */
     public function reset()
     {
@@ -46,7 +43,8 @@ class TagSet
     /**
      * Get the unique tag identifier for a given tag.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function tagId($name)
@@ -77,7 +75,8 @@ class TagSet
     /**
      * Reset the tag and return the new tag identifier.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function resetTag($name)
@@ -90,7 +89,8 @@ class TagSet
     /**
      * Get the tag identifier key for a given tag.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function tagKey($name)

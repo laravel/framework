@@ -23,9 +23,8 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Create a new Memcached store.
      *
-     * @param  \Memcached  $memcached
-     * @param  string      $prefix
-     * @return void
+     * @param \Memcached $memcached
+     * @param string     $prefix
      */
     public function __construct($memcached, $prefix = '')
     {
@@ -36,7 +35,8 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function get($key)
@@ -50,23 +50,24 @@ class MemcachedStore extends TaggableStore implements Store
 
     /**
      * Retrieve multiple items from the cache by key,
-     * items not found in the cache will have a null value for the key
+     * items not found in the cache will have a null value for the key.
      *
      * @param string[] $keys
+     *
      * @return array
      */
     public function getMulti(array $keys)
     {
         $prefixedKeys = [];
 
-        foreach($keys as $keyToPrefix) {
-            $prefixedKeys[] = $this->prefix . $keyToPrefix;
+        foreach ($keys as $keyToPrefix) {
+            $prefixedKeys[] = $this->prefix.$keyToPrefix;
         }
 
         $cas = null;
-        $cacheValues = $this->memcached->getMulti($prefixedKeys,$cas,\Memcached::GET_PRESERVE_ORDER);
+        $cacheValues = $this->memcached->getMulti($prefixedKeys, $cas, \Memcached::GET_PRESERVE_ORDER);
 
-        $returnValues = array_combine($keys,$cacheValues);
+        $returnValues = array_combine($keys, $cacheValues);
 
         return $returnValues;
     }
@@ -74,10 +75,9 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $minutes
-     * @return void
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $minutes
      */
     public function put($key, $value, $minutes)
     {
@@ -85,18 +85,17 @@ class MemcachedStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes
+     * Store multiple items in the cache for a set number of minutes.
      *
-     * @param array $values array of key => value pairs
+     * @param array $values  array of key => value pairs
      * @param int   $minutes
-     * @return void
      */
     public function putMulti(array $values, $minutes)
     {
         $formattedKeyValues = [];
 
-        foreach($values as $keyToPrefix => $singleValue) {
-            $formattedKeyValues[$this->prefix . $keyToPrefix] = $singleValue;
+        foreach ($values as $keyToPrefix => $singleValue) {
+            $formattedKeyValues[$this->prefix.$keyToPrefix] = $singleValue;
         }
 
         $this->memcached->setMulti($formattedKeyValues, $minutes * 60);
@@ -105,9 +104,10 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $minutes
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $minutes
+     *
      * @return bool
      */
     public function add($key, $value, $minutes)
@@ -118,8 +118,9 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -130,8 +131,9 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -142,9 +144,8 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param string $key
+     * @param mixed  $value
      */
     public function forever($key, $value)
     {
@@ -154,7 +155,8 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -164,8 +166,6 @@ class MemcachedStore extends TaggableStore implements Store
 
     /**
      * Remove all items from the cache.
-     *
-     * @return void
      */
     public function flush()
     {
@@ -195,11 +195,10 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Set the cache key prefix.
      *
-     * @param  string  $prefix
-     * @return void
+     * @param string $prefix
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix.':' : '';
     }
 }
