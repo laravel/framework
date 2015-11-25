@@ -555,6 +555,10 @@ class Factory implements FactoryContract
      */
     public function stopSection($overwrite = false)
     {
+        if(empty($this->sectionStack)) {
+            return '';
+        }
+
         $last = array_pop($this->sectionStack);
 
         if ($overwrite) {
@@ -573,6 +577,10 @@ class Factory implements FactoryContract
      */
     public function appendSection()
     {
+        if(empty($this->sectionStack)) {
+            return '';
+        }
+
         $last = array_pop($this->sectionStack);
 
         if (isset($this->sections[$last])) {
