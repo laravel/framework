@@ -48,6 +48,24 @@ class FileStore implements Store
     }
 
     /**
+     * Retrieve multiple items from the cache by key,
+     * items not found in the cache will have a null value for the key
+     *
+     * @param string[] $keys
+     * @return array
+     */
+    public function getMulti(array $keys)
+    {
+        $returnValues = [];
+
+        foreach($keys as $singleKey) {
+            $returnValues[$singleKey] = $this->get($singleKey);
+        }
+
+        return $returnValues;
+    }
+
+    /**
      * Retrieve an item and expiry time from the cache by key.
      *
      * @param  string  $key
@@ -100,6 +118,20 @@ class FileStore implements Store
         $this->createCacheDirectory($path = $this->path($key));
 
         $this->files->put($path, $value);
+    }
+
+    /**
+     * Store multiple items in the cache for a set number of minutes
+     *
+     * @param array $values array of key => value pairs
+     * @param int   $minutes
+     * @return void
+     */
+    public function putMulti(array $values, $minutes)
+    {
+        foreach($values as $key => $singleValue) {
+            $this->put($key,$singleValue,$minutes);
+        }
     }
 
     /**
