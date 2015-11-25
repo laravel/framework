@@ -59,7 +59,7 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $prefixedKeys = [];
 
-        foreach($keys as $keyToPrefix) {
+        foreach ($keys as $keyToPrefix) {
             $prefixedKeys[] = $this->prefix.$keyToPrefix;
         }
 
