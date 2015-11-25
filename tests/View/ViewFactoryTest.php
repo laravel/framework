@@ -396,6 +396,40 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->make('view')->render();
     }
 
+    public function testExtraStopSectionCallDoesCloseExternalOutputBuffers()
+    {
+        ob_start();
+
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'should be cleared';
+        $factory->stopSection();
+        echo 'should not ';
+        $factory->stopSection();
+        echo 'be cleared';
+
+        $contents = ob_get_clean();
+
+        $this->assertEquals('should not be cleared', $contents);
+    }
+
+    public function testExtraAppendSectionCallDoesCloseExternalOutputBuffers()
+    {
+        ob_start();
+
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'should be cleared';
+        $factory->stopSection();
+        echo 'should not ';
+        $factory->appendSection();
+        echo 'be cleared';
+
+        $contents = ob_get_clean();
+
+        $this->assertEquals('should not be cleared', $contents);
+    }
+
     protected function getFactory()
     {
         return new Factory(
