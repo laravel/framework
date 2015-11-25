@@ -68,7 +68,7 @@ class RedisStore extends TaggableStore implements Store
         $returnValues = [];
         $prefixedKeys = [];
 
-        foreach($keys as $keyToPrefix) {
+        foreach ($keys as $keyToPrefix) {
             $prefixedKeys[] = $this->prefix . $keyToPrefix;
         }
 
@@ -81,7 +81,6 @@ class RedisStore extends TaggableStore implements Store
 
         return $returnValues;
     }
-
 
     /**
      * Store an item in the cache for a given number of minutes.
@@ -117,7 +116,6 @@ class RedisStore extends TaggableStore implements Store
 
         $this->connection()->exec();
     }
-
 
     /**
      * Increment the value of an item in the cache.

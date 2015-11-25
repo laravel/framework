@@ -64,7 +64,7 @@ class MemcachedStore extends TaggableStore implements Store
         }
 
         $cas = null;
-        $cacheValues = $this->memcached->getMulti($prefixedKeys,$cas,\Memcached::GET_PRESERVE_ORDER);
+        $cacheValues = $this->memcached->getMulti($prefixedKeys, $cas, \Memcached::GET_PRESERVE_ORDER);
 
         $returnValues = array_combine($keys,$cacheValues);
 
@@ -96,7 +96,7 @@ class MemcachedStore extends TaggableStore implements Store
         $formattedKeyValues = [];
 
         foreach ($values as $keyToPrefix => $singleValue) {
-            $formattedKeyValues[$this->prefix . $keyToPrefix] = $singleValue;
+            $formattedKeyValues[$this->prefix.$keyToPrefix] = $singleValue;
         }
 
         $this->memcached->setMulti($formattedKeyValues, $minutes * 60);
