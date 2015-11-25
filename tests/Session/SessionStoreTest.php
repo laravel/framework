@@ -28,9 +28,11 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($session->has('baz'));
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testSessionGetBagException()
     {
-        $this->setExpectedException('InvalidArgumentException');
         $session = $this->getSession();
         $session->getBag('doesNotExist');
     }
