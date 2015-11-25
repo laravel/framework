@@ -50,7 +50,7 @@ class MemcachedStore extends TaggableStore implements Store
 
     /**
      * Retrieve multiple items from the cache by key,
-     * items not found in the cache will have a null value for the key
+     * items not found in the cache will have a null value for the key.
      *
      * @param string[] $keys
      * @return array
@@ -85,7 +85,7 @@ class MemcachedStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes
+     * Store multiple items in the cache for a set number of minutes.
      *
      * @param array $values array of key => value pairs
      * @param int   $minutes
@@ -95,7 +95,7 @@ class MemcachedStore extends TaggableStore implements Store
     {
         $formattedKeyValues = [];
 
-        foreach($values as $keyToPrefix => $singleValue) {
+        foreach ($values as $keyToPrefix => $singleValue) {
             $formattedKeyValues[$this->prefix . $keyToPrefix] = $singleValue;
         }
 

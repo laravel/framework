@@ -58,7 +58,7 @@ class RedisStore extends TaggableStore implements Store
 
     /**
      * Retrieve multiple items from the cache by key,
-     * items not found in the cache will have a null value for the key
+     * items not found in the cache will have a null value for the key.
      *
      * @param string[] $keys
      * @return array
@@ -101,7 +101,7 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes
+     * Store multiple items in the cache for a set number of minutes.
      *
      * @param array $values array of key => value pairs
      * @param int   $minutes
@@ -111,8 +111,8 @@ class RedisStore extends TaggableStore implements Store
     {
         $this->connection()->multi();
 
-        foreach($values as $key => $singleValue) {
-            $this->put($key,$singleValue,$minutes);
+        foreach ($values as $key => $singleValue) {
+            $this->put($key, $singleValue, $minutes);
         }
 
         $this->connection()->exec();

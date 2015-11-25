@@ -87,7 +87,7 @@ class DatabaseStore implements Store
 
     /**
      * Retrieve multiple items from the cache by key,
-     * items not found in the cache will have a null value for the key
+     * items not found in the cache will have a null value for the key.
      *
      * @param string[] $keys
      * @return array
@@ -96,7 +96,7 @@ class DatabaseStore implements Store
     {
         $returnValues = [];
 
-        foreach($keys as $singleKey) {
+        foreach ($keys as $singleKey) {
             $returnValues[$singleKey] = $this->get($singleKey);
         }
 
@@ -130,7 +130,7 @@ class DatabaseStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes
+     * Store multiple items in the cache for a set number of minutes.
      *
      * @param array $values array of key => value pairs
      * @param int   $minutes
@@ -138,8 +138,8 @@ class DatabaseStore implements Store
      */
     public function putMulti(array $values, $minutes)
     {
-        foreach($values as $key => $singleValue) {
-            $this->put($key,$singleValue,$minutes);
+        foreach ($values as $key => $singleValue) {
+            $this->put($key, $singleValue, $minutes);
         }
     }
 
