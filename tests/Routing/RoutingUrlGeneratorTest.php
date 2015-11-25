@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
 class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
@@ -8,8 +11,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testBasicGeneration()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
@@ -21,8 +24,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
          * Test HTTPS request URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('https://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('https://www.foo.com/')
         );
 
         $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar'));
@@ -31,8 +34,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
          * Test asset URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/index.php/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/index.php/')
         );
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
@@ -42,56 +45,56 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testBasicRouteGeneration()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         /*
          * Empty Named Route
          */
-        $route = new Illuminate\Routing\Route(['GET'], '/', ['as' => 'plain']);
+        $route = new Route(['GET'], '/', ['as' => 'plain']);
         $routes->add($route);
 
         /*
          * Named Routes
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
         /*
          * Parameters...
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar/{baz}/breeze/{boom}', ['as' => 'bar']);
+        $route = new Route(['GET'], 'foo/bar/{baz}/breeze/{boom}', ['as' => 'bar']);
         $routes->add($route);
 
         /*
          * Single Parameter...
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar/{baz}', ['as' => 'foobar']);
+        $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'foobar']);
         $routes->add($route);
 
         /*
          * HTTPS...
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
+        $route = new Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
         $routes->add($route);
 
         /*
          * Controller Route Route
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bam', ['controller' => 'foo@bar']);
+        $route = new Route(['GET'], 'foo/bam', ['controller' => 'foo@bar']);
         $routes->add($route);
 
         /*
          * Non ASCII routes
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar/åαф/{baz}', ['as' => 'foobarbaz']);
+        $route = new Route(['GET'], 'foo/bar/åαф/{baz}', ['as' => 'foobarbaz']);
         $routes->add($route);
 
         /*
          * Fragments
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
+        $route = new Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
         $routes->add($route);
 
         $this->assertEquals('/', $url->route('plain', [], false));
@@ -117,14 +120,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testFluentRouteNameDefinitions()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         /*
          * Named Routes
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', []);
+        $route = new Route(['GET'], 'foo/bar', []);
         $route->name('foo');
         $routes->add($route);
         $routes->refreshNameLookups();
@@ -135,8 +138,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testControllerRoutesWithADefaultNamespace()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $url->setRootControllerNamespace('namespace');
@@ -144,10 +147,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         /*
          * Controller Route Route
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['controller' => 'namespace\foo@bar']);
+        $route = new Route(['GET'], 'foo/bar', ['controller' => 'namespace\foo@bar']);
         $routes->add($route);
 
-        $route = new Illuminate\Routing\Route(['GET'], 'something/else', ['controller' => 'something\foo@bar']);
+        $route = new Route(['GET'], 'something/else', ['controller' => 'something\foo@bar']);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
@@ -157,13 +160,13 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testControllerRoutesOutsideOfDefaultNamespace()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $url->setRootControllerNamespace('namespace');
 
-        $route = new Illuminate\Routing\Route(['GET'], 'root/namespace', ['controller' => '\root\namespace@foo']);
+        $route = new Route(['GET'], 'root/namespace', ['controller' => '\root\namespace@foo']);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com/root/namespace', $url->action('\root\namespace@foo'));
@@ -172,11 +175,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testRoutableInterfaceRouting()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
+        $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
         $routes->add($route);
 
         $model = new RoutableInterfaceStub;
@@ -188,11 +191,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testRoutableInterfaceRoutingWithSingleParameter()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
+        $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
         $routes->add($route);
 
         $model = new RoutableInterfaceStub;
@@ -204,14 +207,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testRoutesMaintainRequestScheme()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('https://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('https://www.foo.com/')
         );
 
         /*
          * Named Routes
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
         $this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo'));
@@ -220,14 +223,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testHttpOnlyRoutes()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('https://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('https://www.foo.com/')
         );
 
         /*
          * Named Routes
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -236,17 +239,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testRoutesWithDomains()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
         /*
          * Wildcards & Domains...
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
+        $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
@@ -257,17 +260,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testRoutesWithDomainsAndPorts()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com:8080/')
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
         /*
          * Wildcards & Domains...
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
+        $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
         $this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
@@ -277,14 +280,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testHttpsRoutesWithDomains()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('https://foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('https://foo.com/')
         );
 
         /*
          * When on HTTPS, no need to specify 443
          */
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
         $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
@@ -292,14 +295,14 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
     public function testRoutesWithDomainsThroughProxy()
     {
-        Illuminate\Http\Request::setTrustedProxies(['10.0.0.1']);
+        Request::setTrustedProxies(['10.0.0.1']);
 
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
+        $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
@@ -311,11 +314,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com:8080/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com:8080/')
         );
 
-        $route = new Illuminate\Routing\Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {}]);
+        $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {}]);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
@@ -324,8 +327,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $url->forceRootUrl('https://www.bar.com');
@@ -339,12 +342,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
          * Route Based...
          */
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $url->forceSchema('https');
-        $route = new Illuminate\Routing\Route(['GET'], '/foo', ['as' => 'plain']);
+        $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 
         $this->assertEquals('https://www.foo.com/foo', $url->route('plain'));
@@ -356,8 +359,8 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
     public function testPrevious()
     {
         $url = new UrlGenerator(
-            $routes = new Illuminate\Routing\RouteCollection,
-            $request = Illuminate\Http\Request::create('http://www.foo.com/')
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.bar.com/');
