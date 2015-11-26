@@ -48,7 +48,10 @@ class EnvironmentDetector
         // and if it was that automatically overrides as the environment. Otherwise, we
         // will check the environment as a "web" request like a typical HTTP request.
         if (! is_null($value = $this->getEnvironmentArgument($args))) {
-            return head(array_slice(explode('=', $value), 1));
+            $env = head(array_slice(explode('=', $value), 1));
+            putenv("APP_ENV=$env");
+
+            return $env;
         }
 
         return $this->detectWebEnvironment($callback);
