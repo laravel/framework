@@ -75,7 +75,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
-        "iron-io/iron_mq": "~2.0|~4.0",
+        "iron-io/iron_mq": "~2.0",
         "mockery/mockery": "~0.9.2",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~4.0",
@@ -103,7 +103,7 @@
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
-        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0|~4.0).",
+        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
