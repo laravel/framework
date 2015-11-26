@@ -145,6 +145,8 @@ if (! function_exists('cache')) {
      * @param  \DateTime|int|null  $minutes
      * @param  \Closure|null  $callback
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     function cache($key = null, $minutes = null, Closure $callback = null)
     {
@@ -155,7 +157,7 @@ if (! function_exists('cache')) {
         }
 
         if (func_num_args() == 1) {
-            throw new \Exception('Call signature does not match function definition.');
+            throw new InvalidArgumentException('Call signature does not match function definition.');
         }
 
         $args = func_get_args();
