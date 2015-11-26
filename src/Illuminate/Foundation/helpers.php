@@ -151,11 +151,11 @@ if (! function_exists('cache')) {
     {
         $manager = app('cache');
 
-        if (func_num_args() == 0)
+        if (func_num_args() == 0) {
             return $manager;
+        }
 
-        if (func_num_args() == 1)
-        {
+        if (func_num_args() == 1) {
             throw new \Exception('Call signature does not match function definition.');
         }
 
