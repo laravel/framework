@@ -148,9 +148,11 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
+    /**
+     * @expectedException BadMethodCallException
+     */
     public function testViewBadMethod()
     {
-        $this->setExpectedException('BadMethodCallException');
         $view = $this->getView();
         $view->badMethodCall();
     }

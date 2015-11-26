@@ -11,9 +11,11 @@ class ViewEngineResolverTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(spl_object_hash($result), spl_object_hash($resolver->resolve('foo')));
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {
-        $this->setExpectedException('InvalidArgumentException');
         $resolver = new Illuminate\View\Engines\EngineResolver;
         $resolver->resolve('foo');
     }
