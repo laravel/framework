@@ -137,14 +137,13 @@ if (! function_exists('bcrypt')) {
 
 if (! function_exists('cache')) {
     /**
-     * Get the cache manager.
+     * Get an item from the cache, or store the default value.
      *
-     * If any parameters are given, we will assume you want to specify
-     * something to be cached.
+     * If no parameters are given, we will assume you want the cache manager.
      *
-     * @param  string  $key
-     * @param  \DateTime|int  $minutes
-     * @param  \Closure  $callback
+     * @param  string|null  $key
+     * @param  \DateTime|int|null  $minutes
+     * @param  \Closure|null  $callback
      * @return mixed
      */
     function cache($key = null, $minutes = null, Closure $callback = null)
