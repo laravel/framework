@@ -134,9 +134,11 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response->withFoo('bar');
     }
 
+    /**
+     * @expectedException BadMethodCallException
+     */
     public function testMagicCallException()
     {
-        $this->setExpectedException('BadMethodCallException');
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
