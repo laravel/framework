@@ -135,6 +135,36 @@ if (! function_exists('bcrypt')) {
     }
 }
 
+if (! function_exists('cache')) {
+    /**
+     * Get the cache manager.
+     *
+     * If any parameters are given, we will assume you want to specify
+     * something to be cached.
+     *
+     * @param  string  $key
+     * @param  \DateTime|int  $minutes
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    function cache($key = null, $minutes = null, Closure $callback = null)
+    {
+        $manager = app('cache');
+
+        if (func_num_args() == 0)
+            return $manager;
+
+        if (func_num_args() == 1)
+        {
+            throw new \Exception('Call signature does not match function definition.');
+        }
+
+        $args = func_get_args();
+
+        return $manager->remember($args[0], $args[1], $args[2]);
+    }
+}
+
 if (! function_exists('config')) {
     /**
      * Get / set the specified configuration value.
