@@ -45,6 +45,9 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $this->runCommand($command, ['store' => 'foo']);
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testClearWithInvalidStoreOption()
     {
         $command = new ClearCommandTestStub(
@@ -56,9 +59,8 @@ class ClearCommandTest extends PHPUnit_Framework_TestCase
         $app = new Application();
         $command->setLaravel($app);
 
-        $cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('\InvalidArgumentException');
+        $cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('InvalidArgumentException');
         $cacheRepository->shouldReceive('flush')->never();
-        $this->setExpectedException('InvalidArgumentException');
 
         $this->runCommand($command, ['store' => 'bar']);
     }
