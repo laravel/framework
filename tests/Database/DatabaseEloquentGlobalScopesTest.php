@@ -60,9 +60,7 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
 
-        $model = new EloquentClosureGlobalScopesTestModel();
-        $query = $model->newQuery();
-        $model->removeGlobalScopes($query);
+        $query = EloquentClosureGlobalScopesTestModel::removeGlobalScopes();
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
