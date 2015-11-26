@@ -1903,17 +1903,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Remove all of the global scopes from an Eloquent builder.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function removeGlobalScopes($builder)
-    {
-        return $builder->removeGlobalScopes();
-    }
-
-    /**
      * Create a new Eloquent query builder for the model.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
