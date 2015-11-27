@@ -38,6 +38,7 @@ abstract class Grammar
         if ($this->tablePrefix && strpos(strtolower($table), ' as ') === false) {
             $table = $table.' as '.$table;
         }
+
         return $this->wrap($this->tablePrefix.$table, true);
     }
 
