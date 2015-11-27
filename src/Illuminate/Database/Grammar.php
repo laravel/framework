@@ -35,7 +35,9 @@ abstract class Grammar
         if ($this->isExpression($table)) {
             return $this->getValue($table);
         }
-
+        if ($this->tablePrefix && strpos(strtolower($table), ' as ') === false) {
+            $table = $table . ' as ' . $table;
+        }
         return $this->wrap($this->tablePrefix.$table, true);
     }
 
@@ -73,11 +75,7 @@ abstract class Grammar
         // normal, so if there is more than one segment, we will wrap the first
         // segments as if it was a table and the rest as just regular values.
         foreach ($segments as $key => $segment) {
-            if ($key == 0 && count($segments) > 1) {
                 $wrapped[] = $this->wrapTable($segment);
-            } else {
-                $wrapped[] = $this->wrapValue($segment);
-            }
         }
 
         return implode('.', $wrapped);
