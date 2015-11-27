@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class ArrayStore extends TaggableStore implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * The array of stored values.
      *
@@ -37,6 +39,18 @@ class ArrayStore extends TaggableStore implements Store
     public function put($key, $value, $minutes)
     {
         $this->storage[$key] = $value;
+    }
+
+    /**
+     * Store multiple items in the cache for a set number of minutes.
+     *
+     * @param  array  $values
+     * @param  int  $minutes
+     * @return void
+     */
+    public function putMultiple(array $values, $minutes)
+    {
+        $this->storage += $values;
     }
 
     /**

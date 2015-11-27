@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class ApcStore extends TaggableStore implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * The APC wrapper instance.
      *

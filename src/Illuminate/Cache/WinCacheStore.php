@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class WinCacheStore extends TaggableStore implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * A string that should be prepended to keys.
      *
