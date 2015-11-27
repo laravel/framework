@@ -10,6 +10,8 @@ use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * The database connection instance.
      *
