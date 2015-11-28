@@ -29,7 +29,7 @@ class PipelineTest extends PHPUnit_Framework_TestCase
 
     public function testPipelineUsageWithParameters()
     {
-        $parameters = ['one','two'];
+        $parameters = ['one', 'two'];
 
         $result = (new Pipeline(new Illuminate\Container\Container))
             ->send('foo')
