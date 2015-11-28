@@ -507,9 +507,11 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->accepts('application/baz+json'));
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
     public function testSessionMethod()
     {
-        $this->setExpectedException('RuntimeException');
         $request = Request::create('/', 'GET');
         $request->session();
     }

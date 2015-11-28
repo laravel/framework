@@ -65,7 +65,7 @@ class MailgunTransport extends Transport
 
         $options['multipart'] = [
             ['name' => 'to', 'contents' => $to],
-            ['name' => 'message', 'contents' => (string) $message, 'filename' => 'message.mime'],
+            ['name' => 'message', 'contents' => $message->toString(), 'filename' => 'message.mime'],
         ];
 
         return $this->client->post($this->url, $options);
