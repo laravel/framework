@@ -141,6 +141,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('laravel php framework', Str::snake('LaravelPhpFramework', ' '));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel Php Framework'));
         $this->assertEquals('laravel_php_framework', Str::snake('Laravel    Php      Framework   '));
+        $this->assertEquals('laravel_php_framework', Str::snake('LaravelPhp_Framework'));
     }
 
     public function testStudly()
