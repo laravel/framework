@@ -55,7 +55,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Determine if a translation exists for a given locale.
      *
      * @param  string  $key
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return bool
      */
     public function hasForLocale($key, $locale = null)
@@ -67,7 +67,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Determine if a translation exists.
      *
      * @param  string  $key
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @param  bool  $fallback
      * @return bool
      */
@@ -81,7 +81,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @param  string  $key
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @param  bool  $fallback
      * @return string
      */
@@ -92,7 +92,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         // Here we will get the locale that should be used for the language line. If one
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
-        $locales = $fallback ? $this->parseLocale($locale) : [$locale];
+        $locales = $fallback ? $this->parseLocale($locale) : [$locale ?: $this->locale];
 
         foreach ($locales as $locale) {
             $this->load($namespace, $group, $locale);
