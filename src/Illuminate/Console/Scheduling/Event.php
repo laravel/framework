@@ -731,7 +731,9 @@ class Event
      */
     public function pingBefore($url)
     {
-        return $this->before(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->before(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**
@@ -755,7 +757,9 @@ class Event
      */
     public function thenPing($url)
     {
-        return $this->then(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->then(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**
