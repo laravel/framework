@@ -254,7 +254,7 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if (isset($command->queue) && isset($command->delay)) {
+        if (isset($command->queue, $command->delay)) {
             return $queue->laterOn($command->queue, $command->delay, $command);
         }
 
