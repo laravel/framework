@@ -2,9 +2,6 @@
 
 namespace Illuminate\Contracts\Bus;
 
-use Closure;
-use ArrayAccess;
-
 interface Dispatcher
 {
     /**
