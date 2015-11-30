@@ -71,7 +71,7 @@ class Redirector
 
     /**
      * Create a new redirect response and stores the current URL in the session if the
-     * current request is "safe" or the previous URL otherwise
+     * current request is "safe" or the previous URL otherwise.
      *
      * @param  string  $path
      * @param  int     $status
