@@ -63,14 +63,19 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class BusInjectionStub {}
+class BusInjectionStub
+{
+}
 
-class BusDispatcherBasicCommand {
+class BusDispatcherBasicCommand
+{
     public $name;
+
     public function __construct($name = null)
     {
         $this->name = $name;
     }
+
     public function handle(BusInjectionStub $stub)
     {
         //
