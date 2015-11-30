@@ -3,13 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use ArrayAccess;
-use ReflectionClass;
 use RuntimeException;
-use ReflectionParameter;
-use InvalidArgumentException;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
