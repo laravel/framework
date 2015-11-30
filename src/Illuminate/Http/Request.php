@@ -141,7 +141,9 @@ class Request extends SymfonyRequest implements ArrayAccess
     {
         $segments = explode('/', $this->path());
 
-        return array_values(array_filter($segments, function ($v) { return $v != ''; }));
+        return array_values(array_filter($segments, function ($v) {
+            return $v != '';
+        }));
     }
 
     /**

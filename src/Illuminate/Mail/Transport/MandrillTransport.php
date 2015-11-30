@@ -48,7 +48,13 @@ class MandrillTransport extends Transport
             'async' => false,
         ];
 
-        return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', ['form_params' => $data]);
+        if (version_compare(ClientInterface::VERSION, '6') === 1) {
+            $options = ['form_params' => $data];
+        } else {
+            $options = ['body' => $data];
+        }
+
+        return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', $options);
     }
 
     /**

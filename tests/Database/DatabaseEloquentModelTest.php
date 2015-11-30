@@ -1491,6 +1491,22 @@ class EloquentModelGetMutatorsStub extends Model
     public function getLastNameAttribute()
     {
     }
+
+    public function doNotgetFirstInvalidAttribute()
+    {
+    }
+
+    public function doNotGetSecondInvalidAttribute()
+    {
+    }
+
+    public function doNotgetThirdInvalidAttributeEither()
+    {
+    }
+
+    public function doNotGetFourthInvalidAttributeEither()
+    {
+    }
 }
 
 class EloquentModelCastingStub extends Model
