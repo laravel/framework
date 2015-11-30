@@ -102,7 +102,7 @@
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~6.0).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",

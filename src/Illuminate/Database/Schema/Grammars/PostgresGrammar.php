@@ -390,7 +390,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        $allowed = array_map(function ($a) { return "'".$a."'"; }, $column->allowed);
+        $allowed = array_map(function ($a) {
+            return "'".$a."'";
+        }, $column->allowed);
 
         return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed).'))';
     }

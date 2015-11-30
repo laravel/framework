@@ -427,7 +427,9 @@ class Dispatcher implements DispatcherContract
      */
     protected function cloneArgumentsForQueueing(array $arguments)
     {
-        return array_map(function ($a) { return is_object($a) ? clone $a : $a; }, $arguments);
+        return array_map(function ($a) {
+            return is_object($a) ? clone $a : $a;
+        }, $arguments);
     }
 
     /**

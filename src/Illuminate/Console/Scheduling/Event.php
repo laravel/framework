@@ -10,7 +10,6 @@ use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
 
 class Event
 {
@@ -238,7 +237,7 @@ class Event
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return bool
      */
-    public function isDue(Application $app)
+    public function isDue($app)
     {
         if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
@@ -271,7 +270,7 @@ class Event
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return bool
      */
-    protected function filtersPass(Application $app)
+    protected function filtersPass($app)
     {
         foreach ($this->filters as $callback) {
             if (! $app->call($callback)) {
@@ -738,7 +737,9 @@ class Event
      */
     public function pingBefore($url)
     {
-        return $this->before(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->before(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**
@@ -762,7 +763,9 @@ class Event
      */
     public function thenPing($url)
     {
-        return $this->then(function () use ($url) { (new HttpClient)->get($url); });
+        return $this->then(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
     }
 
     /**

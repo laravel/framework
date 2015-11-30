@@ -24,7 +24,6 @@ use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
-use Illuminate\Foundation\Console\CommandMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
@@ -77,7 +76,6 @@ class ArtisanServiceProvider extends ServiceProvider
     protected $devCommands = [
         'AppName' => 'command.app.name',
         'CacheTable' => 'command.cache.table',
-        'CommandMake' => 'command.command.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
@@ -163,18 +161,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.clear-compiled', function () {
             return new ClearCompiledCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerCommandMakeCommand()
-    {
-        $this->app->singleton('command.command.make', function ($app) {
-            return new CommandMakeCommand($app['files']);
         });
     }
 
