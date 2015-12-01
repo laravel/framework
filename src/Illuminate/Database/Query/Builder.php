@@ -1542,7 +1542,7 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->get(func_get_args());
+        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
