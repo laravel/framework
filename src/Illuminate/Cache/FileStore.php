@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class FileStore implements Store
 {
+    use RetrievesMultipleKeys;
+
     /**
      * The Illuminate Filesystem instance.
      *
@@ -39,7 +41,7 @@ class FileStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return mixed
      */
     public function get($key)
