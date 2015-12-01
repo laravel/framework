@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
