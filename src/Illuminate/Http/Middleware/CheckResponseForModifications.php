@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Http\Middleware;
+namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Symfony\Component\HttpFoundation\Response;
