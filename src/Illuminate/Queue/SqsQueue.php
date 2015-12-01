@@ -41,13 +41,14 @@ class SqsQueue extends Queue implements QueueContract
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
      * @param  string  $default
+     * @param  string  $prefix
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default, $prefix)
+    public function __construct(SqsClient $sqs, $default, $prefix = '')
     {
         $this->sqs = $sqs;
-        $this->default = $default;
         $this->prefix = $prefix;
+        $this->default = $default;
     }
 
     /**
@@ -144,12 +145,11 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function getQueue($queue)
     {
-        // if queue is already a url, return it.
         if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
             return $queue;
         }
 
-        return $this->prefix.($queue ?: $this->default);
+        return rtrim($this->prefix, '/').'/'.($queue ?: $this->default);
     }
 
     /**
