@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * The cache store implementation.
      *

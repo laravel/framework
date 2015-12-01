@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class FileStore implements Store
 {
+    use DefaultMultipleTrait;
+
     /**
      * The Illuminate Filesystem instance.
      *

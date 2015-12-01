@@ -11,6 +11,22 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $store->get('foo'));
     }
 
+    public function testMultipleItemsCanBeSetAndRetrieved()
+    {
+        $store = new ArrayStore;
+        $store->put('foo', 'bar', 10);
+        $store->putMultiple([
+            'fizz'  => 'buz',
+            'quz'   => 'baz',
+        ], 10);
+        $this->assertEquals([
+            'foo'   => 'bar',
+            'fizz'  => 'buz',
+            'quz'   => 'baz',
+            'norf'  => null,
+        ], $store->getMultiple(['foo', 'fizz', 'quz', 'norf']));
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMock('Illuminate\Cache\ArrayStore', ['put']);

@@ -57,6 +57,33 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value for the key.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function getMultiple(array $keys)
+    {
+        $returnValues = [];
+        $prefixedKeys = [];
+
+        foreach ($keys as $keyToPrefix) {
+            $prefixedKeys[] = $this->prefix.$keyToPrefix;
+        }
+
+        $cacheValues = $this->connection()->mget($prefixedKeys);
+
+        foreach ($cacheValues as $i => $value) {
+            $key = $keys[$i];
+            $returnValues[$key] = is_numeric($value) ? $value : unserialize($value);
+        }
+
+        return $returnValues;
+    }
+
+    /**
      * Store an item in the cache for a given number of minutes.
      *
      * @param  string  $key
@@ -71,6 +98,24 @@ class RedisStore extends TaggableStore implements Store
         $minutes = max(1, $minutes);
 
         $this->connection()->setex($this->prefix.$key, $minutes * 60, $value);
+    }
+
+    /**
+     * Store multiple items in the cache for a set number of minutes.
+     *
+     * @param  array  $values
+     * @param  int  $minutes
+     * @return void
+     */
+    public function putMultiple(array $values, $minutes)
+    {
+        $this->connection()->multi();
+
+        foreach ($values as $key => $singleValue) {
+            $this->put($key, $singleValue, $minutes);
+        }
+
+        $this->connection()->exec();
     }
 
     /**
