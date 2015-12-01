@@ -105,6 +105,10 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function get($key, $default = null)
     {
+        if (is_array($key)) {
+            return $this->many($key);
+        }
+
         $value = $this->store->get($key);
 
         if (is_null($value)) {
@@ -116,6 +120,37 @@ class Repository implements CacheContract, ArrayAccess
         }
 
         return $value;
+    }
+
+    /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function many(array $keys)
+    {
+        $normalizedKeys = [];
+
+        foreach ($keys as $key => $value) {
+            $normalizedKeys[] = is_string($key) ? $key : $value;
+        }
+
+        $values = $this->store->many($normalizedKeys);
+
+        foreach ($values as $key => &$value) {
+            if (is_null($value)) {
+                $this->fireCacheEvent('missed', [$key]);
+
+                $value = isset($keys[$key]) ? value($keys[$key]) : null;
+            } else {
+                $this->fireCacheEvent('hit', [$key, $value]);
+            }
+        }
+
+        return $values;
     }
 
     /**
@@ -142,14 +177,38 @@ class Repository implements CacheContract, ArrayAccess
      * @param  \DateTime|int  $minutes
      * @return void
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $minutes = null)
     {
+        if (is_array($key) && filter_var($value, FILTER_VALIDATE_INT) !== false) {
+            return $this->putMany($key, $value);
+        }
+
         $minutes = $this->getMinutes($minutes);
 
         if (! is_null($minutes)) {
             $this->store->put($key, $value, $minutes);
 
             $this->fireCacheEvent('write', [$key, $value, $minutes]);
+        }
+    }
+
+    /**
+     * Store multiple items in the cache for a given number of minutes.
+     *
+     * @param  array  $values
+     * @param  int  $minutes
+     * @return void
+     */
+    public function putMany(array $values, $minutes)
+    {
+        $minutes = $this->getMinutes($minutes);
+
+        if (! is_null($minutes)) {
+            $this->store->putMany($values, $minutes);
+
+            foreach ($values as $key => $value) {
+                $this->fireCacheEvent('write', [$key, $value, $minutes]);
+            }
         }
     }
 
