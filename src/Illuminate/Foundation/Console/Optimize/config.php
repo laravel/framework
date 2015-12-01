@@ -8,7 +8,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Foundation/Application.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Bus/Dispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Bus/QueueingDispatcher.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Bus/HandlerResolver.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Pipeline/Pipeline.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Support/Renderable.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Contracts/Logging/Log.php',
