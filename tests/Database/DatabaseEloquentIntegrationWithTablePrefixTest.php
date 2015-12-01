@@ -1,23 +1,78 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentIntegrationWithTablePrefixTest extends DatabaseEloquentIntegrationTest
+class DatabaseEloquentIntegrationWithTablePrefixTest
 {
     /**
      * Bootstrap Eloquent.
      *
      * @return void
      */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        $resolver = new DatabaseIntegrationTestConnectionResolver;
-        $resolver->connection()->setTablePrefix('prefix_');
-        Eloquent::setConnectionResolver($resolver);
+        $db = new DB;
 
-        Eloquent::setEventDispatcher(
-            new Illuminate\Events\Dispatcher
-        );
+        $db->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        Eloquent::getConnectionResolver()->connection()->setTablePrefix('prefix_');
+
+        $this->createSchema();
+    }
+
+    protected function createSchema()
+    {
+        foreach (['default'] as $connection) {
+            $this->schema($connection)->create('users', function ($table) {
+                $table->increments('id');
+                $table->string('email');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('friends', function ($table) {
+                $table->integer('user_id');
+                $table->integer('friend_id');
+            });
+
+            $this->schema($connection)->create('posts', function ($table) {
+                $table->increments('id');
+                $table->integer('user_id');
+                $table->integer('parent_id')->nullable();
+                $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('photos', function ($table) {
+                $table->increments('id');
+                $table->morphs('imageable');
+                $table->string('name');
+                $table->timestamps();
+            });
+        }
+    }
+
+    /**
+     * Tear down the database schema.
+     *
+     * @return void
+     */
+    public function tearDown()
+    {
+        foreach (['default'] as $connection) {
+            $this->schema($connection)->drop('users');
+            $this->schema($connection)->drop('friends');
+            $this->schema($connection)->drop('posts');
+            $this->schema($connection)->drop('photos');
+        }
+
+        Relation::morphMap([], false);
     }
 
     public function testBasicModelHydration()
