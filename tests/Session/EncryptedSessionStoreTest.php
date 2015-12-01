@@ -17,6 +17,7 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
+        $session->now('qux', 'norf');
         $serialized = serialize([
             '_token' => $session->token(),
             'foo' => 'bar',
