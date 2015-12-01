@@ -31,7 +31,7 @@
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the thenPing method on schedules (~5.3|~6.0).",
+        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (~5.3|~6.0).",
         "mtdowling/cron-expression": "Required to use scheduling component (~1.0).",
         "symfony/process": "Required to use scheduling component (2.7.*)."
     },
