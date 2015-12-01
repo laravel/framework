@@ -28,6 +28,6 @@ class SqsConnector implements ConnectorInterface
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
         }
 
-        return new SqsQueue(new SqsClient($config), $config['queue']);
+        return new SqsQueue(new SqsClient($config), $config['queue'], Arr::get($config, 'prefix', ''));
     }
 }
