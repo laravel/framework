@@ -55,6 +55,13 @@ class Store implements SessionInterface
     protected $bagData = [];
 
     /**
+     * The keys that should only be available for the current request.
+     *
+     * @var array
+     */
+    protected $nowKeys = [];
+
+    /**
      * The session handler implementation.
      *
      * @var \SessionHandlerInterface
@@ -312,11 +319,11 @@ class Store implements SessionInterface
      */
     public function removeFlashNowData()
     {
-        foreach ($this->get('flash.now', []) as $old) {
-            $this->forget($old);
+        foreach ($this->nowKeys as $key) {
+            $this->forget($key);
         }
 
-        $this->put('flash.now', []);
+        $this->nowKeys = [];
     }
 
     /**
@@ -443,11 +450,11 @@ class Store implements SessionInterface
      * @param  mixed $value
      * @return void
      */
-    public function flashNow($key, $value)
+    public function now($key, $value)
     {
         $this->put($key, $value);
 
-        $this->push('flash.now', $key);
+        $this->nowKeys[] = $key;
     }
 
     /**
