@@ -95,8 +95,6 @@ class Store implements SessionInterface
             $this->regenerateToken();
         }
 
-        $this->removeFlashNowData();
-
         return $this->started = true;
     }
 
@@ -261,6 +259,8 @@ class Store implements SessionInterface
 
         $this->ageFlashData();
 
+        $this->removeFlashNowData();
+
         $this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
 
         $this->started = false;
@@ -306,7 +306,7 @@ class Store implements SessionInterface
     }
 
     /**
-     * Remove data that was flashed on last request
+     * Remove data that was flashed for only the current request.
      *
      * @return void
      */
@@ -316,7 +316,7 @@ class Store implements SessionInterface
             $this->forget($old);
         }
 
-        $this->remove('flash.now');
+        $this->put('flash.now', []);
     }
 
     /**
@@ -437,7 +437,7 @@ class Store implements SessionInterface
 
     /**
      * Flash a key / value pair to the session
-     * for immediate use
+     * for immediate use.
      *
      * @param  string $key
      * @param  mixed $value
