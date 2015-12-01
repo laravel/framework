@@ -228,7 +228,7 @@ class ResourceRegistrar
      */
     public function getResourceWildcard($value)
     {
-        return str_replace('-', '_', $value);
+        return camel_case($value);
     }
 
     /**

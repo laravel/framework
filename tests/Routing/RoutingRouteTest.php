@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Symfony\Component\HttpFoundation\Response;
@@ -796,22 +797,29 @@ return 'foo!'; });
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{fooBars}', $routes[0]->getUri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars.foo-bazs', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_bazs}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{fooBars}/foo-bazs/{fooBazs}', $routes[0]->getUri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show'], 'as' => 'prefix']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{fooBars}', $routes[0]->getUri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
+    }
+
+    public function testResourceWildcardCase()
+    {
+        $registrar = new ResourceRegistrar($this->getRouter());
+
+        $this->assertEquals('fooBarAndFooBaz', $registrar->getResourceWildCard('foo-bar_and fooBaz'));
     }
 
     public function testResourceRouteNaming()
