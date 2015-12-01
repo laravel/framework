@@ -38,7 +38,7 @@ class CacheMemcachedStoreTest extends PHPUnit_Framework_TestCase
             'foo'   => 'fizz',
             'bar'   => 'buzz',
             'baz'   => 'norf',
-        ], $store->getMultiple([
+        ], $store->many([
             'foo', 'bar', 'baz',
         ]));
     }

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Cache\Store;
 
 class NullStore extends TaggableStore implements Store
 {
-    use DefaultMultipleTrait;
+    use RetrievesMultipleKeys;
 
     /**
      * The array of stored values.

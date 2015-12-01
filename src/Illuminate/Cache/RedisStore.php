@@ -46,7 +46,7 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return mixed
      */
     public function get($key)
@@ -59,28 +59,26 @@ class RedisStore extends TaggableStore implements Store
     /**
      * Retrieve multiple items from the cache by key.
      *
-     * Items not found in the cache will have a null value for the key.
+     * Items not found in the cache will have a null value.
      *
      * @param  array  $keys
      * @return array
      */
-    public function getMultiple(array $keys)
+    public function many(array $keys)
     {
-        $returnValues = [];
-        $prefixedKeys = [];
+        $return = [];
 
-        foreach ($keys as $keyToPrefix) {
-            $prefixedKeys[] = $this->prefix.$keyToPrefix;
+        $prefixedKeys = array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys);
+
+        $values = $this->connection()->mget($prefixedKeys);
+
+        foreach ($values as $index => $value) {
+            $return[$keys[$index]] = is_numeric($value) ? $value : unserialize($value);
         }
 
-        $cacheValues = $this->connection()->mget($prefixedKeys);
-
-        foreach ($cacheValues as $i => $value) {
-            $key = $keys[$i];
-            $returnValues[$key] = is_numeric($value) ? $value : unserialize($value);
-        }
-
-        return $returnValues;
+        return $return;
     }
 
     /**
@@ -101,18 +99,18 @@ class RedisStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes.
+     * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
      * @param  int  $minutes
      * @return void
      */
-    public function putMultiple(array $values, $minutes)
+    public function putMany(array $values, $minutes)
     {
         $this->connection()->multi();
 
-        foreach ($values as $key => $singleValue) {
-            $this->put($key, $singleValue, $minutes);
+        foreach ($values as $key => $value) {
+            $this->put($key, $value, $minutes);
         }
 
         $this->connection()->exec();

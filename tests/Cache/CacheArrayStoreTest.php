@@ -15,7 +15,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
     {
         $store = new ArrayStore;
         $store->put('foo', 'bar', 10);
-        $store->putMultiple([
+        $store->putMany([
             'fizz'  => 'buz',
             'quz'   => 'baz',
         ], 10);
@@ -24,7 +24,7 @@ class CacheArrayStoreTest extends PHPUnit_Framework_TestCase
             'fizz'  => 'buz',
             'quz'   => 'baz',
             'norf'  => null,
-        ], $store->getMultiple(['foo', 'fizz', 'quz', 'norf']));
+        ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
     public function testStoreItemForeverProperlyStoresInArray()
