@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bus;
 
-use ArrayAccess;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 trait DispatchesJobs
