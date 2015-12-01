@@ -307,7 +307,7 @@ class Store implements SessionInterface
 
     /**
      * Remove data that was flashed on last request
-     * 
+     *
      * @return void
      */
     public function removeFlashNowData()
@@ -438,7 +438,7 @@ class Store implements SessionInterface
     /**
      * Flash a key / value pair to the session
      * for immediate use
-     * 
+     *
      * @param  string $key
      * @param  mixed $value
      * @return void
