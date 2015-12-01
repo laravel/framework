@@ -37,7 +37,7 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return mixed
      */
     public function get($key)
@@ -52,29 +52,24 @@ class MemcachedStore extends TaggableStore implements Store
     /**
      * Retrieve multiple items from the cache by key.
      *
-     * Items not found in the cache will have a null value for the key.
+     * Items not found in the cache will have a null value.
      *
      * @param  array  $keys
      * @return array
      */
-    public function getMultiple(array $keys)
+    public function many(array $keys)
     {
-        $prefixedKeys = [];
+        $prefixedKeys = array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys);
 
-        foreach ($keys as $keyToPrefix) {
-            $prefixedKeys[] = $this->prefix.$keyToPrefix;
-        }
-
-        $cas = null;
-        $cacheValues = $this->memcached->getMulti($prefixedKeys, $cas, Memcached::GET_PRESERVE_ORDER);
+        $values = $this->memcached->getMulti($prefixedKeys, null, Memcached::GET_PRESERVE_ORDER);
 
         if ($this->memcached->getResultCode() != 0) {
             return array_fill_keys($keys, null);
         }
 
-        $returnValues = array_combine($keys, $cacheValues);
-
-        return $returnValues;
+        return array_combine($keys, $values);
     }
 
     /**
@@ -91,21 +86,21 @@ class MemcachedStore extends TaggableStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a set number of minutes.
+     * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
      * @param  int  $minutes
      * @return void
      */
-    public function putMultiple(array $values, $minutes)
+    public function putMany(array $values, $minutes)
     {
-        $formattedKeyValues = [];
+        $prefixedValues = [];
 
-        foreach ($values as $keyToPrefix => $singleValue) {
-            $formattedKeyValues[$this->prefix.$keyToPrefix] = $singleValue;
+        foreach ($values as $key => $value) {
+            $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti($formattedKeyValues, $minutes * 60);
+        $this->memcached->setMulti($prefixedValues, $minutes * 60);
     }
 
     /**

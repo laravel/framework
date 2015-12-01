@@ -18,7 +18,7 @@ class CacheNullStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([
             'foo'   => null,
             'bar'   => null,
-        ], $store->getMultiple([
+        ], $store->many([
             'foo',
             'bar',
         ]));

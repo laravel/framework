@@ -31,7 +31,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
             'foo'   => 'qux',
             'bar'   => null,
             'baz'   => 'norf',
-        ], $store->getMultiple(['foo', 'bar', 'baz']));
+        ], $store->many(['foo', 'bar', 'baz']));
     }
 
     public function testSetMethodProperlyCallsAPC()
@@ -53,7 +53,7 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
             $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
         ]);
         $store = new Illuminate\Cache\ApcStore($apc);
-        $store->putMultiple([
+        $store->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
             'bar'   => 'norf',

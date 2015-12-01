@@ -39,7 +39,7 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
             'foo'   => 'bar',
             'fizz'  => 'buzz',
             'norf'  => 'quz',
-        ], $redis->getMultiple([
+        ], $redis->many([
             'foo', 'fizz', 'norf',
         ]));
     }
@@ -72,7 +72,7 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('setex')->with('prefix:bar', 60 * 60, serialize('norf'));
         $connection->shouldReceive('exec')->once();
 
-        $redis->putMultiple([
+        $redis->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
             'bar' => 'norf',
