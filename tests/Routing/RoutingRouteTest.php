@@ -685,7 +685,7 @@ return 'foo!'; });
     public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()
     {
         $router = $this->getRouter();
-        $router->group(['prefix'=> 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
+        $router->group(['prefix' => 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
             $router->get('bar', function () {return 'hello';})->middleware('baz:gaz');
         });
         $routes = $router->getRoutes()->getRoutes();
