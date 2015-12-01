@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Mime_Message;
-use GuzzleHttp\Post\PostFile;
 use GuzzleHttp\ClientInterface;
 
 class MailgunTransport extends Transport
@@ -64,17 +63,10 @@ class MailgunTransport extends Transport
 
         $message->setBcc([]);
 
-        if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $options['multipart'] = [
-                ['name' => 'to', 'contents' => $to],
-                ['name' => 'message', 'contents' => $message->toString(), 'filename' => 'message.mime'],
-            ];
-        } else {
-            $options['body'] = [
-                'to' => $to,
-                'message' => new PostFile('message', $message->toString()),
-            ];
-        }
+        $options['multipart'] = [
+            ['name' => 'to', 'contents' => $to],
+            ['name' => 'message', 'contents' => $message->toString(), 'filename' => 'message.mime'],
+        ];
 
         return $this->client->post($this->url, $options);
     }
