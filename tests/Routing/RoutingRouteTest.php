@@ -682,6 +682,20 @@ return 'foo!'; });
         $this->assertEquals('foo/bar/baz', $route->getPath());
     }
 
+    public function testRouteMiddlewareMergeWithMiddlewareAttributesAsStrings()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix'=> 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
+            $router->get('bar', function () {return 'hello';})->middleware('baz:gaz');
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            ['boo:foo', 'baz:gaz'],
+            $route->middleware()
+        );
+    }
+
     public function testRoutePrefixing()
     {
         /*
