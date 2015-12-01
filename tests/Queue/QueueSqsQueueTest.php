@@ -97,4 +97,12 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
     }
+
+    public function testGetQueueProperlyResolvesName()
+    {
+        $queue = new Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->baseUrl.'/'.$this->account.'/');
+        $this->assertEquals($this->queueUrl, $queue->getQueue($this->queueName));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
+        $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
+    }
 }

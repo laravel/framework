@@ -23,6 +23,13 @@ class SqsQueue extends Queue implements QueueContract
     protected $default;
 
     /**
+     * The sqs prefix url.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * The job creator callback.
      *
      * @var callable|null
@@ -36,10 +43,11 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string  $default
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default)
+    public function __construct(SqsClient $sqs, $default, $prefix)
     {
         $this->sqs = $sqs;
         $this->default = $default;
+        $this->prefix = $prefix;
     }
 
     /**
@@ -136,7 +144,12 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function getQueue($queue)
     {
-        return $queue ?: $this->default;
+        // if queue is already a url, return it.
+        if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
+            return $queue;
+        }
+
+        return $this->prefix.($queue ?: $this->default);
     }
 
     /**
