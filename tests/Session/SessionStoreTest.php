@@ -101,6 +101,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
+        $session->now('qux', 'norf');
         $session->getHandler()->shouldReceive('write')->once()->with(
             $this->getSessionId(),
             serialize([
@@ -155,6 +156,22 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $session->get('bar'));
 
         $session->ageFlashData();
+
+        $this->assertFalse($session->has('foo'));
+        $this->assertNull($session->get('foo'));
+    }
+
+    public function testDataFlashingNow()
+    {
+        $session = $this->getSession();
+        $session->now('foo', 'bar');
+        $session->now('bar', 0);
+
+        $this->assertTrue($session->has('foo'));
+        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertEquals(0, $session->get('bar'));
+
+        $session->removeFlashNowData();
 
         $this->assertFalse($session->has('foo'));
         $this->assertNull($session->get('foo'));
