@@ -72,6 +72,8 @@ class Redirector
     /**
      * Create a new redirect response, while putting the current URL in the session.
      *
+     * Note that we're only going to store the current URL if the request was "safe".
+     *
      * @param  string  $path
      * @param  int     $status
      * @param  array   $headers
@@ -80,7 +82,12 @@ class Redirector
      */
     public function guest($path, $status = 302, $headers = [], $secure = null)
     {
-        $this->session->put('url.intended', $this->generator->full());
+        if ($this->generator->getRequest()->isMethodSafe()) {
+            $intendedUrl = $this->generator->full();
+        } else {
+            $intendedUrl = $this->session->previousUrl();
+        }
+        $this->session->put('url.intended', $intendedUrl);
 
         return $this->to($path, $status, $headers, $secure);
     }
