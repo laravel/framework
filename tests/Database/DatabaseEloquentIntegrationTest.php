@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
-use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -16,38 +16,52 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $db = new DB;
+
         $db->addConnection([
             'driver'    => 'sqlite',
             'database'  => ':memory:',
         ]);
+
+        $db->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ], 'second_connection');
+
         $db->bootEloquent();
         $db->setAsGlobal();
 
-        $this->schema()->create('users', function ($table) {
-            $table->increments('id');
-            $table->string('email')->unique();
-            $table->timestamps();
-        });
+        $this->createSchema();
+    }
 
-        $this->schema()->create('friends', function ($table) {
-            $table->integer('user_id');
-            $table->integer('friend_id');
-        });
+    protected function createSchema()
+    {
+        foreach (['default', 'second_connection'] as $connection) {
+            $this->schema($connection)->create('users', function ($table) {
+                $table->increments('id');
+                $table->string('email');
+                $table->timestamps();
+            });
 
-        $this->schema()->create('posts', function ($table) {
-            $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('parent_id')->nullable();
-            $table->string('name');
-            $table->timestamps();
-        });
+            $this->schema($connection)->create('friends', function ($table) {
+                $table->integer('user_id');
+                $table->integer('friend_id');
+            });
 
-        $this->schema()->create('photos', function ($table) {
-            $table->increments('id');
-            $table->morphs('imageable');
-            $table->string('name');
-            $table->timestamps();
-        });
+            $this->schema($connection)->create('posts', function ($table) {
+                $table->increments('id');
+                $table->integer('user_id');
+                $table->integer('parent_id')->nullable();
+                $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('photos', function ($table) {
+                $table->increments('id');
+                $table->morphs('imageable');
+                $table->string('name');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -57,10 +71,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        $this->schema()->drop('users');
-        $this->schema()->drop('friends');
-        $this->schema()->drop('posts');
-        $this->schema()->drop('photos');
+        foreach (['default', 'second_connection'] as $connection) {
+            $this->schema($connection)->drop('users');
+            $this->schema($connection)->drop('friends');
+            $this->schema($connection)->drop('posts');
+            $this->schema($connection)->drop('photos');
+        }
 
         Relation::morphMap([], false);
     }
@@ -227,15 +243,20 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testBasicModelHydration()
     {
-        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $user = new EloquentTestUser(['email' => 'taylorotwell@gmail.com']);
+        $user->setConnection('second_connection');
+        $user->save();
 
-        $models = EloquentTestUser::hydrateRaw('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com'], 'foo_connection');
+        $user = new EloquentTestUser(['email' => 'abigailotwell@gmail.com']);
+        $user->setConnection('second_connection');
+        $user->save();
+
+        $models = EloquentTestUser::hydrateRaw('SELECT * FROM users WHERE email = ?', ['abigailotwell@gmail.com'], 'second_connection');
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
         $this->assertInstanceOf('EloquentTestUser', $models[0]);
         $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
-        $this->assertEquals('foo_connection', $models[0]->getConnectionName());
+        $this->assertEquals('second_connection', $models[0]->getConnectionName());
         $this->assertEquals(1, $models->count());
     }
 
@@ -405,7 +426,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testEmptyMorphToRelationship()
     {
-        $photo = EloquentTestPhoto::create(['name' => 'Avatar 1']);
+        $photo = new EloquentTestPhoto;
 
         $this->assertNull($photo->imageable);
     }
@@ -492,9 +513,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
      *
      * @return Connection
      */
-    protected function connection()
+    protected function connection($connection = 'default')
     {
-        return Eloquent::getConnectionResolver()->connection();
+        return Eloquent::getConnectionResolver()->connection($connection);
     }
 
     /**
@@ -502,9 +523,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
      *
      * @return Schema\Builder
      */
-    protected function schema()
+    protected function schema($connection = 'default')
     {
-        return $this->connection()->getSchemaBuilder();
+        return $this->connection($connection)->getSchemaBuilder();
     }
 }
 
