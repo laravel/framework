@@ -17,7 +17,7 @@
         "php": ">=5.5.9",
         "illuminate/filesystem": "5.3.*",
         "illuminate/support": "5.3.*",
-        "symfony/translation": "3.0.*"
+        "symfony/translation": "3.1.*"
     },
     "autoload": {
         "psr-4": {

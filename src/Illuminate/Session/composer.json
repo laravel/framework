@@ -18,8 +18,8 @@
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
         "nesbot/carbon": "~1.20",
-        "symfony/finder": "3.0.*",
-        "symfony/http-foundation": "3.0.*"
+        "symfony/finder": "3.1.*",
+        "symfony/http-foundation": "3.1.*"
     },
     "autoload": {
         "psr-4": {
