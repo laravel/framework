@@ -101,6 +101,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
+        $session->flashNow('qux', 'norf');
         $session->getHandler()->shouldReceive('write')->once()->with(
             $this->getSessionId(),
             serialize([
@@ -110,6 +111,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
                 'flash' => [
                     'new' => [],
                     'old' => ['baz'],
+                    'now' => [],
                 ],
                 '_sf2_meta' => $session->getBagData('_sf2_meta'),
             ])
