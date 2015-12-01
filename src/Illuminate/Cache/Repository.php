@@ -6,7 +6,6 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
-use InvalidArgumentException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
