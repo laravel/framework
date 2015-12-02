@@ -29,7 +29,7 @@ class ValidationServiceProvider extends ServiceProvider
     protected function registerValidationResolverHook()
     {
         $this->app->afterResolving(function (ValidatesWhenResolved $resolved) {
-            if (!$this->app->runningInConsole()) {
+            if (! $this->app->runningInConsole()) {
                 $resolved->validate();
             }
         });
