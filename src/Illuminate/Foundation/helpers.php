@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 
@@ -315,7 +314,9 @@ if (! function_exists('env')) {
                 return;
         }
 
-        if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+        $len = strlen($value);
+
+        if ($len > 1 && $value[0] === '"' && $value[$len - 1] === '"') {
             return substr($value, 1, -1);
         }
 
