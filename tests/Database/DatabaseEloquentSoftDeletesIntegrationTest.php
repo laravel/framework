@@ -264,7 +264,6 @@ class SoftDeletesTestPost extends Eloquent
     }
 }
 
-
 /**
  * Eloquent Models...
  */
