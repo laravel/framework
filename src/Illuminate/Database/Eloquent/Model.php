@@ -2439,7 +2439,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $json = json_encode($this->jsonSerialize(), $options);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException("Error encoding model to JSON. Reason: {$jsonLastErrorMsg}", json_last_error());
+            throw new RuntimeException('Error encoding model to JSON. Reason: '.json_last_error_msg(), json_last_error());
         }
 
         return $json;
