@@ -1273,6 +1273,17 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['eleventh']);
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessageRegExp /^Error encoding model to JSON\. Reason\:\s.*$/
+     */
+    public function testToJsonThrowsExceptionWhenDataIsMalformed()
+    {
+        $model = new EloquentModelStub;
+        $model->unencoded_binary_column = "\xBB\x00\x00\xBB";
+        $model->toJson();
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
