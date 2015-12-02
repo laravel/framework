@@ -340,7 +340,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure|string  $scope
      * @param  \Closure|null  $implementation
      * @return mixed
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public static function addGlobalScope($scope, Closure $implementation = null)
@@ -357,7 +357,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
         }
 
-        throw new InvalidArgumentException('Global scope must be an instance of Closure or ScopeInterface');
+        throw new InvalidArgumentException('Global scope must be an instance of Closure or ScopeInterface.');
     }
 
     /**
