@@ -20,7 +20,7 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     public function testGlobalScopeCanBeRemoved()
     {
         $model = new EloquentGlobalScopesTestModel();
-        $query = $model->newQuery()->removeGlobalScope(ActiveScope::class);
+        $query = $model->newQuery()->withoutGlobalScope(ActiveScope::class);
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
@@ -36,7 +36,7 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     public function testClosureGlobalScopeCanBeRemoved()
     {
         $model = new EloquentClosureGlobalScopesTestModel();
-        $query = $model->newQuery()->removeGlobalScope('active_scope');
+        $query = $model->newQuery()->withoutGlobalScope('active_scope');
         $this->assertEquals('select * from "table" order by "name" asc', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
@@ -48,7 +48,7 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
 
-        $query->removeGlobalScope('active_scope');
+        $query->withoutGlobalScope('active_scope');
         $this->assertEquals('select * from "table" order by "name" asc', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
@@ -56,11 +56,11 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     public function testAllGlobalScopesCanBeRemoved()
     {
         $model = new EloquentClosureGlobalScopesTestModel();
-        $query = $model->newQuery()->removeGlobalScopes();
+        $query = $model->newQuery()->withoutGlobalScopes();
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
 
-        $query = EloquentClosureGlobalScopesTestModel::removeGlobalScopes();
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes();
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }

@@ -96,7 +96,7 @@ class Builder
      * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
      * @return $this
      */
-    public function removeGlobalScope($scope)
+    public function withoutGlobalScope($scope)
     {
         if (is_string($scope)) {
             unset($this->scopes[$scope]);
@@ -118,7 +118,7 @@ class Builder
      *
      * @return $this
      */
-    public function removeGlobalScopes()
+    public function withoutGlobalScopes()
     {
         $this->scopes = [];
 
@@ -461,7 +461,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->getQueryWithScopes()->get($columns);
+        $results = $this->loadScopes()->getQuery()->get($columns);
 
         $connection = $this->model->getConnectionName();
 
@@ -641,7 +641,9 @@ class Builder
             call_user_func($callback, $query);
         }
 
-        return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
+        return $this->addHasWhere(
+            $query->loadScopes(), $relation, $operator, $count, $boolean
+        );
     }
 
     /**
@@ -750,7 +752,7 @@ class Builder
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        $this->mergeWheresToHas($hasQuery, $relation);
+        $this->mergeModelDefinedRelationWheresToHasQuery($hasQuery, $relation);
 
         if (is_numeric($count)) {
             $count = new Expression($count);
@@ -766,14 +768,14 @@ class Builder
      * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
      * @return void
      */
-    protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
+    protected function mergeModelDefinedRelationWheresToHasQuery(Builder $hasQuery, Relation $relation)
     {
         // Here we have the "has" query and the original relation. We need to copy over any
         // where clauses the developer may have put in the relationship function over to
         // the has query, and then copy the bindings from the "has" query to the main.
         $relationQuery = $relation->getBaseQuery();
 
-        $hasQuery->removeGlobalScopes()->mergeWheres(
+        $hasQuery->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
 
@@ -805,7 +807,7 @@ class Builder
             $relations = func_get_args();
         }
 
-        $eagers = $this->parseRelations($relations);
+        $eagers = $this->parseWithRelations($relations);
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
 
@@ -818,7 +820,7 @@ class Builder
      * @param  array  $relations
      * @return array
      */
-    protected function parseRelations(array $relations)
+    protected function parseWithRelations(array $relations)
     {
         $results = [];
 
@@ -835,7 +837,7 @@ class Builder
             // We need to separate out any nested includes. Which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager load names.
-            $results = $this->parseNested($name, $results);
+            $results = $this->parseNestedWith($name, $results);
 
             $results[$name] = $constraints;
         }
@@ -850,7 +852,7 @@ class Builder
      * @param  array   $results
      * @return array
      */
-    protected function parseNested($name, $results)
+    protected function parseNestedWith($name, $results)
     {
         $progress = [];
 
@@ -885,12 +887,12 @@ class Builder
     /**
      * Get the underlying query builder instance with applied global scopes.
      *
-     * @return \Illuminate\Database\Query\Builder|static
+     * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function getQueryWithScopes()
+    public function loadScopes()
     {
         if (! $this->scopes) {
-            return $this->getQuery();
+            return $this;
         }
 
         $builder = clone $this;
@@ -905,7 +907,7 @@ class Builder
             }
         }
 
-        return $builder->getQuery();
+        return $builder;
     }
 
     /**
@@ -1022,7 +1024,7 @@ class Builder
         }
 
         if (in_array($method, $this->passthru)) {
-            return call_user_func_array([$this->getQueryWithScopes(), $method], $parameters);
+            return call_user_func_array([$this->loadScopes()->getQuery(), $method], $parameters);
         }
 
         call_user_func_array([$this->query, $method], $parameters);

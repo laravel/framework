@@ -44,6 +44,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
             $table->timestamps();
             $table->softDeletes();
         });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('post_id');
+            $table->string('body');
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -54,6 +62,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     public function tearDown()
     {
         $this->schema()->drop('users');
+        $this->schema()->drop('posts');
+        $this->schema()->drop('comments');
     }
 
     /**
@@ -137,11 +147,55 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post = $abigail->posts()->create(['title' => 'First Title']);
-        $post->delete();
 
-        $users = SoftDeletesTestUser::has('posts')->get();
-
+        $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->has('posts')->get();
         $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->has('posts')->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orHas('posts')->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+            $query->where('title', 'First Title');
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+            $query->where('title', 'Another Title');
+        })->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orWhereHas('posts', function ($query) {
+            $query->where('title', 'First Title');
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        // With Post Deleted...
+
+        $post->delete();
+        $users = SoftDeletesTestUser::has('posts')->get();
+        $this->assertEquals(0, count($users));
+    }
+
+    /**
+     * @group test
+     */
+    public function testWhereHasWithNestedDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+        $comment = $post->comments()->create(['body' => 'Comment Body']);
+        $comment->delete();
+
+        $users = SoftDeletesTestUser::has('posts.comments')->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
+        $this->assertEquals(1, count($users));
     }
 
     /**
@@ -202,5 +256,23 @@ class SoftDeletesTestPost extends Eloquent
 
     protected $dates = ['deleted_at'];
     protected $table = 'posts';
+    protected $guarded = [];
+
+    public function comments()
+    {
+        return $this->hasMany(SoftDeletesTestComment::class, 'post_id');
+    }
+}
+
+
+/**
+ * Eloquent Models...
+ */
+class SoftDeletesTestComment extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+    protected $table = 'comments';
     protected $guarded = [];
 }

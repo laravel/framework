@@ -1869,7 +1869,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $builder = $this->newQuery();
 
-        return $builder->removeGlobalScope($scope);
+        return $builder->withoutGlobalScope($scope);
     }
 
     /**
