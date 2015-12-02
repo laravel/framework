@@ -2,20 +2,90 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Manager;
+use Closure;
+use InvalidArgumentException;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 
-class AuthManager extends Manager
+class AuthManager
 {
     /**
-     * Create a new driver instance.
+     * The application instance.
      *
-     * @param  string  $driver
-     * @return mixed
+     * @var \Illuminate\Foundation\Application
      */
-    protected function createDriver($driver)
+    protected $app;
+
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array
+     */
+    protected $customCreators = [];
+
+    /**
+     * The array of created "drivers".
+     *
+     * @var array
+     */
+    protected $guards = [];
+
+    /**
+     * Create a new Auth manager instance.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app)
     {
-        $guard = parent::createDriver($driver);
+        $this->app = $app;
+    }
+
+    /**
+     * Attempt to get the store from the local cache.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatelessGuard
+     */
+    protected function guard($name = null)
+    {
+        $name = $name ?: $this->getDefaultDriver();
+
+        return isset($this->guards[$name]) ? $this->guards[$name] : $this->resolve($name);
+    }
+
+    /**
+     * Resolve the given store.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    protected function resolve($name)
+    {
+        $config = $this->getConfig($name);
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
+        }
+
+        if (isset($this->customCreators[$config['driver']])) {
+            return $this->callCustomCreator($name, $config);
+        } else {
+            return $this->{'create'.ucfirst($config['driver']).'Driver'}($name, $config);
+        }
+    }
+
+    /**
+     * Create a session based authentication guard.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Illuminate\Auth\Guard
+     */
+    public function createSessionDriver($name, $config)
+    {
+        $provider = $this->createBackend($config['backend']);
+
+        $guard = new Guard($name, $provider, $this->app['session.store']);
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
@@ -38,30 +108,13 @@ class AuthManager extends Manager
     /**
      * Call a custom driver creator.
      *
-     * @param  string  $driver
-     * @return \Illuminate\Contracts\Auth\Guard
+     * @param  string  $name
+     * @param  array  $config
+     * @return mixed
      */
-    protected function callCustomCreator($driver)
+    protected function callCustomCreator($name, array $config)
     {
-        $custom = parent::callCustomCreator($driver);
-
-        if ($custom instanceof GuardContract) {
-            return $custom;
-        }
-
-        return new Guard($custom, $this->app['session.store']);
-    }
-
-    /**
-     * Create an instance of the database driver.
-     *
-     * @return \Illuminate\Auth\Guard
-     */
-    public function createDatabaseDriver()
-    {
-        $provider = $this->createDatabaseProvider();
-
-        return new Guard($provider, $this->app['session.store']);
+        return $this->customCreators[$config['driver']]($this->app, $name, $config);
     }
 
     /**
@@ -82,18 +135,6 @@ class AuthManager extends Manager
     }
 
     /**
-     * Create an instance of the Eloquent driver.
-     *
-     * @return \Illuminate\Auth\Guard
-     */
-    public function createEloquentDriver()
-    {
-        $provider = $this->createEloquentProvider();
-
-        return new Guard($provider, $this->app['session.store']);
-    }
-
-    /**
      * Create an instance of the Eloquent user provider.
      *
      * @return \Illuminate\Auth\EloquentUserProvider
@@ -103,6 +144,17 @@ class AuthManager extends Manager
         $model = $this->app['config']['auth.model'];
 
         return new EloquentUserProvider($this->app['hash'], $model);
+    }
+
+    /**
+     * Get the cache connection configuration.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function getConfig($name)
+    {
+        return $this->app['config']["auth.guards.{$name}"];
     }
 
     /**
@@ -124,5 +176,31 @@ class AuthManager extends Manager
     public function setDefaultDriver($name)
     {
         $this->app['config']['auth.driver'] = $name;
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param  string    $driver
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function extend($driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Dynamically call the default driver instance.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return call_user_func_array([$this->guard(), $method], $parameters);
     }
 }

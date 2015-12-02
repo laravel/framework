@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class Guard implements GuardContract
 {
     /**
+     * The name of the Guard. Typically "session".
+     *
+     * Corresponds to driver name in authentication configuration.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The currently authenticated user.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable
@@ -88,15 +97,18 @@ class Guard implements GuardContract
     /**
      * Create a new authentication guard.
      *
+     * @param  string  $name
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Symfony\Component\HttpFoundation\Session\SessionInterface  $session
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return void
      */
-    public function __construct(UserProvider $provider,
+    public function __construct($name,
+                                UserProvider $provider,
                                 SessionInterface $session,
                                 Request $request = null)
     {
+        $this->name = $name;
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
@@ -746,7 +758,7 @@ class Guard implements GuardContract
      */
     public function getName()
     {
-        return 'login_'.md5(get_class($this));
+        return 'login_'.$this->name.'_'.md5(get_class($this));
     }
 
     /**
@@ -756,7 +768,7 @@ class Guard implements GuardContract
      */
     public function getRecallerName()
     {
-        return 'remember_'.md5(get_class($this));
+        return 'remember_'.$this->name.'_'.md5(get_class($this));
     }
 
     /**
