@@ -98,7 +98,7 @@ class SoftDeletingScope implements ScopeInterface
     protected function addWithTrashed(Builder $builder)
     {
         $builder->macro('withTrashed', function (Builder $builder) {
-            return $builder->removeGlobalScope($this);
+            return $builder->withoutGlobalScope($this);
         });
     }
 
@@ -113,7 +113,9 @@ class SoftDeletingScope implements ScopeInterface
         $builder->macro('onlyTrashed', function (Builder $builder) {
             $model = $builder->getModel();
 
-            $builder->removeGlobalScope($this)->getQuery()->whereNotNull($model->getQualifiedDeletedAtColumn());
+            $builder->withoutGlobalScope($this)->whereNotNull(
+                $model->getQualifiedDeletedAtColumn()
+            );
 
             return $builder;
         });
