@@ -3,24 +3,33 @@
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    /**
+     * Bootstrap Eloquent.
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass()
     {
-        $db = new DB;
+        Eloquent::setConnectionResolver(
+            new SoftDeletesDatabaseIntegrationTestConnectionResolver
+        );
 
-        $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
-        ]);
+        Eloquent::setEventDispatcher(
+            new Illuminate\Events\Dispatcher
+        );
+    }
 
-        $db->bootEloquent();
-        $db->setAsGlobal();
-
-        $this->createSchema();
+    /**
+     * Tear down Eloquent.
+     */
+    public static function tearDownAfterClass()
+    {
+        Eloquent::unsetEventDispatcher();
+        Eloquent::unsetConnectionResolver();
     }
 
     /**
@@ -28,19 +37,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
      *
      * @return void
      */
-    public function createSchema()
+    public function setUp()
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        $this->schema()->create('posts', function ($table) {
-            $table->increments('id');
-            $table->integer('user_id');
-            $table->string('title');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -131,20 +132,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals('taylorotwell@gmail.com', $taylor->email);
     }
 
-    public function testWhereHasWithDeletedRelationship()
-    {
-        $this->createUsers();
-
-        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
-        $post = $abigail->posts()->create(['title' => 'First Title']);
-        $post->delete();
-
-        dd(SoftDeletesTestUser::has('posts')->toSql());
-        $users = SoftDeletesTestUser::has('posts')->get();
-
-        $this->assertEquals(0, count($users));
-    }
-
     /**
      * Helpers...
      */
@@ -187,21 +174,31 @@ class SoftDeletesTestUser extends Eloquent
     protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
-    }
 }
 
 /**
- * Eloquent Models...
+ * Connection Resolver.
  */
-class SoftDeletesTestPost extends Eloquent
+class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
 {
-    use SoftDeletes;
+    protected $connection;
 
-    protected $dates = ['deleted_at'];
-    protected $table = 'posts';
-    protected $guarded = [];
+    public function connection($name = null)
+    {
+        if (isset($this->connection)) {
+            return $this->connection;
+        }
+
+        return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
+    }
+
+    public function getDefaultConnection()
+    {
+        return 'default';
+    }
+
+    public function setDefaultConnection($name)
+    {
+        //
+    }
 }
