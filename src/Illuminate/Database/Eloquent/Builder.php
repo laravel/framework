@@ -83,7 +83,7 @@ class Builder
      * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
      * @return $this
      */
-    public function applyGlobalScope($identifier, $scope)
+    public function withGlobalScope($identifier, $scope)
     {
         $this->scopes[$identifier] = $scope;
 
@@ -461,7 +461,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->loadScopes()->getQuery()->get($columns);
+        $results = $this->applyScopes()->getQuery()->get($columns);
 
         $connection = $this->model->getConnectionName();
 
@@ -642,7 +642,7 @@ class Builder
         }
 
         return $this->addHasWhere(
-            $query->loadScopes(), $relation, $operator, $count, $boolean
+            $query->applyScopes(), $relation, $operator, $count, $boolean
         );
     }
 
@@ -885,11 +885,11 @@ class Builder
     }
 
     /**
-     * Get the underlying query builder instance with applied global scopes.
+     * Apply the scopes to the Eloquent builder instance and return it.
      *
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function loadScopes()
+    public function applyScopes()
     {
         if (! $this->scopes) {
             return $this;
@@ -1024,7 +1024,7 @@ class Builder
         }
 
         if (in_array($method, $this->passthru)) {
-            return call_user_func_array([$this->loadScopes()->getQuery(), $method], $parameters);
+            return call_user_func_array([$this->applyScopes()->getQuery(), $method], $parameters);
         }
 
         call_user_func_array([$this->query, $method], $parameters);
