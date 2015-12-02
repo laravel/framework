@@ -22,6 +22,8 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      * @param  string  $key
      * @param  string  $cipher
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
@@ -54,6 +56,8 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encrypt($value)
     {
@@ -70,7 +74,13 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
         // authenticity. Then, we'll JSON encode the data in a "payload" array.
         $mac = $this->hash($iv = base64_encode($iv), $value);
 
-        return base64_encode(json_encode(compact('iv', 'value', 'mac')));
+        $json = json_encode(compact('iv', 'value', 'mac'));
+
+        if (! is_string($json)) {
+            throw new EncryptException('Could not encrypt the data.');
+        }
+
+        return base64_encode($json);
     }
 
     /**
@@ -78,6 +88,8 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
      *
      * @param  string  $payload
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     public function decrypt($payload)
     {

@@ -145,11 +145,13 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function getQueue($queue)
     {
+        $queue = $queue ?: $this->default;
+
         if (filter_var($queue, FILTER_VALIDATE_URL) !== false) {
             return $queue;
         }
 
-        return rtrim($this->prefix, '/').'/'.($queue ?: $this->default);
+        return rtrim($this->prefix, '/').'/'.($queue);
     }
 
     /**
