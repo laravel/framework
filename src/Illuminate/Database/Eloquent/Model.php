@@ -339,11 +339,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure|string  $scope
      * @param  \Closure|null  $implementation
-     * @return void
+     * @return mixed
+     * 
+     * @throws \InvalidArgumentException
      */
     public static function addGlobalScope($scope, Closure $implementation = null)
     {
-        if (is_string($scope) && $implementation) {
+        if (is_string($scope) && $implementation !== null) {
             return static::$globalScopes[get_called_class()][$scope] = $implementation;
         }
 
