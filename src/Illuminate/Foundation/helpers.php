@@ -3,7 +3,13 @@
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\Cookie\Factory as CookieFactory;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 if (! function_exists('abort')) {
     /**
@@ -91,7 +97,7 @@ if (! function_exists('auth')) {
      */
     function auth()
     {
-        return app(Illuminate\Contracts\Auth\Guard::class);
+        return app(Guard::class);
     }
 }
 
@@ -188,7 +194,7 @@ if (! function_exists('cookie')) {
      */
     function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
     {
-        $cookie = app(Illuminate\Contracts\Cookie\Factory::class);
+        $cookie = app(CookieFactory::class);
 
         if (is_null($name)) {
             return $cookie;
@@ -253,20 +259,6 @@ if (! function_exists('decrypt')) {
     function decrypt($value)
     {
         return app('encrypter')->decrypt($value);
-    }
-}
-
-if (! function_exists('delete')) {
-    /**
-     * Register a new DELETE route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function delete($uri, $action)
-    {
-        return app('router')->delete($uri, $action);
     }
 }
 
@@ -374,7 +366,7 @@ if (! function_exists('factory')) {
      */
     function factory()
     {
-        $factory = app(Illuminate\Database\Eloquent\Factory::class);
+        $factory = app(EloquentFactory::class);
 
         $arguments = func_get_args();
 
@@ -385,20 +377,6 @@ if (! function_exists('factory')) {
         } else {
             return $factory->of($arguments[0]);
         }
-    }
-}
-
-if (! function_exists('get')) {
-    /**
-     * Register a new GET route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function get($uri, $action)
-    {
-        return app('router')->get($uri, $action);
     }
 }
 
@@ -461,20 +439,6 @@ if (! function_exists('old')) {
     }
 }
 
-if (! function_exists('patch')) {
-    /**
-     * Register a new PATCH route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function patch($uri, $action)
-    {
-        return app('router')->patch($uri, $action);
-    }
-}
-
 if (! function_exists('policy')) {
     /**
      * Get a policy instance for a given class.
@@ -490,20 +454,6 @@ if (! function_exists('policy')) {
     }
 }
 
-if (! function_exists('post')) {
-    /**
-     * Register a new POST route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function post($uri, $action)
-    {
-        return app('router')->post($uri, $action);
-    }
-}
-
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
@@ -514,20 +464,6 @@ if (! function_exists('public_path')) {
     function public_path($path = '')
     {
         return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.$path : $path);
-    }
-}
-
-if (! function_exists('put')) {
-    /**
-     * Register a new PUT route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function put($uri, $action)
-    {
-        return app('router')->put($uri, $action);
     }
 }
 
@@ -569,21 +505,6 @@ if (! function_exists('request')) {
     }
 }
 
-if (! function_exists('resource')) {
-    /**
-     * Route a resource to a controller.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return \Illuminate\Routing\Route
-     */
-    function resource($name, $controller, array $options = [])
-    {
-        return app('router')->resource($name, $controller, $options);
-    }
-}
-
 if (! function_exists('response')) {
     /**
      * Return a new response from the application.
@@ -595,7 +516,7 @@ if (! function_exists('response')) {
      */
     function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = app(Illuminate\Contracts\Routing\ResponseFactory::class);
+        $factory = app(ResponseFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
@@ -729,15 +650,15 @@ if (! function_exists('url')) {
      * @param  string  $path
      * @param  mixed   $parameters
      * @param  bool    $secure
-     * @return string
+     * @return Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
-            return app('url');
+            return app(UrlGenerator::class);
         }
 
-        return app('url')->to($path, $parameters, $secure);
+        return app(UrlGenerator::class)->to($path, $parameters, $secure);
     }
 }
 
@@ -752,7 +673,7 @@ if (! function_exists('view')) {
      */
     function view($view = null, $data = [], $mergeData = [])
     {
-        $factory = app(Illuminate\Contracts\View\Factory::class);
+        $factory = app(ViewFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
