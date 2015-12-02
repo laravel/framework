@@ -256,20 +256,6 @@ if (! function_exists('decrypt')) {
     }
 }
 
-if (! function_exists('delete')) {
-    /**
-     * Register a new DELETE route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function delete($uri, $action)
-    {
-        return app('router')->delete($uri, $action);
-    }
-}
-
 if (! function_exists('elixir')) {
     /**
      * Get the path to a versioned Elixir file.
@@ -388,20 +374,6 @@ if (! function_exists('factory')) {
     }
 }
 
-if (! function_exists('get')) {
-    /**
-     * Register a new GET route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function get($uri, $action)
-    {
-        return app('router')->get($uri, $action);
-    }
-}
-
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
@@ -461,20 +433,6 @@ if (! function_exists('old')) {
     }
 }
 
-if (! function_exists('patch')) {
-    /**
-     * Register a new PATCH route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function patch($uri, $action)
-    {
-        return app('router')->patch($uri, $action);
-    }
-}
-
 if (! function_exists('policy')) {
     /**
      * Get a policy instance for a given class.
@@ -490,20 +448,6 @@ if (! function_exists('policy')) {
     }
 }
 
-if (! function_exists('post')) {
-    /**
-     * Register a new POST route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function post($uri, $action)
-    {
-        return app('router')->post($uri, $action);
-    }
-}
-
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
@@ -514,20 +458,6 @@ if (! function_exists('public_path')) {
     function public_path($path = '')
     {
         return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.$path : $path);
-    }
-}
-
-if (! function_exists('put')) {
-    /**
-     * Register a new PUT route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function put($uri, $action)
-    {
-        return app('router')->put($uri, $action);
     }
 }
 
@@ -566,21 +496,6 @@ if (! function_exists('request')) {
         }
 
         return app('request')->input($key, $default);
-    }
-}
-
-if (! function_exists('resource')) {
-    /**
-     * Route a resource to a controller.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return \Illuminate\Routing\Route
-     */
-    function resource($name, $controller, array $options = [])
-    {
-        return app('router')->resource($name, $controller, $options);
     }
 }
 
