@@ -57,7 +57,6 @@
         "illuminate/events": "self.version",
         "illuminate/exception": "self.version",
         "illuminate/filesystem": "self.version",
-        "illuminate/foundation": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
         "illuminate/log": "self.version",
