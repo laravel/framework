@@ -408,7 +408,7 @@ class Router implements RegistrarContract
             $new['as'] = $old['as'].(isset($new['as']) ? $new['as'] : '');
         }
 
-        return array_merge_recursive(array_except($old, ['namespace', 'prefix', 'where', 'as']), $new);
+        return array_merge_recursive(Arr::except($old, ['namespace', 'prefix', 'where', 'as']), $new);
     }
 
     /**
