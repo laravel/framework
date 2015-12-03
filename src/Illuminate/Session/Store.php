@@ -540,14 +540,14 @@ class Store implements SessionInterface
     }
 
     /**
-     * Remove an item from the session.
+     * Remove one or many items from the session.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return void
      */
-    public function forget($key)
+    public function forget($keys)
     {
-        Arr::forget($this->attributes, $key);
+        Arr::forget($this->attributes, $keys);
     }
 
     /**
