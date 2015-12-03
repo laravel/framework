@@ -1027,8 +1027,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $aliases = [
             'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
-            'auth'                 => 'Illuminate\Auth\AuthManager',
-            'auth.driver'          => ['Illuminate\Auth\Guard', 'Illuminate\Contracts\Auth\Guard'],
+            'auth'                 => ['Illuminate\Auth\AuthManager', 'Illuminate\Contracts\Auth\Factory'],
+            'auth.driver'          => ['Illuminate\Contracts\Auth\Guard'],
             'auth.password.tokens' => 'Illuminate\Auth\Passwords\TokenRepositoryInterface',
             'blade.compiler'       => 'Illuminate\View\Compilers\BladeCompiler',
             'cache'                => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
@@ -1047,7 +1047,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
             'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
             'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
-            'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
+            'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBrokerManager', 'Illuminate\Contracts\Auth\PasswordBrokerFactory'],
+            'auth.password.broker' => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
             'queue'                => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory', 'Illuminate\Contracts\Queue\Monitor'],
             'queue.connection'     => 'Illuminate\Contracts\Queue\Queue',
             'redirect'             => 'Illuminate\Routing\Redirector',

@@ -4,10 +4,12 @@ namespace Illuminate\Auth;
 
 use Closure;
 use InvalidArgumentException;
-use Illuminate\Contracts\Auth\Guard as GuardContract;
+use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
-class AuthManager
+class AuthManager implements FactoryContract
 {
+    use CreatesUserProviders;
+
     /**
      * The application instance.
      *
@@ -44,18 +46,7 @@ class AuthManager
      * Attempt to get the guard from the local cache.
      *
      * @param  string  $name
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatelessGuard
-     */
-    public function driver($name = null)
-    {
-        return $this->guard($name);
-    }
-
-    /**
-     * Attempt to get the guard from the local cache.
-     *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatelessGuard
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
     public function guard($name = null)
     {
@@ -67,10 +58,10 @@ class AuthManager
     }
 
     /**
-     * Resolve the given store.
+     * Resolve the given guard.
      *
      * @param  string  $name
-     * @return \Illuminate\Contracts\Cache\Repository
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
     protected function resolve($name)
     {
@@ -104,13 +95,13 @@ class AuthManager
      *
      * @param  string  $name
      * @param  array  $config
-     * @return \Illuminate\Auth\Guard
+     * @return \Illuminate\Auth\SessionGuard
      */
     public function createSessionDriver($name, $config)
     {
         $provider = $this->createUserProvider($config['provider']);
 
-        $guard = new Guard($name, $provider, $this->app['session.store']);
+        $guard = new SessionGuard($name, $provider, $this->app['session.store']);
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
@@ -131,51 +122,7 @@ class AuthManager
     }
 
     /**
-     * Create the user provider implementation for the driver.
-     *
-     * @param  string  $provider
-     * @return \Illuminate\Contracts\Auth\UserProvider
-     */
-    protected function createUserProvider($provider)
-    {
-        $config = $this->app['config']['auth.providers.'.$provider];
-
-        switch ($config['driver']) {
-            case 'database':
-                return $this->createDatabaseProvider($config);
-            case 'eloquent':
-                return $this->createEloquentProvider($config);
-            default:
-                throw new InvalidArgumentException("Authentication user provider [{$config['driver']}] is not defined.");
-        }
-    }
-
-    /**
-     * Create an instance of the database user provider.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Auth\DatabaseUserProvider
-     */
-    protected function createDatabaseProvider($config)
-    {
-        $connection = $this->app['db']->connection();
-
-        return new DatabaseUserProvider($connection, $this->app['hash'], $config['table']);
-    }
-
-    /**
-     * Create an instance of the Eloquent user provider.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Auth\EloquentUserProvider
-     */
-    protected function createEloquentProvider($config)
-    {
-        return new EloquentUserProvider($this->app['hash'], $config['model']);
-    }
-
-    /**
-     * Get the cache connection configuration.
+     * Get the guard configuration.
      *
      * @param  string  $name
      * @return array
@@ -192,7 +139,18 @@ class AuthManager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['auth.driver'];
+        return $this->app['config']['auth.guard'];
+    }
+
+    /**
+     * Set the default guard driver the factory should serve.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function shouldUse($name)
+    {
+        return $this->setDefaultDriver($name);
     }
 
     /**
@@ -203,7 +161,7 @@ class AuthManager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['auth.driver'] = $name;
+        $this->app['config']['auth.guard'] = $name;
     }
 
     /**
