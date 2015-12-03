@@ -896,18 +896,78 @@ class Builder
         }
 
         $builder = clone $this;
+        $query = $builder->getQuery();
+
+        $whereCount = count($query->wheres);
+        $whereOffsets = [0, $whereCount];
 
         foreach ($this->scopes as $scope) {
-            if ($scope instanceof Closure) {
-                $scope($builder);
-            }
+            $this->applyScope($scope, $builder);
 
-            if ($scope instanceof ScopeInterface) {
-                $scope->apply($builder, $this->getModel());
-            }
+            $whereOffsets[] = count($query->wheres);
+        }
+
+        if ($whereCount && count($query->wheres) > $whereCount) {
+            $this->nestWheresForGlobalScope($query, array_unique($whereOffsets));
         }
 
         return $builder;
+    }
+
+    /**
+     * Apply a single scope on the given builder instance.
+     *
+     * @param \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function applyScope($scope, $builder)
+    {
+        if ($scope instanceof Closure) {
+            $scope($builder);
+        }
+
+        if ($scope instanceof ScopeInterface) {
+            $scope->apply($builder, $this->getModel());
+        }
+    }
+
+    /**
+     * Nest where conditions of the builder and each global scope.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $builder
+     * @param  array  $offsets
+     * @return void
+     */
+    protected function nestWheresForGlobalScope(QueryBuilder $builder, array $offsets)
+    {
+        $wheres = $builder->wheres;
+
+        $builder->wheres = [];
+
+        $lastOffset = array_shift($offsets);
+
+        foreach ($offsets as $offset) {
+            $builder->wheres[] = $this->sliceWhereConditions($wheres, $lastOffset, $offset - $lastOffset);
+
+            $lastOffset = $offset;
+        }
+    }
+
+    /**
+     * Create a where array with sliced where conditions.
+     *
+     * @param  array  $wheres
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return array
+     */
+    protected function sliceWhereConditions($wheres, $offset, $length = null)
+    {
+        $query = $this->getQuery()->getQueryForNestedWhere();
+        $query->wheres = array_slice($wheres, $offset, $length);
+
+        return ['type' => 'Nested', 'query' => $query, 'boolean' => 'and'];
     }
 
     /**
