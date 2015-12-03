@@ -26,7 +26,10 @@ class GeneratorServiceProvider extends ServiceProvider
 
         $this->registerMiddlewareGenerator();
 
-        $this->commands('command.controller.make', 'command.middleware.make');
+        $this->commands([
+            'command.controller.make',
+            'command.middleware.make',
+        ]);
     }
 
     /**

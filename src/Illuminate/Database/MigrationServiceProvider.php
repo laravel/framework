@@ -90,12 +90,15 @@ class MigrationServiceProvider extends ServiceProvider
         // Once the commands are registered in the application IoC container we will
         // register them with the Artisan start event so that these are available
         // when the Artisan application actually starts up and is getting used.
-        $this->commands(
-            'command.migrate', 'command.migrate.make',
-            'command.migrate.install', 'command.migrate.rollback',
-            'command.migrate.reset', 'command.migrate.refresh',
-            'command.migrate.status'
-        );
+        $this->commands([
+            'command.migrate',
+            'command.migrate.make',
+            'command.migrate.install',
+            'command.migrate.rollback',
+            'command.migrate.reset',
+            'command.migrate.refresh',
+            'command.migrate.status',
+        ]);
     }
 
     /**

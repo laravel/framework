@@ -25,7 +25,9 @@ class CommandsServiceProvider extends ServiceProvider
             return new SessionTableCommand($app['files'], $app['composer']);
         });
 
-        $this->commands('command.session.database');
+        $this->commands([
+            'command.session.database',
+        ]);
     }
 
     /**

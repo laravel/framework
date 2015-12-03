@@ -34,9 +34,9 @@ class GeneratorServiceProvider extends ServiceProvider
             $this->{"register{$command}Command"}();
         }
 
-        $this->commands(
-            'command.auth.resets.clear'
-        );
+        $this->commands([
+            'command.auth.resets.clear',
+        ]);
     }
 
     /**
