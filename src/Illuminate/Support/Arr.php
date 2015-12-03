@@ -199,7 +199,13 @@ class Arr
     {
         $original = &$array;
 
-        foreach ((array) $keys as $key) {
+        $keys = (array) $keys;
+
+        if (count($keys) === 0) {
+            return;
+        }
+
+        foreach ($keys as $key) {
             $parts = explode('.', $key);
 
             while (count($parts) > 1) {
