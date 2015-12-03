@@ -199,6 +199,10 @@ class Filesystem
      */
     public function mimeType($path)
     {
+        if (!extension_loaded("fileinfo")) {
+            return '"fileinfo" PECL extension has not been loaded.';
+        }
+        
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
 
