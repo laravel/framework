@@ -2431,10 +2431,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  int  $options
      * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonException
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->jsonSerialize(), $options);
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $json;
+        } else {
+            $jsonLastErrorMsg = json_last_error_msg();
+
+            throw new JsonException(
+                "Error encoding model to JSON. Reason: {$jsonLastErrorMsg}",
+                json_last_error()
+            );
+        }
     }
 
     /**
