@@ -37,9 +37,9 @@ class JobMakeCommand extends GeneratorCommand
     {
         if ($this->option('queued')) {
             return __DIR__.'/stubs/job-queued.stub';
-        } else {
-            return __DIR__.'/stubs/job.stub';
         }
+
+        return __DIR__.'/stubs/job.stub';
     }
 
     /**

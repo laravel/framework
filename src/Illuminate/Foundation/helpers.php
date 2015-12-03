@@ -362,9 +362,9 @@ if (! function_exists('factory')) {
             return $factory->of($arguments[0], $arguments[1])->times(isset($arguments[2]) ? $arguments[2] : 1);
         } elseif (isset($arguments[1])) {
             return $factory->of($arguments[0])->times($arguments[1]);
-        } else {
-            return $factory->of($arguments[0]);
         }
+
+        return $factory->of($arguments[0]);
     }
 }
 
