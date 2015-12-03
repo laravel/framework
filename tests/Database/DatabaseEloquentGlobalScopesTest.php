@@ -64,6 +64,23 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
+
+    public function testThatAllScopeWhereConditionsAreNested()
+    {
+        $model = new EloquentClosureGlobalScopesWithOrTestModel();
+
+        $query = $model->newQuery()->where('col1', 'val1')->orWhere('col2', 'val2');
+        $this->assertEquals('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and ("active" = ?) order by "name" asc', $query->toSql());
+        $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+    }
+
+    public function testRegularScopesWithOrWhereConditionsAreNested()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->approved();
+
+        $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+    }
 }
 
 class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
@@ -72,12 +89,33 @@ class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\
 
     public static function boot()
     {
+        static::addGlobalScope(function ($query) {
+            $query->orderBy('name');
+        });
+
         static::addGlobalScope('active_scope', function ($query) {
             $query->where('active', 1);
         });
 
+        parent::boot();
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approved', 1)->orWhere('should_approve', 0);
+    }
+}
+
+class EloquentClosureGlobalScopesWithOrTestModel extends EloquentClosureGlobalScopesTestModel
+{
+    public static function boot()
+    {
+        static::addGlobalScope('or_scope', function ($query) {
+            $query->where('email', 'taylor@gmail.com')->orWhere('email', 'someone@else.com');
+        });
+
         static::addGlobalScope(function ($query) {
-            $query->orderBy('name');
+            $query->select('email', 'password');
         });
 
         parent::boot();
