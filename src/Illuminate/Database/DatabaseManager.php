@@ -285,6 +285,26 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Gets an array of all drivers that we know of.
+     *
+     * @return array
+     */
+    public function getAllDrivers()
+    {
+        return $this->factory->getAllDrivers();
+    }
+
+    /**
+     * Gets an array of available drivers.
+     *
+     * @return array
+     */
+    public function getAvailableDrivers()
+    {
+        return $this->factory->getAvailableDrivers();
+    }
+
+    /**
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method

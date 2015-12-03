@@ -46,6 +46,36 @@ class ConnectionFactory
     }
 
     /**
+     * Gets an array of all drivers that we know of.
+     *
+     * @return array
+     */
+    public function getAllDrivers()
+    {
+        return array_keys($this->getDriverClassPrefixes());
+    }
+
+    /**
+     * Gets an array of available drivers.
+     *
+     * @return array
+     */
+    public function getAvailableDrivers()
+    {
+        $drivers = $this->getAllDrivers();
+        $availableDrivers = [];
+
+        foreach ($drivers as $driver) {
+            $connector = $this->createConnector(['driver' => $driver]);
+            if ($connector->isDriverAvailable()) {
+                $availableDrivers[] = $driver;
+            }
+        }
+
+        return $availableDrivers;
+    }
+
+    /**
      * Create a single database connection instance.
      *
      * @param  array  $config

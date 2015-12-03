@@ -84,7 +84,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
 
         $host = isset($host) ? "host={$host};" : '';
 
-        $dsn = "pgsql:{$host}dbname={$database}";
+        $pdoDriver = $this->getPDODriver();
+        $dsn = "{$pdoDriver}:{$host}dbname={$database}";
 
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
@@ -113,5 +114,15 @@ class PostgresConnector extends Connector implements ConnectorInterface
         } else {
             return '"'.$schema.'"';
         }
+    }
+
+    /**
+     * Get PDO Driver that can be used for this connection.
+     *
+     * @return string
+     */
+    protected function getPDODriver()
+    {
+        return 'pgsql';
     }
 }

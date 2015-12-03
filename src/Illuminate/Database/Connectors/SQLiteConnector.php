@@ -17,12 +17,13 @@ class SQLiteConnector extends Connector implements ConnectorInterface
     public function connect(array $config)
     {
         $options = $this->getOptions($config);
+        $pdoDriver = $this->getPDODriver();
 
         // SQLite supports "in-memory" databases that only last as long as the owning
         // connection does. These are useful for tests or for short lifetime store
         // querying. In-memory databases may only have a single open connection.
         if ($config['database'] == ':memory:') {
-            return $this->createConnection('sqlite::memory:', $config, $options);
+            return $this->createConnection("{$pdoDriver}::memory:", $config, $options);
         }
 
         $path = realpath($config['database']);
@@ -34,6 +35,16 @@ class SQLiteConnector extends Connector implements ConnectorInterface
             throw new InvalidArgumentException("Database (${config['database']}) does not exist.");
         }
 
-        return $this->createConnection("sqlite:{$path}", $config, $options);
+        return $this->createConnection("{$pdoDriver}:{$path}", $config, $options);
+    }
+
+    /**
+     * Get PDO Drivers that can be used for this connection.
+     *
+     * @return string
+     */
+    protected function getPDODriver()
+    {
+        return 'sqlite';
     }
 }

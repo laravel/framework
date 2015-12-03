@@ -103,4 +103,32 @@ class Connector
 
         throw $e;
     }
+
+    /**
+     * Get PDO driver this connection can use.
+     *
+     * @return string|null
+     */
+    protected function getPDODriver()
+    {
+        return;
+    }
+
+    /**
+     * Checks whether this Connector is available or not.
+     *
+     * @return bool
+     */
+    public function isDriverAvailable()
+    {
+        $drivers = \PDO::getAvailableDrivers();
+        $driver = $this->getPDODriver();
+
+        if ($driver === null) {
+            // We do not know if this driver is available or not.
+            return true;
+        }
+
+        return in_array($driver, $drivers);
+    }
 }
