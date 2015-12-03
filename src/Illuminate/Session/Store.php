@@ -201,7 +201,7 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
-        return sha1(uniqid('', true).Str::random(25).microtime(true));
+        return sha1(uniqid('', true).Str::random(mt_rand(25, 99)).microtime(true).app()->request->ip());
     }
 
     /**
