@@ -5,10 +5,6 @@ namespace Illuminate\Database\Connectors;
 use PDO;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\SQLiteConnection;
-use Illuminate\Database\PostgresConnection;
-use Illuminate\Database\SqlServerConnection;
 use Illuminate\Contracts\Container\Container;
 
 class ConnectionFactory
@@ -161,6 +157,56 @@ class ConnectionFactory
     }
 
     /**
+     * Prepare a map of driver to class prefixes.
+     *
+     * @return array
+     */
+    protected function getDriverClassPrefixes()
+    {
+        return [
+            'mysql' => 'MySql',
+            'pgsql' => 'Postgres',
+            'sqlite' => 'SQLite',
+            'sqlsrv' => 'SqlServer',
+        ];
+    }
+
+    /**
+     * Create a class instance for the given driver and suffix based on the configuration.
+     *
+     * @param string  $driver
+     * @param string  $suffix
+     * @param array   $parameters
+     * @param string  $namespace
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function makeClassForDriver($driver, $suffix, array $parameters = null, $namespace = __NAMESPACE__)
+    {
+        $abstract = strtolower($suffix);
+        if ($this->container->bound($key = "db.{$abstract}.{$driver}")) {
+            $args = [$key];
+            if (! is_null($parameters)) {
+                array_push($args, $parameters);
+            }
+
+            return call_user_func_array([$this->container, 'make'], $args);
+        }
+
+        $prefixes = $this->getDriverClassPrefixes();
+
+        if (isset($prefixes[$driver])) {
+            $className = $namespace.'\\'.$prefixes[$driver].$suffix;
+            $reflector = new \ReflectionClass($className);
+
+            return $reflector->newInstanceArgs($parameters ?: []);
+        }
+
+        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
+    }
+
+    /**
      * Create a connector instance based on the configuration.
      *
      * @param  array  $config
@@ -174,25 +220,7 @@ class ConnectionFactory
             throw new InvalidArgumentException('A driver must be specified.');
         }
 
-        if ($this->container->bound($key = "db.connector.{$config['driver']}")) {
-            return $this->container->make($key);
-        }
-
-        switch ($config['driver']) {
-            case 'mysql':
-                return new MySqlConnector;
-
-            case 'pgsql':
-                return new PostgresConnector;
-
-            case 'sqlite':
-                return new SQLiteConnector;
-
-            case 'sqlsrv':
-                return new SqlServerConnector;
-        }
-
-        throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]");
+        return $this->makeClassForDriver($config['driver'], 'Connector');
     }
 
     /**
@@ -209,24 +237,11 @@ class ConnectionFactory
      */
     protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = [])
     {
-        if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, [$connection, $database, $prefix, $config]);
-        }
-
-        switch ($driver) {
-            case 'mysql':
-                return new MySqlConnection($connection, $database, $prefix, $config);
-
-            case 'pgsql':
-                return new PostgresConnection($connection, $database, $prefix, $config);
-
-            case 'sqlite':
-                return new SQLiteConnection($connection, $database, $prefix, $config);
-
-            case 'sqlsrv':
-                return new SqlServerConnection($connection, $database, $prefix, $config);
-        }
-
-        throw new InvalidArgumentException("Unsupported driver [$driver]");
+        return $this->makeClassForDriver(
+            $driver,
+            'Connection',
+            [$connection, $database, $prefix, $config],
+            'Illuminate\\Database'
+        );
     }
 }
