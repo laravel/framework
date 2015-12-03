@@ -41,16 +41,29 @@ class AuthManager
     }
 
     /**
-     * Attempt to get the store from the local cache.
+     * Attempt to get the guard from the local cache.
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatelessGuard
      */
-    protected function guard($name = null)
+    public function driver($name = null)
+    {
+        return $this->guard($name);
+    }
+
+    /**
+     * Attempt to get the guard from the local cache.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatelessGuard
+     */
+    public function guard($name = null)
     {
         $name = $name ?: $this->getDefaultDriver();
 
-        return isset($this->guards[$name]) ? $this->guards[$name] : $this->resolve($name);
+        return isset($this->guards[$name])
+                    ? $this->guards[$name]
+                    : $this->guards[$name] = $this->resolve($name);
     }
 
     /**
@@ -75,6 +88,18 @@ class AuthManager
     }
 
     /**
+     * Call a custom driver creator.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return mixed
+     */
+    protected function callCustomCreator($name, array $config)
+    {
+        return $this->customCreators[$config['driver']]($this->app, $name, $config);
+    }
+
+    /**
      * Create a session based authentication guard.
      *
      * @param  string  $name
@@ -83,7 +108,7 @@ class AuthManager
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createBackend($config['backend']);
+        $provider = $this->createUserProvider($config['provider']);
 
         $guard = new Guard($name, $provider, $this->app['session.store']);
 
@@ -106,44 +131,47 @@ class AuthManager
     }
 
     /**
-     * Call a custom driver creator.
+     * Create the user provider implementation for the driver.
      *
-     * @param  string  $name
-     * @param  array  $config
-     * @return mixed
+     * @param  string  $provider
+     * @return \Illuminate\Contracts\Auth\UserProvider
      */
-    protected function callCustomCreator($name, array $config)
+    protected function createUserProvider($provider)
     {
-        return $this->customCreators[$config['driver']]($this->app, $name, $config);
+        $config = $this->app['config']['auth.providers.'.$provider];
+
+        switch ($config['driver']) {
+            case 'database':
+                return $this->createDatabaseProvider($config);
+            case 'eloquent':
+                return $this->createEloquentProvider($config);
+            default:
+                throw new InvalidArgumentException("Authentication user provider [{$config['driver']}] is not defined.");
+        }
     }
 
     /**
      * Create an instance of the database user provider.
      *
+     * @param  array  $config
      * @return \Illuminate\Auth\DatabaseUserProvider
      */
-    protected function createDatabaseProvider()
+    protected function createDatabaseProvider($config)
     {
         $connection = $this->app['db']->connection();
 
-        // When using the basic database user provider, we need to inject the table we
-        // want to use, since this is not an Eloquent model we will have no way to
-        // know without telling the provider, so we'll inject the config value.
-        $table = $this->app['config']['auth.table'];
-
-        return new DatabaseUserProvider($connection, $this->app['hash'], $table);
+        return new DatabaseUserProvider($connection, $this->app['hash'], $config['table']);
     }
 
     /**
      * Create an instance of the Eloquent user provider.
      *
+     * @param  array  $config
      * @return \Illuminate\Auth\EloquentUserProvider
      */
-    protected function createEloquentProvider()
+    protected function createEloquentProvider($config)
     {
-        $model = $this->app['config']['auth.model'];
-
-        return new EloquentUserProvider($this->app['hash'], $model);
+        return new EloquentUserProvider($this->app['hash'], $config['model']);
     }
 
     /**
