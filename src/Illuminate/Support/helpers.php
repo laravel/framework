@@ -427,9 +427,9 @@ if (! function_exists('data_get')) {
                 }
 
                 $target = $target->{$segment};
-            } else {
-                return value($default);
             }
+
+            return value($default);
         }
 
         return $target;

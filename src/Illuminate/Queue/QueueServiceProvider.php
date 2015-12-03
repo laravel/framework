@@ -292,9 +292,10 @@ class QueueServiceProvider extends ServiceProvider
 
             if (isset($config['table'])) {
                 return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
-            } else {
-                return new NullFailedJobProvider;
             }
+
+                return new NullFailedJobProvider;
+
         });
     }
 
