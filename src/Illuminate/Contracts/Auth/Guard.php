@@ -2,53 +2,72 @@
 
 namespace Illuminate\Contracts\Auth;
 
-interface Guard extends StatelessGuard
+interface Guard
 {
     /**
-     * Attempt to authenticate a user using the given credentials.
+     * Determine if the current user is authenticated.
      *
-     * @param  array  $credentials
-     * @param  bool   $remember
-     * @param  bool   $login
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true);
+    public function check();
 
     /**
-     * Attempt to authenticate using HTTP Basic Auth.
+     * Determine if the current user is a guest.
+     *
+     * @return bool
+     */
+    public function guest();
+
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function user();
+
+    /**
+     * Get the ID for the currently authenticated user.
+     *
+     * @return int|null
+     */
+    public function id();
+
+    /**
+     * Log a user into the application without sessions or cookies.
+     *
+     * @param  array  $credentials
+     * @return bool
+     */
+    public function once(array $credentials = []);
+
+    /**
+     * Perform a stateless HTTP Basic login attempt.
      *
      * @param  string  $field
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
-    public function basic($field = 'email');
+    public function onceBasic($field = 'email');
 
     /**
-     * Log a user into the application.
+     * Validate a user's credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  bool  $remember
-     * @return void
-     */
-    public function login(Authenticatable $user, $remember = false);
-
-    /**
-     * Log the given user ID into the application.
-     *
-     * @param  mixed  $id
-     * @param  bool   $remember
-     * @return \Illuminate\Contracts\Auth\Authenticatable
-     */
-    public function loginUsingId($id, $remember = false);
-
-    /**
-     * Determine if the user was authenticated via "remember me" cookie.
-     *
+     * @param  array  $credentials
      * @return bool
      */
-    public function viaRemember();
+    public function validate(array $credentials = []);
+
+    /**
+     * Log the given user ID into the application without sessions or cookies.
+     *
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function onceUsingId($id);
 
     /**
      * Log the user out of the application.
+     *
+     * Not required by all drivers, but may be used for invalidating tokens, etc.
      *
      * @return void
      */
