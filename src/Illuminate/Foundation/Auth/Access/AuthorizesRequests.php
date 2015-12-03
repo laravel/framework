@@ -52,6 +52,6 @@ trait AuthorizesRequests
             return [$ability, $arguments];
         }
 
-        return [debug_backtrace(false, 3)[2]['function'], $ability];
+        return [debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'], $ability];
     }
 }
