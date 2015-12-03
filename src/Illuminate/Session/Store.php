@@ -303,9 +303,7 @@ class Store implements SessionInterface
      */
     public function ageFlashData()
     {
-        foreach ($this->get('flash.old', []) as $old) {
-            $this->forget($old);
-        }
+        $this->forget($this->get('flash.old', []));
 
         $this->put('flash.old', $this->get('flash.new', []));
 
@@ -319,9 +317,7 @@ class Store implements SessionInterface
      */
     public function removeFlashNowData()
     {
-        foreach ($this->nowKeys as $key) {
-            $this->forget($key);
-        }
+        $this->forget($this->nowKeys);
 
         $this->nowKeys = [];
     }
@@ -544,14 +540,14 @@ class Store implements SessionInterface
     }
 
     /**
-     * Remove an item from the session.
+     * Remove one or many items from the session.
      *
-     * @param  string  $key
+     * @param  string|array  $keys
      * @return void
      */
-    public function forget($key)
+    public function forget($keys)
     {
-        Arr::forget($this->attributes, $key);
+        Arr::forget($this->attributes, $keys);
     }
 
     /**
