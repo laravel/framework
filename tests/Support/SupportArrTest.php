@@ -277,6 +277,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testForget()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::forget($array, null);
+        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::forget($array, []);
+        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
         Arr::forget($array, 'products.desk');
         $this->assertEquals(['products' => []], $array);
 
