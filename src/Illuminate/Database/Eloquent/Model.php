@@ -3031,7 +3031,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->getUpdatedAtColumn(),
         ];
 
-        $attributes = array_except($this->attributes, $except);
+        $attributes = Arr::except($this->attributes, $except);
 
         with($instance = new static)->setRawAttributes($attributes);
 
