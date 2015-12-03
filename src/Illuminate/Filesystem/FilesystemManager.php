@@ -128,7 +128,7 @@ class FilesystemManager implements FactoryContract
     {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
 
-        $links = (array_get($config, 'links') === 'skip')
+        $links = Arr::get($config, 'links') === 'skip'
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 

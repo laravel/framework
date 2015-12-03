@@ -836,7 +836,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list($current, $caller) = debug_backtrace(false, 2);
+            list($current, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
             $relation = $caller['function'];
         }
@@ -874,7 +874,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
         if (is_null($name)) {
-            list($current, $caller) = debug_backtrace(false, 2);
+            list($current, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
             $name = Str::snake($caller['function']);
         }
@@ -1094,7 +1094,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $self = __FUNCTION__;
 
-        $caller = Arr::first(debug_backtrace(false), function ($key, $trace) use ($self) {
+        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($key, $trace) use ($self) {
             $caller = $trace['function'];
 
             return ! in_array($caller, Model::$manyMethods) && $caller != $self;
@@ -3043,7 +3043,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->getUpdatedAtColumn(),
         ];
 
-        $attributes = array_except($this->attributes, $except);
+        $attributes = Arr::except($this->attributes, $except);
 
         with($instance = new static)->setRawAttributes($attributes);
 
