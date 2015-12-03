@@ -1090,7 +1090,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function getArrayableItems($items)
     {
-        if ($items instanceof self) {
+        if ($items instanceof static) {
             return $items->all();
         } elseif ($items instanceof Arrayable) {
             return $items->toArray();
