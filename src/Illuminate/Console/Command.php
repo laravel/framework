@@ -60,14 +60,22 @@ class Command extends SymfonyCommand
     /**
      * The mapping between human readable verbosity levels and Symfony's OutputInterface.
      *
-     * @var int[]
+     * @var array
      */
-    protected $verbosity = [
-        'v'     => OutputInterface::VERBOSITY_VERBOSE,
-        'vv'    => OutputInterface::VERBOSITY_VERY_VERBOSE,
-        'vvv'   => OutputInterface::VERBOSITY_DEBUG,
-        'quiet' => OutputInterface::VERBOSITY_QUIET,
+    protected $verbosityMap = [
+        'v'      => OutputInterface::VERBOSITY_VERBOSE,
+        'vv'     => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        'vvv'    => OutputInterface::VERBOSITY_DEBUG,
+        'quiet'  => OutputInterface::VERBOSITY_QUIET,
+        'normal' => OutputInterface::VERBOSITY_NORMAL,
     ];
+
+    /**
+     * The default verbosity of output commands.
+     *
+     * @var int
+     */
+    protected $verbosity = OutputInterface::VERBOSITY_NORMAL;
 
     /**
      * Create a new console command instance.
@@ -332,30 +340,41 @@ class Command extends SymfonyCommand
     }
 
     /**
-     * Convert the input level to the OutputInterface level.
+     * Get the verbosity level in terms of Symfony's OutputInterface level.
      *
      * @param  string|int  $level
-     * @return bool
+     * @return int
      */
-    public function convertVerbosity($level)
+    public function getVerbosity($level = null)
     {
-        if (isset($this->verbosity[$level])) {
-            $level = $this->verbosity[$level];
+        if (isset($this->verbosityMap[$level])) {
+            $level = $this->verbosityMap[$level];
         } elseif (! is_int($level)) {
-            $level = OutputInterface::VERBOSITY_NORMAL;
+            $level = $this->verbosity;
         }
 
         return $level;
     }
 
     /**
+     * Set the verbosity level.
+     *
+     * @param string|int $level
+     * @return void
+     */
+    public function setVerbosity($level)
+    {
+        $this->verbosity = $this->getVerbosity($level);
+    }
+
+    /**
      * Write a string as information output.
      *
      * @param  string  $string
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function info($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function info($string, $verbosityLevel = null)
     {
         $this->line($string, 'info', $verbosityLevel);
     }
@@ -365,23 +384,23 @@ class Command extends SymfonyCommand
      *
      * @param  string  $string
      * @param  string  $style
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function line($string, $style = null, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function line($string, $style = null, $verbosityLevel = null)
     {
         $styledString = $style ? "<$style>$string</$style>" : $string;
-        $this->output->writeln($styledString, $this->convertVerbosity($verbosityLevel));
+        $this->output->writeln($styledString, $this->getVerbosity($verbosityLevel));
     }
 
     /**
      * Write a string as comment output.
      *
      * @param  string  $string
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function comment($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function comment($string, $verbosityLevel = null)
     {
         $this->line($string, 'comment', $verbosityLevel);
     }
@@ -390,10 +409,10 @@ class Command extends SymfonyCommand
      * Write a string as question output.
      *
      * @param  string  $string
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function question($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function question($string, $verbosityLevel = null)
     {
         $this->line($string, 'question', $verbosityLevel);
     }
@@ -402,10 +421,10 @@ class Command extends SymfonyCommand
      * Write a string as error output.
      *
      * @param  string  $string
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function error($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function error($string, $verbosityLevel = null)
     {
         $this->line($string, 'error', $verbosityLevel);
     }
@@ -414,10 +433,10 @@ class Command extends SymfonyCommand
      * Write a string as warning output.
      *
      * @param  string  $string
-     * @param  int|string  $verbosityLevel
+     * @param  null|int|string  $verbosityLevel
      * @return void
      */
-    public function warn($string, $verbosityLevel = OutputInterface::VERBOSITY_NORMAL)
+    public function warn($string, $verbosityLevel = null)
     {
         if (! $this->output->getFormatter()->hasStyle('warning')) {
             $style = new OutputFormatterStyle('yellow');
