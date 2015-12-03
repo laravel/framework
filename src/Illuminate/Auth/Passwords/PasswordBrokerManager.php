@@ -63,7 +63,7 @@ class PasswordBrokerManager implements FactoryContract
         $config = $this->getConfig($name);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Password broker [{$name}] is not defined.");
+            throw new InvalidArgumentException("Password resetter [{$name}] is not defined.");
         }
 
         // The password broker uses a token repository to validate tokens and send user
@@ -101,7 +101,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["auth.brokers.{$name}"];
+        return $this->app['config']["auth.resetters.{$name}"];
     }
 
     /**
@@ -111,7 +111,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['auth.broker'];
+        return $this->app['config']['auth.default_resetter'];
     }
 
     /**
@@ -122,7 +122,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['auth.broker'] = $name;
+        $this->app['config']['auth.default_resetter'] = $name;
     }
 
     /**

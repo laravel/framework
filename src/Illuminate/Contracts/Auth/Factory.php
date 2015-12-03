@@ -13,7 +13,7 @@ interface Factory
     public function guard($name = null);
 
     /**
-     * Set the default guard driver the factory should serve.
+     * Set the default guard the factory should serve.
      *
      * @param  string  $name
      * @return void
