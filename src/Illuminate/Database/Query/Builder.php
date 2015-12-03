@@ -452,7 +452,11 @@ class Builder
         if (is_array($column)) {
             return $this->whereNested(function ($query) use ($column) {
                 foreach ($column as $key => $value) {
-                    $query->where($key, '=', $value);
+                    if (is_array($value) && count($value)==2) {
++                       $query->where($key, $value[0], $value[1]);
++                   }else{
++                       $query->where($key, '=', $value);
++                   }
                 }
             }, $boolean);
         }
