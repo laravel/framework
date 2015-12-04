@@ -99,7 +99,7 @@ class AuthManager implements FactoryContract
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createUserProvider($config['provider']);
+        $provider = $this->createUserProvider($config['source']);
 
         $guard = new SessionGuard($name, $provider, $this->app['session.store']);
 
@@ -139,7 +139,7 @@ class AuthManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['auth.default_guard'];
+        return $this->app['config']['auth.defaults.guard'];
     }
 
     /**
@@ -161,7 +161,7 @@ class AuthManager implements FactoryContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['auth.default_guard'] = $name;
+        $this->app['config']['auth.defaults.guard'] = $name;
     }
 
     /**

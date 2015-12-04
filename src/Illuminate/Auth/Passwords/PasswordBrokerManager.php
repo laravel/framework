@@ -69,7 +69,7 @@ class PasswordBrokerManager implements FactoryContract
         // aggregate service of sorts providing a convenient interface for resets.
         return new PasswordBroker(
             $this->createTokenRepository($config),
-            $this->createUserProvider($config['provider']),
+            $this->createUserProvider($config['source']),
             $this->app['mailer'],
             $config['email']
         );
@@ -99,7 +99,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["auth.resetters.{$name}"];
+        return $this->app['config']["auth.passwords.{$name}"];
     }
 
     /**
@@ -109,7 +109,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['auth.default_resetter'];
+        return $this->app['config']['auth.defaults.passwords'];
     }
 
     /**
@@ -120,7 +120,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['auth.default_resetter'] = $name;
+        $this->app['config']['auth.defaults.passwords'] = $name;
     }
 
     /**
