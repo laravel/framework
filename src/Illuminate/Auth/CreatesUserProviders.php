@@ -14,7 +14,7 @@ trait CreatesUserProviders
      */
     protected function createUserProvider($provider)
     {
-        $config = $this->app['config']['auth.providers.'.$provider];
+        $config = $this->app['config']['auth.sources.'.$provider];
 
         switch ($config['driver']) {
             case 'database':
@@ -22,7 +22,7 @@ trait CreatesUserProviders
             case 'eloquent':
                 return $this->createEloquentProvider($config);
             default:
-                throw new InvalidArgumentException("Authentication user provider [{$config['driver']}] is not defined.");
+                throw new InvalidArgumentException("Authentication user source [{$config['driver']}] is not defined.");
         }
     }
 
