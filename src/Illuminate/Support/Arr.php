@@ -197,20 +197,20 @@ class Arr
         foreach ($keys as $key) {
             $parts = explode('.', $key);
 
+            // clean up before each pass
+            $array = &$original;
+
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
-                    $parts = [];
+                    break(2);
                 }
             }
 
             unset($array[array_shift($parts)]);
-
-            // clean up after each pass
-            $array = &$original;
         }
     }
 
