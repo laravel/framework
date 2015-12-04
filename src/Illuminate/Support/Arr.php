@@ -206,7 +206,7 @@ class Arr
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
-                    break(2);
+                    continue 2;
                 }
             }
 
