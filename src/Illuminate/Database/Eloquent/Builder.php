@@ -935,9 +935,7 @@ class Builder
     {
         if ($scope instanceof Closure) {
             $scope($builder);
-        }
-
-        if ($scope instanceof ScopeInterface) {
+        } elseif ($scope instanceof ScopeInterface) {
             $scope->apply($builder, $this->getModel());
         }
     }
@@ -959,20 +957,20 @@ class Builder
     /**
      * Nest where conditions of the builder and each global scope.
      *
-     * @param  \Illuminate\Database\Query\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $offsets
      * @return void
      */
-    protected function nestWheresForScope(QueryBuilder $builder, array $offsets)
+    protected function nestWheresForScope(QueryBuilder $query, array $offsets)
     {
-        $wheres = $builder->wheres;
+        $wheres = $query->wheres;
 
-        $builder->wheres = [];
+        $query->wheres = [];
 
         $lastOffset = array_shift($offsets);
 
         foreach ($offsets as $offset) {
-            $builder->wheres[] = $this->sliceWhereConditions($wheres, $lastOffset, $offset - $lastOffset);
+            $query->wheres[] = $this->sliceWhereConditions($wheres, $lastOffset, $offset - $lastOffset);
 
             $lastOffset = $offset;
         }
