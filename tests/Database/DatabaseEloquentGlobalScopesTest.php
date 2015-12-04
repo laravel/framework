@@ -65,7 +65,7 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
-    public function testThatAllScopeWhereConditionsAreNested()
+    public function testGlobalScopesWithOrWhereConditionsAreNested()
     {
         $model = new EloquentClosureGlobalScopesWithOrTestModel();
 
