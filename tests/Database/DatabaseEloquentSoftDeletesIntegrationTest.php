@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -78,6 +79,16 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertCount(1, $users);
         $this->assertEquals(2, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(1));
+    }
+
+    public function testSoftDeletesAreNotRetrievedFromBaseQuery()
+    {
+        $this->createUsers();
+
+        $query = SoftDeletesTestUser::query()->toBase();
+
+        $this->assertInstanceOf(Builder::class, $query);
+        $this->assertCount(1, $query->get());
     }
 
     public function testWithTrashedReturnsAllRecords()
