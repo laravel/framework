@@ -17,6 +17,10 @@ trait ResetsPasswords
      */
     public function getEmail()
     {
+        if (view()->exists('passwords.email')) {
+            return view('passwords.email');
+        }
+
         return view('auth.password');
     }
 
@@ -63,6 +67,10 @@ trait ResetsPasswords
     {
         if (is_null($token)) {
             throw new NotFoundHttpException;
+        }
+
+        if (view()->exists('passwords.reset')) {
+            return view('passwords.reset');
         }
 
         return view('auth.reset')->with('token', $token);
