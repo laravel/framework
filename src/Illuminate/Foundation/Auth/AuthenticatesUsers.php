@@ -17,6 +17,16 @@ trait AuthenticatesUsers
      */
     public function getLogin()
     {
+        return $this->showLoginForm();
+    }
+
+    /**
+     * Show the application login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
         if (view()->exists('auth.authenticate')) {
             return view('auth.authenticate');
         }
@@ -31,6 +41,17 @@ trait AuthenticatesUsers
      * @return \Illuminate\Http\Response
      */
     public function postLogin(Request $request)
+    {
+        return $this->login($request);
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request)
     {
         $this->validate($request, [
             $this->loginUsername() => 'required', 'password' => 'required',
@@ -114,6 +135,16 @@ trait AuthenticatesUsers
      * @return \Illuminate\Http\Response
      */
     public function getLogout()
+    {
+        return $this->logout();
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function logout()
     {
         Auth::logout();
 
