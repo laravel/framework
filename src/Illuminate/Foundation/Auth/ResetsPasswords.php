@@ -106,7 +106,7 @@ trait ResetsPasswords
         }
 
         if (view()->exists('passwords.reset')) {
-            return view('passwords.reset');
+            return view('passwords.reset')->with('token', $token);
         }
 
         return view('auth.reset')->with('token', $token);
