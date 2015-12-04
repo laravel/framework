@@ -171,7 +171,7 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
 
-        $session->removeFlashNowData();
+        $session->ageFlashData();
 
         $this->assertFalse($session->has('foo'));
         $this->assertNull($session->get('foo'));
@@ -197,6 +197,15 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $session = $this->getSession();
         $session->flash('foo', 'bar');
         $session->set('flash.old', ['foo']);
+        $session->reflash();
+        $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
+        $this->assertFalse(array_search('foo', $session->get('flash.old')));
+    }
+
+    public function testReflashWithNow()
+    {
+        $session = $this->getSession();
+        $session->now('foo', 'bar');
         $session->reflash();
         $this->assertNotFalse(array_search('foo', $session->get('flash.new')));
         $this->assertFalse(array_search('foo', $session->get('flash.old')));
