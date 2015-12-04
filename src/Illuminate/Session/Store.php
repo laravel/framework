@@ -55,13 +55,6 @@ class Store implements SessionInterface
     protected $bagData = [];
 
     /**
-     * The keys that should only be available for the current request.
-     *
-     * @var array
-     */
-    protected $nowKeys = [];
-
-    /**
      * The session handler implementation.
      *
      * @var \SessionHandlerInterface
@@ -266,8 +259,6 @@ class Store implements SessionInterface
 
         $this->ageFlashData();
 
-        $this->removeFlashNowData();
-
         $this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
 
         $this->started = false;
@@ -308,18 +299,6 @@ class Store implements SessionInterface
         $this->put('flash.old', $this->get('flash.new', []));
 
         $this->put('flash.new', []);
-    }
-
-    /**
-     * Remove data that was flashed for only the current request.
-     *
-     * @return void
-     */
-    public function removeFlashNowData()
-    {
-        $this->forget($this->nowKeys);
-
-        $this->nowKeys = [];
     }
 
     /**
@@ -450,7 +429,7 @@ class Store implements SessionInterface
     {
         $this->put($key, $value);
 
-        $this->nowKeys[] = $key;
+        $this->push('flash.old', $key);
     }
 
     /**
