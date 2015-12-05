@@ -907,6 +907,16 @@ class Builder
     }
 
     /**
+     * Get a base query builder instance.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function toBase()
+    {
+        return $this->applyScopes()->getQuery();
+    }
+
+    /**
      * Set the underlying query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
