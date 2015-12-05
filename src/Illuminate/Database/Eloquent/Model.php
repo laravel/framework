@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use DateTime;
 use Exception;
+use Throwable;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
