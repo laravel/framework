@@ -209,6 +209,16 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, count($users));
     }
 
+    public function testOrWhereWithSoftDeleteConstraint()
+    {
+        $this->createUsers();
+        SoftDeletesTestUser::create(['id' => 3, 'email' => 'something@else.com']);
+
+        $users = SoftDeletesTestUser::where('email', 'something@else.com')->orWhere('email', 'abigailotwell@gmail.com');
+        $this->assertEquals(2, count($users->get()));
+        $this->assertEquals(['abigailotwell@gmail.com', 'something@else.com'], $users->orderBy('id')->pluck('email')->all());
+    }
+
     /**
      * Helpers...
      */

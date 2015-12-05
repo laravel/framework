@@ -881,7 +881,17 @@ class Builder
     {
         array_unshift($parameters, $this);
 
-        return call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+        $query = $this->getQuery();
+
+        $offset = count($query->wheres);
+
+        $result = call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+
+        if ($this->shouldNestWheresForScope($query, $offset)) {
+            $this->nestWheresForScope($query, $offset);
+        }
+
+        return $result;
     }
 
     /**
@@ -896,18 +906,91 @@ class Builder
         }
 
         $builder = clone $this;
+        $query = $builder->getQuery();
+
+        $count = count($query->wheres);
+        $offsets = [$count];
 
         foreach ($this->scopes as $scope) {
-            if ($scope instanceof Closure) {
-                $scope($builder);
-            }
+            $this->applyScope($scope, $builder);
 
-            if ($scope instanceof ScopeInterface) {
-                $scope->apply($builder, $this->getModel());
-            }
+            $offsets[] = count($query->wheres);
+        }
+
+        if ($this->shouldNestWheresForScope($query, $count)) {
+            $this->nestWheresForScope($query, $offsets);
         }
 
         return $builder;
+    }
+
+    /**
+     * Apply a single scope on the given builder instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function applyScope($scope, $builder)
+    {
+        if ($scope instanceof Closure) {
+            $scope($builder);
+        } elseif ($scope instanceof ScopeInterface) {
+            $scope->apply($builder, $this->getModel());
+        }
+    }
+
+    /**
+     * Determine if the scope added after the given offset should be nested.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  int  $offset
+     * @return bool
+     */
+    protected function shouldNestWheresForScope(QueryBuilder $query, $offset)
+    {
+        $booleans = collect($query->wheres)->pluck('boolean');
+
+        return $booleans->contains('or') && $offset && count($query->wheres) > $offset;
+    }
+
+    /**
+     * Nest where conditions of the builder and each global scope.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  int|array  $offset
+     * @return void
+     */
+    protected function nestWheresForScope(QueryBuilder $query, $offset)
+    {
+        $wheres = $query->wheres;
+        $offsets = collect([0, $offset, count($wheres)])->flatten()->unique();
+
+        $query->wheres = [];
+
+        $lastOffset = $offsets->shift();
+
+        foreach ($offsets as $offset) {
+            $query->wheres[] = $this->sliceWhereConditions($wheres, $lastOffset, $offset - $lastOffset);
+
+            $lastOffset = $offset;
+        }
+    }
+
+    /**
+     * Create a where array with sliced where conditions.
+     *
+     * @param  array  $wheres
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return array
+     */
+    protected function sliceWhereConditions($wheres, $offset, $length = null)
+    {
+        $query = $this->getQuery()->getQueryForNestedWhere();
+        $query->wheres = array_slice($wheres, $offset, $length);
+
+        return ['type' => 'Nested', 'query' => $query, 'boolean' => 'and'];
     }
 
     /**
