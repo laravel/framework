@@ -1,79 +1,98 @@
 <?php
 
+use org\bovigo\vfs\vfsStream;
 use Illuminate\Filesystem\Filesystem;
+use org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\content\LargeFileContent;
 
 class FilesystemTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var org\bovigo\vfs\vfsStreamDirectory
+     */
+    private $root;
+
+    /**
+     * Setup the environment.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        $this->root = vfsStream::setup();
+    }
+
     public function testGetRetrievesFiles()
     {
-        file_put_contents(__DIR__.'/file.txt', 'Hello World');
+        $file = vfsStream::newFile('temp.txt')->withContent('Foo Bar')->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals('Hello World', $files->get(__DIR__.'/file.txt'));
-        @unlink(__DIR__.'/file.txt');
+        $this->assertEquals('Foo Bar', $files->get($file->url()));
     }
 
     public function testPutStoresFiles()
     {
+        $file = vfsStream::newFile('temp.txt')->at($this->root);
         $files = new Filesystem;
-        $files->put(__DIR__.'/file.txt', 'Hello World');
-        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
-        @unlink(__DIR__.'/file.txt');
-    }
-
-    public function testDeleteRemovesFiles()
-    {
-        file_put_contents(__DIR__.'/file.txt', 'Hello World');
-        $files = new Filesystem;
-        $files->delete(__DIR__.'/file.txt');
-        $this->assertFileNotExists(__DIR__.'/file.txt');
-        @unlink(__DIR__.'/file.txt');
+        $files->put($file->url(), 'Hello World');
+        $this->assertStringEqualsFile($file->url(), 'Hello World');
     }
 
     public function testPrependExistingFiles()
     {
+        $file = vfsStream::newFile('temp.txt')->withContent('Hello World')->at($this->root);
         $files = new Filesystem;
-        $files->put(__DIR__.'/file.txt', 'World');
-        $files->prepend(__DIR__.'/file.txt', 'Hello ');
-        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
-        @unlink(__DIR__.'/file.txt');
+        $files->prepend($file->url(), 'Laravel, ');
+        $this->assertStringEqualsFile($file->url(), 'Laravel, Hello World');
     }
 
     public function testPrependNewFiles()
     {
+        $url = sprintf('%s\%s', $this->root->url(), 'newTempFile.txt');
         $files = new Filesystem;
-        $files->prepend(__DIR__.'/file.txt', 'Hello World');
-        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'Hello World');
-        @unlink(__DIR__.'/file.txt');
+        $files->prepend($url, 'Hello World!');
+        $this->assertStringEqualsFile($url, 'Hello World!');
     }
 
     public function testDeleteDirectory()
     {
-        mkdir(__DIR__.'/foo');
-        file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
+        $this->root->addChild(new vfsStreamDirectory('temp'));
+        $dir = $this->root->getChild('temp');
+        $file = vfsStream::newFile('bar.txt')->withContent('bar')->at($dir);
+
         $files = new Filesystem;
-        $files->deleteDirectory(__DIR__.'/foo');
-        $this->assertFalse(is_dir(__DIR__.'/foo'));
-        $this->assertFileNotExists(__DIR__.'/foo/file.txt');
+        $this->assertTrue(is_dir($dir->url()));
+        $files->deleteDirectory($dir->url());
+        $this->assertFalse(is_dir($dir->url()));
+        $this->assertFileNotExists($file->url());
     }
 
     public function testCleanDirectory()
     {
-        mkdir(__DIR__.'/foo');
-        file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
+        $this->root->addChild(new vfsStreamDirectory('party'));
+        $dir = $this->root->getChild('party');
+        $file = vfsStream::newFile('soda.txt')->withContent('party')->at($dir);
+
         $files = new Filesystem;
-        $files->cleanDirectory(__DIR__.'/foo');
-        $this->assertTrue(is_dir(__DIR__.'/foo'));
-        $this->assertFileNotExists(__DIR__.'/foo/file.txt');
-        @rmdir(__DIR__.'/foo');
+        $files->cleanDirectory($dir->url());
+        $this->assertTrue(is_dir($dir->url()));
+        $this->assertFileNotExists($file->url());
+    }
+
+    public function testDeleteRemovesFiles()
+    {
+        $file = vfsStream::newFile('unlucky.txt')->withContent('So sad')->at($this->root);
+        $files = new Filesystem;
+        $this->assertTrue($files->exists($file->url()));
+        $files->delete($file->url());
+        $this->assertFalse($files->exists($file->url()));
     }
 
     public function testMacro()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'Hello World');
+        $file = vfsStream::newFile('name.txt')->withContent('Taylor')->at($this->root);
         $files = new Filesystem;
-        $files->macro('getFoo', function () use ($files) { return $files->get(__DIR__.'/foo.txt'); });
-        $this->assertEquals('Hello World', $files->getFoo());
-        @unlink(__DIR__.'/foo.txt');
+        $files->macro('getName', function () use ($files, $file) { return $files->get($file->url()); });
+        $this->assertEquals('Taylor', $files->getName());
     }
 
     public function testFilesMethod()
@@ -94,36 +113,27 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     public function testCopyDirectoryReturnsFalseIfSourceIsntDirectory()
     {
         $files = new Filesystem;
-        $this->assertFalse($files->copyDirectory(__DIR__.'/foo/bar/baz/breeze/boom', __DIR__));
+        $this->assertFalse($files->copyDirectory(vfsStream::url('foo/bar/baz/tmp'), vfsStream::url('foo')));
     }
 
     public function testCopyDirectoryMovesEntireDirectory()
     {
-        mkdir(__DIR__.'/tmp', 0777, true);
-        file_put_contents(__DIR__.'/tmp/foo.txt', '');
-        file_put_contents(__DIR__.'/tmp/bar.txt', '');
-        mkdir(__DIR__.'/tmp/nested', 0777, true);
-        file_put_contents(__DIR__.'/tmp/nested/baz.txt', '');
+        $this->root->addChild(new vfsStreamDirectory('tmp', 0777));
+        $dir = $this->root->getChild('tmp');
+        vfsStream::newFile('foo.txt')->withContent('foo')->at($dir);
+        vfsStream::newFile('bar.txt')->withContent('bar')->at($dir);
+
+        $dir->addChild(new vfsStreamDirectory('nested', 0777));
+        vfsStream::newFile('baz.txt')->withContent('baz')->at($dir->getChild('nested'));
 
         $files = new Filesystem;
-        $files->copyDirectory(__DIR__.'/tmp', __DIR__.'/tmp2');
-        $this->assertTrue(is_dir(__DIR__.'/tmp2'));
-        $this->assertFileExists(__DIR__.'/tmp2/foo.txt');
-        $this->assertFileExists(__DIR__.'/tmp2/bar.txt');
-        $this->assertTrue(is_dir(__DIR__.'/tmp2/nested'));
-        $this->assertFileExists(__DIR__.'/tmp2/nested/baz.txt');
-
-        unlink(__DIR__.'/tmp/nested/baz.txt');
-        rmdir(__DIR__.'/tmp/nested');
-        unlink(__DIR__.'/tmp/bar.txt');
-        unlink(__DIR__.'/tmp/foo.txt');
-        rmdir(__DIR__.'/tmp');
-
-        unlink(__DIR__.'/tmp2/nested/baz.txt');
-        rmdir(__DIR__.'/tmp2/nested');
-        unlink(__DIR__.'/tmp2/foo.txt');
-        unlink(__DIR__.'/tmp2/bar.txt');
-        rmdir(__DIR__.'/tmp2');
+        $tmp2 = sprintf('%s/%s', $this->root->url(), 'tmp2');
+        $files->copyDirectory($dir->url(), $tmp2);
+        $this->assertTrue(is_dir($tmp2));
+        $this->assertFileExists($tmp2.'/foo.txt');
+        $this->assertFileExists($tmp2.'/bar.txt');
+        $this->assertTrue(is_dir($tmp2.'/nested'));
+        $this->assertFileExists($tmp2.'/nested/baz.txt');
     }
 
     /**
@@ -132,15 +142,14 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     public function testGetThrowsExceptionNonexisitingFile()
     {
         $files = new Filesystem;
-        $files->get(__DIR__.'/unknown-file.txt');
+        $files->get(vfsStream::url('foo/bar/baz/tmp/file.txt'));
     }
 
     public function testGetRequireReturnsProperly()
     {
-        file_put_contents(__DIR__.'/file.php', '<?php return "Howdy?"; ?>');
+        $file = vfsStream::newFile('file.php')->withContent('<?php return "Howdy?"; ?>')->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals('Howdy?', $files->getRequire(__DIR__.'/file.php'));
-        @unlink(__DIR__.'/file.php');
+        $this->assertEquals('Howdy?', $files->getRequire($file->url()));
     }
 
     /**
@@ -149,60 +158,58 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     public function testGetRequireThrowsExceptionNonexisitingFile()
     {
         $files = new Filesystem;
-        $files->getRequire(__DIR__.'/file.php');
+        $files->getRequire(vfsStream::url('foo/bar/tmp/file.php'));
     }
 
     public function testAppendAddsDataToFile()
     {
-        file_put_contents(__DIR__.'/file.txt', 'foo');
+        $file = vfsStream::newFile('foo.txt')->withContent('foo')->at($this->root);
         $files = new Filesystem;
-        $bytesWritten = $files->append(__DIR__.'/file.txt', 'bar');
+        $bytesWritten = $files->append($file->url(), 'bar');
         $this->assertEquals(mb_strlen('bar', '8bit'), $bytesWritten);
-        $this->assertFileExists(__DIR__.'/file.txt');
-        $this->assertStringEqualsFile(__DIR__.'/file.txt', 'foobar');
-        @unlink(__DIR__.'/file.txt');
+        $this->assertFileExists($file->url());
+        $this->assertStringEqualsFile($file->url(), 'foobar');
     }
 
     public function testMoveMovesFiles()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $file = vfsStream::newFile('pop.txt')->withContent('pop')->at($this->root);
+        $rock = $this->root->url().'/rock.txt';
         $files = new Filesystem;
-        $files->move(__DIR__.'/foo.txt', __DIR__.'/bar.txt');
-        $this->assertFileExists(__DIR__.'/bar.txt');
-        $this->assertFileNotExists(__DIR__.'/foo.txt');
-        @unlink(__DIR__.'/bar.txt');
+        $files->move($file->url(), $rock);
+        $this->assertFileExists($rock);
+        $this->assertStringEqualsFile($rock, 'pop');
+        $this->assertFileNotExists($this->root->url().'/pop.txt');
     }
 
     public function testExtensionReturnsExtension()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $file = vfsStream::newFile('rock.csv')->withContent('pop,rock')->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals('txt', $files->extension(__DIR__.'/foo.txt'));
-        @unlink(__DIR__.'/foo.txt');
+        $this->assertEquals('csv', $files->extension($file->url()));
     }
 
     public function testTypeIndentifiesFile()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $file = vfsStream::newFile('rock.csv')->withContent('pop,rock')->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals('file', $files->type(__DIR__.'/foo.txt'));
-        @unlink(__DIR__.'/foo.txt');
+        $this->assertEquals('file', $files->type($file->url()));
     }
 
     public function testTypeIndentifiesDirectory()
     {
-        mkdir(__DIR__.'/foo');
+        $this->root->addChild(new vfsStreamDirectory('music'));
+        $dir = $this->root->getChild('music');
         $files = new Filesystem;
-        $this->assertEquals('dir', $files->type(__DIR__.'/foo'));
-        @rmdir(__DIR__.'/foo');
+        $this->assertEquals('dir', $files->type($dir->url()));
     }
 
     public function testSizeOutputsSize()
     {
-        $size = file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $content = LargeFileContent::withKilobytes(2);
+        $file = vfsStream::newFile('2kb.txt')->withContent($content)->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals($size, $files->size(__DIR__.'/foo.txt'));
-        @unlink(__DIR__.'/foo.txt');
+        $this->assertEquals($file->size(), $files->size($file->url()));
     }
 
     /**
@@ -210,21 +217,45 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
      */
     public function testMimeTypeOutputsMimeType()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $file = vfsStream::newFile('foo.txt')->withContent('foo')->at($this->root);
         $files = new Filesystem;
-        $this->assertEquals('text/plain', $files->mimeType(__DIR__.'/foo.txt'));
-        @unlink(__DIR__.'/foo.txt');
+        $this->assertEquals('text/plain', $files->mimeType($file->url()));
     }
 
     public function testIsWritable()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $file = vfsStream::newFile('foo.txt', 0444)->withContent('foo')->at($this->root);
         $files = new Filesystem;
-        @chmod(__DIR__.'/foo.txt', 0444);
-        $this->assertFalse($files->isWritable(__DIR__.'/foo.txt'));
-        @chmod(__DIR__.'/foo.txt', 0777);
-        $this->assertTrue($files->isWritable(__DIR__.'/foo.txt'));
-        @unlink(__DIR__.'/foo.txt');
+        $this->assertFalse($files->isWritable($file->url()));
+        $file->chmod(0777);
+        $this->assertTrue($files->isWritable($file->url()));
+    }
+
+    public function testIsFile()
+    {
+        $this->root->addChild(new vfsStreamDirectory('assets'));
+        $dir = $this->root->getChild('assets');
+        $file = vfsStream::newFile('foo.txt')->withContent('foo')->at($this->root);
+        $files = new Filesystem;
+        $this->assertFalse($files->isFile($dir->url()));
+        $this->assertTrue($files->isFile($file->url()));
+    }
+
+    public function testIsDirectory()
+    {
+        $this->root->addChild(new vfsStreamDirectory('assets'));
+        $dir = $this->root->getChild('assets');
+        $file = vfsStream::newFile('foo.txt')->withContent('foo')->at($this->root);
+        $files = new Filesystem;
+        $this->assertTrue($files->isDirectory($dir->url()));
+        $this->assertFalse($files->isDirectory($file->url()));
+    }
+
+    public function testLastModified()
+    {
+        $file = vfsStream::newFile('foo.txt')->withContent('foo')->at($this->root);
+        $files = new Filesystem;
+        $this->assertEquals($file->filemtime(), $files->lastModified($file->url()));
     }
 
     public function testGlobFindsFiles()
@@ -241,36 +272,36 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
 
     public function testAllFilesFindsFiles()
     {
-        file_put_contents(__DIR__.'/foo.txt', 'foo');
-        file_put_contents(__DIR__.'/bar.txt', 'bar');
+        $this->root->addChild(new vfsStreamDirectory('languages'));
+        $dir = $this->root->getChild('languages');
+        $file1 = vfsStream::newFile('php.txt')->withContent('PHP')->at($dir);
+        $file2 = vfsStream::newFile('c.txt')->withContent('C')->at($dir);
         $files = new Filesystem;
         $allFiles = [];
-        foreach ($files->allFiles(__DIR__) as $file) {
+        foreach ($files->allFiles($dir->url()) as $file) {
             $allFiles[] = $file->getFilename();
         }
-        $this->assertContains('foo.txt', $allFiles);
-        $this->assertContains('bar.txt', $allFiles);
-        @unlink(__DIR__.'/foo.txt');
-        @unlink(__DIR__.'/bar.txt');
+        $this->assertContains($file1->getName(), $allFiles);
+        $this->assertContains($file2->getName(), $allFiles);
     }
 
     public function testDirectoriesFindsDirectories()
     {
-        mkdir(__DIR__.'/foo');
-        mkdir(__DIR__.'/bar');
+        $this->root->addChild(new vfsStreamDirectory('languages'));
+        $this->root->addChild(new vfsStreamDirectory('music'));
+        $dir1 = $this->root->getChild('languages');
+        $dir2 = $this->root->getChild('music');
         $files = new Filesystem;
-        $directories = $files->directories(__DIR__);
-        $this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'foo', $directories);
-        $this->assertContains(__DIR__.DIRECTORY_SEPARATOR.'bar', $directories);
-        @rmdir(__DIR__.'/foo');
-        @rmdir(__DIR__.'/bar');
+        $directories = $files->directories($this->root->url());
+        $this->assertContains($dir1->url(), $directories);
+        $this->assertContains($dir2->url(), $directories);
     }
 
     public function testMakeDirectory()
     {
         $files = new Filesystem;
-        $this->assertTrue($files->makeDirectory(__DIR__.'/foo'));
-        $this->assertFileExists(__DIR__.'/foo');
-        @rmdir(__DIR__.'/foo');
+        $dir = $this->root->url().'/laravel';
+        $this->assertTrue($files->makeDirectory($dir));
+        $this->assertTrue($files->exists($dir));
     }
 }
