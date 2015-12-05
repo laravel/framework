@@ -212,10 +212,10 @@ class SqlServerGrammar extends Grammar
     public function compileExists(Builder $query)
     {
         $existsQuery = clone $query;
-        $existsQuery->columns = [];
-        $existsQuery->selectRaw('1 [exists]')->limit(1);
 
-        return $this->compileSelect($existsQuery);
+        $existsQuery->columns = [];
+
+        return $this->compileSelect($existsQuery->selectRaw('1 [exists]')->limit(1));
     }
 
     /**
