@@ -975,7 +975,7 @@ class Builder
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
         // their own sections. This is to prevent any confusing logic order.
-        $wheres = $query->wheres;
+        $allWheres = $query->wheres;
 
         $query->wheres = [];
 
@@ -986,7 +986,7 @@ class Builder
 
         foreach ($whereCounts as $whereCount) {
             $query->wheres[] = $this->sliceWhereConditions(
-                $wheres, $previousCount, $whereCount - $previousCount
+                $allWheres, $previousCount, $whereCount - $previousCount
             );
 
             $previousCount = $whereCount;
@@ -996,16 +996,18 @@ class Builder
     /**
      * Create a where array with sliced where conditions.
      *
-     * @param  array  $wheres
+     * @param  array  $allWheres
      * @param  int  $offset
      * @param  int  $length
      * @return array
      */
-    protected function sliceWhereConditions($wheres, $offset, $length)
+    protected function sliceWhereConditions($allWheres, $offset, $length)
     {
-        with($query = $this->getQuery()->forNestedWhere())->wheres = array_slice($wheres, $offset, $length);
+        $whereGroup = $this->getQuery()->forNestedWhere();
 
-        return ['type' => 'Nested', 'query' => $query, 'boolean' => 'and'];
+        $whereGroup->wheres = array_slice($allWheres, $offset, $length);
+
+        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => 'and'];
     }
 
     /**
