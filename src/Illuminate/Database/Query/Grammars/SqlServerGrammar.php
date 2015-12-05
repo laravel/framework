@@ -211,9 +211,11 @@ class SqlServerGrammar extends Grammar
      */
     public function compileExists(Builder $query)
     {
-        $select = $this->compileSelect($query);
+        $existsQuery = clone $query;
+        $existsQuery->columns = [];
+        $existsQuery->selectRaw('1 [exists]')->limit(1);
 
-        return "select cast(case when exists($select) then 1 else 0 end as bit) as {$this->wrap('exists')}";
+        return $this->compileSelect($existsQuery);
     }
 
     /**
