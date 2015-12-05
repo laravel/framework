@@ -550,6 +550,7 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
     use Illuminate\Database\Eloquent\SoftDeletes;
+
     public function scopeEmpty($query)
     {
         return $query;
