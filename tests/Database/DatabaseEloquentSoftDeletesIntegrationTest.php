@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -89,6 +90,29 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $this->assertInstanceOf(Builder::class, $query);
         $this->assertCount(1, $query->get());
+    }
+
+    public function testSoftDeletesAreNotRetrievedFromBuilderHelpers()
+    {
+        $this->createUsers();
+
+        $count = 0;
+        $query = SoftDeletesTestUser::query();
+        $query->chunk(2, function ($user) use (&$count) {
+            $count += count($user);
+        });
+        $this->assertEquals(1, $count);
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->pluck('email')->all());
+
+        Paginator::currentPageResolver(function () { return 1; });
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->paginate(2)->all());
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->simplePaginate(2)->all());
     }
 
     public function testWithTrashedReturnsAllRecords()
@@ -212,11 +236,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     public function testOrWhereWithSoftDeleteConstraint()
     {
         $this->createUsers();
-        SoftDeletesTestUser::create(['id' => 3, 'email' => 'something@else.com']);
 
-        $users = SoftDeletesTestUser::where('email', 'something@else.com')->orWhere('email', 'abigailotwell@gmail.com');
-        $this->assertEquals(2, count($users->get()));
-        $this->assertEquals(['abigailotwell@gmail.com', 'something@else.com'], $users->orderBy('id')->pluck('email')->all());
+        $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->orWhere('email', 'abigailotwell@gmail.com');
+        $this->assertEquals(['abigailotwell@gmail.com'], $users->pluck('email')->all());
     }
 
     /**
