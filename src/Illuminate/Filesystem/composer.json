@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6.4",
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
         "symfony/finder": "3.1.*"
