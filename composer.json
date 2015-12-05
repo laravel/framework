@@ -34,7 +34,6 @@
         "symfony/finder": "3.1.*",
         "symfony/http-foundation": "3.1.*",
         "symfony/http-kernel": "3.1.*",
-        "symfony/polyfill-php56": "~1.0",
         "symfony/process": "3.1.*",
         "symfony/routing": "3.1.*",
         "symfony/translation": "3.1.*",
