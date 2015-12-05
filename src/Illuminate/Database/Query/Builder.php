@@ -631,7 +631,7 @@ class Builder
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        $query = $this->getQueryForNestedWhere();
+        $query = $this->forNestedWhere();
 
         call_user_func($callback, $query);
 
@@ -643,7 +643,7 @@ class Builder
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public function getQueryForNestedWhere()
+    public function forNestedWhere()
     {
         $query = $this->newQuery();
 
