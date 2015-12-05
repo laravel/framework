@@ -16,6 +16,16 @@ trait RegistersUsers
      */
     public function getRegister()
     {
+        return $this->showRegistrationForm();
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showRegistrationForm()
+    {
         return view('auth.register');
     }
 
@@ -26,6 +36,17 @@ trait RegistersUsers
      * @return \Illuminate\Http\Response
      */
     public function postRegister(Request $request)
+    {
+        return $this->register($request);
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function register(Request $request)
     {
         $validator = $this->validator($request->all());
 
