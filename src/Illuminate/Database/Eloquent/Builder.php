@@ -887,8 +887,8 @@ class Builder
 
         $result = call_user_func_array([$this->model, $scope], $parameters) ?: $this;
 
-        if ($this->shouldNestWheresForScope($offset, $query)) {
-            $this->nestWheresForScope($query, [0, $offset, count($query->wheres)]);
+        if ($this->shouldNestWheresForScope($query, $offset)) {
+            $this->nestWheresForScope($query, $offset);
         }
 
         return $result;
@@ -909,7 +909,7 @@ class Builder
         $query = $builder->getQuery();
 
         $count = count($query->wheres);
-        $offsets = [0, $count];
+        $offsets = [$count];
 
         foreach ($this->scopes as $scope) {
             $this->applyScope($scope, $builder);
@@ -917,8 +917,8 @@ class Builder
             $offsets[] = count($query->wheres);
         }
 
-        if ($this->shouldNestWheresForScope($count, $query)) {
-            $this->nestWheresForScope($query, array_unique($offsets));
+        if ($this->shouldNestWheresForScope($query, $count)) {
+            $this->nestWheresForScope($query, $offsets);
         }
 
         return $builder;
@@ -943,11 +943,11 @@ class Builder
     /**
      * Determine if the scope added after the given offset should be nested.
      *
-     * @param  int  $offset
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  int  $offset
      * @return bool
      */
-    protected function shouldNestWheresForScope($offset, QueryBuilder $query)
+    protected function shouldNestWheresForScope(QueryBuilder $query, $offset)
     {
         $booleans = collect($query->wheres)->pluck('boolean');
 
@@ -958,16 +958,17 @@ class Builder
      * Nest where conditions of the builder and each global scope.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $offsets
+     * @param  int|array  $offset
      * @return void
      */
-    protected function nestWheresForScope(QueryBuilder $query, array $offsets)
+    protected function nestWheresForScope(QueryBuilder $query, $offset)
     {
         $wheres = $query->wheres;
+        $offsets = collect([0, $offset, count($wheres)])->flatten()->unique();
 
         $query->wheres = [];
 
-        $lastOffset = array_shift($offsets);
+        $lastOffset = $offsets->shift();
 
         foreach ($offsets as $offset) {
             $query->wheres[] = $this->sliceWhereConditions($wheres, $lastOffset, $offset - $lastOffset);
