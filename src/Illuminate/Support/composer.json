@@ -37,6 +37,7 @@
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
         "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (~1.1).",
+        "symfony/polyfill-php56": "Required to use the hash_equals function on PHP 5.5 (~1.0).",
         "symfony/process": "Required to use the composer class (3.1.*).",
         "symfony/var-dumper": "Required to use the dd function (3.1.*)."
     },

@@ -106,9 +106,9 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->registerCommands($this->commands);
 
-        if (! $this->app->environment('production')) {
+        //if (! $this->app->environment('production')) {
             $this->registerCommands($this->devCommands);
-        }
+        //}
     }
 
     /**
