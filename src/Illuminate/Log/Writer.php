@@ -11,6 +11,10 @@ use Monolog\Logger as MonologLogger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\GelfHandler;
+use Gelf\Publisher;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -259,6 +263,33 @@ class Writer implements LogContract, PsrLoggerInterface
         );
 
         $handler->setFormatter($this->getDefaultFormatter());
+    }
+
+    /**
+     * Register a Gelf handler.
+     *
+     * @param  string  $host
+     * @param  int     $port
+     * @param  string  $protocol
+     * @param  string  $level
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function useGelf($host, $port = 12201, $protocol = 'udp', $level = 'debug')
+    {
+        if ($protocol === 'udp') {
+            $transport = new UdpTransport($host, $port);
+        }
+        elseif ($protocol === 'tcp') {
+            $transport = new TcpTransport($host, $port);
+        }
+        else {
+            throw new \RuntimeException("Gelf transport supports only tcp and udp protocols. Invalid protocol passed.");
+        }
+
+        return $this->monolog->pushHandler(
+            new GelfHandler(new Publisher($transport), $this->parseLevel($level))
+        );
     }
 
     /**

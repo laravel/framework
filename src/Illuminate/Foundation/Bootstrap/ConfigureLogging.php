@@ -109,4 +109,19 @@ class ConfigureLogging
     {
         $log->useErrorLog();
     }
+
+    /**
+     * Configure the Monolog handlers for the application
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Log\Writer  $log
+     */
+    protected function configureGelfHandler(Application $app, Writer $log)
+    {
+        $log->useGelf(
+            $app->make('config')->get('app.log_gelf_host'),
+            $app->make('config')->get('app.log_gelf_port', 12201),
+            $app->make('config')->get('app.log_gelf_protocol', 'udp')
+        );
+    }
 }
