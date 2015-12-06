@@ -282,7 +282,7 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->query->pluck($column, $key);
+        $results = $this->toBase()->pluck($column, $key);
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -311,9 +311,11 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $total = $this->query->getCountForPagination();
+        $query = $this->toBase();
 
-        $this->query->forPage(
+        $total = $query->getCountForPagination();
+
+        $query->forPage(
             $page = $page ?: Paginator::resolveCurrentPage($pageName),
             $perPage = $perPage ?: $this->model->getPerPage()
         );
@@ -369,7 +371,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->increment($column, $amount, $extra);
+        return $this->toBase()->increment($column, $amount, $extra);
     }
 
     /**
@@ -384,7 +386,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->decrement($column, $amount, $extra);
+        return $this->toBase()->decrement($column, $amount, $extra);
     }
 
     /**
@@ -867,7 +869,20 @@ class Builder
     {
         array_unshift($parameters, $this);
 
-        return call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+        $query = $this->getQuery();
+
+        // We will keep track of how many wheres are on the query before running the
+        // scope so that we can properly group the added scope constraints in the
+        // query as their own isolated nested where statement and avoid issues.
+        $originalWhereCount = count($query->wheres);
+
+        $result = call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+
+        if ($this->shouldNestWheresForScope($originalWhereCount, $query)) {
+            $this->nestWheresForScope($query, [0, $originalWhereCount, count($query->wheres)]);
+        }
+
+        return $result;
     }
 
     /**
@@ -883,17 +898,104 @@ class Builder
 
         $builder = clone $this;
 
-        foreach ($this->scopes as $scope) {
-            if ($scope instanceof Closure) {
-                $scope($builder);
-            }
+        $query = $builder->getQuery();
 
-            if ($scope instanceof ScopeInterface) {
-                $scope->apply($builder, $this->getModel());
-            }
+        // We will keep track of how many wheres are on the query before running the
+        // scope so that we can properly group the added scope constraints in the
+        // query as their own isolated nested where statement and avoid issues.
+        $originalWhereCount = count($query->wheres);
+
+        $whereCounts = [0, $originalWhereCount];
+
+        foreach ($this->scopes as $scope) {
+            $this->applyScope($scope, $builder);
+
+            // Again, we will keep track of the count each time we add where clauses so that
+            // we will properly isolate each set of scope constraints inside of their own
+            // nested where clause to avoid any conflicts or issues with logical order.
+            $whereCounts[] = count($query->wheres);
+        }
+
+        if ($this->shouldNestWheresForScope($originalWhereCount, $query)) {
+            $this->nestWheresForScope($query, array_unique($whereCounts));
         }
 
         return $builder;
+    }
+
+    /**
+     * Apply a single scope on the given builder instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function applyScope($scope, $builder)
+    {
+        if ($scope instanceof Closure) {
+            $scope($builder);
+        } elseif ($scope instanceof ScopeInterface) {
+            $scope->apply($builder, $this->getModel());
+        }
+    }
+
+    /**
+     * Determine if the scope added after the given offset should be nested.
+     *
+     * @param  int  $originalWhereCount
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return bool
+     */
+    protected function shouldNestWheresForScope($originalWhereCount, QueryBuilder $query)
+    {
+        return $originalWhereCount && count($query->wheres) > $originalWhereCount;
+    }
+
+    /**
+     * Nest where conditions of the builder and each global scope.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $offsets
+     * @return void
+     */
+    protected function nestWheresForScope(QueryBuilder $query, array $whereCounts)
+    {
+        // Here, we totally remove all of the where clauses since we are going to
+        // rebuild them as nested queries by slicing the groups of wheres into
+        // their own sections. This is to prevent any confusing logic order.
+        $allWheres = $query->wheres;
+
+        $query->wheres = [];
+
+        // We will take the first offset (typically 0) of where clauses and start
+        // slicing out every scope's where clauses into their own nested where
+        // groups for improved isolation of every scope's added constraints.
+        $previousCount = array_shift($whereCounts);
+
+        foreach ($whereCounts as $whereCount) {
+            $query->wheres[] = $this->sliceWhereConditions(
+                $allWheres, $previousCount, $whereCount - $previousCount
+            );
+
+            $previousCount = $whereCount;
+        }
+    }
+
+    /**
+     * Create a where array with sliced where conditions.
+     *
+     * @param  array  $allWheres
+     * @param  int  $offset
+     * @param  int  $length
+     * @return array
+     */
+    protected function sliceWhereConditions($allWheres, $offset, $length)
+    {
+        $whereGroup = $this->getQuery()->forNestedWhere();
+
+        $whereGroup->wheres = array_slice($allWheres, $offset, $length);
+
+        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => 'and'];
     }
 
     /**
