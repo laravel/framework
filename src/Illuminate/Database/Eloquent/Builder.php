@@ -385,7 +385,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->increment($column, $amount, $extra);
+        return $this->toBase()->increment($column, $amount, $extra);
     }
 
     /**
@@ -400,7 +400,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->decrement($column, $amount, $extra);
+        return $this->toBase()->decrement($column, $amount, $extra);
     }
 
     /**
