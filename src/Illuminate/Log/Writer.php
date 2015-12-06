@@ -272,7 +272,6 @@ class Writer implements LogContract, PsrLoggerInterface
      * @param  int  $port
      * @param  string  $protocol
      * @param  string  $level
-     *
      * @return \Psr\Log\LoggerInterface
      */
     public function useGelf($host, $port = 12201, $protocol = 'udp', $level = 'debug')
