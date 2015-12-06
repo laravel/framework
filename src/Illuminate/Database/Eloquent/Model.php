@@ -2813,11 +2813,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function castAttribute($key, $value)
     {
+        $castType = $this->getCastType($key);
+        $isResolvable = class_exists($this->casts[$key]) || in_array($key, app()->getBindings());
+
+        // Some objects aren't stored as json so we'll skip those
+        // here so they'll get handled accordingly later
+        if (! in_array($castType, ['date', 'datetime']) && $isResolvable) {
+            if ($value !== null) {
+                $value = $this->fromJson($value);
+            }
+
+            return app($this->casts[$key], [$value]);
+        }
+
         if (is_null($value)) {
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        switch ($castType) {
             case 'int':
             case 'integer':
                 return (int) $value;
