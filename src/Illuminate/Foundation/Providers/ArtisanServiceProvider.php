@@ -36,7 +36,6 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -83,7 +82,6 @@ class ArtisanServiceProvider extends ServiceProvider
         'JobMake' => 'command.job.make',
         'ListenerMake' => 'command.listener.make',
         'MiddlewareMake' => 'command.middleware.make',
-        'MigrationMake' => 'command.migration.make',
         'ModelMake' => 'command.model.make',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
@@ -305,25 +303,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.middleware.make', function ($app) {
             return new MiddlewareMakeCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerMigrationMakeCommand()
-    {
-        $this->app->singleton('command.migration.make', function ($app) {
-            // Once we have the migration creator registered, we will create the command
-            // and inject the creator. The creator is responsible for the actual file
-            // creation of the migrations, and may be extended by these developers.
-            $creator = $app['migration.creator'];
-
-            $composer = $app['composer'];
-
-            return new MigrateMakeCommand($creator, $composer);
         });
     }
 
