@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6.4",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~3.0",
@@ -34,7 +34,6 @@
         "symfony/finder": "3.1.*",
         "symfony/http-foundation": "3.1.*",
         "symfony/http-kernel": "3.1.*",
-        "symfony/polyfill-php56": "~1.0",
         "symfony/process": "3.1.*",
         "symfony/routing": "3.1.*",
         "symfony/translation": "3.1.*",
@@ -76,7 +75,7 @@
         "iron-io/iron_mq": "~2.0",
         "mockery/mockery": "~0.9.2",
         "pda/pheanstalk": "~3.0",
-        "phpunit/phpunit": "~4.1",
+        "phpunit/phpunit": "~5.0",
         "predis/predis": "~1.0",
         "symfony/css-selector": "3.1.*",
         "symfony/dom-crawler": "3.1.*"
