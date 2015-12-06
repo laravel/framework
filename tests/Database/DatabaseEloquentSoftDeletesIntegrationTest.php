@@ -113,6 +113,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->simplePaginate(2)->all());
+
+        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
+        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
     }
 
     public function testWithTrashedReturnsAllRecords()
