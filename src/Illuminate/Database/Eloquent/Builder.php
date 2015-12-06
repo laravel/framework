@@ -282,7 +282,7 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->query->pluck($column, $key);
+        $results = $this->toBase()->pluck($column, $key);
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -325,9 +325,11 @@ class Builder
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $total = $this->query->getCountForPagination();
+        $query = $this->toBase();
 
-        $this->query->forPage(
+        $total = $query->getCountForPagination();
+
+        $query->forPage(
             $page = $page ?: Paginator::resolveCurrentPage($pageName),
             $perPage = $perPage ?: $this->model->getPerPage()
         );
@@ -383,7 +385,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->increment($column, $amount, $extra);
+        return $this->toBase()->increment($column, $amount, $extra);
     }
 
     /**
@@ -398,7 +400,7 @@ class Builder
     {
         $extra = $this->addUpdatedAtColumn($extra);
 
-        return $this->query->decrement($column, $amount, $extra);
+        return $this->toBase()->decrement($column, $amount, $extra);
     }
 
     /**
