@@ -31,6 +31,16 @@ class LogWriterTest extends PHPUnit_Framework_TestCase
         $writer->useErrorLog();
     }
 
+    public function testGelfLogHandlerCanBeAdded()
+    {
+        if (!class_exists('Gelf\Publisher')) {
+            $this->markTestSkipped('graylog/gelf-php package is not installed');
+        }
+        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
+        $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\GelfHandler'));
+        $writer->useGelf('localhost');
+    }
+
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
