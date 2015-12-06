@@ -101,14 +101,14 @@
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
+        "graylog2/gelf-php": "Required to use Gelf logging transport (~1.4)",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~5.3|~6.0).",
         "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "graylog2/gelf-php": "Required to use Gelf logging transport (~1.4)"
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
     },
     "minimum-stability": "dev"
 }
