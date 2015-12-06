@@ -60,9 +60,9 @@ class RetryCommand extends Command
 
             $this->laravel['queue.failer']->forget($failed->id);
 
-            $this->info('The failed job [{$id}] has been pushed back onto the queue!');
+            $this->info("The failed job [{$id}] has been pushed back onto the queue!");
         } else {
-            $this->error('No failed job matches the given ID [{$id}].');
+            $this->error("No failed job matches the given ID [{$id}].");
         }
     }
 

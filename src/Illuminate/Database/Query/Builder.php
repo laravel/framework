@@ -631,16 +631,23 @@ class Builder
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        // To handle nested queries we'll actually create a brand new query instance
-        // and pass it off to the Closure that we have. The Closure can simply do
-        // do whatever it wants to a query then we will store it for compiling.
-        $query = $this->newQuery();
-
-        $query->from($this->from);
+        $query = $this->forNestedWhere();
 
         call_user_func($callback, $query);
 
         return $this->addNestedWhereQuery($query, $boolean);
+    }
+
+    /**
+     * Create a new query instance for nested where condition.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function forNestedWhere()
+    {
+        $query = $this->newQuery();
+
+        return $query->from($this->from);
     }
 
     /**

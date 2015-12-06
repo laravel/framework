@@ -399,7 +399,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
-        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals('select * from "table" where ("foo" = ? and ("baz" > ?)) and ("table"."deleted_at" is null)', $query->toSql());
+        $this->assertEquals(['bar', 9000], $query->getBindings());
+    }
+
+    public function testRealNestedWhereWithMultipleScopesAndOneDeadScope()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) { $query->empty()->where('baz', '>', 9000); });
+        $this->assertEquals('select * from "table" where ("foo" = ? and ("baz" > ?)) and ("table"."deleted_at" is null)', $query->toSql());
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
@@ -541,6 +550,11 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
     use Illuminate\Database\Eloquent\SoftDeletes;
+
+    public function scopeEmpty($query)
+    {
+        return $query;
+    }
 }
 
 class EloquentBuilderTestPluckStub

@@ -3,10 +3,10 @@
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
@@ -93,11 +93,11 @@ if (! function_exists('auth')) {
     /**
      * Get the available auth instance.
      *
-     * @return \Illuminate\Contracts\Auth\Guard
+     * @return \Illuminate\Contracts\Auth\Factory
      */
     function auth()
     {
-        return app(Guard::class);
+        return app(AuthFactory::class);
     }
 }
 
