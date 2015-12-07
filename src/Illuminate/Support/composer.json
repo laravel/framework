@@ -17,8 +17,7 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "illuminate/contracts": "5.2.*",
-        "doctrine/inflector": "~1.0",
-        "danielstjules/stringy": "~2.1"
+        "doctrine/inflector": "~1.0"
     },
     "autoload": {
         "psr-4": {
