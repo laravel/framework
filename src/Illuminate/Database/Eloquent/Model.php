@@ -1532,26 +1532,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function saveOrFail(array $options = [])
     {
-        $db = $this->getConnection();
-        $result = false;
-
-        $db->beginTransaction();
-
-        try {
-            $result = $this->save($options);
-
-            $db->commit();
-        } catch (Exception $e) {
-            $db->rollBack();
-
-            throw $e;
-        } catch (Throwable $e) {
-            $db->rollBack();
-
-            throw $e;
-        }
-
-        return $result;
+        return $this->getConnection()->transaction(function () use ($options) {
+            return $this->save($options);
+        });
     }
 
     /**
