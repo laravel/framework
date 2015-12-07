@@ -316,6 +316,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testFromDateTime()
     {
+        date_default_timezone_set('UTC');
+
         $model = new EloquentModelStub();
 
         $value = Carbon\Carbon::parse('2015-04-17 22:59:01');
