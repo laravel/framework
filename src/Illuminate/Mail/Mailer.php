@@ -163,7 +163,7 @@ class Mailer implements MailerContract, MailQueueContract
         // be used when sending an e-mail. We will extract both of them out here.
         list($view, $plain, $raw) = $this->parseView($view);
 
-        $data['message'] = $message = $this->createMessage();
+        $data['__message'] = $message = $this->createMessage();
 
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
