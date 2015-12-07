@@ -773,7 +773,7 @@ class Router implements RegistrarContract
         foreach ($route->signatureParameters(Model::class) as $parameter) {
             $class = $parameter->getClass();
 
-            if (array_key_exists($parameter->name, $parameters)) {
+            if (array_key_exists($parameter->name, $parameters) && ! $route->getParameter($parameter->name) instanceof Model) {
                 $method = $parameter->isDefaultValueAvailable() ? 'find' : 'findOrFail';
 
                 $route->setParameter(
