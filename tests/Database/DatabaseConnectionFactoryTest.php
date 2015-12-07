@@ -112,4 +112,21 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('connector', $factory->createConnector(['driver' => 'foo']));
     }
+
+    public function testGetAllDrivers()
+    {
+        $factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $container->shouldReceive('bound')->andReturn(false);
+        $allDrivers = $factory->getAllDrivers();
+        $this->assertEquals(['mysql', 'pgsql', 'sqlite', 'sqlsrv'], $allDrivers);
+    }
+
+    public function testGetAvailableDrivers()
+    {
+        $factory = new Illuminate\Database\Connectors\ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $container->shouldReceive('bound')->andReturn(false);
+        $drivers = $factory->getAvailableDrivers();
+        $allDrivers = $factory->getAllDrivers();
+        $this->assertNotSame([], array_intersect_key($drivers, $allDrivers));
+    }
 }

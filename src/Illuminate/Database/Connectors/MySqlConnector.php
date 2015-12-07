@@ -92,7 +92,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getSocketDsn(array $config)
     {
-        return "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
+        $pdoDriver = $this->getPDODriver();
+
+        return "{$pdoDriver}:unix_socket={$config['unix_socket']};dbname={$config['database']}";
     }
 
     /**
@@ -105,8 +107,20 @@ class MySqlConnector extends Connector implements ConnectorInterface
     {
         extract($config);
 
+        $pdoDriver = $this->getPDODriver();
+
         return isset($port)
-                        ? "mysql:host={$host};port={$port};dbname={$database}"
-                        : "mysql:host={$host};dbname={$database}";
+                        ? "{$pdoDriver}:host={$host};port={$port};dbname={$database}"
+                        : "{$pdoDriver}:host={$host};dbname={$database}";
+    }
+
+    /**
+     * Get PDO Driver that can be used for this connection.
+     *
+     * @return string
+     */
+    protected function getPDODriver()
+    {
+        return 'mysql';
     }
 }
