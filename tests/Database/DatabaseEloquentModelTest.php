@@ -3,6 +3,7 @@
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Fluent;
 
 class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 {
@@ -1175,6 +1176,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model->ninth = '1969-07-20';
         $model->tenth = '1969-07-20 22:56:00';
         $model->eleventh = '1969-07-20 22:56:00';
+        $model->twelfth = ['foo' => 'bar'];
 
         $this->assertInternalType('int', $model->first);
         $this->assertInternalType('float', $model->second);
@@ -1184,6 +1186,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('object', $model->sixth);
         $this->assertInternalType('array', $model->seventh);
         $this->assertInternalType('array', $model->eighth);
+        $this->assertInternalType('array', $model->twelfth);
         $this->assertTrue($model->fourth);
         $this->assertFalse($model->fifth);
         $this->assertEquals($obj, $model->sixth);
@@ -1195,6 +1198,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20', $model->ninth->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->tenth->toDateTimeString());
         $this->assertEquals(-14173440, $model->eleventh);
+        $this->assertInstanceOf(Fluent::class);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['first']);
@@ -1204,7 +1208,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('boolean', $arr['fifth']);
         $this->assertInternalType('object', $arr['sixth']);
         $this->assertInternalType('array', $arr['seventh']);
-        $this->assertInternalType('array', $arr['eighth']);
+        $this->assertInternalType('array', $arr['twelfth']);
         $this->assertTrue($arr['fourth']);
         $this->assertFalse($arr['fifth']);
         $this->assertEquals($obj, $arr['sixth']);
@@ -1215,6 +1219,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('1969-07-20', $arr['ninth']->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $arr['tenth']->toDateTimeString());
         $this->assertEquals(-14173440, $arr['eleventh']);
+        $this->assertEquals(['foo' => 'bar'], $arr['twelfth']);
     }
 
     public function testModelAttributeCastingPreservesNull()
@@ -1523,6 +1528,7 @@ class EloquentModelCastingStub extends Model
         'ninth' => 'date',
         'tenth' => 'datetime',
         'eleventh' => 'timestamp',
+        'twelfth' => Fluent::class,
     ];
 
     public function eighthAttributeValue()
