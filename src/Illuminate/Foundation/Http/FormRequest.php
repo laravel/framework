@@ -18,6 +18,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     use ValidatesWhenResolvedTrait;
 
     /**
+     * Contains return of authorize method
+     *
+     * @var bool
+     */
+    protected $passesAuthorization;
+
+    /**
      * The container instance.
      *
      * @var \Illuminate\Container\Container
@@ -104,8 +111,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function passesAuthorization()
     {
-        if (method_exists($this, 'authorize')) {
-            return $this->container->call([$this, 'authorize']);
+        if (!$this->passesAuthorization) {
+            return false;
+        } elseif (method_exists($this, 'authorize')) {
+            $this->authorize();
         }
 
         return false;
