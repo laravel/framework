@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use DateTime;
 use Exception;
-use Throwable;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
