@@ -984,12 +984,15 @@ class Builder
         // We will construct where offsets by adding the outer most offsets to the
         // collection (0 and total where count) while also flattening the array
         // and extracting unique values, ensuring that all wheres are sliced.
-        $whereOffsets = collect([0, $whereCounts, count($allWheres)])->flatten()->unique();
+        $whereOffsets = collect([0, $whereCounts, count($allWheres)])
+                    ->flatten()->unique();
 
         $sliceFrom = $whereOffsets->shift();
 
         foreach ($whereOffsets as $sliceTo) {
-            $this->sliceWhereConditions($query, $allWheres, $sliceFrom, $sliceTo);
+            $this->sliceWhereConditions(
+                $query, $allWheres, $sliceFrom, $sliceTo
+            );
 
             $sliceFrom = $sliceTo;
         }
@@ -1023,14 +1026,14 @@ class Builder
     /**
      * Create a where array with nested where conditions.
      *
-     * @param  array  $whereSubset
+     * @param  array  $whereSlice
      * @return array
      */
-    protected function nestWhereSlice($whereSubset)
+    protected function nestWhereSlice($whereSlice)
     {
         $whereGroup = $this->getQuery()->forNestedWhere();
 
-        $whereGroup->wheres = $whereSubset;
+        $whereGroup->wheres = $whereSlice;
 
         return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => 'and'];
     }
