@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 if (! function_exists('abort')) {
     /**
@@ -659,6 +660,28 @@ if (! function_exists('url')) {
         }
 
         return app(UrlGenerator::class)->to($path, $parameters, $secure);
+    }
+}
+
+if (! function_exists('validator')) {
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    function validator(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        $factory = app(ValidationFactory::class);
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($data, $rules, $messages, $customAttributes);
     }
 }
 
