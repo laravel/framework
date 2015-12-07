@@ -1210,10 +1210,8 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
-        $this->assertInstanceOf('Carbon\Carbon', $arr['dateAttribute']);
-        $this->assertInstanceOf('Carbon\Carbon', $arr['datetimeAttribute']);
-        $this->assertEquals('1969-07-20', $arr['dateAttribute']->toDateString());
-        $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']->toDateTimeString());
+        $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
+        $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
     }
 
