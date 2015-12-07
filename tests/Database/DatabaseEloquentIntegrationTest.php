@@ -446,6 +446,34 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertNull($photo->imageable);
     }
 
+    public function testSaveOrFail()
+    {
+        $date = '1970-01-01';
+        $post = new EloquentTestPost([
+            'user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date,
+        ]);
+
+        $this->assertTrue($post->saveOrFail());
+        $this->assertEquals(1, EloquentTestPost::count());
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testSaveOrFailWithDuplicatedEntry()
+    {
+        $date = '1970-01-01';
+        EloquentTestPost::create([
+            'id' => 1, 'user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date,
+        ]);
+
+        $post = new EloquentTestPost([
+            'id' => 1, 'user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date,
+        ]);
+
+        $post->saveOrFail();
+    }
+
     public function testMultiInsertsWithDifferentValues()
     {
         $date = '1970-01-01';
@@ -485,6 +513,41 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
             }
             $user = EloquentTestUser::first();
             $this->assertEquals('taylor@laravel.com', $user->email);
+        });
+    }
+
+    public function testNestedTransactionsUsingSaveOrFailWillSucceed()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
+        $this->connection()->transaction(function () use ($user) {
+            try {
+                $user->email = 'otwell@laravel.com';
+                $user->saveOrFail();
+            } catch (Exception $e) {
+                // ignore the exception
+            }
+
+            $user = EloquentTestUser::first();
+            $this->assertEquals('otwell@laravel.com', $user->email);
+            $this->assertEquals(1, $user->id);
+        });
+    }
+
+    public function testNestedTransactionsUsingSaveOrFailWillFails()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
+        $this->connection()->transaction(function () use ($user) {
+            try {
+                $user->id = 'invalid';
+                $user->email = 'otwell@laravel.com';
+                $user->saveOrFail();
+            } catch (Exception $e) {
+                // ignore the exception
+            }
+
+            $user = EloquentTestUser::first();
+            $this->assertEquals('taylor@laravel.com', $user->email);
+            $this->assertEquals(1, $user->id);
         });
     }
 

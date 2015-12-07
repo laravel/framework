@@ -1547,6 +1547,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Save the model to the database using transaction.
+     *
+     * @param  array  $options
+     * @return bool
+     *
+     * @throws \Throwable
+     */
+    public function saveOrFail(array $options = [])
+    {
+        return $this->getConnection()->transaction(function () use ($options) {
+            return $this->save($options);
+        });
+    }
+
+    /**
      * Finish processing on a successful save operation.
      *
      * @param  array  $options
