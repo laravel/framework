@@ -18,7 +18,7 @@ class PaginationServiceProvider extends ServiceProvider
         });
 
         Paginator::currentPageResolver(function ($pageName = 'page') {
-            return $this->app['request']->input($pageName);
+            return (int) $this->app['request']->input($pageName);
         });
     }
 }
