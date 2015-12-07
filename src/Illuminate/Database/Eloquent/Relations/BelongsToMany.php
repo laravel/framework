@@ -559,11 +559,11 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  array  $models
+     * @param  \Illuminate\Support\Collection|array  $models
      * @param  array  $joinings
      * @return array
      */
-    public function saveMany(array $models, array $joinings = [])
+    public function saveMany($models, array $joinings = [])
     {
         foreach ($models as $key => $model) {
             $this->save($model, (array) Arr::get($joinings, $key), false);
