@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use RuntimeException;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
