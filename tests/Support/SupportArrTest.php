@@ -307,5 +307,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]];
         Arr::forget($array, 'products.desk.final.taxes');
         $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
+
+        $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
+        Arr::forget($array, ['products.amount.all', 'products.desk.price']);
+        $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
     }
 }
