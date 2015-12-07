@@ -266,7 +266,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the support drivers.
      *
-     * @return array[string]
+     * @return array
      */
     public function supportedDrivers()
     {
