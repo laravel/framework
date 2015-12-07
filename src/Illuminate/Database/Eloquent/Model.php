@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use DateTime;
 use Exception;
+use Throwable;
 use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
@@ -1544,6 +1545,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return $saved;
+    }
+
+    /**
+     * Save the model to the database using transaction.
+     *
+     * @param  array  $options
+     * @return bool
+     *
+     * @throws \Throwable
+     */
+    public function saveOrFail(array $options = [])
+    {
+        return $this->getConnection()->transaction(function () use ($options) {
+            return $this->save($options);
+        });
     }
 
     /**
