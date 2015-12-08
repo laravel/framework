@@ -79,7 +79,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertFileNotExists(__DIR__.'/foo/file.txt');
         $this->assertTrue(is_dir(__DIR__.'/foo/foo1'));
         $this->assertFileNotExists(__DIR__.'/foo/foo1/file.txt');
-        @rmdir(__DIR__.'/foo/foo1');		
+        @rmdir(__DIR__.'/foo/foo1');
         @rmdir(__DIR__.'/foo');
     }
 

@@ -438,7 +438,7 @@ class Filesystem
      * Empty the specified directory of all files and folders.
      *
      * @param  string  $directory
-     * @param  bool    $preserveSubDirs	 
+     * @param  bool    $preserveSubDirs
      * @return bool
      */
     public function cleanDirectory($directory, $preserveSubDirs = false)
