@@ -180,7 +180,6 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->once())->method('getRecaller')->will($this->returnValue(null));
         $provider->shouldReceive('updateRememberToken')->once();
 
-        $cookie = m::mock('Symfony\Component\HttpFoundation\Cookie');
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logout();
