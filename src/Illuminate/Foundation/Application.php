@@ -800,7 +800,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function configurationIsCached()
     {
-        return $this['files']->exists($this->getCachedConfigPath());
+        return file_exists($this->getCachedConfigPath());
     }
 
     /**
