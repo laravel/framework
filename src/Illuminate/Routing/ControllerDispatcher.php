@@ -83,8 +83,6 @@ class ControllerDispatcher
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        // Here we will make a stack onion instance to execute this request in, which gives
-        // us the ability to define middlewares on controllers.
         return (new Pipeline($this->container))
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $middleware)
