@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Cache\RateLimiter;
 
-class ThrottleAccess
+class ThrottleRequests
 {
     /**
      * The rate limiter instance.
@@ -16,7 +16,7 @@ class ThrottleAccess
     protected $limiter;
 
     /**
-     * Create a new route throttler.
+     * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @return void
