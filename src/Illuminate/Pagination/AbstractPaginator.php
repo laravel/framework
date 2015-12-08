@@ -237,7 +237,7 @@ abstract class AbstractPaginator implements Htmlable
     public function firstItem()
     {
         if (count($this->items) === 0) {
-            return null;
+            return;
         }
 
         return ($this->currentPage - 1) * $this->perPage + 1;
@@ -251,7 +251,7 @@ abstract class AbstractPaginator implements Htmlable
     public function lastItem()
     {
         if (count($this->items) === 0) {
-            return null;
+            return;
         }
 
         return $this->firstItem() + $this->count() - 1;
