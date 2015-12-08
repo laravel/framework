@@ -131,10 +131,6 @@ class Route
                 return $this->runCallable($request);
             }
 
-            if ($this->customDispatcherIsBound()) {
-                return $this->runWithCustomDispatcher($request);
-            }
-
             return $this->runController($request);
         } catch (HttpResponseException $e) {
             return $e->getResponse();
@@ -168,40 +164,8 @@ class Route
     {
         list($class, $method) = explode('@', $this->action['uses']);
 
-        $parameters = $this->resolveClassMethodDependencies(
-            $this->parametersWithoutNulls(), $class, $method
-        );
-
-        if (! method_exists($instance = $this->container->make($class), $method)) {
-            throw new NotFoundHttpException;
-        }
-
-        return call_user_func_array([$instance, $method], $parameters);
-    }
-
-    /**
-     * Determine if a custom route dispatcher is bound in the container.
-     *
-     * @return bool
-     */
-    protected function customDispatcherIsBound()
-    {
-        return $this->container->bound('illuminate.route.dispatcher');
-    }
-
-    /**
-     * Send the request and route to a custom dispatcher for handling.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    protected function runWithCustomDispatcher(Request $request)
-    {
-        list($class, $method) = explode('@', $this->action['uses']);
-
-        $dispatcher = $this->container->make('illuminate.route.dispatcher');
-
-        return $dispatcher->dispatch($this, $request, $class, $method);
+        return (new ControllerDispatcher($this->container->make('router'), $this->container))
+                    ->dispatch($this, $request, $class, $method);
     }
 
     /**
