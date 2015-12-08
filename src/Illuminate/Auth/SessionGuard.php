@@ -760,7 +760,7 @@ class SessionGuard implements StatefulGuard
      */
     public function getName()
     {
-        return 'login_'.$this->name.'_'.md5(get_class($this));
+        return 'login_'.$this->name.'_'.sha1(get_class($this));
     }
 
     /**
@@ -770,7 +770,7 @@ class SessionGuard implements StatefulGuard
      */
     public function getRecallerName()
     {
-        return 'remember_'.$this->name.'_'.md5(get_class($this));
+        return 'remember_'.$this->name.'_'.sha1(get_class($this));
     }
 
     /**
