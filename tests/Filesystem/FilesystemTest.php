@@ -71,7 +71,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         mkdir(__DIR__.'/foo');
         file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
-		mkdir(__DIR__.'/foo/foo1');
+        mkdir(__DIR__.'/foo/foo1');
         file_put_contents(__DIR__.'/foo/foo1/file.txt', 'Hello World');
         $files = new Filesystem;
         $files->cleanDirectory(__DIR__.'/foo', true);

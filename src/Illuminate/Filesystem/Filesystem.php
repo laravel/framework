@@ -401,10 +401,10 @@ class Filesystem
      */
     public function deleteDirectory($directory, $preserve = false, $preserveSubDirs = false)
     {
-        if ($preserveSubDirs)  {
+        if ($preserveSubDirs) {
             $preserve = true;
         }
-		
+
         if (! $this->isDirectory($directory)) {
             return false;
         }
