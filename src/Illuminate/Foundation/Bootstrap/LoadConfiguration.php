@@ -38,8 +38,8 @@ class LoadConfiguration
             $this->loadConfigurationFiles($app, $config);
         }
 
-        $app->detectEnvironment(function () {
-            return config('app.env', 'production');
+        $app->detectEnvironment(function () use ($config) {
+            return $config->get('app.env', 'production');
         });
 
         date_default_timezone_set($config['app.timezone']);
