@@ -800,10 +800,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function fingerprint()
     {
         if (! $this->route()) {
-            throw new RuntimeException("Unable to generate fingerprint. Route not set.");
+            throw new RuntimeException("Unable to generate fingerprint. Route unavailable.");
         }
 
-        return md5(
+        return sha1(
             implode('|', $this->route()->methods()).
             '|'.$this->route()->domain().
             '|'.$this->route()->uri().
