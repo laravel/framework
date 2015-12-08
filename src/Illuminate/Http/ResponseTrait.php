@@ -40,6 +40,21 @@ trait ResponseTrait
     }
 
     /**
+     * Add an array of headers to the response.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withHeaders(array $headers)
+    {
+        foreach ($headers as $key => $value) {
+            $this->headers->set($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a cookie to the response.
      *
      * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie

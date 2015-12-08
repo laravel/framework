@@ -449,7 +449,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->applyScopes()->getQuery()->get($columns);
+        $results = $this->toBase()->get($columns);
 
         $connection = $this->model->getConnectionName();
 
@@ -878,8 +878,8 @@ class Builder
 
         $result = call_user_func_array([$this->model, $scope], $parameters) ?: $this;
 
-        if ($this->shouldNestWheresForScope($originalWhereCount, $query)) {
-            $this->nestWheresForScope($query, [0, $originalWhereCount, count($query->wheres)]);
+        if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
+            $this->nestWheresForScope($query, $originalWhereCount);
         }
 
         return $result;
@@ -905,7 +905,7 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $whereCounts = [0, $originalWhereCount];
+        $whereCounts = [$originalWhereCount];
 
         foreach ($this->scopes as $scope) {
             $this->applyScope($scope, $builder);
@@ -916,8 +916,8 @@ class Builder
             $whereCounts[] = count($query->wheres);
         }
 
-        if ($this->shouldNestWheresForScope($originalWhereCount, $query)) {
-            $this->nestWheresForScope($query, array_unique($whereCounts));
+        if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
+            $this->nestWheresForScope($query, $whereCounts);
         }
 
         return $builder;
@@ -942,23 +942,23 @@ class Builder
     /**
      * Determine if the scope added after the given offset should be nested.
      *
-     * @param  int  $originalWhereCount
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  int  $originalWhereCount
      * @return bool
      */
-    protected function shouldNestWheresForScope($originalWhereCount, QueryBuilder $query)
+    protected function shouldNestWheresForScope(QueryBuilder $query, $originalWhereCount)
     {
         return $originalWhereCount && count($query->wheres) > $originalWhereCount;
     }
 
     /**
-     * Nest where conditions of the builder and each global scope.
+     * Nest where conditions by slicing them at the given where count.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $offsets
+     * @param  int|array  $whereCounts
      * @return void
      */
-    protected function nestWheresForScope(QueryBuilder $query, array $whereCounts)
+    protected function nestWheresForScope(QueryBuilder $query, $whereCounts)
     {
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
@@ -967,33 +967,59 @@ class Builder
 
         $query->wheres = [];
 
-        // We will take the first offset (typically 0) of where clauses and start
-        // slicing out every scope's where clauses into their own nested where
-        // groups for improved isolation of every scope's added constraints.
-        $previousCount = array_shift($whereCounts);
+        // We will construct where offsets by adding the outer most offsets to the
+        // collection (0 and total where count) while also flattening the array
+        // and extracting unique values, ensuring that all wheres are sliced.
+        $whereOffsets = collect([0, $whereCounts, count($allWheres)])
+                    ->flatten()->unique();
 
-        foreach ($whereCounts as $whereCount) {
-            $query->wheres[] = $this->sliceWhereConditions(
-                $allWheres, $previousCount, $whereCount - $previousCount
+        $sliceFrom = $whereOffsets->shift();
+
+        foreach ($whereOffsets as $sliceTo) {
+            $this->sliceWhereConditions(
+                $query, $allWheres, $sliceFrom, $sliceTo
             );
 
-            $previousCount = $whereCount;
+            $sliceFrom = $sliceTo;
         }
     }
 
     /**
-     * Create a where array with sliced where conditions.
+     * Create a slice of where conditions at the given offsets and nest them if needed.
      *
-     * @param  array  $allWheres
-     * @param  int  $offset
-     * @param  int  $length
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $wheres
+     * @param  int  $sliceFrom
+     * @param  int  $sliceTo
+     * @return void
+     */
+    protected function sliceWhereConditions(QueryBuilder $query, array $wheres, $sliceFrom, $sliceTo)
+    {
+        $whereSlice = array_slice($wheres, $sliceFrom, $sliceTo - $sliceFrom);
+
+        $whereBooleans = collect($whereSlice)->pluck('boolean');
+
+        // Here we'll check if the given subset of where clauses contains any "or"
+        // booleans and in this case create a nested where expression. That way
+        // we don't add any unnecessary nesting thus keeping the query clean.
+        if ($whereBooleans->contains('or')) {
+            $query->wheres[] = $this->nestWhereSlice($whereSlice);
+        } else {
+            $query->wheres = array_merge($query->wheres, $whereSlice);
+        }
+    }
+
+    /**
+     * Create a where array with nested where conditions.
+     *
+     * @param  array  $whereSlice
      * @return array
      */
-    protected function sliceWhereConditions($allWheres, $offset, $length)
+    protected function nestWhereSlice($whereSlice)
     {
         $whereGroup = $this->getQuery()->forNestedWhere();
 
-        $whereGroup->wheres = array_slice($allWheres, $offset, $length);
+        $whereGroup->wheres = $whereSlice;
 
         return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => 'and'];
     }
@@ -1122,7 +1148,7 @@ class Builder
         }
 
         if (in_array($method, $this->passthru)) {
-            return call_user_func_array([$this->applyScopes()->getQuery(), $method], $parameters);
+            return call_user_func_array([$this->toBase(), $method], $parameters);
         }
 
         call_user_func_array([$this->query, $method], $parameters);

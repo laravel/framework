@@ -148,6 +148,10 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
+        if ($this->isAlias($abstract)) {
+            $abstract = $this->getAlias($abstract);
+        }
+
         return isset($this->resolved[$abstract]) || isset($this->instances[$abstract]);
     }
 
