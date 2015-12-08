@@ -58,6 +58,26 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * The default verbosity of output commands.
+     *
+     * @var int
+     */
+    protected $verbosity = OutputInterface::VERBOSITY_NORMAL;
+
+    /**
+     * The mapping between human readable verbosity levels and Symfony's OutputInterface.
+     *
+     * @var array
+     */
+    protected $verbosityMap = [
+        'v'      => OutputInterface::VERBOSITY_VERBOSE,
+        'vv'     => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        'vvv'    => OutputInterface::VERBOSITY_DEBUG,
+        'quiet'  => OutputInterface::VERBOSITY_QUIET,
+        'normal' => OutputInterface::VERBOSITY_NORMAL,
+    ];
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -323,64 +343,73 @@ class Command extends SymfonyCommand
      * Write a string as information output.
      *
      * @param  string  $string
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function info($string)
+    public function info($string, $verbosity = null)
     {
-        $this->output->writeln("<info>$string</info>");
+        $this->line($string, 'info', $verbosity);
     }
 
     /**
      * Write a string as standard output.
      *
      * @param  string  $string
+     * @param  string  $style
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function line($string)
+    public function line($string, $style = null, $verbosity = null)
     {
-        $this->output->writeln($string);
+        $styled = $style ? "<$style>$string</$style>" : $string;
+
+        $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
 
     /**
      * Write a string as comment output.
      *
      * @param  string  $string
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function comment($string)
+    public function comment($string, $verbosity = null)
     {
-        $this->output->writeln("<comment>$string</comment>");
+        $this->line($string, 'comment', $verbosity);
     }
 
     /**
      * Write a string as question output.
      *
      * @param  string  $string
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function question($string)
+    public function question($string, $verbosity = null)
     {
-        $this->output->writeln("<question>$string</question>");
+        $this->line($string, 'question', $verbosity);
     }
 
     /**
      * Write a string as error output.
      *
      * @param  string  $string
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function error($string)
+    public function error($string, $verbosity = null)
     {
-        $this->output->writeln("<error>$string</error>");
+        $this->line($string, 'error', $verbosity);
     }
 
     /**
      * Write a string as warning output.
      *
      * @param  string  $string
+     * @param  null|int|string  $verbosity
      * @return void
      */
-    public function warn($string)
+    public function warn($string, $verbosity = null)
     {
         if (! $this->output->getFormatter()->hasStyle('warning')) {
             $style = new OutputFormatterStyle('yellow');
@@ -388,7 +417,35 @@ class Command extends SymfonyCommand
             $this->output->getFormatter()->setStyle('warning', $style);
         }
 
-        $this->output->writeln("<warning>$string</warning>");
+        $this->line($string, 'warning', $verbosity);
+    }
+
+    /**
+     * Get the verbosity level in terms of Symfony's OutputInterface level.
+     *
+     * @param  string|int  $level
+     * @return int
+     */
+    protected function parseVerbosity($level = null)
+    {
+        if (isset($this->verbosityMap[$level])) {
+            $level = $this->verbosityMap[$level];
+        } elseif (! is_int($level)) {
+            $level = $this->verbosity;
+        }
+
+        return $level;
+    }
+
+    /**
+     * Set the verbosity level.
+     *
+     * @param string|int $level
+     * @return void
+     */
+    protected function setVerbosity($level)
+    {
+        $this->verbosity = $this->parseVerbosity($level);
     }
 
     /**
