@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Password;
 
 trait ResetsPasswords
 {
-    use RedirectUsers;
+    use RedirectsUsers;
 
     /**
      * Display the form to request a password reset link.
