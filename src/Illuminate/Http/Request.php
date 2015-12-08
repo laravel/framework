@@ -793,6 +793,25 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get a unique fingerprint for the request / route / IP address.
+     *
+     * @return string
+     */
+    public function fingerprint()
+    {
+        if (! $this->route()) {
+            throw new RuntimeException("Unable to generate fingerprint. Route not set.");
+        }
+
+        return md5(
+            implode('|', $this->route()->methods()).
+            '|'.$this->route()->domain().
+            '|'.$this->route()->uri().
+            '|'.$this->ip()
+        );
+    }
+
+    /**
      * Get the user resolver callback.
      *
      * @return \Closure

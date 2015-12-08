@@ -55,6 +55,21 @@ class Response extends BaseResponse
     }
 
     /**
+     * Add an array of headers to the response.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withHeaders(array $headers)
+    {
+        foreach ($headers as $key => $value) {
+            $this->headers->set($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Morph the given content into JSON.
      *
      * @param  mixed   $content
