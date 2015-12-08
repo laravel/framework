@@ -10,6 +10,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResetsPasswords
 {
+    use RedirectUsers;
+
     /**
      * Display the form to request a password reset link.
      *
@@ -115,19 +117,5 @@ trait ResetsPasswords
         $user->save();
 
         Auth::login($user);
-    }
-
-    /**
-     * Get the post password reset redirect path.
-     *
-     * @return string
-     */
-    public function redirectPath()
-    {
-        if (property_exists($this, 'redirectPath')) {
-            return $this->redirectPath;
-        }
-
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
 }
