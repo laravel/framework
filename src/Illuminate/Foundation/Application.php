@@ -844,13 +844,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Get the path to the cached services.json file.
+     * Get the path to the cached services.php file.
      *
      * @return string
      */
     public function getCachedServicesPath()
     {
-        return $this->basePath().'/bootstrap/cache/services.json';
+        return $this->basePath().'/bootstrap/cache/services.php';
     }
 
     /**
