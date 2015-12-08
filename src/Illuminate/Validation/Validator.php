@@ -1235,11 +1235,11 @@ class Validator implements ValidatorContract
      */
     protected function validateActiveUrl($attribute, $value)
     {
-        if (! ($url = parse_url($value, PHP_URL_HOST))) {
-            return false;
+        if ($url = parse_url($value, PHP_URL_HOST)) {
+            return checkdnsrr($url, 'A');
         }
 
-        return checkdnsrr($url, 'A');
+        return false;
     }
 
     /**
