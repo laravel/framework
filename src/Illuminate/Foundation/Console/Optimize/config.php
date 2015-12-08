@@ -76,7 +76,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/ServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/AggregateServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/RoutingServiceProvider.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/ControllerServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Events/EventServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Validation/ValidationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Validation/ValidatesRequests.php',
