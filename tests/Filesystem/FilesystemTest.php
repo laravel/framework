@@ -67,6 +67,21 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @rmdir(__DIR__.'/foo');
     }
 
+    public function testCleanDirectoryWithPreserve()
+    {
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/file.txt', 'Hello World');
+		mkdir(__DIR__.'/foo/foo1');
+        file_put_contents(__DIR__.'/foo/foo1/file.txt', 'Hello World');
+        $files = new Filesystem;
+        $files->cleanDirectory(__DIR__.'/foo', true);
+        $this->assertTrue(is_dir(__DIR__.'/foo'));
+        $this->assertFileNotExists(__DIR__.'/foo/file.txt');
+        $this->assertTrue(is_dir(__DIR__.'/foo/foo1'));
+        $this->assertFileNotExists(__DIR__.'/foo/foo1/file.txt');
+        @rmdir(__DIR__.'/foo');
+    }
+
     public function testMacro()
     {
         file_put_contents(__DIR__.'/foo.txt', 'Hello World');

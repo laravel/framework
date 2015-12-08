@@ -396,10 +396,15 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  bool    $preserve
+     * @param  bool    $preserveSubDirs
      * @return bool
      */
-    public function deleteDirectory($directory, $preserve = false)
+    public function deleteDirectory($directory, $preserve = false, $preserveSubDirs = false)
     {
+        if ($preserveSubDirs)  {
+            $preserve = true;
+        }
+		
         if (! $this->isDirectory($directory)) {
             return false;
         }
@@ -411,7 +416,7 @@ class Filesystem
             // delete that sub-directory otherwise we'll just delete the file and
             // keep iterating through each file until the directory is cleaned.
             if ($item->isDir() && ! $item->isLink()) {
-                $this->deleteDirectory($item->getPathname());
+                $this->deleteDirectory($item->getPathname(), $preserveSubDirs, $preserveSubDirs);
             }
 
             // If the item is just a file, we can go ahead and delete it since we're
@@ -433,10 +438,11 @@ class Filesystem
      * Empty the specified directory of all files and folders.
      *
      * @param  string  $directory
+     * @param  bool    $preserveSubDirs	 
      * @return bool
      */
-    public function cleanDirectory($directory)
+    public function cleanDirectory($directory, $preserveSubDirs = false)
     {
-        return $this->deleteDirectory($directory, true);
+        return $this->deleteDirectory($directory, true, $preserveSubDirs);
     }
 }
