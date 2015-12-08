@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait ResetsPasswords
 {
-    use RedirectUsers;
+    use RedirectsUsers;
 
     /**
      * Display the form to request a password reset link.
