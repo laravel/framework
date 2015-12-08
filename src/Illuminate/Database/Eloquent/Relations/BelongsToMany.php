@@ -341,7 +341,7 @@ class BelongsToMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'self_'.Str::random(32);
     }
 
     /**
