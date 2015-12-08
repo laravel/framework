@@ -152,17 +152,35 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     public function testLogoutRemovesSessionTokenAndRememberMeCookie()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $mock = $this->getMock('Illuminate\Auth\SessionGuard', ['getName', 'getRecallerName'], ['default', $provider, $session, $request]);
+        $mock = $this->getMock('Illuminate\Auth\SessionGuard', ['getName', 'getRecallerName', 'getRecaller'], ['default', $provider, $session, $request]);
         $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
+        $mock->expects($this->once())->method('getRecaller')->will($this->returnValue('non-null-cookie'));
         $provider->shouldReceive('updateRememberToken')->once();
 
         $cookie = m::mock('Symfony\Component\HttpFoundation\Cookie');
         $cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
         $cookies->shouldReceive('queue')->once()->with($cookie);
+        $mock->getSession()->shouldReceive('remove')->once()->with('foo');
+        $mock->setUser($user);
+        $mock->logout();
+        $this->assertNull($mock->getUser());
+    }
+
+    public function testLogoutDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $mock = $this->getMock('Illuminate\Auth\SessionGuard', ['getName', 'getRecaller'], ['default', $provider, $session, $request]);
+        $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->shouldReceive('setRememberToken')->once();
+        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+        $mock->expects($this->once())->method('getRecaller')->will($this->returnValue(null));
+        $provider->shouldReceive('updateRememberToken')->once();
+
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logout();
