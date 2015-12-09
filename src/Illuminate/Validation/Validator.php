@@ -810,7 +810,7 @@ class Validator implements ValidatorContract
      */
     protected function validateBoolean($attribute, $value)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [true, false, 0, 1, '0', '1', 'true', 'false'];
 
         return in_array($value, $acceptable, true);
     }
