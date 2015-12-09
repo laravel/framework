@@ -111,6 +111,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->middlewareGroup('web', [
             function ($request, $next) {
                 $_SERVER['__middleware.group'] = true;
+
                 return $next($request);
             },
             function ($request, $next) {
