@@ -76,7 +76,9 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Exception $e)
     {
-        foreach ($this->dontReport as $type) {
+        $dontReport = array_merge($this->dontReport, [HttpResponseException::class]);
+
+        foreach ($dontReport as $type) {
             if ($e instanceof $type) {
                 return true;
             }
