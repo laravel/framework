@@ -78,6 +78,43 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
+
+    public function testLoadViewsFromAddsOverridingDirectoryFromAppIfExists1()
+    {
+        $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
+        $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
+        $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
+
+        $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
+        $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
+
+        $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/zaz/resources/views/vendor/name.space');
+        $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/foo');
+
+        $provider->shouldAllowMockingProtectedMethods();
+        $provider->shouldReceive('isValidDirectory')->once()->andReturn(true);
+
+        $provider->boot();
+    }
+
+    public function testLoadViewsFromAddsOverridingDirectoryFromAppIfExists2()
+    {
+        $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
+        $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
+        $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
+
+        $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
+        $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
+
+        $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/zaz/resources/views/vendor/name/space');
+        $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/foo');
+
+        $provider->shouldAllowMockingProtectedMethods();
+        $provider->shouldReceive('isValidDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name.space')->andReturn(false);
+        $provider->shouldReceive('isValidDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name/space')->andReturn(true);
+
+        $provider->boot();
+    }
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider
@@ -105,5 +142,17 @@ class ServiceProviderForTestingTwo extends ServiceProvider
         $this->publishes(['source/unmarked/two/b' => 'destination/unmarked/two/b']);
         $this->publishes(['source/tagged/two/a' => 'destination/tagged/two/a'], 'some_tag');
         $this->publishes(['source/tagged/two/b' => 'destination/tagged/two/b'], 'some_tag');
+    }
+}
+
+class ServiceProviderForTestingThree extends ServiceProvider
+{
+    public function register()
+    {
+    }
+
+    public function boot()
+    {
+        $this->loadViewsFrom(__DIR__.'/foo', 'name.space');
     }
 }
