@@ -10,6 +10,13 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 class Blueprint
 {
     /**
+     * The database driver.
+     *
+     * @var string
+     */
+    protected $driver;
+
+    /**
      * The table the blueprint describes.
      *
      * @var string
@@ -61,9 +68,10 @@ class Blueprint
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function __construct($table, Closure $callback = null)
+    public function __construct($table, $driver, $charset, Closure $callback = null)
     {
         $this->table = $table;
+        $this->driver = $driver;
         $this->charset = $charset;
 
         if (! is_null($callback)) {
@@ -451,10 +459,9 @@ class Blueprint
      */
     public function string($column, $length = 255)
     {
-        if ($this->charset == 'utf8mb4' && $length == 255) {
+        if ($this->driver == 'mysql' && $this->charset == 'utf8mb4' && $length == 255) {
             $length = 191;
         }
-        
         return $this->addColumn('string', $column, compact('length'));
     }
 
