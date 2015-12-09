@@ -84,7 +84,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
         $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
         $files = m::mock('Illuminate\\Filesystem\\Filesystem');
-        $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
+        $provider = new ServiceProviderForTestingThree($app);
 
         $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
         $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
@@ -103,7 +103,7 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
         $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
         $files = m::mock('Illuminate\\Filesystem\\Filesystem');
-        $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
+        $provider = new ServiceProviderForTestingThree($app);
 
         $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
         $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
