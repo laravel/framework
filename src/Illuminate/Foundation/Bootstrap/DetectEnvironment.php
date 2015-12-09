@@ -16,14 +16,12 @@ class DetectEnvironment
      */
     public function bootstrap(Application $app)
     {
-        try {
-            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-        } catch (InvalidArgumentException $e) {
-            //
+        if (! $app->configurationIsCached()) {
+            try {
+                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+            } catch (InvalidArgumentException $e) {
+                //
+            }
         }
-
-        $app->detectEnvironment(function () {
-            return env('APP_ENV', 'production');
-        });
     }
 }

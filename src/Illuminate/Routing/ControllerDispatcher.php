@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 
 class ControllerDispatcher
@@ -83,8 +84,6 @@ class ControllerDispatcher
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        // Here we will make a stack onion instance to execute this request in, which gives
-        // us the ability to define middlewares on controllers.
         return (new Pipeline($this->container))
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $middleware)
@@ -104,7 +103,7 @@ class ControllerDispatcher
      */
     protected function getMiddleware($instance, $method)
     {
-        $results = [];
+        $results = new Collection;
 
         foreach ($instance->getMiddleware() as $name => $options) {
             if (! $this->methodExcludedByOptions($method, $options)) {
@@ -112,7 +111,7 @@ class ControllerDispatcher
             }
         }
 
-        return $results;
+        return $results->flatten()->all();
     }
 
     /**

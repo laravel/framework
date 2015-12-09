@@ -800,7 +800,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function configurationIsCached()
     {
-        return $this['files']->exists($this->getCachedConfigPath());
+        return file_exists($this->getCachedConfigPath());
     }
 
     /**
@@ -844,13 +844,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Get the path to the cached services.json file.
+     * Get the path to the cached services.php file.
      *
      * @return string
      */
     public function getCachedServicesPath()
     {
-        return $this->basePath().'/bootstrap/cache/services.json';
+        return $this->basePath().'/bootstrap/cache/services.php';
     }
 
     /**
@@ -1029,33 +1029,33 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
             'auth'                 => ['Illuminate\Auth\AuthManager', 'Illuminate\Contracts\Auth\Factory'],
             'auth.driver'          => ['Illuminate\Contracts\Auth\Guard'],
-            'auth.password.tokens' => 'Illuminate\Auth\Passwords\TokenRepositoryInterface',
-            'blade.compiler'       => 'Illuminate\View\Compilers\BladeCompiler',
+            'auth.password.tokens' => ['Illuminate\Auth\Passwords\TokenRepositoryInterface'],
+            'blade.compiler'       => ['Illuminate\View\Compilers\BladeCompiler'],
             'cache'                => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
             'cache.store'          => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Repository'],
             'config'               => ['Illuminate\Config\Repository', 'Illuminate\Contracts\Config\Repository'],
             'cookie'               => ['Illuminate\Cookie\CookieJar', 'Illuminate\Contracts\Cookie\Factory', 'Illuminate\Contracts\Cookie\QueueingFactory'],
             'encrypter'            => ['Illuminate\Encryption\Encrypter', 'Illuminate\Contracts\Encryption\Encrypter'],
-            'db'                   => 'Illuminate\Database\DatabaseManager',
+            'db'                   => ['Illuminate\Database\DatabaseManager'],
             'db.connection'        => ['Illuminate\Database\Connection', 'Illuminate\Database\ConnectionInterface'],
             'events'               => ['Illuminate\Events\Dispatcher', 'Illuminate\Contracts\Events\Dispatcher'],
-            'files'                => 'Illuminate\Filesystem\Filesystem',
+            'files'                => ['Illuminate\Filesystem\Filesystem'],
             'filesystem'           => ['Illuminate\Filesystem\FilesystemManager', 'Illuminate\Contracts\Filesystem\Factory'],
-            'filesystem.disk'      => 'Illuminate\Contracts\Filesystem\Filesystem',
-            'filesystem.cloud'     => 'Illuminate\Contracts\Filesystem\Cloud',
-            'hash'                 => 'Illuminate\Contracts\Hashing\Hasher',
+            'filesystem.disk'      => ['Illuminate\Contracts\Filesystem\Filesystem'],
+            'filesystem.cloud'     => ['Illuminate\Contracts\Filesystem\Cloud'],
+            'hash'                 => ['Illuminate\Contracts\Hashing\Hasher'],
             'translator'           => ['Illuminate\Translation\Translator', 'Symfony\Component\Translation\TranslatorInterface'],
             'log'                  => ['Illuminate\Log\Writer', 'Illuminate\Contracts\Logging\Log', 'Psr\Log\LoggerInterface'],
             'mailer'               => ['Illuminate\Mail\Mailer', 'Illuminate\Contracts\Mail\Mailer', 'Illuminate\Contracts\Mail\MailQueue'],
             'auth.password'        => ['Illuminate\Auth\Passwords\PasswordBrokerManager', 'Illuminate\Contracts\Auth\PasswordBrokerFactory'],
             'auth.password.broker' => ['Illuminate\Auth\Passwords\PasswordBroker', 'Illuminate\Contracts\Auth\PasswordBroker'],
             'queue'                => ['Illuminate\Queue\QueueManager', 'Illuminate\Contracts\Queue\Factory', 'Illuminate\Contracts\Queue\Monitor'],
-            'queue.connection'     => 'Illuminate\Contracts\Queue\Queue',
-            'redirect'             => 'Illuminate\Routing\Redirector',
+            'queue.connection'     => ['Illuminate\Contracts\Queue\Queue'],
+            'redirect'             => ['Illuminate\Routing\Redirector'],
             'redis'                => ['Illuminate\Redis\Database', 'Illuminate\Contracts\Redis\Database'],
             'request'              => ['Illuminate\Http\Request', 'Symfony\Component\HttpFoundation\Request'],
             'router'               => ['Illuminate\Routing\Router', 'Illuminate\Contracts\Routing\Registrar'],
-            'session'              => 'Illuminate\Session\SessionManager',
+            'session'              => ['Illuminate\Session\SessionManager'],
             'session.store'        => ['Illuminate\Session\Store', 'Symfony\Component\HttpFoundation\Session\SessionInterface'],
             'url'                  => ['Illuminate\Routing\UrlGenerator', 'Illuminate\Contracts\Routing\UrlGenerator'],
             'validator'            => ['Illuminate\Validation\Factory', 'Illuminate\Contracts\Validation\Factory'],
@@ -1063,7 +1063,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         ];
 
         foreach ($aliases as $key => $aliases) {
-            foreach ((array) $aliases as $alias) {
+            foreach ($aliases as $alias) {
                 $this->alias($key, $alias);
             }
         }
