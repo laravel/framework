@@ -80,6 +80,13 @@ class Route
     protected $compiled;
 
     /**
+     * The router instance used by the route.
+     *
+     * @var \Illuminate\Routing\Router
+     */
+    protected $router;
+
+    /**
      * The container instance used by the route.
      *
      * @var \Illuminate\Container\Container
@@ -164,7 +171,7 @@ class Route
     {
         list($class, $method) = explode('@', $this->action['uses']);
 
-        return (new ControllerDispatcher($this->container->make('router'), $this->container))
+        return (new ControllerDispatcher($this->router, $this->container))
                     ->dispatch($this, $request, $class, $method);
     }
 
@@ -809,6 +816,19 @@ class Route
     }
 
     /**
+     * Set the router instance on the route.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @return $this
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+
+        return $this;
+    }
+
+    /**
      * Set the container instance on the route.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -834,7 +854,7 @@ class Route
             throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }
 
-        unset($this->container, $this->compiled);
+        unset($this->router, $this->container, $this->compiled);
     }
 
     /**

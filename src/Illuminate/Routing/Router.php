@@ -536,7 +536,9 @@ class Router implements RegistrarContract
      */
     protected function newRoute($methods, $uri, $action)
     {
-        return (new Route($methods, $uri, $action))->setContainer($this->container);
+        return (new Route($methods, $uri, $action))
+                    ->setRouter($this)
+                    ->setContainer($this->container);
     }
 
     /**
@@ -1124,7 +1126,7 @@ class Router implements RegistrarContract
     public function setRoutes(RouteCollection $routes)
     {
         foreach ($routes as $route) {
-            $route->setContainer($this->container);
+            $route->setRouter($this)->setContainer($this->container);
         }
 
         $this->routes = $routes;
