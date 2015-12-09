@@ -315,7 +315,7 @@ class Arr
     {
         if (count($array) && ! self::isAssoc($array) && is_array($array[0]) && self::isAssoc($array[0])) {
             if (count($array) > 1) {
-                $item_keys = array_map(function($item) {
+                $item_keys = array_map(function ($item) {
                     $keys = array_keys($item);
                     sort($keys);
 
