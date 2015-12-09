@@ -66,6 +66,13 @@ class Router implements RegistrarContract
     protected $middleware = [];
 
     /**
+     * All of the middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [];
+
+    /**
      * The registered route value binders.
      *
      * @var array
@@ -708,24 +715,35 @@ class Router implements RegistrarContract
     public function gatherRouteMiddlewares(Route $route)
     {
         return Collection::make($route->middleware())->map(function ($name) {
+            if (isset($this->middlewareGroups[$name])) {
+                return $this->middlewareGroups[$name];
+            }
+
             return Collection::make($this->resolveMiddlewareClassName($name));
         })
         ->collapse()->all();
     }
 
     /**
-     * Resolve the middleware name to a class name preserving passed parameters.
+     * Resolve the middleware name to a class name(s) preserving passed parameters.
      *
      * @param  string  $name
-     * @return string
+     * @return string|array
      */
     public function resolveMiddlewareClassName($name)
     {
         $map = $this->middleware;
 
-        list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+        if (isset($this->middlewareGroups[$name])) {
+            return $this->middlewareGroups[$name];
+        } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
+            return $map[$name];
+        } else {
+            list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-        return (isset($map[$name]) ? $map[$name] : $name).($parameters !== null ? ':'.$parameters : '');
+            return (isset($map[$name]) ? $map[$name] : $name).
+                   ($parameters !== null ? ':'.$parameters : '');
+        }
     }
 
     /**
@@ -830,6 +848,20 @@ class Router implements RegistrarContract
     public function middleware($name, $class)
     {
         $this->middleware[$name] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Register a group of middleware.
+     *
+     * @param  string  $name
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function middlewareGroup($name, array $middleware)
+    {
+        $this->middlewareGroups[$name] = $middleware;
 
         return $this;
     }
