@@ -92,6 +92,39 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('closure', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testClosureMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'foo', function () { return 'hello'; }]);
+        $router->middleware('foo', function ($request, $next) {
+            return 'caught';
+        });
+        $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testMiddlewareGroups()
+    {
+        unset($_SERVER['__middleware.group']);
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () { return 'hello'; }]);
+
+        $router->middlewareGroup('web', [
+            function ($request, $next) {
+                $_SERVER['__middleware.group'] = true;
+
+                return $next($request);
+            },
+            function ($request, $next) {
+                return 'caught';
+            },
+        ]);
+
+        $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['__middleware.group']);
+
+        unset($_SERVER['__middleware.group']);
+    }
+
     public function testFluentRouteNamingWithinAGroup()
     {
         $router = $this->getRouter();
@@ -709,11 +742,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
         );
 
-        $router = new Router(new Illuminate\Events\Dispatcher, $container = new Illuminate\Container\Container);
-
-        $container->singleton('illuminate.route.dispatcher', function ($container) use ($router) {
-            return new Illuminate\Routing\ControllerDispatcher($router, $container);
-        });
+        $router = $this->getRouter();
 
         $router->get('foo/bar', 'RouteTestControllerStub@index');
 
@@ -723,6 +752,27 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+    }
+
+    public function testControllerMiddlewareGroups()
+    {
+        unset(
+            $_SERVER['route.test.controller.middleware'],
+            $_SERVER['route.test.controller.middleware.class']
+        );
+
+        $router = $this->getRouter();
+
+        $router->middlewareGroup('web', [
+            'RouteTestControllerMiddleware',
+            'RouteTestControllerMiddlewareTwo',
+        ]);
+
+        $router->get('foo/bar', 'RouteTestControllerMiddlewareGroupStub@index');
+
+        $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['route.test.controller.middleware']);
+        $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
     }
 
     protected function getRouter()
@@ -747,6 +797,19 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     }
 }
 
+class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controller
+{
+    public function __construct()
+    {
+        $this->middleware('web');
+    }
+
+    public function index()
+    {
+        return 'Hello World';
+    }
+}
+
 class RouteTestControllerMiddleware
 {
     public function handle($request, $next)
@@ -756,6 +819,14 @@ class RouteTestControllerMiddleware
         $_SERVER['route.test.controller.middleware.class'] = get_class($response);
 
         return $response;
+    }
+}
+
+class RouteTestControllerMiddlewareTwo
+{
+    public function handle($request, $next)
+    {
+        return new \Illuminate\Http\Response('caught');
     }
 }
 

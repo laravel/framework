@@ -50,6 +50,13 @@ class Kernel implements KernelContract
     protected $middleware = [];
 
     /**
+     * The application's route middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [];
+
+    /**
      * The application's route middleware.
      *
      * @var array
@@ -67,6 +74,10 @@ class Kernel implements KernelContract
     {
         $this->app = $app;
         $this->router = $router;
+
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            $router->middlewareGroup($key, $middleware);
+        }
 
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->middleware($key, $middleware);

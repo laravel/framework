@@ -66,6 +66,13 @@ class Router implements RegistrarContract
     protected $middleware = [];
 
     /**
+     * All of the middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [];
+
+    /**
      * The registered route value binders.
      *
      * @var array
@@ -446,7 +453,9 @@ class Router implements RegistrarContract
      */
     protected function newRoute($methods, $uri, $action)
     {
-        return (new Route($methods, $uri, $action))->setContainer($this->container);
+        return (new Route($methods, $uri, $action))
+                    ->setRouter($this)
+                    ->setContainer($this->container);
     }
 
     /**
@@ -618,22 +627,40 @@ class Router implements RegistrarContract
         return Collection::make($route->middleware())->map(function ($name) {
             return Collection::make($this->resolveMiddlewareClassName($name));
         })
-        ->collapse()->all();
+        ->flatten()->all();
     }
 
     /**
-     * Resolve the middleware name to a class name preserving passed parameters.
+     * Resolve the middleware name to a class name(s) preserving passed parameters.
      *
      * @param  string  $name
-     * @return string
+     * @return string|array
      */
     public function resolveMiddlewareClassName($name)
     {
         $map = $this->middleware;
 
-        list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+        // If the middleware is the name of a middleware group, we will return the array
+        // of middlewares that belong to the group. This allows developers to group a
+        // set of middleware under single keys that can be conveniently referenced.
+        if (isset($this->middlewareGroups[$name])) {
+            return $this->middlewareGroups[$name];
 
-        return (isset($map[$name]) ? $map[$name] : $name).($parameters !== null ? ':'.$parameters : '');
+        // When the middleware is simply a Closure, we will return this Closure instance
+        // directly so that Closures can be registered as middleware inline, which is
+        // convenient on occasions when the developers are experimenting with them.
+        } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
+            return $map[$name];
+
+        // Finally, when the middleware is simply a string mapped to a class name the
+        // middleware name will get parsed into the full class name and parameters
+        // which may be run using the Pipeline which accepts this string format.
+        } else {
+            list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+
+            return (isset($map[$name]) ? $map[$name] : $name).
+                   ($parameters !== null ? ':'.$parameters : '');
+        }
     }
 
     /**
@@ -738,6 +765,20 @@ class Router implements RegistrarContract
     public function middleware($name, $class)
     {
         $this->middleware[$name] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Register a group of middleware.
+     *
+     * @param  string  $name
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function middlewareGroup($name, array $middleware)
+    {
+        $this->middlewareGroups[$name] = $middleware;
 
         return $this;
     }
@@ -1034,7 +1075,7 @@ class Router implements RegistrarContract
     public function setRoutes(RouteCollection $routes)
     {
         foreach ($routes as $route) {
-            $route->setContainer($this->container);
+            $route->setRouter($this)->setContainer($this->container);
         }
 
         $this->routes = $routes;

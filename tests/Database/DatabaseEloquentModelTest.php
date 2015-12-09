@@ -54,8 +54,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         // ensure password attribute was not set to null
         $this->assertArrayNotHasKey('password', $attributes);
         $this->assertEquals('******', $model->password);
-        $this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $attributes['password_hash']);
-        $this->assertEquals('5ebe2294ecd0e0f08eab7690d2a6ee69', $model->password_hash);
+
+        $hash = 'e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4';
+
+        $this->assertEquals($hash, $attributes['password_hash']);
+        $this->assertEquals($hash, $model->password_hash);
     }
 
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
@@ -1314,7 +1317,7 @@ class EloquentModelStub extends Model
 
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password_hash'] = md5($value);
+        $this->attributes['password_hash'] = sha1($value);
     }
 
     public function publicIncrement($column, $amount = 1)
