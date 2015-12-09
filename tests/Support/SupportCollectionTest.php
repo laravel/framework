@@ -702,6 +702,20 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testFirstValueOnlyCallback()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->first(function ($value) { return $value === 'bar'; });
+        $this->assertEquals('bar', $result);
+    }
+
+    public function testFirstValueOnlyAndDefaultCallback()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->first(function ($value) { return $value === 'bar'; });
+        $this->assertEquals('bar', $result);
+    }
+
     public function testGroupByAttribute()
     {
         $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
