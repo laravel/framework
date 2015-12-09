@@ -108,6 +108,12 @@ class Arr
      */
     public static function except($array, $keys)
     {
+        if (self::isColumned($array)) {
+            return array_map(function ($array) use ($keys) {
+                return self::except($array, $keys);
+            }, $array);
+        }
+
         static::forget($array, $keys);
 
         return $array;
@@ -298,6 +304,34 @@ class Arr
     }
 
     /**
+     * Determines if an array is columned.
+     *
+     * An array is "columned" if it is index, and it's items are associative arrays using the same keys.
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    public static function isColumned(array $array)
+    {
+        if (count($array) && ! self::isAssoc($array) && is_array($array[0]) && self::isAssoc($array[0])) {
+            if (count($array) > 1) {
+                $item_keys = array_map(function($item) {
+                    $keys = array_keys($item);
+                    sort($keys);
+
+                    return implode('|', $keys);
+                }, $array);
+
+                return count(array_unique($item_keys)) === 1;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
@@ -306,6 +340,12 @@ class Arr
      */
     public static function only($array, $keys)
     {
+        if (self::isColumned($array)) {
+            return array_map(function ($array) use ($keys) {
+                return self::only($array, $keys);
+            }, $array);
+        }
+
         return array_intersect_key($array, array_flip((array) $keys));
     }
 

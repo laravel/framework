@@ -28,6 +28,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'Desk', 'price' => 100];
         $array = Arr::except($array, ['price']);
         $this->assertEquals(['name' => 'Desk'], $array);
+
+        $array = [['name' => 'Desk', 'price' => 100], ['name' => 'Chair', 'price' => 50]];
+        $array = Arr::except($array, ['price']);
+        $this->assertEquals([['name' => 'Desk'], ['name' => 'Chair']], $array);
     }
 
     public function testFirst()
@@ -80,11 +84,24 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testIsColumned()
+    {
+        $this->assertTrue(Arr::isColumned([['a' => 'a'], ['a' => 'b']]));
+        $this->assertTrue(Arr::isColumned([[1 => 'a', 2 => 'b'], [2 => 'a', 1 => 'b']]));
+        $this->assertFalse(Arr::isColumned(['a', 'b']));
+        $this->assertFalse(Arr::isColumned([['a'], ['b']]));
+        $this->assertFalse(Arr::isColumned([['a' => 'a'], ['b' => 'b']]));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+
+        $array = [['name' => 'Desk', 'price' => 100, 'orders' => 10], ['name' => 'Chair', 'price' => 50, 'orders' => 5]];
+        $array = Arr::only($array, ['name', 'price']);
+        $this->assertEquals([['name' => 'Desk', 'price' => 100], ['name' => 'Chair', 'price' => 50]], $array);
     }
 
     public function testPluck()
