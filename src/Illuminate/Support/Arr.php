@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use ReflectionFunction;
 
 class Arr
 {
@@ -149,7 +150,7 @@ class Arr
      */
     public static function first($array, callable $callback, $default = null)
     {
-        $reflection = new \ReflectionFunction($callback);
+        $reflection = new ReflectionFunction($callback);
         $valueOnlyCallback = $reflection->getNumberOfParameters() == 1;
 
         foreach ($array as $key => $value) {
