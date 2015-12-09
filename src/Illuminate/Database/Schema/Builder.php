@@ -204,7 +204,9 @@ class Builder
             return call_user_func($this->resolver, $table, $callback);
         }
 
-        return new Blueprint($table, $callback);
+        $charset = $this->connection->getConfig('charset');
+
+        return new Blueprint($table, $charset, $callback);
     }
 
     /**

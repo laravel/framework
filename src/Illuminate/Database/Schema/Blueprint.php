@@ -64,6 +64,7 @@ class Blueprint
     public function __construct($table, Closure $callback = null)
     {
         $this->table = $table;
+        $this->charset = $charset;
 
         if (! is_null($callback)) {
             $callback($this);
@@ -450,6 +451,10 @@ class Blueprint
      */
     public function string($column, $length = 255)
     {
+        if ($this->charset == 'utf8mb4' && $length == 255) {
+            $length = 191;
+        }
+        
         return $this->addColumn('string', $column, compact('length'));
     }
 
