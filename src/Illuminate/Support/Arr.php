@@ -154,7 +154,7 @@ class Arr
 
         foreach ($array as $key => $value) {
             if (($valueOnlyCallback && call_user_func($callback, $value))
-            || (!$valueOnlyCallback && call_user_func($callback, $key, $value))) {
+            || (! $valueOnlyCallback && call_user_func($callback, $key, $value))) {
                 return $value;
             }
         }
