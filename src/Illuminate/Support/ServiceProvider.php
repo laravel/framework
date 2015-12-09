@@ -78,46 +78,13 @@ abstract class ServiceProvider
         $appBasePath = $this->app->basePath();
         $namespacePath = str_replace('.', '/', $namespace);
 
-        $overridingPath = $this->getValidDirectory([
-            "{$appBasePath}/resources/views/vendor/{$namespace}",
-            "{$appBasePath}/resources/views/vendor/{$namespacePath}",
-        ]);
-
-        if ($overridingPath !== null) {
-            $this->app['view']->addNamespace($namespace, $overridingPath);
+        if ($this->app['files']->isDirectory($appPath = "{$appBasePath}/resources/views/vendor/{$namespace}")) {
+            $this->app['view']->addNamespace($namespace, $appPath);
+        } elseif ($this->app['files']->isDirectory($appPath = "{$appBasePath}/resources/views/vendor/{$namespacePath}")) {
+            $this->app['view']->addNamespace($namespace, $appPath);
         }
 
         $this->app['view']->addNamespace($namespace, $path);
-    }
-
-    /**
-     * Checks whether there exists a valid directory in the given
-     * array and returns the directory path.
-     * It stops searching after the first valid directory is found.
-     * Returns null if it doesn't find any valid directory.
-     *
-     * @param  array  $paths
-     * @return string|null
-     */
-    protected function getValidDirectory(array $paths)
-    {
-        foreach ($paths as $path) {
-            if ($this->isValidDirectory($path)) {
-                return $path;
-            }
-        }
-
-        return;
-    }
-
-    /**
-     * Check if the given path is a valid directory.
-     * @param  string $path
-     * @return bool
-     */
-    protected function isValidDirectory($path)
-    {
-        return is_dir($path);
     }
 
     /**

@@ -83,16 +83,17 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
         $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
+        $files = m::mock('Illuminate\\Filesystem\\Filesystem');
         $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
 
         $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
         $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
+        $app->shouldReceive('offsetGet')->once()->with('files')->andReturn($files);
 
         $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/zaz/resources/views/vendor/name.space');
         $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/foo');
 
-        $provider->shouldAllowMockingProtectedMethods();
-        $provider->shouldReceive('isValidDirectory')->once()->andReturn(true);
+        $files->shouldReceive('isDirectory')->once()->andReturn(true);
 
         $provider->boot();
     }
@@ -101,17 +102,18 @@ class SupportServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $app = m::mock('Illuminate\\Foundation\\Application')->makePartial();
         $viewFinder = m::mock('Illuminate\\View\\FileViewFinder');
+        $files = m::mock('Illuminate\\Filesystem\\Filesystem');
         $provider = m::mock('ServiceProviderForTestingThree[isValidDirectory]', [$app])->makePartial();
 
         $app->shouldReceive('basePath')->once()->andReturn(__DIR__.'/zaz');
         $app->shouldReceive('offsetGet')->twice()->with('view')->andReturn($viewFinder);
+        $app->shouldReceive('offsetGet')->twice()->with('files')->andReturn($files);
 
         $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/zaz/resources/views/vendor/name/space');
         $viewFinder->shouldReceive('addNamespace')->once()->with('name.space', __DIR__.'/foo');
 
-        $provider->shouldAllowMockingProtectedMethods();
-        $provider->shouldReceive('isValidDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name.space')->andReturn(false);
-        $provider->shouldReceive('isValidDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name/space')->andReturn(true);
+        $files->shouldReceive('isDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name.space')->andReturn(false);
+        $files->shouldReceive('isDirectory')->once()->with(__DIR__.'/zaz/resources/views/vendor/name/space')->andReturn(true);
 
         $provider->boot();
     }
