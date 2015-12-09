@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 
 class ControllerDispatcher
@@ -102,7 +103,7 @@ class ControllerDispatcher
      */
     protected function getMiddleware($instance, $method)
     {
-        $results = [];
+        $results = new Collection;
 
         foreach ($instance->getMiddleware() as $name => $options) {
             if (! $this->methodExcludedByOptions($method, $options)) {
@@ -110,7 +111,7 @@ class ControllerDispatcher
             }
         }
 
-        return $results;
+        return $results->flatten()->all();
     }
 
     /**
