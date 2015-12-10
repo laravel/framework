@@ -303,6 +303,25 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the response is a superset of the given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    protected function seeJsonSubset(array $data)
+    {
+        $actual = json_decode($this->response->getContent(), true);
+
+        if (is_null($actual) || $actual === false) {
+            return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
+        }
+
+        $this->assertArraySubset($data, $actual);
+
+        return $this;
+    }
+
+    /**
      * Format the given key and value into a JSON string for expectation checks.
      *
      * @param  string  $key
