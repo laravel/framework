@@ -11,6 +11,8 @@ trait CreatesUserProviders
      *
      * @param  string  $provider
      * @return \Illuminate\Contracts\Auth\UserProvider
+     *
+     * @throws \InvalidArgumentException
      */
     protected function createUserProvider($provider)
     {
