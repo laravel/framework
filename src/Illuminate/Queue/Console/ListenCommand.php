@@ -63,6 +63,15 @@ class ListenCommand extends Command
 
         $timeout = $this->input->getOption('timeout');
 
+        $sleep = $this->input->getOption('sleep');
+
+        // Timeout must be higher than sleep, otherwise the process will fail
+        // due to improper timeout.
+        if ($timeout <= $sleep) {
+            $timeout = $sleep + 1;
+            $this->output->writeln("<comment>Warning: --timeout value must be higher than --sleep. Setting it to --timeout={$timeout}.</comment>");
+        }
+
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
