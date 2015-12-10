@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
@@ -696,7 +695,6 @@ class Router implements RegistrarContract
         $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddlewares($route);
 
         return (new Pipeline($this->container))
-                        ->handleExceptions()
                         ->send($request)
                         ->through($middleware)
                         ->then(function ($request) use ($route) {

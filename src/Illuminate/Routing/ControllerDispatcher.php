@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 
@@ -85,7 +84,6 @@ class ControllerDispatcher
                                 $this->container->make('middleware.disable') === true;
 
         return (new Pipeline($this->container))
-                    ->handleExceptions()
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $middleware)
                     ->then(function ($request) use ($instance, $route, $method) {
