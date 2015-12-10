@@ -28,8 +28,5 @@
             "dev-master": "5.2-dev"
         }
     },
-    "suggest": {
-        "symfony/debug": "Required to handle Throwables during exception handling (2.8.*|3.0.*).",
-    },
     "minimum-stability": "dev"
 }

@@ -3,12 +3,7 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
-use Exception;
-use Throwable;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Pipeline implements PipelineContract
@@ -40,13 +35,6 @@ class Pipeline implements PipelineContract
      * @var string
      */
     protected $method = 'handle';
-
-    /**
-     * Indicates if exceptions should be caught and handled.
-     *
-     * @var bool
-     */
-    protected $handleExceptions = false;
 
     /**
      * Create a new class instance.
@@ -127,19 +115,13 @@ class Pipeline implements PipelineContract
                 // If the pipe is an instance of a Closure, we will just call it directly but
                 // otherwise we'll resolve the pipes out of the container and call it with
                 // the appropriate method and arguments, returning the results back out.
-                try {
-                    if ($pipe instanceof Closure) {
-                        return call_user_func($pipe, $passable, $stack);
-                    } else {
-                        list($name, $parameters) = $this->parsePipeString($pipe);
+                if ($pipe instanceof Closure) {
+                    return call_user_func($pipe, $passable, $stack);
+                } else {
+                    list($name, $parameters) = $this->parsePipeString($pipe);
 
-                        return call_user_func_array([$this->container->make($name), $this->method],
-                                array_merge([$passable, $stack], $parameters));
-                    }
-                } catch (Exception $e) {
-                    return $this->handleException($passable, $e);
-                } catch (Throwable $e) {
-                    return $this->handleException($passable, new FatalThrowableError($e));
+                    return call_user_func_array([$this->container->make($name), $this->method],
+                            array_merge([$passable, $stack], $parameters));
                 }
             };
         };
@@ -159,29 +141,6 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Handle the given exception if an exception handler is bound.
-     *
-     * Exception only handled when passable is HTTP request and handling is enabled.
-     *
-     * @param  \Exception  $e
-     * @return mixed
-     */
-    protected function handleException($passable, Exception $e)
-    {
-        if (! $this->handleExceptions ||
-            ! $this->container->bound(ExceptionHandler::class) ||
-            ! $passable instanceof Request) {
-            throw $e;
-        }
-
-        $handler = $this->container->make(ExceptionHandler::class);
-
-        $handler->report($e);
-
-        return $handler->render($passable, $e);
-    }
-
-    /**
      * Parse full pipe string to get name and parameters.
      *
      * @param  string $pipe
@@ -196,17 +155,5 @@ class Pipeline implements PipelineContract
         }
 
         return [$name, $parameters];
-    }
-
-    /**
-     * Indicate that exceptions should be handled.
-     *
-     * @return $this
-     */
-    public function handleExceptions()
-    {
-        $this->handleExceptions = true;
-
-        return $this;
     }
 }
