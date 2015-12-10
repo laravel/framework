@@ -65,11 +65,8 @@ class ListenCommand extends Command
 
         $sleep = $this->input->getOption('sleep');
 
-        // Timeout must be higher than sleep, otherwise the process will fail
-        // due to improper timeout.
         if ($timeout <= $sleep) {
-            $timeout = $sleep + 1;
-            $this->output->writeln("<comment>Warning: --timeout value must be higher than --sleep. Setting it to --timeout={$timeout}.</comment>");
+            throw new \InvalidArgumentException("--timeout value must be higher than --sleep");
         }
 
         // We need to get the right queue for the connection which is set in the queue
