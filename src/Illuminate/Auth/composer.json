@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "ext-mbstring": "*",
         "illuminate/contracts": "5.1.*",
         "illuminate/http": "5.1.*",
         "illuminate/session": "5.1.*",
