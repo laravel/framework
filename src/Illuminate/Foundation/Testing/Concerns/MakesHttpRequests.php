@@ -280,14 +280,8 @@ trait MakesHttpRequests
     {
         $method = $negate ? 'assertFalse' : 'assertTrue';
 
-        $actual = json_decode($this->response->getContent(), true);
-
-        if (is_null($actual) || $actual === false) {
-            return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
-        }
-
         $actual = json_encode(Arr::sortRecursive(
-            (array) $actual
+            (array) $this->decodeResponseJson()
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
@@ -310,15 +304,25 @@ trait MakesHttpRequests
      */
     protected function seeJsonSubset(array $data)
     {
-        $actual = json_decode($this->response->getContent(), true);
-
-        if (is_null($actual) || $actual === false) {
-            return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
-        }
-
-        $this->assertArraySubset($data, $actual);
+        $this->assertArraySubset($data, $this->decodeResponseJson());
 
         return $this;
+    }
+
+    /**
+     * Validate and return the decoded response JSON.
+     *
+     * @return array
+     */
+    protected function decodeResponseJson()
+    {
+        $decodedResponse = json_decode($this->response->getContent(), true);
+
+        if (is_null($decodedResponse) || $decodedResponse === false) {
+            $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
+        }
+
+        return $decodedResponse;
     }
 
     /**
