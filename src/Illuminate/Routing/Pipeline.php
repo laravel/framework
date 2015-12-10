@@ -25,7 +25,9 @@ class Pipeline extends BasePipeline
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
                 try {
-                    return call_user_func(parent::getSlice()($stack, $pipe), $passable);
+                    $slice = parent::getSlice();
+
+                    return call_user_func($slice($stack, $pipe), $passable);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 } catch (Throwable $e) {
