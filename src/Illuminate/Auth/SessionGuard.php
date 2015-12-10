@@ -413,8 +413,6 @@ class SessionGuard implements StatefulGuard
     protected function fireAttemptEvent(array $credentials, $remember, $login)
     {
         if ($this->events) {
-            $payload = [$credentials, $remember, $login];
-
             $this->events->fire(new Events\Attempting(
                 $credentials, $remember, $login
             ));
