@@ -8,6 +8,11 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
+/**
+ * This extended pipeline catches any exceptions that occur during each slice.
+ *
+ * The exceptions are converted to HTTP responses for proper middleware handling.
+ */
 class Pipeline extends BasePipeline
 {
     /**
