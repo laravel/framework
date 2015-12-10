@@ -102,9 +102,7 @@ class Kernel implements KernelContract
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
-            $this->reportException($e);
+            $this->reportException($e = new FatalThrowableError($e));
 
             $response = $this->renderException($request, $e);
         }

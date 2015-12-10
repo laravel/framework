@@ -85,6 +85,7 @@ class ControllerDispatcher
                                 $this->container->make('middleware.disable') === true;
 
         return (new Pipeline($this->container))
+                    ->handleExceptions()
                     ->send($request)
                     ->through($shouldSkipMiddleware ? [] : $middleware)
                     ->then(function ($request) use ($instance, $route, $method) {
