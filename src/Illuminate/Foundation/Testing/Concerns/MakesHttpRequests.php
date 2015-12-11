@@ -280,14 +280,8 @@ trait MakesHttpRequests
     {
         $method = $negate ? 'assertFalse' : 'assertTrue';
 
-        $actual = json_decode($this->response->getContent(), true);
-
-        if (is_null($actual) || $actual === false) {
-            return $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
-        }
-
         $actual = json_encode(Arr::sortRecursive(
-            (array) $actual
+            (array) $this->decodeResponseJson()
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
@@ -300,6 +294,35 @@ trait MakesHttpRequests
         }
 
         return $this;
+    }
+
+    /**
+     * Assert that the response is a superset of the given JSON.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    protected function seeJsonSubset(array $data)
+    {
+        $this->assertArraySubset($data, $this->decodeResponseJson());
+
+        return $this;
+    }
+
+    /**
+     * Validate and return the decoded response JSON.
+     *
+     * @return array
+     */
+    protected function decodeResponseJson()
+    {
+        $decodedResponse = json_decode($this->response->getContent(), true);
+
+        if (is_null($decodedResponse) || $decodedResponse === false) {
+            $this->fail('Invalid JSON was returned from the route. Perhaps an exception was thrown?');
+        }
+
+        return $decodedResponse;
     }
 
     /**
