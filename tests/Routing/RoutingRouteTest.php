@@ -108,18 +108,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router = $this->getRouter();
         $router->get('foo/bar', ['middleware' => 'web', function () { return 'hello'; }]);
 
-        $router->middlewareGroup('web', [
-            function ($request, $next) {
-                $_SERVER['__middleware.group'] = true;
+        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'two:taylor']);
 
-                return $next($request);
-            },
-            function ($request, $next) {
-                return 'caught';
-            },
-        ]);
-
-        $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertEquals('caught taylor', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertTrue($_SERVER['__middleware.group']);
 
         unset($_SERVER['__middleware.group']);
@@ -930,5 +922,22 @@ class RouteModelBindingClosureStub
     public function findAlternate($value)
     {
         return strtolower($value).'alt';
+    }
+}
+
+class RoutingTestMiddlewareGroupOne
+{
+    public function handle($request, $next)
+    {
+        $_SERVER['__middleware.group'] = true;
+        return $next($request);
+    }
+}
+
+class RoutingTestMiddlewareGroupTwo
+{
+    public function handle($request, $next, $parameter = null)
+    {
+        return new \Illuminate\Http\Response('caught '.$parameter);
     }
 }
