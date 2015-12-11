@@ -42,6 +42,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(200, $value);
     }
 
+    public function testFirstValueOnlyCallback()
+    {
+        $array = [100, 200, 300];
+
+        $value = Arr::first($array, function ($value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(200, $value);
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];
