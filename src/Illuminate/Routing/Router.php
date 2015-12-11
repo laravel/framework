@@ -578,8 +578,8 @@ class Router implements RegistrarContract
         if (! is_array($action)) {
             return false;
         }
-
-        list($class, $method) = each($action);
+        
+        $class = key($action);
 
         return class_exists($class);
     }
