@@ -2781,13 +2781,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Determine whether an attribute should be casted to a native type.
      *
      * @param  string  $key
-     * @param  array|null  $types
+     * @param  array|string|null  $types
      * @return bool
      */
-    protected function hasCast($key, array $types = null)
+    protected function hasCast($key, $types = null)
     {
         if (array_key_exists($key, $this->casts)) {
-            return $types ? in_array($this->getCastType($key), $types, true) : true;
+            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
         }
 
         return false;
