@@ -2781,11 +2781,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Determine whether an attribute should be casted to a native type.
      *
      * @param  string  $key
+     * @param  array|string|null  $types
      * @return bool
      */
-    protected function hasCast($key)
+    protected function hasCast($key, $types = null)
     {
-        return array_key_exists($key, $this->casts);
+        if (array_key_exists($key, $this->casts)) {
+            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
+        }
+
+        return false;
     }
 
     /**
@@ -2796,8 +2801,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key) &&
-               in_array($this->getCastType($key), ['date', 'datetime'], true);
+        return $this->hasCast($key, ['date', 'datetime']);
     }
 
     /**
@@ -2808,8 +2812,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key) &&
-               in_array($this->getCastType($key), ['array', 'json', 'object', 'collection'], true);
+        return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
     }
 
     /**
