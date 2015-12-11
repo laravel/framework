@@ -801,10 +801,14 @@ class Router implements RegistrarContract
 
             if (array_key_exists($parameter->name, $parameters) &&
                 ! $route->getParameter($parameter->name) instanceof Model) {
-                $method = $parameter->isDefaultValueAvailable() ? 'find' : 'findOrFail';
+                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
+
+                $model = $class->newInstance();
 
                 $route->setParameter(
-                    $parameter->name, $class->newInstance()->{$method}($parameters[$parameter->name])
+                    $parameter->name, $model->where(
+                        $model->getRouteKeyName(), $parameters[$parameter->name]
+                    )->{$method}()
                 );
             }
         }
