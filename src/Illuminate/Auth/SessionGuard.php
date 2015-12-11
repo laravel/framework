@@ -412,7 +412,7 @@ class SessionGuard implements StatefulGuard
      */
     protected function fireAttemptEvent(array $credentials, $remember, $login)
     {
-        if ($this->events) {
+        if (isset($this->events)) {
             $this->events->fire(new Events\Attempting(
                 $credentials, $remember, $login
             ));
@@ -427,7 +427,7 @@ class SessionGuard implements StatefulGuard
      */
     public function attempting($callback)
     {
-        if ($this->events) {
+        if (isset($this->events)) {
             $this->events->listen(Events\Attempting::class, $callback);
         }
     }
