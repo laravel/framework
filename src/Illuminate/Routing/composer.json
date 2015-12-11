@@ -21,6 +21,7 @@
         "illuminate/pipeline": "5.3.*",
         "illuminate/session": "5.3.*",
         "illuminate/support": "5.3.*",
+        "symfony/debug": "3.1.*",
         "symfony/http-foundation": "3.1.*",
         "symfony/http-kernel": "3.1.*",
         "symfony/routing": "3.1.*"
