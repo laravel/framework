@@ -733,7 +733,7 @@ class Router implements RegistrarContract
         // of middlewares that belong to the group. This allows developers to group a
         // set of middleware under single keys that can be conveniently referenced.
         if (isset($this->middlewareGroups[$name])) {
-            return $this->middlewareGroups[$name];
+            return $this->parseMiddlewareGroup($name);
 
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
@@ -750,6 +750,32 @@ class Router implements RegistrarContract
             return (isset($map[$name]) ? $map[$name] : $name).
                    ($parameters !== null ? ':'.$parameters : '');
         }
+    }
+
+    /**
+     * Parse the middleware group and format it for usage.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseMiddlewareGroup($name)
+    {
+        $results = [];
+
+        foreach ($this->middlewareGroups[$name] as $middleware) {
+            list($middleware, $parameters) = array_pad(explode(':', $middleware, 2), 2, null);
+
+            // If this middleware is actually a route middleware, we will extract the full
+            // class name out of the middleware list now. Then we'll add the parameters
+            // back onto this class' name so the pipeline will properly extract them.
+            if (isset($this->middleware[$middleware])) {
+                $middleware = $this->middleware[$middleware];
+            }
+
+            $results[] = $middleware.($parameters ? ':'.$parameters : '');
+        }
+
+        return $results;
     }
 
     /**
