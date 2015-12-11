@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
@@ -644,7 +643,7 @@ class Router implements RegistrarContract
         // of middlewares that belong to the group. This allows developers to group a
         // set of middleware under single keys that can be conveniently referenced.
         if (isset($this->middlewareGroups[$name])) {
-            return $this->middlewareGroups[$name];
+            return $this->parseMiddlewareGroup($name);
 
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
@@ -661,6 +660,32 @@ class Router implements RegistrarContract
             return (isset($map[$name]) ? $map[$name] : $name).
                    ($parameters !== null ? ':'.$parameters : '');
         }
+    }
+
+    /**
+     * Parse the middleware group and format it for usage.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseMiddlewareGroup($name)
+    {
+        $results = [];
+
+        foreach ($this->middlewareGroups[$name] as $middleware) {
+            list($middleware, $parameters) = array_pad(explode(':', $middleware, 2), 2, null);
+
+            // If this middleware is actually a route middleware, we will extract the full
+            // class name out of the middleware list now. Then we'll add the parameters
+            // back onto this class' name so the pipeline will properly extract them.
+            if (isset($this->middleware[$middleware])) {
+                $middleware = $this->middleware[$middleware];
+            }
+
+            $results[] = $middleware.($parameters ? ':'.$parameters : '');
+        }
+
+        return $results;
     }
 
     /**
@@ -712,10 +737,14 @@ class Router implements RegistrarContract
 
             if (array_key_exists($parameter->name, $parameters) &&
                 ! $route->getParameter($parameter->name) instanceof Model) {
-                $method = $parameter->isDefaultValueAvailable() ? 'find' : 'findOrFail';
+                $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
+
+                $model = $class->newInstance();
 
                 $route->setParameter(
-                    $parameter->name, $class->newInstance()->{$method}($parameters[$parameter->name])
+                    $parameter->name, $model->where(
+                        $model->getRouteKeyName(), $parameters[$parameter->name]
+                    )->{$method}()
                 );
             }
         }

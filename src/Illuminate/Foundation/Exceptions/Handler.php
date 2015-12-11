@@ -6,6 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Exception\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -75,7 +76,9 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Exception $e)
     {
-        foreach ($this->dontReport as $type) {
+        $dontReport = array_merge($this->dontReport, [HttpResponseException::class]);
+
+        foreach ($dontReport as $type) {
             if ($e instanceof $type) {
                 return true;
             }
@@ -93,12 +96,14 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
-        if ($e instanceof ModelNotFoundException) {
+        if ($e instanceof HttpResponseException) {
+            return $e->getResponse();
+        } elseif ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
-        } elseif ($e instanceof ValidationException && $e->response) {
-            return $e->response;
+        } elseif ($e instanceof ValidationException && $e->getResponse()) {
+            return $e->getResponse();
         }
 
         if ($this->isHttpException($e)) {

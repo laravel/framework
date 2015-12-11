@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 
