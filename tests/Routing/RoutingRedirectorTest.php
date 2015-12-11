@@ -125,6 +125,13 @@ class RoutingRedirectorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
     }
 
+    public function testActionAsArray()
+    {
+        $this->url->shouldReceive('action')->with([bar::class => 'index'], [])->andReturn('http://foo.com/bar');
+        $response = $this->redirect->action([bar::class => 'index']);
+        $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
+    }
+
     public function testRoute()
     {
         $this->url->shouldReceive('route')->with('home')->andReturn('http://foo.com/bar');

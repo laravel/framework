@@ -568,15 +568,20 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL to a controller action.
      *
-     * @param  string  $action
-     * @param  mixed   $parameters
-     * @param  bool    $absolute
+     * @param  array|string  $action
+     * @param  mixed  $parameters
+     * @param  bool  $absolute
      * @return string
      *
      * @throws \InvalidArgumentException
      */
     public function action($action, $parameters = [], $absolute = true)
     {
+        if (is_array($action)) {
+            list($class, $method) = each($action);
+            $action = '\\'.$class.'@'.$method;
+        }
+
         if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
             $action = $this->rootNamespace.'\\'.$action;
         } else {

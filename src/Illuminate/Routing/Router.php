@@ -486,6 +486,12 @@ class Router implements RegistrarContract
      */
     protected function createRoute($methods, $uri, $action)
     {
+        // If the action is referenced as an array we will
+        // convert the array to a regular action string.
+        if ($this->actionIsReferencedAsArray($action)) {
+            $action = $this->convertToActionString($action);
+        }
+
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.
@@ -559,6 +565,36 @@ class Router implements RegistrarContract
         $action = $this->mergeWithLastGroup($route->getAction());
 
         $route->setAction($action);
+    }
+
+    /**
+     * Determine if action is referenced as an array.
+     *
+     * @param  string|array  $action
+     * @return bool
+     */
+    private function actionIsReferencedAsArray($action)
+    {
+        if (! is_array($action)) {
+            return false;
+        }
+
+        list($class, $method) = each($action);
+
+        return class_exists($class);
+    }
+
+    /**
+     * Convert action array to action string.
+     *
+     * @param  array  $action
+     * @return string
+     */
+    private function convertToActionString($action)
+    {
+        list($class, $method) = each($action);
+
+        return '\\'.$class.'@'.$method;
     }
 
     /**
