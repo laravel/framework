@@ -930,6 +930,7 @@ class RoutingTestMiddlewareGroupOne
     public function handle($request, $next)
     {
         $_SERVER['__middleware.group'] = true;
+
         return $next($request);
     }
 }
