@@ -237,12 +237,15 @@ class Builder
     /**
      * Add a new "raw" select expression to the query.
      *
-     * @param  string  $expression
+     * @param  string|array $expression
      * @param  array   $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function selectRaw($expression, array $bindings = [])
     {
+        if (is_array($expression)) {
+            $expression = implode(', ', $expression);
+        }
         $this->addSelect(new Expression($expression));
 
         if ($bindings) {
