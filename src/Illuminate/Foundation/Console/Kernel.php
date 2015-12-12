@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -247,7 +248,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+        $this->app[ExceptionHandler::class]->report($e);
     }
 
     /**
@@ -259,6 +260,6 @@ class Kernel implements KernelContract
      */
     protected function renderException($output, Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+        $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
     }
 }
