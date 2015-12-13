@@ -242,7 +242,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $i = 'index.php';
 
-        return Str::contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
+        return strpos($root, $i) !== false ? str_replace('/'.$i, '', $root) : $root;
     }
 
     /**
@@ -618,9 +618,9 @@ class UrlGenerator implements UrlGeneratorContract
             $root = $this->cachedRoot;
         }
 
-        $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
+        $start = strpos($root, 'http://') === 0 ? 'http://' : 'https://';
 
-        return preg_replace('~'.$start.'~', $scheme, $root, 1);
+        return str_replace($start, $scheme, $root);
     }
 
     /**
