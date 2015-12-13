@@ -115,6 +115,28 @@ if (! function_exists('back')) {
     }
 }
 
+if (! function_exists('back_url')) {
+    /**
+     * Create a new redirect url to the previous location.
+     *
+     * @param  string|null  $route
+     * @param  array  $parameters
+     * @param  int  $status
+     * @param  array  $headers
+     * @return string
+     */
+    function back_url($route = null, $parameters = [], $status = 302, $headers = [])
+    {
+        $url = app('url');
+
+        if (! is_null($route) && $url->previous() == $url->full()) {
+            return $url->route($name, $params);
+        }
+
+        return $url->previous();
+    }
+}
+
 if (! function_exists('base_path')) {
     /**
      * Get the path to the base of the install.
