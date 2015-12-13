@@ -360,28 +360,37 @@ class Store implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets an attribute.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @param  bool  $explicit
      */
-    public function set($name, $value)
+    public function set($name, $value, $explicit = false)
     {
-        Arr::set($this->attributes, $name, $value);
+        if (! $explicit) {
+            Arr::set($this->attributes, $name, $value);
+        } else {
+            $this->attributes[$name] = $value;
+        }
     }
 
     /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
-     * @param  mixed       $value
+     * @param  mixed  $value
+     * @param  bool  $explicit
      * @return void
      */
-    public function put($key, $value = null)
+    public function put($key, $value = null, $explicit = false)
     {
         if (! is_array($key)) {
             $key = [$key => $value];
         }
 
         foreach ($key as $arrayKey => $arrayValue) {
-            $this->set($arrayKey, $arrayValue);
+            $this->set($arrayKey, $arrayValue, $explicit);
         }
     }
 

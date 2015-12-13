@@ -321,4 +321,19 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
     {
         return 'name';
     }
+
+    public function testSetRaw()
+    {
+        $session = $this->getSession();
+        $session->set('domain.com', ['foo' => 'bar'], true);
+        $session->set('something.else', ['qu' => 'ux']);
+        $this->assertEquals(['foo' => 'bar'], $session->get('domain.com'));
+        $this->assertEquals(null, $session->get('domain.com.foo'));
+        $this->assertEquals(['qu' => 'ux'], $session->get('something.else'));
+        $this->assertEquals('ux', $session->get('something.else.qu'));
+        $this->assertEquals([
+            'domain.com' => ['foo' => 'bar'],
+            'something' => ['else' => ['qu' => 'ux']],
+        ], $session->all());
+    }
 }
