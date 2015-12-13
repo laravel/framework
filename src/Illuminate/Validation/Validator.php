@@ -1336,7 +1336,7 @@ class Validator implements ValidatorContract
      * @param  mixed  $value
      * @return bool
      */
-    protected function isAValidFileInstance($value)
+    public function isAValidFileInstance($value)
     {
         if ($value instanceof UploadedFile && ! $value->isValid()) {
             return false;

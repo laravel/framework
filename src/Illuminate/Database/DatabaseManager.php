@@ -270,7 +270,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function supportedDrivers()
     {
-        return ['mysql', 'pgsql', 'sqlite', 'dblib', 'sqlsrv'];
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
     }
 
     /**
@@ -280,7 +280,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function availableDrivers()
     {
-        return array_intersect($this->supportedDrivers(), PDO::getAvailableDrivers());
+        return array_intersect($this->supportedDrivers(), str_replace('dblib', 'sqlsrv', PDO::getAvailableDrivers()));
     }
 
     /**
