@@ -12,11 +12,24 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->assertSame("php -i > {$defaultOutput} 2>&1 &", $event->buildCommand());
     }
 
+    public function testBuildCommandSendOutputTo()
+    {
+        $event = new Event('php -i');
+
+        $event->sendOutputTo('/dev/null');
+        $this->assertSame("php -i > '/dev/null' 2>&1 &", $event->buildCommand());
+
+        $event = new Event('php -i');
+
+        $event->sendOutputTo('/my folder/foo.log');
+        $this->assertSame("php -i > '/my folder/foo.log' 2>&1 &", $event->buildCommand());
+    }
+
     public function testBuildCommandAppendOutput()
     {
         $event = new Event('php -i');
 
         $event->appendOutputTo('/dev/null');
-        $this->assertSame('php -i >> /dev/null 2>&1 &', $event->buildCommand());
+        $this->assertSame("php -i >> '/dev/null' 2>&1 &", $event->buildCommand());
     }
 }
