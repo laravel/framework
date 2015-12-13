@@ -238,7 +238,7 @@ class Builder
      * Add a new "raw" select expression to the query.
      *
      * @param  string|array  $expression
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function selectRaw($expression, array $bindings = [])
@@ -246,7 +246,7 @@ class Builder
         if (is_array($expression)) {
             $expression = implode(', ', $expression);
         }
-        
+
         $this->addSelect(new Expression($expression));
 
         if ($bindings) {
