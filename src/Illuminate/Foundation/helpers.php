@@ -673,7 +673,7 @@ if (! function_exists('validator')) {
      * @param  array  $customAttributes
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    function validator(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $factory = app(ValidationFactory::class);
 

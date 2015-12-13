@@ -84,7 +84,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/FormRequest.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Bus/DispatchesJobs.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FormRequestServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/PaginationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/AuthServiceProvider.php',

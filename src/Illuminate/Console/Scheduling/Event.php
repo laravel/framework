@@ -9,6 +9,7 @@ use Cron\CronExpression;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
 
 class Event
@@ -204,7 +205,7 @@ class Event
     }
 
     /**
-     * Build the comand string.
+     * Build the command string.
      *
      * @return string
      */
@@ -658,7 +659,7 @@ class Event
      */
     public function sendOutputTo($location, $append = false)
     {
-        $this->output = $location;
+        $this->output = ProcessUtils::escapeArgument($location);
 
         $this->shouldAppendOutput = $append;
 
