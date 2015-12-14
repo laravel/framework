@@ -1044,7 +1044,6 @@ class Validator implements ValidatorContract
         // In order to prevent an error caused by certain coding style
         // we will cut off the space from the column name
         $column = trim($column);
-        
         list($idColumn, $id) = [null, null];
 
         if (isset($parameters[2])) {
