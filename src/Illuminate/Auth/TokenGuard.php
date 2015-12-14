@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -100,15 +101,39 @@ class TokenGuard implements Guard
 
         $user = null;
 
-        $token = $this->request->input($this->inputKey);
+        $token = $this->getTokenForRequest();
 
-        if (! is_null($token)) {
+        if (! empty($token)) {
             $user = $this->provider->retrieveByCredentials(
                 [$this->storageKey => $token]
             );
         }
 
         return $this->user = $user;
+    }
+
+    /**
+     * Get the token for the current request.
+     *
+     * @return string
+     */
+    protected function getTokenForRequest()
+    {
+        $token = $this->request->input($this->inputKey);
+
+        if (empty($token)) {
+            $token = $this->request->getPassword();
+        }
+
+        if (empty($token)) {
+            $header = $this->request->header('Authorization');
+
+            if (Str::startsWith($header, 'Bearer ')) {
+                $token = Str::substr($header, 7);
+            }
+        }
+
+        return $token;
     }
 
     /**
