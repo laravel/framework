@@ -582,6 +582,22 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
+    public function testIncrementingPrimaryKeysAreCastToIntegersByDefault()
+    {
+        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUser::first();
+        $this->assertInternalType('int', $user->id);
+    }
+
+    public function testDefaultIncrementingPrimaryKeyIntegerCastCanBeOverwritten()
+    {
+        EloquentTestUserWithStringCastId::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUserWithStringCastId::first();
+        $this->assertInternalType('string', $user->id);
+    }
+
     /**
      * Helpers...
      */
@@ -671,4 +687,11 @@ class EloquentTestPhoto extends Eloquent
     {
         return $this->morphTo();
     }
+}
+
+class EloquentTestUserWithStringCastId extends EloquentTestUser
+{
+    protected $casts = [
+        'id' => 'string',
+    ];
 }

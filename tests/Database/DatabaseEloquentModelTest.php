@@ -930,7 +930,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testRouteKeyIsPrimaryKey()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelNonIncrementingStub;
         $model->id = 'foo';
         $this->assertEquals('foo', $model->getRouteKey());
     }
@@ -1552,4 +1552,11 @@ class EloquentModelDynamicVisibleStub extends Illuminate\Database\Eloquent\Model
     {
         return ['name', 'id'];
     }
+}
+
+class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'stub';
+    protected $guarded = [];
+    public $incrementing = false;
 }
