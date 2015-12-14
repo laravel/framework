@@ -1749,7 +1749,12 @@ class Validator implements ValidatorContract
     protected function doReplacements($message, $attribute, $rule, $parameters)
     {
         $value = $this->getAttribute($attribute);
-        $message = str_replace([':ATTRIBUTE', ':Attribute', ':attribute'], [strtoupper($value), ucfirst($value), $value], $message);
+
+        $message = str_replace(
+            [':ATTRIBUTE', ':Attribute', ':attribute'],
+            [Str::upper($value), Str::ucfirst($value), $value],
+            $message
+        );
 
         if (isset($this->replacers[Str::snake($rule)])) {
             $message = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
