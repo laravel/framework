@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Closure;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
@@ -117,6 +118,30 @@ class AuthManager implements FactoryContract
         if (method_exists($guard, 'setRequest')) {
             $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
         }
+
+        return $guard;
+    }
+
+    /**
+     * Create a token based authentication guard.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Illuminate\Auth\TokenGuard
+     */
+    public function createTokenDriver($name, $config)
+    {
+        // The token guard implemetns a basic API token based guard implementation
+        // that takes an API token field from the request and matches it to the
+        // user in the database or another persistence layer where users are.
+        $guard = new TokenGuard(
+            $this->createUserProvider($config['source']),
+            $this->app['request'],
+            Arr::get($config, 'input', 'api_token'),
+            Arr::get($config, 'token', 'api_token')
+        );
+
+        $this->app->refresh('request', $guard, 'setRequest');
 
         return $guard;
     }
