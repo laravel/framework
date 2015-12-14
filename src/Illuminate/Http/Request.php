@@ -786,9 +786,9 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         if (is_null($route) || is_null($param)) {
             return $route;
-        } else {
-            return $route->parameter($param);
         }
+
+        return $route->parameter($param);
     }
 
     /**

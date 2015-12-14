@@ -103,15 +103,15 @@ class FactoryBuilder
     {
         if ($this->amount === 1) {
             return $this->makeInstance($attributes);
-        } else {
-            $results = [];
-
-            for ($i = 0; $i < $this->amount; $i++) {
-                $results[] = $this->makeInstance($attributes);
-            }
-
-            return new Collection($results);
         }
+
+        $results = [];
+
+        for ($i = 0; $i < $this->amount; $i++) {
+            $results[] = $this->makeInstance($attributes);
+        }
+
+        return new Collection($results);
     }
 
     /**

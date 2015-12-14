@@ -77,9 +77,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (is_resource($contents)) {
             return $this->driver->putStream($path, $contents, $config);
-        } else {
-            return $this->driver->put($path, $contents, $config);
         }
+
+        return $this->driver->put($path, $contents, $config);
     }
 
     /**

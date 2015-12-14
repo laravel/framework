@@ -320,11 +320,11 @@ class Gate implements GateContract
             return $this->resolvePolicyCallback($user, $ability, $arguments);
         } elseif (isset($this->abilities[$ability])) {
             return $this->abilities[$ability];
-        } else {
-            return function () {
-                return false;
-            };
         }
+
+        return function () {
+            return false;
+        };
     }
 
     /**
