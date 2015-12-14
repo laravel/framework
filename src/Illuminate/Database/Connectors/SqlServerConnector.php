@@ -45,9 +45,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         // need to establish the PDO connections and return them back for use.
         if (in_array('dblib', $this->getAvailableDrivers())) {
             return $this->getDblibDsn($config);
-        } else {
-            return $this->getSqlSrvDsn($config);
         }
+
+        return $this->getSqlSrvDsn($config);
     }
 
     /**
@@ -120,9 +120,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     {
         if (isset($config['port'])) {
             return $config['host'].$separator.$config['port'];
-        } else {
-            return $config['host'];
         }
+
+        return $config['host'];
     }
 
     /**

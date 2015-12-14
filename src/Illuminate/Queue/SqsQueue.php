@@ -118,9 +118,9 @@ class SqsQueue extends Queue implements QueueContract
         if (count($response['Messages']) > 0) {
             if ($this->jobCreator) {
                 return call_user_func($this->jobCreator, $this->container, $this->sqs, $queue, $response);
-            } else {
-                return new SqsJob($this->container, $this->sqs, $queue, $response['Messages'][0]);
             }
+
+            return new SqsJob($this->container, $this->sqs, $queue, $response['Messages'][0]);
         }
     }
 

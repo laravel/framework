@@ -174,9 +174,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
     {
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
-        } else {
-            return $this->dispatchNow($command, $afterResolving);
         }
+
+        return $this->dispatchNow($command, $afterResolving);
     }
 
     /**
@@ -240,9 +240,9 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
         if (method_exists($command, 'queue')) {
             return $command->queue($queue, $command);
-        } else {
-            return $this->pushCommandToQueue($queue, $command);
         }
+
+        return $this->pushCommandToQueue($queue, $command);
     }
 
     /**
