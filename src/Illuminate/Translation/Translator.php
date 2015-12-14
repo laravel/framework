@@ -149,7 +149,9 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            $line = str_replace(':'.$key, $value, $line);
+            $search = [':'.strtoupper($key), ':'.ucfirst($key), ':'.$key];
+            $replace = [strtoupper($value), ucfirst($value), $value];
+            $line = str_replace($search, $replace, $line);
         }
 
         return $line;
