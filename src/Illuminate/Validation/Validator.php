@@ -1041,7 +1041,10 @@ class Validator implements ValidatorContract
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
         $column = isset($parameters[1]) ? $parameters[1] : $attribute;
-
+        // In order to prevent an error caused by certain coding style
+        // we will cut off the space from the column name
+        $column = trim($column)
+        
         list($idColumn, $id) = [null, null];
 
         if (isset($parameters[2])) {
