@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use InvalidArgumentException;
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,6 +63,12 @@ class ListenCommand extends Command
         $connection = $this->input->getArgument('connection');
 
         $timeout = $this->input->getOption('timeout');
+
+        if ($timeout <= $this->input->getOption('sleep')) {
+            throw new InvalidArgumentException(
+                "Job timeout must be greater than 'sleep' option value."
+            );
+        }
 
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
