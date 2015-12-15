@@ -116,18 +116,6 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Log the user out of the application.
-     *
-     * Not required by all drivers, but may be used for invalidating tokens, etc.
-     *
-     * @return void
-     */
-    public function logout()
-    {
-        //
-    }
-
-    /**
      * Set the current request instance.
      *
      * @param  \Illuminate\Http\Request  $request

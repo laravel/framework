@@ -41,15 +41,6 @@ interface Guard
     public function validate(array $credentials = []);
 
     /**
-     * Log the user out of the application.
-     *
-     * Not required by all drivers, but may be used for invalidating tokens, etc.
-     *
-     * @return void
-     */
-    public function logout();
-
-    /**
      * Set the current user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
