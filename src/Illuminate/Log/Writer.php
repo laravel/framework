@@ -14,10 +14,9 @@ use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
-use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Writer implements LogContract, PsrLoggerInterface
+class Writer implements LogContract
 {
     /**
      * The Monolog logger instance.
