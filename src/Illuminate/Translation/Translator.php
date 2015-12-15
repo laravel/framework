@@ -132,6 +132,18 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
         $replace = $this->sortReplacements($replace)->toArray();
 
+        return $this->determineReplacements($line, $replace);
+    }
+
+    /**
+     * Determines whether to make Array or String place-holder replacements.
+     *
+     * @param  string  $line
+     * @param  array   $replace
+     * @return string|array
+     */
+    protected function determineReplacements($line, array $replace)
+    {
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
@@ -168,15 +180,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  array   $replace
      * @return string
      */
-    protected function makeArrayReplacements(array $lines, $replace)
+    protected function makeArrayReplacements(array $lines, array $replace)
     {
         $replaced = [];
         foreach ($lines as $string => $line) {
-            if (is_array($line)) {
-                $replaced[$string] = $this->makeArrayReplacements($line, $replace);
-            } else {
-                $replaced[$string] = $this->makeReplacements($line, $replace);
-            }
+            $replaced[$string] = $this->determineReplacements($line, $replace);
         }
 
         return $replaced;
