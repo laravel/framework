@@ -106,13 +106,15 @@ class Factory implements ArrayAccess
      */
     public function load($path)
     {
+        $factory = $this;
+
         if (is_dir($path)) {
             foreach (Finder::create()->files()->in($path) as $file) {
                 require $file->getRealPath();
             }
         }
 
-        return $this;
+        return $factory;
     }
 
     /**
