@@ -134,7 +134,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
-            return $line;
+            return $this->makeArrayReplacements($line, $replace);
         }
     }
 
@@ -158,6 +158,33 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         }
 
         return $line;
+    }
+
+    /**
+     * Make the place-holder replacements to all lines provided by the array.
+     *
+     * @param  array   $lines
+     * @param  \Illuminate\Support\Collection|array   $replace
+     * @return string
+     */
+    protected function makeArrayReplacements(array $lines, $replace, $sorted = false)
+    {
+        if (!$sorted) {
+            $replace = $this->sortReplacements($replace);
+        }
+
+        $replaced = [];
+        foreach ($lines as $string => $line) {
+            if (is_array($line)) {
+                $replaced[$string] = $this->makeArrayReplacements($line, $replace, true);
+            } else {
+                foreach ($replace as $key => $value) {
+                    $replaced[$string] = str_replace(':'.$key, $value, $line);
+                }
+            }
+        }
+
+        return $replaced;
     }
 
     /**
