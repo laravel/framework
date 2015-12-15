@@ -9,12 +9,15 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\SupportsBasicAuth;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class SessionGuard implements StatefulGuard
+class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
+    use GuardHelpers;
+
     /**
      * The name of the Guard. Typically "session".
      *
@@ -23,13 +26,6 @@ class SessionGuard implements StatefulGuard
      * @var string
      */
     protected $name;
-
-    /**
-     * The currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
-     */
-    protected $user;
 
     /**
      * The user we last attempted to retrieve.
@@ -44,13 +40,6 @@ class SessionGuard implements StatefulGuard
      * @var bool
      */
     protected $viaRemember = false;
-
-    /**
-     * The user provider implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\UserProvider
-     */
-    protected $provider;
 
     /**
      * The session used by the guard.
@@ -112,26 +101,6 @@ class SessionGuard implements StatefulGuard
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
-    }
-
-    /**
-     * Determine if the current user is authenticated.
-     *
-     * @return bool
-     */
-    public function check()
-    {
-        return ! is_null($this->user());
-    }
-
-    /**
-     * Determine if the current user is a guest.
-     *
-     * @return bool
-     */
-    public function guest()
-    {
-        return ! $this->check();
     }
 
     /**
@@ -439,7 +408,7 @@ class SessionGuard implements StatefulGuard
      * @param  bool  $remember
      * @return void
      */
-    public function login(UserContract $user, $remember = false)
+    public function login(Authenticatable $user, $remember = false)
     {
         $this->updateSession($user->getAuthIdentifier());
 
@@ -526,7 +495,7 @@ class SessionGuard implements StatefulGuard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function queueRecallerCookie(UserContract $user)
+    protected function queueRecallerCookie(Authenticatable $user)
     {
         $value = $user->getAuthIdentifier().'|'.$user->getRememberToken();
 
@@ -596,7 +565,7 @@ class SessionGuard implements StatefulGuard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function refreshRememberToken(UserContract $user)
+    protected function refreshRememberToken(Authenticatable $user)
     {
         $user->setRememberToken($token = Str::random(60));
 
@@ -609,7 +578,7 @@ class SessionGuard implements StatefulGuard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function createRememberTokenIfDoesntExist(UserContract $user)
+    protected function createRememberTokenIfDoesntExist(Authenticatable $user)
     {
         if (empty($user->getRememberToken())) {
             $this->refreshRememberToken($user);
@@ -711,7 +680,7 @@ class SessionGuard implements StatefulGuard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function setUser(UserContract $user)
+    public function setUser(Authenticatable $user)
     {
         $this->user = $user;
 

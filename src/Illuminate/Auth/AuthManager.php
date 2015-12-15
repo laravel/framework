@@ -122,6 +122,28 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Create a token based authentication guard.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Illuminate\Auth\TokenGuard
+     */
+    public function createTokenDriver($name, $config)
+    {
+        // The token guard implemetns a basic API token based guard implementation
+        // that takes an API token field from the request and matches it to the
+        // user in the database or another persistence layer where users are.
+        $guard = new TokenGuard(
+            $this->createUserProvider($config['source']),
+            $this->app['request']
+        );
+
+        $this->app->refresh('request', $guard, 'setRequest');
+
+        return $guard;
+    }
+
+    /**
      * Get the guard configuration.
      *
      * @param  string  $name
@@ -162,6 +184,24 @@ class AuthManager implements FactoryContract
     public function setDefaultDriver($name)
     {
         $this->app['config']['auth.defaults.guard'] = $name;
+    }
+
+    /**
+     * Register a new callback based request guard.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function viaRequest($name, callable $callback)
+    {
+        return $this->extend($name, function () use ($callback) {
+            $guard = new RequestGuard($callback, $this->app['request']);
+
+            $this->app->refresh('request', $guard, 'setRequest');
+
+            return $guard;
+        });
     }
 
     /**
