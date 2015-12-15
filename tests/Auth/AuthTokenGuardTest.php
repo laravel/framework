@@ -85,6 +85,7 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
 class AuthTokenGuardTestUser
 {
     public $id;
+
     public function getAuthIdentifier()
     {
         return $this->id;
