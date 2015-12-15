@@ -297,7 +297,7 @@ trait InteractsWithPages
         // If the URL is null, we assume the developer only wants to find a link
         // with the given text regardless of the URL. So, if we find the link
         // we will return true now. Otherwise, we look for the given URL.
-        if ($url == null) {
+        if (is_null($url)) {
             return true;
         }
 
@@ -547,7 +547,7 @@ trait InteractsWithPages
             throw new Exception("There are no checkbox elements with the name or ID [$selector].");
         }
 
-        return $checkbox->attr('checked') !== null;
+        return ! is_null($checkbox->attr('checked'));
     }
 
     /**

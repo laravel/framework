@@ -260,7 +260,7 @@ class MorphTo extends BelongsTo
      */
     protected function useWithTrashed(Builder $query)
     {
-        if ($this->withTrashed && $query->getMacro('withTrashed') !== null) {
+        if ($this->withTrashed && ! is_null($query->getMacro('withTrashed'))) {
             return $query->withTrashed();
         }
 

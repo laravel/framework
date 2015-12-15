@@ -345,7 +345,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function addGlobalScope($scope, Closure $implementation = null)
     {
-        if (is_string($scope) && $implementation !== null) {
+        if (is_string($scope) && ! is_null($implementation)) {
             return static::$globalScopes[get_called_class()][$scope] = $implementation;
         }
 
