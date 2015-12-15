@@ -10,19 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class TokenGuard implements Guard
 {
-    /**
-     * The currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
-     */
-    protected $user;
-
-    /**
-     * The user provider implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\UserProvider
-     */
-    protected $provider;
+    use GuardHelpers;
 
     /**
      * The request instance.
@@ -66,26 +54,6 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Determine if the current user is authenticated.
-     *
-     * @return bool
-     */
-    public function check()
-    {
-        return ! is_null($this->user());
-    }
-
-    /**
-     * Determine if the current user is a guest.
-     *
-     * @return bool
-     */
-    public function guest()
-    {
-        return ! $this->check();
-    }
-
-    /**
      * Get the currently authenticated user.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
@@ -126,26 +94,10 @@ class TokenGuard implements Guard
         }
 
         if (empty($token)) {
-            $header = $this->request->header('Authorization');
-
-            if (Str::startsWith($header, 'Bearer ')) {
-                $token = Str::substr($header, 7);
-            }
+            $token = $this->request->bearerToken();
         }
 
         return $token;
-    }
-
-    /**
-     * Get the ID for the currently authenticated user.
-     *
-     * @return int|null
-     */
-    public function id()
-    {
-        if ($this->user()) {
-            return $this->user()->getAuthIdentifier();
-        }
     }
 
     /**
@@ -175,17 +127,6 @@ class TokenGuard implements Guard
     public function logout()
     {
         //
-    }
-
-    /**
-     * Set the current user.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
-     */
-    public function setUser(Authenticatable $user)
-    {
-        $this->user = $user;
     }
 
     /**
