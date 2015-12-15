@@ -190,6 +190,24 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Register a new callback based request guard.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function viaRequest($name, callable $callback)
+    {
+        return $this->extend($name, function () use ($callback) {
+            $guard = new RequestGuard($callback, $this->app['request']);
+
+            $this->app->refresh('request', $guard, 'setRequest');
+
+            return $guard;
+        });
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param  string    $driver
