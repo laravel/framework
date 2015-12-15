@@ -686,7 +686,7 @@ return 'foo!'; });
     {
         $router = $this->getRouter();
         $router->group(['prefix' => 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
-            $router->get('bar', function () {return 'hello';})->middleware('baz:gaz');
+            $router->get('bar', function () { return 'hello'; })->middleware('baz:gaz');
         });
         $routes = $router->getRoutes()->getRoutes();
         $route = $routes[0];
