@@ -2904,6 +2904,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->asJson($value);
         }
 
+        // If the value is an empty string, convert it to be explicity null.  This
+        // prevents errors when inserting into a postgres database where the column
+        // constraint is non null but an empty string is passed.
+        if ($value === '') {
+            $value = null;
+        }
+
         $this->attributes[$key] = $value;
 
         return $this;
