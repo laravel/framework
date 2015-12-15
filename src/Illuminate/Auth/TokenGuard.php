@@ -84,11 +84,11 @@ class TokenGuard implements Guard
         $token = $this->request->input($this->inputKey);
 
         if (empty($token)) {
-            $token = $this->request->getPassword();
+            $token = $this->request->bearerToken();
         }
 
         if (empty($token)) {
-            $token = $this->request->bearerToken();
+            $token = $this->request->getPassword();
         }
 
         return $token;
