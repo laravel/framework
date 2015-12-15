@@ -129,10 +129,10 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
-        $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
-        $replace = $this->sortReplacements($replace)->toArray();
-
-        return $this->determineReplacements($line, $replace);
+        return $this->determineReplacements(
+            Arr::get($this->loaded[$namespace][$group][$locale], $item),
+            $this->sortReplacements($replace)->toArray()
+        );
     }
 
     /**
