@@ -36,19 +36,15 @@ class TokenGuard implements Guard
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @param  string  $inputKey
-     * @param  string  $storageKey
      * @return void
      */
     public function __construct(UserProvider $provider,
-                                Request $request,
-                                $inputKey = 'api_token',
-                                $storageKey = 'api_token')
+                                Request $request)
     {
         $this->request = $request;
         $this->provider = $provider;
-        $this->inputKey = $inputKey;
-        $this->storageKey = $storageKey;
+        $this->inputKey = 'api_token';
+        $this->storageKey = 'api_token';
     }
 
     /**
