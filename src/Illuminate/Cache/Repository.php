@@ -95,7 +95,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function get($key, $default = null)
     {
-        $value = $this->store->get($key);
+        $value = $this->store->get($this->itemKey($key));
 
         if (is_null($value)) {
             $this->fireCacheEvent('missed', [$key]);
@@ -137,7 +137,7 @@ class Repository implements CacheContract, ArrayAccess
         $minutes = $this->getMinutes($minutes);
 
         if (! is_null($minutes)) {
-            $this->store->put($key, $value, $minutes);
+            $this->store->put($this->itemKey($key), $value, $minutes);
 
             $this->fireCacheEvent('write', [$key, $value, $minutes]);
         }
@@ -160,7 +160,7 @@ class Repository implements CacheContract, ArrayAccess
         }
 
         if (method_exists($this->store, 'add')) {
-            return $this->store->add($key, $value, $minutes);
+            return $this->store->add($this->itemKey($key), $value, $minutes);
         }
 
         if (is_null($this->get($key))) {
@@ -181,7 +181,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forever($key, $value)
     {
-        $this->store->forever($key, $value);
+        $this->store->forever($this->itemKey($key), $value);
 
         $this->fireCacheEvent('write', [$key, $value, 0]);
     }
@@ -249,7 +249,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forget($key)
     {
-        $success = $this->store->forget($key);
+        $success = $this->store->forget($this->itemKey($key));
 
         $this->fireCacheEvent('delete', [$key]);
 
@@ -384,6 +384,17 @@ class Repository implements CacheContract, ArrayAccess
         }
 
         return is_string($duration) ? (int) $duration : $duration;
+    }
+
+    /**
+     * Get the key to be used with the store.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function itemKey($key)
+    {
+        return $key;
     }
 
     /**
