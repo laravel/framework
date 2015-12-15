@@ -713,6 +713,20 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the bearer token from the request headers.
+     *
+     * @return string|null
+     */
+    public function bearerToken()
+    {
+        $header = $this->header('Authorization', '');
+
+        if (Str::startsWith($header, 'Bearer ')) {
+            return Str::substr($header, 7);
+        }
+    }
+
+    /**
      * Create an Illuminate request from a Symfony instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
