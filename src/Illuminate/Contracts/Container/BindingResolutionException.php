@@ -2,9 +2,9 @@
 
 namespace Illuminate\Contracts\Container;
 
-use Illuminate\Container\BindingResolutionException as BaseException;
+use Exception;
 
-class BindingResolutionException extends BaseException
+class BindingResolutionException extends Exception
 {
     //
 }

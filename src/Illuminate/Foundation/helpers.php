@@ -1,15 +1,16 @@
 <?php
 
 use Illuminate\Support\Str;
-use Illuminate\View\Expression;
+use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 if (! function_exists('abort')) {
     /**
@@ -93,11 +94,11 @@ if (! function_exists('auth')) {
     /**
      * Get the available auth instance.
      *
-     * @return \Illuminate\Contracts\Auth\Guard
+     * @return \Illuminate\Contracts\Auth\Factory
      */
     function auth()
     {
-        return app(Guard::class);
+        return app(AuthFactory::class);
     }
 }
 
@@ -212,7 +213,7 @@ if (! function_exists('csrf_field')) {
      */
     function csrf_field()
     {
-        return new Expression('<input type="hidden" name="_token" value="'.csrf_token().'">');
+        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'">');
     }
 }
 
@@ -249,17 +250,16 @@ if (! function_exists('database_path')) {
     }
 }
 
-if (! function_exists('delete')) {
+if (! function_exists('decrypt')) {
     /**
-     * Register a new DELETE route with the router.
+     * Decrypt the given value.
      *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
+     * @param  string  $value
+     * @return string
      */
-    function delete($uri, $action)
+    function decrypt($value)
     {
-        return app('router')->delete($uri, $action);
+        return app('encrypter')->decrypt($value);
     }
 }
 
@@ -285,6 +285,19 @@ if (! function_exists('elixir')) {
         }
 
         throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
+    }
+}
+
+if (! function_exists('encrypt')) {
+    /**
+     * Encrypt the given value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function encrypt($value)
+    {
+        return app('encrypter')->encrypt($value);
     }
 }
 
@@ -368,20 +381,6 @@ if (! function_exists('factory')) {
     }
 }
 
-if (! function_exists('get')) {
-    /**
-     * Register a new GET route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function get($uri, $action)
-    {
-        return app('router')->get($uri, $action);
-    }
-}
-
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
@@ -423,7 +422,7 @@ if (! function_exists('method_field')) {
      */
     function method_field($method)
     {
-        return new Expression('<input type="hidden" name="_method" value="'.$method.'">');
+        return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
     }
 }
 
@@ -438,20 +437,6 @@ if (! function_exists('old')) {
     function old($key = null, $default = null)
     {
         return app('request')->old($key, $default);
-    }
-}
-
-if (! function_exists('patch')) {
-    /**
-     * Register a new PATCH route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function patch($uri, $action)
-    {
-        return app('router')->patch($uri, $action);
     }
 }
 
@@ -470,20 +455,6 @@ if (! function_exists('policy')) {
     }
 }
 
-if (! function_exists('post')) {
-    /**
-     * Register a new POST route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function post($uri, $action)
-    {
-        return app('router')->post($uri, $action);
-    }
-}
-
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
@@ -494,20 +465,6 @@ if (! function_exists('public_path')) {
     function public_path($path = '')
     {
         return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.$path : $path);
-    }
-}
-
-if (! function_exists('put')) {
-    /**
-     * Register a new PUT route with the router.
-     *
-     * @param  string  $uri
-     * @param  \Closure|array|string  $action
-     * @return \Illuminate\Routing\Route
-     */
-    function put($uri, $action)
-    {
-        return app('router')->put($uri, $action);
     }
 }
 
@@ -546,21 +503,6 @@ if (! function_exists('request')) {
         }
 
         return app('request')->input($key, $default);
-    }
-}
-
-if (! function_exists('resource')) {
-    /**
-     * Route a resource to a controller.
-     *
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array   $options
-     * @return \Illuminate\Routing\Route
-     */
-    function resource($name, $controller, array $options = [])
-    {
-        return app('router')->resource($name, $controller, $options);
     }
 }
 
@@ -709,11 +651,37 @@ if (! function_exists('url')) {
      * @param  string  $path
      * @param  mixed   $parameters
      * @param  bool    $secure
-     * @return string
+     * @return Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
     {
+        if (is_null($path)) {
+            return app(UrlGenerator::class);
+        }
+
         return app(UrlGenerator::class)->to($path, $parameters, $secure);
+    }
+}
+
+if (! function_exists('validator')) {
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
+    {
+        $factory = app(ValidationFactory::class);
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($data, $rules, $messages, $customAttributes);
     }
 }
 

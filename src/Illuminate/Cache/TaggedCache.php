@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache implements Store
 {
+    use RetrievesMultipleKeys;
+
     /**
      * The cache store implementation.
      *
@@ -50,7 +52,7 @@ class TaggedCache implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed   $default
      * @return mixed
      */

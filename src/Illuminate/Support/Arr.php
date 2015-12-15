@@ -26,26 +26,6 @@ class Arr
     }
 
     /**
-     * Build a new array using a callback.
-     *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
-     */
-    public static function build($array, callable $callback)
-    {
-        $results = [];
-
-        foreach ($array as $key => $value) {
-            list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
-
-            $results[$innerKey] = $innerValue;
-        }
-
-        return $results;
-    }
-
-    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array|\ArrayAccess  $array
@@ -58,6 +38,10 @@ class Arr
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
+            }
+
+            if (! is_array($values)) {
+                continue;
             }
 
             $results = array_merge($results, $values);
@@ -114,32 +98,6 @@ class Arr
     }
 
     /**
-     * Fetch a flattened array of a nested array element.
-     *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     *
-     * @deprecated since version 5.1. Use pluck instead.
-     */
-    public static function fetch($array, $key)
-    {
-        foreach (explode('.', $key) as $segment) {
-            $results = [];
-
-            foreach ($array as $value) {
-                if (array_key_exists($segment, $value = (array) $value)) {
-                    $results[] = $value[$segment];
-                }
-            }
-
-            $array = array_values($results);
-        }
-
-        return array_values($results);
-    }
-
-    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
@@ -175,17 +133,26 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
+     * @param  int  $depth
      * @return array
      */
-    public static function flatten($array)
+    public static function flatten($array, $depth = INF)
     {
-        $return = [];
+        return array_reduce($array, function ($result, $item) use ($depth) {
+            $item = $item instanceof Collection ? $item->all() : $item;
 
-        array_walk_recursive($array, function ($x) use (&$return) {
-            $return[] = $x;
-        });
+            if (is_array($item)) {
+                if ($depth === 1) {
+                    return array_merge($result, $item);
+                }
 
-        return $return;
+                return array_merge($result, static::flatten($item, $depth - 1));
+            }
+
+            $result[] = $item;
+
+            return $result;
+        }, []);
     }
 
     /**
@@ -208,20 +175,20 @@ class Arr
         foreach ($keys as $key) {
             $parts = explode('.', $key);
 
+            // clean up before each pass
+            $array = &$original;
+
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
-                    $parts = [];
+                    continue 2;
                 }
             }
 
             unset($array[array_shift($parts)]);
-
-            // clean up after each pass
-            $array = &$original;
         }
     }
 
@@ -312,7 +279,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array   $array
+     * @param  array|\ArrayAccess  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array

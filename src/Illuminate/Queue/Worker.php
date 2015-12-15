@@ -240,7 +240,7 @@ class Worker
         if ($this->events) {
             $data = json_decode($job->getRawBody(), true);
 
-            $this->events->fire('illuminate.queue.after', [$connection, $job, $data]);
+            $this->events->fire(new Events\JobProcessed($connection, $job, $data));
         }
     }
 
@@ -278,7 +278,7 @@ class Worker
         if ($this->events) {
             $data = json_decode($job->getRawBody(), true);
 
-            $this->events->fire('illuminate.queue.failed', [$connection, $job, $data]);
+            $this->events->fire(new Events\JobFailed($connection, $job, $data));
         }
     }
 
@@ -300,7 +300,7 @@ class Worker
      */
     public function stop()
     {
-        $this->events->fire('illuminate.queue.stopping');
+        $this->events->fire(new Events\WorkerStopping);
 
         die;
     }
