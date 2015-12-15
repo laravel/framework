@@ -3,7 +3,6 @@
 namespace Illuminate\Auth;
 
 use Closure;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
