@@ -156,12 +156,10 @@ class TokenGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
-        if (! is_null($token)) {
-            $credentials = [$this->storageKey => $credentials[$this->inputKey]];
+        $credentials = [$this->storageKey => $credentials[$this->inputKey]];
 
-            if ($this->provider->retrieveByCredentials($credentials)) {
-                return true;
-            }
+        if ($this->provider->retrieveByCredentials($credentials)) {
+            return true;
         }
 
         return false;
