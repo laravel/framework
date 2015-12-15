@@ -32,40 +32,9 @@ class TaggedCache extends Repository
      */
     protected function fireCacheEvent($event, $payload)
     {
-        if (preg_match('/^'.sha1($this->tags->getNamespace()).':(.*)$/', $payload[0], $matches) === 1) {
-            $payload[0] = $matches[1];
-        }
         $payload[] = $this->tags->getNames();
 
         parent::fireCacheEvent($event, $payload);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get($key, $default = null)
-    {
-        return parent::get($this->taggedItemKey($key), $default);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($key, $value, $minutes)
-    {
-        parent::put($this->taggedItemKey($key), $value, $minutes);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function add($key, $value, $minutes)
-    {
-        if (method_exists($this->store, 'add')) {
-            $key = $this->taggedItemKey($key);
-        }
-
-        return parent::add($key, $value, $minutes);
     }
 
     /**
@@ -77,7 +46,7 @@ class TaggedCache extends Repository
      */
     public function increment($key, $value = 1)
     {
-        $this->store->increment($this->taggedItemKey($key), $value);
+        $this->store->increment($this->itemKey($key), $value);
     }
 
     /**
@@ -89,23 +58,7 @@ class TaggedCache extends Repository
      */
     public function decrement($key, $value = 1)
     {
-        $this->store->decrement($this->taggedItemKey($key), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function forever($key, $value)
-    {
-        parent::forever($this->taggedItemKey($key), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function forget($key)
-    {
-        return parent::forget($this->taggedItemKey($key));
+        $this->store->decrement($this->itemKey($key), $value);
     }
 
     /**
@@ -127,5 +80,13 @@ class TaggedCache extends Repository
     public function taggedItemKey($key)
     {
         return sha1($this->tags->getNamespace()).':'.$key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function itemKey($key)
+    {
+        return $this->taggedItemKey($key);
     }
 }
