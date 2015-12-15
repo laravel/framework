@@ -15,12 +15,12 @@ interface StatefulGuard extends Guard
     public function attempt(array $credentials = [], $remember = false, $login = true);
 
     /**
-     * Attempt to authenticate using HTTP Basic Auth.
+     * Log a user into the application without sessions or cookies.
      *
-     * @param  string  $field
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @param  array  $credentials
+     * @return bool
      */
-    public function basic($field = 'email');
+    public function once(array $credentials = []);
 
     /**
      * Log a user into the application.
@@ -41,9 +41,26 @@ interface StatefulGuard extends Guard
     public function loginUsingId($id, $remember = false);
 
     /**
+     * Log the given user ID into the application without sessions or cookies.
+     *
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function onceUsingId($id);
+
+    /**
      * Determine if the user was authenticated via "remember me" cookie.
      *
      * @return bool
      */
     public function viaRemember();
+
+    /**
+     * Log the user out of the application.
+     *
+     * Not required by all drivers, but may be used for invalidating tokens, etc.
+     *
+     * @return void
+     */
+    public function logout();
 }

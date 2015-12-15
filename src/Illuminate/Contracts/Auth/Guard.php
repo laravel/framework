@@ -33,22 +33,6 @@ interface Guard
     public function id();
 
     /**
-     * Log a user into the application without sessions or cookies.
-     *
-     * @param  array  $credentials
-     * @return bool
-     */
-    public function once(array $credentials = []);
-
-    /**
-     * Perform a stateless HTTP Basic login attempt.
-     *
-     * @param  string  $field
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    public function onceBasic($field = 'email');
-
-    /**
      * Validate a user's credentials.
      *
      * @param  array  $credentials
@@ -57,19 +41,10 @@ interface Guard
     public function validate(array $credentials = []);
 
     /**
-     * Log the given user ID into the application without sessions or cookies.
+     * Set the current user.
      *
-     * @param  mixed  $id
-     * @return bool
-     */
-    public function onceUsingId($id);
-
-    /**
-     * Log the user out of the application.
-     *
-     * Not required by all drivers, but may be used for invalidating tokens, etc.
-     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function logout();
+    public function setUser(Authenticatable $user);
 }

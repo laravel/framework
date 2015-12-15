@@ -1515,10 +1515,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => 'http://g232oogle.com'], ['x' => 'AlphaNum']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AlphaNum']);//numbers in Hindi
+        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AlphaNum']); // numbers in Hindi
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaNum']);//eastern arabic numerals
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaNum']); // eastern arabic numerals
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AlphaNum']);
@@ -1537,7 +1537,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => 'नमस्कार-_'], ['x' => 'AlphaDash']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaDash']);//eastern arabic numerals
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaDash']); // eastern arabic numerals
         $this->assertTrue($v->passes());
     }
 
