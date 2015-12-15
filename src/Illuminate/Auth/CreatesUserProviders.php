@@ -21,7 +21,7 @@ trait CreatesUserProviders
      *
      * @throws \InvalidArgumentException
      */
-    protected function createUserProvider($provider)
+    public function createUserProvider($provider)
     {
         $config = $this->app['config']['auth.providers.'.$provider];
 
