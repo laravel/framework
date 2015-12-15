@@ -137,8 +137,6 @@ class AuthManager implements FactoryContract
         $guard = new TokenGuard(
             $this->createUserProvider($config['source']),
             $this->app['request'],
-            Arr::get($config, 'input', 'api_token'),
-            Arr::get($config, 'token', 'api_token')
         );
 
         $this->app->refresh('request', $guard, 'setRequest');
