@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
-use Psr\Log\LoggerInterface;
+use Illuminate\Contracts\Logging\Log;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exception\HttpResponseException;
@@ -22,7 +22,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * The log implementation.
      *
-     * @var \Psr\Log\LoggerInterface
+     * @var \Illuminate\Contracts\Logging\Log
      */
     protected $log;
 
@@ -36,10 +36,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Create a new exception handler instance.
      *
-     * @param  \Psr\Log\LoggerInterface  $log
+     * @param  \Illuminate\Contracts\Logging\Log  $log
      * @return void
      */
-    public function __construct(LoggerInterface $log)
+    public function __construct(Log $log)
     {
         $this->log = $log;
     }
