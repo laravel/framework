@@ -50,7 +50,10 @@ class MakeAuthCommand extends Command
         if (! $this->option('views')) {
             $this->info('Installed HomeController.');
 
-            copy(__DIR__.'/stubs/make/controllers/HomeController.stub', app_path('Http/Controllers/HomeController.php'));
+            copy(
+                __DIR__.'/stubs/make/controllers/HomeController.stub',
+                app_path('Http/Controllers/HomeController.php')
+            );
 
             $this->info('Updated Routes File.');
 
