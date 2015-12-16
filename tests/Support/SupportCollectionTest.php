@@ -112,10 +112,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo.array', 'bar.array'], $results);
     }
 
-    public function testToJsonEncodesTheToArrayResult()
+    public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection()
     {
-        $c = $this->getMock('Illuminate\Support\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $item1 = m::mock('JsonSerializable');
+        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
+        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $c = new Collection([$item1, $item2]);
+        $results = $c->jsonSerialize();
+
+        $this->assertEquals(['foo.json', 'bar.array'], $results);
+    }
+
+    public function testToJsonEncodesTheJsonSerializeResult()
+    {
+        $c = $this->getMock('Illuminate\Support\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
@@ -123,8 +135,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }
@@ -216,8 +228,51 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testFlatten()
     {
+        // Flat arrays are unaffected
+        $c = new Collection(['#foo', '#bar', '#baz']);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays are flattened with existing flat items
+        $c = new Collection([['#foo', '#bar'], '#baz']);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Sets of nested arrays are flattened
         $c = new Collection([['#foo', '#bar'], ['#baz']]);
         $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Deeply nested arrays are flattened
+        $c = new Collection([['#foo', ['#bar']], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested collections are flattened alongside arrays
+        $c = new Collection([new Collection(['#foo', '#bar']), ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested collections containing plain arrays are flattened
+        $c = new Collection([new Collection(['#foo', ['#bar']]), ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays containing collections are flattened
+        $c = new Collection([['#foo', new Collection(['#bar'])], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays containing collections containing arrays are flattened
+        $c = new Collection([['#foo', new Collection(['#bar', ['#zap']])], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], $c->flatten()->all());
+    }
+
+    public function testFlattenWithDepth()
+    {
+        // No depth flattens recursively
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten()->all());
+
+        // Specifying a depth only flattens to that depth
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', ['#bar', ['#baz']], '#zap'], $c->flatten(1)->all());
+
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], $c->flatten(2)->all());
     }
 
     public function testMergeNull()
@@ -374,7 +429,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection(['zaeed', 'alan']);
         $reversed = $data->reverse();
 
-        $this->assertEquals(['alan', 'zaeed'], array_values($reversed->all()));
+        $this->assertSame([1 => 'alan', 0 => 'zaeed'], $reversed->all());
+
+        $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $reversed = $data->reverse();
+
+        $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
     }
 
     public function testFlip()
@@ -392,7 +452,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
         $this->assertEquals(4, $data->count());
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
-        $this->assertEquals([10], $data[3]->toArray());
+        $this->assertEquals([9 => 10], $data[3]->toArray());
     }
 
     public function testEvery()
@@ -484,7 +544,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);
         $data = $data->take(-2);
-        $this->assertEquals(['dayle', 'shawn'], $data->all());
+        $this->assertEquals([1 => 'dayle', 2 => 'shawn'], $data->all());
     }
 
     public function testMacroable()
@@ -800,7 +860,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
-        $this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
+        $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 

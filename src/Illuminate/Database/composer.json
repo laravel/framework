@@ -16,10 +16,10 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/container": "5.1.*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "nesbot/carbon": "~1.19"
+        "illuminate/container": "5.2.*",
+        "illuminate/contracts": "5.2.*",
+        "illuminate/support": "5.2.*",
+        "nesbot/carbon": "~1.20"
     },
     "autoload": {
         "psr-4": {
@@ -28,16 +28,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
-        "illuminate/console": "Required to use the database commands (5.1.*).",
-        "illuminate/events": "Required to use the observers with Eloquent (5.1.*).",
-        "illuminate/filesystem": "Required to use the migrations (5.1.*).",
-        "illuminate/pagination": "Required to paginate the result set (5.1.*)."
+        "illuminate/console": "Required to use the database commands (5.2.*).",
+        "illuminate/events": "Required to use the observers with Eloquent (5.2.*).",
+        "illuminate/filesystem": "Required to use the migrations (5.2.*).",
+        "illuminate/pagination": "Required to paginate the result set (5.2.*)."
     },
     "minimum-stability": "dev"
 }

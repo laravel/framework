@@ -8,10 +8,11 @@ use SplFileInfo;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class Request extends SymfonyRequest implements ArrayAccess
+class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     /**
      * The decoded JSON content for the request.
@@ -295,7 +296,7 @@ class Request extends SymfonyRequest implements ArrayAccess
     /**
      * Get a subset of the items from the input data.
      *
-     * @param  array  $keys
+     * @param  array|mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -712,6 +713,20 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Get the bearer token from the request headers.
+     *
+     * @return string|null
+     */
+    public function bearerToken()
+    {
+        $header = $this->header('Authorization', '');
+
+        if (Str::startsWith($header, 'Bearer ')) {
+            return Str::substr($header, 7);
+        }
+    }
+
+    /**
      * Create an Illuminate request from a Symfony instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -792,6 +807,25 @@ class Request extends SymfonyRequest implements ArrayAccess
     }
 
     /**
+     * Get a unique fingerprint for the request / route / IP address.
+     *
+     * @return string
+     */
+    public function fingerprint()
+    {
+        if (! $this->route()) {
+            throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
+        }
+
+        return sha1(
+            implode('|', $this->route()->methods()).
+            '|'.$this->route()->domain().
+            '|'.$this->route()->uri().
+            '|'.$this->ip()
+        );
+    }
+
+    /**
      * Get the user resolver callback.
      *
      * @return \Closure
@@ -835,6 +869,16 @@ class Request extends SymfonyRequest implements ArrayAccess
         $this->routeResolver = $callback;
 
         return $this;
+    }
+
+    /**
+     * Get all of the input and files for the request.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->all();
     }
 
     /**

@@ -18,12 +18,46 @@ class CacheApcStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $store->get('foo'));
     }
 
+    public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()
+    {
+        $apc = $this->getMock('Illuminate\Cache\ApcWrapper', ['get']);
+        $apc->expects($this->exactly(3))->method('get')->willReturnMap([
+            ['foo', 'qux'],
+            ['bar', null],
+            ['baz', 'norf'],
+        ]);
+        $store = new Illuminate\Cache\ApcStore($apc);
+        $this->assertEquals([
+            'foo'   => 'qux',
+            'bar'   => null,
+            'baz'   => 'norf',
+        ], $store->many(['foo', 'bar', 'baz']));
+    }
+
     public function testSetMethodProperlyCallsAPC()
     {
         $apc = $this->getMock('Illuminate\Cache\ApcWrapper', ['put']);
         $apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
         $store = new Illuminate\Cache\ApcStore($apc);
         $store->put('foo', 'bar', 1);
+    }
+
+    public function testSetMultipleMethodProperlyCallsAPC()
+    {
+        $apc = $this->getMock('Illuminate\Cache\ApcWrapper', ['put']);
+        $apc->expects($this->exactly(3))->method('put')->withConsecutive([
+            $this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60),
+        ], [
+            $this->equalTo('baz'), $this->equalTo('qux'), $this->equalTo(60),
+        ], [
+            $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
+        ]);
+        $store = new Illuminate\Cache\ApcStore($apc);
+        $store->putMany([
+            'foo'   => 'bar',
+            'baz'   => 'qux',
+            'bar'   => 'norf',
+        ], 1);
     }
 
     public function testIncrementMethodProperlyCallsAPC()

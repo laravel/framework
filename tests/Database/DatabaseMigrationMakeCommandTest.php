@@ -14,7 +14,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            $composer = m::mock('Illuminate\Foundation\Composer'),
+            $composer = m::mock('Illuminate\Support\Composer'),
             __DIR__.'/vendor'
         );
         $app = new Illuminate\Foundation\Application;
@@ -30,7 +30,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new Illuminate\Foundation\Application;
@@ -45,7 +45,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new Illuminate\Foundation\Application;
@@ -60,7 +60,7 @@ class DatabaseMigrationMakeCommandTest extends PHPUnit_Framework_TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Foundation\Composer')->shouldIgnoreMissing(),
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
             __DIR__.'/vendor'
         );
         $app = new Illuminate\Foundation\Application;

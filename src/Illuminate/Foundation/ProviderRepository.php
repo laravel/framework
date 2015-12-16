@@ -169,7 +169,7 @@ class ProviderRepository
         // service provided by the application and whether its provider is using
         // deferred loading or should be eagerly loaded on each request to us.
         if ($this->files->exists($this->manifestPath)) {
-            $manifest = json_decode($this->files->get($this->manifestPath), true);
+            $manifest = $this->files->getRequire($this->manifestPath);
 
             return array_merge(['when' => []], $manifest);
         }
@@ -184,7 +184,7 @@ class ProviderRepository
     public function writeManifest($manifest)
     {
         $this->files->put(
-            $this->manifestPath, json_encode($manifest, JSON_PRETTY_PRINT)
+            $this->manifestPath, '<?php return '.var_export($manifest, true).';'
         );
 
         return array_merge(['when' => []], $manifest);

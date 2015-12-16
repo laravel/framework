@@ -43,7 +43,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
 
-        $events->fire('artisan.start', [$this]);
+        $events->fire(new Events\ArtisanStarting($this));
     }
 
     /**

@@ -164,16 +164,31 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
-    public function testListsRetrieval()
+    public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
-        $simple = EloquentTestUser::oldest('id')->lists('users.email')->all();
-        $keyed = EloquentTestUser::oldest('id')->lists('users.email', 'users.id')->all();
+        $simple = EloquentTestUser::oldest('id')->pluck('users.email')->all();
+        $keyed = EloquentTestUser::oldest('id')->pluck('users.email', 'users.id')->all();
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+    }
+
+    public function testPluckWithJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user2->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+
+        $query = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id');
+
+        $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('posts.name', 'posts.id')->all());
+        $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('posts.name', 'users.id')->all());
+        $this->assertEquals(['abigailotwell@gmail.com' => 'First post', 'taylorotwell@gmail.com' => 'Second post'], $query->pluck('posts.name', 'users.email as user_email')->all());
     }
 
     public function testFindOrFail()
@@ -567,6 +582,22 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
+    public function testIncrementingPrimaryKeysAreCastToIntegersByDefault()
+    {
+        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUser::first();
+        $this->assertInternalType('int', $user->id);
+    }
+
+    public function testDefaultIncrementingPrimaryKeyIntegerCastCanBeOverwritten()
+    {
+        EloquentTestUserWithStringCastId::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUserWithStringCastId::first();
+        $this->assertInternalType('string', $user->id);
+    }
+
     /**
      * Helpers...
      */
@@ -656,4 +687,11 @@ class EloquentTestPhoto extends Eloquent
     {
         return $this->morphTo();
     }
+}
+
+class EloquentTestUserWithStringCastId extends EloquentTestUser
+{
+    protected $casts = [
+        'id' => 'string',
+    ];
 }

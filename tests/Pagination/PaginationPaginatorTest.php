@@ -42,6 +42,15 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 2));
     }
 
+    public function testLengthAwarePaginatorCanGenerateUrlsWithoutTrailingSlashes()
+    {
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/test/', 'pageName' => 'foo']);
+
+        $this->assertEquals('http://website.com/test?foo=2', $p->url($p->currentPage()));
+        $this->assertEquals('http://website.com/test?foo=1', $p->url($p->currentPage() - 1));
+        $this->assertEquals('http://website.com/test?foo=1', $p->url($p->currentPage() - 2));
+    }
+
     public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
@@ -178,12 +187,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
     public function testPaginatorRemovesTrailingSlashes()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
+
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 }
