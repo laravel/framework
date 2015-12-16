@@ -291,7 +291,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoDefaults($matches[2]).'; ?>'.$whitespace;
+            return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$this->compileEchoVar($matches[2]).'; ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
@@ -310,7 +310,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            $wrapped = sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
+            $wrapped = sprintf($this->echoFormat, $this->compileEchoVar($matches[2]));
 
             return $matches[1] ? substr($matches[0], 1) : '<?php echo '.$wrapped.'; ?>'.$whitespace;
         };
@@ -331,10 +331,49 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
 
-            return $matches[1] ? $matches[0] : '<?php echo e('.$this->compileEchoDefaults($matches[2]).'); ?>'.$whitespace;
+            return $matches[1] ? $matches[0] : '<?php echo e('.$this->compileEchoVar($matches[2]).'); ?>'.$whitespace;
         };
 
         return preg_replace_callback($pattern, $callback, $value);
+    }
+    /**
+     * Compile the  var values for the echo statement.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileEchoVar($value)
+    {
+
+        $segments = explode(' ', $value);
+        $var = current($segments);
+        if( 0 === strpos($var, '$')){
+
+            if (false !== strpos($var, '.')) {
+
+                // {$var.property}
+                $vars = explode('.', $var);
+                $name = array_shift($vars);
+                foreach ($vars as  $val) {
+                    if(false !== strpos($val, '$')){
+
+                        $name .= '[' . $val . ']';
+                    }else{
+                        $name .= '["' . $val . '"]';
+                    }
+                }
+            } elseif (false !== strpos($var, '[')) {
+                // {$var['key']}
+                $name = $var;
+            } elseif (false !== strpos($var, ':') && false === strpos($var, '(') && false === strpos($var, '::') && false === strpos($var, '?')) {
+                // {$var:property}
+                $name   = str_replace(':', '->', $var);
+            } else {
+                $name = $var;
+            }
+        }
+        $segments[0] = isset($name)?$name:$segments[0];
+        return $this->compileEchoDefaults(implode(' ', $segments));
     }
 
     /**
