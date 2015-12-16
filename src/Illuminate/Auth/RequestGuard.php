@@ -51,9 +51,7 @@ class RequestGuard implements Guard
             return $this->user;
         }
 
-        $user = call_user_func($this->callback, $this->request);
-
-        return $this->user = $user;
+        $this->user = call_user_func($this->callback, $this->request);
     }
 
     /**
