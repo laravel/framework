@@ -147,7 +147,7 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        return $this->replaceNamespace($stub, $name)->replaceResource($stub)->replaceClass($stub, $name);
     }
 
     /**
@@ -167,6 +167,31 @@ abstract class GeneratorCommand extends Command
             'DummyRootNamespace', $this->laravel->getNamespace(), $stub
         );
 
+        return $this;
+    }
+
+    /**
+     * Replace the resource for the given stub.
+     *
+     * @param  string  $stub
+     * @return $this
+     */
+    protected function replaceResource(&$stub)
+    {
+        //Replace only if resource option is supplied
+        if($resource = $this->option('resource')){
+            $stub = str_replace(
+                'DummyModelVar', strtolower($resource), $stub
+            );
+
+            $stub = str_replace(
+                'DummyModel', $resource, $stub
+            );
+
+            $stub = str_replace(
+                'DummyCollection', strtolower(str_plural($resource)), $stub
+            );
+        }
         return $this;
     }
 
