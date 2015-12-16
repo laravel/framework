@@ -142,6 +142,52 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('jason', $c[0]);
     }
 
+    public function testArrayAccessOffsetExists()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertTrue($c->offsetExists(0));
+        $this->assertTrue($c->offsetExists(1));
+        $this->assertFalse($c->offsetExists(1000));
+    }
+
+    public function testArrayAccessOffsetGet()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertEquals('foo', $c->offsetGet(0));
+        $this->assertEquals('bar', $c->offsetGet(1));
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Notice
+     */
+    public function testArrayAccessOffsetGetOnNonExist()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $c->offsetGet(1000);
+    }
+
+    public function testArrayAccessOffsetSet()
+    {
+        $c = new Collection(['foo', 'foo']);
+
+        $c->offsetSet(1, 'bar');
+        $this->assertEquals('bar', $c[1]);
+
+        $c->offsetSet(null, 'qux');
+        $this->assertEquals('qux', $c[2]);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Notice
+     */
+    public function testArrayAccessOffsetUnset()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $c->offsetUnset(1);
+        $c[1];
+    }
+
     public function testForgetSingleKey()
     {
         $c = new Collection(['foo', 'bar']);
