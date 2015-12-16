@@ -122,7 +122,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/ControllerInspector.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Bus/BusServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Matching/ValidatorInterface.php',
