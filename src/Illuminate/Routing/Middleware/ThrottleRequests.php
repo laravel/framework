@@ -31,6 +31,8 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
+     * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
      * @return mixed
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
