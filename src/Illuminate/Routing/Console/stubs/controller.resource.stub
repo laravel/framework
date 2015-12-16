@@ -1,0 +1,102 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Http\Request;
+
+use DummyRootNamespaceHttp\Requests;
+use DummyRootNamespaceHttp\Controllers\Controller;
+
+class DummyClass extends Controller
+{
+    /**
+     * Display a listing of DummyCollection
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $DummyCollection = DummyModel::all();
+
+		return view('DummyCollection.index', compact('DummyCollection'));
+	}
+
+    /**
+     * Show the form for creating a new DummyModel
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('DummyCollection.create');
+    }
+
+    /**
+     * Store a newly created DummyModel in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        DummyModel::create($request->get());
+
+		return Redirect::route('DummyCollection.index');
+	}
+
+    /**
+     * Display the specified DummyModel.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $DummyModelVar = DummyModel::findOrFail($id);
+
+		return view('DummyCollection.show', compact('DummyModelVar'));
+	}
+
+    /**
+     * Show the form for editing the specified DummyModel.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $DummyModelVar = DummyModel::find($id);
+
+		return view('DummyCollection.edit', compact('DummyModelVar'));
+	}
+
+    /**
+     * Update the specified DummyModel in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $DummyModelVar = DummyModel::findOrFail($id);
+
+		$DummyModelVar->update($request->get());
+
+		return Redirect::route('DummyCollection.index');
+	}
+
+    /**
+     * Remove the specified DummyModel from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        DummyModel::destroy($id);
+
+		return Redirect::route('DummyCollection.index');
+	}
+
+}
