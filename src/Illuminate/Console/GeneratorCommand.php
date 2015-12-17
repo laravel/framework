@@ -179,7 +179,7 @@ abstract class GeneratorCommand extends Command
     protected function replaceResource(&$stub)
     {
         //Replace only if resource option is supplied
-        if($resource = $this->option('resource')){
+        if($resource = $this->getResourceInput()){
             $stub = str_replace(
                 'DummyModelVar', strtolower($resource), $stub
             );
@@ -228,6 +228,19 @@ abstract class GeneratorCommand extends Command
     protected function getNameInput()
     {
         return $this->argument('name');
+    }
+
+    /**
+     * Get the resource option if exists.
+     *
+     * @return string
+     */
+    protected function getResourceInput()
+    {
+        if (array_search('resource', array_column($this->getOptions(), 0))) {
+            return $this->option('resource');
+        }
+        return false;
     }
 
     /**
