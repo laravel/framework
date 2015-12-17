@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -408,7 +408,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    public function login(Authenticatable $user, $remember = false)
+    public function login(AuthenticatableContract $user, $remember = false)
     {
         $this->updateSession($user->getAuthIdentifier());
 
@@ -495,7 +495,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function queueRecallerCookie(Authenticatable $user)
+    protected function queueRecallerCookie(AuthenticatableContract $user)
     {
         $value = $user->getAuthIdentifier().'|'.$user->getRememberToken();
 
@@ -565,7 +565,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function refreshRememberToken(Authenticatable $user)
+    protected function refreshRememberToken(AuthenticatableContract $user)
     {
         $user->setRememberToken($token = Str::random(60));
 
@@ -578,7 +578,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function createRememberTokenIfDoesntExist(Authenticatable $user)
+    protected function createRememberTokenIfDoesntExist(AuthenticatableContract $user)
     {
         if (empty($user->getRememberToken())) {
             $this->refreshRememberToken($user);
@@ -680,7 +680,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function setUser(Authenticatable $user)
+    public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
 
