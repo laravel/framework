@@ -179,7 +179,7 @@ abstract class GeneratorCommand extends Command
     protected function replaceResource(&$stub)
     {
         //Replace only if resource option is supplied
-        if($resource = $this->getResourceInput()){
+        if ($resource = $this->getResourceInput()) {
             $stub = str_replace(
                 'DummyModelVar', strtolower($resource), $stub
             );
@@ -192,6 +192,7 @@ abstract class GeneratorCommand extends Command
                 'DummyCollection', strtolower(str_plural($resource)), $stub
             );
         }
+
         return $this;
     }
 
@@ -240,6 +241,7 @@ abstract class GeneratorCommand extends Command
         if (array_search('resource', array_column($this->getOptions(), 0))) {
             return $this->option('resource');
         }
+        
         return false;
     }
 
