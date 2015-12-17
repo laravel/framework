@@ -152,6 +152,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('Name is required!', $v->messages()->first('name'));
+
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required' => ':Attribute is required!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Name is required!', $v->messages()->first('name'));
+
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required' => ':ATTRIBUTE is required!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('NAME is required!', $v->messages()->first('name'));
     }
 
     public function testDisplayableValuesAreReplaced()
