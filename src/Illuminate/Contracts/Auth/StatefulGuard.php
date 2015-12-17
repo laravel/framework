@@ -58,8 +58,6 @@ interface StatefulGuard extends Guard
     /**
      * Log the user out of the application.
      *
-     * Not required by all drivers, but may be used for invalidating tokens, etc.
-     *
      * @return void
      */
     public function logout();

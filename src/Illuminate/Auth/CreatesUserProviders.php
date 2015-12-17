@@ -7,6 +7,13 @@ use InvalidArgumentException;
 trait CreatesUserProviders
 {
     /**
+     * The registered custom provider creators.
+     *
+     * @var array
+     */
+    protected $customProviderCreators = [];
+
+    /**
      * Create the user provider implementation for the driver.
      *
      * @param  string  $provider
@@ -14,9 +21,15 @@ trait CreatesUserProviders
      *
      * @throws \InvalidArgumentException
      */
-    protected function createUserProvider($provider)
+    public function createUserProvider($provider)
     {
-        $config = $this->app['config']['auth.sources.'.$provider];
+        $config = $this->app['config']['auth.providers.'.$provider];
+
+        if (isset($this->customProviderCreators[$provider])) {
+            return call_user_func(
+                $this->customProviderCreators[$provider], $this->app, $config
+            );
+        }
 
         switch ($config['driver']) {
             case 'database':
@@ -24,7 +37,7 @@ trait CreatesUserProviders
             case 'eloquent':
                 return $this->createEloquentProvider($config);
             default:
-                throw new InvalidArgumentException("Authentication user source [{$config['driver']}] is not defined.");
+                throw new InvalidArgumentException("Authentication user provider [{$config['driver']}] is not defined.");
         }
     }
 
