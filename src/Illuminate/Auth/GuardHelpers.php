@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 /**
  * These methods are typically the same across all guards.
@@ -61,7 +61,7 @@ trait GuardHelpers
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function setUser(Authenticatable $user)
+    public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
     }
