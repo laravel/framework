@@ -34,12 +34,12 @@ class RateLimiter
      */
     public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
     {
-        $lockedOut = $this->cache->has($key.':lockout');
+        if ($this->cache->has($key.':lockout')) {
+            return true;
+        }
 
-        if ($this->attempts($key) > $maxAttempts || $lockedOut) {
-            if (! $lockedOut) {
-                $this->cache->add($key.':lockout', time() + ($decayMinutes * 60), $decayMinutes);
-            }
+        if ($this->attempts($key) > $maxAttempts) {
+            $this->cache->add($key.':lockout', time() + ($decayMinutes * 60), $decayMinutes);
 
             return true;
         }
