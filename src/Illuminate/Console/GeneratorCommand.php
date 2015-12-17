@@ -241,7 +241,7 @@ abstract class GeneratorCommand extends Command
         if (array_search('resource', array_column($this->getOptions(), 0))) {
             return $this->option('resource');
         }
-        
+
         return false;
     }
 
