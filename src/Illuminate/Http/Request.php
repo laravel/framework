@@ -290,7 +290,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $input = $this->getInputSource()->all() + $this->query->all();
 
-        return Arr::get($input, $key, $default);
+        return data_get($input, $key, $default);
     }
 
     /**
@@ -308,7 +308,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $input = $this->all();
 
         foreach ($keys as $key) {
-            Arr::set($results, $key, Arr::get($input, $key));
+            Arr::set($results, $key, data_get($input, $key));
         }
 
         return $results;
@@ -375,7 +375,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        return Arr::get($this->files->all(), $key, $default);
+        return data_get($this->files->all(), $key, $default);
     }
 
     /**
@@ -552,7 +552,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json;
         }
 
-        return Arr::get($this->json->all(), $key, $default);
+        return data_get($this->json->all(), $key, $default);
     }
 
     /**
@@ -900,7 +900,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return Arr::get($this->all(), $offset);
+        return data_get($this->all(), $offset);
     }
 
     /**

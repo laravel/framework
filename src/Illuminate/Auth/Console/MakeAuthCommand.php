@@ -7,11 +7,11 @@ use Illuminate\Console\Command;
 class MakeAuthCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:auth';
+    protected $signature = 'make:auth {--views : Only scaffold the authentication views}';
 
     /**
      * The console command description.
@@ -47,13 +47,22 @@ class MakeAuthCommand extends Command
 
         $this->exportViews();
 
-        $this->info('Installed HomeController.');
+        if (! $this->option('views')) {
+            $this->info('Installed HomeController.');
 
-        copy(__DIR__.'/stubs/make/controllers/HomeController.stub', app_path('Http/Controllers/HomeController.php'));
+            copy(
+                __DIR__.'/stubs/make/controllers/HomeController.stub',
+                app_path('Http/Controllers/HomeController.php')
+            );
 
-        $this->info('Updated Routes File.');
+            $this->info('Updated Routes File.');
 
-        copy(__DIR__.'/stubs/make/routes.stub', app_path('Http/routes.php'));
+            file_put_contents(
+                app_path('Http/routes.php'),
+                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
+                FILE_APPEND
+            );
+        }
 
         $this->comment('Authentication scaffolding generated successfully!');
     }

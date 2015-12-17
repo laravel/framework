@@ -99,7 +99,7 @@ class AuthManager implements FactoryContract
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createUserProvider($config['source']);
+        $provider = $this->createUserProvider($config['provider']);
 
         $guard = new SessionGuard($name, $provider, $this->app['session.store']);
 
@@ -134,7 +134,7 @@ class AuthManager implements FactoryContract
         // that takes an API token field from the request and matches it to the
         // user in the database or another persistence layer where users are.
         $guard = new TokenGuard(
-            $this->createUserProvider($config['source']),
+            $this->createUserProvider($config['provider']),
             $this->app['request']
         );
 
@@ -189,13 +189,13 @@ class AuthManager implements FactoryContract
     /**
      * Register a new callback based request guard.
      *
-     * @param  string  $name
+     * @param  string  $driver
      * @param  callable  $callback
      * @return $this
      */
-    public function viaRequest($name, callable $callback)
+    public function viaRequest($driver, callable $callback)
     {
-        return $this->extend($name, function () use ($callback) {
+        return $this->extend($driver, function () use ($callback) {
             $guard = new RequestGuard($callback, $this->app['request']);
 
             $this->app->refresh('request', $guard, 'setRequest');
@@ -207,7 +207,7 @@ class AuthManager implements FactoryContract
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string    $driver
+     * @param  string  $driver
      * @param  \Closure  $callback
      * @return $this
      */
@@ -219,10 +219,24 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Register a custom provider creator Closure.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function provider($name, Closure $callback)
+    {
+        $this->customProviderCreators[$name] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

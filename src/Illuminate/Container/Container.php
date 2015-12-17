@@ -814,6 +814,16 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveNonClass(ReflectionParameter $parameter)
     {
+        $declaringClass = $parameter->getDeclaringClass();
+
+        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
+            if ($concrete instanceof Closure) {
+                return call_user_func($concrete, $this);
+            } else {
+                return $concrete;
+            }
+        }
+
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
