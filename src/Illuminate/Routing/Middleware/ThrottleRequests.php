@@ -33,10 +33,17 @@ class ThrottleRequests
      * @param  \Closure  $next
      * @param  int  $maxAttempts
      * @param  int  $decayMinutes
+     * @param  int  $skipInternal
      * @return mixed
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $skipInternal = 0)
     {
+        $response = $next($request);
+
+        if ($request->internal() && $skipInternal === 1) {
+            return $response;
+        }
+
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
@@ -49,7 +56,7 @@ class ThrottleRequests
 
         $this->limiter->hit($key, $decayMinutes);
 
-        return $next($request)->withHeaders([
+        return $response->withHeaders([
             'X-RateLimit-Limit' => $maxAttempts,
             'X-RateLimit-Remaining' => $maxAttempts - $this->limiter->attempts($key) + 1,
         ]);
