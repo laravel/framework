@@ -34,13 +34,6 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ContainerConcreteStub', $container->make('ContainerConcreteStub'));
     }
 
-    public function testSlashesAreHandled()
-    {
-        $container = new Container;
-        $container->bind('\Foo', function () { return 'hello'; });
-        $this->assertEquals('hello', $container->make('Foo'));
-    }
-
     public function testParametersCanOverrideDependencies()
     {
         $container = new Container;
@@ -445,31 +438,6 @@ return $obj; });
 
         $this->assertInstanceOf('ContainerImplementationStub', $one->impl);
         $this->assertInstanceOf('ContainerImplementationStubTwo', $two->impl);
-    }
-
-    public function testContextualBindingWorksRegardlessOfLeadingBackslash()
-    {
-        $container = new Container;
-
-        $container->bind('IContainerContractStub', 'ContainerImplementationStub');
-
-        $container->when('\ContainerTestContextInjectOne')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
-        $container->when('ContainerTestContextInjectTwo')->needs('\IContainerContractStub')->give('ContainerImplementationStubTwo');
-
-        $this->assertInstanceOf(
-            'ContainerImplementationStubTwo',
-            $container->make('ContainerTestContextInjectOne')->impl
-        );
-
-        $this->assertInstanceOf(
-            'ContainerImplementationStubTwo',
-            $container->make('ContainerTestContextInjectTwo')->impl
-        );
-
-        $this->assertInstanceOf(
-            'ContainerImplementationStubTwo',
-            $container->make('\ContainerTestContextInjectTwo')->impl
-        );
     }
 
     public function testContainerTags()
