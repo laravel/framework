@@ -552,6 +552,24 @@ return $obj; });
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->resolved('foo'));
     }
+
+    /**
+     * @group poop
+     */
+    public function testContainerCanInjectSimpleVariable()
+    {
+        $container = new Container;
+        $container->when('ContainerInjectVariableStub')->needs('$something')->give(100);
+        $instance = $container->make('ContainerInjectVariableStub');
+        $this->assertEquals(100, $instance->something);
+
+        $container = new Container;
+        $container->when('ContainerInjectVariableStub')->needs('$something')->give(function ($container) {
+            return $container->make('ContainerConcreteStub');
+        });;
+        $instance = $container->make('ContainerInjectVariableStub');
+        $this->assertInstanceOf('ContainerConcreteStub', $instance->something);
+    }
 }
 
 class ContainerConcreteStub
@@ -673,6 +691,15 @@ class ContainerStaticMethodStub
     public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
     {
         return func_get_args();
+    }
+}
+
+class ContainerInjectVariableStub
+{
+    public $something;
+    public function __construct(ContainerConcreteStub $concrete, $something)
+    {
+        $this->something = $something;
     }
 }
 
