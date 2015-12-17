@@ -36,7 +36,7 @@ class RateLimiter
     {
         $lockedOut = $this->cache->has($key.':lockout');
 
-        if ($this->attempts($key) > $maxAttempts || $lockedOut) {
+        if ($lockedOut || $this->attempts($key) > $maxAttempts) {
             if (! $lockedOut) {
                 $this->cache->add($key.':lockout', time() + ($decayMinutes * 60), $decayMinutes);
             }
