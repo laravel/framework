@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\InternalRequest;
 use PHPUnit_Framework_Assert as PHPUnit;
 
 trait MakesHttpRequests
@@ -27,6 +28,13 @@ trait MakesHttpRequests
     protected $currentUri;
 
     /**
+     * Should the request be treated as internal or external.
+     *
+     * @var bool
+     */
+    protected $external = true;
+
+    /**
      * Additional server variables for the request.
      *
      * @var array
@@ -43,6 +51,46 @@ trait MakesHttpRequests
         $this->app->instance('middleware.disable', true);
 
         return $this;
+    }
+
+    /**
+     * Make an internal request.
+     * @return $this
+     */
+    public function makeInternal()
+    {
+        $this->external = false;
+
+        return $this;
+    }
+
+    /**
+     * Make an external request.
+     * @return $this
+     */
+    public function makeExternal()
+    {
+        $this->external = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicates the request is internal.
+     * @return bool
+     */
+    protected function isInternal()
+    {
+        return $this->external !== true;
+    }
+
+    /**
+     * Indicates the request is external.
+     * @return bool
+     */
+    protected function isExternal()
+    {
+        return $this->external === true;
     }
 
     /**
@@ -446,10 +494,17 @@ trait MakesHttpRequests
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
-        $request = Request::create(
-            $this->currentUri, $method, $parameters,
-            $cookies, $files, array_replace($this->serverVariables, $server), $content
-        );
+        if ($this->isExternal()) {
+            $request = Request::create(
+                $this->currentUri, $method, $parameters,
+                $cookies, $files, array_replace($this->serverVariables, $server), $content
+            );
+        } else {
+            $request = InternalRequest::create(
+                $this->currentUri, $method, $parameters,
+                $cookies, $files, array_replace($this->serverVariables, $server), $content
+            );
+        }
 
         $response = $kernel->handle($request);
 
