@@ -18,8 +18,8 @@ class DummyClass extends Controller
     {
         $DummyCollection = DummyModel::all();
 
-		return view('DummyCollection.index', compact('DummyCollection'));
-	}
+        return view('DummyCollection.index', compact('DummyCollection'));
+    }
 
     /**
      * Show the form for creating a new DummyModel
@@ -41,8 +41,8 @@ class DummyClass extends Controller
     {
         DummyModel::create($request->get());
 
-		return Redirect::route('DummyCollection.index');
-	}
+        return Redirect::route('DummyCollection.index');
+    }
 
     /**
      * Display the specified DummyModel.
@@ -54,37 +54,37 @@ class DummyClass extends Controller
     {
         $DummyModelVar = DummyModel::findOrFail($id);
 
-		return view('DummyCollection.show', compact('DummyModelVar'));
-	}
+        return view('DummyCollection.show', compact('DummyModelVar'));
+    }
 
     /**
      * Show the form for editing the specified DummyModel.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $DummyModelVar = DummyModel::find($id);
 
-		return view('DummyCollection.edit', compact('DummyModelVar'));
-	}
+        return view('DummyCollection.edit', compact('DummyModelVar'));
+    }
 
     /**
      * Update the specified DummyModel in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $DummyModelVar = DummyModel::findOrFail($id);
 
-		$DummyModelVar->update($request->get());
+        $DummyModelVar->update($request->get());
 
-		return Redirect::route('DummyCollection.index');
-	}
+        return Redirect::route('DummyCollection.index');
+    }
 
     /**
      * Remove the specified DummyModel from storage.
@@ -96,7 +96,6 @@ class DummyClass extends Controller
     {
         DummyModel::destroy($id);
 
-		return Redirect::route('DummyCollection.index');
-	}
-
+        return Redirect::route('DummyCollection.index');
+    }
 }
