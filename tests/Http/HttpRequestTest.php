@@ -144,7 +144,10 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->internal());
         $this->assertInstanceOf(Request::class, $request);
         $this->assertInstanceOf(InternalRequest::class, $request);
+    }
 
+    public function testExternalRequest()
+    {
         $request = Request::create('/', 'GET', [], [], [], [], '{}');
         $this->assertFalse($request->internal());
         $this->assertInstanceOf(Request::class, $request);
