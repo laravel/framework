@@ -711,6 +711,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Shuffle the items in the collection while preserving associative keys.
+     *
+     * @return static
+     */
+    public function shuffleAssociative()
+    {
+        $items = $this->items;
+
+        $keys = array_keys($items);
+
+        shuffle($keys);
+
+        $random = [];
+
+        foreach ($keys as $key) {
+            $random[$key] = $items[$key];
+        }
+
+        return new static($random);
+    }
+
+    /**
      * Slice the underlying collection array.
      *
      * @param  int   $offset
