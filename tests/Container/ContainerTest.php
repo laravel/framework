@@ -566,7 +566,7 @@ return $obj; });
         $container = new Container;
         $container->when('ContainerInjectVariableStub')->needs('$something')->give(function ($container) {
             return $container->make('ContainerConcreteStub');
-        });;
+        });
         $instance = $container->make('ContainerInjectVariableStub');
         $this->assertInstanceOf('ContainerConcreteStub', $instance->something);
     }
@@ -697,6 +697,7 @@ class ContainerStaticMethodStub
 class ContainerInjectVariableStub
 {
     public $something;
+
     public function __construct(ContainerConcreteStub $concrete, $something)
     {
         $this->something = $something;
