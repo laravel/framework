@@ -697,7 +697,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Shuffle the items in the collection while preserving associative keys
+     * Shuffle the items in the collection while preserving associative keys.
      *
      * @return static
      */
