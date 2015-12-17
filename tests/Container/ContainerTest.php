@@ -553,9 +553,6 @@ return $obj; });
         $this->assertTrue($container->resolved('foo'));
     }
 
-    /**
-     * @group poop
-     */
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
