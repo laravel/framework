@@ -711,7 +711,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $random = [];
 
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             $random[$key] = $items[$key];
         }
 
