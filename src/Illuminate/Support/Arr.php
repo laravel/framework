@@ -203,6 +203,12 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
+                if ($part === '*') {
+                    foreach ($array as &$item) {
+                        static::forget($item, implode('.', $parts));
+                    }
+                }
+
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
@@ -210,7 +216,13 @@ class Arr
                 }
             }
 
-            unset($array[array_shift($parts)]);
+            $first = array_shift($parts);
+
+            if ($first === '*') {
+                $array = null;
+            }
+
+            unset($array[$first]);
         }
     }
 
