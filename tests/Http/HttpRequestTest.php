@@ -3,6 +3,7 @@
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Http\InternalRequest;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends PHPUnit_Framework_TestCase
@@ -135,6 +136,19 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($request->pjax());
         $request->headers->set('X-PJAX', '');
         $this->assertFalse($request->pjax());
+    }
+
+    public function testInternalRequest()
+    {
+        $request = InternalRequest::create('/', 'GET', [], [], [], [], '{}');
+        $this->assertTrue($request->internal());
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertInstanceOf(InternalRequest::class, $request);
+
+        $request = Request::create('/', 'GET', [], [], [], [], '{}');
+        $this->assertFalse($request->internal());
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertNotInstanceOf(InternalRequest::class, $request);
     }
 
     public function testSecureMethod()
