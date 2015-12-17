@@ -58,6 +58,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Indicates the request is internal.
+     *
+     * @return bool
+     */
+    final public function internal()
+    {
+        return $this instanceof InternalRequest;
+    }
+
+    /**
      * Get the request method.
      *
      * @return string
