@@ -97,6 +97,17 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
      * @return string
      */
+    public function links(Presenter $presenter = null)
+    {
+        return $this->render($presenter);
+    }
+
+    /**
+     * Render the paginator using the given presenter.
+     *
+     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @return string
+     */
     public function render(Presenter $presenter = null)
     {
         if (is_null($presenter) && static::$presenterResolver) {
