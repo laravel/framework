@@ -765,7 +765,7 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
-        if ($values instanceof Builder) {
+        if ($values instanceof self) {
             return $this->whereInSubQuery($column, $values, $boolean, $not);
         }
 
