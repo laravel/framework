@@ -521,7 +521,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function merge(array $input)
     {
-        $this->getInputSource()->add($input);
+        $results = $this->all();
+
+        foreach ($input as $key => $value) {
+            Arr::set($results, $key, $value);
+        }
+
+        $this->replace($results);
+
+        return $this;
     }
 
     /**

@@ -283,6 +283,11 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request->merge($merge);
         $this->assertEquals('Taylor', $request->input('name'));
         $this->assertEquals('Dayle', $request->input('buddy'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => ['qux']]]);
+        $request->merge(['foo.baz' => ['quz'], 'foo.bar.someting' => 'value']);
+        $this->assertEquals(['quz'], $request->input('foo.baz'));
+        $this->assertEquals('value', $request->input('foo.bar.someting'));
     }
 
     public function testReplaceMethod()
