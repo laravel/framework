@@ -35,11 +35,10 @@ class TokenGuard implements Guard
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    public function __construct(UserProvider $provider,
-                                Request $request)
+    public function __construct(UserProvider $provider, Request $request)
     {
         $this->request = $request;
         $this->provider = $provider;
