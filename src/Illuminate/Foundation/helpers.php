@@ -263,6 +263,19 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('dispatch')) {
+    /**
+     * Dispatch a job to its appropriate handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    function dispatch($job)
+    {
+        return app('Illuminate\Contracts\Bus\Dispatcher')->dispatch($job);
+    }
+}
+
 if (! function_exists('elixir')) {
     /**
      * Get the path to a versioned Elixir file.
