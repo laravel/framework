@@ -640,7 +640,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
     public function testAddMethod()
     {
-        $request = Request::create('/', 'GET', [ 'foo' => ['bar' => ['qux']]]);
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => ['qux']]]);
         $request->add(['baz' => 'quz']);
         $this->assertEquals('quz', $request->input('baz'));
         $request->add(['foo.baz' => ['quz'], 'foo.bar.someting' => 'value']);
