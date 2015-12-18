@@ -614,6 +614,25 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Add input into the current request's input array.
+     *
+     * @param  array  $inputs
+     * @return $this
+     */
+    public function add(array $inputs)
+    {
+        $results = $this->all();
+
+        foreach($inputs as $key => $value){
+            Arr::set($results, $key, $value);
+        }
+
+        $this->replace($results);
+
+        return $this;
+    }
+
+    /**
      * Determines whether the current requests accepts a given content type.
      *
      * @param  string|array  $contentTypes

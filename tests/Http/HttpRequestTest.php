@@ -637,4 +637,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $request->shouldReceive('flash')->once()->with('except', ['key1', 'key2']);
         $request->flashExcept(['key1', 'key2']);
     }
+
+    public function testAddMethod()
+    {
+        $request = Request::create('/', 'GET', [ 'foo' => ['bar' => ['qux']]]);
+        $request->add(['baz' => 'quz']);
+        $this->assertEquals('quz', $request->input('baz'));
+        $request->add(['foo.baz' => ['quz'], 'foo.bar.someting' => 'value']);
+        $this->assertEquals(['quz'], $request->input('foo.baz'));
+        $this->assertEquals('value', $request->input('foo.bar.someting'));
+    }
 }
