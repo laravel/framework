@@ -517,7 +517,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
-     * @return void
+     * @return $this
      */
     public function merge(array $input)
     {
