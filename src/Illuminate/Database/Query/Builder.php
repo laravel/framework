@@ -853,7 +853,7 @@ class Builder
      * Add a external sub-select to the query.
      *
      * @param  string   $column
-     * @param  \Illuminate\Database\Query\Builder|static $query
+     * @param  \Illuminate\Database\Query\Builder|static  $query
      * @param  string   $boolean
      * @param  bool     $not
      * @return $this
