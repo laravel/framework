@@ -517,7 +517,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
-     * @return $this
+     * @return void
      */
     public function merge(array $input)
     {
@@ -528,8 +528,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         $this->replace($results);
-
-        return $this;
     }
 
     /**
