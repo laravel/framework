@@ -332,6 +332,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function clearBootedModels()
     {
         static::$booted = [];
+        static::$globalScopes = [];
     }
 
     /**
