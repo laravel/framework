@@ -623,7 +623,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $results = $this->all();
 
-        foreach($inputs as $key => $value){
+        foreach ($inputs as $key => $value) {
             Arr::set($results, $key, $value);
         }
 
