@@ -100,14 +100,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
     {
         $p = new LengthAwarePaginator([], 1, 1, 1);
         $presenter = m::mock('StdClass');
-        \Illuminate\Pagination\AbstractPaginator::presenter(function () use ($presenter) {
+        Illuminate\Pagination\AbstractPaginator::presenter(function () use ($presenter) {
             return $presenter;
         });
         $presenter->shouldReceive('render')->andReturn('presenter');
 
         $this->assertEquals('presenter', $p->render());
 
-        \Illuminate\Pagination\AbstractPaginator::presenter(function () {
+        Illuminate\Pagination\AbstractPaginator::presenter(function () {
             return;
         });
     }
