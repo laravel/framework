@@ -199,7 +199,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         $qu = $view->errors->get('qu');
         $this->assertEquals($qu[0], 'ux');
         $data = ['foo' => 'baz'];
-        $this->assertSame($view, $view->withErrors(new \Illuminate\Support\MessageBag($data)));
+        $this->assertSame($view, $view->withErrors(new Illuminate\Support\MessageBag($data)));
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'baz');
     }
