@@ -651,6 +651,17 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned integer column on the table.
+     *
+     * @param  string $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function relation($column)
+    {
+        return $this->integer($column, false, true);
+    }
+
+    /**
      * Create a new boolean column on the table.
      *
      * @param  string  $column
