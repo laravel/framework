@@ -2,7 +2,6 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
 use Illuminate\Support\ServiceProvider;
 
 class EncryptionServiceProvider extends ServiceProvider
