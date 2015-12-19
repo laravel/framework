@@ -2191,6 +2191,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array|string  $attributes
      * @return $this
+     *
+     * @deprecated since version 5.2. Use the "makeVisible" method directly.
      */
     public function withHidden($attributes)
     {
