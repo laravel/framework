@@ -226,7 +226,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
     public function testWithHiddenSetsHiddenOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
-        $c = $c->withHidden(['hidden']);
+        $c = $c->makeVisible(['hidden']);
 
         $this->assertEquals([], $c[0]->getHidden());
     }
