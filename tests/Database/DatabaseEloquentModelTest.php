@@ -698,7 +698,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
         $model->setHidden(['age', 'id']);
-        $model->withHidden('age');
+        $model->makeVisible('age');
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayHasKey('age', $array);
