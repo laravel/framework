@@ -798,7 +798,9 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function getUserResolver()
     {
-        return $this->userResolver ?: function () {};
+        return $this->userResolver ?: function () {
+            //
+        };
     }
 
     /**
@@ -821,7 +823,9 @@ class Request extends SymfonyRequest implements ArrayAccess
      */
     public function getRouteResolver()
     {
-        return $this->routeResolver ?: function () {};
+        return $this->routeResolver ?: function () {
+            //
+        };
     }
 
     /**
