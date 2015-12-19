@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Encryption\Encrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
