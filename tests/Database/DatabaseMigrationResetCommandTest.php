@@ -40,7 +40,7 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class AppDatabaseMigrationStub extends \Illuminate\Foundation\Application
+class AppDatabaseMigrationStub extends Illuminate\Foundation\Application
 {
     public function environment()
     {
