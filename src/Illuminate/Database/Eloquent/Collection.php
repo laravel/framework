@@ -202,13 +202,26 @@ class Collection extends BaseCollection
      * @param  array|string  $attributes
      * @return $this
      */
-    public function withHidden($attributes)
+    public function makeVisible($attributes)
     {
         $this->each(function ($model) use ($attributes) {
-            $model->withHidden($attributes);
+            $model->makeVisible($attributes);
         });
 
         return $this;
+    }
+
+    /**
+     * Make the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     *
+     * @deprecated since version 5.2. Use the "makeVisible" method directly.
+     */
+    public function withHidden($attributes)
+    {
+        return $this->makeVisible($attributes);
     }
 
     /**
