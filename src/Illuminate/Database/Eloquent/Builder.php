@@ -80,7 +80,7 @@ class Builder
      * Register a new global scope.
      *
      * @param  string  $identifier
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
      * @return $this
      */
     public function withGlobalScope($identifier, $scope)
@@ -93,7 +93,7 @@ class Builder
     /**
      * Remove a registered global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
      * @return $this
      */
     public function withoutGlobalScope($scope)
@@ -926,7 +926,7 @@ class Builder
     /**
      * Apply a single scope on the given builder instance.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
@@ -934,7 +934,7 @@ class Builder
     {
         if ($scope instanceof Closure) {
             $scope($builder);
-        } elseif ($scope instanceof ScopeInterface) {
+        } elseif ($scope instanceof Scope) {
             $scope->apply($builder, $this->getModel());
         }
     }

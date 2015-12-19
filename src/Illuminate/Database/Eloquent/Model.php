@@ -338,7 +338,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Register a new global scope on the model.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|\Closure|string  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|string  $scope
      * @param  \Closure|null  $implementation
      * @return mixed
      *
@@ -354,17 +354,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return static::$globalScopes[get_called_class()][uniqid('scope')] = $scope;
         }
 
-        if ($scope instanceof ScopeInterface) {
+        if ($scope instanceof Scope) {
             return static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
         }
 
-        throw new InvalidArgumentException('Global scope must be an instance of Closure or ScopeInterface.');
+        throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope.');
     }
 
     /**
      * Determine if a model has a global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
      * @return bool
      */
     public static function hasGlobalScope($scope)
@@ -375,8 +375,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a global scope registered with the model.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
-     * @return \Illuminate\Database\Eloquent\ScopeInterface|\Closure|null
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @return \Illuminate\Database\Eloquent\Scope|\Closure|null
      */
     public static function getGlobalScope($scope)
     {
@@ -1872,7 +1872,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a new query instance without a given scope.
      *
-     * @param  \Illuminate\Database\Eloquent\ScopeInterface|string  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function newQueryWithoutScope($scope)
@@ -2181,6 +2181,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array|string  $attributes
      * @return $this
+     *
+     * @deprecated since version 5.2. Use the "makeVisible" method directly.
      */
     public function withHidden($attributes)
     {

@@ -134,7 +134,7 @@ class EloquentGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
     }
 }
 
-class ActiveScope implements \Illuminate\Database\Eloquent\ScopeInterface
+class ActiveScope implements \Illuminate\Database\Eloquent\Scope
 {
     public function apply(\Illuminate\Database\Eloquent\Builder $builder, \Illuminate\Database\Eloquent\Model $model)
     {
