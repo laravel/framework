@@ -765,8 +765,10 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
-        if ($values instanceof self) {
-            return $this->whereInSubQuery($column, $values, $boolean, $not);
+        if ($values instanceof static) {
+            return $this->whereInExistingQuery(
+                $column, $values, $boolean, $not
+            );
         }
 
         // If the value of the where in clause is actually a Closure, we will assume that
@@ -858,7 +860,7 @@ class Builder
      * @param  bool     $not
      * @return $this
      */
-    protected function whereInSubQuery($column, $query, $boolean, $not)
+    protected function whereInExistingQuery($column, $query, $boolean, $not)
     {
         $type = $not ? 'NotInSub' : 'InSub';
 
