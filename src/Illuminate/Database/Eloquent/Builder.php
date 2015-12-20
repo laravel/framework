@@ -116,11 +116,18 @@ class Builder
     /**
      * Remove all registered global scopes.
      *
+     * @param  array  $scopes
      * @return $this
      */
-    public function withoutGlobalScopes()
+    public function withoutGlobalScopes($scopes = null)
     {
-        $this->scopes = [];
+        if (is_array($scopes)) {
+            foreach($scopes as $scope) {
+                $this->withoutGlobalScope($scope);
+            }
+        } else {
+            $this->scopes = [];
+        }
 
         return $this;
     }
