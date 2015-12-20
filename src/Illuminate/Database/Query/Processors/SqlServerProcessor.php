@@ -19,7 +19,8 @@ class SqlServerProcessor extends Processor
     {
         $query->getConnection()->insert($sql, $values);
 
-        $id = $query->getConnection()->getPdo()->lastInsertId();
+        //$id = $query->getConnection()->getPdo()->lastInsertId(); this is not working on linux pdo driver and a sql server table with a trigger inserting a new record. It brings me the id of insert trigger made, not the id of the main table. Its a bug on PDO linux driver (on windows it works fine)
+        $id = $query->selectRaw("SCOPE_IDENTITY() AS lastId")->first()->lastId; //this works fine for everyone.
 
         return is_numeric($id) ? (int) $id : $id;
     }
