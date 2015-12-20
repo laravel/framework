@@ -4,6 +4,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\Expression;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -260,6 +261,19 @@ if (! function_exists('delete')) {
     function delete($uri, $action)
     {
         return app('router')->delete($uri, $action);
+    }
+}
+
+if (! function_exists('dispatch')) {
+    /**
+     * Dispatch a job to its appropriate handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    function dispatch($job)
+    {
+        return app(Dispatcher::class)->dispatch($job);
     }
 }
 
