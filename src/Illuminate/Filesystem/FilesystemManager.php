@@ -6,6 +6,7 @@ use Closure;
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Filesystem as Flysystem;
@@ -89,6 +90,8 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -98,7 +101,13 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        return $this->{'create'.ucfirst($config['driver']).'Driver'}($config);
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        } else {
+            throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+        }
     }
 
     /**
