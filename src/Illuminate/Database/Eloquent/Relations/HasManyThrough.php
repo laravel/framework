@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class HasManyThrough extends Relation
@@ -123,7 +124,7 @@ class HasManyThrough extends Relation
      */
     public function parentSoftDeletes()
     {
-        return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_class($this->parent)));
+        return in_array(SoftDeletes::class, class_uses_recursive(get_class($this->parent)));
     }
 
     /**
