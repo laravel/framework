@@ -771,6 +771,12 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
+        if ($values instanceof static) {
+            return $this->whereInExistingQuery(
+                $column, $values, $boolean, $not
+            );
+        }
+
         // If the value of the where in clause is actually a Closure, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
         // execute those Closures, then we can re-construct the entire sub-selects.
@@ -843,6 +849,26 @@ class Builder
         // provided callback with the query so the developer may set any of the query
         // conditions they want for the in clause, then we'll put it in this array.
         call_user_func($callback, $query = $this->newQuery());
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a external sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInExistingQuery($column, $query, $boolean, $not)
+    {
+        $type = $not ? 'NotInSub' : 'InSub';
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
