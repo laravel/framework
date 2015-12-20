@@ -1663,9 +1663,9 @@ class Validator implements ValidatorContract
         // message for the fields, then we will check for a general custom line
         // that is not attribute specific. If we find either we'll return it.
         foreach ($keys as $key) {
-            foreach (array_flip($source) as $value => $sourceKey) {
+            foreach (array_keys($source) as $sourceKey) {
                 if (Str::is($sourceKey, $key)) {
-                    return $value;
+                    return $source[$sourceKey];
                 }
             }
         }
