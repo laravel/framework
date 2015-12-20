@@ -18,7 +18,7 @@ class SqlServerProcessor extends Processor
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {
         $query->getConnection()->insert($sql, $values);
-        $id = $query->selectRaw("SCOPE_IDENTITY() AS lastId")->first()->lastId;
+        $id = $query->selectRaw('SCOPE_IDENTITY() AS lastId')->first()->lastId;
 
         return is_numeric($id) ? (int) $id : $id;
     }
