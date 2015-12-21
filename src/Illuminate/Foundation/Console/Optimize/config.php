@@ -82,7 +82,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Validation/ValidatesWhenResolvedTrait.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Auth/Access/AuthorizesRequests.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Http/FormRequest.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Bus/DispatchesJobs.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Foundation/Providers/FoundationServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Auth/AuthServiceProvider.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pagination/PaginationServiceProvider.php',
