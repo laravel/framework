@@ -763,22 +763,29 @@ class Router implements RegistrarContract
         $results = [];
 
         foreach ($this->middlewareGroups[$name] as $middleware) {
+            // If the middleware is another middleware group we will pull in the group and
+            // merge its middleware into the results. This allows groups to conveniently
+            // reference other groups without needing to repeat all their middlewares.
             if (isset($this->middlewareGroups[$middleware])) {
-                $results = array_merge($results, $this->parseMiddlewareGroup($middleware));
-            } else {
-                list($middleware, $parameters) = array_pad(
-                    explode(':', $middleware, 2), 2, null
+                $results = array_merge(
+                    $results, $this->parseMiddlewareGroup($middleware)
                 );
 
-                // If this middleware is actually a route middleware, we will extract the full
-                // class name out of the middleware list now. Then we'll add the parameters
-                // back onto this class' name so the pipeline will properly extract them.
-                if (isset($this->middleware[$middleware])) {
-                    $middleware = $this->middleware[$middleware];
-                }
-
-                $results[] = $middleware.($parameters ? ':'.$parameters : '');
+                continue;
             }
+
+            list($middleware, $parameters) = array_pad(
+                explode(':', $middleware, 2), 2, null
+            );
+
+            // If this middleware is actually a route middleware, we will extract the full
+            // class name out of the middleware list now. Then we'll add the parameters
+            // back onto this class' name so the pipeline will properly extract them.
+            if (isset($this->middleware[$middleware])) {
+                $middleware = $this->middleware[$middleware];
+            }
+
+            $results[] = $middleware.($parameters ? ':'.$parameters : '');
         }
 
         return $results;
