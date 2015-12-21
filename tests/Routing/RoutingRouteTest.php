@@ -117,6 +117,22 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         unset($_SERVER['__middleware.group']);
     }
 
+    public function testMiddlewareGroupsCanReferenceOtherGroups()
+    {
+        unset($_SERVER['__middleware.group']);
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () { return 'hello'; }]);
+
+        $router->middleware('two', 'RoutingTestMiddlewareGroupTwo');
+        $router->middlewareGroup('first', ['two:abigail']);
+        $router->middlewareGroup('web', ['RoutingTestMiddlewareGroupOne', 'first']);
+
+        $this->assertEquals('caught abigail', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['__middleware.group']);
+
+        unset($_SERVER['__middleware.group']);
+    }
+
     public function testFluentRouteNamingWithinAGroup()
     {
         $router = $this->getRouter();
