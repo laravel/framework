@@ -763,16 +763,22 @@ class Router implements RegistrarContract
         $results = [];
 
         foreach ($this->middlewareGroups[$name] as $middleware) {
-            list($middleware, $parameters) = array_pad(explode(':', $middleware, 2), 2, null);
+            if (isset($this->middlewareGroups[$middleware])) {
+                $results = array_merge($results, $this->parseMiddlewareGroup($middleware));
+            } else {
+                list($middleware, $parameters) = array_pad(
+                    explode(':', $middleware, 2), 2, null
+                );
 
-            // If this middleware is actually a route middleware, we will extract the full
-            // class name out of the middleware list now. Then we'll add the parameters
-            // back onto this class' name so the pipeline will properly extract them.
-            if (isset($this->middleware[$middleware])) {
-                $middleware = $this->middleware[$middleware];
+                // If this middleware is actually a route middleware, we will extract the full
+                // class name out of the middleware list now. Then we'll add the parameters
+                // back onto this class' name so the pipeline will properly extract them.
+                if (isset($this->middleware[$middleware])) {
+                    $middleware = $this->middleware[$middleware];
+                }
+
+                $results[] = $middleware.($parameters ? ':'.$parameters : '');
             }
-
-            $results[] = $middleware.($parameters ? ':'.$parameters : '');
         }
 
         return $results;
