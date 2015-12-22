@@ -16,7 +16,6 @@ class DatabaseSoftDeletingScopeTest extends PHPUnit_Framework_TestCase
         $model = m::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
         $builder->shouldReceive('whereNull')->once()->with('table.deleted_at');
-        $scope->shouldReceive('extend')->once();
 
         $scope->apply($builder, $model);
     }

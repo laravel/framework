@@ -87,6 +87,10 @@ class Builder
     {
         $this->scopes[$identifier] = $scope;
 
+        if (method_exists($scope, 'extend')) {
+            $scope->extend($this);
+        }
+
         return $this;
     }
 
