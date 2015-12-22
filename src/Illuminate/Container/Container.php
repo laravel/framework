@@ -533,7 +533,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         $dependencies = [];
 
-        foreach ($this->getCallReflector($callback)->getParameters() as $key => $parameter) {
+        foreach ($this->getCallReflector($callback)->getParameters() as $parameter) {
             $this->addDependencyForCallParameter($parameter, $parameters, $dependencies);
         }
 
