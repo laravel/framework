@@ -234,7 +234,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testSeveralSameInlineValidationMessagesAreRespected()
     {
         $trans = $this->getRealTranslator();
-        
+
         $data = [
             'name' => '',
             'foo' => 'bar',
