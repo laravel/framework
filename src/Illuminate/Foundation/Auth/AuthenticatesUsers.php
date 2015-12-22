@@ -79,6 +79,16 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
+        if($request->ajax())
+        {
+            return [
+                'code'  => 403,
+                'errors' => [
+                    $this->loginUsername() => $this->getFailedLoginMessage()
+                ]  
+            ];
+        }
+
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
