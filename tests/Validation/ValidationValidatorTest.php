@@ -231,6 +231,37 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('require it please!', $v->messages()->first('name'));
     }
 
+    public function testSeveralSameInlineValidationMessagesAreRespected()
+    {
+        $trans = $this->getRealTranslator();
+        
+        $data = [
+            'name' => '',
+            'foo' => 'bar',
+            'laravel' => 'framework',
+        ];
+
+        $rules = [
+            'name' => 'Required',
+            'foo' => 'Boolean',
+            'laravel' => 'Numeric',
+        ];
+
+        $messages = [
+            'name.required' => 'validation failed',
+            'foo.boolean' => 'validation failed',
+            'laravel.numeric' => 'another failure',
+        ];
+
+        $v = new Validator($trans, $data, $rules, $messages);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+
+        $this->assertEquals('validation failed', $v->messages()->first('name'));
+        $this->assertEquals('validation failed', $v->messages()->first('foo'));
+        $this->assertEquals('another failure', $v->messages()->first('laravel'));
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getRealTranslator();
