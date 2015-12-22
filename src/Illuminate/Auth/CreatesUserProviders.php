@@ -25,9 +25,9 @@ trait CreatesUserProviders
     {
         $config = $this->app['config']['auth.providers.'.$provider];
 
-        if (isset($this->customProviderCreators[$config["driver"]])) {
+        if (isset($this->customProviderCreators[$config['driver']])) {
             return call_user_func(
-                $this->customProviderCreators[$config["driver"]], $this->app, $config
+                $this->customProviderCreators[$config['driver']], $this->app, $config
             );
         }
 
