@@ -806,7 +806,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return is_array($value);
+        return is_null($value) || is_array($value);
     }
 
     /**
@@ -824,7 +824,7 @@ class Validator implements ValidatorContract
 
         $acceptable = [true, false, 0, 1, '0', '1'];
 
-        return in_array($value, $acceptable, true);
+        return is_null($value) || in_array($value, $acceptable, true);
     }
 
     /**
@@ -840,7 +840,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return is_null($value) || filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
@@ -856,7 +856,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return is_numeric($value);
+        return is_null($value) || is_numeric($value);
     }
 
     /**
@@ -872,7 +872,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return is_string($value);
+        return is_null($value) || is_string($value);
     }
 
     /**

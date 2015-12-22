@@ -1874,8 +1874,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, [], ['foo' => 'numeric']);
         $this->assertTrue($v->passes());
 
+        // Allow null on these rules unless required
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => null], ['foo' => 'numeric']);
+        $this->assertFalse($v->fails());
+
+        // Allow null on these rules unless required
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'required|numeric']);
         $this->assertTrue($v->fails());
 
         $trans = $this->getRealTranslator();
