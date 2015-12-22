@@ -1864,35 +1864,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testThatPrimitiveTypesAreImplicitAndMustBeCorrectIfDataIsPresent()
-    {
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
-        $this->assertTrue($v->fails());
-
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, [], ['foo' => 'numeric']);
-        $this->assertTrue($v->passes());
-
-        // Allow null on these rules unless required
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['foo' => null], ['foo' => 'numeric']);
-        $this->assertFalse($v->fails());
-
-        // Allow null on these rules unless required
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['foo' => null], ['foo' => 'required|numeric']);
-        $this->assertTrue($v->fails());
-
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['foo' => ''], ['foo' => 'array']);
-        $this->assertTrue($v->fails());
-
-        $trans = $this->getRealTranslator();
-        $v = new Validator($trans, [], ['foo' => 'array']);
-        $this->assertTrue($v->passes());
-    }
-
     public function testInlineMessagesMayUseAsteriskForEachRules()
     {
     }

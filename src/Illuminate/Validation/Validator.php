@@ -149,7 +149,7 @@ class Validator implements ValidatorContract
     protected $implicitRules = [
         'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Accepted',
-        'Array', 'Boolean', 'Integer', 'Numeric', 'String',
+        // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
     /**
