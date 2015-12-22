@@ -79,7 +79,7 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return [
                 'code'  => 403,
                 'errors' => [
