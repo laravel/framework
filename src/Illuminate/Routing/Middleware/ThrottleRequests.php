@@ -29,17 +29,27 @@ class ThrottleRequests
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
+     * @param  int $maxAttempts
+     * @param  int $decayMinutes
+     * @param bool $throw
      * @return mixed
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $throw = false)
     {
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
+
+            if ($throw) {
+                throw new HttpException(429,'Too may attempts',null,[
+                    'Retry-After' => $this->limiter->availableIn($key),
+                    'X-RateLimit-Limit' => $maxAttempts,
+                    'X-RateLimit-Remaining' => 0,
+                ]);
+            }
+
             return new Response('Too Many Attempts.', 429, [
                 'Retry-After' => $this->limiter->availableIn($key),
                 'X-RateLimit-Limit' => $maxAttempts,
