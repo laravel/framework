@@ -239,7 +239,7 @@ class Command extends SymfonyCommand
      */
     public function hasOption($key)
     {
-        return $this->input->hasParameterOption('--' . $key);
+        return $this->input->hasParameterOption('--'.$key);
     }
 
     /**
