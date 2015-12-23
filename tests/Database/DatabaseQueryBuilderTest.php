@@ -1356,6 +1356,28 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
     }
 
+    public function testChunkWithoutOrderBy()
+    {
+        $builder = $this->getBuilder();
+        $query = 'select * from "users" order by "id" asc limit 10 offset 0';
+        $builder->getConnection()->shouldReceive('select')->once()->with($query, [], true)->andReturn([]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturn([]);
+        $builder->select('*')->from('users')->chunk(10, function() {return true;});
+
+        $this->assertEquals($query, $builder->toSql());
+    }
+
+    public function testChunkWithOrderBy()
+    {
+        $builder = $this->getBuilder();
+        $query = 'select * from "users" order by "sort_order" asc limit 10 offset 0';
+        $builder->getConnection()->shouldReceive('select')->once()->with($query, [], true)->andReturn([]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturn([]);
+        $builder->select('*')->from('users')->orderBy('sort_order')->chunk(10, function() {return true;});
+
+        $this->assertEquals($query, $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
