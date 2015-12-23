@@ -81,6 +81,17 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
+
+    public function testHasQueryWhereBothModelsHaveGlobalScopes()
+    {
+        $query = EloquentGlobalScopesWithRelationModel::has('related')->where('bar', 'baz');
+
+        $subQuery = 'select count(*) from "table" where "table"."related_id" = "table2"."id" and "active" = ? and "foo" = ?';
+        $mainQuery = 'select * from "table2" where ('.$subQuery.') >= 1 and "bar" = ? and "active" = ? order by "name" asc';
+
+        $this->assertEquals($mainQuery, $query->toSql());
+        $this->assertEquals([1, 'bar', 'baz', 1], $query->getBindings());
+    }
 }
 
 class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\Model
@@ -103,6 +114,16 @@ class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\
     public function scopeApproved($query)
     {
         return $query->where('approved', 1)->orWhere('should_approve', 0);
+    }
+}
+
+class EloquentGlobalScopesWithRelationModel extends EloquentClosureGlobalScopesTestModel
+{
+    protected $table = 'table2';
+
+    public function related()
+    {
+        return $this->hasMany(EloquentGlobalScopesTestModel::class, 'related_id')->where('foo', 'bar');
     }
 }
 
