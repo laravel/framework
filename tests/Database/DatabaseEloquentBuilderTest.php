@@ -153,10 +153,11 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkExecuteCallbackOverPaginatedRequest()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get,getOrderBys]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturn($builder);
+        $builder->shouldReceive('getOrderBys')->once()->with()->andReturn('id');
         $builder->shouldReceive('get')->times(3)->andReturn(['foo1', 'foo2'], ['foo3'], []);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -173,9 +174,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkCanBeStoppedByReturningFalse()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get]', [$this->getMockQueryBuilder()]);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPage,get,getOrderBys]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturn($builder);
         $builder->shouldReceive('forPage')->never()->with(2, 2);
+        $builder->shouldReceive('getOrderBys')->once()->with()->andReturn('id');
         $builder->shouldReceive('get')->times(1)->andReturn(['foo1', 'foo2']);
 
         $callbackExecutionAssertor = m::mock('StdClass');
@@ -190,6 +192,17 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
             return false;
         });
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testChunkThrowsExceptionWithoutOrderBy()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[getOrderBys]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('getOrderBys')->once()->with()->andReturn(null);
+
+        $builder->chunk(2, function () { return true; });
     }
 
     public function testPluckReturnsTheMutatedAttributesOfAModel()
