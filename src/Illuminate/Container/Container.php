@@ -801,7 +801,7 @@ class Container implements ArrayAccess, ContainerContract
             }
         }
 
-        return (array) $dependencies;
+        return $dependencies;
     }
 
     /**
