@@ -86,11 +86,11 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     {
         $query = EloquentGlobalScopesWithRelationModel::has('related')->where('bar', 'baz');
 
-        $subQuery = 'select count(*) from "table" where "table"."related_id" = "table2"."id" and "active" = ? and "foo" = ?';
+        $subQuery = 'select count(*) from "table" where "table"."related_id" = "table2"."id" and "foo" = ? and "active" = ?';
         $mainQuery = 'select * from "table2" where ('.$subQuery.') >= 1 and "bar" = ? and "active" = ? order by "name" asc';
 
         $this->assertEquals($mainQuery, $query->toSql());
-        $this->assertEquals([1, 'bar', 'baz', 1], $query->getBindings());
+        $this->assertEquals(['bar', 1, 'baz', 1], $query->getBindings());
     }
 }
 

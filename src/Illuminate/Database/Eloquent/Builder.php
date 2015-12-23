@@ -655,7 +655,7 @@ class Builder
         }
 
         return $this->addHasWhere(
-            $query->applyScopes(), $relation, $operator, $count, $boolean
+            $query, $relation, $operator, $count, $boolean
         );
     }
 
@@ -771,7 +771,7 @@ class Builder
             $count = new Expression($count);
         }
 
-        return $this->where(new Expression('('.$hasQuery->getQuery()->toSql().')'), $operator, $count, $boolean);
+        return $this->where(new Expression('('.$hasQuery->toSql().')'), $operator, $count, $boolean);
     }
 
     /**
@@ -792,7 +792,7 @@ class Builder
             $relationQuery->wheres, $relationQuery->getBindings()
         );
 
-        $this->query->addBinding($hasQuery->getQuery()->getBindings(), 'where');
+        $this->query->addBinding($hasQuery->getBindings(), 'where');
     }
 
     /**
