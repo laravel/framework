@@ -713,10 +713,30 @@ class Router implements RegistrarContract
      */
     public function gatherRouteMiddlewares(Route $route)
     {
-        return Collection::make($route->middleware())->map(function ($name) {
+        $middlewares = Collection::make($route->middleware())->map(function ($name) {
             return Collection::make($this->resolveMiddlewareClassName($name));
-        })
-        ->flatten()->all();
+        })->flatten();
+
+        if ($throttlers = $this->countThrottleRequests($middlewares)) {
+            $middlewares = $middlewares->reject(function ($item) use (&$throttlers) {
+                return $throttlers-- > 1;
+            });
+        }
+
+        return $middlewares->all();
+    }
+
+    /**
+     * Count the amount of throttle middlewares in a flattened middleware Collection.
+     *
+     * @param \Illuminate\Support\Collection $collection
+     * @return int
+     */
+    protected function countThrottleRequests(Collection $collection)
+    {
+        return $collection->sum(function ($item) {
+            return is_string($item) ? starts_with($item, 'Illuminate\Routing\Middleware\ThrottleRequests:') : false;
+        });
     }
 
     /**
