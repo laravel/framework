@@ -47,7 +47,11 @@ class ThrottleRequests
             ]);
         }
 
-        $this->limiter->hit($key, $decayMinutes);
+        static $hit = false;
+
+        if ($hit === false) {
+            $hit = $this->limiter->hit($key, $decayMinutes);
+        }
 
         return $next($request)->withHeaders([
             'X-RateLimit-Limit' => $maxAttempts,
