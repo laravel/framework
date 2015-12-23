@@ -803,6 +803,8 @@ class Router implements RegistrarContract
 
         $this->container->instance('Illuminate\Routing\Route', $route);
 
+        $this->events->fire(new Events\RouteFound($route, $request));
+
         return $this->substituteBindings($route);
     }
 
@@ -875,6 +877,17 @@ class Router implements RegistrarContract
     public function matched($callback)
     {
         $this->events->listen(Events\RouteMatched::class, $callback);
+    }
+
+    /**
+     * Register a route found event listener.
+     *
+     * @param  string|callable  $callback
+     * @return void
+     */
+    public function found($callback)
+    {
+        $this->events->listen(Events\RouteFound::class, $callback);
     }
 
     /**
