@@ -72,6 +72,14 @@ class TaggedCache extends Repository
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function itemKey($key)
+    {
+        return $this->taggedItemKey($key);
+    }
+
+    /**
      * Get a fully qualified key for a tagged item.
      *
      * @param  string  $key
@@ -80,13 +88,5 @@ class TaggedCache extends Repository
     public function taggedItemKey($key)
     {
         return sha1($this->tags->getNamespace()).':'.$key;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function itemKey($key)
-    {
-        return $this->taggedItemKey($key);
     }
 }
