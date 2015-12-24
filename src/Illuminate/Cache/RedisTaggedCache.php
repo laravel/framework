@@ -13,9 +13,9 @@ class RedisTaggedCache extends TaggedCache
      */
     public function forever($key, $value)
     {
-        $this->pushForeverKeys($namespace = $this->tags->getNamespace(), $key);
+        $this->pushForeverKeys($this->tags->getNamespace(), $key);
 
-        $this->store->forever(sha1($namespace).':'.$key, $value);
+        parent::forever($key, $value);
     }
 
     /**

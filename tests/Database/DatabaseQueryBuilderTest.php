@@ -157,11 +157,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereDatePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
+        $this->assertEquals('select * from "users" where "created_at" = ?::date', $builder->toSql());
+        $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
+    }
+
     public function testWhereDayPostgres()
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-        $this->assertEquals('select * from "users" where day("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where extract(day from "created_at") = ?', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
@@ -169,7 +177,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-        $this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where extract(month from "created_at") = ?', $builder->toSql());
         $this->assertEquals([0 => 5], $builder->getBindings());
     }
 
@@ -177,7 +185,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-        $this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where extract(year from "created_at") = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
@@ -207,25 +215,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testWhereDaySqlServer()
     {
-        $builder = $this->getPostgresBuilder();
+        $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-        $this->assertEquals('select * from "users" where day("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from [users] where day([created_at]) = ?', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
     public function testWhereMonthSqlServer()
     {
-        $builder = $this->getPostgresBuilder();
+        $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-        $this->assertEquals('select * from "users" where month("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from [users] where month([created_at]) = ?', $builder->toSql());
         $this->assertEquals([0 => 5], $builder->getBindings());
     }
 
     public function testWhereYearSqlServer()
     {
-        $builder = $this->getPostgresBuilder();
+        $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-        $this->assertEquals('select * from "users" where year("created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from [users] where year([created_at]) = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
