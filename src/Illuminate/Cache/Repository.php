@@ -6,6 +6,7 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
+use BadMethodCallException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -109,7 +110,7 @@ class Repository implements CacheContract, ArrayAccess
             return $this->many($key);
         }
 
-        $value = $this->store->get($key);
+        $value = $this->store->get($this->itemKey($key));
 
         if (is_null($value)) {
             $this->fireCacheEvent('missed', [$key]);
@@ -186,7 +187,7 @@ class Repository implements CacheContract, ArrayAccess
         $minutes = $this->getMinutes($minutes);
 
         if (! is_null($minutes)) {
-            $this->store->put($key, $value, $minutes);
+            $this->store->put($this->itemKey($key), $value, $minutes);
 
             $this->fireCacheEvent('write', [$key, $value, $minutes]);
         }
@@ -229,7 +230,7 @@ class Repository implements CacheContract, ArrayAccess
         }
 
         if (method_exists($this->store, 'add')) {
-            return $this->store->add($key, $value, $minutes);
+            return $this->store->add($this->itemKey($key), $value, $minutes);
         }
 
         if (is_null($this->get($key))) {
@@ -250,7 +251,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forever($key, $value)
     {
-        $this->store->forever($key, $value);
+        $this->store->forever($this->itemKey($key), $value);
 
         $this->fireCacheEvent('write', [$key, $value, 0]);
     }
@@ -318,11 +319,60 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forget($key)
     {
-        $success = $this->store->forget($key);
+        $success = $this->store->forget($this->itemKey($key));
 
         $this->fireCacheEvent('delete', [$key]);
 
         return $success;
+    }
+
+    /**
+     * Begin executing a new tags operation if the store supports it.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Cache\TaggedCache
+     *
+     * @deprecated since version 5.1. Use tags instead.
+     */
+    public function section($name)
+    {
+        return $this->tags($name);
+    }
+
+    /**
+     * Begin executing a new tags operation if the store supports it.
+     *
+     * @param  array|mixed  $names
+     * @return \Illuminate\Cache\TaggedCache
+     *
+     * @throws \BadMethodCallException
+     */
+    public function tags($names)
+    {
+        if (method_exists($this->store, 'tags')) {
+            $taggedCache = $this->store->tags($names);
+
+            if (! is_null($this->events)) {
+                $taggedCache->setEventDispatcher($this->events);
+            }
+
+            $taggedCache->setDefaultCacheTime($this->default);
+
+            return $taggedCache;
+        }
+
+        throw new BadMethodCallException('This cache store does not support tagging.');
+    }
+
+    /**
+     * Format the key for a cache item.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function itemKey($key)
+    {
+        return $key;
     }
 
     /**
