@@ -70,6 +70,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
+        $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
         $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
