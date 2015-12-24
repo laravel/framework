@@ -99,7 +99,7 @@ class TagSet
     }
 
     /**
-     * Get all of the names in the set.
+     * Get all of the tag names in the set.
      *
      * @return array
      */

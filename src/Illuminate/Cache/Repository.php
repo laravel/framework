@@ -285,12 +285,24 @@ class Repository implements CacheContract, ArrayAccess
             if (! is_null($this->events)) {
                 $taggedCache->setEventDispatcher($this->events);
             }
+
             $taggedCache->setDefaultCacheTime($this->default);
 
             return $taggedCache;
         }
 
-        throw BadMethodCallException('The current cache store does not support tagging.');
+        throw new BadMethodCallException('This cache store does not support tagging.');
+    }
+
+    /**
+     * Format the key for a cache item.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function itemKey($key)
+    {
+        return $key;
     }
 
     /**
@@ -384,17 +396,6 @@ class Repository implements CacheContract, ArrayAccess
         }
 
         return is_string($duration) ? (int) $duration : $duration;
-    }
-
-    /**
-     * Get the key to be used with the store.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    protected function itemKey($key)
-    {
-        return $key;
     }
 
     /**
