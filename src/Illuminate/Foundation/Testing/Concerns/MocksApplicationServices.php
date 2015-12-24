@@ -12,7 +12,7 @@ trait MocksApplicationServices
      *
      * These events will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|mixed  $events
+     * @param  array|string  $events
      * @return $this
      */
     public function expectsEvents($events)
@@ -65,7 +65,7 @@ trait MocksApplicationServices
      *
      * These jobs will be mocked, so that handlers will not actually be executed.
      *
-     * @param  array|mixed  $jobs
+     * @param  array|string  $jobs
      * @return $this
      */
     protected function expectsJobs($jobs)
