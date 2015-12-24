@@ -153,7 +153,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $position = 0;
 
-        foreach ($this->items as $key => $item) {
+        foreach ($this->items as $item) {
             if ($position % $step === $offset) {
                 $new[] = $item;
             }
