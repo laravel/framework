@@ -473,17 +473,37 @@ class Router implements RegistrarContract
     /**
      * Get the prefix from the last group on the stack.
      *
+     * @param boolean $forUrl
      * @return string
      */
-    public function getLastGroupPrefix()
+    public function getLastGroupPrefix($forUrl = true)
     {
         if (! empty($this->groupStack)) {
             $last = end($this->groupStack);
 
-            return isset($last['prefix']) ? $last['prefix'] : '';
+            if($forUrl) {
+                return isset($last['prefix']) ? $last['prefix'] : null;
+            }
+
+            return isset($last['prefix']) ? $this->removeGroupStackPrefixParameters($last['prefix']) : '';
         }
 
         return '';
+    }
+
+    /**
+     * Remove the assigned parameters to routes group prefix used for routes name
+     *
+     * @param string $prefix
+     * @return string
+     */
+    protected function removeGroupStackPrefixParameters($prefix)
+    {
+        if(strpos($prefix, '{') !== false && strpos($prefix, '}') !== false) {
+            return preg_replace('/(\/?\{.*?\})/', '', $prefix);
+        }
+
+        return $prefix;
     }
 
     /**
