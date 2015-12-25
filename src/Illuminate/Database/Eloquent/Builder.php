@@ -10,6 +10,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use RuntimeException;
 
 class Builder
 {
@@ -265,9 +266,15 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function chunk($count, callable $callback)
     {
+        if (is_null($this->getOrderBys())) {
+            throw new RuntimeException('Chunk requires an orderby clause.');
+        }
+
         $results = $this->forPage($page = 1, $count)->get();
 
         while (count($results) > 0) {

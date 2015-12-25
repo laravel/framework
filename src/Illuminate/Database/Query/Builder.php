@@ -14,6 +14,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
+use RuntimeException;
 
 class Builder
 {
@@ -1545,9 +1546,15 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function chunk($count, callable $callback)
     {
+        if (is_null($this->getOrderBys())) {
+            throw new RuntimeException('Chunk requires an orderby clause.');
+        }
+
         $results = $this->forPage($page = 1, $count)->get();
 
         while (count($results) > 0) {
@@ -1564,6 +1571,18 @@ class Builder
         }
 
         return true;
+    }
+
+    /**
+     * Returns the currently set ordering.
+     *
+     * @return array|null
+     */
+    public function getOrderBys()
+    {
+        $property = $this->unions ? 'unionOrders' : 'orders';
+
+        return $this->{$property};
     }
 
     /**
