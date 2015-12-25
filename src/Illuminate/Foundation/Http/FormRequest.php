@@ -12,6 +12,7 @@ use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -118,7 +119,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedAuthorization()
     {
-        throw new HttpResponseException($this->forbiddenResponse());
+        throw new HttpException(403, 'Forbidden');
     }
 
     /**
