@@ -283,7 +283,7 @@ class Store implements SessionInterface
     protected function addBagDataToSession()
     {
         foreach (array_merge($this->bags, [$this->metaBag]) as $bag) {
-            if(isset($this->bagData[$bag->getStorageKey()])){
+            if (isset($this->bagData[$bag->getStorageKey()])){
                 $this->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
             }
         }
