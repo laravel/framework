@@ -12,13 +12,22 @@ class CacheMissed
     public $key;
 
     /**
+     * Any tags that were used.
+     *
+     * @var array
+     */
+    public $tags;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $event
+     * @param  array  $tags
      * @return void
      */
-    public function __construct($key)
+    public function __construct($key, array $tags = [])
     {
         $this->key = $key;
+        $this->tags = $tags;
     }
 }

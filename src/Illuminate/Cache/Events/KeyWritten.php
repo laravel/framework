@@ -26,17 +26,26 @@ class KeyWritten
     public $minutes;
 
     /**
+     * Any tags that were used.
+     *
+     * @var array
+     */
+    public $tags;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $key
      * @param  mixed  $value
      * @param  int  $minutes
+     * @param  array  $tags
      * @return void
      */
-    public function __construct($key, $value, $minutes)
+    public function __construct($key, $value, $minutes, $tags = [])
     {
         $this->key = $key;
         $this->value = $value;
         $this->minutes = $minutes;
+        $this->tags = $tags;
     }
 }
