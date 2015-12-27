@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -391,10 +392,12 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeEnum(Fluent $column)
     {
-        return 'nvarchar(255)';
+        throw new RuntimeException('Enum types are not supported by SqlServer.');
     }
 
     /**
@@ -402,10 +405,12 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeJson(Fluent $column)
     {
-        return 'nvarchar(max)';
+        throw new RuntimeException('Json types are not supported by SqlServer.');
     }
 
     /**
@@ -413,10 +418,12 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'nvarchar(max)';
+        throw new RuntimeException('Jsonb types are not supported by SqlServer.');
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -459,10 +460,12 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'json';
+        throw new RuntimeException('Jsonb types are not supported by MySql.');
     }
 
     /**
