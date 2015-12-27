@@ -446,7 +446,7 @@ class Str
      *
      * Note: Adapted from Stringy\Stringy.
      *
-     * @see https://github.com/danielstjules/Stringy/blob/2.1.0/LICENSE.txt
+     * @see https://github.com/danielstjules/Stringy/blob/2.2.0/LICENSE.txt
      *
      * @return array
      */
