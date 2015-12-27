@@ -483,6 +483,12 @@ empty
         $this->assertEquals('<?php $__env->stopSection(); ?>', $compiler->compileString('@endsection'));
     }
 
+    public function testParentsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php $__env->appendParent(); ?>', $compiler->compileString('@parent'));
+    }    
+
     public function testAppendSectionsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

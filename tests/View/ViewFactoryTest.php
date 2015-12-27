@@ -238,7 +238,8 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
-        echo 'hi @parent';
+        echo 'hi ';
+        $factory->appendParent();
         $factory->stopSection();
         $factory->startSection('foo');
         echo 'there';
@@ -249,16 +250,49 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testSectionMultipleExtending()
     {
         $factory = $this->getFactory();
+        
         $factory->startSection('foo');
-        echo 'hello @parent nice to see you @parent';
+        echo 'hello ';
+        $factory->appendParent();
+        echo ' nice to see you ';
+        $factory->appendParent();
+        echo ' again';
         $factory->stopSection();
+        
         $factory->startSection('foo');
-        echo 'my @parent';
+        echo 'my ';
+        $factory->appendParent();
+        echo ' ';
+        $factory->appendParent();
+        echo ' ever';
         $factory->stopSection();
+        
+        $factory->startSection('foo');
+        echo 'best ';
+        $factory->appendParent();
+        $factory->stopSection();
+
         $factory->startSection('foo');
         echo 'friend';
         $factory->stopSection();
-        $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
+
+        $factory->startSection('foo');
+        echo 'this is not appended';
+        $factory->stopSection();
+        
+        $this->assertEquals('hello my best friend best friend ever nice to see you my best friend best friend ever again', $factory->yieldContent('foo'));
+    }
+
+    public function testParentKeywordEscaping()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hi @parent';
+        $factory->stopSection();
+        $factory->startSection('foo');
+        echo 'there';
+        $factory->stopSection();
+        $this->assertEquals('hi @parent', $factory->yieldContent('foo'));
     }
 
     public function testSingleStackPush()
@@ -282,7 +316,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hi, Hello!', $factory->yieldContent('foo'));
     }
 
-    public function testSessionAppending()
+    public function testSectionAppending()
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
