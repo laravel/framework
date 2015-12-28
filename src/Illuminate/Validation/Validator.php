@@ -153,6 +153,13 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The flattened array of data
+     * 
+     * @var array
+     */
+    protected $flattenedData;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
@@ -272,7 +279,7 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::dot($this->data);
+        $data = $this->getFlattenedData();
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
@@ -318,6 +325,9 @@ class Validator implements ValidatorContract
                 $this->validate($attribute, $rule);
             }
         }
+
+        // Cleanup the memory
+        $this->flattenedData = null;
 
         // Here we will spin through all of the "after" hooks on this validator and
         // fire them off. This gives the callbacks a chance to perform all kinds
@@ -412,6 +422,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get flatened array of data
+     * 
+     * @return array
+     */
+    protected function getFlattenedData()
+    {
+        if (is_null($this->flattenedData)) {
+            $this->flattenedData = Arr::dot($this->data);
+        }
+
+        return $this->flattenedData;
+    }
+
+    /**
      * Determine if the attribute is validatable.
      *
      * @param  string  $rule
@@ -448,7 +472,7 @@ class Validator implements ValidatorContract
     protected function passesOptionalCheck($attribute)
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
-            return array_key_exists($attribute, Arr::dot($this->data))
+            return array_key_exists($attribute, $this->getFlattenedData())
                 || in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
         }
@@ -2381,6 +2405,7 @@ class Validator implements ValidatorContract
     public function setData(array $data)
     {
         $this->data = $this->parseData($data);
+        $this->flattenedData = null;
     }
 
     /**
