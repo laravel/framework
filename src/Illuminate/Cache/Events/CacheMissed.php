@@ -12,7 +12,7 @@ class CacheMissed
     public $key;
 
     /**
-     * Any tags that were used.
+     * The tags that were assigned to the key.
      *
      * @var array
      */
