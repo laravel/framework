@@ -86,15 +86,15 @@ class Kernel implements KernelContract
      */
     protected function boot()
     {
-      $this->bootTraits();
+        $this->bootTraits();
 
-      foreach ($this->middlewareGroups as $key => $middleware) {
-          $this->router->middlewareGroup($key, $middleware);
-      }
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            $this->router->middlewareGroup($key, $middleware);
+        }
 
-      foreach ($this->routeMiddleware as $key => $middleware) {
-          $this->router->middleware($key, $middleware);
-      }
+        foreach ($this->routeMiddleware as $key => $middleware) {
+            $this->router->middleware($key, $middleware);
+        }
     }
 
     /**
