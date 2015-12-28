@@ -76,15 +76,25 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->router = $router;
 
-        $this->bootTraits();
+        $this->boot();
+    }
 
-        foreach ($this->middlewareGroups as $key => $middleware) {
-            $router->middlewareGroup($key, $middleware);
-        }
+    /**
+     * The "booting" Http Kernel method.
+     *
+     * @return void
+     */
+    protected function boot()
+    {
+      $this->bootTraits();
 
-        foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->middleware($key, $middleware);
-        }
+      foreach ($this->middlewareGroups as $key => $middleware) {
+          $this->router->middlewareGroup($key, $middleware);
+      }
+
+      foreach ($this->routeMiddleware as $key => $middleware) {
+          $this->router->middleware($key, $middleware);
+      }
     }
 
     /**
