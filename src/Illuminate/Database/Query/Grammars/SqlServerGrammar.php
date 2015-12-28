@@ -321,4 +321,24 @@ class SqlServerGrammar extends Grammar
 
         return trim("update {$table}{$joins} set $columns $where");
     }
+
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $table
+     * @return string
+     */
+    public function wrapTable($table)
+    {
+        $table = parent::wrapTable($table);
+
+        if (preg_match('/^(.+?)(\(.*?\))?]$/', $table, $matches) === 1) {
+            $table = $matches[1].']';
+            $parameters = isset($matches[2]) ? $matches[2] : '';
+
+            return $table.$parameters;
+        }
+
+        return $table;
+    }
 }
