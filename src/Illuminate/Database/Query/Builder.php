@@ -1567,9 +1567,7 @@ class Builder
     }
 
     /**
-     * Execute a callback over each item.
-     *
-     * We're also saving memory by chunking the results into memory.
+     * Execute a callback over each item while chunking.
      *
      * @param  callable  $callback
      * @param  int  $count
