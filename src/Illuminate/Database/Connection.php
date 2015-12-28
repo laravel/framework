@@ -661,7 +661,7 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function causedByLostConnection(QueryException $e)
 	{
-		return str_contains($e->getPrevious()->getMessage(), 'server has gone away');
+		return str_contains($e->getPrevious()->getMessage(), ['server has gone away', 'Error while sending']);
 	}
 
 	/**
