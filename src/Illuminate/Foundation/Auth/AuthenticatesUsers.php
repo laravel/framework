@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Str;
 
 trait AuthenticatesUsers
 {
@@ -54,7 +55,7 @@ trait AuthenticatesUsers
     public function login(Request $request)
     {
         $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
+            $this->loginVirtualCloumn() => 'required', 'password' => 'required',
         ]);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -68,6 +69,10 @@ trait AuthenticatesUsers
 
         $credentials = $this->getCredentials($request);
 
+        if ($this->hasLoginVirtualColumn()) {
+            $credentials[$this->loginRealCloumn($request)] = array_pull($credentials, $this->loginVirtualCloumn());
+        }
+
         if (Auth::attempt($credentials, $request->has('remember'))) {
             return $this->handleUserWasAuthenticated($request, $throttles);
         }
@@ -80,9 +85,9 @@ trait AuthenticatesUsers
         }
 
         return redirect()->back()
-            ->withInput($request->only($this->loginUsername(), 'remember'))
+            ->withInput($request->only($this->loginVirtualCloumn(), 'remember'))
             ->withErrors([
-                $this->loginUsername() => $this->getFailedLoginMessage(),
+                $this->loginVirtualCloumn() => $this->getFailedLoginMessage(),
             ]);
     }
 
@@ -114,7 +119,7 @@ trait AuthenticatesUsers
      */
     protected function getCredentials(Request $request)
     {
-        return $request->only($this->loginUsername(), 'password');
+        return $request->only($this->loginVirtualCloumn(), 'password');
     }
 
     /**
@@ -159,6 +164,36 @@ trait AuthenticatesUsers
     public function loginUsername()
     {
         return property_exists($this, 'username') ? $this->username : 'email';
+    }
+
+    /**
+     * Get the login virtual column to be used by the controller.
+     *
+     * @return string
+     */
+    public function loginVirtualCloumn()
+    {
+        return $this->hasLoginVirtualColumn() ? $this->loginCloumn : $this->loginUsername();
+    }
+
+    /**
+     * Determine if the controller has login virtual column.
+     *
+     * @return bool
+     */
+    protected function hasLoginVirtualColumn()
+    {
+        return isset($this->loginCloumn) && $this->loginCloumn !== null;
+    }
+
+    /**
+     * Get the login real column to be used by the controller.
+     *
+     * @return string
+     */
+    protected function loginRealCloumn(Request $request)
+    {
+        return Str::contains($request->get($this->loginVirtualCloumn()), '@') ? 'email' : 'username';
     }
 
     /**
