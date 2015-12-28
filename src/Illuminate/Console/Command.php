@@ -305,7 +305,7 @@ class Command extends SymfonyCommand
      * Format input to textual table.
      *
      * @param  array   $headers
-     * @param  array|\Illuminate\Contracts\Support\Arrayable  $rows
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $style
      * @return void
      */

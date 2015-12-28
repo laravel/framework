@@ -48,7 +48,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $array
      * @return array
      */
     public static function collapse($array)
