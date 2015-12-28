@@ -213,6 +213,7 @@ class Event
     public function buildCommand()
     {
         $output = ProcessUtils::escapeArgument($this->output);
+
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
