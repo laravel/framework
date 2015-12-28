@@ -402,10 +402,14 @@ if (! function_exists('info')) {
      *
      * @param  string  $message
      * @param  array   $context
-     * @return void
+     * @return \Illuminate\Contracts\Logging\Log|null
      */
-    function info($message, $context = [])
+    function info($message = null, $context = [])
     {
+        if (is_null($message)) {
+            return app('log');
+        }
+
         return app('log')->info($message, $context);
     }
 }
