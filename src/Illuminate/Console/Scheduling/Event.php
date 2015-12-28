@@ -211,12 +211,14 @@ class Event
      */
     public function buildCommand()
     {
+        $output = ProcessUtils::escapeArgument($this->output);
+
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$this->output.' 2>&1 &';
+            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
         } else {
-            $command = $this->command.$redirect.$this->output.' 2>&1 &';
+            $command = $this->command.$redirect.$output.' 2>&1 &';
         }
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
@@ -659,7 +661,7 @@ class Event
      */
     public function sendOutputTo($location, $append = false)
     {
-        $this->output = ProcessUtils::escapeArgument($location);
+        $this->output = $location;
 
         $this->shouldAppendOutput = $append;
 
