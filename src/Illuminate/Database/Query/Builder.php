@@ -1567,6 +1567,26 @@ class Builder
     }
 
     /**
+     * Execute a callback over each item.
+     *
+     * We're also saving memory by chunking the results into memory.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return bool
+     */
+    public function each(callable $callback, $count = 1000)
+    {
+        return $this->chunk($count, function ($results) use ($callback) {
+            foreach ($results as $key => $value) {
+                if ($callback($item, $key) === false) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
      * Get an array with the values of a given column.
      *
      * @param  string  $column
