@@ -26,7 +26,7 @@ class KeyWritten
     public $minutes;
 
     /**
-     * Any tags that were used.
+     * The tags that were assigned to the key.
      *
      * @var array
      */
@@ -44,8 +44,8 @@ class KeyWritten
     public function __construct($key, $value, $minutes, $tags = [])
     {
         $this->key = $key;
+        $this->tags = $tags;
         $this->value = $value;
         $this->minutes = $minutes;
-        $this->tags = $tags;
     }
 }

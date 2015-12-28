@@ -19,7 +19,7 @@ class CacheHit
     public $value;
 
     /**
-     * Any tags that were used.
+     * The tags that were assigned to the key.
      *
      * @var array
      */
@@ -36,7 +36,7 @@ class CacheHit
     public function __construct($key, $value, array $tags = [])
     {
         $this->key = $key;
-        $this->value = $value;
         $this->tags = $tags;
+        $this->value = $value;
     }
 }
