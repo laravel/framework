@@ -19,15 +19,24 @@ class CacheHit
     public $value;
 
     /**
+     * Any tags that were used.
+     *
+     * @var array
+     */
+    public $tags;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  array  $tags
      * @return void
      */
-    public function __construct($key, $value)
+    public function __construct($key, $value, array $tags = [])
     {
         $this->key = $key;
         $this->value = $value;
+        $this->tags = $tags;
     }
 }

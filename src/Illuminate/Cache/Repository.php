@@ -76,13 +76,29 @@ class Repository implements CacheContract, ArrayAccess
 
         switch ($event) {
             case 'hit':
-                return $this->events->fire(new Events\CacheHit($payload[0], $payload[1]));
+                if (count($payload) == 2) {
+                    $payload[] = [];
+                }
+
+                return $this->events->fire(new Events\CacheHit($payload[0], $payload[1], $payload[2]));
             case 'missed':
-                return $this->events->fire(new Events\CacheMissed($payload[0]));
+                if (count($payload) == 1) {
+                    $payload[] = [];
+                }
+
+                return $this->events->fire(new Events\CacheMissed($payload[0], $payload[1]));
             case 'delete':
-                return $this->events->fire(new Events\KeyForgotten($payload[0]));
+                if (count($payload) == 1) {
+                    $payload[] = [];
+                }
+
+                return $this->events->fire(new Events\KeyForgotten($payload[0], $payload[1]));
             case 'write':
-                return $this->events->fire(new Events\KeyWritten($payload[0], $payload[1], $payload[2]));
+                if (count($payload) == 3) {
+                    $payload[] = [];
+                }
+
+                return $this->events->fire(new Events\KeyWritten($payload[0], $payload[1], $payload[2], $payload[3]));
         }
     }
 
