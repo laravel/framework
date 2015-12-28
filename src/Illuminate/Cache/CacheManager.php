@@ -101,7 +101,7 @@ class CacheManager implements FactoryContract
             if (method_exists($this, $driverMethod)) {
                 return $this->{$driverMethod}($config);
             } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] not supported.");
+                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
             }
         }
     }
@@ -174,28 +174,6 @@ class CacheManager implements FactoryContract
     protected function createNullDriver()
     {
         return $this->repository(new NullStore);
-    }
-
-    /**
-     * Create an instance of the WinCache cache driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Cache\WinCacheStore
-     */
-    protected function createWincacheDriver(array $config)
-    {
-        return $this->repository(new WinCacheStore($this->getPrefix($config)));
-    }
-
-    /**
-     * Create an instance of the XCache cache driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Cache\WinCacheStore
-     */
-    protected function createXcacheDriver(array $config)
-    {
-        return $this->repository(new XCacheStore($this->getPrefix($config)));
     }
 
     /**

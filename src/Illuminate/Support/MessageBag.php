@@ -159,6 +159,17 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
+     * Get all of the unique messages for every key in the bag.
+     *
+     * @param  string  $format
+     * @return array
+     */
+    public function unique($format = null)
+    {
+        return array_unique($this->all($format));
+    }
+
+    /**
      * Format an array of messages.
      *
      * @param  array   $messages
@@ -294,7 +305,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**

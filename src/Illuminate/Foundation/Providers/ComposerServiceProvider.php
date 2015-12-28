@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Foundation\Composer;
+use Illuminate\Support\Composer;
 use Illuminate\Support\ServiceProvider;
 
 class ComposerServiceProvider extends ServiceProvider

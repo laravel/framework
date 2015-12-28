@@ -10,16 +10,6 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testSectionCanBeFlushed()
-    {
-        $store = new ArrayStore;
-        $store->section('bop')->put('foo', 'bar', 10);
-        $store->section('zap')->put('baz', 'boom', 10);
-        $store->section('bop')->flush();
-        $this->assertNull($store->section('bop')->get('foo'));
-        $this->assertEquals('boom', $store->section('zap')->get('baz'));
-    }
-
     public function testCacheCanBeSavedWithMultipleTags()
     {
         $store = new ArrayStore;

@@ -192,26 +192,26 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
-    public function testListsReturnsTheMutatedAttributesOfAModel()
+    public function testPluckReturnsTheMutatedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(['bar', 'baz']);
+        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'bar']));
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'baz']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
 
-        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->lists('name')->all());
+        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
     }
 
-    public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+    public function testPluckWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(['bar', 'baz']);
+        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
 
-        $this->assertEquals(['bar', 'baz'], $builder->lists('name')->all());
+        $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
     public function testMacrosAreCalledOnBuilder()
@@ -399,7 +399,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
-        $this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
+        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals(['bar', 9000], $query->getBindings());
+    }
+
+    public function testRealNestedWhereWithMultipleScopesAndOneDeadScope()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) { $query->empty()->where('baz', '>', 9000); });
+        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
@@ -541,9 +550,14 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
     use Illuminate\Database\Eloquent\SoftDeletes;
+
+    public function scopeEmpty($query)
+    {
+        return $query;
+    }
 }
 
-class EloquentBuilderTestListsStub
+class EloquentBuilderTestPluckStub
 {
     protected $attributes;
 

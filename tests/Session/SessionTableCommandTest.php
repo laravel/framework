@@ -15,7 +15,7 @@ class SessionTableCommandTest extends PHPUnit_Framework_TestCase
     {
         $command = new SessionTableCommandTestStub(
             $files = m::mock('Illuminate\Filesystem\Filesystem'),
-            $composer = m::mock('Illuminate\Foundation\Composer')
+            $composer = m::mock('Illuminate\Support\Composer')
         );
         $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 

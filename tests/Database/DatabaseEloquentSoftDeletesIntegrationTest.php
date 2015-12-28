@@ -2,34 +2,27 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * Bootstrap Eloquent.
-     *
-     * @return void
-     */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        Eloquent::setConnectionResolver(
-            new SoftDeletesDatabaseIntegrationTestConnectionResolver
-        );
+        $db = new DB;
 
-        Eloquent::setEventDispatcher(
-            new Illuminate\Events\Dispatcher
-        );
-    }
+        $db->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ]);
 
-    /**
-     * Tear down Eloquent.
-     */
-    public static function tearDownAfterClass()
-    {
-        Eloquent::unsetEventDispatcher();
-        Eloquent::unsetConnectionResolver();
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
     }
 
     /**
@@ -37,11 +30,27 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
      *
      * @return void
      */
-    public function setUp()
+    public function createSchema()
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        $this->schema()->create('posts', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('title');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('post_id');
+            $table->string('body');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -55,6 +64,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     public function tearDown()
     {
         $this->schema()->drop('users');
+        $this->schema()->drop('posts');
+        $this->schema()->drop('comments');
     }
 
     /**
@@ -69,6 +80,42 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertCount(1, $users);
         $this->assertEquals(2, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(1));
+    }
+
+    public function testSoftDeletesAreNotRetrievedFromBaseQuery()
+    {
+        $this->createUsers();
+
+        $query = SoftDeletesTestUser::query()->toBase();
+
+        $this->assertInstanceOf(Builder::class, $query);
+        $this->assertCount(1, $query->get());
+    }
+
+    public function testSoftDeletesAreNotRetrievedFromBuilderHelpers()
+    {
+        $this->createUsers();
+
+        $count = 0;
+        $query = SoftDeletesTestUser::query();
+        $query->chunk(2, function ($user) use (&$count) {
+            $count += count($user);
+        });
+        $this->assertEquals(1, $count);
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->pluck('email')->all());
+
+        Paginator::currentPageResolver(function () { return 1; });
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->paginate(2)->all());
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->simplePaginate(2)->all());
+
+        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
+        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
     }
 
     public function testWithTrashedReturnsAllRecords()
@@ -132,6 +179,71 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals('taylorotwell@gmail.com', $taylor->email);
     }
 
+    public function testWhereHasWithDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+
+        $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->has('posts')->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->has('posts')->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orHas('posts')->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+            $query->where('title', 'First Title');
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($query) {
+            $query->where('title', 'Another Title');
+        })->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::where('email', 'doesnt@exist.com')->orWhereHas('posts', function ($query) {
+            $query->where('title', 'First Title');
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        // With Post Deleted...
+
+        $post->delete();
+        $users = SoftDeletesTestUser::has('posts')->get();
+        $this->assertEquals(0, count($users));
+    }
+
+    /**
+     * @group test
+     */
+    public function testWhereHasWithNestedDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+        $comment = $post->comments()->create(['body' => 'Comment Body']);
+        $comment->delete();
+
+        $users = SoftDeletesTestUser::has('posts.comments')->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
+        $this->assertEquals(1, count($users));
+    }
+
+    public function testOrWhereWithSoftDeleteConstraint()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->orWhere('email', 'abigailotwell@gmail.com');
+        $this->assertEquals(['abigailotwell@gmail.com'], $users->pluck('email')->all());
+    }
+
     /**
      * Helpers...
      */
@@ -174,31 +286,38 @@ class SoftDeletesTestUser extends Eloquent
     protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
+    }
 }
 
 /**
- * Connection Resolver.
+ * Eloquent Models...
  */
-class SoftDeletesDatabaseIntegrationTestConnectionResolver implements Illuminate\Database\ConnectionResolverInterface
+class SoftDeletesTestPost extends Eloquent
 {
-    protected $connection;
+    use SoftDeletes;
 
-    public function connection($name = null)
+    protected $dates = ['deleted_at'];
+    protected $table = 'posts';
+    protected $guarded = [];
+
+    public function comments()
     {
-        if (isset($this->connection)) {
-            return $this->connection;
-        }
-
-        return $this->connection = new Illuminate\Database\SQLiteConnection(new PDO('sqlite::memory:'));
+        return $this->hasMany(SoftDeletesTestComment::class, 'post_id');
     }
+}
 
-    public function getDefaultConnection()
-    {
-        return 'default';
-    }
+/**
+ * Eloquent Models...
+ */
+class SoftDeletesTestComment extends Eloquent
+{
+    use SoftDeletes;
 
-    public function setDefaultConnection($name)
-    {
-        //
-    }
+    protected $dates = ['deleted_at'];
+    protected $table = 'comments';
+    protected $guarded = [];
 }

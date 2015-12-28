@@ -25,6 +25,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
+        $original = $query->columns;
+
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
@@ -38,7 +40,11 @@ class SqlServerGrammar extends Grammar
             return $this->compileAnsiOffset($query, $components);
         }
 
-        return $this->concatenate($components);
+        $sql = $this->concatenate($components);
+
+        $query->columns = $original;
+
+        return $sql;
     }
 
     /**
@@ -314,5 +320,23 @@ class SqlServerGrammar extends Grammar
         }
 
         return trim("update {$table}{$joins} set $columns $where");
+    }
+
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $table
+     * @return string
+     */
+    public function wrapTable($table)
+    {
+        $table = parent::wrapTable($table);
+
+        // check if the table is defined as a table-valued function
+        if (preg_match('/^(.+?)(\(.*?\))]$/', $table, $matches) === 1) {
+            $table = $matches[1].']'.$matches[2];
+        }
+
+        return $table;
     }
 }
