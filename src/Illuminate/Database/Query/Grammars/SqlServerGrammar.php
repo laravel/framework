@@ -324,9 +324,17 @@ class SqlServerGrammar extends Grammar
      */
     public function wrapTable($table)
     {
-        $table = parent::wrapTable($table);
+        return $this->wrapTableValuedFunction(parent::wrapTable($table));
+    }
 
-        // check if the table is defined as a table-valued function
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function wrapTableValuedFunction($table)
+    {
         if (preg_match('/^(.+?)(\(.*?\))]$/', $table, $matches) === 1) {
             $table = $matches[1].']'.$matches[2];
         }
