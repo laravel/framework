@@ -1343,6 +1343,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users" where "name" = ?', $builder->toSql());
     }
 
+    public function testTableValuedFunctionAsTableInSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users()');
+        $this->assertEquals('select * from [users]()', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users(1,2)');
+        $this->assertEquals('select * from [users](1,2)', $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
