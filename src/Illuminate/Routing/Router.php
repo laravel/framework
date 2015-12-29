@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Contracts\Routing\LocaleManager as LocaleManagerContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -21,6 +22,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Router implements RegistrarContract
 {
     use Macroable;
+
+    /**
+     * The locale manager for handling language specific actions.
+     *
+     * @var LocaleManager
+     */
+    protected $localeManager;
 
     /**
      * The event dispatcher instance.
@@ -104,13 +112,15 @@ class Router implements RegistrarContract
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Routing\LocaleManager  $localeManager
      * @return void
      */
-    public function __construct(Dispatcher $events, Container $container = null)
+    public function __construct(Dispatcher $events, Container $container = null, LocaleManagerContract $localeManager = null)
     {
         $this->events = $events;
-        $this->routes = new RouteCollection;
         $this->container = $container ?: new Container;
+        $this->localeManager = $localeManager ?: $this->container->make(LocaleManagerContract::class);
+        $this->routes = new RouteCollection($this->localeManager);
 
         $this->bind('_missing', function ($v) {
             return explode('/', $v);
@@ -1133,5 +1143,25 @@ class Router implements RegistrarContract
     public function getPatterns()
     {
         return $this->patterns;
+    }
+
+    /**
+     * Get current router locale manager.
+     *
+     * @return \Illuminate\Contracts\Routing\LocaleManager|\Illuminate\Routing\LocaleManager
+     */
+    public function getLocaleManager()
+    {
+        return $this->localeManager;
+    }
+
+    /**
+     * Set new locale manager for router.
+     *
+     * @param  \Illuminate\Contracts\Routing\LocaleManager  $manager
+     */
+    public function setLocaleManager(LocaleManagerContract $manager)
+    {
+        $this->localeManager = $manager;
     }
 }
