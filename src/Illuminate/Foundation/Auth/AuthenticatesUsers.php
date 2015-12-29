@@ -17,6 +17,16 @@ trait AuthenticatesUsers
      */
     public function getLogin()
     {
+        return $this->showLoginForm();
+    }
+
+    /**
+     * Show the application login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
         if (view()->exists('auth.authenticate')) {
             return view('auth.authenticate');
         }
@@ -31,6 +41,17 @@ trait AuthenticatesUsers
      * @return \Illuminate\Http\Response
      */
     public function postLogin(Request $request)
+    {
+        return $this->login($request);
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request)
     {
         $this->validate($request, [
             $this->loginUsername() => 'required', 'password' => 'required',
@@ -58,7 +79,7 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
-        return redirect($this->loginPath())
+        return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getFailedLoginMessage(),
@@ -115,19 +136,19 @@ trait AuthenticatesUsers
      */
     public function getLogout()
     {
-        Auth::logout();
-
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return $this->logout();
     }
 
     /**
-     * Get the path to the login route.
+     * Log the user out of the application.
      *
-     * @return string
+     * @return \Illuminate\Http\Response
      */
-    public function loginPath()
+    public function logout()
     {
-        return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+        Auth::logout();
+
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
     }
 
     /**

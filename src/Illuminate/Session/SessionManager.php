@@ -73,7 +73,7 @@ class SessionManager extends Manager
 
         $table = $this->app['config']['session.table'];
 
-        return $this->buildSession(new DatabaseSessionHandler($connection, $table));
+        return $this->buildSession(new DatabaseSessionHandler($connection, $table, $this->app));
     }
 
     /**

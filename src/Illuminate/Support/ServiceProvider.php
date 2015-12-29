@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use BadMethodCallException;
+use Illuminate\Console\Events\ArtisanStarting;
 
 abstract class ServiceProvider
 {
@@ -173,8 +174,8 @@ abstract class ServiceProvider
         // give us the Artisan console instance which we will give commands to.
         $events = $this->app['events'];
 
-        $events->listen('artisan.start', function ($artisan) use ($commands) {
-            $artisan->resolveCommands($commands);
+        $events->listen(ArtisanStarting::class, function ($event) use ($commands) {
+            $event->artisan->resolveCommands($commands);
         });
     }
 
