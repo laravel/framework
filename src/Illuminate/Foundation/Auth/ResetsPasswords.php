@@ -98,14 +98,16 @@ trait ResetsPasswords
      * If no token is present, display the link request form.
      *
      * @param  string|null  $token
-     * @param  string|null  $email
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm($token = null, $email = null)
+    public function showResetForm($token = null, Request $request)
     {
         if (is_null($token)) {
             return $this->getEmail();
         }
+
+        $email = $request->input('email');
 
         if (view()->exists('auth.passwords.reset')) {
             return view('auth.passwords.reset')->with(compact('token', 'email'));
