@@ -77,7 +77,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * The "booting" Console Kernel method.
+     * Boot the console kernel.
      *
      * @return void
      */
@@ -91,7 +91,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Calls bootable methods of traits.
+     * Boot the traits.
      *
      * @return void
      */
