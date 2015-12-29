@@ -586,6 +586,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         (new Collection)->random();
     }
 
+    public function testRandomCanReturnAllItemsWhenRequestingMoreThanAvailable()
+    {
+        $data = new Collection([1, 2, 3, 4, 5, 6]);
+
+        $random = $data->random(10, true);
+        $this->assertEquals($data, $random);
+    }
+
     public function testTakeLast()
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);

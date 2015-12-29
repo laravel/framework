@@ -604,13 +604,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or more items randomly from the collection.
      *
      * @param  int  $amount
+     * @param  bool  $alwaysReturn
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = 1)
+    public function random($amount = 1, $alwaysReturn = false)
     {
         if ($amount > ($count = $this->count())) {
+            if ($alwaysReturn) {
+                return $this;
+            }
+
             throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection");
         }
 
