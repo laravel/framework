@@ -17,6 +17,8 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->registerRouter();
 
+        $this->registerLocaleManager();
+
         $this->registerUrlGenerator();
 
         $this->registerRedirector();
@@ -142,6 +144,13 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app) {
             return new ResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
+        });
+    }
+
+    private function registerLocaleManager()
+    {
+        $this->app->singleton('Illuminate\Contracts\Routing\LocaleManager', function ($app) {
+            return new LocaleManager($app);
         });
     }
 }
