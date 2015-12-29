@@ -841,6 +841,20 @@ class Route
     }
 
     /**
+     * Get route locale.
+     *
+     * @return string|null
+     */
+    public function getLocale()
+    {
+        if (isset($this->action['lang'])) {
+            return $this->action['lang'];
+        }
+
+        return '*';
+    }
+
+    /**
      * Prepare the route instance for serialization.
      *
      * @return void
