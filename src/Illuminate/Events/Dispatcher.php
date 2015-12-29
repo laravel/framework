@@ -107,7 +107,7 @@ class Dispatcher implements DispatcherContract
      */
     public function hasListeners($eventName)
     {
-        return isset($this->listeners[$eventName]);
+        return isset($this->listeners[$eventName]) || isset($this->wildcards[$eventName]);
     }
 
     /**
