@@ -945,7 +945,7 @@ class Connection implements ConnectionInterface
      */
     public function getDriverName()
     {
-        return $this->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->getConfig('driver');
     }
 
     /**
