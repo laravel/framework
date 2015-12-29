@@ -10,15 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use \Illuminate\Contracts\Routing\LocaleManager as LocaleManagerContract;
 
 class RouteCollection implements Countable, IteratorAggregate
 {
     /**
-     * An array of the routes keyed by method.
+     * Application locale manager.
      *
-     * @var array
+     * @var \Illuminate\Contracts\Routing\LocaleManager
      */
-    protected $routes = [];
+    protected $localeManager;
 
     /**
      * An flattened array of all of the routes.
@@ -28,18 +29,35 @@ class RouteCollection implements Countable, IteratorAggregate
     protected $allRoutes = [];
 
     /**
-     * A look-up table of routes by their names.
-     *
-     * @var array
-     */
-    protected $nameList = [];
-
-    /**
      * A look-up table of routes by controller action.
      *
      * @var array
      */
     protected $actionList = [];
+
+    /**
+     * A look-up table of routes by language.
+     *
+     * @var array
+     */
+    protected $localizedRoutes = [];
+
+    /**
+     * A look-up table of routes by language grouped by method.
+     *
+     * @var array
+     */
+    protected $localizedRoutesMethods = [];
+
+    /**
+     * RouteCollection constructor.
+     *
+     * @param  \Illuminate\Contracts\Routing\LocaleManager  $localeManager
+     */
+    public function __construct(LocaleManagerContract $localeManager)
+    {
+        $this->localeManager = $localeManager;
+    }
 
     /**
      * Add a Route instance to the collection.
@@ -65,12 +83,13 @@ class RouteCollection implements Countable, IteratorAggregate
     protected function addToCollections($route)
     {
         $domainAndUri = $route->domain().$route->getUri();
+        $routeLocale = $route->getLocale();
 
         foreach ($route->methods() as $method) {
-            $this->routes[$method][$domainAndUri] = $route;
+            $this->localizedRoutesMethods[$routeLocale][$method][$domainAndUri] = $route;
         }
 
-        $this->allRoutes[$method.$domainAndUri] = $route;
+        $this->allRoutes[$method.$routeLocale.$domainAndUri] = $route;
     }
 
     /**
@@ -86,8 +105,12 @@ class RouteCollection implements Countable, IteratorAggregate
         // to iterate through every route every time we need to perform a look-up.
         $action = $route->getAction();
 
+        $routeLocale = $route->getLocale();
+
         if (isset($action['as'])) {
-            $this->nameList[$action['as']] = $route;
+            $this->localizedRoutes[$routeLocale][$action['as']] = $route;
+        } else {
+            $this->localizedRoutes[$routeLocale][$route->domain() . $route->getUri()] = $route;
         }
 
         // When the route is routing to a controller we will also store the action that
@@ -107,11 +130,11 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function refreshNameLookups()
     {
-        $this->nameList = [];
+        $this->localizedRoutes = [];
 
         foreach ($this->allRoutes as $route) {
             if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
+                $this->localizedRoutes[$this->getRouteLocale($route)][$route->getName()] = $route;
             }
         }
     }
@@ -132,13 +155,14 @@ class RouteCollection implements Countable, IteratorAggregate
      * Find the first route matching a given request.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string|null $locale
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function match(Request $request)
+    public function match(Request $request, $locale = null)
     {
-        $routes = $this->get($request->getMethod());
+        $routes = $this->get($request->getMethod(), $locale);
 
         // First, we will see if we can find a matching route for this current request
         // method. If we can, great, we can just return it so that it can be called
@@ -242,11 +266,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function get($method = null)
     {
-        if (is_null($method)) {
-            return $this->getRoutes();
-        }
-
-        return Arr::get($this->routes, $method, []);
+        return $method ? $this->getRoutesByMethod($method) : $this->getRoutes();
     }
 
     /**
@@ -264,11 +284,24 @@ class RouteCollection implements Countable, IteratorAggregate
      * Get a route instance by its name.
      *
      * @param  string  $name
+     * @param  string|array|null  $locales
      * @return \Illuminate\Routing\Route|null
      */
-    public function getByName($name)
+    public function getByName($name, $locales = null)
     {
-        return isset($this->nameList[$name]) ? $this->nameList[$name] : null;
+        if ($locales) {
+            $locales = array_unique(array_merge((array) $locales, ['*']));
+        } else {
+            $locales = $this->localeManager->getLanguages();
+        }
+
+        foreach ($locales as $locale) {
+            if (isset($this->localizedRoutes[$locale][$name])) {
+                return $this->localizedRoutes[$locale][$name];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -289,7 +322,34 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutes()
     {
-        return array_values($this->allRoutes);
+        $routes = [];
+
+        foreach ($this->localeManager->getLanguages() as $language) {
+            if (isset($this->localizedRoutes[$language])) {
+                $routes[] = $this->localizedRoutes[$language];
+            }
+        }
+
+        return Arr::flatten($routes);
+    }
+
+    /**
+     * Get all of the routes in the collection by method.
+     *
+     * @param  string  $method
+     * @return array
+     */
+    public function getRoutesByMethod($method)
+    {
+        $routes = [];
+
+        foreach ($this->localeManager->getLanguages() as $language) {
+            if (isset($this->localizedRoutesMethods[$language][$method])) {
+                $routes[] = $this->localizedRoutesMethods[$language][$method];
+            }
+        }
+
+        return Arr::flatten($routes);
     }
 
     /**
@@ -299,7 +359,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->getRoutes());
+        return new ArrayIterator(array_values($this->allRoutes));
     }
 
     /**
@@ -309,6 +369,6 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function count()
     {
-        return count($this->getRoutes());
+        return count($this->allRoutes);
     }
 }

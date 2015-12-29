@@ -447,7 +447,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
     public function testModelBindingThroughIOC()
     {
-        $router = new Router(new Dispatcher, $container = new Container);
+        $router = new Router(new Dispatcher, $container = $this->getContainer());
 
         $container->bind('RouteModelInterface', 'RouteModelBindingStub');
         $router->get('foo/{bar}', function ($name) { return $name; });
@@ -706,7 +706,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testRouterFiresRoutedEvent()
     {
         $events = new Illuminate\Events\Dispatcher();
-        $router = new Router($events);
+        $router = new Router($events, $this->getContainer());
         $router->get('foo/bar', function () { return ''; });
 
         $request = Request::create('http://foo.com/foo/bar', 'GET');
@@ -783,10 +783,52 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
     }
 
-    protected function getRouter()
+    protected function getRouter($defaultLocale = 'en')
     {
-        return new Router(new Illuminate\Events\Dispatcher);
+        return new Router(new Illuminate\Events\Dispatcher, $this->getContainer($defaultLocale));
     }
+
+    protected function getContainer($defaultLocale = 'en')
+    {
+        $container = new ApplicationStub();
+        $container->singleton(\Illuminate\Foundation\Application::class, function ($app) {
+            return $app;
+        });
+        $container->bind(\Illuminate\Contracts\Routing\LocaleManager::class, function ($app) {
+            return new LocaleManagerStub($app);
+        });
+        $container->singleton('config', function() use ($defaultLocale) {
+            return new \Illuminate\Config\Repository([
+                'app' => [
+                    'locale' => $defaultLocale
+                ]
+            ]);
+        });
+
+        return $container;
+    }
+}
+
+class ApplicationStub extends \Illuminate\Foundation\Application
+{
+    protected $locale = 'en';
+
+    public function __construct() { }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+}
+
+class LocaleManagerStub extends \Illuminate\Routing\LocaleManager
+{
+
 }
 
 class RouteTestControllerStub extends Illuminate\Routing\Controller
