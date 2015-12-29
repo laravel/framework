@@ -60,7 +60,7 @@ class JoinClause
      *
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
-     * @param  string|\Closure  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $boolean
@@ -97,7 +97,7 @@ class JoinClause
     /**
      * Add an "or on" clause to the join.
      *
-     * @param  string|\Closure  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\JoinClause
@@ -110,7 +110,7 @@ class JoinClause
     /**
      * Add an "on where" clause to the join.
      *
-     * @param  string|\Closure  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $boolean
@@ -124,7 +124,7 @@ class JoinClause
     /**
      * Add an "or on where" clause to the join.
      *
-     * @param  string|\Closure  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\JoinClause

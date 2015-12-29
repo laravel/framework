@@ -216,7 +216,7 @@ class Validator implements ValidatorContract
     {
         foreach ($rules as $key => $rule) {
             if (Str::contains($key, '*')) {
-                $this->each($key, $rule);
+                $this->each($key, [$rule]);
 
                 unset($rules[$key]);
             } else {

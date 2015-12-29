@@ -1804,6 +1804,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['foo' => 'Array']);
         $v->each('foo', 'numeric|min:4|max:16');
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foo', ['numeric', 'min:6', 'max:14']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foo', ['numeric', 'min:4', 'max:16']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateImplicitEachWithAsterisks()
@@ -1817,6 +1825,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => 'Numeric|Min:4|Max:16']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => ['Numeric', 'Min:6', 'Max:16']]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array', 'foo.*' => ['Numeric', 'Min:4', 'Max:16']]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
             ['foo' => 'Array', 'foo.*.name' => 'Required|String']);
         $this->assertTrue($v->passes());
@@ -1827,6 +1841,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
             ['foo' => 'Array', 'foo.*.name' => 'Required|String', 'foo.*.votes.*' => 'Required|Integer']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String']]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'Numeric']]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String'], 'foo.*.votes.*' => ['Required', 'Integer']]);
         $this->assertFalse($v->passes());
     }
 
