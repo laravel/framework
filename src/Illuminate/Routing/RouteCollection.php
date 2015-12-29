@@ -95,7 +95,7 @@ class RouteCollection implements Countable, IteratorAggregate
     /**
      * Add the route to any look-up tables if necessary.
      *
-     * @param  \Illuminate\Routing\Route $route
+     * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
     protected function addLookups($route)
