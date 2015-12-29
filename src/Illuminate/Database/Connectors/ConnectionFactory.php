@@ -57,9 +57,9 @@ class ConnectionFactory
      */
     protected function createSingleConnection(array $config)
     {
-        $pdo = $this->createConnector($config)->connect($config);
+        $connector = $this->createConnector($config);
 
-        return $this->createConnection($config['driver'], $pdo, $config['database'], $config['prefix'], $config);
+        return $this->createConnection($config['driver'], $connector, $config['database'], $config['prefix'], $config);
     }
 
     /**
@@ -72,20 +72,9 @@ class ConnectionFactory
     {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadPdo($config));
-    }
-
-    /**
-     * Create a new PDO instance for reading.
-     *
-     * @param  array  $config
-     * @return \PDO
-     */
-    protected function createReadPdo(array $config)
-    {
         $readConfig = $this->getReadConfig($config);
 
-        return $this->createConnector($readConfig)->connect($readConfig);
+        return $connection->setReadConnector($this->createConnector($readConfig), $readConfig);
     }
 
     /**
@@ -198,33 +187,31 @@ class ConnectionFactory
     /**
      * Create a new connection instance.
      *
-     * @param  string   $driver
-     * @param  \PDO     $connection
-     * @param  string   $database
-     * @param  string   $prefix
-     * @param  array    $config
+     * @param  string             $driver
+     * @param  ConnectorInterface $connector
+     * @param  string             $database
+     * @param  string             $prefix
+     * @param  array              $config
      * @return \Illuminate\Database\Connection
-     *
-     * @throws \InvalidArgumentException
      */
-    protected function createConnection($driver, PDO $connection, $database, $prefix = '', array $config = [])
+    protected function createConnection($driver, ConnectorInterface $connector, $database, $prefix = '', array $config = [])
     {
         if ($this->container->bound($key = "db.connection.{$driver}")) {
-            return $this->container->make($key, [$connection, $database, $prefix, $config]);
+            return $this->container->make($key, [$connector, $database, $prefix, $config]);
         }
 
         switch ($driver) {
             case 'mysql':
-                return new MySqlConnection($connection, $database, $prefix, $config);
+                return new MySqlConnection($connector, $database, $prefix, $config);
 
             case 'pgsql':
-                return new PostgresConnection($connection, $database, $prefix, $config);
+                return new PostgresConnection($connector, $database, $prefix, $config);
 
             case 'sqlite':
-                return new SQLiteConnection($connection, $database, $prefix, $config);
+                return new SQLiteConnection($connector, $database, $prefix, $config);
 
             case 'sqlsrv':
-                return new SqlServerConnection($connection, $database, $prefix, $config);
+                return new SqlServerConnection($connector, $database, $prefix, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [$driver]");
