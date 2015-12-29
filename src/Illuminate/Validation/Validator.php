@@ -1235,9 +1235,11 @@ class Validator implements ValidatorContract
      */
     protected function validateActiveUrl($attribute, $value)
     {
-        $url = str_replace(['http://', 'https://', 'ftp://'], '', strtolower($value));
+        if ($url = parse_url($value, PHP_URL_HOST)) {
+            return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
+        }
 
-        return checkdnsrr($url, 'A');
+        return false;
     }
 
     /**
