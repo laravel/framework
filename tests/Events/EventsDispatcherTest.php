@@ -88,6 +88,17 @@ class EventsDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
 
+    public function testWildcardListenersCanBeRemoved()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo.*', function () { $_SERVER['__event.test'] = 'foo'; });
+        $d->forget('foo.*');
+        $d->fire('foo.bar');
+
+        $this->assertFalse(isset($_SERVER['__event.test']));
+    }
+
     public function testFiringReturnsCurrentlyFiredEvent()
     {
         unset($_SERVER['__event.test']);
