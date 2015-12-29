@@ -20,7 +20,7 @@ class DetectEnvironment
             try {
                 (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
             } catch (InvalidArgumentException $e) {
-                //
+                die($e->getMessage());
             }
         }
     }
