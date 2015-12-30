@@ -68,7 +68,7 @@ trait AuthenticatesUsers
 
         $credentials = $this->getCredentials($request);
 
-        if (Auth::attempt($credentials, $request->has('remember'))) {
+        if (Auth::guard($this->getGuard())->attempt($credentials, $request->has('remember'))) {
             return $this->handleUserWasAuthenticated($request, $throttles);
         }
 
@@ -171,5 +171,15 @@ trait AuthenticatesUsers
         return in_array(
             ThrottlesLogins::class, class_uses_recursive(get_class($this))
         );
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return string|null
+     */
+    protected function getGuard()
+    {
+        return property_exists($this, 'guard') ? $this->guard : null;
     }
 }
