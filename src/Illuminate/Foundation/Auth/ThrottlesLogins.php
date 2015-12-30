@@ -62,12 +62,6 @@ trait ThrottlesLogins
             $this->getThrottleKey($request)
         );
 
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                $this->loginUsername() => [$this->getLockoutErrorMessage($seconds)],
-            ], 429);
-        }
-
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
