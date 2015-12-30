@@ -867,6 +867,26 @@ class Blueprint
     }
 
     /**
+     * Adds the `api_token` column to the table.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function apiToken()
+    {
+        return $this->string('api_token', 100)->unique();
+    }
+
+    /**
+     * Indicate that the api token column should be dropped.
+     *
+     * @return void
+     */
+    public function dropApiToken()
+    {
+        $this->dropColumn('api_token');
+    }
+
+    /**
      * Create a new drop index command on the blueprint.
      *
      * @param  string  $command
