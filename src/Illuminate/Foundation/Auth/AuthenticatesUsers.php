@@ -164,7 +164,8 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Get the guard to be used by Auth
+     * Get the guard to be used by Auth.
+     *
      * @return string|null
      */
     public function getGuard()
@@ -180,8 +181,7 @@ trait AuthenticatesUsers
     protected function isUsingThrottlesLoginsTrait()
     {
         return in_array(
-            ThrottlesLogins::class,
-            class_uses_recursive(get_class($this))
+            ThrottlesLogins::class, class_uses_recursive(get_class($this))
         );
     }
 }
