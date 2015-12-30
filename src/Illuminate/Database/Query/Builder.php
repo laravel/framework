@@ -1575,6 +1575,10 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
+        if (is_null($this->getOrderBys())) {
+            $this->orderBy('id', 'asc');
+        }
+
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($item, $key) === false) {
@@ -1582,6 +1586,18 @@ class Builder
                 }
             }
         });
+    }
+
+    /**
+     * Returns the currently set ordering.
+     *
+     * @return array|null
+     */
+    public function getOrderBys()
+    {
+        $property = $this->unions ? 'unionOrders' : 'orders';
+
+        return $this->{$property};
     }
 
     /**
