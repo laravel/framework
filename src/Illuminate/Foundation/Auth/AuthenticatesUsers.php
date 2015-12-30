@@ -99,10 +99,6 @@ trait AuthenticatesUsers
             return $this->authenticated($request, Auth::user());
         }
 
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['url' => $request->session()->pull('url.intended')]);
-        }
-
         return redirect()->intended($this->redirectPath());
     }
 
@@ -114,15 +110,6 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        // If the request is an AJAX request or is asking for JSON, we will return the errors
-        // in JSON format so the developers can build JavaScript applications for handling
-        // authentication instead of being forced to use old forms for these situations.
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                $this->loginUsername() => [$this->getFailedLoginMessage()],
-            ], 422);
-        }
-
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
