@@ -209,6 +209,15 @@ this is a comment
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testLongCommentsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $longCode = str_repeat('_', 1024);
+        $string = '{{--' . $longCode . '--}}';
+        $expected = '<?php /*' . $longCode . '*/ ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
