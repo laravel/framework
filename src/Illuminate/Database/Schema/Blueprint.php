@@ -873,7 +873,7 @@ class Blueprint
      */
     public function apiToken()
     {
-        return $this->string('api_token', 100)->unique();
+        return $this->string('api_token', 32)->unique();
     }
 
     /**
