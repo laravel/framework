@@ -68,9 +68,7 @@ trait AuthenticatesUsers
 
         $credentials = $this->getCredentials($request);
 
-        $guard = $this->getGuard();
-
-        if (Auth::guard($guard)->attempt($credentials, $request->has('remember'))) {
+        if (Auth::guard($this->getGuard())->attempt($credentials, $request->has('remember'))) {
             return $this->handleUserWasAuthenticated($request, $throttles);
         }
 
@@ -164,16 +162,6 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Get the guard to be used by Auth.
-     *
-     * @return string|null
-     */
-    public function getGuard()
-    {
-        return property_exists($this, 'guard') ? $this->guard : null;
-    }
-
-    /**
      * Determine if the class is using the ThrottlesLogins trait.
      *
      * @return bool
@@ -183,5 +171,15 @@ trait AuthenticatesUsers
         return in_array(
             ThrottlesLogins::class, class_uses_recursive(get_class($this))
         );
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return string|null
+     */
+    protected function getGuard()
+    {
+        return property_exists($this, 'guard') ? $this->guard : null;
     }
 }
