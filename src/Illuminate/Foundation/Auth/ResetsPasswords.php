@@ -97,11 +97,11 @@ trait ResetsPasswords
      *
      * If no token is present, display the link request form.
      *
-     * @param  string|null  $token
      * @param  \Illuminate\Http\Request  $request
+     * @param  string|null  $token
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm($token = null, Request $request)
+    public function showResetForm(Request $request, $token = null)
     {
         if (is_null($token)) {
             return $this->getEmail();
