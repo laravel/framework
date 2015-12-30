@@ -250,7 +250,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testSectionMultipleExtending()
     {
         $factory = $this->getFactory();
-        
+
         $factory->startSection('foo');
         echo 'hello ';
         $factory->appendParent();
@@ -258,7 +258,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->appendParent();
         echo ' again';
         $factory->stopSection();
-        
+
         $factory->startSection('foo');
         echo 'my ';
         $factory->appendParent();
@@ -266,7 +266,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->appendParent();
         echo ' ever';
         $factory->stopSection();
-        
+
         $factory->startSection('foo');
         echo 'best ';
         $factory->appendParent();
@@ -279,7 +279,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->startSection('foo');
         echo 'this is not appended';
         $factory->stopSection();
-        
+
         $this->assertEquals('hello my best friend best friend ever nice to see you my best friend best friend ever again', $factory->yieldContent('foo'));
     }
 
@@ -331,12 +331,12 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testSectionAppendingCorrectlyHandlesParents()
     {
         $factory = $this->getFactory();
-        
+
         $factory->startSection('foo');
         echo 'hello ';
         $factory->appendParent();
         $factory->appendSection();
-        
+
         $factory->startSection('foo');
         echo ' nice to see you ';
         $factory->appendParent();

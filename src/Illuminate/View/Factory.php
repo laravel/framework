@@ -654,7 +654,7 @@ class Factory implements FactoryContract
                 foreach ($this->parentMarksLast[$section] as $markLast) {
                     $marks[] = $mark + $markLast + $offset;
                 }
-                
+
                 $offset += $len;
             }
 
@@ -690,7 +690,7 @@ class Factory implements FactoryContract
 
         $this->parentMarks = [];
 
-        $this->parentMarksLast = [];       
+        $this->parentMarksLast = [];
     }
 
     /**
