@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
+use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1572,11 +1573,13 @@ class Builder
      * @param  callable  $callback
      * @param  int  $count
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function each(callable $callback, $count = 1000)
     {
         if (is_null($this->getOrderBys())) {
-            $this->orderBy('id', 'asc');
+            throw new RuntimeException('You must provided an ordering on the query.');
         }
 
         return $this->chunk($count, function ($results) use ($callback) {

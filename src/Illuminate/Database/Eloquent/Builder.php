@@ -296,7 +296,7 @@ class Builder
     public function each(callable $callback, $count = 1000)
     {
         if (is_null($this->getOrderBys())) {
-            $this->orderBy('id', 'asc');
+            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
         }
 
         return $this->chunk($count, function ($results) use ($callback) {
