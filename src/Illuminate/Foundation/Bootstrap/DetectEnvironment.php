@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
-use InvalidArgumentException;
+use Dotenv\Exception\InvalidPathException;
 use Illuminate\Contracts\Foundation\Application;
 
 class DetectEnvironment
@@ -19,7 +19,7 @@ class DetectEnvironment
         if (! $app->configurationIsCached()) {
             try {
                 (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidPathException $e) {
                 //
             }
         }
