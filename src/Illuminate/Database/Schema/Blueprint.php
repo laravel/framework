@@ -297,6 +297,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the userstamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropUserstamps()
+    {
+        $this->dropColumn('created_by', 'updated_by');
+    }
+
+    /**
      * Indicate that the timestamp columns should be dropped.
      *
      * @return void
@@ -806,6 +816,18 @@ class Blueprint
         $this->timestampTz('created_at');
 
         $this->timestampTz('updated_at');
+    }
+
+    /**
+     * Add creation and update userstamps to the table.
+     *
+     * @return void
+     */
+    public function userstamps()
+    {
+        $this->unsignedInteger('created_by')->nullable();
+
+        $this->unsignedInteger('updated_by')->nullable();
     }
 
     /**

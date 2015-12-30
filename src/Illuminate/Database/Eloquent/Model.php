@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Auth;
 use Closure;
 use DateTime;
 use Exception;
@@ -9,6 +10,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -75,6 +77,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var bool
      */
     public $timestamps = true;
+
+    /**
+     * Indicates if the model should be userstamped.
+     *
+     * @var bool
+     */
+    public $userstamps = false;
 
     /**
      * The model's attributes.
@@ -264,6 +273,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var string
      */
     const UPDATED_AT = 'updated_at';
+
+    /**
+     * The name of the "created by" column.
+     *
+     * @var string
+     */
+    const CREATED_BY = 'created_by';
+
+    /**
+     * The name of the "updated by" column.
+     *
+     * @var string
+     */
+    const UPDATED_BY = 'updated_by';
 
     /**
      * Create a new Eloquent model instance.
@@ -1605,6 +1628,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 $this->updateTimestamps();
             }
 
+            // If we are using userstamps we need to touch the update userstamp on the model.
+            if ($this->userstamps && Arr::get($options, 'userstamps', true)) {
+                $this->updateUserStamps();
+            }
+
             // Once we have run the update operation, we will fire the "updated" event for
             // this model instance. This will allow developers to hook into these after
             // models are updated, giving them a chance to do any special processing.
@@ -1638,6 +1666,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // convenience. After, we will just continue saving these model instances.
         if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
             $this->updateTimestamps();
+        }
+
+        // If we are using userstamps we need to touch the creation and update userstamps
+        // on this model.
+        if ($this->userstamps && Arr::get($options, 'userstamps', true)) {
+            $this->updateUserStamps();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
@@ -1772,11 +1806,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function touch()
     {
-        if (! $this->timestamps) {
+        if (! $this->timestamps && ! $this->userstamps) {
             return false;
         }
 
-        $this->updateTimestamps();
+        if( $this->timestamps ) {
+            $this->updateTimestamps();
+        }
+
+        if( $this->userstamps ) {
+            $this->updateUserstamps();
+        }
 
         return $this->save();
     }
@@ -1863,6 +1903,74 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function freshTimestampString()
     {
         return $this->fromDateTime($this->freshTimestamp());
+    }
+
+    /**
+     * Update the creation and update userstamps.
+     *
+     * @return void
+     */
+    protected function updateUserstamps()
+    {
+        $user_id = null;
+        if( Auth::check() )
+        {
+            $user_id = Auth::user() -> {Auth::user() -> {'primaryKey'}};
+        }
+
+        if (! $this->isDirty(static::UPDATED_BY)) {
+            $this->setUpdatedBy($user_id);
+        }
+
+        if (! $this->exists && ! $this->isDirty(static::CREATED_BY)) {
+            $this->setCreatedBy($user_id);
+        }
+    }
+
+    /**
+     * Set the value of the "created by" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setCreatedBy($value)
+    {
+        $this->{static::CREATED_BY} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of the "updated by" attribute.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setUpdatedBy($value)
+    {
+        $this->{static::UPDATED_BY} = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the name of the "created by" column.
+     *
+     * @return string
+     */
+    public function getCreatedByColumn()
+    {
+        return static::CREATED_BY;
+    }
+
+    /**
+     * Get the name of the "updated by" column.
+     *
+     * @return string
+     */
+    public function getUpdatedByColumn()
+    {
+        return static::UPDATED_BY;
     }
 
     /**
