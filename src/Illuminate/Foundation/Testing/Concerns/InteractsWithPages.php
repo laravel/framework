@@ -181,7 +181,7 @@ trait InteractsWithPages
         // Asterisks are translated into zero-or-more regular expression wildcards
         // to make it convenient to check if the strings starts with the given
         // pattern such as "library/*", making any string check convenient.
-        $pattern = str_replace('*', '.*', $text).'\z';
+        $pattern = str_replace('*', '.*', $text);
 
         $rawPattern = preg_quote($pattern, '/');
 
