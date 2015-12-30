@@ -213,8 +213,8 @@ this is a comment
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $longCode = str_repeat('_', 1024);
-        $string = '{{--' . $longCode . '--}}';
-        $expected = '<?php /*' . $longCode . '*/ ?>';
+        $string = '{{--'.$longCode.'--}}';
+        $expected = '<?php /*'.$longCode.'*/ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
