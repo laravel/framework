@@ -79,11 +79,7 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
-        return redirect()->back()
-            ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $this->getFailedLoginMessage(),
-            ]);
+        return $this->sendFailedLoginResponse($request);
     }
 
     /**
@@ -103,18 +99,35 @@ trait AuthenticatesUsers
             return $this->authenticated($request, Auth::user());
         }
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['url' => $request->session()->pull('url.intended')]);
+        }
+
         return redirect()->intended($this->redirectPath());
     }
 
     /**
-     * Get the needed authorization credentials from the request.
+     * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @param \Illuminate\Http\Request  $response
+     * @return \Illuminate\Http\Response
      */
-    protected function getCredentials(Request $request)
+    protected function sendFailedLoginResponse(Request $request)
     {
-        return $request->only($this->loginUsername(), 'password');
+        // If the request is an AJAX request or is asking for JSON, we will return the errors
+        // in JSON format so the developers can build JavaScript applications for handling
+        // authentication instead of being forced to use old forms for these situations.
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                $this->loginUsername() => [$this->getFailedLoginMessage()],
+            ], 422);
+        }
+
+        return redirect()->back()
+            ->withInput($request->only($this->loginUsername(), 'remember'))
+            ->withErrors([
+                $this->loginUsername() => $this->getFailedLoginMessage(),
+            ]);
     }
 
     /**
@@ -127,6 +140,17 @@ trait AuthenticatesUsers
         return Lang::has('auth.failed')
                 ? Lang::get('auth.failed')
                 : 'These credentials do not match our records.';
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function getCredentials(Request $request)
+    {
+        return $request->only($this->loginUsername(), 'password');
     }
 
     /**
