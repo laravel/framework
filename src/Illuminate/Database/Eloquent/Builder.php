@@ -295,6 +295,10 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
+        if (is_null($this->getOrderBys())) {
+            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
+        }
+
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($item, $key) === false) {
