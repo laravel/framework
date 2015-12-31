@@ -55,6 +55,13 @@ class MakeAuthCommand extends Command
                 app_path('Http/Controllers/HomeController.php')
             );
 
+            $this->info('Installed WelcomeController.');
+
+            copy(
+                __DIR__.'/stubs/make/controllers/WelcomeController.stub',
+                app_path('Http/Controllers/WelcomeController.php')
+            );
+
             $this->info('Updated Routes File.');
 
             file_put_contents(
