@@ -1578,8 +1578,8 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (is_null($this->getOrderBys())) {
-            throw new RuntimeException('You must provided an ordering on the query.');
+        if (is_null($this->orders) && is_null($this->unionOrders)) {
+            throw new RuntimeException('You must specify an orderBy clause when using the "each" function.');
         }
 
         return $this->chunk($count, function ($results) use ($callback) {
@@ -1589,18 +1589,6 @@ class Builder
                 }
             }
         });
-    }
-
-    /**
-     * Returns the currently set ordering.
-     *
-     * @return array|null
-     */
-    public function getOrderBys()
-    {
-        $property = $this->unions ? 'unionOrders' : 'orders';
-
-        return $this->{$property};
     }
 
     /**
