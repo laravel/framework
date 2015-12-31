@@ -8,12 +8,10 @@ trait WithoutEvents
 {
     public function disableEventsForAllTests()
     {
-        $this->afterApplicationCreated(function () {
-            if (method_exists($this, 'withoutEvents')) {
-                $this->withoutEvents();
-            } else {
-                throw new Exception('Unable to disable middleware. ApplicationTrait not used.');
-            }
-        });
+        if (method_exists($this, 'withoutEvents')) {
+            $this->withoutEvents();
+        } else {
+            throw new Exception('Unable to disable middleware. ApplicationTrait not used.');
+        }
     }
 }
