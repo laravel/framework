@@ -63,6 +63,8 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
             $this->refreshApplication();
         }
 
+        $this->setUpTraits();
+
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             call_user_func($callback);
         }
@@ -80,6 +82,32 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         putenv('APP_ENV=testing');
 
         $this->app = $this->createApplication();
+    }
+
+    /**
+     * Boot the testing helper traits.
+     *
+     * @return void
+     */
+    protected function setUpTraits()
+    {
+        $uses = array_flip(class_uses_recursive(get_class($this)));
+
+        if (isset($uses[DatabaseTransactions::class])) {
+            $this->beginDatabaseTransaction();
+        }
+
+        if (isset($uses[DatabaseMigrations::class])) {
+            $this->runDatabaseMigrations();
+        }
+
+        if (isset($uses[WithoutMiddleware::class])) {
+            $this->disableMiddlewareForAllTests();
+        }
+
+        if (isset($uses[WithoutEvents::class])) {
+            $this->disableEventsForAllTests();
+        }
     }
 
     /**

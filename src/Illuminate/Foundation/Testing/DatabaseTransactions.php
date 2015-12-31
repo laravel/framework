@@ -4,9 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 trait DatabaseTransactions
 {
-    /**
-     * @before
-     */
     public function beginDatabaseTransaction()
     {
         $this->afterApplicationCreated(function () {
