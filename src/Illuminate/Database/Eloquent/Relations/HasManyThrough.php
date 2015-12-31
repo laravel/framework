@@ -86,7 +86,7 @@ class HasManyThrough extends Relation
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = '*')
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
         $parentTable = $this->parent->getTable();
 
