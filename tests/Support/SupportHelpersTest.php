@@ -180,6 +180,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([null, null], array_pluck($data, 'foo.bar'));
     }
 
+    public function testArrayPrepend()
+    {
+        $array = array_prepend(['one', 'two', 'three', 'four'], 'zero');
+        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $array);
+
+        $array = array_prepend(['one' => 1, 'two' => 2], 0, 'zero');
+        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
+    }
+
     public function testArrayFlatten()
     {
         $this->assertEquals(['#foo', '#bar', '#baz'], array_flatten([['#foo', '#bar'], ['#baz']]));
