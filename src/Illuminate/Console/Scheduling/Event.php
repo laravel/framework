@@ -247,7 +247,6 @@ class Event
         }
 
         return $this->expressionPasses() &&
-               $this->filtersPass($app) &&
                $this->runsInEnvironment($app->environment());
     }
 
@@ -273,7 +272,7 @@ class Event
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return bool
      */
-    protected function filtersPass($app)
+    public function filtersPass($app)
     {
         foreach ($this->filters as $callback) {
             if (! $app->call($callback)) {
