@@ -43,6 +43,10 @@ class MySqlConnector extends Connector implements ConnectorInterface {
 		{
 			$connection->prepare("set session sql_mode='STRICT_ALL_TABLES'")->execute();
 		}
+		else
+		{
+			$connection->prepare("set session sql_mode=''")->execute();
+		}
 
 		return $connection;
 	}
