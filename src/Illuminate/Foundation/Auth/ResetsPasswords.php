@@ -84,7 +84,7 @@ trait ResetsPasswords
      *
      * If no token is present, display the link request form.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $token
      * @return \Illuminate\Http\Response
      */
