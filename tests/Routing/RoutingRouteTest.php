@@ -180,6 +180,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo.bar.show', $routes[0]->getName());
         $this->assertEquals('foo/bar/{bar}', $routes[0]->getUri());
+
+        // Two groups with 'prefix' and 'as'
+        $router = $this->getRouter();
+        $router->group(['as' => 'foo.', 'prefix' => 'bar'], function () use ($router) {
+            $router->group(['as' => 'bar.', 'prefix' => 'foo'], function () use ($router) {
+                $router->resource('foo', 'FooController', ['only' => ['show']]);
+            });
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo.bar.foo.show', $routes[0]->getName());
+        $this->assertEquals('bar/foo/foo/{foo}', $routes[0]->getUri());
     }
 
     public function testMacro()
