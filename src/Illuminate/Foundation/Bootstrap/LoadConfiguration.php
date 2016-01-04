@@ -73,7 +73,8 @@ class LoadConfiguration
 
         $configPath = realpath($app->configPath());
 
-        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
+        //fixed the regex error if the XDebug enable
+        foreach (Finder::create()->files()->name('/.*\.php/')->in($configPath) as $file) {
             $nesting = $this->getConfigurationNesting($file, $configPath);
 
             $files[$nesting.basename($file->getRealPath(), '.php')] = $file->getRealPath();
