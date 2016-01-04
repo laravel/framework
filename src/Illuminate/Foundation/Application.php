@@ -517,7 +517,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function register($provider, $options = [], $force = false)
     {
-        if ($registered = $this->getProvider($provider) && ! $force) {
+        if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
         }
 
