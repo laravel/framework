@@ -510,7 +510,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->$source->all();
         }
 
-        return $this->$source->get($key, $default, true);
+        return $this->$source->get($key, $default);
     }
 
     /**
