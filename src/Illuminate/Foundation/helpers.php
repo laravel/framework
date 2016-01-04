@@ -97,9 +97,9 @@ if (! function_exists('auth')) {
      *
      * @return \Illuminate\Contracts\Auth\Factory
      */
-    function auth()
+    function auth($guard = null)
     {
-        return app(AuthFactory::class);
+        return app(AuthFactory::class)->guard($guard);
     }
 }
 
