@@ -702,7 +702,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation only when it produces output.
      *
-     * @param  array|mixed $addresses
+     * @param  array|mixed  $addresses
      * @return $this
      *
      * @throws \LogicException
@@ -732,15 +732,17 @@ class Event
     {
         $text = file_get_contents($this->output);
 
-        if ($includeEmpty || ! empty($text)) {
-            $mailer->raw($text, function ($m) use ($addresses) {
-                $m->subject($this->getEmailSubject());
-
-                foreach ($addresses as $address) {
-                    $m->to($address);
-                }
-            });
+        if (! $includeEmpty && empty($text)) {
+            return;
         }
+
+        $mailer->raw($text, function ($m) use ($addresses) {
+            $m->subject($this->getEmailSubject());
+
+            foreach ($addresses as $address) {
+                $m->to($address);
+            }
+        });
     }
 
     /**
