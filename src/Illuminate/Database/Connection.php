@@ -727,14 +727,14 @@ class Connection implements ConnectionInterface
     public function logQuery($query, $bindings, $time = null)
     {
         if (isset($this->events)) {
-            $this->events->fire('illuminate.query', [$query, $bindings, $time, $this->getName()]);
+            $this->events->fire(new Events\QueryExecuted(
+                $query, $bindings, $time, $this
+            ));
         }
 
-        if (! $this->loggingQueries) {
-            return;
+        if ($this->loggingQueries) {
+            $this->queryLog[] = compact('query', 'bindings', 'time');
         }
-
-        $this->queryLog[] = compact('query', 'bindings', 'time');
     }
 
     /**
@@ -746,7 +746,7 @@ class Connection implements ConnectionInterface
     public function listen(Closure $callback)
     {
         if (isset($this->events)) {
-            $this->events->listen('illuminate.query', $callback);
+            $this->events->listen(Events\QueryExecuted::class, $callback);
         }
     }
 
@@ -758,8 +758,17 @@ class Connection implements ConnectionInterface
      */
     protected function fireConnectionEvent($event)
     {
-        if (isset($this->events)) {
-            $this->events->fire('connection.'.$this->getName().'.'.$event, $this);
+        if (! isset($this->events)) {
+            return;
+        }
+
+        switch ($event) {
+            case 'beganTransaction':
+                return $this->events->fire(new Events\TransactionBeginning($this));
+            case 'committed':
+                return $this->events->fire(new Events\TransactionCommitted($this));
+            case 'rollingBack':
+                return $this->events->fire(new Events\TransactionRolledBack($this));
         }
     }
 

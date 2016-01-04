@@ -15,15 +15,16 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/container": "5.1.*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/http": "5.1.*",
-        "illuminate/pipeline": "5.1.*",
-        "illuminate/session": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "symfony/http-foundation": "2.7.*",
-        "symfony/http-kernel": "2.7.*",
-        "symfony/routing": "2.7.*"
+        "illuminate/container": "5.2.*",
+        "illuminate/contracts": "5.2.*",
+        "illuminate/http": "5.2.*",
+        "illuminate/pipeline": "5.2.*",
+        "illuminate/session": "5.2.*",
+        "illuminate/support": "5.2.*",
+        "symfony/debug": "2.8.*|3.0.*",
+        "symfony/http-foundation": "2.8.*|3.0.*",
+        "symfony/http-kernel": "2.8.*|3.0.*",
+        "symfony/routing": "2.8.*|3.0.*"
     },
     "autoload": {
         "psr-4": {
@@ -32,11 +33,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (5.1.*)."
+        "illuminate/console": "Required to use the make commands (5.2.*)."
     },
     "minimum-stability": "dev"
 }

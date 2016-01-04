@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/container": "5.1.*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*",
-        "symfony/http-foundation": "2.7.*",
-        "symfony/translation": "2.7.*"
+        "illuminate/container": "5.2.*",
+        "illuminate/contracts": "5.2.*",
+        "illuminate/support": "5.2.*",
+        "symfony/http-foundation": "2.8.*|3.0.*",
+        "symfony/translation": "2.8.*|3.0.*"
     },
     "autoload": {
         "psr-4": {
@@ -28,11 +28,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database presence verifier (5.1.*)."
+        "illuminate/database": "Required to use the database presence verifier (5.2.*)."
     },
     "minimum-stability": "dev"
 }

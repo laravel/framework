@@ -6,9 +6,6 @@ use Exception;
 
 trait WithoutMiddleware
 {
-    /**
-     * @before
-     */
     public function disableMiddlewareForAllTests()
     {
         if (method_exists($this, 'withoutMiddleware')) {
