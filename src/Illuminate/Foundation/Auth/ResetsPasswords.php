@@ -62,11 +62,34 @@ trait ResetsPasswords
 
         switch ($response) {
             case Password::RESET_LINK_SENT:
-                return redirect()->back()->with('status', trans($response));
+                return $this->getSendResetLinkEmailSuccessResponse($response);
 
             case Password::INVALID_USER:
-                return redirect()->back()->withErrors(['email' => trans($response)]);
+            default:
+                return $this->getSendResetLinkEmailFailureResponse($response);
         }
+    }
+
+    /**
+     * Get the response to send back after the reset link has been successfully sent.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function getSendResetLinkEmailSuccessResponse($response)
+    {
+        return redirect()->back()->with('status', trans($response));
+    }
+
+    /**
+     * Get the response to send back after the reset link could not be sent.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function getSendResetLinkEmailFailureResponse($response)
+    {
+        return redirect()->back()->withErrors(['email' => trans($response)]);
     }
 
     /**
@@ -152,13 +175,37 @@ trait ResetsPasswords
 
         switch ($response) {
             case Password::PASSWORD_RESET:
-                return redirect($this->redirectPath())->with('status', trans($response));
+                return $this->getResetSuccessResponse($response);
 
             default:
-                return redirect()->back()
-                            ->withInput($request->only('email'))
-                            ->withErrors(['email' => trans($response)]);
+                return $this->getResetFailureResponse($response, $request);
         }
+    }
+
+    /**
+     * Get the response to send back after a successful password reset.
+     *
+     * @param  mixed  $response
+     * @param  Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function getResetSuccessResponse($response)
+    {
+        return redirect($this->redirectPath())->with('status', trans($response));
+    }
+
+    /**
+     * Get the response to send back after a failing password reset.
+     *
+     * @param  string  $response
+     * @param  Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function getResetFailureResponse($response, Request $request)
+    {
+        return redirect()->back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**
