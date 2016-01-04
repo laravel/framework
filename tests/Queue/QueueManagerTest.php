@@ -51,4 +51,24 @@ class QueueManagerTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($queue, $manager->connection('foo'));
     }
+
+    public function testNullConnectionCanBeResolved()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'null',
+            ],
+            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+        ];
+
+        $manager = new QueueManager($app);
+        $connector = m::mock('StdClass');
+        $queue = m::mock('StdClass');
+        $connector->shouldReceive('connect')->once()->with(['driver' => 'null'])->andReturn($queue);
+        $manager->addConnector('null', function () use ($connector) { return $connector; });
+        $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('setEncrypter')->once()->with($encrypter);
+
+        $this->assertSame($queue, $manager->connection('null'));
+    }
 }
