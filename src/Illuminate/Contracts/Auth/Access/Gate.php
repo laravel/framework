@@ -31,6 +31,32 @@ interface Gate
     public function policy($class, $policy);
 
     /**
+     * Register a callback to run before all Gate checks.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function before(callable $callback);
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function allows($ability, $arguments = []);
+
+    /**
+     * Determine if the given ability should be denied for the current user.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function denies($ability, $arguments = []);
+
+    /**
      * Determine if the given ability should be granted.
      *
      * @param  string  $ability
@@ -38,4 +64,12 @@ interface Gate
      * @return bool
      */
     public function check($ability, $arguments = []);
+
+    /**
+     * Get a guard instance for the given user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @return static
+     */
+    public function forUser($user);
 }

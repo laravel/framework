@@ -6,9 +6,6 @@ use Exception;
 
 trait WithoutEvents
 {
-    /**
-     * @before
-     */
     public function disableEventsForAllTests()
     {
         if (method_exists($this, 'withoutEvents')) {

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Encryption;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 abstract class BaseEncrypter
@@ -73,10 +72,10 @@ abstract class BaseEncrypter
      */
     protected function validMac(array $payload)
     {
-        $bytes = Str::randomBytes(16);
+        $bytes = random_bytes(16);
 
         $calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 
-        return Str::equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
+        return hash_equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
     }
 }

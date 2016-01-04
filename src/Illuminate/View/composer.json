@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/container": "5.1.*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/events": "5.1.*",
-        "illuminate/filesystem": "5.1.*",
-        "illuminate/support": "5.1.*"
+        "illuminate/container": "5.2.*",
+        "illuminate/contracts": "5.2.*",
+        "illuminate/events": "5.2.*",
+        "illuminate/filesystem": "5.2.*",
+        "illuminate/support": "5.2.*"
     },
     "autoload": {
         "psr-4": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "minimum-stability": "dev"

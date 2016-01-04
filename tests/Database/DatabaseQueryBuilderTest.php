@@ -18,6 +18,27 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "users"', $builder->toSql());
     }
 
+    public function testBasicSelectWithGetColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select * from "users"', $sql);
+        });
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "foo", "bar" from "users"', $sql);
+        });
+
+        $builder->from('users')->get();
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get(['foo', 'bar']);
+        $this->assertNull($builder->columns);
+
+        $this->assertEquals('select * from "users"', $builder->toSql());
+        $this->assertNull($builder->columns);
+    }
+
     public function testBasicSelectUseWritePdo()
     {
         $builder = $this->getMySqlBuilderWithProcessor();
@@ -790,7 +811,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
             return $results;
         });
-        $results = $builder->from('users')->where('id', '=', 1)->lists('foo');
+        $results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
         $this->assertEquals(['bar', 'baz'], $results);
 
         $builder = $this->getBuilder();
@@ -798,7 +819,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']])->andReturnUsing(function ($query, $results) {
             return $results;
         });
-        $results = $builder->from('users')->where('id', '=', 1)->lists('foo', 'id');
+        $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');
         $this->assertEquals([1 => 'bar', 10 => 'baz'], $results);
     }
 

@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Composer;
+use Illuminate\Support\Composer;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,7 +27,7 @@ class AppNameCommand extends Command
     /**
      * The Composer class instance.
      *
-     * @var \Illuminate\Foundation\Composer
+     * @var \Illuminate\Support\Composer
      */
     protected $composer;
 
@@ -48,7 +48,7 @@ class AppNameCommand extends Command
     /**
      * Create a new key generator command.
      *
-     * @param  \Illuminate\Foundation\Composer  $composer
+     * @param  \Illuminate\Support\Composer  $composer
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
@@ -78,8 +78,6 @@ class AppNameCommand extends Command
         $this->setComposerNamespace();
 
         $this->setDatabaseFactoryNamespaces();
-
-        $this->setPhpSpecNamespace();
 
         $this->info('Application namespace set!');
 
@@ -201,7 +199,7 @@ class AppNameCommand extends Command
     protected function setAuthConfigNamespace()
     {
         $this->replaceIn(
-            $this->getAuthConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getConfigPath('auth'), $this->currentRoot.'\\User', $this->argument('name').'\\User'
         );
     }
 
@@ -213,20 +211,8 @@ class AppNameCommand extends Command
     protected function setServicesConfigNamespace()
     {
         $this->replaceIn(
-            $this->getServicesConfigPath(), $this->currentRoot.'\\User', $this->argument('name').'\\User'
+            $this->getConfigPath('services'), $this->currentRoot.'\\User', $this->argument('name').'\\User'
         );
-    }
-
-    /**
-     * Set the PHPSpec configuration namespace.
-     *
-     * @return void
-     */
-    protected function setPhpSpecNamespace()
-    {
-        if ($this->files->exists($path = $this->getPhpSpecConfigPath())) {
-            $this->replaceIn($path, $this->currentRoot, $this->argument('name'));
-        }
     }
 
     /**
@@ -283,36 +269,6 @@ class AppNameCommand extends Command
     protected function getConfigPath($name)
     {
         return $this->laravel['path.config'].'/'.$name.'.php';
-    }
-
-    /**
-     * Get the path to the authentication configuration file.
-     *
-     * @return string
-     */
-    protected function getAuthConfigPath()
-    {
-        return $this->getConfigPath('auth');
-    }
-
-    /**
-     * Get the path to the services configuration file.
-     *
-     * @return string
-     */
-    protected function getServicesConfigPath()
-    {
-        return $this->getConfigPath('services');
-    }
-
-    /**
-     * Get the path to the PHPSpec configuration file.
-     *
-     * @return string
-     */
-    protected function getPhpSpecConfigPath()
-    {
-        return $this->laravel->basePath().'/phpspec.yml';
     }
 
     /**

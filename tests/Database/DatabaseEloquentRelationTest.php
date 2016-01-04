@@ -73,9 +73,6 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $grammar->shouldReceive('wrap');
         $parent->shouldReceive('newQueryWithoutScopes')->andReturn($eloquentBuilder);
 
-        //Test Condition
-        $parent->shouldReceive('applyGlobalScopes')->andReturn($eloquentBuilder)->never();
-
         $relation = new EloquentRelationStub($eloquentBuilder, $parent);
         $relation->wrap('test');
     }
