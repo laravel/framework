@@ -96,7 +96,7 @@ trait AuthenticatesUsers
         }
 
         if (method_exists($this, 'authenticated')) {
-            return $this->authenticated($request, Auth::user());
+            return $this->authenticated($request, Auth::guard($this->getGuard())->user());
         }
 
         return redirect()->intended($this->redirectPath());
