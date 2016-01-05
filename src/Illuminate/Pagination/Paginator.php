@@ -76,7 +76,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function nextPageUrl()
     {
-        if ($this->hasMore) {
+        if ($this->hasMorePages()) {
             return $this->url($this->currentPage() + 1);
         }
     }
