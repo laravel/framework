@@ -498,16 +498,6 @@ class Event
     }
 
     /**
-     * Schedule the event to run yearly.
-     *
-     * @return $this
-     */
-    public function yearly()
-    {
-        return $this->cron('0 0 1 1 * *');
-    }
-
-    /**
      * Schedule the event to run quarterly.
      *
      * @return $this
@@ -515,6 +505,16 @@ class Event
     public function quarterly()
     {
         return $this->cron('0 0 1 */3 *');
+    }
+
+    /**
+     * Schedule the event to run yearly.
+     *
+     * @return $this
+     */
+    public function yearly()
+    {
+        return $this->cron('0 0 1 1 * *');
     }
 
     /**
