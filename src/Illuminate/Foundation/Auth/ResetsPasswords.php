@@ -12,7 +12,8 @@ trait ResetsPasswords
     use RedirectsUsers;
 
     /**
-     * Get the broker to be used during resetting the password
+     * Get the broker to be used during resetting the password.
+     *
      * @return string|null
      */
     public function getBroker()
