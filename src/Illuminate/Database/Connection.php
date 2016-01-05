@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Database\Connectors\ConnectorInterface;
 use PDO;
 use Closure;
 use Exception;
@@ -27,21 +28,28 @@ class Connection implements ConnectionInterface
      *
      * @var PDO
      */
-    protected $pdo;
+    private $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
      * @var PDO
      */
-    protected $readPdo;
+    private $readPdo;
 
     /**
-     * The reconnector instance for the connection.
+     * The connector which opens the PDO connection when it is needed
      *
-     * @var callable
+     * @var ConnectorInterface
      */
-    protected $reconnector;
+    protected $connector;
+
+    /**
+     * The connector which opens the PDO connection when performing reads
+     *
+     * @var ConnectorInterface
+     */
+    protected $readConnector;
 
     /**
      * The query grammar implementation.
@@ -135,17 +143,23 @@ class Connection implements ConnectionInterface
     protected $config = [];
 
     /**
+     * The read database connection configuration options
+     *
+     * @var array
+     */
+    protected $readConfig = [];
+
+    /**
      * Create a new database connection instance.
      *
-     * @param  \PDO     $pdo
-     * @param  string   $database
-     * @param  string   $tablePrefix
-     * @param  array    $config
-     * @return void
+     * @param  ConnectorInterface $connector
+     * @param  string             $database
+     * @param  string             $tablePrefix
+     * @param  array              $config
      */
-    public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = [])
+    public function __construct(ConnectorInterface $connector, $database = '', $tablePrefix = '', array $config = [])
     {
-        $this->pdo = $pdo;
+        $this->connector = $connector;
 
         // First we will setup the default properties. We keep track of the DB
         // name we are connected to since it is needed when some reflective
@@ -308,7 +322,7 @@ class Connection implements ConnectionInterface
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+        return $this->run($query, $bindings, $useReadPdo, function ($me, $query, $bindings) use ($useReadPdo) {
             if ($me->pretending()) {
                 return [];
             }
@@ -380,7 +394,7 @@ class Connection implements ConnectionInterface
      */
     public function statement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
+        return $this->run($query, $bindings, false, function ($me, $query, $bindings) {
             if ($me->pretending()) {
                 return true;
             }
@@ -400,7 +414,7 @@ class Connection implements ConnectionInterface
      */
     public function affectingStatement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
+        return $this->run($query, $bindings, false, function ($me, $query, $bindings) {
             if ($me->pretending()) {
                 return 0;
             }
@@ -424,7 +438,7 @@ class Connection implements ConnectionInterface
      */
     public function unprepared($query)
     {
-        return $this->run($query, [], function ($me, $query) {
+        return $this->run($query, [], false, function ($me, $query) {
             if ($me->pretending()) {
                 return true;
             }
@@ -504,9 +518,9 @@ class Connection implements ConnectionInterface
         ++$this->transactions;
 
         if ($this->transactions == 1) {
-            $this->pdo->beginTransaction();
+            $this->getPdo()->beginTransaction();
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
+            $this->getPdo()->exec(
                 $this->queryGrammar->compileSavepoint('trans'.$this->transactions)
             );
         }
@@ -522,7 +536,7 @@ class Connection implements ConnectionInterface
     public function commit()
     {
         if ($this->transactions == 1) {
-            $this->pdo->commit();
+            $this->getPdo()->commit();
         }
 
         --$this->transactions;
@@ -538,9 +552,9 @@ class Connection implements ConnectionInterface
     public function rollBack()
     {
         if ($this->transactions == 1) {
-            $this->pdo->rollBack();
+            $this->getPdo()->rollBack();
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
+            $this->getPdo()->exec(
                 $this->queryGrammar->compileSavepointRollBack('trans'.$this->transactions)
             );
         }
@@ -593,14 +607,17 @@ class Connection implements ConnectionInterface
      *
      * @param  string    $query
      * @param  array     $bindings
+     * @param  bool      $useReadPdo
      * @param  \Closure  $callback
      * @return mixed
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function run($query, $bindings, Closure $callback)
+    protected function run($query, $bindings, $useReadPdo, Closure $callback)
     {
-        $this->reconnectIfMissingConnection();
+        if(! $this->pretending()) {
+            $this->reconnectIfMissingConnection($useReadPdo);
+        }
 
         $start = microtime(true);
 
@@ -611,7 +628,7 @@ class Connection implements ConnectionInterface
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {
             $result = $this->tryAgainIfCausedByLostConnection(
-                $e, $query, $bindings, $callback
+                $e, $useReadPdo, $query, $bindings, $callback
             );
         }
 
@@ -660,6 +677,7 @@ class Connection implements ConnectionInterface
      * Handle a query exception that occurred during query execution.
      *
      * @param  \Illuminate\Database\QueryException  $e
+     * @param  bool      $useReadPdo
      * @param  string    $query
      * @param  array     $bindings
      * @param  \Closure  $callback
@@ -667,10 +685,10 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
+    protected function tryAgainIfCausedByLostConnection(QueryException $e, $useReadPdo, $query, $bindings, Closure $callback)
     {
         if ($this->causedByLostConnection($e->getPrevious())) {
-            $this->reconnect();
+            $this->reconnect($useReadPdo);
 
             return $this->runQueryCallback($query, $bindings, $callback);
         }
@@ -691,29 +709,23 @@ class Connection implements ConnectionInterface
     /**
      * Reconnect to the database.
      *
-     * @return void
-     *
-     * @throws \LogicException
+     * @param  bool $useReadPdo
+     * @return PDO
      */
-    public function reconnect()
+    public function reconnect($useReadPdo)
     {
-        if (is_callable($this->reconnector)) {
-            return call_user_func($this->reconnector, $this);
-        }
-
-        throw new LogicException('Lost connection and no reconnector available.');
+        return $useReadPdo ? $this->getReadPdo(true) : $this->getPdo(true);
     }
 
     /**
      * Reconnect to the database if a PDO connection is missing.
      *
+     * @param  $useReadPdo
      * @return void
      */
-    protected function reconnectIfMissingConnection()
+    protected function reconnectIfMissingConnection($useReadPdo)
     {
-        if (is_null($this->getPdo()) || is_null($this->getReadPdo())) {
-            $this->reconnect();
-        }
+        $useReadPdo ? $this->getReadPdo() : $this->getPdo();
     }
 
     /**
@@ -827,7 +839,7 @@ class Connection implements ConnectionInterface
         if (is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
-            $data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
+            $data = ['pdo' => $this->getPdo(), 'dbname' => $this->getConfig('database')];
 
             $this->doctrineConnection = new DoctrineConnection($data, $driver);
         }
@@ -838,25 +850,36 @@ class Connection implements ConnectionInterface
     /**
      * Get the current PDO connection.
      *
-     * @return \PDO
+     * @param bool $fresh
+     * @return PDO
      */
-    public function getPdo()
+    public function getPdo($fresh = false)
     {
+        if(is_null($this->pdo) || $fresh) {
+            $this->pdo = $this->connector->connect($this->config);
+        }
         return $this->pdo;
     }
 
     /**
      * Get the current PDO connection used for reading.
      *
-     * @return \PDO
+     * @param bool $fresh
+     * @return PDO
      */
-    public function getReadPdo()
+    public function getReadPdo($fresh = false)
     {
         if ($this->transactions >= 1) {
-            return $this->getPdo();
+            return $this->getPdo($fresh);
         }
 
-        return $this->readPdo ?: $this->pdo;
+        if($this->readConnector) {
+            if(is_null($this->readPdo) || $fresh) {
+                $this->readPdo = $this->readConnector->connect($this->readConfig ?: $this->config);
+            }
+            return $this->readPdo;
+        }
+        return $this->getPdo($fresh);
     }
 
     /**
@@ -890,14 +913,15 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the reconnect instance on the connection.
-     *
-     * @param  callable  $reconnector
+     * @param ConnectorInterface $connector
+     * @param array              $readConfig
      * @return $this
      */
-    public function setReconnector(callable $reconnector)
+    public function setReadConnector(ConnectorInterface $connector, array $readConfig)
     {
-        $this->reconnector = $reconnector;
+        $this->readConnector = $connector;
+
+        $this->readConfig = $readConfig;
 
         return $this;
     }
@@ -930,7 +954,7 @@ class Connection implements ConnectionInterface
      */
     public function getDriverName()
     {
-        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->getConfig('driver');
     }
 
     /**
