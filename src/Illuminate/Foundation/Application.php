@@ -517,7 +517,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function register($provider, $options = [], $force = false)
     {
-        if ($registered = $this->getProvider($provider) && ! $force) {
+        if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
         }
 
@@ -1029,8 +1029,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'app'                  => ['Illuminate\Foundation\Application', 'Illuminate\Contracts\Container\Container', 'Illuminate\Contracts\Foundation\Application'],
             'auth'                 => ['Illuminate\Auth\AuthManager', 'Illuminate\Contracts\Auth\Factory'],
             'auth.driver'          => ['Illuminate\Contracts\Auth\Guard'],
-            'auth.password'        => ['Illuminate\Contracts\Auth\PasswordBrokerFactory'],
-            'auth.password.broker' => ['Illuminate\Contracts\Auth\PasswordBroker'],
             'blade.compiler'       => ['Illuminate\View\Compilers\BladeCompiler'],
             'cache'                => ['Illuminate\Cache\CacheManager', 'Illuminate\Contracts\Cache\Factory'],
             'cache.store'          => ['Illuminate\Cache\Repository', 'Illuminate\Contracts\Cache\Repository'],
