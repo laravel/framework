@@ -195,7 +195,7 @@ trait ResetsPasswords
 
         $user->save();
 
-        Auth::login($user);
+        Auth::guard($this->getGuard())->login($user);
     }
 
     /**
