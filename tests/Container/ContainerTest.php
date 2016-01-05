@@ -328,6 +328,26 @@ return $obj; });
         $container->make('ContainerMixedPrimitiveStub', []);
     }
 
+    /**
+     * @expectedException Illuminate\Contracts\Container\BindingResolutionException
+     * @expectedExceptionMessage Target [IContainerContractStub] is not instantiable.
+     */
+    public function testBindingResolutionExceptionMessage()
+    {
+        $container = new Container;
+        $container->make('IContainerContractStub', []);
+    }
+
+    /**
+     * @expectedException Illuminate\Contracts\Container\BindingResolutionException
+     * @expectedExceptionMessage Target [IContainerContractStub] is not instantiable while building [ContainerTestContextInjectOne].
+     */
+    public function testBindingResolutionExceptionMessageIncludesBuildStack()
+    {
+        $container = new Container;
+        $container->make('ContainerTestContextInjectOne', []);
+    }
+
     public function testCallWithDependencies()
     {
         $container = new Container;
