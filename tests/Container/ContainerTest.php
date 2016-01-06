@@ -332,14 +332,14 @@ return $obj; });
     {
         $container = new Container;
         $result = $container->call(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         });
 
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals([], $result[1]);
 
         $result = $container->call(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf('stdClass', $result[0]);
@@ -349,7 +349,7 @@ return $obj; });
          * Wrap a function...
          */
         $result = $container->wrap(function (StdClass $foo, $bar = []) {
-            return func_get_args();
+            return [$foo, $bar] + func_get_args();
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf('Closure', $result);
@@ -393,10 +393,10 @@ return $obj; });
     {
         $container = new Container;
         $result = $container->call(function ($foo, $bar = []) {
-            return func_get_args();
-        }, ['foo','bar']);
+            return [$foo, $bar] + func_get_args();
+        }, ['foo','bar', 'baz']);
 
-        $this->assertEquals(['foo','bar'], $result);
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
 
     public function testCallWithCallableArray()
@@ -669,7 +669,7 @@ class ContainerTestCallStub
 
     public function inject(ContainerConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return [$stub, $default] + func_get_args();
     }
 }
 
@@ -697,7 +697,7 @@ class ContainerStaticMethodStub
 {
     public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
     {
-        return func_get_args();
+        return [$stub, $default] + func_get_args();
     }
 }
 
@@ -713,5 +713,5 @@ class ContainerInjectVariableStub
 
 function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
 {
-    return func_get_args();
+    return [$stub, $default] + func_get_args();
 }
