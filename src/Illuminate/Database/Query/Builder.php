@@ -708,8 +708,6 @@ class Builder
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
-        $type = $not ? 'NotExists' : 'Exists';
-
         $query = $this->newQuery();
 
         // Similar to the sub-select clause, we will create a new query instance so
@@ -717,11 +715,7 @@ class Builder
         // compile the whole thing in the grammar and insert it into the SQL.
         call_user_func($callback, $query);
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
+        return $this->whereExistsQuery($query, $boolean, $not);
     }
 
     /**
@@ -746,6 +740,25 @@ class Builder
     public function whereNotExists(Closure $callback, $boolean = 'and')
     {
         return $this->whereExists($callback, $boolean, true);
+    }
+
+    /**
+     * Add an exists clause to the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereExistsQuery(Builder $query, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotExists' : 'Exists';
+
+        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
     }
 
     /**
