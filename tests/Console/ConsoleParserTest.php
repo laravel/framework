@@ -155,11 +155,11 @@ class ConsoleParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals((object) ['red' => 0, 'green' => 0, 'blue' => 0], $defaults[0]);
         $this->assertEquals((object) ['prop' => (object) ['nested' => [2, 4]], 'not' => 5], $defaults[1]);
     }
-    
+
     protected function getArgDefaults($results)
     {
         $args = $results[1];
-        
+
         return array_map(function ($arg) {
             return $arg->getDefault();
         }, $args);

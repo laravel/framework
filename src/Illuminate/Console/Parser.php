@@ -149,7 +149,7 @@ class Parser
     {
         switch (true) {
             case preg_match('/^null$/i', $default):
-                return null;
+                return;
             case preg_match('/^(true|false)$/', $default):
                 return $default === 'true';
             case preg_match('/^[1-9]\d*$/', $default):
