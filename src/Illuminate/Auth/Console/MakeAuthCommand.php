@@ -59,8 +59,7 @@ class MakeAuthCommand extends Command
 
             file_put_contents(
                 app_path('Http/routes.php'),
-                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
-                FILE_APPEND
+                file_get_contents(__DIR__.'/stubs/make/routes.stub')
             );
         }
 
