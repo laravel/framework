@@ -137,13 +137,13 @@ class Connection implements ConnectionInterface
     /**
      * Create a new database connection instance.
      *
-     * @param  \PDO     $pdo
+     * @param  \PDO|\Closure     $pdo
      * @param  string   $database
      * @param  string   $tablePrefix
      * @param  array    $config
      * @return void
      */
-    public function __construct(PDO $pdo, $database = '', $tablePrefix = '', array $config = [])
+    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
         $this->pdo = $pdo;
 
@@ -504,9 +504,9 @@ class Connection implements ConnectionInterface
         ++$this->transactions;
 
         if ($this->transactions == 1) {
-            $this->pdo->beginTransaction();
+            $this->getPdo()->beginTransaction();
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
+            $this->getPdo()->exec(
                 $this->queryGrammar->compileSavepoint('trans'.$this->transactions)
             );
         }
@@ -522,7 +522,7 @@ class Connection implements ConnectionInterface
     public function commit()
     {
         if ($this->transactions == 1) {
-            $this->pdo->commit();
+            $this->getPdo()->commit();
         }
 
         --$this->transactions;
@@ -538,9 +538,9 @@ class Connection implements ConnectionInterface
     public function rollBack()
     {
         if ($this->transactions == 1) {
-            $this->pdo->rollBack();
+            $this->getPdo()->rollBack();
         } elseif ($this->transactions > 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->pdo->exec(
+            $this->getPdo()->exec(
                 $this->queryGrammar->compileSavepointRollBack('trans'.$this->transactions)
             );
         }
@@ -827,7 +827,7 @@ class Connection implements ConnectionInterface
         if (is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
-            $data = ['pdo' => $this->pdo, 'dbname' => $this->getConfig('database')];
+            $data = ['pdo' => $this->getPdo(), 'dbname' => $this->getConfig('database')];
 
             $this->doctrineConnection = new DoctrineConnection($data, $driver);
         }
@@ -842,6 +842,10 @@ class Connection implements ConnectionInterface
      */
     public function getPdo()
     {
+        if ($this->pdo instanceof Closure) {
+            return $this->pdo = call_user_func($this->pdo);
+        }
+
         return $this->pdo;
     }
 
@@ -856,7 +860,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        return $this->readPdo ?: $this->pdo;
+        return $this->readPdo ?: $this->getPdo();
     }
 
     /**
@@ -930,7 +934,7 @@ class Connection implements ConnectionInterface
      */
     public function getDriverName()
     {
-        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->getConfig('driver');
     }
 
     /**
