@@ -715,7 +715,7 @@ class Builder
         // compile the whole thing in the grammar and insert it into the SQL.
         call_user_func($callback, $query);
 
-        return $this->whereExistsQuery($query, $boolean, $not);
+        return $this->addWhereExistsQuery($query, $boolean, $not);
     }
 
     /**
@@ -743,25 +743,6 @@ class Builder
     }
 
     /**
-     * Add an exists clause to the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder $query
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereExistsQuery(Builder $query, $boolean = 'and', $not = false)
-    {
-        $type = $not ? 'NotExists' : 'Exists';
-
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
-    }
-
-    /**
      * Add a where not exists clause to the query.
      *
      * @param  \Closure  $callback
@@ -770,6 +751,25 @@ class Builder
     public function orWhereNotExists(Closure $callback)
     {
         return $this->orWhereExists($callback, true);
+    }
+
+    /**
+     * Add an exists clause to the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function addWhereExistsQuery(Builder $query, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotExists' : 'Exists';
+
+        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
     }
 
     /**

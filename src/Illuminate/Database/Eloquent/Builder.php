@@ -655,7 +655,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query.
+     * Add a relationship count / exists condition to the query.
      *
      * @param  string  $relation
      * @param  string  $operator
@@ -675,9 +675,10 @@ class Builder
         // If we only need to check for the existence of the relation, then we can
         // optimize the subquery to only run a "where exists" clause instead of
         // the full "count" clause. This will make the query run much faster.
-        $queryType = $this->shouldRunExistsQuery($operator, $count) ? 'getRelationQuery' : 'getRelationCountQuery';
+        $queryType = $this->shouldRunExistsQuery($operator, $count)
+                ? 'getRelationQuery' : 'getRelationCountQuery';
 
-        $query = $relation->$queryType($relation->getRelated()->newQuery(), $this);
+        $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
             call_user_func($callback, $query);
@@ -689,7 +690,7 @@ class Builder
     }
 
     /**
-     * Add nested relationship count/exists conditions to the query.
+     * Add nested relationship count / exists conditions to the query.
      *
      * @param  string  $relations
      * @param  string  $operator
@@ -717,7 +718,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query.
+     * Add a relationship count / exists condition to the query.
      *
      * @param  string  $relation
      * @param  string  $boolean
@@ -730,7 +731,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query with where clauses.
+     * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string    $relation
      * @param  \Closure  $callback
@@ -744,7 +745,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query with where clauses.
+     * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
@@ -756,7 +757,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query with an "or".
+     * Add a relationship count / exists condition to the query with an "or".
      *
      * @param  string  $relation
      * @param  string  $operator
@@ -769,7 +770,7 @@ class Builder
     }
 
     /**
-     * Add a relationship count/exists condition to the query with where clauses and an "or".
+     * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string    $relation
      * @param  \Closure  $callback
@@ -796,10 +797,10 @@ class Builder
     {
         $this->mergeModelDefinedRelationWheresToHasQuery($hasQuery, $relation);
 
-        if($this->shouldRunExistsQuery($operator, $count)) {
+        if ($this->shouldRunExistsQuery($operator, $count)) {
             $not = ($operator === '<' && $count === 1);
 
-            return $this->whereExistsQuery($hasQuery->toBase(), $boolean, $not);
+            return $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not);
         }
 
         return $this->whereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
