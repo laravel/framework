@@ -388,7 +388,7 @@ return $obj; });
         $result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
         $this->assertEquals(['foo', 'bar'], $result);
     }
-    
+
     public function testCallWithDefaultValueAndParameters()
     {
         $container = new Container;
