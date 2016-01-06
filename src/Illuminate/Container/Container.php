@@ -741,6 +741,7 @@ class Container implements ArrayAccess, ContainerContract
         if (! $reflector->isInstantiable()) {
             if (! empty($this->buildStack)) {
                 $previous = implode(', ', $this->buildStack);
+
                 $message = "Target [$concrete] is not instantiable while building [$previous].";
             } else {
                 $message = "Target [$concrete] is not instantiable.";
