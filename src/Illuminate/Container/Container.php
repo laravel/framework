@@ -576,7 +576,7 @@ class Container implements ArrayAccess, ContainerContract
         } elseif ($parameter->getClass()) {
             $dependencies[] = $this->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
-            $dependencies[] = $parameter->getDefaultValue();
+            //$dependencies[] = $parameter->getDefaultValue();
         }
     }
 
