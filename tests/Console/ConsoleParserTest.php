@@ -104,4 +104,64 @@ class ConsoleParserTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
     }
+
+    public function testDefaultParsing()
+    {
+        $results = Parser::parse('command:name {arg1=default}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertEquals('default', $defaults[0]);
+
+        $results = Parser::parse('command:name {arg1=} {arg2=null}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertNull($defaults[0]);
+        $this->assertNull($defaults[1]);
+
+        $results = Parser::parse('command:name {arg1=true} {arg2=false}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertTrue($defaults[0]);
+        $this->assertInternalType('bool', $defaults[0]);
+        $this->assertFalse($defaults[1]);
+        $this->assertInternalType('bool', $defaults[1]);
+
+        $results = Parser::parse('command:name {arg1=2}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertEquals(2, $defaults[0]);
+        $this->assertInternalType('int', $defaults[0]);
+
+        $results = Parser::parse('command:name {arg1=2.3} {arg2=.3} {arg3=0.9}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertEquals(2.3, $defaults[0]);
+        $this->assertInternalType('float', $defaults[0]);
+        $this->assertEquals(0.3, $defaults[1]);
+        $this->assertInternalType('float', $defaults[0]);
+        $this->assertEquals(0.9, $defaults[2]);
+        $this->assertInternalType('float', $defaults[0]);
+
+        $results = Parser::parse('command:name {arg1=[]} {arg2=array(1,2)} {arg3=["red" => 0, "green" => 0, "blue" => 0]}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertEquals([], $defaults[0]);
+        $this->assertEquals([1, 2], $defaults[1]);
+        $this->assertEquals(['red' => 0, 'green' => 0, 'blue' => 0], $defaults[2]);
+
+        $results = Parser::parse('command:name {arg1={"red": 0, "green": 0, "blue": 0}} {arg2={"prop": {"nested": [2, 4]}, "not": 5}}');
+        $defaults = $this->getArgDefaults($results);
+
+        $this->assertEquals((object) ['red' => 0, 'green' => 0, 'blue' => 0], $defaults[0]);
+        $this->assertEquals((object) ['prop' => (object) ['nested' => [2, 4]], 'not' => 5], $defaults[1]);
+    }
+    
+    protected function getArgDefaults($results)
+    {
+        $args = $results[1];
+        
+        return array_map(function ($arg) {
+            return $arg->getDefault();
+        }, $args);
+    }
 }
