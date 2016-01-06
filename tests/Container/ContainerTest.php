@@ -394,7 +394,7 @@ return $obj; });
         $container = new Container;
         $result = $container->call(function ($foo, $bar = []) {
             return [$foo, $bar] + func_get_args();
-        }, ['foo','bar', 'baz']);
+        }, ['foo', 'bar', 'baz']);
 
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
