@@ -24,7 +24,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
             ],
             'write' => [
                 'database'  => ':memory:',
-            ]
+            ],
         ], 'read_write');
 
         $this->db->setAsGlobal();
