@@ -388,6 +388,16 @@ return $obj; });
         $result = $container->call('ContainerTestCallStub', ['foo', 'bar'], 'work');
         $this->assertEquals(['foo', 'bar'], $result);
     }
+    
+    public function testCallWithDefaultValueAndParameters()
+    {
+        $container = new Container;
+        $result = $container->call(function ($foo, $bar = []) {
+            return func_get_args();
+        }, ['foo','bar']);
+
+        $this->assertEquals(['foo','bar'], $result);
+    }
 
     public function testCallWithCallableArray()
     {
