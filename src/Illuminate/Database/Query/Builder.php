@@ -538,6 +538,32 @@ class Builder
     }
 
     /**
+     * Adds multiple where clauses to the query.
+     *
+     * @param array $conditions
+     * @return $this
+     */
+    public function whereAll($conditions)
+    {
+        foreach ($conditions as $condition) {
+            if (count($condition) == 2) {
+                list($column, $value) = $condition;
+            } else {
+                list($column, $operator, $value, $clause) = $condition;
+            }
+
+            $this->where(
+                $column,
+                ! empty($operator) ? $operator : '=',
+                ! empty($value) ? $value : null,
+                ! empty($clause) ? $clause : 'and'
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the given operator and value combination is legal.
      *
      * @param  string  $operator
