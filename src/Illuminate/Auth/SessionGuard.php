@@ -260,9 +260,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Attempt to authenticate using HTTP Basic Auth.
      *
      * @param  string  $field
+     * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
-    public function basic($field = 'email')
+    public function basic($field = 'email', $extraConditions = [])
     {
         if ($this->check()) {
             return;
@@ -271,7 +272,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If a username is set on the HTTP basic request, we will return out without
         // interrupting the request lifecycle. Otherwise, we'll need to generate a
         // request indicating that the given credentials were invalid for login.
-        if ($this->attemptBasic($this->getRequest(), $field)) {
+        if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
             return;
         }
 
@@ -282,11 +283,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Perform a stateless HTTP Basic login attempt.
      *
      * @param  string  $field
+     * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
-    public function onceBasic($field = 'email')
+    public function onceBasic($field = 'email', $extraConditions = [])
     {
-        if (! $this->once($this->getBasicCredentials($this->getRequest(), $field))) {
+        $credentials = $this->getBasicCredentials($this->getRequest(), $field);
+
+        if (! $this->once(array_merge($credentials, $extraConditions))) {
             return $this->getBasicResponse();
         }
     }
@@ -296,15 +300,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  string  $field
+     * @param  array  $extraConditions
      * @return bool
      */
-    protected function attemptBasic(Request $request, $field)
+    protected function attemptBasic(Request $request, $field, $extraConditions = [])
     {
         if (! $request->getUser()) {
             return false;
         }
 
-        return $this->attempt($this->getBasicCredentials($request, $field));
+        $credentials = $this->getBasicCredentials($request, $field);
+
+        return $this->attempt(array_merge($credentials, $extraConditions));
     }
 
     /**
