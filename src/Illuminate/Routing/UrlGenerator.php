@@ -330,7 +330,7 @@ class UrlGenerator implements UrlGeneratorContract
             throw UrlGenerationException::forMissingParameters($route);
         }
 
-        $uri = strtr(urlencode($uri), $this->dontEncode);
+        $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         return $absolute ? $uri : '/'.ltrim(str_replace($root, '', $uri), '/');
     }
