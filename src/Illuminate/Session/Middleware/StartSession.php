@@ -128,7 +128,8 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+        $ignorePrevousUrl = Arr::get($this->manager->getSessionConfig(), 'ignore_previous_url', array());
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax() && ! in_array($request->route()->getUri(), $ignorePrevousUrl) && ! in_array($request->route()->getName(), $ignorePrevousUrl)){
             $session->setPreviousUrl($request->fullUrl());
         }
     }
