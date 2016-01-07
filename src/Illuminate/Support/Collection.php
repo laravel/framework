@@ -652,8 +652,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function reject($callback)
     {
         if ($this->useAsCallable($callback)) {
-            return $this->filter(function ($item) use ($callback) {
-                return ! $callback($item);
+            return $this->filter(function ($value, $key) use ($callback) {
+                return ! $callback($value, $key);
             });
         }
 
