@@ -2,46 +2,11 @@
 
 namespace Illuminate\Foundation\Validation;
 
-use Exception;
+use Illuminate\Validation\ValidationException as BaseException;
 
-class ValidationException extends Exception
+/**
+ * @deprecated since 5.3. Use Illuminate\Validation\ValidationException.
+ */
+class ValidationException extends BaseException
 {
-    /**
-     * The validator instance.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    public $validator;
-
-    /**
-     * The recommended response to send to the client.
-     *
-     * @var \Illuminate\Http\Response|null
-     */
-    public $response;
-
-    /**
-     * Create a new exception instance.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @param  \Illuminate\Http\Response  $response
-     * @return void
-     */
-    public function __construct($validator, $response = null)
-    {
-        parent::__construct('The given data failed to pass validation.');
-
-        $this->response = $response;
-        $this->validator = $validator;
-    }
-
-    /**
-     * Get the underlying response instance.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
 }

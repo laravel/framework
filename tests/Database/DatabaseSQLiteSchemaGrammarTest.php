@@ -435,8 +435,8 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($statements));
         $expected = [
-            'alter table "users" add column "created_at" datetime not null',
-            'alter table "users" add column "updated_at" datetime not null',
+            'alter table "users" add column "created_at" datetime default CURRENT_TIMESTAMP not null',
+            'alter table "users" add column "updated_at" datetime default CURRENT_TIMESTAMP not null',
         ];
         $this->assertEquals($expected, $statements);
     }

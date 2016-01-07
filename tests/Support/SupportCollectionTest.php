@@ -91,6 +91,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
 
+        $items = new TestJsonSerializeObject;
+        $array = $method->invokeArgs($collection, [$items]);
+        $this->assertSame(['foo' => 'bar'], $array);
+
         $items = new Collection(['foo' => 'bar']);
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
@@ -1083,5 +1087,13 @@ class TestJsonableObject implements Jsonable
     public function toJson($options = 0)
     {
         return '{"foo":"bar"}';
+    }
+}
+
+class TestJsonSerializeObject implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return ['foo' => 'bar'];
     }
 }

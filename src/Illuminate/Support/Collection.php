@@ -1093,6 +1093,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $items->toArray();
         } elseif ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
+        } elseif ($items instanceof JsonSerializable) {
+            return $items->jsonSerialize();
         }
 
         return (array) $items;
