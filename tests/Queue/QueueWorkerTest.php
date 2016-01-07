@@ -4,15 +4,25 @@ use Mockery as m;
 
 class QueueWorkerTest extends PHPUnit_Framework_TestCase
 {
+    protected $mockingNonExistentAllowed;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->mockingNonExistentAllowed = m::getConfiguration()->mockingNonExistentMethodsAllowed();
+        m::getConfiguration()->allowMockingNonExistentMethods(false);
+    }
+
     public function tearDown()
     {
+        m::getConfiguration()->allowMockingNonExistentMethods($this->mockingNonExistentAllowed);
         m::close();
     }
 
     public function testJobIsPoppedOffQueueAndProcessed()
     {
         $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
-        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('stdClass', '\Illuminate\Contracts\Queue\Queue'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
         $connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
@@ -24,7 +34,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public function testJobIsPoppedOffFirstQueueInListAndProcessed()
     {
         $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
-        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('stdClass', '\Illuminate\Contracts\Queue\Queue'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
         $connection->shouldReceive('pop')->once()->with('queue1')->andReturn(null);
@@ -37,7 +47,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
     {
         $worker = $this->getMock('Illuminate\Queue\Worker', ['process', 'sleep'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
-        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
+        $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('stdClass', '\Illuminate\Contracts\Queue\Queue'));
         $connection->shouldReceive('pop')->once()->with('queue')->andReturn(null);
         $worker->expects($this->never())->method('process');
         $worker->expects($this->once())->method('sleep')->with($this->equalTo(3));
@@ -47,7 +57,6 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function testWorkerLogsJobToFailedQueueIfMaxTriesHasBeenExceeded()
     {
-        m::getConfiguration()->allowMockingNonExistentMethods(false);
         $worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'), $failer = m::mock('stdClass', 'Illuminate\Queue\Failed\FailedJobProviderInterface'));
         $job = m::mock('stdClass', 'Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('attempts')->once()->andReturn(10);
