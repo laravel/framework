@@ -24,6 +24,7 @@ trait DetectsLostConnections
             'is dead or not enabled',
             'Error while sending',
             'decryption failed or bad record mac',
+            'SSL connection has been closed unexpectedly',
         ]);
     }
 }
