@@ -154,7 +154,6 @@ class Parser
                 return $default === 'true';
             case preg_match('/^[1-9]\d*$/', $default):
                 return (int) $default;
-                break;
             case preg_match('/^(0?|[1-9]\d*)\.\d+$/', $default):
                 return (float) $default;
             case preg_match('/^(?:(array\()|(\[)).*(?(1)\))(?(2)\])$/', $default):
