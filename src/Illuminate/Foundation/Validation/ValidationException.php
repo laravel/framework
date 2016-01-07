@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Validation;
 
-use Exception;
 use Illuminate\Validation\ValidationException as BaseException;
 
 /**
