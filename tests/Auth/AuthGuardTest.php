@@ -32,7 +32,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
 
-        $guard->basic('email', $request);
+        $guard->basic('email');
     }
 
     public function testBasicReturnsResponseOnFailure()
@@ -43,7 +43,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(false);
         $request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
-        $response = $guard->basic('email', $request);
+        $response = $guard->basic('email');
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertEquals(401, $response->getStatusCode());
