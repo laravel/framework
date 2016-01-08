@@ -163,7 +163,7 @@ class DatabaseStore implements Store
             if (is_array($cache)) {
                 $cache = (object) $cache;
             }
-            
+
             $current = $this->encrypter->decrypt($cache->value);
             $new = $callback($current, $value);
 
