@@ -21,7 +21,7 @@ class MakeAuthCommand extends Command
     protected $description = 'Scaffold basic login and registration views and routes';
 
     /**
-     * THe views that need to be exported.
+     * The views that need to be exported.
      *
      * @var array
      */
