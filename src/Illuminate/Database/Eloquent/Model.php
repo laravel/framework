@@ -3185,9 +3185,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         foreach ($attributes as $key) {
             if (isset($this->attributes[$key])) {
-                if (! array_key_exists($key, $this->original) ||
-                        $this->attributes[$key] !== $this->original[$key] &&
-                            ! $this->originalIsNumericallyEquivalent($key)) {
+                if (! array_key_exists($key, $this->original)) {
+                    return true;
+                }
+
+                if ($this->attributes[$key] !== $this->original[$key] &&
+                        ! $this->originalIsNumericallyEquivalent($key)) {
                     return true;
                 }
             }
