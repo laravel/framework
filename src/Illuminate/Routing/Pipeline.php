@@ -77,6 +77,12 @@ class Pipeline extends BasePipeline
 
         $handler->report($e);
 
-        return $handler->render($passable, $e);
+        $response = $handler->render($passable, $e);
+
+        if (method_exists($response, 'withException')) {
+            $response->withException($e);
+        }
+
+        return $response;
     }
 }
