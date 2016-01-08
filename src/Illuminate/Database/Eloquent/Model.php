@@ -2874,7 +2874,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         switch ($this->getCastType($key)) {
             case 'int':
             case 'integer':
-                return (int) $value;
+                return (is_int($value)) ? (int) $value : (string) $value;
             case 'real':
             case 'float':
             case 'double':
