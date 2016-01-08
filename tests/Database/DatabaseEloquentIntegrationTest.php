@@ -598,6 +598,16 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('string', $user->id);
     }
 
+    public function testRelationsArePreloadedInGlobalScope()
+    {
+        $user = EloquentTestUserWithGlobalScope::create(['email' => 'taylorotwell@gmail.com']);
+        $user->posts()->create(['name' => 'My Post']);
+
+        $result = EloquentTestUserWithGlobalScope::first();
+
+        $this->assertCount(1, $result->getRelations());
+    }
+
     /**
      * Helpers...
      */
@@ -649,6 +659,18 @@ class EloquentTestUser extends Eloquent
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
+    }
+}
+
+class EloquentTestUserWithGlobalScope extends EloquentTestUser
+{
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(function ($builder) {
+           $builder->with('posts');
+        });
     }
 }
 

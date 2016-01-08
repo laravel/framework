@@ -232,16 +232,18 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        $models = $this->getModels($columns);
+        $builder = $this->applyScopes();
+
+        $models = $builder->getModels($columns);
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
         if (count($models) > 0) {
-            $models = $this->eagerLoadRelations($models);
+            $models = $builder->eagerLoadRelations($models);
         }
 
-        return $this->model->newCollection($models);
+        return $builder->getModel()->newCollection($models);
     }
 
     /**
@@ -498,7 +500,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->toBase()->get($columns);
+        $results = $this->query->get($columns);
 
         $connection = $this->model->getConnectionName();
 
