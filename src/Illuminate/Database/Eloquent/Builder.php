@@ -513,7 +513,7 @@ class Builder
      */
     public function eagerLoadRelations(array $models)
     {
-        foreach ($this->eagerLoad as $name => $constraints) {
+        foreach ($this->applyScopes()->eagerLoad as $name => $constraints) {
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
