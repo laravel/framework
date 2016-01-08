@@ -29,9 +29,9 @@ class Parser
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
 
-        preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches);
+        preg_match_all('/(\{([^\{\}]*((?1)\}|[^\}])*))\}/', $expression, $matches);
 
-        $tokens = isset($matches[1]) ? $matches[1] : [];
+        $tokens = isset($matches[2]) ? $matches[2] : [];
 
         if (count($tokens)) {
             return array_merge([$name], static::parameters($tokens));
@@ -91,8 +91,8 @@ class Parser
             case Str::endsWith($token, '?'):
                 return new InputArgument(trim($token, '?'), InputArgument::OPTIONAL, $description);
 
-            case preg_match('/(.+)\=(.+)/', $token, $matches):
-                return new InputArgument($matches[1], InputArgument::OPTIONAL, $description, $matches[2]);
+            case preg_match('/(.+?)\=(.+)/', $token, $matches):
+                return new InputArgument($matches[1], InputArgument::OPTIONAL, $description, self::parseDefault($matches[2]));
 
             default:
                 return new InputArgument($token, InputArgument::REQUIRED, $description);
@@ -131,11 +131,53 @@ class Parser
             case Str::endsWith($token, '=*'):
                 return new InputOption(trim($token, '=*'), $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description);
 
-            case preg_match('/(.+)\=(.+)/', $token, $matches):
-                return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
+            case preg_match('/(.+?)\=(.+)/', $token, $matches):
+                return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, self::parseDefault($matches[2]));
 
             default:
                 return new InputOption($token, $shortcut, InputOption::VALUE_NONE, $description);
         }
+    }
+
+    /**
+     * Parse a default value expression.
+     *
+     * @param  string  $default
+     * @return mixed
+     */
+    protected static function parseDefault($default)
+    {
+        switch (true) {
+            case preg_match('/^null$/i', $default):
+                return;
+            case preg_match('/^(true|false)$/', $default):
+                return $default === 'true';
+            case preg_match('/^[1-9]\d*$/', $default):
+                return (int) $default;
+            case preg_match('/^(0?|[1-9]\d*)\.\d+$/', $default):
+                return (float) $default;
+            case preg_match('/^(?:(array\()|(\[)).*(?(1)\))(?(2)\])$/', $default):
+                $default = preg_replace('/^array\((.*)\)$/', '[$1]', $default);
+
+                if ($default === '[]') {
+                    return [];
+                }
+
+                $default = preg_replace('/(?:(\d+)|(\'|")(.*?)\2)(\s*=>)/', '"$1$3":', $default, -1, $count);
+
+                if ($count) {
+                    $default = preg_replace(['/^\[/', '/\]$/'], ['{', '}'], $default);
+                }
+
+                return json_decode($default, true);
+        }
+
+        $default_json_decoded = json_decode($default);
+
+        if (is_object($default_json_decoded)) {
+            return $default_json_decoded;
+        }
+
+        return $default;
     }
 }
