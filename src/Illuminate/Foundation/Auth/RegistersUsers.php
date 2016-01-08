@@ -26,8 +26,8 @@ trait RegistersUsers
      */
     public function showRegistrationForm()
     {
-        if (property_exists($this, 'registrationView')) {
-            return view($this->registrationView);
+        if (property_exists($this, 'registerView')) {
+            return view($this->registerView);
         }
 
         return view('auth.register');
@@ -66,7 +66,7 @@ trait RegistersUsers
     }
 
     /**
-     * Get the guard to be used during authentication.
+     * Get the guard to be used during registration.
      *
      * @return string|null
      */
