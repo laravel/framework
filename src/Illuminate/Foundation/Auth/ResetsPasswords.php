@@ -12,26 +12,6 @@ trait ResetsPasswords
     use RedirectsUsers;
 
     /**
-     * Get the broker to be used during resetting the password.
-     *
-     * @return string|null
-     */
-    public function getBroker()
-    {
-        return property_exists($this, 'broker') ? $this->broker : null;
-    }
-
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return string|null
-     */
-    protected function getGuard()
-    {
-        return property_exists($this, 'guard') ? $this->guard : null;
-    }
-
-    /**
      * Display the form to request a password reset link.
      *
      * @return \Illuminate\Http\Response
@@ -76,7 +56,9 @@ trait ResetsPasswords
     {
         $this->validate($request, ['email' => 'required|email']);
 
-        $response = Password::broker($this->getBroker())->sendResetLink($request->only('email'), function (Message $message) {
+        $broker = $this->getBroker();
+
+        $response = Password::broker($broker)->sendResetLink($request->only('email'), function (Message $message) {
             $message->subject($this->getEmailSubject());
         });
 
@@ -189,7 +171,9 @@ trait ResetsPasswords
             'email', 'password', 'password_confirmation', 'token'
         );
 
-        $response = Password::broker($this->getBroker())->reset($credentials, function ($user, $password) {
+        $broker = $this->getBroker();
+
+        $response = Password::broker($broker)->reset($credentials, function ($user, $password) {
             $this->resetPassword($user, $password);
         });
 
@@ -241,5 +225,25 @@ trait ResetsPasswords
         return redirect()->back()
             ->withInput($request->only('email'))
             ->withErrors(['email' => trans($response)]);
+    }
+
+    /**
+     * Get the broker to be used during password reset.
+     *
+     * @return string|null
+     */
+    public function getBroker()
+    {
+        return property_exists($this, 'broker') ? $this->broker : null;
+    }
+
+    /**
+     * Get the guard to be used during password reset.
+     *
+     * @return string|null
+     */
+    protected function getGuard()
+    {
+        return property_exists($this, 'guard') ? $this->guard : null;
     }
 }
