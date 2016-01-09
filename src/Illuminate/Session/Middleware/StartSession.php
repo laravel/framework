@@ -1,19 +1,18 @@
-<?php
-
-namespace Illuminate\Session\Middleware;
+<?php namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Routing\TerminableMiddleware;
 
-class StartSession
-{
+class StartSession implements TerminableMiddleware {
+
     /**
      * The session manager.
      *
@@ -53,7 +52,8 @@ class StartSession
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
-        if ($this->sessionConfigured()) {
+        if ($this->sessionConfigured())
+        {
             $session = $this->startSession($request);
 
             $request->setSession($session);
@@ -64,7 +64,8 @@ class StartSession
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
         // add the session identifier cookie to the application response headers now.
-        if ($this->sessionConfigured()) {
+        if ($this->sessionConfigured())
+        {
             $this->storeCurrentUrl($request, $session);
 
             $this->collectGarbage($session);
@@ -84,7 +85,8 @@ class StartSession
      */
     public function terminate($request, $response)
     {
-        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
+        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions())
+        {
             $this->manager->driver()->save();
         }
     }
@@ -128,7 +130,8 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+        $ignorePrevousUrl = Arr::get($this->manager->getSessionConfig(), 'ignore_previous_url', array());
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax() && ! in_array($request->route()->getUri(), $ignorePrevousUrl) && ! in_array($request->route()->getName(), $ignorePrevousUrl)) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
@@ -146,7 +149,8 @@ class StartSession
         // Here we will see if this request hits the garbage collection lottery by hitting
         // the odds needed to perform garbage collection on any given request. If we do
         // hit it, we'll call this handler to let it delete all the expired sessions.
-        if ($this->configHitsLottery($config)) {
+        if ($this->configHitsLottery($config))
+        {
             $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
         }
     }
@@ -159,7 +163,7 @@ class StartSession
      */
     protected function configHitsLottery(array $config)
     {
-        return random_int(1, $config['lottery'][1]) <= $config['lottery'][0];
+        return mt_rand(1, $config['lottery'][1]) <= $config['lottery'][0];
     }
 
     /**
@@ -171,14 +175,16 @@ class StartSession
      */
     protected function addCookieToResponse(Response $response, SessionInterface $session)
     {
-        if ($this->usingCookieSessions()) {
+        if ($this->usingCookieSessions())
+        {
             $this->manager->driver()->save();
         }
 
-        if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
+        if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig()))
+        {
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], Arr::get($config, 'secure', false)
+                $config['path'], $config['domain'], array_get($config, 'secure', false)
             ));
         }
     }
@@ -190,7 +196,7 @@ class StartSession
      */
     protected function getSessionLifetimeInSeconds()
     {
-        return Arr::get($this->manager->getSessionConfig(), 'lifetime') * 60;
+        return array_get($this->manager->getSessionConfig(), 'lifetime') * 60;
     }
 
     /**
@@ -212,7 +218,7 @@ class StartSession
      */
     protected function sessionConfigured()
     {
-        return ! is_null(Arr::get($this->manager->getSessionConfig(), 'driver'));
+        return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
     }
 
     /**
@@ -225,7 +231,7 @@ class StartSession
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! in_array($config['driver'], [null, 'array']);
+        return ! in_array($config['driver'], array(null, 'array'));
     }
 
     /**
@@ -235,10 +241,9 @@ class StartSession
      */
     protected function usingCookieSessions()
     {
-        if (! $this->sessionConfigured()) {
-            return false;
-        }
+        if ( ! $this->sessionConfigured()) return false;
 
         return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
     }
+
 }
