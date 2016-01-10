@@ -94,7 +94,6 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $column
-     *
      * @return string
      */
     public function getColumnType($table, $column)
