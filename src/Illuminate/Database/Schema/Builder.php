@@ -90,6 +90,19 @@ class Builder
     }
 
     /**
+     * Return the database agnostic type name for the passed column name.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     *
+     * @return string
+     */
+    public function getColumnType($table, $column)
+    {
+        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+    }
+    
+    /**
      * Get the column listing for a given table.
      *
      * @param  string  $table
