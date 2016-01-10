@@ -27,6 +27,10 @@ trait AuthenticatesUsers
      */
     public function showLoginForm()
     {
+        if (property_exists($this, 'loginView')) {
+            return view($this->loginView);
+        }
+
         if (view()->exists('auth.authenticate')) {
             return view('auth.authenticate');
         }
@@ -96,7 +100,7 @@ trait AuthenticatesUsers
         }
 
         if (method_exists($this, 'authenticated')) {
-            return $this->authenticated($request, Auth::user());
+            return $this->authenticated($request, Auth::guard($this->getGuard())->user());
         }
 
         return redirect()->intended($this->redirectPath());
@@ -105,7 +109,7 @@ trait AuthenticatesUsers
     /**
      * Get the failed login response instance.
      *
-     * @param \Illuminate\Http\Request  $response
+     * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     protected function sendFailedLoginResponse(Request $request)

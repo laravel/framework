@@ -272,6 +272,16 @@ class Route
     }
 
     /**
+     * Determine if the route has parameters.
+     *
+     * @return bool
+     */
+    public function hasParameters()
+    {
+        return isset($this->parameters);
+    }
+
+    /**
      * Determine a given parameter exists from the route.
      *
      * @param  string $name
@@ -279,6 +289,10 @@ class Route
      */
     public function hasParameter($name)
     {
+        if (! $this->hasParameters()) {
+            return false;
+        }
+
         return array_key_exists($name, $this->parameters());
     }
 

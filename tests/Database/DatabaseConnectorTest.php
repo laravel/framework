@@ -159,7 +159,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
 
     protected function getDsn(array $config)
     {
-        extract($config);
+        extract($config, EXTR_SKIP);
 
         if (in_array('dblib', PDO::getAvailableDrivers())) {
             $port = isset($config['port']) ? ':'.$port : '';
