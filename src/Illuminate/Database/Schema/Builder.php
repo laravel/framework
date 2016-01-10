@@ -101,7 +101,7 @@ class Builder
     {
         return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
     }
-    
+
     /**
      * Get the column listing for a given table.
      *
