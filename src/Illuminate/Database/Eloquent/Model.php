@@ -473,8 +473,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function fillableFromArray(array $attributes)
     {
-        if (count($this->fillable) > 0 && ! static::$unguarded) {
-            return array_intersect_key($attributes, array_flip($this->fillable));
+        if (count($this->getFillable()) > 0 && ! static::$unguarded) {
+            return array_intersect_key($attributes, array_flip($this->getFillable()));
         }
 
         return $attributes;
@@ -2340,7 +2340,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If the key is in the "fillable" array, we can of course assume that it's
         // a fillable attribute. Otherwise, we will check the guarded array when
         // we need to determine if the attribute is black-listed on the model.
-        if (in_array($key, $this->fillable)) {
+        if (in_array($key, $this->getFillable())) {
             return true;
         }
 
@@ -2348,7 +2348,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return false;
         }
 
-        return empty($this->fillable) && ! Str::startsWith($key, '_');
+        return empty($this->getFillable()) && ! Str::startsWith($key, '_');
     }
 
     /**
@@ -2359,7 +2359,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function isGuarded($key)
     {
-        return in_array($key, $this->guarded) || $this->guarded == ['*'];
+        return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
     }
 
     /**
@@ -2369,7 +2369,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function totallyGuarded()
     {
-        return count($this->fillable) == 0 && $this->guarded == ['*'];
+        return count($this->getFillable()) == 0 && $this->getGuarded() == ['*'];
     }
 
     /**

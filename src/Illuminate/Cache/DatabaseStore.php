@@ -160,6 +160,10 @@ class DatabaseStore implements Store
                 return false;
             }
 
+            if (is_array($cache)) {
+                $cache = (object) $cache;
+            }
+
             $current = $this->encrypter->decrypt($cache->value);
             $new = $callback($current, $value);
 

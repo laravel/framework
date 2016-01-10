@@ -186,7 +186,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function filter(callable $callback = null)
     {
         if ($callback) {
-            return new static(array_filter($this->items, $callback));
+            $return = [];
+
+            foreach ($this->items as $key => $value) {
+                if ($callback($value, $key)) {
+                    $return[$key] = $value;
+                }
+            }
+
+            return new static($return);
         }
 
         return new static(array_filter($this->items));
@@ -630,8 +638,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function reject($callback)
     {
         if ($this->useAsCallable($callback)) {
-            return $this->filter(function ($item) use ($callback) {
-                return ! $callback($item);
+            return $this->filter(function ($value, $key) use ($callback) {
+                return ! $callback($value, $key);
             });
         }
 
@@ -1079,6 +1087,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $items->toArray();
         } elseif ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
+        } elseif ($items instanceof JsonSerializable) {
+            return $items->jsonSerialize();
         }
 
         return (array) $items;

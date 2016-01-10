@@ -61,8 +61,11 @@ class Pipeline extends BasePipeline
     /**
      * Handle the given exception.
      *
+     * @param  mixed  $passable
      * @param  \Exception  $e
      * @return mixed
+     *
+     * @throws \Exception
      */
     protected function handleException($passable, Exception $e)
     {
@@ -74,6 +77,12 @@ class Pipeline extends BasePipeline
 
         $handler->report($e);
 
-        return $handler->render($passable, $e);
+        $response = $handler->render($passable, $e);
+
+        if (method_exists($response, 'withException')) {
+            $response->withException($e);
+        }
+
+        return $response;
     }
 }
