@@ -173,7 +173,9 @@ class BelongsToMany extends Relation
 
         $select = $this->getSelectColumns($columns);
 
-        $models = $this->query->addSelect($select)->getModels();
+        $builder = $this->query->applyScopes();
+
+        $models = $builder->addSelect($select)->getModels();
 
         $this->hydratePivotRelation($models);
 
@@ -181,7 +183,7 @@ class BelongsToMany extends Relation
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
         if (count($models) > 0) {
-            $models = $this->query->eagerLoadRelations($models);
+            $models = $builder->eagerLoadRelations($models);
         }
 
         return $this->related->newCollection($models);
