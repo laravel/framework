@@ -346,16 +346,16 @@ class Router implements RegistrarContract
     public function auth()
     {
         // Authentication Routes...
-        $this->get('login', 'Auth\AuthController@showLoginForm');
+        $this->get('login', 'Auth\AuthController@showLoginForm')->name('auth.login');
         $this->post('login', 'Auth\AuthController@login');
-        $this->get('logout', 'Auth\AuthController@logout');
+        $this->get('logout', 'Auth\AuthController@logout')->name('auth.logout');
 
         // Registration Routes...
-        $this->get('register', 'Auth\AuthController@showRegistrationForm');
+        $this->get('register', 'Auth\AuthController@showRegistrationForm')->name('auth.register');
         $this->post('register', 'Auth\AuthController@register');
 
         // Password Reset Routes...
-        $this->get('password/reset/{token?}', 'Auth\PasswordController@showResetForm');
+        $this->get('password/reset/{token?}', 'Auth\PasswordController@showResetForm')->name('auth.reset');
         $this->post('password/email', 'Auth\PasswordController@sendResetLinkEmail');
         $this->post('password/reset', 'Auth\PasswordController@reset');
     }
