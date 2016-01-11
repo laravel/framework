@@ -1101,8 +1101,7 @@ class Router implements RegistrarContract
         $currentAction = $this->getCurrentRoute()->getAction();
         if (starts_with($currentAction['namespace'], Container::getInstance()->getNamespace())) {
             $currentAction = str_replace($currentAction['namespace'] . '\\', '', $currentAction['controller']);
-        }
-        else {
+        } else {
             $currentAction = $currentAction['controller'];
         }
 
