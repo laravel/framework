@@ -30,6 +30,7 @@ trait MocksApplicationServices
                 }
             }
         });
+        $mock->shouldReceive('listen');
 
         $this->beforeApplicationDestroyed(function () use (&$events) {
             if ($events) {
@@ -54,6 +55,7 @@ trait MocksApplicationServices
         $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
 
         $mock->shouldReceive('fire');
+        $mock->shouldReceive('listen');
 
         $this->app->instance('events', $mock);
 
