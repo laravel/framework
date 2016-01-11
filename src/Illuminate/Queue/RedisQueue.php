@@ -163,8 +163,6 @@ class RedisQueue extends Queue implements QueueContract
     protected function migrateAllExpiredJobs($queue)
     {
         $this->migrateExpiredJobs($queue.':delayed', $queue);
-
-        $this->migrateExpiredJobs($queue.':reserved', $queue);
     }
 
     /**
