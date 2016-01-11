@@ -55,14 +55,16 @@ abstract class Grammar
         // If the value being wrapped has a column alias we will need to separate out
         // the pieces so we can wrap each of the segments of the expression on it
         // own, and then joins them both back together with the "as" connector.
-        if (strpos(strtolower($value), ' as ') !== false) {
-            $segments = explode(' ', $value);
+        if (($pos = stripos($value, ' as ')) !== false) {
+            // Sometimes we have values like "[bad legacy field name] as good_name"
+            $segments[0] = substr($value, 0, $pos);
+            $segments[1] = substr($value, $pos + 4);
 
             if ($prefixAlias) {
-                $segments[2] = $this->tablePrefix.$segments[2];
+                $segments[1] = $this->tablePrefix.$segments[1];
             }
 
-            return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[2]);
+            return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[1]);
         }
 
         $wrapped = [];
