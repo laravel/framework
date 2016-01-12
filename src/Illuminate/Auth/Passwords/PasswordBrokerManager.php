@@ -55,6 +55,8 @@ class PasswordBrokerManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\PasswordBroker
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {

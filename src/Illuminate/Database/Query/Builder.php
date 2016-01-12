@@ -258,6 +258,8 @@ class Builder
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
      */
     public function selectSub($query, $as)
     {
