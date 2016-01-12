@@ -1090,16 +1090,15 @@ class Router implements RegistrarContract
 
     /**
      * Determine if the current action matches a given action.
-     * 
      * This take in account the namespace of the application.
      * 
      * @param string $action
-     *
      * @return bool
      */
     public function currentActionUses($action)
     {
         $currentAction = $this->getCurrentRoute()->getAction();
+
         if (starts_with($currentAction['namespace'], Container::getInstance()->getNamespace())) {
             $currentAction = str_replace($currentAction['namespace'].'\\', '', $currentAction['controller']);
         } else {
