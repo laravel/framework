@@ -112,6 +112,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn(['bar']);
         $builder->shouldReceive('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
@@ -124,6 +125,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn([]);
         $builder->shouldReceive('eagerLoadRelations')->never();
         $builder->setModel($this->getMockModel());
