@@ -33,9 +33,10 @@ class ThrottleRequests
      * @param  \Closure  $next
      * @param  int  $maxAttempts
      * @param  int  $decayMinutes
+     * @param  bool  $skipNotModified
      * @return mixed
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $skipNotModified = false)
     {
         $key = $this->resolveRequestSignature($request);
 
@@ -47,13 +48,17 @@ class ThrottleRequests
             ]);
         }
 
-        $this->limiter->hit($key, $decayMinutes);
-
         $response = $next($request);
+
+        $remaining = $maxAttempts - $this->limiter->attempts($key);
+
+        if (! $this->shouldBypassLimiterHit($skipNotModified, $response)) {
+            $remaining -= $this->limiter->hit($key, $decayMinutes);
+        }
 
         $response->headers->add([
             'X-RateLimit-Limit' => $maxAttempts,
-            'X-RateLimit-Remaining' => $maxAttempts - $this->limiter->attempts($key) + 1,
+            'X-RateLimit-Remaining' => $remaining,
         ]);
 
         return $response;
@@ -68,5 +73,21 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         return $request->fingerprint();
+    }
+
+    /**
+     * Indicates if a not-modified response should be bypassed.
+     *
+     * @param  bool  $skipNotModified
+     * @param  mixed  $response
+     * @return bool
+     */
+    protected function shouldBypassLimiterHit($skipNotModified, $response)
+    {
+        if ($skipNotModified !== true) {
+            return false;
+        }
+
+        return $response instanceof Response && $response->getStatusCode() === 304;
     }
 }
