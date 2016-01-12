@@ -2728,6 +2728,7 @@ class Validator implements ValidatorContract
      * @param  array  $parameters
      * @param  string  $rule
      * @return void
+     *
      * @throws \InvalidArgumentException
      */
     protected function requireParameterCount($count, $parameters, $rule)

@@ -318,6 +318,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string|null  $visibility
      * @return string|null
+     *
      * @throws \InvalidArgumentException
      */
     protected function parseVisibility($visibility)
