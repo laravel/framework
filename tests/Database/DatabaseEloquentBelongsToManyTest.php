@@ -24,6 +24,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getConnectionName')->andReturn('foo.connection');
         $relation->getQuery()->shouldReceive('addSelect')->once()->with(['roles.*', 'user_role.user_id as pivot_user_id', 'user_role.role_id as pivot_role_id'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('applyScopes')->once()->andReturnSelf();
         $relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
         $relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
@@ -67,6 +68,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
             'user_role.created_at as pivot_created_at',
             'user_role.updated_at as pivot_updated_at',
         ])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('applyScopes')->once()->andReturnSelf();
         $relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
         $relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
