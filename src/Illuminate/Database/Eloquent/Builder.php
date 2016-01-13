@@ -854,9 +854,7 @@ class Builder
         // the has query, and then copy the bindings from the "has" query to the main.
         $relationQuery = $relation->toBase();
 
-        $hasQuery = $hasQuery->withoutGlobalScopes();
-
-        $hasQuery->mergeWheres(
+        $hasQuery->withoutGlobalScopes()->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
     }
