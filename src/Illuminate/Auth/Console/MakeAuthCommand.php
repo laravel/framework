@@ -134,6 +134,7 @@ class MakeAuthCommand extends Command
         $stub = str_replace(
             'App\Http\Requests', $this->laravel->getNamespace().'Http\Requests', $stub
         );
+        
         return $this;
     }
 }
