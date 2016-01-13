@@ -155,8 +155,14 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function is()
     {
+        $path = $this->decodedPath();
+
+        if (!empty($this->getQueryString())) {
+            $path .= '?'.urldecode($this->getQueryString());
+        }
+
         foreach (func_get_args() as $pattern) {
-            if (Str::is($pattern, urldecode($this->path()))) {
+            if (Str::is($pattern, $path)) {
                 return true;
             }
         }
