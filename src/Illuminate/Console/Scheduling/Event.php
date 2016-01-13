@@ -692,11 +692,12 @@ class Event
      * E-mail the results of the scheduled operation.
      *
      * @param  array|mixed  $addresses
+     * @param  bool  $onlyIfOutputExists
      * @return $this
      *
      * @throws \LogicException
      */
-    public function emailOutputTo($addresses)
+    public function emailOutputTo($addresses, $onlyIfOutputExists = false)
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             throw new LogicException('Must direct output to a file in order to e-mail results.');
@@ -704,30 +705,22 @@ class Event
 
         $addresses = is_array($addresses) ? $addresses : func_get_args();
 
-        return $this->then(function (Mailer $mailer) use ($addresses) {
-            $this->emailOutput($mailer, $addresses);
+        return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
+            $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
         });
     }
 
     /**
-     * E-mail the results of the scheduled operation only when it produces output.
+     * E-mail the results of the scheduled operation if it produces output.
      *
      * @param  array|mixed  $addresses
      * @return $this
      *
      * @throws \LogicException
      */
-    public function emailOutputIfExistsTo($addresses)
+    public function emailWrittenOutputTo($addresses)
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            throw new LogicException('Must direct output to a file in order to e-mail results.');
-        }
-
-        $addresses = is_array($addresses) ? $addresses : func_get_args();
-
-        return $this->then(function (Mailer $mailer) use ($addresses) {
-            $this->emailOutput($mailer, $addresses, false);
-        });
+        return $this->emailOutputTo($addresses, true);
     }
 
     /**
@@ -738,11 +731,11 @@ class Event
      * @param  bool  $includeEmpty
      * @return void
      */
-    protected function emailOutput(Mailer $mailer, $addresses, $includeEmpty = true)
+    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
         $text = file_get_contents($this->output);
 
-        if (! $includeEmpty && empty($text)) {
+        if ($onlyIfOutputExists && empty($text)) {
             return;
         }
 
