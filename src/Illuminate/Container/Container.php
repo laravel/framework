@@ -587,6 +587,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     protected function callClass($target, array $parameters = [], $defaultMethod = null)
     {

@@ -463,7 +463,7 @@ class Connection implements ConnectionInterface
      * @param  \Closure  $callback
      * @return mixed
      *
-     * @throws \Throwable
+     * @throws \Exception|\Throwable
      */
     public function transaction(Closure $callback)
     {
@@ -868,6 +868,8 @@ class Connection implements ConnectionInterface
      *
      * @param  \PDO|null  $pdo
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function setPdo($pdo)
     {

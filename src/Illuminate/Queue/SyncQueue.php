@@ -17,7 +17,8 @@ class SyncQueue extends Queue implements QueueContract
      * @param  mixed   $data
      * @param  string  $queue
      * @return mixed
-     * @throws \Throwable
+     *
+     * @throws \Exception|\Throwable
      */
     public function push($job, $data = '', $queue = null)
     {

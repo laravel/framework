@@ -480,6 +480,10 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
 
     public function testSyncMethodConvertsCollectionToArrayOfKeys()
     {
+        if (version_compare(PHP_VERSION, '7.0.2') > -1) {
+            $this->markTestSkipped('Skipped due to mockery incompatibility on php 7.0.2 and newer.');
+        }
+
         $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['attach', 'detach', 'touchIfTouching', 'formatSyncList'], $this->getRelationArguments());
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
