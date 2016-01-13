@@ -710,15 +710,43 @@ class Event
     }
 
     /**
+     * E-mail the results of the scheduled operation only when it produces output.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function emailOutputIfExistsTo($addresses)
+    {
+        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+            throw new LogicException('Must direct output to a file in order to e-mail results.');
+        }
+
+        $addresses = is_array($addresses) ? $addresses : func_get_args();
+
+        return $this->then(function (Mailer $mailer) use ($addresses) {
+            $this->emailOutput($mailer, $addresses, false);
+        });
+    }
+
+    /**
      * E-mail the output of the event to the recipients.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  array  $addresses
+     * @param  bool  $includeEmpty
      * @return void
      */
-    protected function emailOutput(Mailer $mailer, $addresses)
+    protected function emailOutput(Mailer $mailer, $addresses, $includeEmpty = true)
     {
-        $mailer->raw(file_get_contents($this->output), function ($m) use ($addresses) {
+        $text = file_get_contents($this->output);
+
+        if (! $includeEmpty && empty($text)) {
+            return;
+        }
+
+        $mailer->raw($text, function ($m) use ($addresses) {
             $m->subject($this->getEmailSubject());
 
             foreach ($addresses as $address) {
