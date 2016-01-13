@@ -379,6 +379,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, count($users));
     }
 
+    /**
+     * @group test
+     */
+    public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUserWithTrashedPosts::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+        $post->delete();
+
+        $users = SoftDeletesTestUserWithTrashedPosts::has('posts')->get();
+        $this->assertEquals(1, count($users));
+    }
+
     public function testOrWhereWithSoftDeleteConstraint()
     {
         $this->createUsers();
@@ -443,6 +458,20 @@ class SoftDeletesTestUser extends Eloquent
     public function group()
     {
         return $this->belongsTo(SoftDeletesTestGroup::class, 'group_id');
+    }
+}
+
+class SoftDeletesTestUserWithTrashedPosts extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+    protected $table = 'users';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasMany(SoftDeletesTestPost::class, 'user_id')->withTrashed();
     }
 }
 
