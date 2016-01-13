@@ -50,7 +50,7 @@ class MakeAuthCommand extends Command
         if (! $this->option('views')) {
             $this->info('Installed HomeController.');
 
-            $homeControllerStub = file_get_contents(__DIR__ . '/stubs/make/controllers/HomeController.stub');
+            $homeControllerStub = file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub');
 
             $this->replaceNamespace($homeControllerStub)
                 ->replaceImports($homeControllerStub);
@@ -117,14 +117,14 @@ class MakeAuthCommand extends Command
     protected function replaceNamespace(&$stub)
     {
         $stub = str_replace(
-            'App\Http\Controllers', $this->laravel->getNamespace() . 'Http\Controllers', $stub
+            'App\Http\Controllers', $this->laravel->getNamespace().'Http\Controllers', $stub
         );
 
         return $this;
     }
 
     /**
-     * Replace namespace in the list list of imports for the given stub
+     * Replace namespace in the list of imports for the given stub.
      *
      * @param $stub
      * @return $this
@@ -132,7 +132,7 @@ class MakeAuthCommand extends Command
     protected function replaceImports(&$stub)
     {
         $stub = str_replace(
-            'App\Http\Requests', $this->laravel->getNamespace() . 'Http\Requests', $stub
+            'App\Http\Requests', $this->laravel->getNamespace().'Http\Requests', $stub
         );
         return $this;
     }
