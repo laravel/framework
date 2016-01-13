@@ -8,6 +8,13 @@ use Exception;
 trait MocksApplicationServices
 {
     /**
+     * Collected fired events.
+     * 
+     * @var array
+     */
+    protected $firedEvents = [];
+
+    /**
      * Specify a list of events that should be fired for the given operation.
      *
      * These events will be mocked, so that handlers will not actually be executed.
@@ -19,24 +26,61 @@ trait MocksApplicationServices
     {
         $events = is_array($events) ? $events : func_get_args();
 
-        $mock = Mockery::spy('Illuminate\Contracts\Events\Dispatcher');
+        $this->withoutEvents();
 
-        $mock->shouldReceive('fire')->andReturnUsing(function ($called) use (&$events) {
-            foreach ($events as $key => $event) {
-                if ((is_string($called) && $called === $event) ||
-                    (is_string($called) && is_subclass_of($called, $event)) ||
-                    (is_object($called) && $called instanceof $event)) {
-                    unset($events[$key]);
-                }
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            $fired = $this->filterFiredEvents($events);
+
+            $eventsNotFired = array_diff($events, $fired);
+
+            if ($eventsNotFired) {
+                throw new Exception(
+                    'The following events were not fired: ['.implode(', ', $eventsNotFired).']'
+                );
             }
         });
 
-        $this->beforeApplicationDestroyed(function () use (&$events) {
-            if ($events) {
+        return $this;
+    }
+
+    /**
+     * Specify a list of events that should not be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|string  $events
+     * @return $this
+     */
+    public function doesntExpectEvents($events)
+    {
+        $events = is_array($events) ? $events : func_get_args();
+
+        $this->withoutEvents();
+
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            $fired = $this->filterFiredEvents($events);
+
+            if ($fired) {
                 throw new Exception(
-                    'The following events were not fired: ['.implode(', ', $events).']'
+                    'The following events were fired: ['.implode(', ', $fired).']'
                 );
             }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Mock the event dispatcher so all events are silenced and collected.
+     *
+     * @return $this
+     */
+    protected function withoutEvents()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+
+        $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
+            $this->firedEvents[] = $called;
         });
 
         $this->app->instance('events', $mock);
@@ -45,19 +89,35 @@ trait MocksApplicationServices
     }
 
     /**
-     * Mock the event dispatcher so all events are silenced.
-     *
-     * @return $this
+     * Filter the given events against the fired events.
+     * 
+     * @param  array  $events
+     * @return array
      */
-    protected function withoutEvents()
+    protected function filterFiredEvents(array $events)
     {
-        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        return array_filter($events, function ($event) {
+            return $this->isFired($event);
+        });
+    }
 
-        $mock->shouldReceive('fire');
+    /**
+     * Check if the given event is fired.
+     * 
+     * @param  object|string  $event
+     * @return bool
+     */
+    protected function isFired($event)
+    {
+        foreach ($this->firedEvents as $called) {
+            if ((is_string($called) && $called === $event) ||
+                (is_string($called) && is_subclass_of($called, $event)) ||
+                (is_object($called) && $called instanceof $event)) {
+                return true;
+            }
+        }
 
-        $this->app->instance('events', $mock);
-
-        return $this;
+        return false;
     }
 
     /**
