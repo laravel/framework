@@ -82,6 +82,10 @@ class ThrottleRequests
      */
     protected function shouldBypassLimiterHit($response)
     {
-        return $response instanceof Response && $response->getStatusCode() === 304;
+        if ($response instanceof Response) {
+            return $response->getStatusCode() === 304;
+        }
+
+        return false;
     }
 }
