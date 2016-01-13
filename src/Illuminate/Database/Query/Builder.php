@@ -1591,9 +1591,11 @@ class Builder
      */
     public function lists($column, $key = null)
     {
-        $columns = $this->getListSelect($column, $key);
+        $select = is_null($key) ? [$column] : [$column, $key];
 
-        $results = new Collection($this->get($columns));
+        $columns = $this->getListSelect($select);
+
+        $results = new Collection($this->get($select));
 
         return $results->pluck($columns[0], Arr::get($columns, 1))->all();
     }
@@ -1601,14 +1603,11 @@ class Builder
     /**
      * Get the columns that should be used in a list array.
      *
-     * @param  string  $column
-     * @param  string  $key
+     * @param  array  $select
      * @return array
      */
-    protected function getListSelect($column, $key)
+    protected function getListSelect($select)
     {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
         // If the selected column contains a "dot", we will remove it so that the list
         // operation can run normally. Specifying the table is not needed, since we
         // really want the names of the columns as it is in this resulting array.
