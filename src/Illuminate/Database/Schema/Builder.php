@@ -90,7 +90,7 @@ class Builder
     }
 
     /**
-     * Return the data type for the passed column name.
+     * Get the data type for the given column name.
      *
      * @param  string  $table
      * @param  string  $column
