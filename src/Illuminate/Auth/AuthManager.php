@@ -33,8 +33,8 @@ class AuthManager extends Manager implements FactoryContract
         $driver = $driver ?: $this->getDefaultDriver();
 
         return isset($this->drivers[$driver])
-            ? $this->drivers[$driver]
-            : $this->drivers[$driver] = $this->resolve($driver);
+                    ? $this->drivers[$driver]
+                    : $this->drivers[$driver] = $this->resolve($driver);
     }
 
     /**
