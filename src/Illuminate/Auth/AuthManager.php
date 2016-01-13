@@ -62,6 +62,8 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {

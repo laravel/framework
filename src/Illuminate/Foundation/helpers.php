@@ -225,7 +225,7 @@ if (! function_exists('csrf_token')) {
      *
      * @return string
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     function csrf_token()
     {

@@ -25,8 +25,6 @@ trait ValidatesRequests
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
-     *
-     * @throws \Illuminate\Foundation\Validation\ValidationException
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {

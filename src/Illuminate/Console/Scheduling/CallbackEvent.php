@@ -28,6 +28,8 @@ class CallbackEvent extends Event
      * @param  string  $callback
      * @param  array  $parameters
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($callback, array $parameters = [])
     {
@@ -82,6 +84,8 @@ class CallbackEvent extends Event
      * Do not allow the event to overlap each other.
      *
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function withoutOverlapping()
     {

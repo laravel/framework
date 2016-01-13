@@ -10,6 +10,8 @@ class EncryptionServiceProvider extends ServiceProvider
      * Register the service provider.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function register()
     {
