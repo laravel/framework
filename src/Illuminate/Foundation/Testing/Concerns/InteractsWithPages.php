@@ -150,6 +150,8 @@ trait InteractsWithPages
      * @param  string  $uri
      * @param  string|null  $message
      * @return void
+     *
+     * @throws \Illuminate\Foundation\Testing\HttpException
      */
     protected function assertPageLoaded($uri, $message = null)
     {
@@ -555,6 +557,8 @@ trait InteractsWithPages
      *
      * @param  string  $name
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     protected function click($name)
     {
@@ -684,6 +688,8 @@ trait InteractsWithPages
      *
      * @param  string|null  $buttonText
      * @return \Symfony\Component\DomCrawler\Form
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getForm($buttonText = null)
     {
@@ -723,6 +729,8 @@ trait InteractsWithPages
      *
      * @param  string  $filter
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function assertFilterProducesResults($filter)
     {

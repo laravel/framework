@@ -14,6 +14,8 @@ trait MocksApplicationServices
      *
      * @param  array|string  $events
      * @return $this
+     *
+     * @throws \Exception
      */
     public function expectsEvents($events)
     {
