@@ -26,14 +26,14 @@ class MakeAuthCommand extends Command
      * @var array
      */
     protected $views = [
-        'auth/login.stub' => 'auth/login.blade.php',
-        'auth/register.stub' => 'auth/register.blade.php',
+        'auth/login.stub'           => 'auth/login.blade.php',
+        'auth/register.stub'        => 'auth/register.blade.php',
         'auth/passwords/email.stub' => 'auth/passwords/email.blade.php',
         'auth/passwords/reset.stub' => 'auth/passwords/reset.blade.php',
         'auth/emails/password.stub' => 'auth/emails/password.blade.php',
-        'layouts/app.stub' => 'layouts/app.blade.php',
-        'home.stub' => 'home.blade.php',
-        'welcome.stub' => 'welcome.blade.php',
+        'layouts/app.stub'          => 'layouts/app.blade.php',
+        'home.stub'                 => 'home.blade.php',
+        'welcome.stub'              => 'welcome.blade.php',
     ];
 
     /**
@@ -47,19 +47,24 @@ class MakeAuthCommand extends Command
 
         $this->exportViews();
 
-        if (! $this->option('views')) {
+        if (!$this->option('views')) {
             $this->info('Installed HomeController.');
 
-            copy(
-                __DIR__.'/stubs/make/controllers/HomeController.stub',
-                app_path('Http/Controllers/HomeController.php')
+            $homeControllerStub = file_get_contents(__DIR__ . '/stubs/make/controllers/HomeController.stub');
+
+            $this->replaceNamespace($homeControllerStub)
+                ->replaceImports($homeControllerStub);
+
+            file_put_contents(
+                app_path('Http/Controllers/HomeController.php'),
+                $homeControllerStub
             );
 
             $this->info('Updated Routes File.');
 
             file_put_contents(
                 app_path('Http/routes.php'),
-                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
+                file_get_contents(__DIR__ . '/stubs/make/routes.stub'),
                 FILE_APPEND
             );
         }
@@ -74,15 +79,15 @@ class MakeAuthCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir(base_path('resources/views/layouts'))) {
+        if (!is_dir(base_path('resources/views/layouts'))) {
             mkdir(base_path('resources/views/layouts'), 0755, true);
         }
 
-        if (! is_dir(base_path('resources/views/auth/passwords'))) {
+        if (!is_dir(base_path('resources/views/auth/passwords'))) {
             mkdir(base_path('resources/views/auth/passwords'), 0755, true);
         }
 
-        if (! is_dir(base_path('resources/views/auth/emails'))) {
+        if (!is_dir(base_path('resources/views/auth/emails'))) {
             mkdir(base_path('resources/views/auth/emails'), 0755, true);
         }
     }
@@ -95,11 +100,40 @@ class MakeAuthCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            $path = base_path('resources/views/'.$value);
+            $path = base_path('resources/views/' . $value);
 
-            $this->line('<info>Created View:</info> '.$path);
+            $this->line('<info>Created View:</info> ' . $path);
 
-            copy(__DIR__.'/stubs/make/views/'.$key, $path);
+            copy(__DIR__ . '/stubs/make/views/' . $key, $path);
         }
+    }
+
+    /**
+     * Replace the namespace for the given stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function replaceNamespace( &$stub )
+    {
+        $stub = str_replace(
+            'App\Http\Controllers', $this->laravel->getNamespace() . 'Http\Controllers', $stub
+        );
+
+        return $this;
+    }
+
+    /**
+     * Replace namespace in the list list of imports for the given stub
+     *
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceImports( &$stub )
+    {
+        $stub = str_replace(
+            'App\Http\Requests', $this->laravel->getNamespace() . 'Http\Requests', $stub
+        );
+        return $this;
     }
 }
