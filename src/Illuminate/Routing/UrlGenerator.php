@@ -314,6 +314,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  mixed  $parameters
      * @param  bool   $absolute
      * @return string
+     *
+     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     protected function toRoute($route, $parameters, $absolute)
     {
