@@ -92,6 +92,20 @@ class Factory implements FactoryContract
     protected $sectionStack = [];
 
     /**
+     * The marks in section for @parent section embedding.
+     *
+     * @var array
+     */
+    protected $parentMarks = [];
+
+    /**
+     * The marks in last captured section for @parent section embedding.
+     *
+     * @var array
+     */
+    protected $parentMarksLast = [];
+
+    /**
      * The number of active rendering operations.
      *
      * @var int
@@ -516,6 +530,8 @@ class Factory implements FactoryContract
      */
     public function startSection($section, $content = '')
     {
+        $this->parentMarksLast[$section] = [];
+
         if ($content === '') {
             if (ob_start()) {
                 $this->sectionStack[] = $section;
@@ -535,6 +551,18 @@ class Factory implements FactoryContract
     public function inject($section, $content)
     {
         return $this->startSection($section, $content);
+    }
+
+    /**
+     * Create mark for parent section content.
+     *
+     * @return void
+     */
+    public function appendParent()
+    {
+        $last = end($this->sectionStack);
+
+        $this->parentMarksLast[$last][] = ob_get_length();
     }
 
     /**
@@ -567,6 +595,7 @@ class Factory implements FactoryContract
         $last = array_pop($this->sectionStack);
 
         if ($overwrite) {
+            $this->parentMarks[$last] = $this->parentMarksLast[$last];
             $this->sections[$last] = ob_get_clean();
         } else {
             $this->extendSection($last, ob_get_clean());
@@ -590,8 +619,15 @@ class Factory implements FactoryContract
         $last = array_pop($this->sectionStack);
 
         if (isset($this->sections[$last])) {
+            $len = strlen($this->sections[$last]);
+
+            foreach ($this->parentMarksLast[$last] as $mark) {
+                $this->parentMarks[$last][] = $mark + $len;
+            }
+
             $this->sections[$last] .= ob_get_clean();
         } else {
+            $this->parentMarks[$last] = $this->parentMarksLast[$last];
             $this->sections[$last] = ob_get_clean();
         }
 
@@ -608,10 +644,25 @@ class Factory implements FactoryContract
     protected function extendSection($section, $content)
     {
         if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
-        }
+            $marks = [];
+            $offset = 0;
+            $len = strlen($content);
 
-        $this->sections[$section] = $content;
+            foreach ($this->parentMarks[$section] as $mark) {
+                $this->sections[$section] = substr_replace($this->sections[$section], $content, $mark + $offset, 0);
+
+                foreach ($this->parentMarksLast[$section] as $markLast) {
+                    $marks[] = $mark + $markLast + $offset;
+                }
+
+                $offset += $len;
+            }
+
+            $this->parentMarks[$section] = $marks;
+        } else {
+            $this->sections[$section] = $content;
+            $this->parentMarks[$section] = $this->parentMarksLast[$section];
+        }
     }
 
     /**
@@ -623,17 +674,7 @@ class Factory implements FactoryContract
      */
     public function yieldContent($section, $default = '')
     {
-        $sectionContent = $default;
-
-        if (isset($this->sections[$section])) {
-            $sectionContent = $this->sections[$section];
-        }
-
-        $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
-
-        return str_replace(
-            '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
-        );
+        return isset($this->sections[$section]) ? $this->sections[$section] : $default;
     }
 
     /**
@@ -646,6 +687,10 @@ class Factory implements FactoryContract
         $this->sections = [];
 
         $this->sectionStack = [];
+
+        $this->parentMarks = [];
+
+        $this->parentMarksLast = [];
     }
 
     /**
