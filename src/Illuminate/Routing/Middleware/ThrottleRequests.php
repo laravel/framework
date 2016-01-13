@@ -47,13 +47,17 @@ class ThrottleRequests
             ]);
         }
 
-        $this->limiter->hit($key, $decayMinutes);
-
         $response = $next($request);
+
+        $remaining = $maxAttempts - $this->limiter->attempts($key);
+
+        if (! $this->shouldBypassLimiterHit($response)) {
+            $remaining -= $this->limiter->hit($key, $decayMinutes);
+        }
 
         $response->headers->add([
             'X-RateLimit-Limit' => $maxAttempts,
-            'X-RateLimit-Remaining' => $maxAttempts - $this->limiter->attempts($key) + 1,
+            'X-RateLimit-Remaining' => $remaining,
         ]);
 
         return $response;
@@ -68,5 +72,16 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         return $request->fingerprint();
+    }
+
+    /**
+     * Indicates if a not-modified response should be bypassed.
+     *
+     * @param  mixed  $response
+     * @return bool
+     */
+    protected function shouldBypassLimiterHit($response)
+    {
+        return $response instanceof Response && $response->getStatusCode() === 304;
     }
 }
