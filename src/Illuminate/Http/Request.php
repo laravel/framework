@@ -157,7 +157,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $path = $this->decodedPath();
 
-        if (!empty($this->getQueryString())) {
+        if (! empty($this->getQueryString())) {
             $path .= '?'.urldecode($this->getQueryString());
         }
 
