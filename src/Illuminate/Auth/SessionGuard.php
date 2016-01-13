@@ -260,7 +260,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Attempt to authenticate using HTTP Basic Auth.
      *
      * @param  string  $field
-     * @param  array  $extraConditions
+     * @param  array   $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function basic($field = 'email', $extraConditions = [])
@@ -283,7 +283,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Perform a stateless HTTP Basic login attempt.
      *
      * @param  string  $field
-     * @param  array  $extraConditions
+     * @param  array   $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function onceBasic($field = 'email', $extraConditions = [])
@@ -300,7 +300,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  string  $field
-     * @param  array  $extraConditions
+     * @param  array   $extraConditions
      * @return bool
      */
     protected function attemptBasic(Request $request, $field, $extraConditions = [])
@@ -382,8 +382,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Fire the attempt event with the arguments.
      *
      * @param  array  $credentials
-     * @param  bool  $remember
-     * @param  bool  $login
+     * @param  bool   $remember
+     * @param  bool   $login
      * @return void
      */
     protected function fireAttemptEvent(array $credentials, $remember, $login)

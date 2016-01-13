@@ -84,7 +84,7 @@ class AuthManager implements FactoryContract
      * Call a custom driver creator.
      *
      * @param  string  $name
-     * @param  array  $config
+     * @param  array   $config
      * @return mixed
      */
     protected function callCustomCreator($name, array $config)
@@ -96,7 +96,7 @@ class AuthManager implements FactoryContract
      * Create a session based authentication guard.
      *
      * @param  string  $name
-     * @param  array  $config
+     * @param  array   $config
      * @return \Illuminate\Auth\SessionGuard
      */
     public function createSessionDriver($name, $config)
@@ -127,7 +127,7 @@ class AuthManager implements FactoryContract
      * Create a token based authentication guard.
      *
      * @param  string  $name
-     * @param  array  $config
+     * @param  array   $config
      * @return \Illuminate\Auth\TokenGuard
      */
     public function createTokenDriver($name, $config)
@@ -191,7 +191,7 @@ class AuthManager implements FactoryContract
     /**
      * Register a new callback based request guard.
      *
-     * @param  string  $driver
+     * @param  string    $driver
      * @param  callable  $callback
      * @return $this
      */
@@ -209,7 +209,7 @@ class AuthManager implements FactoryContract
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
+     * @param  string    $driver
      * @param  \Closure  $callback
      * @return $this
      */
@@ -223,7 +223,7 @@ class AuthManager implements FactoryContract
     /**
      * Register a custom provider creator Closure.
      *
-     * @param  string  $name
+     * @param  string    $name
      * @param  \Closure  $callback
      * @return $this
      */
@@ -238,7 +238,7 @@ class AuthManager implements FactoryContract
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array   $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
