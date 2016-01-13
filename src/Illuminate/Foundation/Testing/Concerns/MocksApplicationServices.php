@@ -8,8 +8,8 @@ use Exception;
 trait MocksApplicationServices
 {
     /**
-     * Collected fired events.
-     * 
+     * All of the fired events.
+     *
      * @var array
      */
     protected $firedEvents = [];
@@ -31,13 +31,11 @@ trait MocksApplicationServices
         $this->withoutEvents();
 
         $this->beforeApplicationDestroyed(function () use ($events) {
-            $fired = $this->filterFiredEvents($events);
+            $fired = $this->getFiredEvents($events);
 
-            $eventsNotFired = array_diff($events, $fired);
-
-            if ($eventsNotFired) {
+            if ($eventsNotFired = array_diff($events, $fired)) {
                 throw new Exception(
-                    'The following events were not fired: ['.implode(', ', $eventsNotFired).']'
+                    'These expected events were not fired: ['.implode(', ', $eventsNotFired).']'
                 );
             }
         });
@@ -60,11 +58,9 @@ trait MocksApplicationServices
         $this->withoutEvents();
 
         $this->beforeApplicationDestroyed(function () use ($events) {
-            $fired = $this->filterFiredEvents($events);
-
-            if ($fired) {
+            if ($fired = $this->getFiredEvents($events)) {
                 throw new Exception(
-                    'The following events were fired: ['.implode(', ', $fired).']'
+                    'These unexpected events were fired: ['.implode(', ', $fired).']'
                 );
             }
         });
@@ -92,24 +88,24 @@ trait MocksApplicationServices
 
     /**
      * Filter the given events against the fired events.
-     * 
+     *
      * @param  array  $events
      * @return array
      */
-    protected function filterFiredEvents(array $events)
+    protected function getFiredEvents(array $events)
     {
         return array_filter($events, function ($event) {
-            return $this->isFired($event);
+            return $this->wasFired($event);
         });
     }
 
     /**
      * Check if the given event is fired.
-     * 
+     *
      * @param  object|string  $event
      * @return bool
      */
-    protected function isFired($event)
+    protected function wasFired($event)
     {
         foreach ($this->firedEvents as $called) {
             if ((is_string($called) && $called === $event) ||
