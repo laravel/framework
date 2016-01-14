@@ -108,9 +108,8 @@ trait MocksApplicationServices
     protected function wasFired($event)
     {
         foreach ($this->firedEvents as $called) {
-            if ((is_string($called) && $called === $event) ||
-                (is_string($called) && is_subclass_of($called, $event)) ||
-                (is_object($called) && $called instanceof $event)) {
+            if ((is_string($called) && ($called === $event || is_subclass_of($called, $event))) ||
+                $called instanceof $event) {
                 return true;
             }
         }
