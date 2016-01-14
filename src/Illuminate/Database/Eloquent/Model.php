@@ -2777,7 +2777,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array|string|null  $types
      * @return bool
      */
-    protected function hasCast($key, $types = null)
+    public function hasCast($key, $types = null)
     {
         if (array_key_exists($key, $this->getCasts())) {
             return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
@@ -2791,7 +2791,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return array
      */
-    protected function getCasts()
+    public function getCasts()
     {
         if ($this->incrementing) {
             return array_merge([
