@@ -346,7 +346,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class ArrayObject implements ArrayAccess
+class ArrayObjectStub implements ArrayAccess
 {
     protected $data;
 
