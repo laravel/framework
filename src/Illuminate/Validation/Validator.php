@@ -274,11 +274,65 @@ class Validator implements ValidatorContract
     {
         $data = Arr::dot($this->data);
 
+        // We will check if the attribute is a nested key, if yes we bring the dot
+        // address of that key as well as the key name itself, the matches will
+        // be use to fill the the key with null if it's not provided for the
+        // "required" rule to work effectively.
+        preg_match("/(.*)\.\*\.([^\.\*]*)$/", $attribute, $matches);
+        if ($matches) {
+            $rootArraySegments = explode('.*.', $matches[1]);
+            $lastSegment = last($rootArraySegments);
+            $this->fillMissingArrayKeys($data, $matches[2], $this->data, $rootArraySegments, $lastSegment);
+        }
+
+        // This pattern is used to check if a given key matches the attribute we are looking for.
+        $pattern = str_replace('*', 'd+', preg_quote($attribute));
+
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
+            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->mergeRules($key, $ruleValue);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fill a missing field in an array with null.
+     *
+     * This to make sure the "required" rule is effective if the array does not have the key
+     *
+     * @param  array  $originalData
+     * @param  string  $field
+     * @param  array  $levelData
+     * @param  array  $segments
+     * @param  string  $lastSegment
+     * @param  array  $keysArray
+     * @return void
+     */
+    protected function fillMissingArrayKeys(&$originalData, $field, $levelData, $segments, $lastSegment, $keysArray = [])
+    {
+        foreach ($levelData as $key => $levelValues) {
+            if ($key !== $lastSegment) {
+                if (! is_array($levelValues) || (! is_numeric($key) && ! in_array($key, $segments))) {
+                    continue;
+                }
+
+                // If the last key is numeric then a previous root was checked and we are moving
+                // into a following root thus we need to reset our index.
+                if (is_numeric(last($keysArray))) {
+                    array_pop($keysArray);
+                }
+
+                $keysArray[] = $key;
+                $this->fillMissingArrayKeys($originalData, $field, $levelValues, $segments, $lastSegment, $keysArray);
+            } else {
+                foreach ($levelValues as $i => $rootValue) {
+                    if (! isset($rootValue[$field])) {
+                        $keysArray = array_merge($keysArray, [$lastSegment, $i, $field]);
+                        $originalData[implode('.', $keysArray)] = null;
                     }
                 }
             }
