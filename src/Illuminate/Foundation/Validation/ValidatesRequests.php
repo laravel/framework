@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Validation\ValidationException as LegacyValidationException;
 
 trait ValidatesRequests
 {
@@ -65,7 +66,7 @@ trait ValidatesRequests
      */
     protected function throwValidationException(Request $request, $validator)
     {
-        throw new ValidationException($validator, $this->buildFailedValidationResponse(
+        throw new LegacyValidationException($validator, $this->buildFailedValidationResponse(
             $request, $this->formatValidationErrors($validator)
         ));
     }
