@@ -7,10 +7,9 @@ trait SoftDeletes
     /**
      * Assert that a given where condition does not matches a soft deleted record.
      *
-     * @param string $table
-     * @param array  $data
-     * @param string $connection
-     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
      * @return $this
      */
     protected function seeIsNotSoftDeletedInDatabase($table, array $data, $connection = null)
@@ -32,10 +31,9 @@ trait SoftDeletes
     /**
      * Assert that a given where condition matches a soft deleted record.
      *
-     * @param string $table
-     * @param array  $data
-     * @param string $connection
-     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
      * @return $this
      */
     protected function seeIsSoftDeletedInDatabase($table, array $data, $connection = null)
