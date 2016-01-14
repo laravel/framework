@@ -33,7 +33,7 @@ class EventServiceProvider extends ServiceProvider
         foreach ($this->listen as $event => $listeners) {
             if (Str::contains($event, '::')) {
                 list($model, $eloquent_event) = explode('::', $event);
-                $event = 'eloquent.' . $eloquent_event . ': ' . $model;
+                $event = 'eloquent.'.$eloquent_event.': '.$model;
             }
 
             foreach ($listeners as $listener) {
