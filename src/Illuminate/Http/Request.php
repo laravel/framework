@@ -801,9 +801,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if (is_null($route) || is_null($param)) {
             return $route;
-        } else {
-            return $route->parameter($param);
+        } elseif (is_array($route)) {
+            return Arr::get($route[2], $param);
         }
+
+        return $route->parameter($param);
     }
 
     /**
