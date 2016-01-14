@@ -36,8 +36,8 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     public function fire()
     {
-        if (! $this->option('event')) {
-            return $this->error('Missing required option: --event');
+        if (! $this->option('event') && ! $this->option('model')) {
+            return $this->error('You must set either the --event or the --model option.');
         }
 
         parent::fire();
@@ -53,10 +53,10 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         $stub = parent::buildClass($name);
 
-        $event = $this->option('event');
+        $event = $this->option('event') ?: $this->option('model');
 
         if (! Str::startsWith($event, $this->laravel->getNamespace()) && ! Str::startsWith($event, 'Illuminate')) {
-            $event = $this->laravel->getNamespace().'Events\\'.$event;
+            $event = $this->laravel->getNamespace().($this->option('event') ? 'Events\\' : '').$event;
         }
 
         $stub = str_replace(
@@ -78,9 +78,17 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('queued')) {
-            return __DIR__.'/stubs/listener-queued.stub';
+            if ($this->option('event')) {
+                return __DIR__.'/stubs/listener-queued.stub';
+            } else {
+                return __DIR__.'/stubs/listener-eloquent-queued.stub';
+            }
         } else {
-            return __DIR__.'/stubs/listener.stub';
+            if ($this->option('event')) {
+                return __DIR__.'/stubs/listener.stub';
+            } else {
+                return __DIR__.'/stubs/listener.stub';
+            }
         }
     }
 
@@ -104,6 +112,7 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         return [
             ['event', null, InputOption::VALUE_REQUIRED, 'The event class being listened for.'],
+            ['model', null, InputOption::VALUE_REQUIRED, 'The model that is being listened to.'],
 
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'],
         ];
