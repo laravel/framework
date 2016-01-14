@@ -470,7 +470,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add "created_at" datetime default CURRENT_TIMESTAMP not null, "updated_at" datetime default CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
     }
 
     public function testAddingTimeStampsTz()
