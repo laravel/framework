@@ -103,7 +103,7 @@ if (! function_exists('auth')) {
         if (is_null($guard)) {
             return app(AuthFactory::class);
         }
-        
+
         return app(AuthFactory::class)->guard($guard);
     }
 }
