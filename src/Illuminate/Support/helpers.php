@@ -433,6 +433,21 @@ if (! function_exists('data_get')) {
     }
 }
 
+if (! function_exists('d')) {
+    /**
+     * Dump the passed variables.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function d()
+    {
+        array_map(function ($x) {
+            (new Dumper)->dump($x);
+        }, func_get_args());
+    }
+}
+
 if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
