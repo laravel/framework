@@ -1,15 +1,16 @@
-<?php 
+<?php
 
 namespace Illuminate\Foundation\Testing;
 
-trait SoftDeletes {
-    
+trait SoftDeletes
+{
     /**
-     * Assert that a given where condition does not matches a soft deleted record
+     * Assert that a given where condition does not matches a soft deleted record.
      *
-     * @param  string $table
-     * @param  array  $data
-     * @param  string $connection
+     * @param string $table
+     * @param array  $data
+     * @param string $connection
+     *
      * @return $this
      */
     protected function seeIsNotSoftDeletedInDatabase($table, array $data, $connection = null)
@@ -24,15 +25,17 @@ trait SoftDeletes {
         $this->assertGreaterThan(0, $count, sprintf(
             'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
         ));
+
         return $this;
     }
 
     /**
-     * Assert that a given where condition matches a soft deleted record
+     * Assert that a given where condition matches a soft deleted record.
      *
-     * @param  string $table
-     * @param  array  $data
-     * @param  string $connection
+     * @param string $table
+     * @param array  $data
+     * @param string $connection
+     *
      * @return $this
      */
     protected function seeIsSoftDeletedInDatabase($table, array $data, $connection = null)
@@ -47,6 +50,7 @@ trait SoftDeletes {
         $this->assertGreaterThan(0, $count, sprintf(
             'Found unexpected records in database table [%s] that matched attributes [%s].', $table, json_encode($data)
         ));
+
         return $this;
     }
 }
