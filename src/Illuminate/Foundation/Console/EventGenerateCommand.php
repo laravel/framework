@@ -37,12 +37,18 @@ class EventGenerateCommand extends Command
                 continue;
             }
 
-            $this->callSilent('make:event', ['name' => $event]);
+            if (Str::contains($event, '::')) {
+                list($model) = explode('::', $event);
+
+                $this->callSilent('make:model', ['name' => $model]);
+            } else {
+                $this->callSilent('make:event', ['name' => $event]);
+            }
 
             foreach ($listeners as $listener) {
                 $listener = preg_replace('/@.+$/', '', $listener);
 
-                $this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
+                $this->callSilent('make:listener', ['name' => $listener, '--event' => isset($model) ? $model : $event]);
             }
         }
 

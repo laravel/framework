@@ -61,21 +61,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function listens()
     {
-        $listens = [];
-
-        foreach ($this->listen as $event => $listeners) {
-            if (Str::contains($event, '::')) {
-                list($model) = explode('::', $event);
-                $event = $model;
-            }
-
-            if (array_key_exists($event, $listens)) {
-                $listens[$event] = array_merge($listens[$event], $listeners);
-            } else {
-                $listens[$event] = $listeners;
-            }
-        }
-
-        return $listens;
+        return $this->listen;
     }
 }
