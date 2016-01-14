@@ -348,7 +348,7 @@ class Repository implements CacheContract, ArrayAccess
      * @param  string  $name
      * @return \Illuminate\Cache\TaggedCache
      *
-     * @deprecated since version 5.1. Use tags instead.
+     * @deprecated since version 5.1.28. Use tags instead.
      */
     public function section($name)
     {
