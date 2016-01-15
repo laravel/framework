@@ -15,6 +15,13 @@ trait MocksApplicationServices
     protected $firedEvents = [];
 
     /**
+     * All of the dispatched jobs.
+     *
+     * @var array
+     */
+    protected $dispatchedJobs = [];
+
+    /**
      * Specify a list of events that should be fired for the given operation.
      *
      * These events will be mocked, so that handlers will not actually be executed.
@@ -94,28 +101,7 @@ trait MocksApplicationServices
      */
     protected function getFiredEvents(array $events)
     {
-        return array_filter($events, function ($event) {
-            return $this->wasFired($event);
-        });
-    }
-
-    /**
-     * Check if the given event is fired.
-     *
-     * @param  object|string  $event
-     * @return bool
-     */
-    protected function wasFired($event)
-    {
-        foreach ($this->firedEvents as $called) {
-            if ((is_string($called) && $called === $event) ||
-                (is_string($called) && is_subclass_of($called, $event)) ||
-                (is_object($called) && $called instanceof $event)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->getDispatched($events, $this->firedEvents);
     }
 
     /**
@@ -130,17 +116,107 @@ trait MocksApplicationServices
     {
         $jobs = is_array($jobs) ? $jobs : func_get_args();
 
-        $mock = Mockery::mock('Illuminate\Bus\Dispatcher[dispatch]', [$this->app]);
+        $this->withoutJobs();
 
-        foreach ($jobs as $job) {
-            $mock->shouldReceive('dispatch')->atLeast()->once()
-                ->with(Mockery::type($job));
-        }
+        $this->beforeApplicationDestroyed(function () use ($jobs) {
+            $dispatched = $this->getDispatchedJobs($jobs);
+
+            if ($jobsNotDispatched = array_diff($jobs, $dispatched)) {
+                throw new Exception(
+                    'These expected jobs were not dispatched: ['.implode(', ', $jobsNotDispatched).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Specify a list of jobs that should not be dispatched for the given operation.
+     *
+     * These jobs will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|string  $jobs
+     * @return $this
+     */
+    protected function doesntExpectJobs($jobs)
+    {
+        $jobs = is_array($jobs) ? $jobs : func_get_args();
+
+        $this->withoutJobs();
+
+        $this->beforeApplicationDestroyed(function () use ($jobs) {
+            if ($dispatched = $this->getDispatchedJobs($jobs)) {
+                throw new Exception(
+                    'These unexpected jobs were dispatched: ['.implode(', ', $dispatched).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Mock the job dispatcher so all jobs are silenced and collected.
+     *
+     * @return $this
+     */
+    protected function withoutJobs()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Bus\Dispatcher');
+
+        $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched) {
+            $this->dispatchedJobs[] = $dispatched;
+        });
 
         $this->app->instance(
             'Illuminate\Contracts\Bus\Dispatcher', $mock
         );
 
         return $this;
+    }
+
+    /**
+     * Filter the given jobs against the dispatched jobs.
+     *
+     * @param  array  $jobs
+     * @return array
+     */
+    protected function getDispatchedJobs(array $jobs)
+    {
+        return $this->getDispatched($jobs, $this->dispatchedJobs);
+    }
+
+    /**
+     * Filter the given classes against an array of dispatched classes.
+     *
+     * @param  array  $classes
+     * @param  array  $dispatched
+     * @return array
+     */
+    protected function getDispatched(array $classes, array $dispatched)
+    {
+        return array_filter($classes, function ($class) use ($dispatched) {
+            return $this->wasDispatched($class, $dispatched);
+        });
+    }
+
+    /**
+     * Check if the given class exists in an array of dispatched classes.
+     *
+     * @param  string  $needle
+     * @param  array   $haystack
+     * @return bool
+     */
+    protected function wasDispatched($needle, array $haystack)
+    {
+        foreach ($haystack as $dispatched) {
+            if ((is_string($dispatched) && ($dispatched === $needle || is_subclass_of($dispatched, $needle))) ||
+                $dispatched instanceof $needle) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
