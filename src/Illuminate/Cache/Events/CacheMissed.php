@@ -21,7 +21,7 @@ class CacheMissed
     /**
      * Create a new event instance.
      *
-     * @param  string  $event
+     * @param  string  $key
      * @param  array  $tags
      * @return void
      */
