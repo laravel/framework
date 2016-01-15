@@ -111,7 +111,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return int
+     * @return void
      */
     public function raw($text, $callback)
     {
@@ -124,7 +124,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return int
+     * @return void
      */
     public function plain($view, array $data, $callback)
     {
