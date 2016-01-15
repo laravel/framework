@@ -455,6 +455,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testContextualRouteMethodBindingThroughIOC()
+    {
+        $router = new Router(new Dispatcher, $container = new Container);
+
+        $concreteClassname = RoutingTestDependencyConcretion::class;
+
+        $container->when(RoutingTestMethodDependencyController::class)
+            ->needs(RoutingTestDependencyInterface::class)
+            ->give($concreteClassname);
+
+        $router->get('foo', 'RoutingTestMethodDependencyController@get');
+        $this->assertEquals($concreteClassname, $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
@@ -956,5 +970,21 @@ class RoutingTestMiddlewareGroupTwo
     public function handle($request, $next, $parameter = null)
     {
         return new \Illuminate\Http\Response('caught '.$parameter);
+    }
+}
+
+interface RoutingTestDependencyInterface
+{
+}
+
+class RoutingTestDependencyConcretion implements RoutingTestDependencyInterface
+{
+}
+
+class RoutingTestMethodDependencyController extends \Illuminate\Routing\Controller
+{
+    public function get(RoutingTestDependencyInterface $foo)
+    {
+        return get_class($foo);
     }
 }

@@ -51,12 +51,8 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $originalParameters = $parameters;
-
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency(
-                $parameter, $parameters, $originalParameters
-            );
+            $instance = $this->transformDependency($parameter, $parameters, $reflector);
 
             if (! is_null($instance)) {
                 $this->spliceIntoParameters($parameters, $key, $instance);
@@ -71,10 +67,9 @@ trait RouteDependencyResolverTrait
      *
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
-     * @param  array  $originalParameters
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters, $originalParameters)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters)
     {
         $class = $parameter->getClass();
 
@@ -82,7 +77,14 @@ trait RouteDependencyResolverTrait
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
-            return $this->container->make($class->name);
+            $abstract = $class->name;
+
+            if ($parameter->getDeclaringClass()) {
+                $contextual = $this->container->getContextualConcrete($parameter->getDeclaringClass()->name, $abstract);
+                $abstract = $contextual ?: $abstract;
+            }
+
+            return $this->container->make($abstract);
         }
     }
 
