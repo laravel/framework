@@ -27,12 +27,12 @@ trait AuthenticatesUsers
      */
     public function showLoginForm()
     {
-        $loginFromView = property_exists($this, 'loginView') ?
+        $loginFormView = property_exists($this, 'loginView') ?
                     $this->loginView :
                     'auth.authenticate';
 
-        if (view()->exists($loginFromView)) {
-            return view($loginFromView);
+        if (view()->exists($loginFormView)) {
+            return view($loginFormView);
         }
 
         return view('auth.login');
