@@ -170,7 +170,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  string
      * @return bool
      */
-    public function fullIs()
+    public function fullUrlIs()
     {
         $url = $this->fullUrl();
 
