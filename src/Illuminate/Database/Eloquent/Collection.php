@@ -212,19 +212,6 @@ class Collection extends BaseCollection
     }
 
     /**
-     * Make the given, typically hidden, attributes visible across the entire collection.
-     *
-     * @param  array|string  $attributes
-     * @return $this
-     *
-     * @deprecated since version 5.2. Use the "makeVisible" method directly.
-     */
-    public function withHidden($attributes)
-    {
-        return $this->makeVisible($attributes);
-    }
-
-    /**
      * Get a dictionary keyed by primary keys.
      *
      * @param  \ArrayAccess|array|null  $items
