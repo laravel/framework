@@ -211,9 +211,8 @@ trait MocksApplicationServices
     protected function wasDispatched($needle, array $haystack)
     {
         foreach ($haystack as $dispatched) {
-            if ((is_string($dispatched) && $dispatched === $needle) ||
-                (is_string($dispatched) && is_subclass_of($dispatched, $needle)) ||
-                (is_object($dispatched) && $dispatched instanceof $needle)) {
+            if ((is_string($dispatched) && ($dispatched === $needle || is_subclass_of($dispatched, $needle))) ||
+                $dispatched instanceof $needle) {
                 return true;
             }
         }
