@@ -7,7 +7,6 @@ use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
 class PasswordBrokerManager implements FactoryContract
 {
-
     /**
      * The application instance.
      *
