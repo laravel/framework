@@ -165,6 +165,25 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Determine if the current request URL and query string matches a pattern.
+     *
+     * @param  mixed  string
+     * @return bool
+     */
+    public function fullUrlIs()
+    {
+        $url = $this->fullUrl();
+
+        foreach (func_get_args() as $pattern) {
+            if (Str::is($pattern, $url)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the request is the result of an AJAX call.
      *
      * @return bool
