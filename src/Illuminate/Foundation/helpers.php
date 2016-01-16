@@ -100,7 +100,11 @@ if (! function_exists('auth')) {
      */
     function auth($guard = null)
     {
-        return app(AuthFactory::class)->guard($guard);
+        if (is_null($guard)) {
+            return app(AuthFactory::class);
+        } else {
+            return app(AuthFactory::class)->guard($guard);
+        }
     }
 }
 
