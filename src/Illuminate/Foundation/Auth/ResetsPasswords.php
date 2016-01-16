@@ -57,8 +57,10 @@ trait ResetsPasswords
         $this->validate($request, ['email' => 'required|email']);
 
         $broker = $this->getBroker();
+        
+        $credentials = $this->getCredentialsResetLink($request);
 
-        $response = Password::broker($broker)->sendResetLink($request->only('email'), function (Message $message) {
+        $response = Password::broker($broker)->sendResetLink($credentials, function (Message $message) {
             $message->subject($this->getEmailSubject());
         });
 
@@ -167,9 +169,7 @@ trait ResetsPasswords
             'password' => 'required|confirmed|min:6',
         ]);
 
-        $credentials = $request->only(
-            'email', 'password', 'password_confirmation', 'token'
-        );
+        $credentials = $this->getCredentialsResetPassword($request);
 
         $broker = $this->getBroker();
 
@@ -200,6 +200,33 @@ trait ResetsPasswords
         $user->save();
 
         Auth::guard($this->getGuard())->login($user);
+    }
+    
+    /**
+     * Get the credentials needed to send the reset password email.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function getCredentialsResetLink(Request $request)
+    {
+        return $request->only('email');
+    }
+    
+    /**
+     * Get the credentials needed to reset password.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function getCredentialsResetPassword(Request $request)
+    {
+        return $request->only(
+            'email',
+            'password',
+            'password_confirmation',
+            'token'
+        );
     }
 
     /**
