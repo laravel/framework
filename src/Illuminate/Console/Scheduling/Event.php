@@ -692,11 +692,12 @@ class Event
      * E-mail the results of the scheduled operation.
      *
      * @param  array|mixed  $addresses
+     * @param  bool  $onlyIfOutputExists
      * @return $this
      *
      * @throws \LogicException
      */
-    public function emailOutputTo($addresses)
+    public function emailOutputTo($addresses, $onlyIfOutputExists = false)
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             throw new LogicException('Must direct output to a file in order to e-mail results.');
@@ -704,9 +705,22 @@ class Event
 
         $addresses = is_array($addresses) ? $addresses : func_get_args();
 
-        return $this->then(function (Mailer $mailer) use ($addresses) {
-            $this->emailOutput($mailer, $addresses);
+        return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
+            $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
         });
+    }
+
+    /**
+     * E-mail the results of the scheduled operation if it produces output.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function emailWrittenOutputTo($addresses)
+    {
+        return $this->emailOutputTo($addresses, true);
     }
 
     /**
@@ -714,11 +728,18 @@ class Event
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  array  $addresses
+     * @param  bool  $includeEmpty
      * @return void
      */
-    protected function emailOutput(Mailer $mailer, $addresses)
+    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
-        $mailer->raw(file_get_contents($this->output), function ($m) use ($addresses) {
+        $text = file_get_contents($this->output);
+
+        if ($onlyIfOutputExists && empty($text)) {
+            return;
+        }
+
+        $mailer->raw($text, function ($m) use ($addresses) {
             $m->subject($this->getEmailSubject());
 
             foreach ($addresses as $address) {
