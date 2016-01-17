@@ -574,7 +574,14 @@ class Container implements ArrayAccess, ContainerContract
 
             unset($parameters[$parameter->name]);
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $this->make($parameter->getClass()->name);
+            $dependency = $parameter->getClass()->name;
+
+            if ($parameter->getDeclaringClass()) {
+                $contextual = $this->getContextualConcrete($parameter->getDeclaringClass()->name, $dependency);
+                $dependency = $contextual ?: $dependency;
+            }
+
+            $dependencies[] = $this->make($dependency);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
@@ -664,7 +671,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcrete($abstract)
     {
-        if (! is_null($concrete = $this->getContextualConcrete($abstract))) {
+        if (! is_null($concrete = $this->getContextualConcrete(end($this->buildStack), $abstract))) {
             return $concrete;
         }
 
@@ -679,15 +686,16 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get the contextual concrete binding for the given abstract.
+     * Get the contextual concrete binding for the given concretion and abstract.
      *
+     * @param  string  $concrete
      * @param  string  $abstract
      * @return string|null
      */
-    protected function getContextualConcrete($abstract)
+    public function getContextualConcrete($concrete, $abstract)
     {
-        if (isset($this->contextual[end($this->buildStack)][$abstract])) {
-            return $this->contextual[end($this->buildStack)][$abstract];
+        if (isset($this->contextual[$concrete][$abstract])) {
+            return $this->contextual[$concrete][$abstract];
         }
     }
 
@@ -822,7 +830,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveNonClass(ReflectionParameter $parameter)
     {
-        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
+        if (! is_null($concrete = $this->getContextualConcrete(end($this->buildStack), '$'.$parameter->name))) {
             if ($concrete instanceof Closure) {
                 return call_user_func($concrete, $this);
             } else {

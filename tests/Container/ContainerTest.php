@@ -492,6 +492,20 @@ return $obj; });
         );
     }
 
+    public function testContextualBindingWorksForObjectMethods()
+    {
+        $container = new Container;
+
+        $container->bind('IContainerContractStub', 'ContainerImplementationStub');
+
+        $container->when('ContainerTestMethodContext')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->call('ContainerTestMethodContext@foo')
+        );
+    }
+
     public function testContainerTags()
     {
         $container = new Container;
@@ -700,6 +714,14 @@ class ContainerTestContextInjectTwo
     public function __construct(IContainerContractStub $impl)
     {
         $this->impl = $impl;
+    }
+}
+
+class ContainerTestMethodContext
+{
+    public function foo(IContainerContractStub $impl)
+    {
+        return $impl;
     }
 }
 
