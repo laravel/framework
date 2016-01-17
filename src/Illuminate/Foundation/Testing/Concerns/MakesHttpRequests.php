@@ -260,7 +260,13 @@ trait MakesHttpRequests
         }
 
         foreach ($structure as $key => $value) {
-            if (is_array($value)) {
+            if (is_array($value) && $key === '*') {
+                $this->assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->seeJsonStructure($structure['*'], $responseDataItem);
+                }
+            } elseif (is_array($value)) {
                 $this->assertArrayHasKey($key, $responseData);
                 $this->seeJsonStructure($structure[$key], $responseData[$key]);
             } else {
