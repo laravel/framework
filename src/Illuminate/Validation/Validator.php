@@ -153,7 +153,7 @@ class Validator implements ValidatorContract
     ];
 
     /**
-     * When set to true, validation attribute name won't be beutified in validation message
+     * When set to true, validation attribute name won't be beutified in validation message.
      *
      * @var bool
      */
@@ -1834,7 +1834,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Disables beautifying of attribute name in validation message
+     * Disables beautifying of attribute name in validation message.
      */
     public function disableAttributeBeautifier()
     {
