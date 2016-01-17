@@ -538,6 +538,57 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Replace each field which has asterisks with the numeric keys of the given attribute.
+     *
+     * @param  array  $fields
+     * @param  string $attribute
+     * @return array
+     */
+    protected function replaceParameterFields(array $fields, $attribute)
+    {
+        if ($keys = $this->getAttributeKeys($attribute)) {
+            $fields = array_map(function ($field) use ($keys) {
+                return $this->replaceAsterisksWithKeys($field, $keys);
+            }, $fields);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Get the numeric keys from an attribute flattened with dot notation.
+     *
+     * E.g. 'foo.1.bar.2.baz' -> [1, 2]
+     *
+     * @param  string $attribute
+     * @return array
+     */
+    protected function getAttributeKeys($attribute)
+    {
+        if (preg_match_all('/\.(\d+)\./', $attribute, $keys)) {
+            array_shift($keys);
+
+            return array_collapse($keys);
+        }
+
+        return [];
+    }
+
+    /**
+     * Replace asterisks with numeric keys.
+     *
+     * E.g. 'foo.*.bar.*.baz', [1, 2] -> foo.1.bar.2.baz
+     *
+     * @param  strint $field
+     * @param  array  $keys
+     * @return string
+     */
+    protected function replaceAsterisksWithKeys($field, array $keys)
+    {
+        return vsprintf(str_replace('*', '%d', $field), $keys);
+    }
+
+    /**
      * "Validate" optional attributes.
      *
      * Always returns true, just lets us put sometimes in rules.
@@ -658,6 +709,8 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWith($attribute, $value, $parameters)
     {
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
+
         if (! $this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
@@ -675,6 +728,8 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWithAll($attribute, $value, $parameters)
     {
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
+
         if (! $this->anyFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
@@ -692,6 +747,8 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWithout($attribute, $value, $parameters)
     {
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
+
         if ($this->anyFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
@@ -709,6 +766,8 @@ class Validator implements ValidatorContract
      */
     protected function validateRequiredWithoutAll($attribute, $value, $parameters)
     {
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
+
         if ($this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
@@ -727,6 +786,8 @@ class Validator implements ValidatorContract
     protected function validateRequiredIf($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
+
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
 
         $data = Arr::get($this->data, $parameters[0]);
 
@@ -750,6 +811,8 @@ class Validator implements ValidatorContract
     protected function validateRequiredUnless($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'required_unless');
+
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
 
         $data = Arr::get($this->data, $parameters[0]);
 
@@ -805,6 +868,8 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'same');
 
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
+
         $other = Arr::get($this->data, $parameters[0]);
 
         return isset($other) && $value === $other;
@@ -821,6 +886,8 @@ class Validator implements ValidatorContract
     protected function validateDifferent($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'different');
+
+        $parameters = $this->replaceParameterFields($parameters, $attribute);
 
         $other = Arr::get($this->data, $parameters[0]);
 
