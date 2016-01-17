@@ -1916,4 +1916,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             new \Illuminate\Translation\ArrayLoader, 'en'
         );
     }
+
+
+    public function testAttributeNameBeautifier()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['res_url' => 'www.example'], ['res_url' => 'required|url'], ['res_url.url' => 'The :attribute format is invalid.']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The res url format is invalid.', $v->messages()->first('res_url'));
+
+        $v = new Validator($trans, ['resURL' => 'www.example'], ['resURL' => 'required|url'], ['resURL.url' => 'The :attribute format is invalid.']);
+        $v->disableAttributeBeautifier();
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The resURL format is invalid.', $v->messages()->first('resURL'));
+    }
 }
