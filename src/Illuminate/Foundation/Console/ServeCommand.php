@@ -38,6 +38,8 @@ class ServeCommand extends Command
         $host = $this->input->getOption('host');
 
         $port = $this->input->getOption('port');
+        
+        $quiet = $this->input->getOption('quiet') ? ' >& /dev/null' : '';
 
         $base = ProcessUtils::escapeArgument($this->laravel->basePath());
 
@@ -52,7 +54,7 @@ class ServeCommand extends Command
                 throw new Exception("HHVM's built-in server requires HHVM >= 3.8.0.");
             }
         } else {
-            passthru("{$binary} -S {$host}:{$port} {$base}/server.php");
+            passthru("{$binary} -S {$host}:{$port} {$base}/server.php{$quiet}");
         }
     }
 
