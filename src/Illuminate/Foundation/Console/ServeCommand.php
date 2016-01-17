@@ -38,7 +38,7 @@ class ServeCommand extends Command
         $host = $this->input->getOption('host');
 
         $port = $this->input->getOption('port');
-        
+
         $quiet = $this->input->getOption('quiet') ? ' >& /dev/null' : '';
 
         $base = ProcessUtils::escapeArgument($this->laravel->basePath());
