@@ -28,8 +28,8 @@ trait ResetsPasswords
      */
     public function showLinkRequestForm()
     {
-        if (property_exists($this, 'passwordEmailView')) {
-            return view($this->passwordEmailView);
+        if (property_exists($this, 'linkRequestView')) {
+            return view($this->linkRequestView);
         }
 
         if (view()->exists('auth.passwords.email')) {
@@ -139,8 +139,8 @@ trait ResetsPasswords
 
         $email = $request->input('email');
 
-        if (property_exists($this, 'passwordResetView')) {
-            return view($this->passwordResetView)->with(compact('token', 'email'));
+        if (property_exists($this, 'resetView')) {
+            return view($this->resetView)->with(compact('token', 'email'));
         }
 
         if (view()->exists('auth.passwords.reset')) {
