@@ -153,6 +153,13 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * When set to true, validation attribute name won't be beutified in validation message.
+     *
+     * @var bool
+     */
+    protected $disableAttributeBeautifier = false;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
@@ -1817,8 +1824,21 @@ class Validator implements ValidatorContract
 
         // If no language line has been specified for the attribute all of the
         // underscores are removed from the attribute name and that will be
-        // used as default versions of the attribute's displayable names.
+        // used as default versions of the attribute's displayable names
+        // unless disableAttributeBeautifier() was called.
+        if ($this->disableAttributeBeautifier) {
+            return $attribute;
+        }
+
         return str_replace('_', ' ', Str::snake($attribute));
+    }
+
+    /**
+     * Disables beautifying of attribute name in validation message.
+     */
+    public function disableAttributeBeautifier()
+    {
+        $this->disableAttributeBeautifier = true;
     }
 
     /**
