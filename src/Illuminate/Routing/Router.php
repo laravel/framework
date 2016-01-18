@@ -131,7 +131,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function get($uri, $action)
+    public function get($uri, $action = null)
     {
         return $this->addRoute(['GET', 'HEAD'], $uri, $action);
     }
@@ -143,7 +143,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function post($uri, $action)
+    public function post($uri, $action = null)
     {
         return $this->addRoute('POST', $uri, $action);
     }
@@ -155,7 +155,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function put($uri, $action)
+    public function put($uri, $action = null)
     {
         return $this->addRoute('PUT', $uri, $action);
     }
@@ -167,7 +167,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function patch($uri, $action)
+    public function patch($uri, $action = null)
     {
         return $this->addRoute('PATCH', $uri, $action);
     }
@@ -179,7 +179,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function delete($uri, $action)
+    public function delete($uri, $action = null)
     {
         return $this->addRoute('DELETE', $uri, $action);
     }
@@ -191,7 +191,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function options($uri, $action)
+    public function options($uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
     }
@@ -203,7 +203,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function any($uri, $action)
+    public function any($uri, $action = null)
     {
         $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -218,7 +218,7 @@ class Router implements RegistrarContract
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function match($methods, $uri, $action)
+    public function match($methods, $uri, $action = null)
     {
         return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
     }
