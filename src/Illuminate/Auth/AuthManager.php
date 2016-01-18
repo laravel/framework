@@ -132,7 +132,7 @@ class AuthManager implements FactoryContract
      */
     public function createTokenDriver($name, $config)
     {
-        // The token guard implemetns a basic API token based guard implementation
+        // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
         // user in the database or another persistence layer where users are.
         $guard = new TokenGuard(
