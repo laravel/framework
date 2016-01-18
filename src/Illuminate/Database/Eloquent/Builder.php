@@ -861,13 +861,13 @@ class Builder
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  mixed  $relations
+     * @param  mixed  ...$relations
      * @return $this
      */
-    public function with($relations)
+    public function with(...$relations)
     {
-        if (is_string($relations)) {
-            $relations = func_get_args();
+        if (is_array($relations[0])) {
+            $relations = $relations[0];
         }
 
         $eagers = $this->parseWithRelations($relations);
