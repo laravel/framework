@@ -541,7 +541,7 @@ class Validator implements ValidatorContract
      * Replace each field which has asterisks with the numeric keys of the given attribute.
      *
      * @param  array  $fields
-     * @param  string $attribute
+     * @param  string  $attribute
      * @return array
      */
     protected function replaceParameterFields(array $fields, $attribute)
@@ -560,7 +560,7 @@ class Validator implements ValidatorContract
      *
      * E.g. 'foo.1.bar.2.baz' -> [1, 2]
      *
-     * @param  string $attribute
+     * @param  string  $attribute
      * @return array
      */
     protected function getAttributeKeys($attribute)
@@ -579,7 +579,7 @@ class Validator implements ValidatorContract
      *
      * E.g. 'foo.*.bar.*.baz', [1, 2] -> foo.1.bar.2.baz
      *
-     * @param  strint $field
+     * @param  string  $field
      * @param  array  $keys
      * @return string
      */
