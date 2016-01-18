@@ -200,7 +200,11 @@ class Str
      */
     public static function parseCallback($callback, $default)
     {
-        return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
+        if (preg_match('/([^@]*)@(.*)/', $callback, $matches)) {
+            return [$matches[1], $matches[2]];
+        }
+
+        return [$callback, $default];
     }
 
     /**

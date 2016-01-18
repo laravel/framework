@@ -68,6 +68,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
+        $this->assertEquals(['Class', 'method@bar'], Str::parseCallback('Class@method@bar', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
     }
 
