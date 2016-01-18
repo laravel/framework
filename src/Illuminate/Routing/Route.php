@@ -942,6 +942,12 @@ class Route
         return $this;
     }
 
+    /**
+     * Set the handler for the route.
+     *
+     * @param  \Closure|array  $action
+     * @return $this
+     */
     public function using($action)
     {
         $this->setAction(array_merge($this->action, $this->parseAction($action)));
