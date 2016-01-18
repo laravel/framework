@@ -950,7 +950,7 @@ class Route
      */
     public function using($action)
     {
-        $this->setAction(array_merge($this->action, $this->parseAction($action)));
+        return $this->setAction(array_merge($this->action, $this->parseAction($action)));
     }
 
     /**

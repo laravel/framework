@@ -99,15 +99,19 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testFluentRouting()
     {
         $router = $this->getRouter();
-        $router->get('foo/bar');
-        $router->dispatch(Request::create('foo/bar', 'GET'));
 
         $router->get('foo/bar')->using(function () { return 'hello'; });
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
+        $router->post('foo/bar')->using(function () { return 'hello'; });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'POST'))->getContent());
+
         $router->get('foo/bar')->using(function () { return 'middleware'; })->middleware('RouteTestControllerMiddleware');
         $this->assertEquals('middleware', $router->dispatch(Request::create('foo/bar'))->getContent());
-        $this->assertContains('RouteTestControllerMiddleware', $router->getMiddleware());
+        $this->assertContains('RouteTestControllerMiddleware', $router->getCurrentRoute()->middleware());
+
+        $router->get('foo/bar');
+        $router->dispatch(Request::create('foo/bar', 'GET'));
     }
 
     public function testFluentRouteNamingWithinAGroup()
