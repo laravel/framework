@@ -100,13 +100,13 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     {
         $router = $this->getRouter();
 
-        $router->get('foo/bar')->using(function () { return 'hello'; });
+        $router->get('foo/bar')->uses(function () { return 'hello'; });
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
-        $router->post('foo/bar')->using(function () { return 'hello'; });
+        $router->post('foo/bar')->uses(function () { return 'hello'; });
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'POST'))->getContent());
 
-        $router->get('foo/bar')->using(function () { return 'middleware'; })->middleware('RouteTestControllerMiddleware');
+        $router->get('foo/bar')->uses(function () { return 'middleware'; })->middleware('RouteTestControllerMiddleware');
         $this->assertEquals('middleware', $router->dispatch(Request::create('foo/bar'))->getContent());
         $this->assertContains('RouteTestControllerMiddleware', $router->getCurrentRoute()->middleware());
 

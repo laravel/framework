@@ -948,7 +948,7 @@ class Route
      * @param  \Closure|array  $action
      * @return $this
      */
-    public function using($action)
+    public function uses($action)
     {
         return $this->setAction(array_merge($this->action, $this->parseAction($action)));
     }
