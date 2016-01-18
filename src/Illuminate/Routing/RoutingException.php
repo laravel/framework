@@ -11,7 +11,7 @@ class RoutingException extends RuntimeException
     public function setRoute(Route $route)
     {
         $this->route = $route;
-        $this->message .= " Failed for route ".$route->uri();
+        $this->message .= ' Failed for route '.$route->uri();
 
         return $this;
     }
