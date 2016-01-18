@@ -627,7 +627,7 @@ class Route
     {
         if (is_null($action)) {
             return ['uses' => function () {
-                throw new RoutingException("The route has no action");
+                throw (new RoutingException("The route has no action."))->setRoute($this);
             }];
         }
         // If the action is already a Closure instance, we will just set that instance
