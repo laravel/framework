@@ -1054,7 +1054,7 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        return  $this->bindings[$abstract]['shared'] === true;
+        return $this->bindings[$abstract]['shared'] === true;
     }
 
     /**
