@@ -1046,13 +1046,15 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->normalize($abstract);
 
-        if (isset($this->bindings[$abstract]['shared'])) {
-            $shared = $this->bindings[$abstract]['shared'];
-        } else {
-            $shared = false;
+        if (isset($this->instances[$abstract])) {
+            return true;
         }
 
-        return isset($this->instances[$abstract]) || $shared === true;
+        if (! isset($this->bindings[$abstract]['shared'])) {
+            return false;
+        }
+
+        return  $this->bindings[$abstract]['shared'] === true;
     }
 
     /**
