@@ -625,6 +625,11 @@ class Route
      */
     protected function parseAction($action)
     {
+        if (is_null($action)) {
+            return ['uses' => function () {
+                throw new RoutingException("The route has no action");
+            }];
+        }
         // If the action is already a Closure instance, we will just set that instance
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
@@ -935,6 +940,11 @@ class Route
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
         return $this;
+    }
+
+    public function using($action)
+    {
+        $this->setAction(array_merge($this->action, $this->parseAction($action)));
     }
 
     /**
