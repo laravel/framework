@@ -33,7 +33,7 @@ class ServeCommand extends Command
      */
     public function fire()
     {
-        chdir($this->laravel->publicPath());
+        chdir($this->laravel->make('path.public'));
 
         $host = $this->input->getOption('host');
 
