@@ -83,11 +83,11 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testRouteCollectionCanGetIterator()
     {
-        $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', [
+        $this->routeCollection->add(new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertEquals([$routeIndex], $this->routeCollection->getRoutes());
+        $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
     }
 
     public function testRouteCollectionCanGetIteratorWhenEMpty()
