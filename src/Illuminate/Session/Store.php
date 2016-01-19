@@ -376,7 +376,7 @@ class Store implements SessionInterface
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return mixed
+     * @return void
      */
     public function setOldInput($key, $value)
     {
