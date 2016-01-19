@@ -139,6 +139,15 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($session->hasOldInput('boom'));
     }
 
+    public function testSetOldInput()
+    {
+        $session = $this->getSession();
+        $session->setOldInput('foo', 'bar');
+
+        $this->assertTrue($session->hasOldInput('foo'));
+        $this->assertEquals('bar', $session->getOldInput('foo'));
+    }
+
     public function testDataFlashing()
     {
         $session = $this->getSession();

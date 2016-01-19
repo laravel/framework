@@ -372,6 +372,22 @@ class Store implements SessionInterface
     }
 
     /**
+     * Set the specified item to the old input array.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return mixed
+     */
+    public function setOldInput($key, $value)
+    {
+        $input = $this->get('_old_input', []);
+
+        Arr::set($input, $key, $value);
+
+        $this->set('_old_input', $input);
+    }
+
+    /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
