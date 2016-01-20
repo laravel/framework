@@ -3516,9 +3516,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Return value before a save
+     * Return value before a save.
      *
-     * @param  Object $original
+     * @param  object $original
      * @return void
      */
     public function beforeSave($original)
@@ -3526,10 +3526,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Return the comparative values after a save
+     * Return the comparative values after a save.
      *
-     * @param  Object $original
-     * @param  Object $after
+     * @param  object $original
+     * @param  object $after
      * @return void
      */
     public function afterSave($original, $after)
