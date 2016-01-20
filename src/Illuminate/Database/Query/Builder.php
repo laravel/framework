@@ -7,7 +7,6 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1591,32 +1590,27 @@ class Builder
      */
     public function lists($column, $key = null)
     {
-        $columns = $this->getListSelect($column, $key);
+        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
-        $results = new Collection($this->get($columns));
-
-        return $results->pluck($columns[0], Arr::get($columns, 1))->all();
+        // If the columns are qualified with a table or have an alias, we cannot use
+        // those directly in the "pluck" operations since the results from the DB
+        // are only keyed by the column itself. We'll strip the table out here.
+        return Arr::pluck(
+            $results,
+            $this->stripTableForPluck($column),
+            $this->stripTableForPluck($key)
+        );
     }
 
     /**
-     * Get the columns that should be used in a list array.
+     * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @param  string  $key
-     * @return array
+     * @return string|null
      */
-    protected function getListSelect($column, $key)
+    protected function stripTableForPluck($column)
     {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
-        // If the selected column contains a "dot", we will remove it so that the list
-        // operation can run normally. Specifying the table is not needed, since we
-        // really want the names of the columns as it is in this resulting array.
-        return array_map(function ($column) {
-            $dot = strpos($column, '.');
-
-            return $dot === false ? $column : substr($column, $dot + 1);
-        }, $select);
+        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
