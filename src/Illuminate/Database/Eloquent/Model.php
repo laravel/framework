@@ -1519,6 +1519,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $query = $this->newQueryWithoutScopes();
 
+        $originalAttributes = $query->first()->attributes;
+
+        $this->beforeSave($originalAttributes);
+
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
         // listeners to cancel save operations if validations fail or whatever.
@@ -1543,6 +1547,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($saved) {
             $this->finishSave($options);
         }
+
+
+        $this->afterSave($originalAttributes, $afterAttributes);
 
         return $saved;
     }
@@ -3506,6 +3513,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         unset($this->$offset);
     }
+
+    /**
+     * Return value before a save
+     *
+     * @param  Object $original
+     * @return void
+     */
+    public function beforeSave($original) {}
+
+    /**
+     * Return the comparative values after a save
+     *
+     * @param  Object $original
+     * @param  Object $after
+     * @return void
+     */
+    public function afterSave($original, $after) {}
 
     /**
      * Determine if an attribute exists on the model.
