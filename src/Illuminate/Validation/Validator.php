@@ -1085,9 +1085,7 @@ class Validator implements ValidatorContract
         // data store like Redis, etc. We will use it to determine uniqueness.
         $verifier = $this->getPresenceVerifier();
 
-        if (! is_null($connection)) {
-            $verifier->setConnection($connection);
-        }
+        $verifier->setConnection($connection);
 
         $extra = $this->getUniqueExtra($parameters);
 
@@ -1175,9 +1173,7 @@ class Validator implements ValidatorContract
     {
         $verifier = $this->getPresenceVerifier();
 
-        if (! is_null($connection)) {
-            $verifier->setConnection($connection);
-        }
+        $verifier->setConnection($connection);
 
         $extra = $this->getExtraExistConditions($parameters);
 
