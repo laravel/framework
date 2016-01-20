@@ -1548,6 +1548,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->finishSave($options);
         }
 
+        $afterAttributes = $query->first()->attributes;
 
         $this->afterSave($originalAttributes, $afterAttributes);
 
