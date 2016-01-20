@@ -3521,7 +3521,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  Object $original
      * @return void
      */
-    public function beforeSave($original) {}
+    public function beforeSave($original)
+    {
+    }
 
     /**
      * Return the comparative values after a save
@@ -3530,7 +3532,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  Object $after
      * @return void
      */
-    public function afterSave($original, $after) {}
+    public function afterSave($original, $after)
+    {
+    }
 
     /**
      * Determine if an attribute exists on the model.
