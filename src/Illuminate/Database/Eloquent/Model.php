@@ -1519,6 +1519,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $query = $this->newQueryWithoutScopes();
 
+        $originalAttributes = [];
+
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
         // listeners to cancel save operations if validations fail or whatever.
@@ -1530,6 +1532,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
+            $originalAttributes = $query->first()->attributes;
+            $this->beforeSave($originalAttributes, $this->attributes);
             $saved = $this->performUpdate($query, $options);
         }
 
@@ -1537,11 +1541,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // ID attribute on the model to the value of the newly inserted row's ID
         // which is typically an auto-increment value managed by the database.
         else {
+            $this->beforeSave($originalAttributes, $this->attributes);
             $saved = $this->performInsert($query, $options);
         }
 
         if ($saved) {
             $this->finishSave($options);
+            $this->afterSave($originalAttributes, $this->attributes);
         }
 
         return $saved;
@@ -3505,6 +3511,28 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function offsetUnset($offset)
     {
         unset($this->$offset);
+    }
+
+    /**
+     * Return value before a save.
+     *
+     * @param  array $original
+     * @param  array $intent
+     * @return void
+     */
+    public function beforeSave($original, $intent)
+    {
+    }
+
+    /**
+     * Return the comparative values after a save.
+     *
+     * @param  array $original
+     * @param  array $after
+     * @return void
+     */
+    public function afterSave($original, $after)
+    {
     }
 
     /**
