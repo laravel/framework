@@ -15,7 +15,7 @@ trait ValidatesRequests
      *
      * @var array
      */
-    protected $sometimes = [];
+    protected $validatesRequestSometimes = [];
 
     /**
      * The default error bag.
@@ -34,7 +34,7 @@ trait ValidatesRequests
      */
     public function sometimes($attribute, $rules, callable $callback)
     {
-        array_push($this->sometimes, compact('attribute', 'rules', 'callback'));
+        array_push($this->validatesRequestSometimes, compact('attribute', 'rules', 'callback'));
 
         return $this;
     }
@@ -144,11 +144,11 @@ trait ValidatesRequests
     {
         $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
 
-        foreach ($this->sometimes as $sometimes) {
+        foreach ($this->validatesRequestSometimes as $sometimes) {
             $validator->sometimes($sometimes['attribute'], $sometimes['rules'], $sometimes['callback']);
         }
 
-        $this->sometimes = [];
+        $this->validatesRequestSometimes = [];
 
         return $validator;
     }
