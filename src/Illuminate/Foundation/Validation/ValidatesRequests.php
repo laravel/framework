@@ -11,11 +11,33 @@ use Illuminate\Contracts\Validation\Validator;
 trait ValidatesRequests
 {
     /**
+     * Conditional validation rules based on a Closure.
+     *
+     * @var array
+     */
+    protected $sometimes = [];
+
+    /**
      * The default error bag.
      *
      * @var string
      */
     protected $validatesRequestErrorBag;
+
+    /**
+     * Add conditions to a given field based on a Closure.
+     *
+     * @param  string|array  $attribute
+     * @param  string|array  $rules
+     * @param  callable  $callback
+     * @return object
+     */
+    public function sometimes($attribute, $rules, callable $callback)
+    {
+        array_push($this->sometimes, compact('attribute', 'rules', 'callback'));
+
+        return $this;
+    }
 
     /**
      * Validate the given request with the given rules.
@@ -28,7 +50,7 @@ trait ValidatesRequests
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
-        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
+        $validator = $this->makeValidator($request->all(), $rules, $messages, $customAttributes);
 
         if ($validator->fails()) {
             $this->throwValidationException($request, $validator);
@@ -107,6 +129,28 @@ trait ValidatesRequests
     protected function getRedirectUrl()
     {
         return app(UrlGenerator::class)->previous();
+    }
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function makeValidator(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
+
+        foreach ($this->sometimes as $sometimes) {
+            $validator->sometimes($sometimes['attribute'], $sometimes['rules'], $sometimes['callback']);
+        }
+
+        $this->sometimes = [];
+
+        return $validator;
     }
 
     /**
