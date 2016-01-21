@@ -53,7 +53,7 @@ class ResourceRegistrar
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route wildcards, which should be the base resources.
-        $base = $this->getResourceWildcard(last(explode('.', $name)));
+        $base = str_singular($this->getResourceWildcard(last(explode('.', $name))));
 
         $defaults = $this->resourceDefaults;
 
@@ -211,13 +211,7 @@ class ResourceRegistrar
      */
     protected function getGroupResourceName($prefix, $resource, $method)
     {
-        $group = trim(str_replace('/', '.', $this->router->getLastGroupPrefix()), '.');
-
-        if (empty($group)) {
-            return trim("{$prefix}{$resource}.{$method}", '.');
-        }
-
-        return trim("{$prefix}{$group}.{$resource}.{$method}", '.');
+        return trim("{$prefix}{$resource}.{$method}", '.');
     }
 
     /**

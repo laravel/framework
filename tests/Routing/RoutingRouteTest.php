@@ -418,6 +418,13 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitModelBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{user}', function (ImplicitModelBindingStub $user) { return $user->value; });
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     /**
      * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -651,21 +658,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars.foo-bazs', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_bazs}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_baz}', $routes[0]->getUri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show'], 'as' => 'prefix']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
@@ -684,6 +691,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $router = $this->getRouter();
         $router->resource('foo.bar', 'FooController');
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+
+        $router = $this->getRouter();
+        $router->resource('prefix/foo.bar', 'FooController');
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
@@ -783,13 +801,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
     }
 
-    public function testControllerInspection()
-    {
-        $router = $this->getRouter();
-        $router->controller('home', 'RouteTestInspectedControllerStub');
-        $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
-    }
-
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -865,14 +876,6 @@ class RouteTestControllerParameterizedMiddlewareTwo
     }
 }
 
-class RouteTestInspectedControllerStub extends Illuminate\Routing\Controller
-{
-    public function getFoo()
-    {
-        return 'hello';
-    }
-}
-
 class RouteTestControllerExceptMiddleware
 {
     public function handle($request, $next)
@@ -913,6 +916,28 @@ class RouteModelBindingStub
     public function first()
     {
         return strtoupper($this->value);
+    }
+}
+
+class ImplicitModelBindingStub extends \Illuminate\Database\Eloquent\Model
+{
+    public $value;
+
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = strtoupper($value);
+
+        return $this;
+    }
+
+    public function firstOrFail()
+    {
+        return $this;
     }
 }
 
