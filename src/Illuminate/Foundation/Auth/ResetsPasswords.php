@@ -137,7 +137,7 @@ trait ResetsPasswords
             return $this->getEmail();
         }
 
-        $email = urldecode($request->input('email'));
+        $email = $request->input('email');
 
         if (property_exists($this, 'resetView')) {
             return view($this->resetView)->with(compact('token', 'email'));
