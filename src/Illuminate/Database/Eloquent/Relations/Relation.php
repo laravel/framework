@@ -336,7 +336,7 @@ abstract class Relation
 
         return $result;
     }
-    
+
     /**
      * Force a clone of the underlying query builder when cloning.
      *
