@@ -1519,9 +1519,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $query = $this->newQueryWithoutScopes();
 
-        $originalAttributes = $query->first()->attributes;
-
-        $this->beforeSave($originalAttributes);
+        $originalAttributes = $this->attributes;
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
@@ -1534,6 +1532,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
+            $this->beforeSave($originalAttributes);
             $saved = $this->performUpdate($query, $options);
         }
 
@@ -1546,11 +1545,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($saved) {
             $this->finishSave($options);
+            $afterAttributes = $this->attributes;
+            $this->afterSave($originalAttributes, $afterAttributes);
         }
-
-        $afterAttributes = $query->first()->attributes;
-
-        $this->afterSave($originalAttributes, $afterAttributes);
 
         return $saved;
     }
