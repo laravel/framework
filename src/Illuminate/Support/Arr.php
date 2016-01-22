@@ -234,8 +234,8 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if ((! is_array($array) || ! isset($array[$segment])) &&
+                (! $array instanceof ArrayAccess || ! isset($array[$segment]))) {
                 return value($default);
             }
 
