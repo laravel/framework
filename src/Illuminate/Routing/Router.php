@@ -834,20 +834,29 @@ class Router implements RegistrarContract
     protected function substituteImplicitBindings($route)
     {
         $parameters = $route->parameters();
+        $toBind = [];
+        $count = 0;
 
-        foreach ($route->signatureParameters(Model::class) as $parameter) {
+        foreach ($route->signatureParameters() as $parameter) {
             $class = $parameter->getClass();
+            if (! $class || $class->isSubclassOf(Model::class)) {
+                $toBind[] = $parameter;
+            } else {
+                $count++;
+            }
+        }
 
-            if (array_key_exists($parameter->name, $parameters) &&
-                ! $route->getParameter($parameter->name) instanceof Model) {
+        foreach ($toBind as $i => $parameter) {
+            $class = $parameter->getClass();
+            if ($class && ! $parameters[$route->parameterNames()[$i]] instanceof Model) {
                 $method = $parameter->isDefaultValueAvailable() ? 'first' : 'firstOrFail';
 
                 $model = $class->newInstance();
 
                 $route->setParameter(
-                    $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
-                    )->{$method}()
+                    $route->parameterNames()[$i], $model->where(
+                    $model->getRouteKeyName(), $parameters[$route->parameterNames()[$i]]
+                )->{$method}()
                 );
             }
         }
