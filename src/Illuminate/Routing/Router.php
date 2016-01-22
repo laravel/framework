@@ -835,14 +835,11 @@ class Router implements RegistrarContract
     {
         $parameters = $route->parameters();
         $toBind = [];
-        $count = 0;
 
         foreach ($route->signatureParameters() as $parameter) {
             $class = $parameter->getClass();
             if (! $class || $class->isSubclassOf(Model::class)) {
                 $toBind[] = $parameter;
-            } else {
-                $count++;
             }
         }
 
