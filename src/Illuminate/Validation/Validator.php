@@ -316,6 +316,9 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             foreach ($rules as $rule) {
                 $this->validate($attribute, $rule);
+                if ($this->shouldBreakOnFail($attribute)) {
+                    break;
+                }
             }
         }
 
@@ -524,6 +527,33 @@ class Validator implements ValidatorContract
     protected function validateSometimes()
     {
         return true;
+    }
+
+    /**
+     * "Break" on first validation fail.
+     *
+     * Always returns true, just lets us put failonfirst in rules.
+     *
+     * @return bool
+     */
+    protected function validateFailOnFirst()
+    {
+        return true;
+    }
+
+    /**
+     * Stop on error if failonfirst rule is given.
+     *
+     * @param string $attribute
+     * @return bool
+     */
+    protected function shouldBreakOnFail($attribute)
+    {
+        if (! $this->hasRule($attribute, ['Failonfirst'])) {
+            return false;
+        }
+
+        return $this->messages->has($attribute);
     }
 
     /**
