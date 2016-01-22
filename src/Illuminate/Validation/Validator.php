@@ -276,7 +276,7 @@ class Validator implements ValidatorContract
 
         // We will check if the attribute is a nested key, if yes we bring the dot
         // address of that key as well as the key name itself, the matches will
-        // be use to fill the the key with null if it's not provided for the
+        // be use to fill the key with null if it's not provided for the
         // "required" rule to work effectively.
         preg_match("/(.*)\.\*\.([^\.\*]*)$/", $attribute, $matches);
         if ($matches) {
