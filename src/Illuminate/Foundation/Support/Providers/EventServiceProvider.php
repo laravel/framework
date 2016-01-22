@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
@@ -30,6 +31,11 @@ class EventServiceProvider extends ServiceProvider
     public function boot(DispatcherContract $events)
     {
         foreach ($this->listen as $event => $listeners) {
+            if (Str::contains($event, '::')) {
+                list($model, $eloquent_event) = explode('::', $event);
+                $event = 'eloquent.'.$eloquent_event.': '.$model;
+            }
+
             foreach ($listeners as $listener) {
                 $events->listen($event, $listener);
             }
