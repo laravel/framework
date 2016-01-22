@@ -47,6 +47,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $from;
 
     /**
+     * The global to address and name.
+     *
+     * @var array
+     */
+    protected $to;
+
+    /**
      * The IoC container instance.
      *
      * @var \Illuminate\Contracts\Container\Container

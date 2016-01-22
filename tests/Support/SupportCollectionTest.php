@@ -1016,6 +1016,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection();
         $this->assertNull($c->avg());
     }
+
+    public function testJsonSerialize()
+    {
+        $c = new Collection([
+            new TestArrayableObject(),
+            new TestJsonableObject(),
+            new TestJsonSerializeObject(),
+            'baz',
+        ]);
+
+        $this->assertSame([
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            'baz',
+        ], $c->jsonSerialize());
+    }
 }
 
 class TestAccessorEloquentTestStub

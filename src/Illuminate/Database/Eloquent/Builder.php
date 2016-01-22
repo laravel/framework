@@ -393,7 +393,7 @@ class Builder
      */
     public function update(array $values)
     {
-        return $this->query->update($this->addUpdatedAtColumn($values));
+        return $this->toBase()->update($this->addUpdatedAtColumn($values));
     }
 
     /**
@@ -454,7 +454,7 @@ class Builder
             return call_user_func($this->onDelete, $this);
         }
 
-        return $this->query->delete();
+        return $this->toBase()->delete();
     }
 
     /**

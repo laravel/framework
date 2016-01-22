@@ -145,7 +145,7 @@ if (! function_exists('array_get')) {
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  array|\ArrayAccess   $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
