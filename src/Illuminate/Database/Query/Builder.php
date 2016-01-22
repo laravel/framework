@@ -1651,8 +1651,8 @@ class Builder
         // are only keyed by the column itself. We'll strip the table out here.
         return Arr::pluck(
             $results,
-            $this->stripeTableForPluck($column),
-            $this->stripeTableForPluck($key)
+            $this->stripTableForPluck($column),
+            $this->stripTableForPluck($key)
         );
     }
 
@@ -1676,7 +1676,7 @@ class Builder
      * @param  string  $column
      * @return string|null
      */
-    protected function stripeTableForPluck($column)
+    protected function stripTableForPluck($column)
     {
         return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
