@@ -111,7 +111,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return void
+     * @return int
      */
     public function raw($text, $callback)
     {
@@ -124,7 +124,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return void
+     * @return int
      */
     public function plain($view, array $data, $callback)
     {
@@ -137,7 +137,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return void
+     * @return int
      */
     public function send($view, array $data, $callback)
     {
@@ -368,7 +368,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int
      */
     protected function sendSwiftMessage($message)
     {
