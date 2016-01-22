@@ -201,31 +201,6 @@ trait InteractsWithPages
     }
 
     /**
-     * Check if the page contains a text within the given element.
-     *
-     * @param  string  $element
-     * @param  string  $text
-     * @return bool
-     */
-    protected function hasInElement($element, $text)
-    {
-        $elements = $this->crawler->filter($element);
-
-        $rawPattern = preg_quote($text, '/');
-        $escapedPattern = preg_quote(e($text), '/');
-        $pattern = $rawPattern == $escapedPattern
-            ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
-
-        foreach ($elements as $element) {
-            if (preg_match("/$pattern/i", $element->nodeValue)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Assert that a given string is seen inside an element.
      *
      * @param  string  $element
@@ -262,6 +237,33 @@ trait InteractsWithPages
         );
 
         return $this;
+    }
+
+    /**
+     * Check if the page contains text within the given element.
+     *
+     * @param  string  $element
+     * @param  string  $text
+     * @return bool
+     */
+    protected function hasInElement($element, $text)
+    {
+        $elements = $this->crawler->filter($element);
+
+        $rawPattern = preg_quote($text, '/');
+
+        $escapedPattern = preg_quote(e($text), '/');
+
+        $pattern = $rawPattern == $escapedPattern
+            ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+
+        foreach ($elements as $element) {
+            if (preg_match("/$pattern/i", $element->nodeValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
