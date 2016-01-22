@@ -455,6 +455,73 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBinding()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', function (ImplicitBindingStub $bar) {
+            return $bar->value;
+        });
+
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingWithIOCBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', function (Request $request, ImplicitBindingStub $bar) {
+            return $bar->value;
+        });
+
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingWithNamingIncoherence()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', function (ImplicitBindingStub $taylor) {
+            return $taylor->value;
+        });
+
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingWithIOCBindingAndNamingIncoherence()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', function (Request $request, ImplicitBindingStub $taylor) {
+            return $taylor->value;
+        });
+
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingWithUnboundParameters()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}/{baz}', function (Request $request, $bar, ImplicitBindingStub $taylor) {
+            return $bar.' and '.$taylor->value;
+        });
+
+        $this->assertEquals('abigail and TAYLOR', $router->dispatch(Request::create('foo/abigail/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitAndExplicitBinding()
+    {
+        $router = $this->getRouter();
+        $router->bind('bar', function ($value) { return strtoupper($value); });
+
+        $router->get('foo/{bar}/{baz}', function ($bar, ImplicitBindingStub $taylor) {
+            return $bar.' ♥ '.$taylor->value;
+        });
+
+        $this->assertEquals('ABIGAIL ♥ TAYLOR', $router->dispatch(Request::create('foo/abigail/taylor', 'GET'))->getContent());
+    }
+
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
@@ -938,6 +1005,28 @@ class RouteModelBindingClosureStub
     public function findAlternate($value)
     {
         return strtolower($value).'alt';
+    }
+}
+
+class ImplicitBindingStub extends \Illuminate\Database\Eloquent\Model
+{
+    public $value;
+
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = strtoupper($value);
+
+        return $this;
+    }
+
+    public function firstOrFail()
+    {
+        return $this;
     }
 }
 
