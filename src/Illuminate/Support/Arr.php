@@ -234,12 +234,11 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! isset($array[$segment])) &&
-                (! $array instanceof ArrayAccess || ! isset($array[$segment]))) {
+            if ((is_array($array) || $array instanceof ArrayAccess) && isset($array[$segment])) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
