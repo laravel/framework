@@ -214,7 +214,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Determine if the recaller cookie is in a valid format.
      *
-     * @param  string  $recaller
+     * @param  mixed  $recaller
      * @return bool
      */
     protected function validRecaller($recaller)

@@ -54,7 +54,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
             return 'new contents';
         }));
 
-        $this->assertEquals('', $view->render(function () {
+        $this->assertEmpty($view->render(function () {
             return '';
         }));
 
