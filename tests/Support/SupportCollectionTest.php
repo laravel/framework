@@ -34,6 +34,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testLastWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->last(null, 'default');
+        $this->assertEquals('default', $result);
+    }
+
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
@@ -685,6 +692,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['foo', 'bar']);
         $result = $data->first(function ($key, $value) { return $value === 'baz'; }, 'default');
+        $this->assertEquals('default', $result);
+    }
+
+    public function testFirstWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->first(null, 'default');
         $this->assertEquals('default', $result);
     }
 
