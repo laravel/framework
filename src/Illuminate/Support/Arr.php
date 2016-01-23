@@ -218,7 +218,7 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  array|\ArrayAccess   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
@@ -234,12 +234,11 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if ((is_array($array) || $array instanceof ArrayAccess) && isset($array[$segment])) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
