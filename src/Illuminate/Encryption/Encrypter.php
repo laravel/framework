@@ -70,7 +70,7 @@ class Encrypter implements EncrypterContract
     {
         $iv = random_bytes(16);
 
-        $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
+        $value = openssl_encrypt($value, $this->cipher, $this->key, 0, $iv);
 
         if ($value === false) {
             throw new EncryptException('Could not encrypt the data.');
@@ -110,7 +110,7 @@ class Encrypter implements EncrypterContract
             throw new DecryptException('Could not decrypt the data.');
         }
 
-        return unserialize($decrypted);
+        return $decrypted;
     }
 
     /**
