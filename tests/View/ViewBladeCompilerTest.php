@@ -329,6 +329,34 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testBreakStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php break; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testContinueStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@continue
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php continue; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testNestedForStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
