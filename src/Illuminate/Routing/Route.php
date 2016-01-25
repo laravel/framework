@@ -261,7 +261,7 @@ class Route
      * Get or set the middlewares attached to the route.
      *
      * @param  array|string|null $middleware
-     * @return array
+     * @return array|$this
      */
     public function middleware($middleware = null)
     {
