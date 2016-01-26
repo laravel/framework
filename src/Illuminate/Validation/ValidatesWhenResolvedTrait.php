@@ -42,7 +42,7 @@ trait ValidatesWhenResolvedTrait
      * @param  \Illuminate\Validation\Validator  $validator
      * @return mixed
      *
-     * @throws \Illuminate\Contracts\Validation\ValidationExceptio
+     * @throws \Illuminate\Contracts\Validation\ValidationException
      */
     protected function failedValidation(Validator $validator)
     {
