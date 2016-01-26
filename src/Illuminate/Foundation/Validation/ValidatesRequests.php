@@ -24,11 +24,16 @@ trait ValidatesRequests
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  callable  $callback
      * @return void
      */
-    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
-        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
+        $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
+
+        if ($callback) {
+            call_user_func($callback, $validator);
+        }
 
         if ($validator->fails()) {
             $this->throwValidationException($request, $validator);
@@ -47,10 +52,10 @@ trait ValidatesRequests
      *
      * @throws \Illuminate\Foundation\Validation\ValidationException
      */
-    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
         $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
-            $this->validate($request, $rules, $messages, $customAttributes);
+            $this->validate($request, $rules, $messages, $customAttributes, $callback);
         });
     }
 
