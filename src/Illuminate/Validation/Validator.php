@@ -533,24 +533,24 @@ class Validator implements ValidatorContract
     /**
      * "Break" on first validation fail.
      *
-     * Always returns true, just lets us put "fail_once" in rules.
+     * Always returns true, just lets us put "bail" in rules.
      *
      * @return bool
      */
-    protected function validateFailOnce()
+    protected function validateBail()
     {
         return true;
     }
 
     /**
-     * Stop on error if "fail_once" rule is assigned and attribute has a message.
+     * Stop on error if "bail" rule is assigned and attribute has a message.
      *
      * @param  string  $attribute
      * @return bool
      */
     protected function shouldStopValidating($attribute)
     {
-        if (! $this->hasRule($attribute, ['FailOnce'])) {
+        if (! $this->hasRule($attribute, ['Bail'])) {
             return false;
         }
 
