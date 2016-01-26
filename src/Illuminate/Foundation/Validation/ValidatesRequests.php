@@ -25,32 +25,22 @@ trait ValidatesRequests
     protected $validatesRequestErrorBag;
 
     /**
-     * Add conditions to a given field based on a Closure.
-     *
-     * @param  string|array  $attribute
-     * @param  string|array  $rules
-     * @param  callable  $callback
-     * @return object
-     */
-    public function sometimes($attribute, $rules, callable $callback)
-    {
-        array_push($this->validatesRequestSometimes, compact('attribute', 'rules', 'callback'));
-
-        return $this;
-    }
-
-    /**
      * Validate the given request with the given rules.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  callable  $callback
      * @return void
      */
-    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
-        $validator = $this->makeValidator($request->all(), $rules, $messages, $customAttributes);
+        $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
+
+        if ($callback) {
+            call_user_func($callback, $validator);
+        }
 
         if ($validator->fails()) {
             $this->throwValidationException($request, $validator);
@@ -69,10 +59,10 @@ trait ValidatesRequests
      *
      * @throws \Illuminate\Foundation\Validation\ValidationException
      */
-    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
         $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
-            $this->validate($request, $rules, $messages, $customAttributes);
+            $this->validate($request, $rules, $messages, $customAttributes, $callback);
         });
     }
 
@@ -129,28 +119,6 @@ trait ValidatesRequests
     protected function getRedirectUrl()
     {
         return app(UrlGenerator::class)->previous();
-    }
-
-    /**
-     * Create a new Validator instance.
-     *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return \Illuminate\Validation\Validator
-     */
-    protected function makeValidator(array $data, array $rules, array $messages = [], array $customAttributes = [])
-    {
-        $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
-
-        foreach ($this->validatesRequestSometimes as $sometimes) {
-            $validator->sometimes($sometimes['attribute'], $sometimes['rules'], $sometimes['callback']);
-        }
-
-        $this->validatesRequestSometimes = [];
-
-        return $validator;
     }
 
     /**
