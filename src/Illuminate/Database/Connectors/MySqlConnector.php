@@ -114,6 +114,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
     {
         if (isset($config['modes'])) {
             $modes = implode(',', $config['modes']);
+
             $connection->prepare("set session sql_mode='".$modes."'")->execute();
         } elseif (isset($config['strict'])) {
             if ($config['strict']) {
