@@ -58,6 +58,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
     }
 
+    public function testFailingOnce()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'fail_once|Same:baz|In:qux']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+    }
+
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();
