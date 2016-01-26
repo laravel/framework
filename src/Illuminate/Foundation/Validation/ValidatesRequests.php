@@ -11,13 +11,6 @@ use Illuminate\Contracts\Validation\Validator;
 trait ValidatesRequests
 {
     /**
-     * Conditional validation rules based on a Closure.
-     *
-     * @var array
-     */
-    protected $validatesRequestSometimes = [];
-
-    /**
      * The default error bag.
      *
      * @var string
