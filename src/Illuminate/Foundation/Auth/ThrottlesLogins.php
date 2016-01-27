@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
 
 trait ThrottlesLogins
@@ -93,6 +94,17 @@ trait ThrottlesLogins
         app(RateLimiter::class)->clear(
             $this->getThrottleKey($request)
         );
+    }
+
+    /**
+     * Fire an event when a lockout occurs.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function fireLockoutEvent(Request $request)
+    {
+        event(new Lockout($request));
     }
 
     /**
