@@ -65,7 +65,7 @@ trait AuthenticatesUsers
         // the IP address of the client making these requests into this application.
         $throttles = $this->isUsingThrottlesLoginsTrait();
 
-        if ($throttles && $this->hasTooManyLoginAttempts($request)) {
+        if ($throttles && $lockedOut = $this->hasTooManyLoginAttempts($request)) {
             return $this->sendLockoutResponse($request);
         }
 
@@ -78,7 +78,7 @@ trait AuthenticatesUsers
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
-        if ($throttles) {
+        if ($throttles && ! $lockedOut) {
             $this->incrementLoginAttempts($request);
         }
 
