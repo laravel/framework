@@ -638,6 +638,10 @@ class MySqlGrammar extends Grammar
         if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
+
+        if (! $column->nullable && ! $column->useCurrent && in_array($column->type, ['timestamp', 'timestampTz'])) {
+            return ' default 0';
+        }
     }
 
     /**
