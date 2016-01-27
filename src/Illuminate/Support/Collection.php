@@ -229,6 +229,33 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items by the given key value pair.
+     *
+     * @param  string  $key
+     * @param  array  $values
+     * @param  bool  $strict
+     * @return static
+     */
+    public function whereIn($key, array $values, $strict = true)
+    {
+        return $this->filter(function ($item) use ($key, $values, $strict) {
+            return in_array(data_get($item, $key), $values, $strict);
+        });
+    }
+
+    /**
+     * Filter items by the given key value pair using loose comparison.
+     *
+     * @param  string  $key
+     * @param  array  $values
+     * @return static
+     */
+    public function whereInLoose($key, array $values)
+    {
+        return $this->whereIn($key, $values, false);
+    }
+
+    /**
      * Get the first item from the collection.
      *
      * @param  callable|null  $callback
@@ -238,7 +265,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function first(callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return count($this->items) > 0 ? reset($this->items) : null;
+            return count($this->items) > 0 ? reset($this->items) : value($default);
         }
 
         return Arr::first($this->items, $callback, $default);

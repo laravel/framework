@@ -316,6 +316,10 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             foreach ($rules as $rule) {
                 $this->validate($attribute, $rule);
+
+                if ($this->shouldStopValidating($attribute)) {
+                    break;
+                }
             }
         }
 
@@ -524,6 +528,33 @@ class Validator implements ValidatorContract
     protected function validateSometimes()
     {
         return true;
+    }
+
+    /**
+     * "Break" on first validation fail.
+     *
+     * Always returns true, just lets us put "bail" in rules.
+     *
+     * @return bool
+     */
+    protected function validateBail()
+    {
+        return true;
+    }
+
+    /**
+     * Stop on error if "bail" rule is assigned and attribute has a message.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function shouldStopValidating($attribute)
+    {
+        if (! $this->hasRule($attribute, ['Bail'])) {
+            return false;
+        }
+
+        return $this->messages->has($attribute);
     }
 
     /**
