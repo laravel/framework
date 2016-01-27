@@ -396,6 +396,18 @@ trait MakesHttpRequests
      *
      * @param  string  $cookieName
      * @param  mixed  $value
+     * @return $this
+     */
+    protected function seePlainCookie($cookieName, $value = null)
+    {
+        return $this->seeCookie($cookieName, $value, false);
+    }
+
+    /**
+     * Asserts that the response contains the given cookie and equals the optional value.
+     *
+     * @param  string  $cookieName
+     * @param  mixed  $value
      * @param  bool  $encrypted
      * @return $this
      */
