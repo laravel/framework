@@ -1905,35 +1905,59 @@ class Builder
     }
 
     /**
-     * Increment a column's value by a given amount.
+     * Increment a column or a group of columns values by given amounts.
      *
-     * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
      * @return int
      */
-    public function increment($column, $amount = 1, array $extra = [])
+    public function increment()
     {
-        $wrapped = $this->grammar->wrap($column);
+        $arguments = func_get_args();
 
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+        if (empty($arguments)) {
+            throw new InvalidArgumentException('Missing argument 1 for increment().');
+        }
 
-        return $this->update($columns);
+        return $this->incrementOrDecrement($arguments, '+');
     }
 
     /**
-     * Decrement a column's value by a given amount.
+     * Decrement a column or a group of columns values by given amounts.
      *
-     * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
      * @return int
      */
-    public function decrement($column, $amount = 1, array $extra = [])
+    public function decrement()
     {
-        $wrapped = $this->grammar->wrap($column);
+        $arguments = func_get_args();
 
-        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
+        if (empty($arguments)) {
+            throw new InvalidArgumentException('Missing argument 1 for decrement().');
+        }
+
+        return $this->incrementOrDecrement($arguments, '-');
+    }
+
+    /**
+     * @param  string  $operator
+     * @param  array  $arguments
+     * @return int
+     */
+    private function incrementOrDecrement(array $arguments, $operator = '+')
+    {
+        if (is_array($arguments[0])) {
+            $columns = $arguments[0];
+            $extra = isset($arguments[1]) ? $arguments[1] : [];
+        } else {
+            $columns = [$arguments[0] => isset($arguments[1]) ? $arguments[1] : 1];
+            $extra = isset($arguments[2]) ? $arguments[2] : [];
+        }
+
+        array_walk($columns, function (&$amount, $column) use ($operator) {
+            $wrapped = $this->grammar->wrap($column);
+
+            $amount = $this->raw("$wrapped $operator $amount");
+        });
+
+        $columns = array_merge($columns, $extra);
 
         return $this->update($columns);
     }
