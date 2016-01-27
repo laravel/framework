@@ -34,6 +34,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testLastWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->last(null, 'default');
+        $this->assertEquals('default', $result);
+    }
+
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
@@ -268,9 +275,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testWhere()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
-
         $this->assertEquals([['v' => 3]], $c->where('v', 3)->values()->all());
+    }
+
+    public function testWhereLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
         $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereLoose('v', 3)->values()->all());
+    }
+
+    public function testWhereIn()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3]], $c->whereIn('v', [1, 3])->values()->all());
+    }
+
+    public function testWhereInLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3], ['v' => '3']], $c->whereInLoose('v', [1, 3])->values()->all());
     }
 
     public function testValues()
@@ -754,6 +777,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['foo', 'bar']);
         $result = $data->first(function ($key, $value) { return $value === 'baz'; }, 'default');
+        $this->assertEquals('default', $result);
+    }
+
+    public function testFirstWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->first(null, 'default');
         $this->assertEquals('default', $result);
     }
 

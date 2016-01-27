@@ -1628,7 +1628,7 @@ class Builder
 
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
-                if ($callback($item, $key) === false) {
+                if ($callback($value, $key) === false) {
                     return false;
                 }
             }

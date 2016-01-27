@@ -22,7 +22,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
     public function testMySqlConnectCallsCreateConnectionWithProperArguments($dsn, $config)
     {
         $connector = $this->getMock('Illuminate\Database\Connectors\MySqlConnector', ['createConnection', 'getOptions']);
-        $connection = m::mock('stdClass');
+        $connection = m::mock('PDO');
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);

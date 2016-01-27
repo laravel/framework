@@ -480,10 +480,6 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
 
     public function testSyncMethodConvertsCollectionToArrayOfKeys()
     {
-        if (version_compare(PHP_VERSION, '7.0.2') > -1) {
-            $this->markTestSkipped('Skipped due to mockery incompatibility on php 7.0.2 and newer.');
-        }
-
         $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['attach', 'detach', 'touchIfTouching', 'formatSyncList'], $this->getRelationArguments());
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
@@ -492,8 +488,11 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
 
-        $collection = m::mock('Illuminate\Database\Eloquent\Collection');
-        $collection->shouldReceive('modelKeys')->once()->andReturn([1, 2, 3]);
+        $collection = new Collection([
+            m::mock(['getKey' => 1]),
+            m::mock(['getKey' => 2]),
+            m::mock(['getKey' => 3]),
+        ]);
         $relation->expects($this->once())->method('formatSyncList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
         $relation->sync($collection);
     }
