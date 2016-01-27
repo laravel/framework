@@ -1907,16 +1907,28 @@ class Builder
     /**
      * Increment a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  string|array  $column
+     * @param  int|array  $amount
+     * @param  array  $extra
+     * @param  string  $operator
      * @return int
      */
-    public function increment($column, $amount = 1, array $extra = [])
+    public function increment($column, $amount = null, array $extra = [], $operator = '+')
     {
-        $wrapped = $this->grammar->wrap($column);
+        if (is_array($column)) {
+            $columns = $column;
+            $extra = is_array($amount) ? $amount : [];
+        } else {
+            $columns = [$column => $amount ?: 1];
+        }
 
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+        array_walk($columns, function (&$amount, $column) use ($operator) {
+            $wrapped = $this->grammar->wrap($column);
+
+            $amount = $this->raw("$wrapped $operator $amount");
+        });
+
+        $columns = array_merge($columns, $extra);
 
         return $this->update($columns);
     }
@@ -1924,18 +1936,14 @@ class Builder
     /**
      * Decrement a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  string|array  $column
+     * @param  int|array  $amount
+     * @param  array  $extra
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {
-        $wrapped = $this->grammar->wrap($column);
-
-        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
-
-        return $this->update($columns);
+        return $this->increment($column, $amount, $extra, '-');
     }
 
     /**

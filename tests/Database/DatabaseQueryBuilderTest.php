@@ -1090,6 +1090,53 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testIncrementMethod()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->once()->with('"level" + 2')->andReturn('level+2');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ? where "id" = ?', ['level+2', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->increment('level', 2);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->once()->with('"level" + 1')->andReturn('level+1');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ? where "id" = ?', ['level+1', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->increment('level');
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->with('"level" + 2')->andReturn('level+2');
+        $builder->getConnection()->shouldReceive('raw')->with('"score" + 200')->andReturn('score+200');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ?, "score" = ? where "id" = ?', ['level+2', 'score+200', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->increment(['level' => 2, 'score' => 200]);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIncrementMethodWithExtras()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->once()->with('"level" + 2')->andReturn('level+2');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ?, "rank" = ? where "id" = ?', ['level+2', 'General', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->increment('level', 2, ['rank' => 'General']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->with('"level" + 2')->andReturn('level+2');
+        $builder->getConnection()->shouldReceive('raw')->with('"score" + 200')->andReturn('score+200');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ?, "score" = ?, "rank" = ? where "id" = ?', ['level+2', 'score+200', 'General', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->increment(['level' => 2, 'score' => 200], ['rank' => 'General']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testDecrementMethod()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('raw')->once()->with('"level" - 2')->andReturn('level-2');
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "level" = ? where "id" = ?', ['level-2', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->decrement('level', 2);
+        $this->assertEquals(1, $result);
+    }
+
     public function testDeleteMethod()
     {
         $builder = $this->getBuilder();
