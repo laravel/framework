@@ -29,7 +29,7 @@ trait ValidatesRequests
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
-        $validator = $this->getValidationFactory()->make($data, $rules, $messages, $customAttributes);
+        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
         if ($callback) {
             call_user_func($callback, $validator);
@@ -55,7 +55,7 @@ trait ValidatesRequests
      */
     public function validateWithBag($errorBag, Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
     {
-        $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes) {
+        $this->withErrorBag($errorBag, function () use ($request, $rules, $messages, $customAttributes, $callback) {
             $this->validate($request, $rules, $messages, $customAttributes, $callback);
         });
     }
