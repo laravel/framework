@@ -24,7 +24,7 @@ trait ValidatesRequests
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
-     * @param  callable  $callback
+     * @param  null|callable  $callback
      * @return void
      */
     public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $callback = null)
@@ -48,6 +48,7 @@ trait ValidatesRequests
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
+     * @param  null|callable  $callback
      * @return void
      *
      * @throws \Illuminate\Foundation\Validation\ValidationException
