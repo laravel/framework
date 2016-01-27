@@ -104,24 +104,51 @@ class MySqlConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Get the modes for the connection.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getModes(array $config)
+    {
+        if (isset($config['modes'])) {
+            return (array) $config['modes'];
+        }
+
+        if (! isset($config['strict'])) {
+            return [];
+        }
+
+        if (! $config['strict']) {
+            return ['NO_ENGINE_SUBSTITUTION'];
+        }
+
+        return [
+            'ERROR_FOR_DIVISION_BY_ZERO',
+            'NO_AUTO_CREATE_USER',
+            'NO_ENGINE_SUBSTITUTION',
+            'NO_ZERO_DATE',
+            'NO_ZERO_IN_DATE',
+            'ONLY_FULL_GROUP_BY',
+            'STRICT_TRANS_TABLES',
+        ];
+    }
+
+    /**
      * Set the modes for the connection.
      *
      * @param  \PDO  $connection
      * @param  array  $config
-     * @return void
+     * @return bool
      */
     protected function setModes(PDO $connection, array $config)
     {
-        if (isset($config['modes'])) {
-            $modes = implode(',', $config['modes']);
+        if ($modes = $this->getModes($config)) {
+            $sqlModes = str_replace("'", '', implode(',', $modes));
 
-            $connection->prepare("set session sql_mode='".$modes."'")->execute();
-        } elseif (isset($config['strict'])) {
-            if ($config['strict']) {
-                $connection->prepare("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'")->execute();
-            } else {
-                $connection->prepare("set session sql_mode='NO_ENGINE_SUBSTITUTION'")->execute();
-            }
+            return $connection->prepare("set session sql_mode='".$sqlModes."'")->execute();
         }
+
+        return false;
     }
 }
