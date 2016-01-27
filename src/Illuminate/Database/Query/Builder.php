@@ -1905,21 +1905,50 @@ class Builder
     }
 
     /**
-     * Increment a column's value by a given amount.
+     * Increment a column or a group of columns values by given amounts.
      *
-     * @param  string|array  $column
-     * @param  int|array  $amount
-     * @param  array  $extra
-     * @param  string  $operator
      * @return int
      */
-    public function increment($column, $amount = null, array $extra = [], $operator = '+')
+    public function increment()
     {
-        if (is_array($column)) {
-            $columns = $column;
-            $extra = is_array($amount) ? $amount : [];
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            throw new InvalidArgumentException('Missing argument 1 for increment().');
+        }
+
+        return $this->incrementOrDecrement($arguments, '+');
+    }
+
+    /**
+     * Decrement a column or a group of columns values by given amounts.
+     *
+     * @return int
+     */
+    public function decrement()
+    {
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            throw new InvalidArgumentException('Missing argument 1 for decrement().');
+        }
+
+        return $this->incrementOrDecrement($arguments, '-');
+    }
+
+    /**
+     * @param  string  $operator
+     * @param  array  $arguments
+     * @return int
+     */
+    private function incrementOrDecrement(array $arguments, $operator = '+')
+    {
+        if (is_array($arguments[0])) {
+            $columns = $arguments[0];
+            $extra = isset($arguments[1]) ? $arguments[1] : [];
         } else {
-            $columns = [$column => $amount ?: 1];
+            $columns = [$arguments[0] => isset($arguments[1]) ? $arguments[1] : 1];
+            $extra = isset($arguments[2]) ? $arguments[2] : [];
         }
 
         array_walk($columns, function (&$amount, $column) use ($operator) {
@@ -1931,19 +1960,6 @@ class Builder
         $columns = array_merge($columns, $extra);
 
         return $this->update($columns);
-    }
-
-    /**
-     * Decrement a column's value by a given amount.
-     *
-     * @param  string|array  $column
-     * @param  int|array  $amount
-     * @param  array  $extra
-     * @return int
-     */
-    public function decrement($column, $amount = 1, array $extra = [])
-    {
-        return $this->increment($column, $amount, $extra, '-');
     }
 
     /**
