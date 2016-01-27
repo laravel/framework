@@ -395,6 +395,9 @@ abstract class Grammar extends BaseGrammar
             case 'longtext':
                 $type = 'text';
                 break;
+            case 'binary':
+                $type = 'blob';
+                break;
         }
 
         return Type::getType($type);
