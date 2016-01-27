@@ -426,7 +426,7 @@ trait MakesHttpRequests
 
         $this->assertTrue($exist, "Cookie [{$cookieName}] not present on response.");
 
-        if (! is_null($value)) {
+        if ($exist && ! is_null($value)) {
             $cookieValue = $cookie->getValue();
 
             $actual = $encrypted
