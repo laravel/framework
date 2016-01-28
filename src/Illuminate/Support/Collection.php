@@ -829,8 +829,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $instance = new static($results);
 
-        return $this->isAssoc() ? $instance
-                                : $instance->values();
+        return Arr::isAssoc($this->items) ? $instance : $instance->values();
     }
 
     /**
