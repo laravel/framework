@@ -426,19 +426,19 @@ trait MakesHttpRequests
 
         $this->assertTrue($exist, "Cookie [{$cookieName}] not present on response.");
 
-        if (! is_null($value)) {
-            $cookieValue = $cookie->getValue();
-
-            $actual = $encrypted
-                ? $this->app['encrypter']->decrypt($cookieValue) : $cookieValue;
-
-            $this->assertEquals(
-                $actual, $value,
-                "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
-            );
+        if (! $exist || is_null($value)) {
+            return $this;
         }
 
-        return $this;
+        $cookieValue = $cookie->getValue();
+
+        $actual = $encrypted
+            ? $this->app['encrypter']->decrypt($cookieValue) : $cookieValue;
+
+        return $this->assertEquals(
+            $actual, $value,
+            "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
+        );
     }
 
     /**
