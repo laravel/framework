@@ -827,12 +827,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$key] = $this->items[$key];
         }
 
-        // Determine if the original collection was an indexed collection and we should
-        // return an indexed collection.
-        $indexed = array_keys($this->items) === range(0, count($this->items) - 1);
+        $instance = new static($results);
 
-        return $indexed ? new static(array_values($results))
-                        : new static($results);
+        return $this->isAssoc() ? $instance
+                                : $instance->values();
     }
 
     /**
