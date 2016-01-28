@@ -827,7 +827,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$key] = $this->items[$key];
         }
 
-        return new static(array_values($results));
+        $is_indexed = array_keys($this->items) === range(0, count($arr) - 1);
+        return $is_indexed ? new static(array_values($results)) : new static($results);
     }
 
     /**
