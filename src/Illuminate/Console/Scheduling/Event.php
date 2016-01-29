@@ -146,18 +146,6 @@ class Event
     }
 
     /**
-     * Run the command in the background using exec.
-     *
-     * @return void
-     */
-    protected function runCommandInBackground()
-    {
-        chdir(base_path());
-
-        exec($this->buildCommand());
-    }
-
-    /**
      * Run the command in the foreground.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
