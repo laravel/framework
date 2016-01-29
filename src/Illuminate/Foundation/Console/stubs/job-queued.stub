@@ -14,7 +14,7 @@ class DummyClass extends Job implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @return self
      */
     public function __construct()
     {

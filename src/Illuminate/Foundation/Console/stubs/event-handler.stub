@@ -11,7 +11,7 @@ class DummyClass
     /**
      * Create the event handler.
      *
-     * @return void
+     * @return self
      */
     public function __construct()
     {
