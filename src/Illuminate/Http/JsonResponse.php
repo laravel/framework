@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
@@ -53,7 +54,7 @@ class JsonResponse extends BaseJsonResponse
                                    : json_encode($data, $this->jsonOptions);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException(json_last_error_msg());
+            throw new InvalidArgumentException(json_last_error_msg());
         }
 
         return $this->update();
