@@ -17,7 +17,7 @@ class DetectEnvironment
     public function bootstrap(Application $app)
     {
         if (! $app->configurationIsCached()) {
-            $this->detectCustomEnvFile($app);
+            $this->checkForSpecificEnvironmentFile($app);
 
             try {
                 (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
@@ -28,17 +28,21 @@ class DetectEnvironment
     }
 
     /**
-     * Detect if a custom env file matching the APP_ENV exists.
+     * Detect if a custom environment file matching the APP_ENV exists.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    protected function detectCustomEnvFile($app)
+    protected function checkForSpecificEnvironmentFile($app)
     {
-        $fileName = $app->environmentFile().'.'.env('APP_ENV');
+        if (! env('APP_ENV')) {
+            return;
+        }
 
-        if (file_exists($app->environmentPath().'/'.$fileName)) {
-            $app->loadEnvironmentFrom($fileName);
+        $file = $app->environmentFile().'.'.env('APP_ENV');
+
+        if (file_exists($app->environmentPath().'/'.$file)) {
+            $app->loadEnvironmentFrom($file);
         }
     }
 }
