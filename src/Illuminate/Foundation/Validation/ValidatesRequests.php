@@ -29,7 +29,7 @@ trait ValidatesRequests
         $request = $request ?: app('request');
 
         if ($validator->fails()) {
-            $this->throwValidationException($request, $validation);
+            $this->throwValidationException($request, $validator);
         }
     }
 
