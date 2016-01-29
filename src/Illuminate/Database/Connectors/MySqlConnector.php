@@ -115,10 +115,6 @@ class MySqlConnector extends Connector implements ConnectorInterface
             return (array) $config['modes'];
         }
 
-        if (! isset($config['strict'])) {
-            return [];
-        }
-
         if ($config['strict'] === false) {
             return ['NO_ENGINE_SUBSTITUTION'];
         }
@@ -137,6 +133,17 @@ class MySqlConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Ensure that the SQL mode should be set.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function shouldSetSqlMode(array $config)
+    {
+        return isset($config['modes']) || isset($config['strict']);
+    }
+
+    /**
      * Set the modes for the connection.
      *
      * @param  \PDO  $connection
@@ -145,9 +152,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function setModes(PDO $connection, array $config)
     {
-        if ($modes = $this->getModes($config)) {
-            $sqlModes = str_replace("'", '', implode(',', $modes));
-
+        if ($this->shouldSetSqlMode($config)) {
+            $sqlModes = str_replace("'", '', implode(',', $this->getModes($config)));
             $connection->prepare("set session sql_mode='".$sqlModes."'")->execute();
         }
     }
