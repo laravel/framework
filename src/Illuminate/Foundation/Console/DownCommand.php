@@ -11,8 +11,8 @@ class DownCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'down {--message? : The message for the maintenance mode. }
-            {--retry? : The number of seconds after which the request may be retried.}';
+    protected $signature = 'down {--message= : The message for the maintenance mode. }
+            {--retry= : The number of seconds after which the request may be retried.}';
 
     /**
      * The console command description.
@@ -28,16 +28,37 @@ class DownCommand extends Command
      */
     public function fire()
     {
-        $data = [
-            'time' => time(),
-            'message' => $this->argument('message'),
-        ];
-
-        $retry = $this->argument('retry');
-        $data['retry'] = is_numeric($retry) && $retry > 0 ? (int) $retry : null;
-
-        file_put_contents($this->laravel->storagePath().'/framework/down', json_encode($data, JSON_PRETTY_PRINT));
+        file_put_contents(
+            $this->laravel->storagePath().'/framework/down',
+            json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
+        );
 
         $this->comment('Application is now in maintenance mode.');
+    }
+
+    /**
+     * Get the payload to be placed in the "down" file.
+     *
+     * @return array
+     */
+    protected function getDownFilePayload()
+    {
+        return [
+            'time' => time(),
+            'message' => $this->option('message'),
+            'retry' => $this->getRetryTime(),
+        ];
+    }
+
+    /**
+     * Get the number of seconds the client should wait before retrying their request.
+     *
+     * @return int|null
+     */
+    protected function getRetryTime()
+    {
+        $retry = $this->option('retry');
+
+        return is_numeric($retry) && $retry > 0 ? (int) $retry : null;
     }
 }
