@@ -83,11 +83,7 @@ class RateLimiter
     {
         $attempts = $this->attempts($key);
 
-        if ($attempts == 0) {
-            return $maxAttempts;
-        }
-
-        return $maxAttempts - $attempts + 1;
+        return $attempts === 0 ? $maxAttempts : $maxAttempts - $attempts + 1;
     }
 
     /**
