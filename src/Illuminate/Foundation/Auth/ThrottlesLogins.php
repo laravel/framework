@@ -96,17 +96,6 @@ trait ThrottlesLogins
     }
 
     /**
-     * Fire an event when a lockout occurs.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
-    protected function fireLockoutEvent(Request $request)
-    {
-        event(new Lockout($request));
-    }
-
-    /**
      * Get the throttle key for the given request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -135,5 +124,16 @@ trait ThrottlesLogins
     protected function lockoutTime()
     {
         return property_exists($this, 'lockoutTime') ? $this->lockoutTime : 60;
+    }
+
+    /**
+     * Fire an event when a lockout occurs.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function fireLockoutEvent(Request $request)
+    {
+        event(new Lockout($request));
     }
 }
