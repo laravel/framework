@@ -139,16 +139,14 @@ class MySqlConnector extends Connector implements ConnectorInterface
      *
      * @param  \PDO  $connection
      * @param  array  $config
-     * @return bool
+     * @return void
      */
     protected function setModes(PDO $connection, array $config)
     {
         if ($modes = $this->getModes($config)) {
             $sqlModes = str_replace("'", '', implode(',', $modes));
 
-            return $connection->prepare("set session sql_mode='".$sqlModes."'")->execute();
+            $connection->prepare("set session sql_mode='".$sqlModes."'")->execute();
         }
-
-        return false;
     }
 }
