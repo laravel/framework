@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 class SimpleBootstrapFourPresenter extends BootstrapFourPresenter
 {
     /**
-     * Create a simple Bootstrap 3 presenter.
+     * Create a simple Bootstrap 4 presenter.
      *
      * @param  \Illuminate\Contracts\Pagination\Paginator  $paginator
      * @return void
