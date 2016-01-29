@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
 
 trait ThrottlesLogins
@@ -43,11 +44,10 @@ trait ThrottlesLogins
      */
     protected function retriesLeft(Request $request)
     {
-        $attempts = app(RateLimiter::class)->attempts(
-            $this->getThrottleKey($request)
+        return app(RateLimiter::class)->retriesLeft(
+            $this->getThrottleKey($request),
+            $this->maxLoginAttempts()
         );
-
-        return $this->maxLoginAttempts() - $attempts + 1;
     }
 
     /**
@@ -124,5 +124,16 @@ trait ThrottlesLogins
     protected function lockoutTime()
     {
         return property_exists($this, 'lockoutTime') ? $this->lockoutTime : 60;
+    }
+
+    /**
+     * Fire an event when a lockout occurs.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function fireLockoutEvent(Request $request)
+    {
+        event(new Lockout($request));
     }
 }

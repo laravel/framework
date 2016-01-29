@@ -398,7 +398,20 @@ trait MakesHttpRequests
      * @param  mixed  $value
      * @return $this
      */
-    protected function seeCookie($cookieName, $value = null)
+    protected function seePlainCookie($cookieName, $value = null)
+    {
+        return $this->seeCookie($cookieName, $value, false);
+    }
+
+    /**
+     * Asserts that the response contains the given cookie and equals the optional value.
+     *
+     * @param  string  $cookieName
+     * @param  mixed  $value
+     * @param  bool  $encrypted
+     * @return $this
+     */
+    protected function seeCookie($cookieName, $value = null, $encrypted = true)
     {
         $headers = $this->response->headers;
 
@@ -413,14 +426,19 @@ trait MakesHttpRequests
 
         $this->assertTrue($exist, "Cookie [{$cookieName}] not present on response.");
 
-        if (! is_null($value)) {
-            $this->assertEquals(
-                $cookie->getValue(), $value,
-                "Cookie [{$cookieName}] was found, but value [{$cookie->getValue()}] does not match [{$value}]."
-            );
+        if (! $exist || is_null($value)) {
+            return $this;
         }
 
-        return $this;
+        $cookieValue = $cookie->getValue();
+
+        $actual = $encrypted
+            ? $this->app['encrypter']->decrypt($cookieValue) : $cookieValue;
+
+        return $this->assertEquals(
+            $actual, $value,
+            "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
+        );
     }
 
     /**

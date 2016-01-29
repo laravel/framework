@@ -89,6 +89,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $payload = $this->getDefaultPayload($data);
 
+        if (! $this->exists) {
+            $this->read($sessionId);
+        }
+
         if ($this->exists) {
             $this->getQuery()->where('id', $sessionId)->update($payload);
         } else {

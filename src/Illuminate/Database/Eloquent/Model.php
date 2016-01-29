@@ -1638,7 +1638,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // table from the database. Not all tables have to be incrementing though.
         $attributes = $this->attributes;
 
-        if ($this->incrementing) {
+        if ($this->getIncrementing()) {
             $this->insertAndSetId($query, $attributes);
         }
 
@@ -2796,7 +2796,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getCasts()
     {
-        if ($this->incrementing) {
+        if ($this->getIncrementing()) {
             return array_merge([
                 $this->getKeyName() => 'int',
             ], $this->casts);
