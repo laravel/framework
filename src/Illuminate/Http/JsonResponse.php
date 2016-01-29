@@ -52,6 +52,10 @@ class JsonResponse extends BaseJsonResponse
                                    ? $data->toJson($this->jsonOptions)
                                    : json_encode($data, $this->jsonOptions);
 
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(json_last_error_msg());
+        }
+
         return $this->update();
     }
 
