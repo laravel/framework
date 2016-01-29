@@ -28,6 +28,17 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         $this->seeInElement('strong', 'Taylor');
     }
 
+    public function testSeeInElementSearchInHtmlTags()
+    {
+        $this->crawler = new Crawler(
+            '<div id="mytable">
+                <img src="image.jpg">
+            </div>'
+        );
+
+        $this->seeInElement('#mytable', 'image.jpg');
+    }
+
     public function testdontSeeInElement()
     {
         $this->crawler = new Crawler(

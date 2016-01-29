@@ -258,7 +258,9 @@ trait InteractsWithPages
             ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
 
         foreach ($elements as $element) {
-            if (preg_match("/$pattern/i", $element->nodeValue)) {
+            $element = new Crawler($element);
+
+            if (preg_match("/$pattern/i", $element->html())) {
                 return true;
             }
         }
