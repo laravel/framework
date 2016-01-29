@@ -66,6 +66,8 @@ trait AuthenticatesUsers
         $throttles = $this->isUsingThrottlesLoginsTrait();
 
         if ($throttles && $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
             return $this->sendLockoutResponse($request);
         }
 
