@@ -15,7 +15,6 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
-use Illuminate\Routing\Exceptions\RoutingException;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 use Illuminate\Http\Exception\HttpResponseException;
 
@@ -527,7 +526,7 @@ class Route
         // if the user never explicitly sets an action to handle the given uri.
         if (is_null($action)) {
             return ['uses' => function () {
-                throw (new RoutingException('The route has no action.'))->setRoute($this);
+                throw new LogicException("Route for [{$this->uri}] has no action.");
             }];
         }
 

@@ -103,8 +103,8 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Routing\Exceptions\RoutingException
-     * @expectedExceptionMessage The route has no action. Failed for route foo/bar.
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Route for [foo/bar] has no action.
      */
     public function testFluentRouting()
     {
