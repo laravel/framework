@@ -1751,10 +1751,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $key = $this->getKeyName();
         $v = $this->getKeyForSaveQuery();
-        if (!is_array($key)) {
+        if (! ($key)) {
             $key = [$key];
         }
-        if (!is_array($v)) {
+        if (! is_array($v)) {
             $v = [$key[0] => $v];
         }
         foreach ($key as $k) {
@@ -1772,7 +1772,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function getKeyForSaveQuery()
     {
         $key = $this->getKeyName();
-        if (!is_array($key)) {
+        if (! is_array($key)) {
             $key = [$key];
         }
         $r = [];
