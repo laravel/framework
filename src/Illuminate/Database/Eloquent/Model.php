@@ -1751,12 +1751,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $key = $this->getKeyName();
         $v = $this->getKeyForSaveQuery();
-        if (!is_array($key))
+        if (!is_array($key)) {
             $key = [$key];
-        if (!is_array($v))
+        }
+        if (!is_array($v)) {
             $v = [$key[0] => $v];
-        foreach ($key as $k)
+        }
+        foreach ($key as $k) {
             $query->where($k, '=', $v[$k]);
+        }
 
         return $query;
     }
@@ -1769,13 +1772,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function getKeyForSaveQuery()
     {
         $key = $this->getKeyName();
-        if (!is_array($key))
+        if (!is_array($key)) {
             $key = [$key];
+        }
         $r = [];
-        foreach ($key as $i => $k)
+        foreach ($key as $i => $k) {
             $r[$k] = isset($this->original[$k]) ? $this->original[$k] : $this->getAttribute($k);
-        if (count($r) == 1)
+        }
+        if (count($r) == 1) {
             $r = $r[$key[0]];
+        }
 
         return $r;
     }
