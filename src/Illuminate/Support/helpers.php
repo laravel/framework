@@ -784,3 +784,25 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('array_trim')) {
+    /**
+     * Return the comma separated representation of an array.
+     *
+     * @param  string  $array
+     * @param  string  $sep
+     * @param  string  $property
+     * @return string
+     */
+    function array_trim($array, $sep = ", ", $property = null)
+    {
+        $result = "";
+        foreach ($array as $entity) {
+            if ($property != null) {
+                $entity = $entity->{$property};
+            }
+            $result .= $entity . $sep;
+        }
+        return trim($result, $sep);
+    }
+}
