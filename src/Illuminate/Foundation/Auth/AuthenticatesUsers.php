@@ -47,6 +47,18 @@ trait AuthenticatesUsers
     {
         return $this->login($request);
     }
+    
+    /**
+     * Validate user login attributes
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return null
+     */
+    protected function validateLogin($request){
+        $this->validate($request, [
+            $this->loginUsername() => 'required', 'password' => 'required',
+        ]);
+    }
 
     /**
      * Handle a login request to the application.
@@ -56,9 +68,7 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
-        $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
-        ]);
+        $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
