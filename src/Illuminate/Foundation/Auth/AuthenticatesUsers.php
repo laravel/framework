@@ -49,12 +49,13 @@ trait AuthenticatesUsers
     }
     
     /**
-     * Validate user login attributes
+     * Validate user login attributes.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return null
      */
-    protected function validateLogin($request){
+    protected function validateLogin($request)
+    {
         $this->validate($request, [
             $this->loginUsername() => 'required', 'password' => 'required',
         ]);
