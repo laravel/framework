@@ -504,6 +504,36 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('The last field is required when first is dayle.', $v->messages()->first('last'));
     }
 
+    public function testRequiredIfNot()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'required_if_not:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['first' => 'shady', 'last' => 'otwell'], ['last' => 'required_if_not:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'required_if_not:first,taylor,dayle']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['first' => 'dayle'], ['last' => 'required_if_not:first,taylor,dayle']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['first' => 'shady'], ['last' => 'required_if_not:first,taylor,dayle']);
+        $this->assertTrue($v->fails());
+
+        // error message when passed multiple values (required_if_not:foo,bar,baz)
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required_if_not' => 'The :attribute field is required when :other is not :value.'], 'en', 'messages');
+        $v = new Validator($trans, ['first' => 'shady', 'last' => ''], ['last' => 'RequiredIfNot:first,taylor,dayle']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The last field is required when first is not shady.', $v->messages()->first('last'));
+    }
+
     public function testRequiredUnless()
     {
         $trans = $this->getRealTranslator();
