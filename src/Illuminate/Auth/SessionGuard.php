@@ -28,7 +28,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $name;
 
     /**
-     * The last user we attempted to retrieve.
+     * The user we last attempted to retrieve.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable
      */

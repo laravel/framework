@@ -93,7 +93,7 @@ class AuthManager implements FactoryContract
     }
 
     /**
-     * Create a session-based authentication guard.
+     * Create a session based authentication guard.
      *
      * @param  string  $name
      * @param  array  $config
@@ -124,7 +124,7 @@ class AuthManager implements FactoryContract
     }
 
     /**
-     * Create a token-based authentication guard.
+     * Create a token based authentication guard.
      *
      * @param  string  $name
      * @param  array  $config
@@ -189,7 +189,7 @@ class AuthManager implements FactoryContract
     }
 
     /**
-     * Register a new callback-based request guard.
+     * Register a new callback based request guard.
      *
      * @param  string  $driver
      * @param  callable  $callback
