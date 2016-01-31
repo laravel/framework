@@ -803,6 +803,7 @@ if (! function_exists('array_trim')) {
             }
             $result .= $entity.$sep;
         }
+        
         return trim($result, $sep);
     }
 }
