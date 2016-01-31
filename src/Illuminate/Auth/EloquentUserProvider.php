@@ -37,7 +37,7 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
-     * Retrieve a user by their unique identifier.
+     * Retrieve a user by his unique identifier.
      *
      * @param  mixed  $identifier
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
@@ -48,7 +48,7 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
-     * Retrieve a user by their unique identifier and "remember me" token.
+     * Retrieve a user by his unique identifier and "remember me" token.
      *
      * @param  mixed  $identifier
      * @param  string  $token

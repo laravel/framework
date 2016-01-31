@@ -94,7 +94,7 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Validate a user's credentials.
+     * Validate the user's credentials.
      *
      * @param  array  $credentials
      * @return bool
