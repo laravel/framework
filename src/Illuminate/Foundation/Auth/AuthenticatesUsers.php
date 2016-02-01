@@ -47,7 +47,7 @@ trait AuthenticatesUsers
     {
         return $this->login($request);
     }
-    
+
     /**
      * Validate user login attributes.
      *
