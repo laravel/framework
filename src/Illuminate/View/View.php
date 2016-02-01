@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use Exception;
 use ArrayAccess;
 use BadMethodCallException;
 use Illuminate\Support\Str;
@@ -77,16 +78,22 @@ class View implements ArrayAccess, ViewContract
      */
     public function render(callable $callback = null)
     {
-        $contents = $this->renderContents();
+        try {
+            $contents = $this->renderContents();
 
-        $response = isset($callback) ? call_user_func($callback, $this, $contents) : null;
+            $response = isset($callback) ? call_user_func($callback, $this, $contents) : null;
 
-        // Once we have the contents of the view, we will flush the sections if we are
-        // done rendering all views so that there is nothing left hanging over when
-        // another view gets rendered in the future by the application developer.
-        $this->factory->flushSectionsIfDoneRendering();
+            // Once we have the contents of the view, we will flush the sections if we are
+            // done rendering all views so that there is nothing left hanging over when
+            // another view gets rendered in the future by the application developer.
+            $this->factory->flushSectionsIfDoneRendering();
 
-        return ! is_null($response) ? $response : $contents;
+            return ! is_null($response) ? $response : $contents;
+        } catch (Exception $e) {
+            $this->factory->flushSections();
+
+            throw $e;
+        }
     }
 
     /**
