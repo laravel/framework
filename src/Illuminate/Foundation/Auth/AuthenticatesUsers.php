@@ -49,19 +49,6 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Validate user login attributes.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return null
-     */
-    protected function validateLogin($request)
-    {
-        $this->validate($request, [
-            $this->loginUsername() => 'required', 'password' => 'required',
-        ]);
-    }
-
-    /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -96,6 +83,19 @@ trait AuthenticatesUsers
         }
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function validateLogin(Request $request)
+    {
+        $this->validate($request, [
+            $this->loginUsername() => 'required', 'password' => 'required',
+        ]);
     }
 
     /**
