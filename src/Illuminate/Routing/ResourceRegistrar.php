@@ -53,7 +53,12 @@ class ResourceRegistrar
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route wildcards, which should be the base resources.
-        $base = $this->getResourceWildcard(last(explode('.', $name)));
+        // We might also want to override the base resource in some cases.
+        $base = isset($options['base']) ? $options['base'] : null;
+
+        if (is_null($base) || Str::contains($base, '/')) {
+            $base = $this->getResourceWildcard(last(explode('.', $name)));
+        }
 
         $defaults = $this->resourceDefaults;
 

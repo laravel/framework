@@ -687,6 +687,28 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
+    public function testResourceRoutingWithCustomBase()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', ['base' => 'baz', 'only' => ['show']]);
+        $route = $router->getRoutes()->getByAction('FooController@show');
+        $this->assertEquals('foo-bars/{baz}', $route->getUri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars.foo-bazs', 'FooController', ['base' => 'baz', 'only' => ['show']]);
+        $route = $router->getRoutes()->getByAction('FooController@show');
+        $this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{baz}', $route->getUri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', [
+            'base' => 'baz',
+            'only' => ['show'],
+            'as' => 'prefix',
+        ]);
+        $route = $router->getRoutes()->getByAction('FooController@show');
+        $this->assertEquals('foo-bars/{baz}', $route->getUri());
+    }
+
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();
