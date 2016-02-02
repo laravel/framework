@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Exception;
+use Throwable;
 use ArrayAccess;
 use BadMethodCallException;
 use Illuminate\Support\Str;
