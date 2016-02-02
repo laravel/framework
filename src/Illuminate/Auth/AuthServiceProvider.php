@@ -53,9 +53,11 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerUserResolver()
     {
-        $this->app->bind(AuthenticatableContract::class, function ($app) {
-            return $app['auth']->user();
-        });
+        $this->app->bind(
+            AuthenticatableContract::class, function ($app) {
+                return call_user_func($app['auth']->userResolver());
+            }
+        );
     }
 
     /**
@@ -67,7 +69,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->singleton(GateContract::class, function ($app) {
             return new Gate($app, function () use ($app) {
-                return $app['auth']->user();
+                return call_user_func($app['auth']->userResolver());
             });
         });
     }
@@ -81,7 +83,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->rebinding('request', function ($app, $request) {
             $request->setUserResolver(function () use ($app) {
-                return $app['auth']->user();
+                return call_user_func($app['auth']->userResolver());
             });
         });
     }
