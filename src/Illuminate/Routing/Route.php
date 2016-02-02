@@ -752,7 +752,7 @@ class Route
      * Set the URI that the route responds to.
      *
      * @param  string  $uri
-     * @return \Illuminate\Routing\Route
+     * @return $this
      */
     public function setUri($uri)
     {
@@ -798,7 +798,7 @@ class Route
      * Set the handler for the route.
      *
      * @param  \Closure|string  $action
-     * @return \Illuminate\Routing\Route
+     * @return $this
      */
     public function uses($action)
     {
