@@ -93,6 +93,10 @@ class View implements ArrayAccess, ViewContract
             $this->factory->flushSections();
 
             throw $e;
+        } catch (Throwable $e) {
+            $this->factory->flushSections();
+
+            throw $e;
         }
     }
 
