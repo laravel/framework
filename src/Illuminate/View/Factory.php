@@ -658,6 +658,8 @@ class Factory implements FactoryContract {
 	 */
 	public function flushSections()
 	{
+		$this->renderCount = 0;
+
 		$this->sections = array();
 
 		$this->sectionStack = array();
