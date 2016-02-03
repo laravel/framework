@@ -39,7 +39,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
     }
-    
+
     public function testEngineCreateTable()
     {
         $blueprint = new Blueprint('users');
