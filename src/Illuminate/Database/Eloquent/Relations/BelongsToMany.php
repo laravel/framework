@@ -333,11 +333,13 @@ class BelongsToMany extends Relation
     {
         $query->select($columns);
 
-        $query->from($this->table.' as '.$hash = $this->getRelationCountHash());
+        $query->from($this->related->getTable().' as '.$hash = $this->getRelationCountHash());
 
-        $key = $this->wrap($this->getQualifiedParentKeyName());
+        $this->related->setTable($hash);
 
-        return $query->where($hash.'.'.$this->foreignKey, '=', new Expression($key));
+        $this->setJoin($query);
+
+        return parent::getRelationQuery($query, $parent, $columns);
     }
 
     /**
