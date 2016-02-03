@@ -65,6 +65,8 @@ class MySqlGrammar extends Grammar
 
         if (isset($blueprint->engine)) {
             $sql .= ' engine = '.$blueprint->engine;
+        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
+            $sql .= ' engine = '.$engine;
         }
 
         return $sql;
