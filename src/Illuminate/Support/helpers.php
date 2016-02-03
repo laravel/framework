@@ -417,6 +417,24 @@ if (! function_exists('data_get')) {
     }
 }
 
+if (! function_exists('dc')) {
+    /**
+     * Dump the passed variables and continue the script.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function dc()
+    {
+        array_map(
+            function ($x) {
+                (new \Illuminate\Support\Debug\Dumper())->dump($x);
+            },
+            func_get_args()
+        );
+    }
+}
+
 if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
@@ -426,9 +444,7 @@ if (! function_exists('dd')) {
      */
     function dd()
     {
-        array_map(function ($x) {
-            (new Dumper)->dump($x);
-        }, func_get_args());
+        array_map('dc', func_get_args());
 
         die(1);
     }
