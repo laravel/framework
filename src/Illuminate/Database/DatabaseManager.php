@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Contracts\Container\Container;
 
 class DatabaseManager implements ConnectionResolverInterface
 {
@@ -40,11 +41,11 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Create a new database manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
      * @return void
      */
-    public function __construct($app, ConnectionFactory $factory)
+    public function __construct(Container $app, ConnectionFactory $factory)
     {
         $this->app = $app;
         $this->factory = $factory;
