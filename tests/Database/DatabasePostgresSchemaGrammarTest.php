@@ -480,7 +480,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone not null, add column "updated_at" timestamp(0) without time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone null, add column "updated_at" timestamp(0) without time zone null', $statements[0]);
     }
 
     public function testAddingTimeStampsTz()
@@ -490,7 +490,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone not null, add column "updated_at" timestamp(0) with time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
     }
 
     public function testAddingBinary()
