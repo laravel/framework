@@ -428,7 +428,7 @@ if (! function_exists('dc')) {
     {
         array_map(
             function ($x) {
-                (new \Illuminate\Support\Debug\Dumper())->dump($x);
+                (new Dumper())->dump($x);
             },
             func_get_args()
         );
