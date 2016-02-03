@@ -470,7 +470,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetime null, "updated_at" datetime null', $statements[0]);
     }
 
     public function testAddingTimeStampsTz()
@@ -480,7 +480,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null, "updated_at" datetimeoffset(0) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) null, "updated_at" datetimeoffset(0) null', $statements[0]);
     }
 
     public function testAddingRememberToken()
