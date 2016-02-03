@@ -20,6 +20,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
         $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
