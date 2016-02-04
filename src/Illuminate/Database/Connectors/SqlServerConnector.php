@@ -90,6 +90,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['APP'] = $config['appname'];
         }
 
+        if (isset($config['readonly'])) {
+            $arguments['ApplicationIntent'] = 'ReadOnly';
+        }
+
         return $this->buildConnectString('sqlsrv', $arguments);
     }
 
