@@ -53,7 +53,7 @@ class ResourceRegistrar
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route wildcards, which should be the base resources.
-        $base = $this->getResourceWildcard(last(explode('.', $name)));
+        $base = $this->getResourceWildcard(last(explode('.', $name)), $options);
 
         $defaults = $this->resourceDefaults;
 
@@ -194,6 +194,10 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
+        // If we set explicit resource name, let's use it instead of default
+        // resource name
+        $resource = $this->getResourceGroupName($resource, $options);
+
         if (! $this->router->hasGroupStack()) {
             return $prefix.$resource.'.'.$method;
         }
@@ -224,10 +228,13 @@ class ResourceRegistrar
      * Format a resource wildcard for usage.
      *
      * @param  string  $value
+     * @param  array  $options
      * @return string
      */
-    public function getResourceWildcard($value)
+    public function getResourceWildcard($value, array $options = [])
     {
+        $value = $this->getResourceGroupName($value, $options);
+
         return str_replace('-', '_', $value);
     }
 
@@ -260,7 +267,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/create';
+        $uri = $this->getResourceUri($name).'/'.$this->getCreateUrlSuffix();
 
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
@@ -314,7 +321,7 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/edit';
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.$this->getEditUrlSuffix();
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -355,5 +362,37 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Get create url suffix.
+     *
+     * @return  string
+     */
+    protected function getCreateUrlSuffix()
+    {
+        return 'create';
+    }
+
+    /**
+     * Get edit url suffix.
+     *
+     * @return  string
+     */
+    protected function getEditUrlSuffix()
+    {
+        return 'edit';
+    }
+
+    /**
+     * Get resource group name.
+     *
+     * @param  string  $resource
+     * @param  array  $options
+     * @return string
+     */
+    protected function getResourceGroupName($resource, array $options)
+    {
+        return isset($options['name']) ? $options['name'] : $resource;
     }
 }
