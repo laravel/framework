@@ -697,7 +697,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection|static
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public static function findOrNew($id, $columns = ['*'])
     {
