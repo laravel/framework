@@ -333,10 +333,11 @@ trait InteractsWithPages
             return true;
         }
 
-        $url = $this->addRootToRelativeUrl($url);
+        $absoluteUrl = $this->addRootToRelativeUrl($url);
 
         foreach ($links as $link) {
-            if ($link->getAttribute('href') == $url) {
+            $linkHref = $link->getAttribute('href');
+            if ($linkHref == $url || $linkHref == $absoluteUrl) {
                 return true;
             }
         }
