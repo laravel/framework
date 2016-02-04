@@ -146,7 +146,7 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
     {
-        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'appname' => 'baz', 'charset' => 'utf-8'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'appname' => 'baz', 'readonly' => true, 'charset' => 'utf-8'];
         $dsn = $this->getDsn($config);
         $connector = $this->getMock('Illuminate\Database\Connectors\SqlServerConnector', ['createConnection', 'getOptions']);
         $connection = m::mock('stdClass');
@@ -170,8 +170,9 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase
         } else {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
+            $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
 
-            return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}";
+            return "sqlsrv:Server={$host}{$port};Database={$database}{$appname}{$readonly}";
         }
     }
 }
