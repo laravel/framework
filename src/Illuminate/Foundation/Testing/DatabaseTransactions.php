@@ -25,14 +25,16 @@ trait DatabaseTransactions
 
     public function beginDatabaseTransaction()
     {
+        $db = $this->app->make('db');
         foreach ($this->connectionsToTransact() as $name) {
-            $this->transacting[$name] = $this->app->make('db')->connection($name);
+            $this->transacting[$name] = $db->connection($name);
             $this->transacting[$name]->beginConnection();
         }
 
         $this->beforeApplicationDestroyed(function () {
+            $db = $this->app->make('db');
             foreach ($this->connectionsToTransact() as $name) {
-                $this->app->make('db')->connection($name)->rollBack();
+                $db->connection($name)->rollBack();
             }
         });
     }
