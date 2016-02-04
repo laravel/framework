@@ -172,8 +172,7 @@ class Arr
                     continue;
                 }
 
-                $flatten = static::flatten($item, $depth - 1);
-                $result = array_merge($result, $flatten);
+                $result = array_merge($result, static::flatten($item, $depth - 1));
                 continue;
             }
 
