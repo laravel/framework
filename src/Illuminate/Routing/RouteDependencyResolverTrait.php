@@ -38,7 +38,7 @@ trait RouteDependencyResolverTrait
         }
 
         return $this->resolveMethodDependencies(
-            $parameters, new ReflectionMethod($instance, $method)
+            $parameters, new ReflectionMethod($instance, $method), get_class($instance).'@'.$method
         );
     }
 
@@ -47,12 +47,13 @@ trait RouteDependencyResolverTrait
      *
      * @param  array  $parameters
      * @param  \ReflectionFunctionAbstract  $reflector
+     * @param  sting  $context
      * @return array
      */
-    public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
+    public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector, $context)
     {
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency($parameter, $parameters, $reflector);
+            $instance = $this->transformDependency($parameter, $parameters, $context);
 
             if (! is_null($instance)) {
                 $this->spliceIntoParameters($parameters, $key, $instance);
@@ -67,9 +68,10 @@ trait RouteDependencyResolverTrait
      *
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
+     * @param  string $context
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters, $context)
     {
         $class = $parameter->getClass();
 
@@ -79,9 +81,11 @@ trait RouteDependencyResolverTrait
         if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
             $abstract = $class->name;
 
-            if ($parameter->getDeclaringClass()) {
-                $contextual = $this->container->getContextualConcrete($parameter->getDeclaringClass()->name, $abstract);
-                $abstract = $contextual ?: $abstract;
+            if (is_string($context)) {
+                $methodContextual = $this->container->getContextualConcrete($context, $abstract);
+                $classContextual = $this->container->getContextualConcrete(explode('@', $context)[0], $abstract);
+
+                $abstract = $methodContextual ?: ($classContextual ?: $abstract);
             }
 
             return $this->container->make($abstract);

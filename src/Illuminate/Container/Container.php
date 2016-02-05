@@ -532,9 +532,18 @@ class Container implements ArrayAccess, ContainerContract
     protected function getMethodDependencies($callback, array $parameters = [])
     {
         $dependencies = [];
+        $context = null;
+
+        if (is_string($callback)) {
+            $context = $callback;
+        }
+
+        if (is_array($callback)) {
+            $context = get_class($callback[0]).'@'.$callback[1];
+        }
 
         foreach ($this->getCallReflector($callback)->getParameters() as $parameter) {
-            $this->addDependencyForCallParameter($parameter, $parameters, $dependencies);
+            $this->addDependencyForCallParameter($parameter, $parameters, $dependencies, $context);
         }
 
         return array_merge($dependencies, $parameters);
@@ -565,10 +574,16 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $dependencies
+     * @param  string $context
+     *
      * @return mixed
      */
-    protected function addDependencyForCallParameter(ReflectionParameter $parameter, array &$parameters, &$dependencies)
-    {
+    protected function addDependencyForCallParameter(
+        ReflectionParameter $parameter,
+        array &$parameters,
+        &$dependencies,
+        $context = null
+    ) {
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
 
@@ -576,9 +591,15 @@ class Container implements ArrayAccess, ContainerContract
         } elseif ($parameter->getClass()) {
             $dependency = $parameter->getClass()->name;
 
-            if ($parameter->getDeclaringClass()) {
-                $contextual = $this->getContextualConcrete($parameter->getDeclaringClass()->name, $dependency);
-                $dependency = $contextual ?: $dependency;
+            if ($context) {
+                $methodContextual = $this->getContextualConcrete($context, $dependency);
+                $classContextual = null;
+
+                if ($this->isCallableWithAtSign($context)) {
+                    $classContextual = $this->getContextualConcrete(explode('@', $context)[0], $dependency);
+                }
+
+                $dependency = $methodContextual ?: ($classContextual ?: $dependency);
             }
 
             $dependencies[] = $this->make($dependency);
