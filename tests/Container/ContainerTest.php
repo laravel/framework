@@ -496,14 +496,46 @@ return $obj; });
     {
         $container = new Container;
 
-        $container->bind('IContainerContractStub', 'ContainerImplementationStub');
+        $container->when('ContainerTestMethodContext')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+        $container->when('ContainerTestMethodContext@bar')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+        $container->when('ContainerTestMethodContext::baz')->needs('IContainerContractStub')->give('ContainerImplementationStubThree');
 
-        $container->when('ContainerTestMethodContext')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
+        $this->assertInstanceOf(
+            'ContainerImplementationStub',
+            $container->call('ContainerTestMethodContext@foo')
+        );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubTwo',
+            $container->call('ContainerTestMethodContext@bar')
+        );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStubThree',
+            $container->call('ContainerTestMethodContext::baz')
+        );
+
+        unset($_SERVER['__test.rebind']);
+    }
+
+    public function testContextualBindingWorksForObjectMethodsAndConstructor()
+    {
+        $container = new Container;
+
+        $container->when('ContainerTestMethodContext')->needs('IContainerContractStub')->give('ContainerImplementationStub');
+        $container->when('ContainerTestMethodContext@foo')->needs('IContainerContractStub')->give('ContainerImplementationStubTwo');
 
         $this->assertInstanceOf(
             'ContainerImplementationStubTwo',
             $container->call('ContainerTestMethodContext@foo')
         );
+
+        $this->assertInstanceOf(
+            'ContainerImplementationStub',
+            $_SERVER['__test.rebind']
+        );
+
+        unset($_SERVER['__test.rebind']);
     }
 
     public function testContainerTags()
@@ -617,6 +649,9 @@ class ContainerImplementationStub implements IContainerContractStub
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
 }
+class ContainerImplementationStubThree implements IContainerContractStub
+{
+}
 
 class ContainerDependentStub
 {
@@ -719,7 +754,22 @@ class ContainerTestContextInjectTwo
 
 class ContainerTestMethodContext
 {
+    public function __construct(IContainerContractStub $impl)
+    {
+        $_SERVER['__test.rebind'] = $impl;
+    }
+
     public function foo(IContainerContractStub $impl)
+    {
+        return $impl;
+    }
+
+    public function bar(IContainerContractStub $impl)
+    {
+        return $impl;
+    }
+
+    public static function baz(IContainerContractStub $impl)
     {
         return $impl;
     }
