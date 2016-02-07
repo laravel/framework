@@ -836,7 +836,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             2 => [30 => ['rating' => 2, 'url' => '2']],
         ];
 
-        $this->assertEquals($expected_result, $result->toArray());    }
+        $this->assertEquals($expected_result, $result->toArray());
+    }
 
     public function testGroupByClosureWhereItemsHaveMultipleGroups()
     {
@@ -846,7 +847,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             ['user' => 3, 'roles' => ['Role_1']],
         ]);
 
-        $result = $data->groupBy( function($item) {
+        $result = $data->groupBy(function($item) {
             return $item['roles'];
         });
 
