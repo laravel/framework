@@ -309,7 +309,7 @@ trait ApplicationTrait
     {
         return $this->app->make('auth')->check();
     }
-/*
+
     /**
      * Assert that the user is authenticated.
      *
