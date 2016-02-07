@@ -303,7 +303,7 @@ trait ApplicationTrait
     /**
      * Return true if the user is authenticated, false otherwise.
      *
-     * @return boolean
+     * @return bool
      */
     protected function isAuthenticated()
     {
