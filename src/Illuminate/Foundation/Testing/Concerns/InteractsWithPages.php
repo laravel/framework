@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Closure;
 use Exception;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -19,6 +20,13 @@ trait InteractsWithPages
      * @var \Symfony\Component\DomCrawler\Crawler
      */
     protected $crawler;
+
+    /**
+     * Subcrawler instances used by the within method.
+     *
+     * @var array
+     */
+    protected $subCrawlers = [];
 
     /**
      * All of the stored inputs for the current page.
@@ -66,6 +74,8 @@ trait InteractsWithPages
         $this->currentUri = $this->app->make('request')->fullUrl();
 
         $this->crawler = new Crawler($this->response->getContent(), $uri);
+
+        $this->subCrawlers = [];
 
         return $this;
     }
@@ -170,6 +180,34 @@ trait InteractsWithPages
     }
 
     /**
+     * Get the right crawler according to the current test context.
+     * 
+     * @return \Symfony\Component\DomCrawler\Crawler
+     */
+    protected function getCrawler()
+    {
+        return ! empty($this->subCrawlers)
+            ? end($this->subCrawlers)
+            : $this->crawler;
+    }
+
+    /**
+     * Narrow the test content to a specific area of the page.
+     *
+     * @param  string  $element
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function within($element, Closure $callback)
+    {
+        $this->subCrawlers[] = $this->getCrawler()->filter($element);
+
+        $callback();
+
+        array_pop($this->subCrawlers);
+    }
+
+    /**
      * Assert that a given string is seen on the page.
      *
      * @param  string  $text
@@ -187,7 +225,7 @@ trait InteractsWithPages
         $pattern = $rawPattern == $escapedPattern
                 ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
 
-        $this->$method("/$pattern/i", $this->response->getContent());
+        $this->$method("/$pattern/i", $this->getCrawler()->html());
 
         return $this;
     }
@@ -251,7 +289,7 @@ trait InteractsWithPages
      */
     protected function hasInElement($element, $text)
     {
-        $elements = $this->crawler->filter($element);
+        $elements = $this->getCrawler()->filter($element);
 
         $rawPattern = preg_quote($text, '/');
 
@@ -320,7 +358,7 @@ trait InteractsWithPages
      */
     protected function hasLink($text, $url = null)
     {
-        $links = $this->crawler->selectLink($text);
+        $links = $this->getCrawler()->selectLink($text);
 
         if ($links->count() == 0) {
             return false;
@@ -592,7 +630,7 @@ trait InteractsWithPages
      */
     protected function click($name)
     {
-        $link = $this->crawler->selectLink($name);
+        $link = $this->getCrawler()->selectLink($name);
 
         if (! count($link)) {
             $link = $this->filterByNameOrId($name, 'a');
@@ -725,10 +763,10 @@ trait InteractsWithPages
     {
         try {
             if ($buttonText) {
-                return $this->crawler->selectButton($buttonText)->form();
+                return $this->getCrawler()->selectButton($buttonText)->form();
             }
 
-            return $this->crawler->filter('form')->form();
+            return $this->getCrawler()->filter('form')->form();
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 "Could not find a form that has submit button [{$buttonText}]."
@@ -792,7 +830,7 @@ trait InteractsWithPages
             $element = "{$element}#{$id}, {$element}[name='{$name}']";
         });
 
-        return $this->crawler->filter(implode(', ', $elements));
+        return $this->getCrawler()->filter(implode(', ', $elements));
     }
 
     /**
