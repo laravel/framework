@@ -847,7 +847,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             ['user' => 3, 'roles' => ['Role_1']],
         ]);
 
-        $result = $data->groupBy(function($item) {
+        $result = $data->groupBy(function ($item) {
             return $item['roles'];
         });
 
