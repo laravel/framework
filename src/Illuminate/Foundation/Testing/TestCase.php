@@ -10,6 +10,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     use Concerns\InteractsWithContainer,
         Concerns\MakesHttpRequests,
         Concerns\ImpersonatesUsers,
+        Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithSession,
