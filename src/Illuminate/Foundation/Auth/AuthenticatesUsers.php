@@ -129,8 +129,8 @@ trait AuthenticatesUsers
     {
         if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
           return new JsonResponse([
-              $this->loginUsername() => array($this->getFailedLoginMessage()),
-          ], 422);
+              $this->loginUsername() => array($this->getFailedLoginMessage())
+          ], 401);
         }
         
         return redirect()->back()
