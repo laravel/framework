@@ -575,7 +575,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  array  $parameters
      * @param  array  $dependencies
      * @param  string $context
-     *
      * @return mixed
      */
     protected function addDependencyForCallParameter(
