@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use RuntimeException;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
