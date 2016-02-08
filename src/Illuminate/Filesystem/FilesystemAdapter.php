@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
@@ -213,6 +214,23 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function lastModified($path)
     {
         return $this->driver->getTimestamp($path);
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function url($path)
+    {
+        if (! $this->driver->getAdapter() instanceof AwsS3Adapter) {
+            throw new RuntimeException("This driver does not support retrieving URLs.");
+        }
+
+        $bucket = $this->driver->getAdapter()->getBucket();
+
+        return $this->driver->getAdapter()->getClient()->getObjectUrl($bucket, $path);
     }
 
     /**
