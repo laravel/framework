@@ -337,6 +337,7 @@ trait InteractsWithPages
 
         foreach ($links as $link) {
             $linkHref = $link->getAttribute('href');
+
             if ($linkHref == $url || $linkHref == $absoluteUrl) {
                 return true;
             }
