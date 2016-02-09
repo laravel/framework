@@ -70,6 +70,10 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         }
 
         $this->setUpHasRun = true;
+
+        if(method_exists($this, 'before')) {
+            $this->app->call([$this, 'before']);
+        }
     }
 
     /**
@@ -139,6 +143,10 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
+
+        if(method_exists($this, 'after')) {
+            $this->app->call([$this, 'after']);
+        }
     }
 
     /**
