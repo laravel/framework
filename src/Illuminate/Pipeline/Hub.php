@@ -23,7 +23,7 @@ class Hub implements HubContract
     protected $pipelines = [];
 
     /**
-     * Create a new Depot instance.
+     * Create a new Hub instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
