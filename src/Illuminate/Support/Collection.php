@@ -91,6 +91,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Concat the collection with the given items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function concat($items)
+    {
+        return new static($this->getArrayableItems($items) + $this->items);
+    }
+
+    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
