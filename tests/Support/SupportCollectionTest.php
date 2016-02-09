@@ -1075,7 +1075,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection(['10000' => 'Scratch Lottery']);
         $this->assertEquals([
             '10000' => 'Scratch Lottery',
-            '1000000' => 'Power Ball'
+            '1000000' => 'Power Ball',
         ], $c->concat(['1000000' => 'Power Ball'])->all());
     }
 
@@ -1084,7 +1084,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection(['1000000' => 'Power Ball']);
         $this->assertEquals([
             '1000000' => 'Mega',
-            '10000000' => 'Millions'
+            '10000000' => 'Millions',
         ], $c->concat(new Collection(['1000000' => 'Mega', '10000000' => 'Millions']))->all());
     }
 }
