@@ -3102,7 +3102,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $attributes = Arr::except($this->attributes, $except);
 
-        with($instance = new static)->setRawAttributes($attributes);
+        $instance = new static;
+
+        $instance->setRawAttributes($attributes);
 
         return $instance->setRelations($this->relations);
     }
