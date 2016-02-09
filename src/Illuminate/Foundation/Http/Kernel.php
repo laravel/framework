@@ -245,7 +245,7 @@ class Kernel implements KernelContract
      */
     public function hasMiddleware($middleware)
     {
-        return array_key_exists($middleware, array_flip($this->middleware));
+        return in_array($middleware, $this->middleware);
     }
 
     /**
