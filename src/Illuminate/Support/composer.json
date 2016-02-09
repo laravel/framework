@@ -16,8 +16,8 @@
     "require": {
         "php": ">=5.5.9",
         "ext-mbstring": "*",
-        "illuminate/contracts": "5.2.*",
-        "doctrine/inflector": "~1.0"
+        "doctrine/inflector": "~1.0",
+        "illuminate/contracts": "5.2.*"
     },
     "autoload": {
         "psr-4": {

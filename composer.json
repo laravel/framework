@@ -42,8 +42,8 @@
     },
     "replace": {
         "illuminate/auth": "self.version",
-        "illuminate/bus": "self.version",
         "illuminate/broadcasting": "self.version",
+        "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
