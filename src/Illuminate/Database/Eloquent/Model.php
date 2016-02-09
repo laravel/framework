@@ -2899,6 +2899,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimeStamp($value);
+            case 'id':
+            case 'identifier':
+                return $this->asIdentifier($value);
             default:
                 return $value;
         }
@@ -3027,6 +3030,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function asTimeStamp($value)
     {
         return (int) $this->asDateTime($value)->timestamp;
+    }
+
+    /**
+     * Return a value as valid identifier.
+     *
+     * @param  mixed  $value
+     * @return int|null
+     */
+    protected function asIdentifier($value)
+    {
+        return (int) $value === 0 ? null : (int) $value;
     }
 
     /**
