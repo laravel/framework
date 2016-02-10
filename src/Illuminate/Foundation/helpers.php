@@ -664,7 +664,7 @@ if (! function_exists('trans_choice')) {
      * Translates the given message based on a count.
      *
      * @param  string  $id
-     * @param  int     $number
+     * @param  int|array|Countable  $number
      * @param  array   $parameters
      * @param  string  $domain
      * @param  string  $locale
