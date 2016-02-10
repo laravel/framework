@@ -79,6 +79,20 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
+     * Argument for fetch mode when using column, class, or func fetch modes.
+     *
+     * @var mixed
+     */
+    protected $fetchArgument;
+
+    /**
+     * Constructor arguments when using the PDO::FETCH_CLASS fetch mode.
+     *
+     * @var array
+     */
+    protected $fetchCtorArgs = [];
+
+    /**
      * The number of active transactions.
      *
      * @var int
@@ -320,7 +334,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute($me->prepareBindings($bindings));
 
-            return $statement->fetchAll($me->getFetchMode());
+            $fetchArg = $me->getFetchArgument();
+
+            return isset($fetchArg) ?
+                $statement->fetchAll($me->getFetchMode(), $fetchArg, $me->getFetchCtorArgs()) :
+                $statement->fetchAll($me->getFetchMode());
         });
     }
 
@@ -1044,14 +1062,38 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the default fetch mode for the connection.
+     * Get the optional fetch argument applied when using PDO FETCH_COLUMN, FETCH_CLASS, and FETCH_FUNC fetch modes.
+     *
+     * @return mixed
+     */
+    public function getFetchArgument()
+    {
+        return $this->fetchArgument;
+    }
+
+    /**
+     * Get custom class constructor arguments when using the PDO::FETCH_CLASS fetch mode.
+     *
+     * @return array
+     */
+    public function getFetchCtorArgs()
+    {
+        return $this->fetchCtorArgs;
+    }
+
+    /**
+     * Set the default fetch mode for the connection, and optional arguments for the given fetch mode.
      *
      * @param  int  $fetchMode
+     * @param  mixed  $fetchArgument
+     * @param  array  $ctorArgs
      * @return int
      */
-    public function setFetchMode($fetchMode)
+    public function setFetchMode($fetchMode, $fetchArgument = null, array $ctorArgs = [])
     {
         $this->fetchMode = $fetchMode;
+        $this->fetchArgument = $fetchArgument;
+        $this->fetchCtorArgs = $ctorArgs;
     }
 
     /**
