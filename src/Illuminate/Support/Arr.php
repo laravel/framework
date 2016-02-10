@@ -140,6 +140,17 @@ class Arr
     }
 
     /**
+     * Determine whether the given value is array-like.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function is($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
+    /**
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
