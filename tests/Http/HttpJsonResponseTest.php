@@ -7,7 +7,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 {
     public function testSeAndRetrieveJsonableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonableObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -15,7 +15,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveJsonSerializeData()
     {
-        $response = new Illuminate\Http\JsonResponse(new JsonSerializeObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -23,7 +23,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
 
     public function testSeAndRetrieveArrayableData()
     {
-        $response = new Illuminate\Http\JsonResponse(new ArrayableObject);
+        $response = new Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $data = $response->getData();
         $this->assertInstanceOf('StdClass', $data);
         $this->assertEquals('bar', $data->foo);
@@ -55,7 +55,7 @@ class HttpJsonResponseTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class JsonableObject implements Jsonable
+class JsonResponseTestJsonableObject implements Jsonable
 {
     public function toJson($options = 0)
     {
@@ -63,7 +63,7 @@ class JsonableObject implements Jsonable
     }
 }
 
-class JsonSerializeObject implements JsonSerializable
+class JsonResponseTestJsonSerializeObject implements JsonSerializable
 {
     public function jsonSerialize()
     {
@@ -71,7 +71,7 @@ class JsonSerializeObject implements JsonSerializable
     }
 }
 
-class ArrayableObject implements Arrayable
+class JsonResponseTestArrayableObject implements Arrayable
 {
     public function toArray()
     {
