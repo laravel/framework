@@ -400,6 +400,78 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
     }
 
+    public function testDataSet()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_set($data, 'baz', 'boom'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_set($data, 'baz', 'noop'));
+        $this->assertEquals(['foo' => [], 'baz' => 'boom'], data_set($data, 'foo.*', 'noop'));
+        $this->assertEquals(
+            ['foo' => ['bar' => 'kaboom'], 'baz' => 'boom'],
+            data_set($data, 'foo.bar', 'kaboom')
+        );
+    }
+
+    public function testDataSetWithStar()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(
+            ['foo' => []],
+            data_set($data, 'foo.*.bar', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], []]],
+            data_set($data, 'bar', [['baz' => 'original'], []])
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
+            data_set($data, 'bar.*.baz', 'boom')
+        );
+    }
+
+    public function testDataSetWithDoubleStar()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First'],
+                        (object) [],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) [],
+                        (object) ['name' => 'Second'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_set($data, 'posts.*.comments.*.name', 'Filled');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First'],
+                        (object) ['name' => 'Filled'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Filled'],
+                        (object) ['name' => 'Second'],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
     public function testArraySort()
     {
         $array = [
