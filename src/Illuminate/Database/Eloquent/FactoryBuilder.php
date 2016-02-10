@@ -130,18 +130,17 @@ class FactoryBuilder
             }
 
             $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker, $attributes);
-            
+
             $evaluated = $this->evaluateClosures(array_merge($definition, $attributes));
 
             return new $this->class($evaluated);
         });
     }
-    
+
     /**
      * Delay closures evaluation after merging to avoid duplication.
      *
      * @param  array  $attributes
-     *
      * @return array
      */
     protected function evaluateClosures(array $attributes)
