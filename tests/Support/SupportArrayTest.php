@@ -44,15 +44,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
     public function testIs()
     {
-        $this->assertTrue(Arr::is([]));
-        $this->assertTrue(Arr::is([1, 2]));
-        $this->assertTrue(Arr::is(['a' => 1, 'b' => 2]));
-        $this->assertTrue(Arr::is(new Collection));
+        $this->assertTrue(Arr::accessible([]));
+        $this->assertTrue(Arr::accessible([1, 2]));
+        $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
+        $this->assertTrue(Arr::accessible(new Collection));
 
-        $this->assertFalse(Arr::is(null));
-        $this->assertFalse(Arr::is('abc'));
-        $this->assertFalse(Arr::is(new stdClass));
-        $this->assertFalse(Arr::is((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::accessible(null));
+        $this->assertFalse(Arr::accessible('abc'));
+        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
     public function testLast()
