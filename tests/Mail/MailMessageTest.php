@@ -18,7 +18,7 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
         $swift->shouldReceive('attach')->once()->with($attachment);
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
         $attachment->shouldReceive('setFilename')->once()->with('bar.jpg');
-        $message->attach('foo.jpg', ['mime' => 'image/jpeg', 'as' => 'bar.jpg']);
+        $message->attach_file('foo.jpg', ['mime' => 'image/jpeg', 'as' => 'bar.jpg']);
     }
 
     public function testDataAttachment()
