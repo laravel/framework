@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http;
 
-use ReflectionClass;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
