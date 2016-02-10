@@ -10,6 +10,17 @@ class Arr
     use Macroable;
 
     /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array   $array
@@ -137,17 +148,6 @@ class Arr
         }
 
         return value($default);
-    }
-
-    /**
-     * Determine whether the given value is array-like.
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    public static function is($value)
-    {
-        return is_array($value) || $value instanceof ArrayAccess;
     }
 
     /**
