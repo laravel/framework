@@ -190,14 +190,14 @@ class Message
     public function attach_files($files, array $options = [], $should_compress = false, $archive_name = 'archive')
     {
         $compress_success = false;
-        
+
         // Trying to compress
         if ($should_compress) {
-            
+
             $zip = new ZipArchive;
-            $filename = storage_path($archive_name . '_' . str_random(32) . '.zip');
+            $filename = storage_path($archive_name.'_'.str_random(32).'.zip');
             $compress_success = $zip->open($filename, ZipArchive::CREATE);
-            
+
             if ($compress_success === true) {
                 foreach ($files as $file) {
                     $zip->addFile($file);
@@ -206,14 +206,14 @@ class Message
                 $this->attach_file($filename, $options);
             }
         }
-        
+
         // If compression failed or was disabled, just attach all files
-        if (!$should_compress || ($should_compress && !$compress_success)) {
+        if (! $should_compress || ($should_compress && ! $compress_success)) {
             foreach ($files as $file) {
                 $this->attach_file($file, $options);
             }
         }
-        
+
         return $this;
     }
 
