@@ -79,18 +79,18 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
-     * Argument for fetch mode when using column, class, or func fetch modes.
+     * The argument for the fetch mode.
      *
      * @var mixed
      */
     protected $fetchArgument;
 
     /**
-     * Constructor arguments when using the PDO::FETCH_CLASS fetch mode.
+     * The constructor arguments for the PDO::FETCH_CLASS fetch mode.
      *
      * @var array
      */
-    protected $fetchCtorArgs = [];
+    protected $fetchConstructorArgument = [];
 
     /**
      * The number of active transactions.
@@ -334,10 +334,10 @@ class Connection implements ConnectionInterface
 
             $statement->execute($me->prepareBindings($bindings));
 
-            $fetchArg = $me->getFetchArgument();
+            $fetchArgument = $me->getFetchArgument();
 
-            return isset($fetchArg) ?
-                $statement->fetchAll($me->getFetchMode(), $fetchArg, $me->getFetchCtorArgs()) :
+            return isset($fetchArgument) ?
+                $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument()) :
                 $statement->fetchAll($me->getFetchMode());
         });
     }
@@ -1062,7 +1062,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the optional fetch argument applied when using PDO FETCH_COLUMN, FETCH_CLASS, and FETCH_FUNC fetch modes.
+     * Get the fetch argument to be applied when selecting.
      *
      * @return mixed
      */
@@ -1072,13 +1072,13 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get custom class constructor arguments when using the PDO::FETCH_CLASS fetch mode.
+     * Get custom constructor arguments for the PDO::FETCH_CLASS fetch mode.
      *
      * @return array
      */
-    public function getFetchCtorArgs()
+    public function getFetchConstructorArgument()
     {
-        return $this->fetchCtorArgs;
+        return $this->fetchConstructorArgument;
     }
 
     /**
@@ -1086,14 +1086,14 @@ class Connection implements ConnectionInterface
      *
      * @param  int  $fetchMode
      * @param  mixed  $fetchArgument
-     * @param  array  $ctorArgs
+     * @param  array  $fetchConstructorArgument
      * @return int
      */
-    public function setFetchMode($fetchMode, $fetchArgument = null, array $ctorArgs = [])
+    public function setFetchMode($fetchMode, $fetchArgument = null, array $fetchConstructorArgument = [])
     {
         $this->fetchMode = $fetchMode;
         $this->fetchArgument = $fetchArgument;
-        $this->fetchCtorArgs = $ctorArgs;
+        $this->fetchConstructorArgument = $fetchConstructorArgument;
     }
 
     /**
