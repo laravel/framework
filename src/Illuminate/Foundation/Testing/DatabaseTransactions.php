@@ -5,30 +5,33 @@ namespace Illuminate\Foundation\Testing;
 trait DatabaseTransactions
 {
     /**
-     * Retrieve the names of the database connections that should be included in the transaction.
+     * Handle database transactions on the specified connections.
      *
-     * The default value of empty string will cause only the default database connection to be included in the transaction.
+     * @return void
+     */
+    public function beginDatabaseTransaction()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $database->connection($name)->beginTransaction();
+        }
+
+        $this->beforeApplicationDestroyed(function () use ($database) {
+            foreach ($this->connectionsToTransact() as $name) {
+                $database->connection($name)->rollBack();
+            }
+        });
+    }
+
+    /**
+     * The database connections that should have transactions.
      *
      * @return array
      */
     protected function connectionsToTransact()
     {
-        return [''];
-    }
-
-    public function beginDatabaseTransaction()
-    {
-        $db = $this->app->make('db');
-
-        foreach ($this->connectionsToTransact() as $name) {
-            $db->connection($name)->beginTransaction();
-        }
-
-        $this->beforeApplicationDestroyed(function () {
-            $db = $this->app->make('db');
-            foreach ($this->connectionsToTransact() as $name) {
-                $db->connection($name)->rollBack();
-            }
-        });
+        return property_exists($this, 'connectionsToTransact')
+                            ? $this->connectionsToTransact : [null];
     }
 }
