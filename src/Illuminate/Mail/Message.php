@@ -189,7 +189,7 @@ class Message
      * @param  string $archive_name
      * @return $this
      */
-    public function attach_files($files, array $options = [], $should_compress = false, $archive_name = 'archive')
+    public function attachFiles($files, array $options = [], $should_compress = false, $archive_name = 'archive')
     {
         $compress_success = false;
 
