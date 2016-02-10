@@ -352,14 +352,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
     public function testAllInputReturnsInputAndFiles()
     {
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
+        $file = $this->getMock('Illuminate\Http\UploadedFile', null, [__FILE__, 'photo.jpg']);
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => 'bar'], [], ['baz' => $file]);
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
     public function testAllInputReturnsNestedInputAndFiles()
     {
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
+        $file = $this->getMock('Illuminate\Http\UploadedFile', null, [__FILE__, 'photo.jpg']);
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], ['foo' => ['photo' => $file]]);
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }

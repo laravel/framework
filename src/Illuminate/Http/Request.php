@@ -5,12 +5,14 @@ namespace Illuminate\Http;
 use Closure;
 use ArrayAccess;
 use SplFileInfo;
+use ReflectionClass;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
@@ -295,7 +297,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function all()
     {
-        return array_replace_recursive($this->input(), $this->files->all());
+        return array_replace_recursive($this->input(), $this->allFiles());
     }
 
     /**
@@ -386,6 +388,35 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get an array of all of the files on the request.
+     *
+     * @return array
+     */
+    public function allFiles()
+    {
+        return $this->convertUploadedFiles($this->files->all());
+    }
+
+    /**
+     * Convert the given array of Symfony UploadedFiles to custom Laravel UploadedFiles.
+     *
+     * @param  array  $files
+     * @return array
+     */
+    protected function convertUploadedFiles(array $files)
+    {
+        $property = (new ReflectionClass(SymfonyUploadedFile::class))->getProperty('test');
+
+        $property->setAccessible(true);
+
+        return array_map(function ($file) use ($property) {
+            return is_array($file)
+                        ? $this->convertUploadedFiles($file)
+                        : UploadedFile::createFromBase($file, $property->getValue($file));
+        }, $files);
+    }
+
+    /**
      * Retrieve a file from the request.
      *
      * @param  string  $key
@@ -394,7 +425,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        return data_get($this->files->all(), $key, $default);
+        return data_get($this->allFiles(), $key, $default);
     }
 
     /**
