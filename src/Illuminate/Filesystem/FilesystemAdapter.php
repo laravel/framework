@@ -225,13 +225,15 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function url($path)
     {
-        if (! $this->driver->getAdapter() instanceof AwsS3Adapter) {
+        $adapter = $this->driver->getAdapter();
+
+        if (! $adapter instanceof AwsS3Adapter) {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }
 
-        $bucket = $this->driver->getAdapter()->getBucket();
+        $bucket = $adapter->getBucket();
 
-        return $this->driver->getAdapter()->getClient()->getObjectUrl($bucket, $path);
+        return $adapter->getClient()->getObjectUrl($bucket, $path);
     }
 
     /**
