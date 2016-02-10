@@ -272,24 +272,10 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::dot($this->data);
-
-        // We will check if the attribute is a nested key, if yes we bring the dot
-        // address of that key as well as the key name itself, the matches will
-        // be use to fill the key with null if it's not provided for the
-        // "required" rule to work effectively.
-        preg_match("/(.*)\.\*\.([^\.\*]*)$/", $attribute, $matches);
-        if ($matches) {
-            $rootArraySegments = explode('.*.', $matches[1]);
-            $lastSegment = last($rootArraySegments);
-            $this->fillMissingArrayKeys($data, $matches[2], $this->data, $rootArraySegments, $lastSegment);
-        }
-
-        // This pattern is used to check if a given key matches the attribute we are looking for.
-        $pattern = str_replace('*', 'd+', preg_quote($attribute));
+        $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
+            if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->mergeRules($key, $ruleValue);
@@ -297,6 +283,33 @@ class Validator implements ValidatorContract
                 }
             }
         }
+    }
+
+    /**
+     * Gather a copy of the data filled with any missing attributes.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function initializeAttributeOnData($attribute)
+    {
+        if (! str_contains($attribute, '*') || ends_with($attribute, '*')) {
+            return $this->data;
+        }
+
+        $target = last(explode('.', $attribute));
+
+        $query = implode('.', array_slice(explode('.', $attribute), 0, -1));
+
+        $data = $this->data;
+
+        foreach (data_get($data, $query) as $key => $value) {
+            if (! isset($value[$target])) {
+                array_set($data, str_replace_last('*', $key, $attribute), null);
+            }
+        }
+
+        return $data;
     }
 
     /**

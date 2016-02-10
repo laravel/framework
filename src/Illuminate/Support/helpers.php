@@ -687,6 +687,27 @@ if (! function_exists('str_replace_array')) {
     }
 }
 
+if (! function_exists('str_replace_last')) {
+    /**
+     * Replace the last occurence of a given value in the string.
+     *
+     * @param  string  $search
+     * @param  array   $replace
+     * @param  string  $subject
+     * @return string
+     */
+    function str_replace_last($search, $replace, $subject)
+    {
+        $position = strrpos($subject, $search);
+
+        if ($position !== false) {
+            return substr_replace($subject, (string) $replace, $position, strlen($search));
+        }
+
+        return $subject;
+    }
+}
+
 if (! function_exists('str_singular')) {
     /**
      * Get the singular form of an English word.
