@@ -9,6 +9,7 @@ use ReflectionClass;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
+    use Macroable;
+
     /**
      * The decoded JSON content for the request.
      *
@@ -425,7 +428,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        return data_get($this->allFiles(), $key, $default);
+        $file = data_get($this->files->all(), $key, $default);
+
+        if (is_array($file)) {
+            return $this->convertUploadedFiles($file);
+        } elseif ($file instanceof SymfonyUploadedFile) {
+            return $this->convertUploadedFiles([$file])[0];
+        }
     }
 
     /**

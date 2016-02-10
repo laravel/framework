@@ -3,10 +3,13 @@
 namespace Illuminate\Http;
 
 use ReflectionClass;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
 {
+    use Macroable;
+
     /**
      * Create a new file instance from a base instance.
      *
@@ -16,11 +19,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public static function createFromBase(SymfonyUploadedFile $file, $testing = false)
     {
-        if ($file instanceof static) {
-            return $file;
-        }
-
-        return new static(
+        return $file instanceof static ? $file : new static(
             $file->getRealPath(), $file->getClientOriginalName(), $file->getClientMimeType(),
             $file->getClientSize(), $file->getError(), $testing
         );
