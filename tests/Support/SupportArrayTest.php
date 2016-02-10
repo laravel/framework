@@ -31,6 +31,20 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk'], $array);
     }
 
+    public function testExists()
+    {
+        $this->assertTrue(Arr::exists([1], 0));
+        $this->assertTrue(Arr::exists([null], 0));
+        $this->assertTrue(Arr::exists(['a' => 1], 'a'));
+        $this->assertTrue(Arr::exists(['a' => null], 'a'));
+        $this->assertTrue(Arr::exists(new Collection(['a' => null]), 'a'));
+
+        $this->assertFalse(Arr::exists([1], 1));
+        $this->assertFalse(Arr::exists([null], 1));
+        $this->assertFalse(Arr::exists(['a' => 1], 0));
+        $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
