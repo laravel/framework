@@ -31,6 +31,20 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'Desk'], $array);
     }
 
+    public function testExists()
+    {
+        $this->assertTrue(Arr::exists([1], 0));
+        $this->assertTrue(Arr::exists([null], 0));
+        $this->assertTrue(Arr::exists(['a' => 1], 'a'));
+        $this->assertTrue(Arr::exists(['a' => null], 'a'));
+        $this->assertTrue(Arr::exists(new Collection(['a' => null]), 'a'));
+
+        $this->assertFalse(Arr::exists([1], 1));
+        $this->assertFalse(Arr::exists([null], 1));
+        $this->assertFalse(Arr::exists(['a' => 1], 0));
+        $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
@@ -40,6 +54,19 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals(200, $value);
+    }
+
+    public function testIs()
+    {
+        $this->assertTrue(Arr::accessible([]));
+        $this->assertTrue(Arr::accessible([1, 2]));
+        $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
+        $this->assertTrue(Arr::accessible(new Collection));
+
+        $this->assertFalse(Arr::accessible(null));
+        $this->assertFalse(Arr::accessible('abc'));
+        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
     public function testLast()
