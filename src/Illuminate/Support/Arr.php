@@ -132,6 +132,22 @@ class Arr
     }
 
     /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  array|\ArrayAccess  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function exists($array, $key)
+    {
+        if (is_array($array)) {
+            return array_key_exists($key, $array);
+        }
+
+        return $array->offsetExists($key);
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
