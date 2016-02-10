@@ -301,9 +301,7 @@ class Validator implements ValidatorContract
 
         $query = implode('.', array_slice(explode('.', $attribute), 0, -1));
 
-        $data = $this->data;
-
-        foreach (data_get($data, $query) as $key => $value) {
+        foreach (data_get($data = $this->data, $query) as $key => $value) {
             if (! isset($value[$target])) {
                 array_set($data, str_replace_last('*', $key, $attribute), null);
             }
