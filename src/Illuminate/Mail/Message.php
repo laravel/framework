@@ -193,7 +193,6 @@ class Message
     {
         $compress_success = false;
 
-        // Trying to compress
         if ($should_compress) {
             $zip = new ZipArchive;
             $filename = storage_path($archive_name.'_'.str_random(32).'.zip');
