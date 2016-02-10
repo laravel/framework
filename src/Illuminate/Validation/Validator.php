@@ -301,7 +301,7 @@ class Validator implements ValidatorContract
 
         $query = implode('.', array_slice(explode('.', $attribute), 0, -1));
 
-        foreach (data_get($data = $this->data, $query) as $key => $value) {
+        foreach (data_get($data = $this->data, $query, []) as $key => $value) {
             if (! isset($value[$target])) {
                 array_set($data, str_replace_last('*', $key, $attribute), null);
             }
@@ -2304,7 +2304,7 @@ class Validator implements ValidatorContract
     protected function normalizeRule($rule)
     {
         switch ($rule) {
-            case 'Int':
+            case 'Int' :
                 return 'Integer';
             case 'Bool':
                 return 'Boolean';
