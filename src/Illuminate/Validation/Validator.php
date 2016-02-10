@@ -313,46 +313,6 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Fill a missing field in an array with null.
-     *
-     * This to make sure the "required" rule is effective if the array does not have the key
-     *
-     * @param  array  $originalData
-     * @param  string  $field
-     * @param  array  $levelData
-     * @param  array  $segments
-     * @param  string  $lastSegment
-     * @param  array  $keysArray
-     * @return void
-     */
-    protected function fillMissingArrayKeys(&$originalData, $field, $levelData, $segments, $lastSegment, $keysArray = [])
-    {
-        foreach ($levelData as $key => $levelValues) {
-            if ($key !== $lastSegment) {
-                if (! is_array($levelValues) || (! is_numeric($key) && ! in_array($key, $segments))) {
-                    continue;
-                }
-
-                // If the last key is numeric then a previous root was checked and we are moving
-                // into a following root thus we need to reset our index.
-                if (is_numeric(last($keysArray))) {
-                    array_pop($keysArray);
-                }
-
-                $keysArray[] = $key;
-                $this->fillMissingArrayKeys($originalData, $field, $levelValues, $segments, $lastSegment, $keysArray);
-            } else {
-                foreach ($levelValues as $i => $rootValue) {
-                    if (! isset($rootValue[$field])) {
-                        $keysArray = array_merge($keysArray, [$lastSegment, $i, $field]);
-                        $originalData[implode('.', $keysArray)] = null;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Merge additional rules into a given attribute.
      *
      * @param  string  $attribute
