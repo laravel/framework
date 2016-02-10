@@ -185,6 +185,8 @@ class Message
      *
      * @param  array  $files
      * @param  array  $options
+     * @param  bool   $should_compress
+     * @param  string $archive_name
      * @return $this
      */
     public function attach_files($files, array $options = [], $should_compress = false, $archive_name = 'archive')
