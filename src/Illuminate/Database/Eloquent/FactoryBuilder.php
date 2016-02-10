@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 
@@ -146,7 +147,7 @@ class FactoryBuilder
     protected function evaluateClosures(array $attributes)
     {
         return array_map(function ($attribute) use ($attributes) {
-            return $attribute instanceof \Closure ? $attribute($attributes) : $attribute;
+            return $attribute instanceof Closure ? $attribute($attributes) : $attribute;
         }, $attributes);
     }
 }
