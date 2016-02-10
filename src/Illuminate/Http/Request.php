@@ -408,6 +408,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     protected function convertUploadedFiles(array $files)
     {
+        // Pending "test" property of Symfony's becoming accessible...
         $property = (new ReflectionClass(SymfonyUploadedFile::class))->getProperty('test');
 
         $property->setAccessible(true);
