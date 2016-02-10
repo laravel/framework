@@ -383,6 +383,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c->diff(null)->all());
     }
 
+    public function testDiffKeys()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['id' => 123, 'foo_bar' => 'Hello']);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2)->all());
+    }
+
     public function testEach()
     {
         $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
