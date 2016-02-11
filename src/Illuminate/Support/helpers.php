@@ -440,9 +440,10 @@ if (! function_exists('data_set')) {
      * @param  mixed  $target
      * @param  string|array  $key
      * @param  mixed  $value
+     * @param  bool  $overwrite
      * @return mixed
      */
-    function data_set(&$target, $key, $value)
+    function data_set(&$target, $key, $value, $overwrite = true)
     {
         $segments = is_array($key) ? $key : explode('.', $key);
 
@@ -451,7 +452,7 @@ if (! function_exists('data_set')) {
                 $target = [];
             } elseif ($segments) {
                 foreach ($target as &$inner) {
-                    data_set($inner, $segments, $value);
+                    data_set($inner, $segments, $value, $overwrite);
                 }
             } else {
                 foreach ($target as &$inner) {
@@ -464,8 +465,8 @@ if (! function_exists('data_set')) {
                     $target[$segment] = [];
                 }
 
-                data_set($target[$segment], $segments, $value);
-            } elseif (! Arr::exists($target, $segment)) {
+                data_set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || ! Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {
@@ -474,8 +475,8 @@ if (! function_exists('data_set')) {
                     $target->{$segment} = [];
                 }
 
-                data_set($target->{$segment}, $segments, $value);
-            } elseif (! isset($target->{$segment})) {
+                data_set($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || ! isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
         }
