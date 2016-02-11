@@ -40,6 +40,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Str::startsWith('jason', 'jas'));
         $this->assertTrue(Str::startsWith('jason', 'jason'));
         $this->assertTrue(Str::startsWith('jason', ['jas']));
+        $this->assertTrue(Str::startsWith('jason', ['day', 'jas']));
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
         $this->assertFalse(Str::startsWith('jason', ''));
@@ -50,6 +51,7 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Str::endsWith('jason', 'on'));
         $this->assertTrue(Str::endsWith('jason', 'jason'));
         $this->assertTrue(Str::endsWith('jason', ['on']));
+        $this->assertTrue(Str::endsWith('jason', ['no', 'on']));
         $this->assertFalse(Str::endsWith('jason', 'no'));
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
@@ -59,7 +61,9 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
+        $this->assertTrue(Str::contains('taylor', 'taylor'));
         $this->assertTrue(Str::contains('taylor', ['ylo']));
+        $this->assertTrue(Str::contains('taylor', ['xxx', 'ylo']));
         $this->assertFalse(Str::contains('taylor', 'xxx'));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
