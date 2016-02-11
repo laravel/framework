@@ -274,8 +274,11 @@ class Validator implements ValidatorContract
     {
         $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
+        // Match only digits and asterisks in place of an asterisk
+        $pattern = str_replace('\*', '[0-9*]+', preg_quote($attribute));
+
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
+            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->mergeRules($key, $ruleValue);
