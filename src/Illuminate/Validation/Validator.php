@@ -297,11 +297,15 @@ class Validator implements ValidatorContract
             return $this->data;
         }
 
-        $target = last(explode('.', $attribute));
-
         $query = implode('.', array_slice(explode('.', $attribute), 0, -1));
 
-        foreach (data_get($data = $this->data, $query, []) as $key => $value) {
+        if (empty($values = data_get($data = $this->data, $query, []))) {
+            return $data;
+        }
+
+        $target = last(explode('.', $attribute));
+
+        foreach ($values as $key => $value) {
             if (! isset($value[$target])) {
                 array_set($data, str_replace_last('*', $key, $attribute), null);
             }
