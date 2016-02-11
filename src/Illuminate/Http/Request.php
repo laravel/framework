@@ -100,10 +100,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $query = $this->getQueryString();
 
-        // If there is no path part in URL, there should be a slash before query (http://example.com/?a=b)
-        $slash = ($this->getBaseUrl().$this->getPathInfo() == '/') ? '/' : '';
+        $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
 
-        return $query ? $this->url().$slash.'?'.$query : $this->url();
+        return $query ? $this->url().$question.$query : $this->url();
     }
 
     /**
