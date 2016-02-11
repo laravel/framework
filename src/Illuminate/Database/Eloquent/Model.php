@@ -760,11 +760,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return !$this->relationLoaded($relation);
         });
 
-        $query = $this->newQuery()->with($unloadedRelations);
-
-        $query->eagerLoadRelations([$this]);
-
-        return $this;
+        if (empty($unloadedRelations)) {
+            return $this;
+        } else {
+            return $this->load($unloadedRelations);
+        }
     }
 
     /**
