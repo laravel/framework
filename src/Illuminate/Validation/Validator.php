@@ -2304,7 +2304,7 @@ class Validator implements ValidatorContract
     protected function normalizeRule($rule)
     {
         switch ($rule) {
-            case 'Int' :
+            case 'Int':
                 return 'Integer';
             case 'Bool':
                 return 'Boolean';
