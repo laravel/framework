@@ -404,12 +404,24 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_set($data, 'baz', 'boom'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_set($data, 'baz', 'noop'));
-        $this->assertEquals(['foo' => [], 'baz' => 'boom'], data_set($data, 'foo.*', 'noop'));
         $this->assertEquals(
-            ['foo' => ['bar' => 'kaboom'], 'baz' => 'boom'],
-            data_set($data, 'foo.bar', 'kaboom')
+            ['foo' => 'bar', 'baz' => 'boom'],
+            data_set($data, 'baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'baz' => 'kaboom'],
+            data_set($data, 'baz', 'kaboom')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'baz' => 'kaboom'],
+            data_set($data, 'foo.*', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'boom'], 'baz' => 'kaboom'],
+            data_set($data, 'foo.bar', 'boom')
         );
     }
 
@@ -428,7 +440,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
+            ['foo' => [], 'bar' => [['baz' => 'boom'], ['baz' => 'boom']]],
             data_set($data, 'bar.*.baz', 'boom')
         );
     }
@@ -458,14 +470,14 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
             'posts' => [
                 (object) [
                     'comments' => [
-                        (object) ['name' => 'First'],
+                        (object) ['name' => 'Filled'],
                         (object) ['name' => 'Filled'],
                     ],
                 ],
                 (object) [
                     'comments' => [
                         (object) ['name' => 'Filled'],
-                        (object) ['name' => 'Second'],
+                        (object) ['name' => 'Filled'],
                     ],
                 ],
             ],
