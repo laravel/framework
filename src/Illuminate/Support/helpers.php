@@ -378,6 +378,21 @@ if (! function_exists('collect')) {
     }
 }
 
+if (! function_exists('data_fill')) {
+    /**
+     * Fill in data where it's missing.
+     *
+     * @param  mixed   $target
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function data_fill(&$target, $key, $value)
+    {
+        return data_set($target, $key, $value, false);
+    }
+}
+
 if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
