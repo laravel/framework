@@ -299,21 +299,9 @@ class Validator implements ValidatorContract
             return $this->data;
         }
 
-        $query = implode('.', array_slice(explode('.', $attribute), 0, -1));
+        $data = $this->data;
 
-        if (empty($values = data_get($data = $this->data, $query, []))) {
-            return $data;
-        }
-
-        $target = last(explode('.', $attribute));
-
-        foreach ($values as $key => $value) {
-            if (! isset($value[$target])) {
-                array_set($data, str_replace_last('*', $key, $attribute), null);
-            }
-        }
-
-        return $data;
+        return data_fill($data, $attribute, null);
     }
 
     /**
