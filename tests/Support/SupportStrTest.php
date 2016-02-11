@@ -138,6 +138,22 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('string', Str::random());
     }
 
+    public function testReplaceFirst()
+    {
+        $this->assertEquals('fooqux foobar', Str::replaceFirst('bar', 'qux', 'foobar foobar'));
+        $this->assertEquals('foo/qux? foo/bar?', Str::replaceFirst('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertEquals('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
+    }
+
+    public function testReplaceLast()
+    {
+        $this->assertEquals('foobar fooqux', Str::replaceLast('bar', 'qux', 'foobar foobar'));
+        $this->assertEquals('foo/bar? foo/qux?', Str::replaceLast('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertEquals('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
+    }
+
     public function testSnake()
     {
         $this->assertEquals('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
