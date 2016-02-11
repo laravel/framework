@@ -1893,7 +1893,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
 
         $data = ['people' => [
-            ['cars' => [['model' => 2005], ['name' => 'alpha']]],
+            ['cars' => [['model' => 2005], []]],
         ]];
         $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
         $this->assertFalse($v->passes());
