@@ -1879,42 +1879,41 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()
     {
         $trans = $this->getRealTranslator();
+
         $data = ['names' => [['second' => 'I have no first']]];
         $v = new Validator($trans, $data, ['names.*.first' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
+        $data = [];
+        $v = new Validator($trans, $data, ['names.*.first' => 'required']);
+        $this->assertTrue($v->passes());
+
         $data = ['names' => [['second' => 'I have no first']]];
         $v = new Validator($trans, $data, ['names.*.first' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = ['people' => [
             ['cars' => [['model' => 2005], []]],
         ]];
         $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = ['people' => [
             ['name' => 'test', 'cars' => [['model' => 2005], ['name' => 'test2']]],
         ]];
         $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = ['people' => [
             ['phones' => ['iphone', 'android'], 'cars' => [['model' => 2005], ['name' => 'test2']]],
         ]];
         $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = ['names' => [['second' => '2']]];
         $v = new Validator($trans, $data, ['names.*.first' => 'sometimes|required']);
         $this->assertTrue($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = [
             'people' => [
                 ['name' => 'Jon', 'email' => 'a@b.c'],
@@ -1924,7 +1923,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['people.*.email' => 'required']);
         $this->assertFalse($v->passes());
 
-        $trans = $this->getRealTranslator();
         $data = [
             'people' => [
                 [
