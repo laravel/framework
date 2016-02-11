@@ -1943,6 +1943,30 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateNestedArrayWithCommonParentChildKey()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = [
+            'products' => [
+                [
+                    'price' => 2,
+                    'options' => [
+                        ['price' => 1],
+                    ],
+                ],
+                [
+                    'price' => 2,
+                    'options' => [
+                        ['price' => 0],
+                    ],
+                ],
+            ],
+        ];
+        $v = new Validator($trans, $data, ['products.*.price' => 'numeric|min:1']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEachWithNonIndexedArray()
     {
         $trans = $this->getRealTranslator();
