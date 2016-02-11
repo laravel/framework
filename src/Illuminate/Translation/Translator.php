@@ -184,7 +184,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Get a translation according to an integer value.
      *
      * @param  string  $key
-     * @param  int     $number
+     * @param  int|array|\Countable  $number
      * @param  array   $replace
      * @param  string  $locale
      * @return string
@@ -192,6 +192,10 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     public function choice($key, $number, array $replace = [], $locale = null)
     {
         $line = $this->get($key, $replace, $locale = $locale ?: $this->locale ?: $this->fallback);
+
+        if (is_array($number) || $number instanceof \Countable) {
+            $number = count($number);
+        }
 
         $replace['count'] = $number;
 
@@ -216,7 +220,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * Get a translation according to an integer value.
      *
      * @param  string  $id
-     * @param  int     $number
+     * @param  int|array|\Countable  $number
      * @param  array   $parameters
      * @param  string  $domain
      * @param  string  $locale
