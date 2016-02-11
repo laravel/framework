@@ -756,7 +756,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relations = func_get_args();
         }
 
-        $unloadedRelations = array_filter($relations, function($relation) {
+        $unloadedRelations = array_filter($relations, function ($relation) {
             return ! $this->relationLoaded($relation);
         });
 
