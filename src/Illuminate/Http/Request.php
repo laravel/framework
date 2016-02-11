@@ -5,7 +5,6 @@ namespace Illuminate\Http;
 use Closure;
 use ArrayAccess;
 use SplFileInfo;
-use ReflectionClass;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -408,15 +407,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     protected function convertUploadedFiles(array $files)
     {
-        // Pending "test" property of Symfony's becoming accessible...
-        $property = (new ReflectionClass(SymfonyUploadedFile::class))->getProperty('test');
-
-        $property->setAccessible(true);
-
-        return array_map(function ($file) use ($property) {
+        return array_map(function ($file) {
             return is_array($file)
                         ? $this->convertUploadedFiles($file)
-                        : UploadedFile::createFromBase($file, $property->getValue($file));
+                        : UploadedFile::createFromBase($file);
         }, $files);
     }
 
