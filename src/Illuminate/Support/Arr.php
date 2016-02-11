@@ -134,7 +134,7 @@ class Arr
     /**
      * Determine if the given key exists in the provided array.
      *
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $array
      * @param  string|int  $key
      * @return bool
      */
