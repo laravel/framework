@@ -96,6 +96,9 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $request = Request::create('https://foo.com', 'GET');
         $this->assertEquals('https://foo.com', $request->fullUrl());
+
+        $request = Request::create('https://foo.com?a=b', 'GET');
+        $this->assertEquals('https://foo.com/?a=b', $request->fullUrl());
     }
 
     public function testIsMethod()
