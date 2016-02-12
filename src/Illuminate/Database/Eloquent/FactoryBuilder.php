@@ -146,8 +146,10 @@ class FactoryBuilder
      */
     protected function evaluateClosures(array $attributes)
     {
-        return array_map(function ($attribute) use ($attributes) {
-            return $attribute instanceof Closure ? $attribute($attributes) : $attribute;
-        }, $attributes);
+        foreach ($attributes as &$attribute) {
+            $attribute = $attribute instanceof Closure ? $attribute($attributes) : $attribute;
+        }
+
+        return $attributes;
     }
 }
