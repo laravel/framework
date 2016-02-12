@@ -431,6 +431,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
             ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
             data_fill($data, 'bar.*.baz', 'boom')
         );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
+            data_fill($data, 'bar.*', 'noop')
+        );
     }
 
     public function testDataFillWithDoubleStar()
@@ -514,6 +519,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'boom'], ['baz' => 'boom']]],
             data_set($data, 'bar.*.baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
+            data_set($data, 'bar.*', 'overwritten')
         );
     }
 
