@@ -730,11 +730,7 @@ if (! function_exists('str_replace_array')) {
      */
     function str_replace_array($search, array $replace, $subject)
     {
-        foreach ($replace as $value) {
-            $subject = Str::replaceFirst($search, $value, $subject);
-        }
-
-        return $subject;
+        return Str::replaceArray($search, $replace, $subject);
     }
 }
 
