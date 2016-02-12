@@ -290,6 +290,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
     }
 
+    public function testValidateArray()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => new \Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getRealTranslator();

@@ -852,7 +852,7 @@ class Validator implements ValidatorContract
      */
     protected function validateArray($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return true;
         }
 
@@ -868,7 +868,7 @@ class Validator implements ValidatorContract
      */
     protected function validateBoolean($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return true;
         }
 
@@ -886,7 +886,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInteger($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return true;
         }
 
@@ -902,7 +902,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNumeric($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return true;
         }
 
@@ -918,7 +918,7 @@ class Validator implements ValidatorContract
      */
     protected function validateString($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return true;
         }
 
