@@ -154,55 +154,57 @@ trait InteractsWithPages
      *
      *      $this->visit('/login')->click('Sign in with Github')
      *
-     * @param  \closure $on     The closure that will run and intercept the HttpRedirection response
-     * @param  string   $target Target scheme://hostname/path that is expected in the redirection
-     * @param  array    $params Parameters that must be found in the redirection target
+     * @param  \closure  $on  The closure that will run and intercept the HttpRedirection response
+     * @param  string  $target  Target scheme://hostname/path that is expected in the redirection
+     * @param  array  $params  Parameters that must be found in the redirection target
      *
      * @return bool
      */
     public function expectRedirectionTo(\closure $on, $target = null, $params = [])
     {
-        $this->suspendFollowingRedirections();
+        try {
+            $this->suspendFollowingRedirections();
 
-        $on($this);
+            $on($this);
 
-        $this->assertInstanceOf(
-            RedirectResponse::class,
-            $this->response,
-            sprintf(
-                'Expected [%s] but got [%s]',
+            $this->assertInstanceOf(
                 RedirectResponse::class,
-                get_class($this->response)
-            )
-        );
-
-        if ($target !== null || count($params) > 0) {
-            $parsedUrl = parse_url($this->response->getTargetUrl());
-        }
-
-        if ($target !== null) {
-            $targetCompareAgainst = $parsedUrl['scheme'].'://'.$parsedUrl['host'].$parsedUrl['path'];
-            $this->assertEquals(
-                $target,
-                $targetCompareAgainst,
+                $this->response,
                 sprintf(
-                    'The targetUrl [%s] doesn\'t match the expected targetUrl [%s]',
-                    $target,
-                    $targetCompareAgainst
+                    'Expected [%s] but got [%s]',
+                    RedirectResponse::class,
+                    get_class($this->response)
                 )
             );
+
+            if ($target !== null || count($params) > 0) {
+                $parsedUrl = parse_url($this->response->getTargetUrl());
+            }
+
+            if ($target !== null) {
+                $targetCompareAgainst = $parsedUrl['scheme'].'://'.$parsedUrl['host'].$parsedUrl['path'];
+                $this->assertEquals(
+                    $target,
+                    $targetCompareAgainst,
+                    sprintf(
+                        'The targetUrl [%s] doesn\'t match the expected targetUrl [%s]',
+                        $target,
+                        $targetCompareAgainst
+                    )
+                );
+            }
+
+            if (count($params) > 0) {
+                parse_str($parsedUrl['query'], $parsedQuery);
+
+                $this->assertArraySubset(
+                    $params,
+                    $parsedQuery
+                );
+            }
+        } finally {
+            $this->restoreFollowingRedirections();
         }
-
-        if (count($params) > 0) {
-            parse_str($parsedUrl['query'], $parsedQuery);
-
-            $this->assertArraySubset(
-                $params,
-                $parsedQuery
-            );
-        }
-
-        $this->restoreFollowingRedirections();
 
         return $this;
     }
