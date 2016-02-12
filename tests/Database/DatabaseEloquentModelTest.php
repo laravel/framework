@@ -1598,14 +1598,16 @@ class EloquentModelLoadIfNeededStub extends Illuminate\Database\Eloquent\Model
     protected $table = 'stub';
     protected $guarded = [];
 
-    public function load($relations) {
+    public function load($relations)
+    {
         foreach ($relations as $relation) {
             $this->relations[$relation] = true;
         }
         return 'load called';
     }
 
-    public function loadIfNeeded($relations) {
+    public function loadIfNeeded($relations)
+    {
         if (is_string($relations)) {
             $relations = func_get_args();
         }
