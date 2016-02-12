@@ -19,8 +19,8 @@
         "illuminate/contracts": "5.3.*",
         "illuminate/container": "5.3.*",
         "illuminate/support": "5.3.*",
-        "symfony/process": "3.1.*",
-        "nesbot/carbon": "~1.20"
+        "nesbot/carbon": "~1.20",
+        "symfony/process": "3.1.*"
     },
     "autoload": {
         "psr-4": {

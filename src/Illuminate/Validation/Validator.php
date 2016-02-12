@@ -272,10 +272,12 @@ class Validator implements ValidatorContract
      */
     public function each($attribute, $rules)
     {
-        $data = Arr::dot($this->data);
+        $data = Arr::dot($this->initializeAttributeOnData($attribute));
+
+        $pattern = str_replace('\*', '[0-9*]+', preg_quote($attribute));
 
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || Str::is($attribute, $key)) {
+            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->mergeRules($key, $ruleValue);
@@ -283,6 +285,23 @@ class Validator implements ValidatorContract
                 }
             }
         }
+    }
+
+    /**
+     * Gather a copy of the data filled with any missing attributes.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function initializeAttributeOnData($attribute)
+    {
+        if (! str_contains($attribute, '*') || ends_with($attribute, '*')) {
+            return $this->data;
+        }
+
+        $data = $this->data;
+
+        return data_fill($data, $attribute, null);
     }
 
     /**

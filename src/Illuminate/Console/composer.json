@@ -17,8 +17,8 @@
         "php": ">=5.6.4",
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
-        "symfony/console": "3.1.*",
-        "nesbot/carbon": "~1.20"
+        "nesbot/carbon": "~1.20",
+        "symfony/console": "3.1.*"
     },
     "autoload": {
         "psr-4": {

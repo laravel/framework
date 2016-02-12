@@ -10,6 +10,17 @@ class Arr
     use Macroable;
 
     /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array   $array
@@ -96,6 +107,22 @@ class Arr
         static::forget($array, $keys);
 
         return $array;
+    }
+
+    /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function exists($array, $key)
+    {
+        if (is_array($array)) {
+            return array_key_exists($key, $array);
+        }
+
+        return $array->offsetExists($key);
     }
 
     /**
@@ -200,7 +227,7 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  array|\ArrayAccess   $array
+     * @param  \ArrayAccess|array   $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
