@@ -420,7 +420,7 @@ if (! function_exists('logger')) {
      *
      * @param  string  $message
      * @param  array  $context
-     * @return null|\Illuminate\Contracts\Logging\Log
+     * @return \Illuminate\Contracts\Logging\Log|null
      */
     function logger($message = null, array $context = [])
     {
@@ -664,7 +664,7 @@ if (! function_exists('trans_choice')) {
      * Translates the given message based on a count.
      *
      * @param  string  $id
-     * @param  int     $number
+     * @param  int|array|\Countable  $number
      * @param  array   $parameters
      * @param  string  $domain
      * @param  string  $locale

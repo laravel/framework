@@ -79,6 +79,20 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
+     * The argument for the fetch mode.
+     *
+     * @var mixed
+     */
+    protected $fetchArgument;
+
+    /**
+     * The constructor arguments for the PDO::FETCH_CLASS fetch mode.
+     *
+     * @var array
+     */
+    protected $fetchConstructorArgument = [];
+
+    /**
      * The number of active transactions.
      *
      * @var int
@@ -320,7 +334,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute($me->prepareBindings($bindings));
 
-            return $statement->fetchAll($me->getFetchMode());
+            $fetchArgument = $me->getFetchArgument();
+
+            return isset($fetchArgument) ?
+                $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument()) :
+                $statement->fetchAll($me->getFetchMode());
         });
     }
 
@@ -1044,14 +1062,38 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the default fetch mode for the connection.
+     * Get the fetch argument to be applied when selecting.
+     *
+     * @return mixed
+     */
+    public function getFetchArgument()
+    {
+        return $this->fetchArgument;
+    }
+
+    /**
+     * Get custom constructor arguments for the PDO::FETCH_CLASS fetch mode.
+     *
+     * @return array
+     */
+    public function getFetchConstructorArgument()
+    {
+        return $this->fetchConstructorArgument;
+    }
+
+    /**
+     * Set the default fetch mode for the connection, and optional arguments for the given fetch mode.
      *
      * @param  int  $fetchMode
+     * @param  mixed  $fetchArgument
+     * @param  array  $fetchConstructorArgument
      * @return int
      */
-    public function setFetchMode($fetchMode)
+    public function setFetchMode($fetchMode, $fetchArgument = null, array $fetchConstructorArgument = [])
     {
         $this->fetchMode = $fetchMode;
+        $this->fetchArgument = $fetchArgument;
+        $this->fetchConstructorArgument = $fetchConstructorArgument;
     }
 
     /**
