@@ -1603,6 +1603,7 @@ class EloquentModelLoadIfNeededStub extends Illuminate\Database\Eloquent\Model
         foreach ($relations as $relation) {
             $this->relations[$relation] = true;
         }
+
         return 'load called';
     }
 
