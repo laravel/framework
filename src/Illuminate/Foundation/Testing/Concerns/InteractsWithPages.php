@@ -35,7 +35,7 @@ trait InteractsWithPages
     protected $uploads = [];
 
     /**
-     * Stores the flag stating we should not test for redirections or page loads
+     * Stores the flag stating we should not test for redirections or page loads.
      *
      * @var bool
      */
@@ -68,9 +68,9 @@ trait InteractsWithPages
 
         $this->call($method, $uri, $parameters, $cookies, $files);
 
-        if($this->suspendFollowingRedirectionsFlag){
+        if ($this->suspendFollowingRedirectionsFlag) {
             $this->clearInputs();
-        }else{
+        } else {
             $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
         }
 
@@ -125,41 +125,43 @@ trait InteractsWithPages
     }
 
     /**
-     * Allows expectation of redirections for assertions of redirect to other sites or pages
+     * Allows expectation of redirections for assertions of redirect to other sites or pages.
      *
      * @return $this
      */
-    public function suspendFollowingRedirections() {
-
+    public function suspendFollowingRedirections()
+    {
         $this->suspendFollowingRedirectionsFlag = true;
+
         return $this;
     }
 
     /**
-     * Disables the expected redirection previously activated by expectRedirection
+     * Disables the expected redirection previously activated by expectRedirection.
      *
      * @return $this
      */
-    public function restoreFollowingRedirections() {
-
+    public function restoreFollowingRedirections()
+    {
         $this->suspendFollowingRedirectionsFlag = false;
+
         return $this;
     }
 
     /**
      * Runs the included closures page interactions inside of a suspended redirection following state
-     * and checks if the response of these operations is a redirection. Perfect for scenarios like:
+     * and checks if the response of these operations is a redirection. Perfect for scenarios like:.
      *
      *      $this->visit('/login')->click('Sign in with Github')
      *
-     * @param \closure $on     The closure that will run and intercept the HttpRedirection response
-     * @param string   $target Target scheme://hostname/path that is expected in the redirection
-     * @param array    $params Parameters that must be found in the redirection target
+     * @param  \closure $on     The closure that will run and intercept the HttpRedirection response
+     * @param  string   $target Target scheme://hostname/path that is expected in the redirection
+     * @param  array    $params Parameters that must be found in the redirection target
      *
      * @return bool
      */
-    public function expectRedirectionTo(\closure $on, $target = null, $params = []) {
-
+    public function expectRedirectionTo(\closure $on, $target = null, $params = [])
+    {
         $this->suspendFollowingRedirections();
 
         $on($this);
@@ -179,7 +181,7 @@ trait InteractsWithPages
         }
 
         if ($target !== null) {
-            $targetCompareAgainst = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+            $targetCompareAgainst = $parsedUrl['scheme'].'://'.$parsedUrl['host'].$parsedUrl['path'];
             $this->assertEquals(
                 $target,
                 $targetCompareAgainst,
@@ -201,6 +203,7 @@ trait InteractsWithPages
         }
 
         $this->restoreFollowingRedirections();
+
         return $this;
     }
 
