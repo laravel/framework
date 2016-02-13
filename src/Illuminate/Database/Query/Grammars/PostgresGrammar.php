@@ -26,6 +26,7 @@ class PostgresGrammar extends Grammar
     protected function compileUnion(array $union)
     {
         $joiner = $union['all'] ? ' union all ' : ' union ';
+
         return $joiner.'('.$union['query']->toSql().')';
     }
 
@@ -268,6 +269,7 @@ class PostgresGrammar extends Grammar
             $unionIndex = array_search('unions', array_keys($segments), true);
             array_splice($segments, $unionIndex, 0, ')');
         }
+
         return implode(' ', array_filter($segments, function ($value) {
             return (string) $value !== '';
         }));
