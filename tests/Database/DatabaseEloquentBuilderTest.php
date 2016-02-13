@@ -112,6 +112,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn(['bar']);
         $builder->shouldReceive('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
@@ -124,6 +125,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn([]);
         $builder->shouldReceive('eagerLoadRelations')->never();
         $builder->setModel($this->getMockModel());
@@ -192,26 +194,26 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
-    public function testListsReturnsTheMutatedAttributesOfAModel()
+    public function testPluckReturnsTheMutatedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(['bar', 'baz']);
+        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'bar']));
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestListsStub(['name' => 'baz']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
 
-        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->lists('name')->all());
+        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
     }
 
-    public function testListsWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+    public function testPluckWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('lists')->with('name', '')->andReturn(['bar', 'baz']);
+        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
 
-        $this->assertEquals(['bar', 'baz'], $builder->lists('name')->all());
+        $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
     public function testMacrosAreCalledOnBuilder()
@@ -399,7 +401,16 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
-        $this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
+        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals(['bar', 9000], $query->getBindings());
+    }
+
+    public function testRealNestedWhereWithMultipleScopesAndOneDeadScope()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) { $query->empty()->where('baz', '>', 9000); });
+        $this->assertEquals('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
@@ -429,7 +440,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
             $q->having('bam', '>', 'qux');
         })->where('quux', 'quuux');
 
-        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) >= 1 and "quux" = ?', $builder->toSql());
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) and "quux" = ?', $builder->toSql());
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
@@ -444,8 +455,21 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
             $q->having('bam', '>', 'qux');
         })->where('quux', 'quuux');
 
-        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and (select count(*) from "eloquent_builder_test_model_close_related_stubs" inner join "quuuux" on "quuuuux" = ? where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) >= 1 and "quux" = ?', $builder->toSql());
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" inner join "quuuux" on "quuuuux" = ? where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) and "quux" = ?', $builder->toSql());
         $this->assertEquals(['baz', 'quuuuuux', 'qux', 'quuux'], $builder->getBindings());
+    }
+
+    public function testHasWithContraintsAndHavingInSubqueryWithCount()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz');
+        $builder->whereHas('foo', function ($q) {
+            $q->having('bam', '>', 'qux');
+        }, '>=', 2)->where('quux', 'quuux');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) >= 2 and "quux" = ?', $builder->toSql());
+        $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
     public function testHasNestedWithConstraints()
@@ -491,6 +515,41 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $result = $model->has('foo.bar')->orHas('foo.baz')->toSql();
 
         $this->assertEquals($builder->toSql(), $result);
+    }
+
+    public function testSelfHasNested()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $nestedSql = $model->whereHas('parentFoo', function ($q) {
+            $q->has('childFoo');
+        })->toSql();
+
+        $dotSql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $nestedSql = preg_replace($aliasRegex, $alias, $nestedSql);
+        $dotSql = preg_replace($aliasRegex, $alias, $dotSql);
+
+        $this->assertEquals($nestedSql, $dotSql);
+    }
+
+    public function testSelfHasNestedUsesAlias()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $sql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $sql);
+
+        $this->assertContains('"self_related_stubs"."parent_id" = "self_alias_hash"."id"', $sql);
     }
 
     protected function mockConnectionForModel($model, $database)
@@ -541,9 +600,14 @@ class EloquentBuilderTestNestedStub extends Illuminate\Database\Eloquent\Model
 {
     protected $table = 'table';
     use Illuminate\Database\Eloquent\SoftDeletes;
+
+    public function scopeEmpty($query)
+    {
+        return $query;
+    }
 }
 
-class EloquentBuilderTestListsStub
+class EloquentBuilderTestPluckStub
 {
     protected $attributes;
 
@@ -581,4 +645,39 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
 
 class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model
 {
+}
+
+class EloquentBuilderTestModelSelfRelatedStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'self_related_stubs';
+
+    public function parentFoo()
+    {
+        return $this->belongsTo('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'parent');
+    }
+
+    public function childFoo()
+    {
+        return $this->hasOne('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'child');
+    }
+
+    public function childFoos()
+    {
+        return $this->hasMany('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'children');
+    }
+
+    public function parentBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
+    }
+
+    public function childBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'parent_id', 'child_id', 'child_bars');
+    }
+
+    public function bazes()
+    {
+        return $this->hasMany('EloquentBuilderTestModelFarRelatedStub', 'foreign_key', 'id', 'bar');
+    }
 }

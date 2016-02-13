@@ -164,16 +164,31 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $query->getCountForPagination());
     }
 
-    public function testListsRetrieval()
+    public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
-        $simple = EloquentTestUser::oldest('id')->lists('users.email')->all();
-        $keyed = EloquentTestUser::oldest('id')->lists('users.email', 'users.id')->all();
+        $simple = EloquentTestUser::oldest('id')->pluck('users.email')->all();
+        $keyed = EloquentTestUser::oldest('id')->pluck('users.email', 'users.id')->all();
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+    }
+
+    public function testPluckWithJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user2->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+
+        $query = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id');
+
+        $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('posts.name', 'posts.id')->all());
+        $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('posts.name', 'users.id')->all());
+        $this->assertEquals(['abigailotwell@gmail.com' => 'First post', 'taylorotwell@gmail.com' => 'Second post'], $query->pluck('posts.name', 'users.email as user_email')->all());
     }
 
     public function testFindOrFail()
@@ -271,12 +286,113 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
+    public function testWhereHasOnSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::whereHas('friends', function ($query) {
+            $query->where('email', 'abigailotwell@gmail.com');
+        })->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::has('friends.friends')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWhereHasOnNestedSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::whereHas('friends.friends', function ($query) {
+            $query->where('email', 'foo@gmail.com');
+        })->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::has('friendsOne')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testHasOnNestedSelfReferencingBelongsToManyRelationshipWithWherePivot()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::has('friendsOne.friendsTwo')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
+    }
+
     public function testHasOnSelfReferencingBelongsToRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
         $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
         $results = EloquentTestPost::has('parentPost')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Child Post', $results->first()->name);
+    }
+
+    public function testWhereHasOnSelfReferencingBelongsToRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::whereHas('parentPost', function ($query) {
+            $query->where('name', 'Parent Post');
+        })->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Child Post', $results->first()->name);
+    }
+
+    public function testHasOnNestedSelfReferencingBelongsToRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::has('parentPost.parentPost')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Child Post', $results->first()->name);
+    }
+
+    public function testWhereHasOnNestedSelfReferencingBelongsToRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::whereHas('parentPost.parentPost', function ($query) {
+            $query->where('name', 'Grandparent Post');
+        })->get();
 
         $this->assertEquals(1, count($results));
         $this->assertEquals('Child Post', $results->first()->name);
@@ -291,6 +407,45 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($results));
         $this->assertEquals('Parent Post', $results->first()->name);
+    }
+
+    public function testWhereHasOnSelfReferencingHasManyRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::whereHas('childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Parent Post', $results->first()->name);
+    }
+
+    public function testHasOnNestedSelfReferencingHasManyRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::has('childPosts.childPosts')->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Grandparent Post', $results->first()->name);
+    }
+
+    public function testWhereHasOnNestedSelfReferencingHasManyRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::whereHas('childPosts.childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
@@ -316,6 +471,26 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $post = EloquentTestPost::with('user')->where('name', 'First Post')->get();
         $this->assertEquals('taylorotwell@gmail.com', $post->first()->user->email);
+    }
+
+    public function testBasicNestedSelfReferencingHasManyEagerLoading()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post = $user->posts()->create(['name' => 'First Post']);
+        $post->childPosts()->create(['name' => 'Child Post', 'user_id' => $user->id]);
+
+        $user = EloquentTestUser::with('posts.childPosts')->where('email', 'taylorotwell@gmail.com')->first();
+
+        $this->assertNotNull($user->posts->first());
+        $this->assertEquals('First Post', $user->posts->first()->name);
+
+        $this->assertNotNull($user->posts->first()->childPosts->first());
+        $this->assertEquals('Child Post', $user->posts->first()->childPosts->first()->name);
+
+        $post = EloquentTestPost::with('parentPost.user')->where('name', 'Child Post')->get();
+        $this->assertNotNull($post->first()->parentPost);
+        $this->assertNotNull($post->first()->parentPost->user);
+        $this->assertEquals('taylorotwell@gmail.com', $post->first()->parentPost->user->email);
     }
 
     public function testBasicMorphManyRelationship()
@@ -567,6 +742,32 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('05-12-12', $array['updated_at']);
     }
 
+    public function testIncrementingPrimaryKeysAreCastToIntegersByDefault()
+    {
+        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUser::first();
+        $this->assertInternalType('int', $user->id);
+    }
+
+    public function testDefaultIncrementingPrimaryKeyIntegerCastCanBeOverwritten()
+    {
+        EloquentTestUserWithStringCastId::create(['email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUserWithStringCastId::first();
+        $this->assertInternalType('string', $user->id);
+    }
+
+    public function testRelationsArePreloadedInGlobalScope()
+    {
+        $user = EloquentTestUserWithGlobalScope::create(['email' => 'taylorotwell@gmail.com']);
+        $user->posts()->create(['name' => 'My Post']);
+
+        $result = EloquentTestUserWithGlobalScope::first();
+
+        $this->assertCount(1, $result->getRelations());
+    }
+
     /**
      * Helpers...
      */
@@ -605,6 +806,16 @@ class EloquentTestUser extends Eloquent
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
     }
 
+    public function friendsOne()
+    {
+        return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
+    }
+
+    public function friendsTwo()
+    {
+        return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+    }
+
     public function posts()
     {
         return $this->hasMany('EloquentTestPost', 'user_id');
@@ -618,6 +829,18 @@ class EloquentTestUser extends Eloquent
     public function photos()
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
+    }
+}
+
+class EloquentTestUserWithGlobalScope extends EloquentTestUser
+{
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(function ($builder) {
+           $builder->with('posts');
+        });
     }
 }
 
@@ -656,4 +879,11 @@ class EloquentTestPhoto extends Eloquent
     {
         return $this->morphTo();
     }
+}
+
+class EloquentTestUserWithStringCastId extends EloquentTestUser
+{
+    protected $casts = [
+        'id' => 'string',
+    ];
 }

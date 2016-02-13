@@ -17,8 +17,8 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "illuminate/contracts": "5.1.*",
-        "illuminate/support": "5.1.*"
+        "illuminate/contracts": "5.2.*",
+        "illuminate/support": "5.2.*"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {

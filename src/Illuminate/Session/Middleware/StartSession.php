@@ -97,7 +97,9 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        with($session = $this->getSession($request))->setRequestOnHandler($request);
+        $session = $this->getSession($request);
+
+        $session->setRequestOnHandler($request);
 
         $session->start();
 
@@ -159,7 +161,7 @@ class StartSession
      */
     protected function configHitsLottery(array $config)
     {
-        return mt_rand(1, $config['lottery'][1]) <= $config['lottery'][0];
+        return random_int(1, $config['lottery'][1]) <= $config['lottery'][0];
     }
 
     /**

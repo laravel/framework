@@ -18,34 +18,32 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "classpreloader/classpreloader": "~2.0|~3.0",
-        "danielstjules/stringy": "~1.8",
+        "classpreloader/classpreloader": "~3.0",
         "doctrine/inflector": "~1.0",
-        "jeremeamia/superclosure": "~2.0",
+        "jeremeamia/superclosure": "~2.2",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
         "mtdowling/cron-expression": "~1.0",
-        "nesbot/carbon": "~1.19",
+        "nesbot/carbon": "~1.20",
         "paragonie/random_compat": "~1.1",
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "2.7.*",
-        "symfony/css-selector": "2.7.*",
-        "symfony/debug": "2.7.*",
-        "symfony/dom-crawler": "2.7.*",
-        "symfony/finder": "2.7.*",
-        "symfony/http-foundation": "2.7.*",
-        "symfony/http-kernel": "2.7.*",
-        "symfony/process": "2.7.*",
-        "symfony/routing": "2.7.*",
-        "symfony/translation": "2.7.*",
-        "symfony/var-dumper": "2.7.*",
-        "vlucas/phpdotenv": "~1.0"
+        "symfony/console": "2.8.*|3.0.*",
+        "symfony/debug": "2.8.*|3.0.*",
+        "symfony/finder": "2.8.*|3.0.*",
+        "symfony/http-foundation": "2.8.*|3.0.*",
+        "symfony/http-kernel": "2.8.*|3.0.*",
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/process": "2.8.*|3.0.*",
+        "symfony/routing": "2.8.*|3.0.*",
+        "symfony/translation": "2.8.*|3.0.*",
+        "symfony/var-dumper": "2.8.*|3.0.*",
+        "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
         "illuminate/auth": "self.version",
-        "illuminate/bus": "self.version",
         "illuminate/broadcasting": "self.version",
+        "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
@@ -74,11 +72,12 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
-        "iron-io/iron_mq": "~2.0",
         "mockery/mockery": "~0.9.2",
         "pda/pheanstalk": "~3.0",
-        "phpunit/phpunit": "~4.0",
-        "predis/predis": "~1.0"
+        "phpunit/phpunit": "~4.1",
+        "predis/predis": "~1.0",
+        "symfony/css-selector": "2.8.*|3.0.*",
+        "symfony/dom-crawler": "2.8.*|3.0.*"
     },
     "autoload": {
         "classmap": [
@@ -94,7 +93,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "5.2-dev"
         }
     },
     "suggest": {
@@ -102,12 +101,13 @@
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~5.3|~6.0).",
-        "iron-io/iron_mq": "Required to use the iron queue driver (~2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (2.8.*|3.0.*).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (2.8.*|3.0.*)."
     },
     "minimum-stability": "dev"
 }

@@ -5,6 +5,7 @@ use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator as Paginator;
 use Illuminate\Pagination\BootstrapThreePresenter as BootstrapPresenter;
+use Illuminate\Pagination\BootstrapFourPresenter as BootstrapFourPresenter;
 
 class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
 {
@@ -40,6 +41,15 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://website.com?foo=2', $p->url($p->currentPage()));
         $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 1));
         $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 2));
+    }
+
+    public function testLengthAwarePaginatorCanGenerateUrlsWithoutTrailingSlashes()
+    {
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/test/', 'pageName' => 'foo']);
+
+        $this->assertEquals('http://website.com/test?foo=2', $p->url($p->currentPage()));
+        $this->assertEquals('http://website.com/test?foo=1', $p->url($p->currentPage() - 1));
+        $this->assertEquals('http://website.com/test?foo=1', $p->url($p->currentPage() - 2));
     }
 
     public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
@@ -96,6 +106,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider.html')), $presenter->render());
     }
 
+    public function testBootstrapFourPresenterCanGeneratorLinksForSlider()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 7);
+        $presenter = new BootstrapFourPresenter($p);
+
+        $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/slider_bs4.html')), $presenter->render());
+    }
+
     public function testCustomPresenter()
     {
         $p = new LengthAwarePaginator([], 1, 1, 1);
@@ -124,6 +146,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning.html')), $presenter->render());
     }
 
+    public function testBootstrapFourPresenterCanGeneratorLinksForTooCloseToBeginning()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 2);
+        $presenter = new BootstrapFourPresenter($p);
+
+        $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/beginning_bs4.html')), $presenter->render());
+    }
+
     public function testBootstrapPresenterCanGeneratorLinksForTooCloseToEnding()
     {
         $array = [];
@@ -134,6 +168,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $presenter = new BootstrapPresenter($p);
 
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending.html')), $presenter->render());
+    }
+
+    public function testBootstrapFourPresenterCanGeneratorLinksForTooCloseToEnding()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 12);
+        $presenter = new BootstrapFourPresenter($p);
+
+        $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/ending_bs4.html')), $presenter->render());
     }
 
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnLastPage()
@@ -148,6 +194,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page.html')), $presenter->render());
     }
 
+    public function testBootstrapFourPresenterCanGeneratorLinksForWhenOnLastPage()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 13);
+        $presenter = new BootstrapFourPresenter($p);
+
+        $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/last_page_bs4.html')), $presenter->render());
+    }
+
     public function testBootstrapPresenterCanGeneratorLinksForWhenOnFirstPage()
     {
         $array = [];
@@ -158,6 +216,18 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $presenter = new BootstrapPresenter($p);
 
         $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/first_page.html')), $presenter->render());
+    }
+
+    public function testBootstrapFourPresenterCanGeneratorLinksForWhenOnFirstPage()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 1);
+        $presenter = new BootstrapFourPresenter($p);
+
+        $this->assertEquals(trim(file_get_contents(__DIR__.'/fixtures/first_page_bs4.html')), $presenter->render());
     }
 
     public function testSimplePaginatorReturnsRelevantContextInformation()
@@ -178,12 +248,14 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
     public function testPaginatorRemovesTrailingSlashes()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
+
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 }

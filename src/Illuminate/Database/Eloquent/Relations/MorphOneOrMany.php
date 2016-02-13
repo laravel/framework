@@ -55,15 +55,16 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
-     * Get the relationship count query.
+     * Get the relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parent
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationCountQuery(Builder $query, Builder $parent)
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
     {
-        $query = parent::getRelationCountQuery($query, $parent);
+        $query = parent::getRelationQuery($query, $parent, $columns);
 
         return $query->where($this->morphType, $this->morphClass);
     }

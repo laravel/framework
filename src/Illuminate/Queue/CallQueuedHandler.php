@@ -38,9 +38,7 @@ class CallQueuedHandler
             $job, unserialize($data['command'])
         );
 
-        $this->dispatcher->dispatchNow($command, function ($handler) use ($job) {
-            $this->setJobInstanceIfNecessary($job, $handler);
-        });
+        $this->dispatcher->dispatchNow($command);
 
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
@@ -71,10 +69,10 @@ class CallQueuedHandler
      */
     public function failed(array $data)
     {
-        $handler = $this->dispatcher->resolveHandler($command = unserialize($data['command']));
+        $command = unserialize($data['command']);
 
-        if (method_exists($handler, 'failed')) {
-            call_user_func([$handler, 'failed'], $command);
+        if (method_exists($command, 'failed')) {
+            $command->failed();
         }
     }
 }

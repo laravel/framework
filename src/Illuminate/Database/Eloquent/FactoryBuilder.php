@@ -119,6 +119,8 @@ class FactoryBuilder
      *
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
+     *
+     * @throws \InvalidArgumentException
      */
     protected function makeInstance(array $attributes = [])
     {

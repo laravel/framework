@@ -195,7 +195,7 @@ class GateTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Auth\Access\UnauthorizedException
+     * @expectedException \Illuminate\Auth\Access\AuthorizationException
      */
     public function test_authorize_throws_unauthorized_exception()
     {

@@ -14,6 +14,8 @@ class Parser
      *
      * @param  string  $expression
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     public static function parse($expression)
     {

@@ -75,6 +75,18 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Get a default cloud filesystem instance.
+     *
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function cloud()
+    {
+        $name = $this->getDefaultCloudDriver();
+
+        return $this->disks[$name] = $this->get($name);
+    }
+
+    /**
      * Attempt to get the disk from the local cache.
      *
      * @param  string  $name
@@ -106,7 +118,7 @@ class FilesystemManager implements FactoryContract
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($config);
         } else {
-            throw new InvalidArgumentException("Driver [{$config['driver']}] not supported.");
+            throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
         }
     }
 
@@ -274,6 +286,16 @@ class FilesystemManager implements FactoryContract
     public function getDefaultDriver()
     {
         return $this->app['config']['filesystems.default'];
+    }
+
+    /**
+     * Get the default cloud driver name.
+     *
+     * @return string
+     */
+    public function getDefaultCloudDriver()
+    {
+        return $this->app['config']['filesystems.cloud'];
     }
 
     /**

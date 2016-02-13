@@ -102,6 +102,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->getRelated()->shouldReceive('newCollection')->once();
 
         $builder = $relation->getQuery();
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getQuery')->andReturn($baseBuilder);
         $builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
         $builder->shouldReceive('getModels')->once()->andReturn([]);
@@ -120,6 +121,7 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->getRelated()->shouldReceive('newCollection')->once();
 
         $builder = $relation->getQuery();
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getQuery')->andReturn($baseBuilder);
         $builder->shouldReceive('addSelect')->once()->with($select)->andReturn($builder);
         $builder->shouldReceive('getModels')->once()->andReturn([]);

@@ -22,6 +22,10 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
         $response->setContent(['foo' => 'bar']);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+
+        $response = new Illuminate\Http\Response(new JsonSerializableStub);
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
     public function testRenderablesAreRendered()
@@ -149,5 +153,13 @@ class JsonableStub implements Jsonable
     public function toJson($options = 0)
     {
         return 'foo';
+    }
+}
+
+class JsonSerializableStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return ['foo' => 'bar'];
     }
 }

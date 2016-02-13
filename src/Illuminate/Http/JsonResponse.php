@@ -2,7 +2,10 @@
 
 namespace Illuminate\Http;
 
+use JsonSerializable;
+use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class JsonResponse extends BaseJsonResponse
@@ -48,9 +51,19 @@ class JsonResponse extends BaseJsonResponse
      */
     public function setData($data = [])
     {
-        $this->data = $data instanceof Jsonable
-                                   ? $data->toJson($this->jsonOptions)
-                                   : json_encode($data, $this->jsonOptions);
+        if ($data instanceof Arrayable) {
+            $this->data = json_encode($data->toArray(), $this->jsonOptions);
+        } elseif ($data instanceof Jsonable) {
+            $this->data = $data->toJson($this->jsonOptions);
+        } elseif ($data instanceof JsonSerializable) {
+            $this->data = json_encode($data->jsonSerialize(), $this->jsonOptions);
+        } else {
+            $this->data = json_encode($data, $this->jsonOptions);
+        }
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException(json_last_error_msg());
+        }
 
         return $this->update();
     }

@@ -35,11 +35,17 @@ class Grammar extends BaseGrammar
      */
     public function compileSelect(Builder $query)
     {
+        $original = $query->columns;
+
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
-        return trim($this->concatenate($this->compileComponents($query)));
+        $sql = trim($this->concatenate($this->compileComponents($query)));
+
+        $query->columns = $original;
+
+        return $sql;
     }
 
     /**
