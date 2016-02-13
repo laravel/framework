@@ -34,6 +34,19 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $joiner = $union['all'] ? ' union all ' : ' union ';
+
+        return $joiner.'('.$union['query']->toSql().')';
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
