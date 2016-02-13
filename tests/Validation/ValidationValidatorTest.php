@@ -297,7 +297,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => new \Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
+        $v = new Validator($trans, ['foo' => new Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
         $this->assertFalse($v->passes());
     }
 
@@ -2031,8 +2031,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function getIlluminateArrayTranslator()
     {
-        return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+        return new Illuminate\Translation\Translator(
+            new Illuminate\Translation\ArrayLoader, 'en'
         );
     }
 }
