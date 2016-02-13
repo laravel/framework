@@ -1280,6 +1280,32 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testLoadIfNeededFiltersLoadedAndUnloadedRelationsCorrectly()
+    {
+        // Benchmark result for relations, foo and bar
+        $model = new EloquentModelLoadIfNeededStub;
+        $this->assertFalse($model->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('bar'));
+
+        // Call load foo for the first time
+        $result = $model->loadIfNeeded('foo');
+        $this->assertEquals('load called', $result);
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('bar'));
+
+        // Call load foo a second time
+        $result = $model->loadIfNeeded('foo');
+        $this->assertEquals('loaded nothing', $result);
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('bar'));
+
+        // Load foo and bar
+        $result = $model->loadIfNeeded(['foo', 'bar']);
+        $this->assertEquals('load called', $result);
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertTrue($model->relationLoaded('bar'));
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1565,4 +1591,36 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentModelLoadIfNeededStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'stub';
+    protected $guarded = [];
+
+    public function load($relations)
+    {
+        foreach ($relations as $relation) {
+            $this->relations[$relation] = true;
+        }
+
+        return 'load called';
+    }
+
+    public function loadIfNeeded($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        $unloadedRelations = array_filter($relations, function ($relation) {
+            return ! $this->relationLoaded($relation);
+        });
+
+        if (empty($unloadedRelations)) {
+            return 'loaded nothing';
+        } else {
+            return $this->load($unloadedRelations);
+        }
+    }
 }
