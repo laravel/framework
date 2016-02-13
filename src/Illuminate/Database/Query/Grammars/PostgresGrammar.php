@@ -255,4 +255,23 @@ class PostgresGrammar extends Grammar
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
     }
+
+    /**
+     * Concatenate an array of segments, removing empties.
+     *
+     * @param  array   $segments
+     * @return string
+     */
+    protected function concatenate($segments)
+    {
+        if (!empty($segments['unions']) && (!empty($segments['orders']) || !empty($segments['limit']))) {
+            array_unshift($segments, '(');
+            $unionIndex = array_search('unions', array_keys($segments), true);
+            array_splice($segments, $unionIndex, null, ')');
+        }
+
+        return implode(' ', array_filter($segments, function ($value) {
+            return (string) $value !== '';
+        }));
+    }
 }
