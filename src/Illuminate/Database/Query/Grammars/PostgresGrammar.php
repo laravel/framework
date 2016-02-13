@@ -270,8 +270,6 @@ class PostgresGrammar extends Grammar
             array_splice($segments, $unionIndex, 0, ')');
         }
 
-        return implode(' ', array_filter($segments, function ($value) {
-            return (string) $value !== '';
-        }));
+        return parent::concatenate($segments);
     }
 }
