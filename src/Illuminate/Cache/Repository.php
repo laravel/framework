@@ -259,6 +259,30 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function increment($key, $value = 1)
+    {
+        return $this->store->increment($key, $value);
+    }
+
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function decrement($key, $value = 1)
+    {
+        return $this->store->decrement($key, $value);
+    }
+
+    /**
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
@@ -495,29 +519,5 @@ class Repository implements CacheContract, ArrayAccess
     public function __clone()
     {
         $this->store = clone $this->store;
-    }
-
-    /**
-     * Increment the value of an item in the cache.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
-     */
-    public function increment($key, $value = 1)
-    {
-        return $this->store->increment($key, $value);
-    }
-
-    /**
-     * Decrement the value of an item in the cache.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
-     */
-    public function decrement($key, $value = 1)
-    {
-        return $this->store->decrement($key, $value);
     }
 }
