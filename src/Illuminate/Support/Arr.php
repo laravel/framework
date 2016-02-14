@@ -74,8 +74,7 @@ class Arr
                 continue;
             }
 
-            $values = ($values instanceof Collection) ? $values->all() : $values;
-            $results = array_merge($results, $values);
+            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
         }
 
         return $results;
