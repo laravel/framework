@@ -410,6 +410,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected function convertUploadedFiles(array $files)
     {
         return array_map(function ($file) {
+            if (is_array($file) && empty(array_filter($file))) {
+                return $file;
+            }
+
             return is_array($file)
                         ? $this->convertUploadedFiles($file)
                         : UploadedFile::createFromBase($file);
