@@ -40,16 +40,17 @@ class ThrottleRequests
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            return $this->toLimitResponse($key, $maxAttempts);
+            return $this->buildResponse($key, $maxAttempts);
         }
 
         $this->limiter->hit($key, $decayMinutes);
 
         $response = $next($request);
 
-        $this->addLimitHeaders($response, $maxAttempts, $this->calculateRemainingAttempts($key, $maxAttempts));
-
-        return $response;
+        return $this->addHeaders(
+            $response, $maxAttempts,
+            $this->calculateRemainingAttempts($key, $maxAttempts)
+        );
     }
 
     /**
@@ -70,11 +71,15 @@ class ThrottleRequests
      * @param  int    $maxAttempts
      * @return \Illuminate\Http\Response
      */
-    protected function toLimitResponse($key, $maxAttempts)
+    protected function buildResponse($key, $maxAttempts)
     {
         $response = new Response('Too Many Attempts.', 429);
 
-        return $this->addLimitHeaders($response, $maxAttempts, $this->calculateRemainingAttempts($key, $maxAttempts), $this->limiter->availableIn($key));
+        return $this->addHeaders(
+            $response, $maxAttempts,
+            $this->calculateRemainingAttempts($key, $maxAttempts),
+            $this->limiter->availableIn($key)
+        );
     }
 
     /**
@@ -86,7 +91,7 @@ class ThrottleRequests
      * @param  int|null $retryAfter
      * @return \Illuminate\Http\Response
      */
-    protected function addLimitHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
+    protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
     {
         $response->headers->add([
             'X-RateLimit-Limit' => $maxAttempts,
