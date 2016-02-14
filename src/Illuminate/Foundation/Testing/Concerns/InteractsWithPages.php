@@ -160,7 +160,7 @@ trait InteractsWithPages
      *
      * @return bool
      */
-    public function expectRedirectionTo(\closure $on, $target = null, $params = [])
+    public function expectRedirectionTo(\Closure $on, $target = null, $params = [])
     {
         try {
             $this->suspendFollowingRedirections();
