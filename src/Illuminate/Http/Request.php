@@ -414,6 +414,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             if (count($file) == 1 && array_key_exists(0, $file) && is_null($file[0])) {
                 return false;
             }
+
             return ! is_null($file);
         });
 
