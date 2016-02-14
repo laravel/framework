@@ -552,9 +552,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testConnectionManagement()
     {
         EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $model = new EloquentModelStub;
-        $model->setConnection('foo');
-        $resolver->shouldReceive('connection')->once()->with('foo')->andReturn('bar');
+        $model = m::mock('EloquentModelStub[getConnectionName,connection]');
+
+        $retval = $model->setConnection('foo');
+        $this->assertEquals($retval, $model);
+        $this->assertEquals('foo', $model->connection);
+
+        $model->shouldReceive('getConnectionName')->once()->andReturn('somethingElse');
+        $resolver->shouldReceive('connection')->once()->with('somethingElse')->andReturn('bar');
 
         $this->assertEquals('bar', $model->getConnection());
     }
@@ -1302,6 +1307,7 @@ class EloquentTestObserverStub
 
 class EloquentModelStub extends Model
 {
+    public $connection;
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = 'EloquentModelSaveStub';
