@@ -10,7 +10,11 @@ use BadMethodCallException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Cache\Events\CacheHit as CacheHitEvent;
+use Illuminate\Cache\Events\KeyWritten as KeyWrittenEvent;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Cache\Events\CacheMissed as CacheMissedEvent;
+use Illuminate\Cache\Events\KeyForgotten as KeyForgottenEvent;
 
 class Repository implements CacheContract, ArrayAccess
 {
@@ -80,25 +84,25 @@ class Repository implements CacheContract, ArrayAccess
                     $payload[] = [];
                 }
 
-                return $this->events->fire(new Events\CacheHit($payload[0], $payload[1], $payload[2]));
+                return $this->events->fire(new CacheHitEvent($payload[0], $payload[1], $payload[2]));
             case 'missed':
                 if (count($payload) == 1) {
                     $payload[] = [];
                 }
 
-                return $this->events->fire(new Events\CacheMissed($payload[0], $payload[1]));
+                return $this->events->fire(new CacheMissedEvent($payload[0], $payload[1]));
             case 'delete':
                 if (count($payload) == 1) {
                     $payload[] = [];
                 }
 
-                return $this->events->fire(new Events\KeyForgotten($payload[0], $payload[1]));
+                return $this->events->fire(new KeyForgottenEvent($payload[0], $payload[1]));
             case 'write':
                 if (count($payload) == 3) {
                     $payload[] = [];
                 }
 
-                return $this->events->fire(new Events\KeyWritten($payload[0], $payload[1], $payload[2], $payload[3]));
+                return $this->events->fire(new KeyWrittenEvent($payload[0], $payload[1], $payload[2], $payload[3]));
         }
     }
 
