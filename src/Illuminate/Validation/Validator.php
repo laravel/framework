@@ -2186,6 +2186,27 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get all attributes.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return array_merge($this->data, $this->files);
+    }
+
+    /**
+     * Checks if an attribute exists.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function hasAttribute($attribute)
+    {
+        return Arr::has($this->attributes(), $attribute);
+    }
+
+    /**
      * Determine if the given attribute has a rule in the given set.
      *
      * @param  string  $attribute
@@ -2802,26 +2823,5 @@ class Validator implements ValidatorContract
         }
 
         throw new BadMethodCallException("Method [$method] does not exist.");
-    }
-
-    /**
-     * Get all attributes.
-     *
-     * @return array
-     */
-    protected function attributes()
-    {
-        return array_merge($this->data, $this->files);
-    }
-
-    /**
-     * Checks if an attribute exists.
-     *
-     * @param  string  $attribute
-     * @return bool
-     */
-    protected function hasAttribute($attribute)
-    {
-        return Arr::has($this->attributes(), $attribute);
     }
 }
