@@ -13,7 +13,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = new Pivot($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
