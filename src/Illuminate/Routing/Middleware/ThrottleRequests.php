@@ -93,14 +93,16 @@ class ThrottleRequests
      */
     protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
     {
-        $response->headers->add([
+        $headers = [
             'X-RateLimit-Limit' => $maxAttempts,
             'X-RateLimit-Remaining' => $remainingAttempts,
-        ]);
+        ];
 
         if (! is_null($retryAfter)) {
-            $response->headers->add(['Retry-After' => $retryAfter]);
+            $headers['Retry-After'] = $retryAfter;
         }
+
+        $response->headers->add($headers);
 
         return $response;
     }
