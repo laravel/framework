@@ -169,7 +169,7 @@ trait ResetsPasswords
      */
     public function reset(Request $request)
     {
-        $this->validate($request, $this->getPasswordValidation());
+        $this->validate($request, $this->getResetValidationRules());
 
         $credentials = $request->only(
             'email', 'password', 'password_confirmation', 'token'
@@ -188,6 +188,20 @@ trait ResetsPasswords
             default:
                 return $this->getResetFailureResponse($request, $response);
         }
+    }
+
+    /**
+     * Get the password reset validation rules.
+     *
+     * @return array
+     */
+    protected function getResetValidationRules()
+    {
+        return [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ];
     }
 
     /**
@@ -249,24 +263,5 @@ trait ResetsPasswords
     protected function getGuard()
     {
         return property_exists($this, 'guard') ? $this->guard : null;
-    }
-
-    /**
-     * Get the password form validation array.
-     *
-     * @return array
-     */
-    protected function getPasswordValidation()
-    {
-        $baseValidation = [
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:6',
-        ];
-        if (property_exists($this, 'passwordValidation')) {
-            return array_merge($baseValidation, $this->passwordValidation);
-        } else {
-            return $baseValidation;
-        }
     }
 }
