@@ -70,14 +70,11 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if ($values instanceof Collection) {
-                $values = $values->all();
-            }
-
-            if (! is_array($values)) {
+            if (! static::accessible($values)) {
                 continue;
             }
 
+            $values = ($values instanceof Collection) ? $values->all() : $values;
             $results = array_merge($results, $values);
         }
 
