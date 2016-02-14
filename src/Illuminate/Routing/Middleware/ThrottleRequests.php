@@ -67,8 +67,8 @@ class ThrottleRequests
     /**
      * Create a 'too many attempts' response.
      *
-     * @param  string $key
-     * @param  int    $maxAttempts
+     * @param  string  $key
+     * @param  int  $maxAttempts
      * @return \Illuminate\Http\Response
      */
     protected function buildResponse($key, $maxAttempts)
@@ -85,22 +85,24 @@ class ThrottleRequests
     /**
      * Add the limit header information to the given response.
      *
-     * @param  \Illuminate\Http\Response $response
-     * @param  int      $maxAttempts
-     * @param  int      $remainingAttempts
-     * @param  int|null $retryAfter
+     * @param  \Illuminate\Http\Response  $response
+     * @param  int  $maxAttempts
+     * @param  int  $remainingAttempts
+     * @param  int|null  $retryAfter
      * @return \Illuminate\Http\Response
      */
     protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
     {
-        $response->headers->add([
+        $headers = [
             'X-RateLimit-Limit' => $maxAttempts,
             'X-RateLimit-Remaining' => $remainingAttempts,
-        ]);
+        ];
 
         if (! is_null($retryAfter)) {
-            $response->headers->add(['Retry-After' => $retryAfter]);
+            $headers['Retry-After'] = $retryAfter;
         }
+
+        $response->headers->add($headers);
 
         return $response;
     }
@@ -108,8 +110,8 @@ class ThrottleRequests
     /**
      * Calculate the number of remaining attempts.
      *
-     * @param  string $key
-     * @param  int $maxAttempts
+     * @param  string  $key
+     * @param  int  $maxAttempts
      * @return int
      */
     protected function calculateRemainingAttempts($key, $maxAttempts)
