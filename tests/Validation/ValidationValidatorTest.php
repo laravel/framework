@@ -1977,6 +1977,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['products.*.price' => 'numeric|min:1']);
         $this->assertTrue($v->passes());
     }
+    
+    public function testValidateNestedArrayWithNonNumericKeys(){
+        $trans = $this->getRealTranslator();
+
+        $data = [
+            'item_amounts' => [
+                'item_123' => 2
+            ]
+        ];
+
+        $v = new Validator($trans, $data, ['item_amounts.*' => 'numeric|min:5']);
+        $this->assertFalse($v->passes());
+    }
 
     public function testValidateEachWithNonIndexedArray()
     {
