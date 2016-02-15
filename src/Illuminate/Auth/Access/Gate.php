@@ -279,7 +279,7 @@ class Gate implements GateContract
      */
     protected function callBeforeCallbacks($user, $ability, array $arguments)
     {
-        $arguments = array_merge([$user, $ability], $arguments);
+        $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
             if (! is_null($result = call_user_func_array($before, $arguments))) {
@@ -299,7 +299,7 @@ class Gate implements GateContract
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
-        $arguments = array_merge([$user, $ability, $result], $arguments);
+        $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
             call_user_func_array($after, $arguments);
