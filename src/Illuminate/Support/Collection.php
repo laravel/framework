@@ -607,7 +607,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Pulls an item from the collection.
+     * Get and remove an item from the collection.
      *
      * @param  mixed  $key
      * @param  mixed  $default
