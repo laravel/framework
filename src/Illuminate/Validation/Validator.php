@@ -252,7 +252,7 @@ class Validator implements ValidatorContract
      */
     public function sometimes($attribute, $rules, callable $callback)
     {
-        $payload = new Fluent(array_merge($this->data, $this->files));
+        $payload = new Fluent($this->attributes());
 
         if (call_user_func($callback, $payload)) {
             foreach ((array) $attribute as $key) {
@@ -274,7 +274,7 @@ class Validator implements ValidatorContract
     {
         $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
-        $pattern = str_replace('\*', '[0-9*]+', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
@@ -295,7 +295,7 @@ class Validator implements ValidatorContract
      */
     protected function initializeAttributeOnData($attribute)
     {
-        if (! str_contains($attribute, '*') || ends_with($attribute, '*')) {
+        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
             return $this->data;
         }
 
@@ -852,7 +852,7 @@ class Validator implements ValidatorContract
      */
     protected function validateArray($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! $this->hasAttribute($attribute)) {
             return true;
         }
 
@@ -868,7 +868,7 @@ class Validator implements ValidatorContract
      */
     protected function validateBoolean($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! $this->hasAttribute($attribute)) {
             return true;
         }
 
@@ -886,7 +886,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInteger($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! $this->hasAttribute($attribute)) {
             return true;
         }
 
@@ -902,7 +902,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNumeric($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! $this->hasAttribute($attribute)) {
             return true;
         }
 
@@ -918,7 +918,7 @@ class Validator implements ValidatorContract
      */
     protected function validateString($attribute, $value)
     {
-        if (! Arr::has($this->data, $attribute)) {
+        if (! $this->hasAttribute($attribute)) {
             return true;
         }
 
@@ -2183,6 +2183,27 @@ class Validator implements ValidatorContract
     protected function replaceAfter($message, $attribute, $rule, $parameters)
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Get all attributes.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return array_merge($this->data, $this->files);
+    }
+
+    /**
+     * Checks if an attribute exists.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function hasAttribute($attribute)
+    {
+        return Arr::has($this->attributes(), $attribute);
     }
 
     /**

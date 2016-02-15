@@ -290,6 +290,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
     }
 
+    public function testValidateArray()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => new Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getRealTranslator();
@@ -1967,6 +1978,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateNestedArrayWithNonNumericKeys()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = [
+            'item_amounts' => [
+                'item_123' => 2,
+            ],
+        ];
+
+        $v = new Validator($trans, $data, ['item_amounts.*' => 'numeric|min:5']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateEachWithNonIndexedArray()
     {
         $trans = $this->getRealTranslator();
@@ -2020,8 +2045,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function getIlluminateArrayTranslator()
     {
-        return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+        return new Illuminate\Translation\Translator(
+            new Illuminate\Translation\ArrayLoader, 'en'
         );
     }
 }
