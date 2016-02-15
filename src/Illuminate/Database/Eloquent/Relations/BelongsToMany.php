@@ -896,6 +896,10 @@ class BelongsToMany extends Relation
             $id = $id->getKey();
         }
 
+        if ($id instanceof Collection) {
+            $id = $id->modelKeys();
+        }
+
         $query = $this->newPivotStatement();
 
         $query->insert($this->createAttachRecords((array) $id, $attributes));
