@@ -449,11 +449,13 @@ if (! function_exists('data_set')) {
         if (($segment = array_shift($segments)) === '*') {
             if (! Arr::accessible($target)) {
                 $target = [];
-            } elseif ($segments) {
+            }
+
+            if ($segments) {
                 foreach ($target as &$inner) {
                     data_set($inner, $segments, $value, $overwrite);
                 }
-            } else {
+            } elseif ($overwrite) {
                 foreach ($target as &$inner) {
                     $inner = $value;
                 }
