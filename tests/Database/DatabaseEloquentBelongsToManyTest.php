@@ -158,6 +158,31 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->attach([2, 3 => ['baz' => 'boom']], ['foo' => 'bar']);
     }
 
+    public function testAttachMethodConvertsCollectionToArrayOfKeys()
+    {
+        $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['touchIfTouching'], $this->getRelationArguments());
+        $query = m::mock('stdClass');
+        $query->shouldReceive('from')->once()->with('user_role')->andReturn($query);
+        $query->shouldReceive('insert')->once()->with(
+            [
+                ['user_id' => 1, 'role_id' => 1],
+                ['user_id' => 1, 'role_id' => 2],
+                ['user_id' => 1, 'role_id' => 3],
+            ]
+        )->andReturn(true);
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
+        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+        $relation->expects($this->once())->method('touchIfTouching');
+
+        $collection = new Collection([
+            m::mock(['getKey' => 1]),
+            m::mock(['getKey' => 2]),
+            m::mock(['getKey' => 3]),
+        ]);
+
+        $relation->attach($collection);
+    }
+
     public function testAttachInsertsPivotTableRecordWithTimestampsWhenNecessary()
     {
         $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\BelongsToMany', ['touchIfTouching'], $this->getRelationArguments());
