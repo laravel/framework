@@ -55,6 +55,15 @@ class MakeAuthCommand extends Command
                 app_path('Http/Controllers/HomeController.php')
             );
 
+            file_put_contents(
+                app_path('Http/Controllers/HomeController.php'),
+                str_replace(
+                    'App\\',
+                    $this->laravel->getNamespace(),
+                    file_get_contents(app_path('Http/Controllers/HomeController.php'))
+                )
+            );
+
             $this->info('Updated Routes File.');
 
             file_put_contents(
