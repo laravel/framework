@@ -212,31 +212,49 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Filter items by the given key value pair.
+     * Filter items by the given key value pair (or array of pairs).
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
-     * @param  bool  $strict
      * @return static
      */
-    public function where($key, $value, $strict = true)
+    public function where($key, $value = null)
     {
-        return $this->filter(function ($item) use ($key, $value, $strict) {
-            return $strict ? data_get($item, $key) === $value
-                           : data_get($item, $key) == $value;
+        $conditions = is_array($key) ? $key : [$key => $value];
+
+        return $this->filter(function ($item) use ($conditions) {
+
+            foreach ($conditions as $key => $value) {
+                if (data_get($item, $key) !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
         });
     }
 
     /**
-     * Filter items by the given key value pair using loose comparison.
+     * Filter items by the given key value pair (or array of pairs) using loose comparison.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
      * @return static
      */
-    public function whereLoose($key, $value)
+    public function whereLoose($key, $value = null)
     {
-        return $this->where($key, $value, false);
+        $conditions = is_array($key) ? $key : [$key => $value];
+
+        return $this->filter(function ($item) use ($conditions) {
+
+            foreach ($conditions as $key => $value) {
+                if (data_get($item, $key) != $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     /**
