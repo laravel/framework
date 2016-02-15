@@ -130,24 +130,30 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
-            $definition = call_user_func($this->definitions[$this->class][$this->name], $this->faker, $attributes);
+            $definition = call_user_func(
+                $this->definitions[$this->class][$this->name],
+                $this->faker, $attributes
+            );
 
-            $evaluated = $this->evaluateClosures(array_merge($definition, $attributes));
+            $evaluated = $this->callClosureAttributes(
+                array_merge($definition, $attributes)
+            );
 
             return new $this->class($evaluated);
         });
     }
 
     /**
-     * Delay closures evaluation after merging to avoid duplication.
+     * Evaluate any Closure attributes on the attribute array.
      *
      * @param  array  $attributes
      * @return array
      */
-    protected function evaluateClosures(array $attributes)
+    protected function callClosureAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            $attribute = $attribute instanceof Closure ? $attribute($attributes) : $attribute;
+            $attribute = $attribute instanceof Closure
+                            ? $attribute($attributes) : $attribute;
         }
 
         return $attributes;
