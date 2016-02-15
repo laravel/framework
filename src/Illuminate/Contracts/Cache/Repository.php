@@ -53,6 +53,24 @@ interface Repository
     public function add($key, $value, $minutes);
 
     /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function increment($key, $value = 1);
+
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function decrement($key, $value = 1);
+
+    /**
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
