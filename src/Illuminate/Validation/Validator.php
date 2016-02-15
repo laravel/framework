@@ -274,7 +274,7 @@ class Validator implements ValidatorContract
     {
         $data = Arr::dot($this->initializeAttributeOnData($attribute));
 
-        $pattern = str_replace('\*', '[0-9*]+', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
