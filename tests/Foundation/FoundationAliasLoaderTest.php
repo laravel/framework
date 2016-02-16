@@ -18,6 +18,6 @@ class FoundationAliasLoaderTest extends PHPUnit_Framework_TestCase
     public function testGetInstanceCreatesOneInstance()
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
-        $this->assertEquals($loader, AliasLoader::getInstance());
+        $this->assertSame($loader, AliasLoader::getInstance());
     }
 }
