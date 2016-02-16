@@ -22,7 +22,7 @@ trait InteractsWithPages
     protected $crawler;
 
     /**
-     * Subcrawler instances used by the within method.
+     * Nested crawler instances used by the "within" method.
      *
      * @var array
      */
@@ -180,18 +180,6 @@ trait InteractsWithPages
     }
 
     /**
-     * Get the right crawler according to the current test context.
-     * 
-     * @return \Symfony\Component\DomCrawler\Crawler
-     */
-    protected function getCrawler()
-    {
-        return ! empty($this->subCrawlers)
-            ? end($this->subCrawlers)
-            : $this->crawler;
-    }
-
-    /**
      * Narrow the test content to a specific area of the page.
      *
      * @param  string  $element
@@ -200,11 +188,23 @@ trait InteractsWithPages
      */
     public function within($element, Closure $callback)
     {
-        $this->subCrawlers[] = $this->getCrawler()->filter($element);
+        $this->subCrawlers[] = $this->crawler()->filter($element);
 
         $callback();
 
         array_pop($this->subCrawlers);
+    }
+
+    /**
+     * Get the current crawler according to the test context.
+     *
+     * @return \Symfony\Component\DomCrawler\Crawler
+     */
+    protected function crawler()
+    {
+        return ! empty($this->subCrawlers)
+                        ? end($this->subCrawlers)
+                        : $this->crawler;
     }
 
     /**
@@ -225,7 +225,7 @@ trait InteractsWithPages
         $pattern = $rawPattern == $escapedPattern
                 ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
 
-        $this->$method("/$pattern/i", $this->getCrawler()->html());
+        $this->$method("/$pattern/i", $this->crawler()->html());
 
         return $this;
     }
@@ -289,7 +289,7 @@ trait InteractsWithPages
      */
     protected function hasInElement($element, $text)
     {
-        $elements = $this->getCrawler()->filter($element);
+        $elements = $this->crawler()->filter($element);
 
         $rawPattern = preg_quote($text, '/');
 
@@ -358,7 +358,7 @@ trait InteractsWithPages
      */
     protected function hasLink($text, $url = null)
     {
-        $links = $this->getCrawler()->selectLink($text);
+        $links = $this->crawler()->selectLink($text);
 
         if ($links->count() == 0) {
             return false;
@@ -632,7 +632,7 @@ trait InteractsWithPages
      */
     protected function click($name)
     {
-        $link = $this->getCrawler()->selectLink($name);
+        $link = $this->crawler()->selectLink($name);
 
         if (! count($link)) {
             $link = $this->filterByNameOrId($name, 'a');
@@ -765,10 +765,10 @@ trait InteractsWithPages
     {
         try {
             if ($buttonText) {
-                return $this->getCrawler()->selectButton($buttonText)->form();
+                return $this->crawler()->selectButton($buttonText)->form();
             }
 
-            return $this->getCrawler()->filter('form')->form();
+            return $this->crawler()->filter('form')->form();
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 "Could not find a form that has submit button [{$buttonText}]."
@@ -832,7 +832,7 @@ trait InteractsWithPages
             $element = "{$element}#{$id}, {$element}[name='{$name}']";
         });
 
-        return $this->getCrawler()->filter(implode(', ', $elements));
+        return $this->crawler()->filter(implode(', ', $elements));
     }
 
     /**
