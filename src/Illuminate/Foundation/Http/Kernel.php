@@ -222,15 +222,17 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Add a new middleware to beginning of a middleware group if it does not already exist.
+     * Add a middleware to the beginning of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
      *
      * @param  string  $group
      * @param  string  $middleware
      * @return $this
      */
-    public function prependGroupMiddleware($group, $middleware)
+    public function prependMiddlewareToGroup($group, $middleware)
     {
-        if (isset($this->middlewareGroups[$group]) && array_search($middleware, $this->middlewareGroups[$group]) === false) {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
         }
 
@@ -238,15 +240,17 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Add a new middleware to end of a middleware group if it does not already exist.
+     * Add a middleware to the end of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
      *
      * @param  string  $group
      * @param  string  $middleware
      * @return $this
      */
-    public function pushGroupMiddleware($group, $middleware)
+    public function pushMiddlewareToGroup($group, $middleware)
     {
-        if (isset($this->middlewareGroups[$group]) && array_search($middleware, $this->middlewareGroups[$group]) === false) {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
 
