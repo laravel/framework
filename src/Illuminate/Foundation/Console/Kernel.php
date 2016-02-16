@@ -208,7 +208,7 @@ class Kernel implements KernelContract
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
-        // If we are calling a arbitary command from within the application, we will load
+        // If we are calling an arbitrary command from within the application, we'll load
         // all of the available deferred providers which will make all of the commands
         // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
