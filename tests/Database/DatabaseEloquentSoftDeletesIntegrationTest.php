@@ -142,8 +142,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $result = SoftDeletesTestUser::findOrNew(1);
         $this->assertNull($result->id);
 
-        $$result = SoftDeletesTestUser::withTrashed()->findOrNew(1);
-        $this->assertNull($result->id);
+        $result = SoftDeletesTestUser::withTrashed()->findOrNew(1);
+        $this->assertEquals(1, $result->id);
     }
 
     public function testFirstOrCreate()
