@@ -493,6 +493,40 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($builder->toSql(), $result);
     }
 
+    public function testSelfHasNested()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub();
+
+        $nestedSql = $model->whereHas('parentFoo', function ($q) {
+            $q->has('childFoo');
+        })->toSql();
+
+        $dotSql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $nestedSql = preg_replace($aliasRegex, $alias, $nestedSql);
+        $dotSql = preg_replace($aliasRegex, $alias, $dotSql);
+
+        $this->assertEquals($nestedSql, $dotSql);
+    }
+
+    public function testSelfHasNestedUsesAlias()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub();
+
+        $sql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $sql);
+        $this->assertContains('"self_related_stubs"."parent_id" = "self_alias_hash"."id"', $sql);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -581,4 +615,39 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
 
 class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model
 {
+}
+
+class EloquentBuilderTestModelSelfRelatedStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'self_related_stubs';
+
+    public function parentFoo()
+    {
+        return $this->belongsTo('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'parent');
+    }
+
+    public function childFoo()
+    {
+        return $this->hasOne('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'child');
+    }
+
+    public function childFoos()
+    {
+        return $this->hasMany('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'children');
+    }
+
+    public function parentBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
+    }
+
+    public function childBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'parent_id', 'child_id', 'child_bars');
+    }
+
+    public function bazes()
+    {
+        return $this->hasMany('EloquentBuilderTestModelFarRelatedStub', 'foreign_key', 'id', 'bar');
+    }
 }
