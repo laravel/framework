@@ -235,7 +235,7 @@ class FilesystemManager implements FactoryContract
      *
      * @param  \League\Flysystem\AdapterInterface  $adapter
      * @param  array  $config
-     * @return \Leage\Flysystem\FlysystemInterface
+     * @return \League\Flysystem\FlysystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config)
     {
