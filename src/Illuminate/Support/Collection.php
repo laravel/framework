@@ -222,16 +222,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $conditions = is_array($key) ? $key : [$key => $value];
 
-        return $this->filter(function ($item) use ($conditions) {
-
-            foreach ($conditions as $key => $value) {
-                if (data_get($item, $key) !== $value) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
+        return $this->doWhere($conditions, true);
     }
 
     /**
@@ -245,10 +236,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $conditions = is_array($key) ? $key : [$key => $value];
 
-        return $this->filter(function ($item) use ($conditions) {
+        return $this->doWhere($conditions, false);
+    }
+
+    /**
+     * Filter items by the given array of key value pairs.
+     *
+     * @param  array  $conditions
+     * @param  bool  $strict
+     * @return static
+     */
+    protected function doWhere($conditions, $strict)
+    {
+        return $this->filter(function ($item) use ($conditions, $strict) {
 
             foreach ($conditions as $key => $value) {
-                if (data_get($item, $key) != $value) {
+                if ($strict ? data_get($item, $key) !== $value : data_get($item, $key) != $value) {
                     return false;
                 }
             }
