@@ -890,7 +890,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return is_null($value) || ctype_digit(ltrim((string)$value, '-'));
+        return is_null($value) || ctype_digit(ltrim((string) $value, '-'));
     }
 
     /**
