@@ -222,6 +222,38 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Add a new middleware to beginning of a middleware group if it does not already exist.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function prependGroupMiddleware($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && array_search($middleware, $this->middlewareGroups[$group]) === false) {
+            array_unshift($this->middlewareGroups[$group], $middleware);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a new middleware to end of a middleware group if it does not already exist.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function pushGroupMiddleware($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && array_search($middleware, $this->middlewareGroups[$group]) === false) {
+            $this->middlewareGroups[$group][] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
      * Bootstrap the application for HTTP requests.
      *
      * @return void
