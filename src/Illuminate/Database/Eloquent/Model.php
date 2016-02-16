@@ -567,52 +567,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get the first record matching the attributes or create it.
-     *
-     * @param  array  $attributes
-     * @return static
-     */
-    public static function firstOrCreate(array $attributes)
-    {
-        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
-            return $instance;
-        }
-
-        return static::create($attributes);
-    }
-
-    /**
-     * Get the first record matching the attributes or instantiate it.
-     *
-     * @param  array  $attributes
-     * @return static
-     */
-    public static function firstOrNew(array $attributes)
-    {
-        if (! is_null($instance = (new static)->newQueryWithoutScopes()->where($attributes)->first())) {
-            return $instance;
-        }
-
-        return new static($attributes);
-    }
-
-    /**
-     * Create or update a record matching the attributes, and fill it with values.
-     *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return static
-     */
-    public static function updateOrCreate(array $attributes, array $values = [])
-    {
-        $instance = static::firstOrNew($attributes);
-
-        $instance->fill($values)->save();
-
-        return $instance;
-    }
-
-    /**
      * Begin querying the model.
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -665,22 +619,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = new static;
 
         return $instance->newQuery()->get($columns);
-    }
-
-    /**
-     * Find a model by its primary key or return new static.
-     *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
-     */
-    public static function findOrNew($id, $columns = ['*'])
-    {
-        if (! is_null($model = static::find($id, $columns))) {
-            return $model;
-        }
-
-        return new static;
     }
 
     /**
