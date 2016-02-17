@@ -150,7 +150,7 @@ class ResponseFactory implements FactoryContract
 
 		$mime = $response->getFile()->getMimeType();
 
-		$headers['Content-Type'] = $mime;
+		$response->headers->set('Content-Type', $mime);
 
         return $response;
     }
