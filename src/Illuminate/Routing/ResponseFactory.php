@@ -138,6 +138,23 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Return the raw contents of a binary file.
+     *
+     * @param \SplFileInfo|string $file
+     * @param string $mime
+     * @param array $headers
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function file($file, $mime, array $headers = [])
+    {
+        $headers['Content-Type'] = $mime;
+
+        $response = new BinaryFileResponse($file, 200, $headers, true);
+
+        return $response;
+    }
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
