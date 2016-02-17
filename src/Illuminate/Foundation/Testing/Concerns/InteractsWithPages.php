@@ -225,7 +225,9 @@ trait InteractsWithPages
         $pattern = $rawPattern == $escapedPattern
                 ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
 
-        $this->$method("/$pattern/i", $this->crawler()->html());
+        $html = $this->crawler() ?: $this->response->getContent();
+
+        $this->$method("/$pattern/i", $html);
 
         return $this;
     }
