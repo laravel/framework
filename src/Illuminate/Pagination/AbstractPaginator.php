@@ -436,7 +436,7 @@ abstract class AbstractPaginator implements Htmlable
     public function map(callable $callback)
     {
         $this->items = $this->items->map($callback);
-        
+
         return $this;
     }
 
