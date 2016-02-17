@@ -77,7 +77,7 @@ class RetryCommand extends Command
         $payload = json_decode($payload, true);
 
         if (isset($payload['attempts'])) {
-            $payload['attempts'] = 0;
+            $payload['attempts'] = 1;
         }
 
         return json_encode($payload);
