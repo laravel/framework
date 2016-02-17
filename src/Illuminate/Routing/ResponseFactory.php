@@ -152,7 +152,7 @@ class ResponseFactory implements FactoryContract
 
 		$response->headers->set('Content-Type', $mime);
 
-        return $response;
+		return $response;
     }
 
     /**
