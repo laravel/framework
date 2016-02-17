@@ -428,6 +428,18 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Run a map over each of the items in underlying collection.
+     * 
+     * @param callable callback function
+     * @return $this
+     */
+    public function map(callable $callback)
+    {
+        $this->items = $this->items->map($callback);
+        return $this;
+    }
+
+    /**
      * Determine if the given item exists.
      *
      * @param  mixed  $key
