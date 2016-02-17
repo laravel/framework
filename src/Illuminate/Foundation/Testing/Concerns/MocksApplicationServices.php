@@ -114,8 +114,9 @@ trait MocksApplicationServices
     /**
      * Specify a list of jobs that should be dispatched for the given operation.
      *
-     * These jobs will be mocked, so that handlers will not actually be executed. When the job is passed as an array,
-     * the first value must contain the job and the second value the value you want to return.
+     * These jobs will be mocked, so that handlers will not actually be executed.
+     * When the job is passed as an array, the first value must contain the
+     * job and the second value the value you want to return.
      *
      * @param  array|string  $jobs
      * @return $this
