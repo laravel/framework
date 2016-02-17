@@ -90,6 +90,13 @@ class Router implements RegistrarContract
      *
      * @var array
      */
+    protected $groupAttributeStack = [];
+
+    /**
+     * The route group stack.
+     *
+     * @var array
+     */
     protected $groupStack = [];
 
     /**
@@ -275,33 +282,41 @@ class Router implements RegistrarContract
      *
      * @param  array     $attributes
      * @param  \Closure  $callback
-     * @return void
+     * @return \Illuminate\Routing\RouteGroup
      */
     public function group(array $attributes, Closure $callback)
     {
-        $this->updateGroupStack($attributes);
+        $group = $this->updateGroupStack($attributes);
 
         // Once we have updated the group stack, we will execute the user Closure and
         // merge in the groups attributes when the route is created. After we have
         // run the callback, we will pop the attributes off of this group stack.
-        call_user_func($callback, $this);
+        call_user_func($callback, $this, $group);
 
+        array_pop($this->groupAttributeStack);
         array_pop($this->groupStack);
+
+        return $group;
     }
 
     /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes
-     * @return void
+     * @return \Illuminate\Routing\RouteGroup
      */
     protected function updateGroupStack(array $attributes)
     {
-        if (! empty($this->groupStack)) {
-            $attributes = $this->mergeGroup($attributes, end($this->groupStack));
+        if (! empty($this->groupAttributeStack)) {
+            $attributes = $this->mergeGroup($attributes, end($this->groupAttributeStack));
         }
 
-        $this->groupStack[] = $attributes;
+        $this->groupAttributeStack[] = $attributes;
+
+        $group = new RouteGroup();
+        $this->groupStack[] = $group;
+
+        return $group;
     }
 
     /**
@@ -312,7 +327,7 @@ class Router implements RegistrarContract
      */
     public function mergeWithLastGroup($new)
     {
-        return $this->mergeGroup($new, end($this->groupStack));
+        return $this->mergeGroup($new, end($this->groupAttributeStack));
     }
 
     /**
@@ -387,8 +402,8 @@ class Router implements RegistrarContract
      */
     public function getLastGroupPrefix()
     {
-        if (! empty($this->groupStack)) {
-            $last = end($this->groupStack);
+        if (! empty($this->groupAttributeStack)) {
+            $last = end($this->groupAttributeStack);
 
             return isset($last['prefix']) ? $last['prefix'] : '';
         }
@@ -426,8 +441,13 @@ class Router implements RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
+        $group = null;
+        if (! empty($this->groupStack)) {
+            $group = end($this->groupStack);
+        }
+
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods, $this->prefix($uri), $action, $group
         );
 
         // If we have groups that need to be merged, we will merge them now after this
@@ -448,11 +468,12 @@ class Router implements RegistrarContract
      * @param  array|string  $methods
      * @param  string  $uri
      * @param  mixed   $action
+     * @param  \Illuminate\Routing\RouteGroup  $group
      * @return \Illuminate\Routing\Route
      */
-    protected function newRoute($methods, $uri, $action)
+    protected function newRoute($methods, $uri, $action, $group)
     {
-        return (new Route($methods, $uri, $action))
+        return (new Route($methods, $uri, $action, $group))
                     ->setRouter($this)
                     ->setContainer($this->container);
     }
@@ -526,7 +547,7 @@ class Router implements RegistrarContract
         // Here we'll merge any group "uses" statement if necessary so that the action
         // has the proper clause for this property. Then we can simply set the name
         // of the controller on the action and return the action array for usage.
-        if (! empty($this->groupStack)) {
+        if (! empty($this->groupAttributeStack)) {
             $action['uses'] = $this->prependGroupUses($action['uses']);
         }
 
@@ -546,7 +567,7 @@ class Router implements RegistrarContract
      */
     protected function prependGroupUses($uses)
     {
-        $group = end($this->groupStack);
+        $group = end($this->groupAttributeStack);
 
         return isset($group['namespace']) && strpos($uses, '\\') !== 0 ? $group['namespace'].'\\'.$uses : $uses;
     }
@@ -726,11 +747,24 @@ class Router implements RegistrarContract
     {
         foreach ($route->parameters() as $key => $value) {
             if (isset($this->binders[$key])) {
-                $route->setParameter($key, $this->performBinding($key, $value, $route));
+                $route->setParameter($key, $this->performBinding($this->binders, $key, $value, $route));
             }
         }
 
         $this->substituteImplicitBindings($route);
+
+        // Route group bindings take precedence over all bindings.
+        $group = $route->getGroup();
+
+        if ($group) {
+            $groupBinders = $group->getBinders();
+
+            foreach ($route->parameters() as $key => $value) {
+                if (isset($groupBinders[$key])) {
+                    $route->setParameter($key, $this->performBinding($groupBinders, $key, $value, $route));
+                }
+            }
+        }
 
         return $route;
     }
@@ -766,14 +800,15 @@ class Router implements RegistrarContract
     /**
      * Call the binding callback for the given key.
      *
+     * @param  array  $binders
      * @param  string  $key
      * @param  string  $value
      * @param  \Illuminate\Routing\Route  $route
      * @return mixed
      */
-    protected function performBinding($key, $value, $route)
+    protected function performBinding($binders, $key, $value, $route)
     {
-        return call_user_func($this->binders[$key], $value, $route);
+        return call_user_func($binders[$key], $value, $route);
     }
 
     /**
@@ -950,7 +985,7 @@ class Router implements RegistrarContract
      */
     public function hasGroupStack()
     {
-        return ! empty($this->groupStack);
+        return ! empty($this->groupAttributeStack);
     }
 
     /**
@@ -960,7 +995,7 @@ class Router implements RegistrarContract
      */
     public function getGroupStack()
     {
-        return $this->groupStack;
+        return $this->groupAttributeStack;
     }
 
     /**

@@ -44,6 +44,13 @@ class Route
     protected $action;
 
     /**
+     * The route group it belongs to.
+     *
+     * @var /Illuminate/Routing/RouteGroup
+     */
+    protected $group;
+
+    /**
      * The default values for the route.
      *
      * @var array
@@ -105,13 +112,15 @@ class Route
      * @param  array   $methods
      * @param  string  $uri
      * @param  \Closure|array  $action
+     * @param  \Illuminate\Routing\RouteGroup  $group
      * @return void
      */
-    public function __construct($methods, $uri, $action)
+    public function __construct($methods, $uri, $action, RouteGroup $group = null)
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
+        $this->group = $group;
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
@@ -390,6 +399,16 @@ class Route
         }
 
         return $this->parameterNames = $this->compileParameterNames();
+    }
+
+    /**
+     * Get the group the route belongs to.
+     *
+     * @return \Illuminate\Routing\RouteGroup
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 
     /**
