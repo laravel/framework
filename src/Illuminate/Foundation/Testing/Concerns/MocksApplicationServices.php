@@ -176,8 +176,9 @@ trait MocksApplicationServices
     }
 
     /**
-     * Mock the job dispatcher so all jobs are silenced and collected. When a return value is defined, return it when
-     * requested.
+     * Mock the job dispatcher so all jobs are silenced and collected.
+     *
+     * When a return value is defined, return it when requested.
      *
      * @return $this
      */
@@ -187,8 +188,9 @@ trait MocksApplicationServices
 
         $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched) {
             $this->dispatchedJobs[] = $dispatched;
-            if (isset($this->jobReturnValues[get_class($dispatched)])) {
-                return $this->jobReturnValues[get_class($dispatched)];
+            $dispatchedClass = is_string($dispatched) ? $dispatched : get_class($dispatched);
+            if (isset($this->jobReturnValues[$dispatchedClass])) {
+                return $this->jobReturnValues[$dispatchedClass];
             }
         });
 
