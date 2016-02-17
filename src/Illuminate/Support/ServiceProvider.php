@@ -135,7 +135,7 @@ abstract class ServiceProvider
                 return [];
             }
 
-            return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
+            return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
         if ($group && array_key_exists($group, static::$publishGroups)) {
