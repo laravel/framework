@@ -140,16 +140,17 @@ class ResponseFactory implements FactoryContract
     /**
      * Return the raw contents of a binary file.
      *
-     * @param \SplFileInfo|string $file
-     * @param string $mime
-     * @param array $headers
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @param  \SplFileInfo|string $file
+     * @param  array $headers
+     * @return  \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function file($file, $mime, array $headers = [])
+    public function file($file, array $headers = [])
     {
-        $headers['Content-Type'] = $mime;
-
         $response = new BinaryFileResponse($file, 200, $headers, true);
+
+		$mime = $response->getFile()->getMimeType();
+
+		$headers['Content-Type'] = $mime;
 
         return $response;
     }
