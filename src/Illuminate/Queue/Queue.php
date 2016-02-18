@@ -72,15 +72,17 @@ abstract class Queue
     protected function createPayload($job, $data = '', $queue = null)
     {
         if ($job instanceof Closure) {
-            return json_encode($this->createClosurePayload($job, $data));
+            $payload = $this->createClosurePayload($job, $data);
         } elseif (is_object($job)) {
             return json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => ['command' => serialize(clone $job)],
             ]);
+        } else {
+            $payload = $this->createPlainPayload($job, $data);
         }
 
-        return json_encode($this->createPlainPayload($job, $data));
+        return json_encode($payload, JSON_UNESCAPED_UNICODE);
     }
 
     /**
