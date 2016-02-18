@@ -236,7 +236,7 @@ class Event
      */
     public function isDue($app)
     {
-        if (!$this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
+        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
             return false;
         }
 
@@ -270,7 +270,7 @@ class Event
     public function filtersPass($app)
     {
         foreach ($this->filters as $callback) {
-            if (!$app->call($callback)) {
+            if (! $app->call($callback)) {
                 return false;
             }
         }
