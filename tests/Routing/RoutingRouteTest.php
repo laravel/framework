@@ -428,6 +428,121 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
     }
 
+    public function testRouteGroupBindings()
+    {
+        /*
+         * Basic functionality
+         */
+        $router = $this->getRouter();
+
+        $router->get('blah/{baz}', function ($name) { return $name; });
+
+        $router->group(['prefix' => 'foo'], function ($router, $group) {
+            $group->bind('baz', function ($value) { return 'TAYLOROMG'; });
+            $router->get('bar/{baz}', function ($name) { return $name; });
+        });
+
+        $router->get('boo/{baz}', function ($name) { return $name; });
+
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('whatever', $router->dispatch(Request::create('blah/whatever', 'GET'))->getContent());
+        $this->assertEquals('whatever', $router->dispatch(Request::create('boo/whatever', 'GET'))->getContent());
+
+        /*
+         * Alternative syntax
+         */
+        $router = $this->getRouter();
+
+        $router->get('blah/{baz}', function ($name) { return $name; });
+
+        $router->group(['prefix' => 'foo'], function ($router) {
+            $router->get('bar/{baz}', function ($name) { return $name; });
+        })->bind('baz', function ($value) { return 'TAYLOROMG'; });
+
+        $router->get('boo/{baz}', function ($name) { return $name; });
+
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('whatever', $router->dispatch(Request::create('blah/whatever', 'GET'))->getContent());
+        $this->assertEquals('whatever', $router->dispatch(Request::create('boo/whatever', 'GET'))->getContent());
+
+        /*
+         * Nested groups
+         */
+        $router = $this->getRouter();
+
+        $router->group(['prefix' => 'foo'], function ($router, $group) {
+            $group->bind('baz', function ($value) { return 'TAYLOROMG'; });
+            $router->get('bar/{baz}', function ($name) { return $name; });
+
+            $router->group(['prefix' => 'goo'], function ($router, $group) {
+                $group->bind('baz', function ($value) { return 'OMGTAYLOR'; });
+                $router->get('bar/{baz}', function ($name) { return $name; });
+
+                $router->group(['prefix' => 'doot'], function ($router, $group) {
+                    $group->bind('baz', function ($value) { return 'DOOTDOOT'; });
+                    $router->get('bar/{baz}', function ($name) { return $name; });
+                });
+
+                $router->get('bee/{baz}', function ($name) { return $name; });
+            });
+
+            $router->group(['prefix' => 'joo'], function ($router, $group) {
+                $group->bind('baz', function ($value) { return 'DAMNSON'; });
+                $router->get('bar/{baz}', function ($name) { return $name; });
+
+                $router->group(['prefix' => 'noot'], function ($router, $group) {
+                    $group->bind('baz', function ($value) { return 'NOOTNOOT'; });
+                    $router->get('bar/{baz}', function ($name) { return $name; });
+                });
+
+                $router->get('bee/{baz}', function ($name) { return $name; });
+            });
+
+            $router->get('bee/{baz}', function ($name) { return $name; });
+        });
+
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('OMGTAYLOR', $router->dispatch(Request::create('foo/goo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('DOOTDOOT', $router->dispatch(Request::create('foo/goo/doot/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('OMGTAYLOR', $router->dispatch(Request::create('foo/goo/bee/whatever', 'GET'))->getContent());
+        $this->assertEquals('DAMNSON', $router->dispatch(Request::create('foo/joo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('NOOTNOOT', $router->dispatch(Request::create('foo/joo/noot/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('DAMNSON', $router->dispatch(Request::create('foo/joo/bee/whatever', 'GET'))->getContent());
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bee/whatever', 'GET'))->getContent());
+
+        /*
+         * Precedence over global explicit bindings
+         */
+        $router = $this->getRouter();
+
+        $router->bind('baz', function ($value) { return $value; });
+        $router->get('bar/{baz}', function ($name) { return $name; });
+
+        $router->group(['prefix' => 'foo'], function ($router, $group) {
+            $group->bind('baz', function ($value) { return 'TAYLOROMG'; });
+            $router->get('bar/{baz}', function ($name) { return $name; });
+        });
+
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('whatever', $router->dispatch(Request::create('bar/whatever', 'GET'))->getContent());
+
+        /*
+         * Precedence over implicit model bindings
+         */
+        $router = $this->getRouter();
+
+        $router->model('baz', 'RouteModelBindingStub');
+        $router->get('bar/{baz}', function ($name) { return $name; });
+
+        $router->group(['prefix' => 'foo'], function ($router, $group) {
+            $group->bind('baz', function ($value) { return 'TAYLOROMG'; });
+            $router->get('bar/{baz}', function ($name) { return $name; });
+        });
+
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('WHATEVER', $router->dispatch(Request::create('bar/whatever', 'GET'))->getContent());
+    }
+
     public function testModelBinding()
     {
         $router = $this->getRouter();
