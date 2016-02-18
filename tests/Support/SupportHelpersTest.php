@@ -341,6 +341,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
         $this->assertNull(data_get($arrayAccess, 'foo'));
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
+
+        $this->assertSame('bar', data_get('foo', ['foo' => 'bar']));
     }
 
     public function testDataGetWithNestedArrays()
