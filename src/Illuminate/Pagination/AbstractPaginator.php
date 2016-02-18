@@ -428,6 +428,19 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Set the paginator's underlying collection.
+     *
+     * @param  \Illuminate\Support\Collection $collection
+     * @return $this
+     */
+    public function setCollection(\Illuminate\Support\Collection $collection)
+    {
+        $this->items = $collection;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given item exists.
      *
      * @param  mixed  $key
