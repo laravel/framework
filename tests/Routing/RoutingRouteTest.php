@@ -499,6 +499,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             });
 
             $router->get('bee/{baz}', function ($name) { return $name; });
+
+            $router->group(['prefix' => 'meep'], function ($router, $group) {
+                $router->get('bar/{baz}', function ($name) { return $name; });
+
+                $router->group(['prefix' => 'moot'], function ($router, $group) {
+                    $group->bind('baz', function ($value) { return 'MOOTMOOT'; });
+                    $router->get('bar/{baz}', function ($name) { return $name; });
+                });
+
+                $router->group(['prefix' => 'super'], function ($router, $group) {
+                    $router->get('bar/{baz}', function ($name) { return $name; });
+                });
+
+                $router->get('bee/{baz}', function ($name) { return $name; });
+            });
         });
 
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
@@ -509,6 +524,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('NOOTNOOT', $router->dispatch(Request::create('foo/joo/noot/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('DAMNSON', $router->dispatch(Request::create('foo/joo/bee/whatever', 'GET'))->getContent());
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bee/whatever', 'GET'))->getContent());
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/meep/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('MOOTMOOT', $router->dispatch(Request::create('foo/meep/moot/bar/whatever', 'GET'))->getContent());
+        $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/meep/super/bar/whatever', 'GET'))->getContent());
 
         /*
          * Precedence over global explicit bindings

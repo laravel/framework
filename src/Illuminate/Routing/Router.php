@@ -313,8 +313,23 @@ class Router implements RegistrarContract
 
         $this->groupAttributeStack[] = $attributes;
 
-        $group = new RouteGroup();
+        $group = new RouteGroup($this->getCurrentGroup());
         $this->groupStack[] = $group;
+
+        return $group;
+    }
+
+    /**
+     * Get the current group from the stack.
+     *
+     * @return \Illuminate\Routing\RouteGroup
+     */
+    protected function getCurrentGroup()
+    {
+        $group = null;
+        if (! empty($this->groupStack)) {
+            $group = end($this->groupStack);
+        }
 
         return $group;
     }
@@ -441,13 +456,8 @@ class Router implements RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
-        $group = null;
-        if (! empty($this->groupStack)) {
-            $group = end($this->groupStack);
-        }
-
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action, $group
+            $methods, $this->prefix($uri), $action, $this->getCurrentGroup()
         );
 
         // If we have groups that need to be merged, we will merge them now after this
