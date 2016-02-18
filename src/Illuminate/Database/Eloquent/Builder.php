@@ -142,7 +142,7 @@ class Builder
             return $model;
         }
 
-        return $this->newModel();
+        return $this->model->newInstance();
     }
 
     /**
@@ -157,7 +157,7 @@ class Builder
             return $instance;
         }
 
-        return $this->newModel($attributes);
+        return $this->model->newInstance($attributes);
     }
 
     /**
@@ -172,7 +172,7 @@ class Builder
             return $instance;
         }
 
-        $instance = $this->newModel($attributes);
+        $instance = $this->model->newInstance($attributes);
 
         $instance->save();
 
@@ -955,19 +955,6 @@ class Builder
     public function getModel()
     {
         return $this->model;
-    }
-
-    /**
-     * Get a fresh instance of a model instance being queried.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function newModel(array $attributes = [])
-    {
-        $class = get_class($this->model);
-
-        return new $class($attributes);
     }
 
     /**
