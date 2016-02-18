@@ -2367,9 +2367,7 @@ class Validator implements ValidatorContract
     protected function getNumericKeys($attribute)
     {
         if (preg_match_all('/\.(\d+)\./', $attribute, $keys)) {
-            array_shift($keys);
-
-            return Arr::collapse($keys);
+            return $keys[1];
         }
 
         return [];
