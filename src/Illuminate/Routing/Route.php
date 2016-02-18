@@ -152,10 +152,38 @@ class Route
     protected function runCallable(Request $request)
     {
         $parameters = $this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(), $this->reflectAction($this->action['uses'])
         );
 
         return call_user_func_array($this->action['uses'], $parameters);
+    }
+
+    /**
+     * Make an appropriate Reflection object based on the type of action defined for the route.
+     *
+     * @param  mixed  $uses
+     * @return mixed
+     *
+     * @throws \UnexpectedValueException
+     */
+    protected function reflectAction($uses)
+    {
+        if (is_string($uses)) {
+            if (strpos($uses, '@') !== false) {
+                $uses = explode('@', $uses);
+            }
+        }
+
+        if (is_array($uses) && 2 == count($uses)) {
+            list($obj, $method) = $uses;
+            $Reflection = new ReflectionMethod($obj, $method);
+        } elseif ($uses instanceof Closure || is_string($uses)) {
+            $Reflection = new ReflectionFunction($uses);
+        } else {
+            throw new UnexpectedValueException(sprintf('Unexpected route action. Expecting array, closure, or string, got %s', typeOf($uses)));
+        }
+
+        return $Reflection;
     }
 
     /**
@@ -258,13 +286,8 @@ class Route
     {
         $action = $this->getAction();
 
-        if (is_string($action['uses'])) {
-            list($class, $method) = explode('@', $action['uses']);
-
-            $parameters = (new ReflectionMethod($class, $method))->getParameters();
-        } else {
-            $parameters = (new ReflectionFunction($action['uses']))->getParameters();
-        }
+        $Reflection = $this->reflectAction($action['uses']);
+        $parameters = $Reflection->getParameters();
 
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
             return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
