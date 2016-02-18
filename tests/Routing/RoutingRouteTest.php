@@ -430,9 +430,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
     public function testRouteGroupBindings()
     {
-        /*
-         * Basic functionality
-         */
         $router = $this->getRouter();
 
         $router->get('blah/{baz}', function ($name) { return $name; });
@@ -447,10 +444,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('whatever', $router->dispatch(Request::create('blah/whatever', 'GET'))->getContent());
         $this->assertEquals('whatever', $router->dispatch(Request::create('boo/whatever', 'GET'))->getContent());
+    }
 
-        /*
-         * Alternative syntax
-         */
+    public function testRouteGroupBindingsAlternativeSyntax()
+    {
         $router = $this->getRouter();
 
         $router->get('blah/{baz}', function ($name) { return $name; });
@@ -464,10 +461,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('whatever', $router->dispatch(Request::create('blah/whatever', 'GET'))->getContent());
         $this->assertEquals('whatever', $router->dispatch(Request::create('boo/whatever', 'GET'))->getContent());
+    }
 
-        /*
-         * Nested groups
-         */
+    public function testRouteGroupBindingsWithNestedGroups()
+    {
         $router = $this->getRouter();
 
         $router->group(['prefix' => 'foo'], function ($router, $group) {
@@ -527,10 +524,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/meep/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('MOOTMOOT', $router->dispatch(Request::create('foo/meep/moot/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/meep/super/bar/whatever', 'GET'))->getContent());
+    }
 
-        /*
-         * Precedence over global explicit bindings
-         */
+    public function testRouteGroupBindingsPrecedenceOverGlobalBindings()
+    {
         $router = $this->getRouter();
 
         $router->bind('baz', function ($value) { return $value; });
@@ -543,10 +540,10 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('TAYLOROMG', $router->dispatch(Request::create('foo/bar/whatever', 'GET'))->getContent());
         $this->assertEquals('whatever', $router->dispatch(Request::create('bar/whatever', 'GET'))->getContent());
+    }
 
-        /*
-         * Precedence over implicit model bindings
-         */
+    public function testRouteGroupBindingsPrecedenceOverImplicitModelBindings()
+    {
         $router = $this->getRouter();
 
         $router->model('baz', 'RouteModelBindingStub');
