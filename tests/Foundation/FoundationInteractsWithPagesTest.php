@@ -1,5 +1,7 @@
 <?php
 
+use Mockery as m;
+use Illuminate\Http\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 
@@ -7,9 +9,47 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
 {
     use MakesHttpRequests;
 
+    protected $baseUrl = 'https://laravel.com';
+
     protected function setCrawler($html)
     {
         $this->crawler = new Crawler($html);
+    }
+
+    public function testSeePageIs()
+    {
+        $this->currentUri = 'https://laravel.com/docs';
+
+        $this->response = m::mock(Response::class);
+        $this->response->shouldReceive('getStatusCode')
+            ->once()
+            ->andReturn(200);
+
+        $this->seePageIs('/docs');
+    }
+
+    public function testSeeThroughWebCrawler()
+    {
+        $this->setCrawler('<p>The PHP Framework For Web Artisans</p>');
+        $this->see('Web Artisans');
+    }
+
+    public function testSeeThroughResponse()
+    {
+        $this->crawler = null;
+
+        $this->response = m::mock(Response::class);
+        $this->response->shouldReceive('getContent')
+            ->once()
+            ->andReturn('<p>The PHP Framework For Web Artisans</p>');
+
+        $this->see('Web Artisans');
+    }
+
+    public function testDontSee()
+    {
+        $this->setCrawler('<p>The PHP Framework For Web Artisans</p>');
+        $this->dontSee('Webmasters');
     }
 
     public function testSeeInElement()
