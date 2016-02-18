@@ -7,7 +7,7 @@ class RouteGroup
     /**
      * The parent of the group.
      *
-     * @var /Illuminate/Routing/RouteGroup
+     * @var /Illuminate/Routing/RouteGroup|null
      */
     protected $parent;
 

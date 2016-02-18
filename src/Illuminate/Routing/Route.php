@@ -46,7 +46,7 @@ class Route
     /**
      * The route group it belongs to.
      *
-     * @var /Illuminate/Routing/RouteGroup
+     * @var /Illuminate/Routing/RouteGroup|null
      */
     protected $group;
 
@@ -112,7 +112,7 @@ class Route
      * @param  array   $methods
      * @param  string  $uri
      * @param  \Closure|array  $action
-     * @param  \Illuminate\Routing\RouteGroup  $group
+     * @param  \Illuminate\Routing\RouteGroup|null  $group
      * @return void
      */
     public function __construct($methods, $uri, $action, RouteGroup $group = null)
@@ -404,7 +404,7 @@ class Route
     /**
      * Get the group the route belongs to.
      *
-     * @return \Illuminate\Routing\RouteGroup
+     * @return \Illuminate\Routing\RouteGroup|null
      */
     public function getGroup()
     {

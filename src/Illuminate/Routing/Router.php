@@ -322,7 +322,7 @@ class Router implements RegistrarContract
     /**
      * Get the current group from the stack.
      *
-     * @return \Illuminate\Routing\RouteGroup
+     * @return \Illuminate\Routing\RouteGroup|null
      */
     protected function getCurrentGroup()
     {
@@ -478,7 +478,7 @@ class Router implements RegistrarContract
      * @param  array|string  $methods
      * @param  string  $uri
      * @param  mixed   $action
-     * @param  \Illuminate\Routing\RouteGroup  $group
+     * @param  \Illuminate\Routing\RouteGroup|null  $group
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute($methods, $uri, $action, $group)
