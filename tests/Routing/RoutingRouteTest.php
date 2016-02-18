@@ -721,6 +721,41 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
     }
 
+    public function testUseSingularResources()
+    {
+        $router = $this->getRouter();
+        $router->useSingularResources();
+        $router->resource('foos', 'FooController');
+
+        $routes = $router->getRoutes();
+        $this->assertEquals('foos', $routes->getByName('foos.index')->uri());
+        $this->assertEquals('foos/{foo}', $routes->getByName('foos.show')->uri());
+        $this->assertEquals('foos/create', $routes->getByName('foos.create')->uri());
+        $this->assertEquals('foos', $routes->getByName('foos.store')->uri());
+        $this->assertEquals('foos/{foo}/edit', $routes->getByName('foos.edit')->uri());
+        $this->assertEquals('foos/{foo}', $routes->getByName('foos.update')->uri());
+        $this->assertEquals('foos/{foo}', $routes->getByName('foos.destroy')->uri());
+    }
+
+    public function testResourceWildcards()
+    {
+        $router = $this->getRouter();
+
+        $router->resource('foos.boos', 'FooController', ['wildcards' => [
+            'foos' => 'fee',
+            'boos' => 'bee',
+        ]]);
+
+        $routes = $router->getRoutes();
+        $this->assertEquals('foos/{fee}/boos', $routes->getByName('foos.boos.index')->uri());
+        $this->assertEquals('foos/{fee}/boos/{bee}', $routes->getByName('foos.boos.show')->uri());
+        $this->assertEquals('foos/{fee}/boos/create', $routes->getByName('foos.boos.create')->uri());
+        $this->assertEquals('foos/{fee}/boos', $routes->getByName('foos.boos.store')->uri());
+        $this->assertEquals('foos/{fee}/boos/{bee}/edit', $routes->getByName('foos.boos.edit')->uri());
+        $this->assertEquals('foos/{fee}/boos/{bee}', $routes->getByName('foos.boos.update')->uri());
+        $this->assertEquals('foos/{fee}/boos/{bee}', $routes->getByName('foos.boos.destroy')->uri());
+    }
+
     public function testRouterFiresRoutedEvent()
     {
         $events = new Illuminate\Events\Dispatcher();

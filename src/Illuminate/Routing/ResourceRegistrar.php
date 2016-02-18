@@ -21,6 +21,20 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * Determines whether to use singular wildcards.
+     *
+     * @var bool
+     */
+    protected $singularWildcards = false;
+
+    /**
+     * The custom wildcards to use.
+     *
+     * @var array
+     */
+    protected $wildcards = [];
+
+    /**
      * Create a new resource registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -50,6 +64,9 @@ class ResourceRegistrar
             return;
         }
 
+        // Set the custom wildcards to use if applicable.
+        $this->wildcards = isset($options['wildcards']) ? $options['wildcards'] : [];
+
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route wildcards, which should be the base resources.
@@ -60,6 +77,9 @@ class ResourceRegistrar
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
             $this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
         }
+
+        // Reset the custom wildcards for next register call.
+        $this->wildcards = [];
     }
 
     /**
@@ -221,6 +241,18 @@ class ResourceRegistrar
     }
 
     /**
+     * Use singular wildcards.
+     *
+     * @return $this
+     */
+    public function useSingularWildcards()
+    {
+        $this->singularWildcards = true;
+
+        return $this;
+    }
+
+    /**
      * Format a resource wildcard for usage.
      *
      * @param  string  $value
@@ -228,6 +260,14 @@ class ResourceRegistrar
      */
     public function getResourceWildcard($value)
     {
+        if (isset($this->wildcards[$value])) {
+            return $this->wildcards[$value];
+        }
+
+        if ($this->singularWildcards) {
+            $value = Str::singular($value);
+        }
+
         return str_replace('-', '_', $value);
     }
 

@@ -37,6 +37,13 @@ class Router implements RegistrarContract
     protected $container;
 
     /**
+     * The resource registrar instance.
+     *
+     * @var \Illuminate\Contracts\Routing\Registrar
+     */
+    protected $registrar;
+
+    /**
      * The route collection instance.
      *
      * @var \Illuminate\Routing\RouteCollection
@@ -104,13 +111,15 @@ class Router implements RegistrarContract
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Routing\Registrar $registrar
      * @return void
      */
-    public function __construct(Dispatcher $events, Container $container = null)
+    public function __construct(Dispatcher $events, Container $container = null, Registrar $registrar = null)
     {
         $this->events = $events;
         $this->routes = new RouteCollection;
         $this->container = $container ?: new Container;
+        $this->registrar = $registrar ?: new ResourceRegistrar($this);
 
         $this->bind('_missing', function ($v) {
             return explode('/', $v);
@@ -329,13 +338,19 @@ class Router implements RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound('Illuminate\Routing\ResourceRegistrar')) {
-            $registrar = $this->container->make('Illuminate\Routing\ResourceRegistrar');
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        $this->registrar->register($name, $controller, $options);
+    }
 
-        $registrar->register($name, $controller, $options);
+    /**
+     * Use singular resource names.
+     *
+     * @return $this
+     */
+    public function useSingularResources()
+    {
+        $this->registrar->useSingularWildcards();
+
+        return $this;
     }
 
     /**
