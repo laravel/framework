@@ -4,6 +4,7 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use ArrayIterator;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 
 abstract class AbstractPaginator implements Htmlable
@@ -430,10 +431,10 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @return $this
      */
-    public function setCollection(\Illuminate\Support\Collection $collection)
+    public function setCollection(Collection $collection)
     {
         $this->items = $collection;
 
