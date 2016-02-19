@@ -256,6 +256,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $route->parameter('foo', 'bar'));
     }
 
+    public function testRouteParametersDefaultValue()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', ['uses' => 'RouteTestControllerWithParameterStub@returnParameter'])->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+        $router->get('foo/{bar?}', function ($bar = '') { return $bar; })->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
     /**
      * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -883,6 +893,14 @@ class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controll
     public function index()
     {
         return 'Hello World';
+    }
+}
+
+class RouteTestControllerWithParameterStub extends Illuminate\Routing\Controller
+{
+    public function returnParameter($bar = '')
+    {
+        return $bar;
     }
 }
 
