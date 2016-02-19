@@ -200,8 +200,8 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            if ($this->isWindowsEnvironment()){
-                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'. $redirect.$output.' 2>&1 &';
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
             } else {
                 $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
             }
@@ -210,16 +210,6 @@ class Event
         }
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
-    }
-
-    /**
-     * Determine if the current enviroment is windows
-     *
-     * @return boolean
-     */
-    protected function isWindowsEnvironment()
-    {
-        return (substr(strtoupper(php_uname('s')), 0, 3) === 'WIN');
     }
 
     /**
