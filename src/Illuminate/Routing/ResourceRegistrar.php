@@ -21,6 +21,27 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * The global wildcard mapping.
+     *
+     * @var array
+     */
+    protected static $wildcardMap = [];
+
+    /**
+     * Singular global wildcards.
+     *
+     * @var bool
+     */
+    protected static $singularWildcards = false;
+
+    /**
+     * The wildcards set for this resource instance.
+     *
+     * @var array|string
+     */
+    protected $wildcards;
+
+    /**
      * Create a new resource registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -41,6 +62,10 @@ class ResourceRegistrar
      */
     public function register($name, $controller, array $options = [])
     {
+        if (isset($options['wildcards']) && ! isset($this->wildcards)) {
+            $this->wildcards = $options['wildcards'];
+        }
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
@@ -228,7 +253,46 @@ class ResourceRegistrar
      */
     public function getResourceWildcard($value)
     {
+        if (isset($this->wildcards[$value])) {
+            $value = $this->wildcards[$value];
+        } elseif (isset(static::$wildcardMap[$value])) {
+            $value = static::$wildcardMap[$value];
+        } elseif ($this->wildcards === 'singular' || static::$singularWildcards) {
+            $value = Str::singular($value);
+        }
+
         return str_replace('-', '_', $value);
+    }
+
+    /**
+     * Set the global wildcard mapping.
+     *
+     * @param array $wildcards
+     * @return void
+     */
+    public static function setWildcards(array $wildcards = [])
+    {
+        static::$wildcardMap = $wildcards;
+    }
+
+    /**
+     * Get the global wildcard map.
+     *
+     * @return array
+     */
+    public static function getWildcards()
+    {
+        return static::$wildcardMap;
+    }
+
+    /**
+     * Set or unset the unmapped global wildcards to singular.
+     *
+     * @return void
+     */
+    public static function singularWildcards($singular = true)
+    {
+        static::$singularWildcards = (bool) $singular;
     }
 
     /**
