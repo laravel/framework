@@ -311,7 +311,7 @@ class Router implements RegistrarContract
      *
      * @return void
      */
-    public function singularParameters()
+    public function singularResourceParameters()
     {
         ResourceRegistrar::singularParameters();
     }
