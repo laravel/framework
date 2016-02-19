@@ -67,7 +67,7 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
     public function testRedirectResponseIsProperlyCreatedWithGivenErrors()
     {
         $request = FoundationTestFormRequestStub::create('/', 'GET');
-        $request->setRedirector($redirector = m::mock('Illuminate\Routing\Redirector'));
+        $request->setRedirector($redirector = m::mock('Illuminate\Contracts\Routing\Redirector'));
         $redirector->shouldReceive('to')->once()->with('previous')->andReturn($response = m::mock('Illuminate\Http\RedirectResponse'));
         $redirector->shouldReceive('getUrlGenerator')->andReturn($url = m::mock('StdClass'));
         $url->shouldReceive('previous')->once()->andReturn('previous');

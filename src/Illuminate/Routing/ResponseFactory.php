@@ -27,7 +27,7 @@ class ResponseFactory implements FactoryContract
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var \Illuminate\Contracts\Routing\Redirector
      */
     protected $redirector;
 
@@ -35,7 +35,7 @@ class ResponseFactory implements FactoryContract
      * Create a new response factory instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param  \Illuminate\Contracts\Routing\Redirector  $redirector
      * @return void
      */
     public function __construct(ViewFactory $view, Redirector $redirector)
