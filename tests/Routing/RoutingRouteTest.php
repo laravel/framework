@@ -808,6 +808,32 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
     }
 
+    public function testArrayActionDefinitionWithControllerInstance()
+    {
+        $router = $this->getRouter();
+        $TestControllerStub = new RouteTestControllerStub;
+
+        $router->get('foo', ['uses' => [$TestControllerStub, 'index']]);
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testArrayActionDefinitionWithControllerClassname()
+    {
+        $router = $this->getRouter();
+        $router->get('foo', ['uses' => [RouteStaticTestControllerStub::class, 'index']]);
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testActionDefinitionWithClosure()
+    {
+        $router = $this->getRouter();
+        $router->get('foo', ['uses' => function () {
+            return 'Hello World';
+        }]);
+
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -825,6 +851,14 @@ class RouteTestControllerStub extends Illuminate\Routing\Controller
     }
 
     public function index()
+    {
+        return 'Hello World';
+    }
+}
+
+class RouteStaticTestControllerStub extends Illuminate\Routing\Controller
+{
+    public static function index()
     {
         return 'Hello World';
     }
