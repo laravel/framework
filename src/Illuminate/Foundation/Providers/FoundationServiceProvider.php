@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Routing\Events\RouteMatched;
