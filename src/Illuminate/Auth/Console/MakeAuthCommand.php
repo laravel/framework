@@ -3,9 +3,12 @@
 namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\AppNamespaceDetectorTrait;
 
 class MakeAuthCommand extends Command
 {
+    use AppNamespaceDetectorTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -50,9 +53,9 @@ class MakeAuthCommand extends Command
         if (! $this->option('views')) {
             $this->info('Installed HomeController.');
 
-            copy(
-                __DIR__.'/stubs/make/controllers/HomeController.stub',
-                app_path('Http/Controllers/HomeController.php')
+            file_put_contents(
+                app_path('Http/Controllers/HomeController.php'),
+                $this->compileControllerStub()
             );
 
             $this->info('Updated Routes File.');
@@ -101,5 +104,19 @@ class MakeAuthCommand extends Command
 
             copy(__DIR__.'/stubs/make/views/'.$key, $path);
         }
+    }
+
+    /**
+     * Compiles the HomeController stub.
+     *
+     * @return string
+     */
+    protected function compileControllerStub()
+    {
+        return str_replace(
+            '{{namespace}}',
+            $this->getAppNamespace(),
+            file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
+        );
     }
 }
