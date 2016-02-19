@@ -30,10 +30,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setContainer(new Illuminate\Container\Container);
         $v->after(function ($validator) {
             $_SERVER['__validator.after.test'] = true;
+
+            // For asserting we can actually work with the instance
+            $validator->errors()->add('bar', 'foo');
         });
 
         $this->assertFalse($v->passes());
         $this->assertTrue($_SERVER['__validator.after.test']);
+        $this->assertTrue($v->errors()->has('bar'));
 
         unset($_SERVER['__validator.after.test']);
     }
