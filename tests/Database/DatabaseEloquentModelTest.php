@@ -333,6 +333,9 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $value = '2015-04-17';
         $this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
 
+        $value = '2015-4-17';
+        $this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
+
         $value = '1429311541';
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
     }

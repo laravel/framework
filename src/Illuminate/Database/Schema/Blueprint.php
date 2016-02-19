@@ -278,7 +278,7 @@ class Blueprint
     /**
      * Indicate that the given foreign key should be dropped.
      *
-     * @param  string  $index
+     * @param  string|array  $index
      * @return \Illuminate\Support\Fluent
      */
     public function dropForeign($index)
