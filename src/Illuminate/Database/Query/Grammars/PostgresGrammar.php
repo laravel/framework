@@ -264,7 +264,7 @@ class PostgresGrammar extends Grammar
      */
     protected function concatenate($segments)
     {
-        if (! empty($segments['unions']) && (! empty($segments['orders']) || ! empty($segments['limit']))) {
+        if (! empty($segments['unions'])) {
             array_unshift($segments, '(');
             $unionIndex = array_search('unions', array_keys($segments), true);
             array_splice($segments, $unionIndex, 0, ')');
