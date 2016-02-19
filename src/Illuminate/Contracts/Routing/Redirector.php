@@ -2,9 +2,6 @@
 
 namespace Illuminate\Contracts\Routing;
 
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Session\Store as SessionStore;
-
 interface Redirector
 {
     /**
