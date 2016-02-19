@@ -688,9 +688,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
-    public function testResourceRoutingWildcards()
+    public function testResourceRoutingParameters()
     {
-        ResourceRegistrar::singularWildcards();
+        ResourceRegistrar::singularParameters();
 
         $router = $this->getRouter();
         $router->resource('foos', 'FooController');
@@ -701,7 +701,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foos/{foo}', $routes[3]->getUri());
         $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
 
-        ResourceRegistrar::setWildcards(['foos' => 'oof', 'bazs' => 'b']);
+        ResourceRegistrar::setParameters(['foos' => 'oof', 'bazs' => 'b']);
 
         $router = $this->getRouter();
         $router->resource('bars.foos.bazs', 'FooController');
@@ -710,12 +710,12 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('bars/{bar}/foos/{oof}/bazs/{b}', $routes[3]->getUri());
 
-        ResourceRegistrar::setWildcards();
-        ResourceRegistrar::singularWildcards(false);
+        ResourceRegistrar::setParameters();
+        ResourceRegistrar::singularParameters(false);
 
         $router = $this->getRouter();
-        $router->resource('foos', 'FooController', ['wildcards' => 'singular']);
-        $router->resource('foos.bars', 'FooController', ['wildcards' => 'singular']);
+        $router->resource('foos', 'FooController', ['parameters' => 'singular']);
+        $router->resource('foos.bars', 'FooController', ['parameters' => 'singular']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
@@ -723,7 +723,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
 
         $router = $this->getRouter();
-        $router->resource('foos.bars', 'FooController', ['wildcards' => ['foos' => 'foo', 'bars' => 'bar']]);
+        $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
