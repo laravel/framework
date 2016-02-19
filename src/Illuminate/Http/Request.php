@@ -12,7 +12,6 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
@@ -24,6 +23,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @var string
      */
     protected $json;
+
+    /**
+     * All of the converted files for the request.
+     *
+     * @var array
+     */
+    protected $convertedFiles;
 
     /**
      * The user resolver callback.
@@ -398,7 +404,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function allFiles()
     {
-        return $this->convertUploadedFiles($this->files->all());
+        $files = $this->files->all();
+
+        return $this->convertedFiles
+                    ? $this->convertedFiles
+                    : $this->convertedFiles = $this->convertUploadedFiles($files);
     }
 
     /**
@@ -429,13 +439,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function file($key = null, $default = null)
     {
-        $file = data_get($this->files->all(), $key, $default);
-
-        if (is_array($file)) {
-            return $this->convertUploadedFiles($file);
-        } elseif ($file instanceof SymfonyUploadedFile) {
-            return $this->convertUploadedFiles([$file])[0];
-        }
+        return data_get($this->allFiles(), $key, $default);
     }
 
     /**
