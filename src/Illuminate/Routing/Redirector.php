@@ -4,8 +4,9 @@ namespace Illuminate\Routing;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Contracts\Routing\Redirector as RedirectorContract;
 
-class Redirector
+class Redirector implements RedirectorContract
 {
     /**
      * The URL generator instance.
