@@ -146,13 +146,7 @@ class ResponseFactory implements FactoryContract
      */
     public function file($file, array $headers = [])
     {
-        $response = new BinaryFileResponse($file, 200, $headers, true);
-
-        $mime = $response->getFile()->getMimeType();
-
-        $response->headers->set('Content-Type', $mime);
-
-        return $response;
+        return new BinaryFileResponse($file, 200, $headers);
     }
 
     /**
