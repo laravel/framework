@@ -55,8 +55,7 @@ class MakeAuthCommand extends Command
 
             file_put_contents(
                 app_path('Http/Controllers/HomeController.php'),
-                $this->compileControllerStub(),
-                FILE_TEXT
+                $this->compileControllerStub()
             );
 
             $this->info('Updated Routes File.');
