@@ -551,7 +551,7 @@ class Route
             );
         }
 
-        return $this->parameters = $this->fillDefaults($this->replaceDefaults($params));
+        return $this->parameters = $this->replaceDefaults($params);
     }
 
     /**
@@ -612,17 +612,6 @@ class Route
             $value = isset($value) ? $value : Arr::get($this->defaults, $key);
         }
 
-        return $parameters;
-    }
-
-    /**
-     * Fill missing parameters with their defaults.
-     *
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function fillDefaults(array $parameters)
-    {
         foreach ($this->defaults as $key => $value) {
             if (! isset($parameters[$key])) {
                 $parameters[$key] = $value;
