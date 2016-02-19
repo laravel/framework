@@ -215,14 +215,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair (or array of pairs).
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|bool  $value
+     * @param  bool  $strict
      * @return static
      */
-    public function where($key, $value = null)
+    public function where($key, $value = null, $strict = true)
     {
-        $conditions = is_array($key) ? $key : [$key => $value];
+        if (is_array($key)) {
+            $conditions = $key;
+            $strict = $value;
+        } else {
+            $conditions = [$key => $value];
+        }
 
-        return $this->doWhere($conditions, true);
+        return $this->doWhere($conditions, $strict);
     }
 
     /**
@@ -234,7 +240,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function whereLoose($key, $value = null)
     {
-        $conditions = is_array($key) ? $key : [$key => $value];
+        if (is_array($key)) {
+            $conditions = $key;
+        } else {
+            $conditions = [$key => $value];
+        }
 
         return $this->doWhere($conditions, false);
     }
