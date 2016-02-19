@@ -153,11 +153,11 @@ class Validator implements ValidatorContract
     ];
 
     /**
-     * The validation rules which accept other fields as parameters.
+     * The validation rules which depend on other fields as parameters.
      *
      * @var array
      */
-    protected $fieldRules = [
+    protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different',
     ];
@@ -390,8 +390,9 @@ class Validator implements ValidatorContract
         // First we will get the numeric keys for the given attribute in case the field is nested in
         // an array. Then we determine if the given rule accepts other field names as parameters.
         // If so, we will replace any asterisks found in the parameters with the numeric keys.
-        if (($keys = $this->getNumericKeys($attribute)) && $this->acceptsFields($rule)) {
-            $parameters = $this->normalizeParameters($parameters, $keys);
+        if (($keys = $this->getNumericKeys($attribute)) &&
+            $this->dependsOnOtherFields($rule)) {
+            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
         }
 
         // We will get the value for the given attribute from the array of data and then
@@ -2346,14 +2347,14 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Determine if the given rule accepts other field names as parameters.
-     * 
+     * Determine if the given rule depends on other fields.
+     *
      * @param  string  $rule
      * @return bool
      */
-    protected function acceptsFields($rule)
+    protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->fieldRules);
+        return in_array($rule, $this->dependentRules);
     }
 
     /**
@@ -2380,7 +2381,7 @@ class Validator implements ValidatorContract
      * @param  array  $keys
      * @return array
      */
-    protected function normalizeParameters(array $parameters, array $keys)
+    protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
         return array_map(function ($field) use ($keys) {
             return $this->replaceAsterisksWithKeys($field, $keys);

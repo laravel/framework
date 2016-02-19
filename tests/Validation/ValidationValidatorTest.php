@@ -2254,7 +2254,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [
             ['bar' => [
                 ['name' => null, 'last' => 'bar'],
-                ['name' => 'second', 'last' => 'bar'],
+                ['name' => null, 'last' => 'bar'],
             ]],
         ]], ['foo.*.bar.*.name' => ['Required_unless:foo.*.bar.*.last,foo']]);
         $this->assertFalse($v->passes());
