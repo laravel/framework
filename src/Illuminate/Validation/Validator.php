@@ -153,6 +153,16 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The validation rules which depend on other fields as parameters.
+     *
+     * @var array
+     */
+    protected $dependentRules = [
+        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different',
+    ];
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Symfony\Component\Translation\TranslatorInterface  $translator
@@ -389,6 +399,14 @@ class Validator implements ValidatorContract
 
         if ($rule == '') {
             return;
+        }
+
+        // First we will get the numeric keys for the given attribute in case the field is nested in
+        // an array. Then we determine if the given rule accepts other field names as parameters.
+        // If so, we will replace any asterisks found in the parameters with the numeric keys.
+        if (($keys = $this->getNumericKeys($attribute)) &&
+            $this->dependsOnOtherFields($rule)) {
+            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
         }
 
         // We will get the value for the given attribute from the array of data and then
@@ -2340,6 +2358,62 @@ class Validator implements ValidatorContract
             default:
                 return $rule;
         }
+    }
+
+    /**
+     * Determine if the given rule depends on other fields.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected function dependsOnOtherFields($rule)
+    {
+        return in_array($rule, $this->dependentRules);
+    }
+
+    /**
+     * Get the numeric keys from an attribute flattened with dot notation.
+     *
+     * E.g. 'foo.1.bar.2.baz' -> [1, 2]
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function getNumericKeys($attribute)
+    {
+        if (preg_match_all('/\.(\d+)\./', $attribute, $keys)) {
+            return $keys[1];
+        }
+
+        return [];
+    }
+
+    /**
+     * Replace each field parameter which has asterisks with the given numeric keys.
+     *
+     * @param  array  $parameters
+     * @param  array  $keys
+     * @return array
+     */
+    protected function replaceAsterisksInParameters(array $parameters, array $keys)
+    {
+        return array_map(function ($field) use ($keys) {
+            return $this->replaceAsterisksWithKeys($field, $keys);
+        }, $parameters);
+    }
+
+    /**
+     * Replace asterisks with numeric keys.
+     *
+     * E.g. 'foo.*.bar.*.baz', [1, 2] -> foo.1.bar.2.baz
+     *
+     * @param  string  $field
+     * @param  array  $keys
+     * @return string
+     */
+    protected function replaceAsterisksWithKeys($field, array $keys)
+    {
+        return vsprintf(str_replace('*', '%d', $field), $keys);
     }
 
     /**
