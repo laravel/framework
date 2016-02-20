@@ -508,6 +508,12 @@ class Route
             $value = isset($value) ? $value : Arr::get($this->defaults, $key);
         }
 
+        foreach ($this->defaults as $key => $value) {
+            if (! isset($parameters[$key])) {
+                $parameters[$key] = $value;
+            }
+        }
+
         return $parameters;
     }
 
