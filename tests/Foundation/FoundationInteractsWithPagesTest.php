@@ -52,6 +52,19 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         $this->dontSee('Webmasters');
     }
 
+    public function testSeeTextAndDontSeeText()
+    {
+        $this->setCrawler('<p>Laravel is a <strong>PHP Framework</strong>.');
+
+        // The methods see and dontSee compare against the HTML.
+        $this->see('strong');
+        $this->dontSee('Laravel is a PHP Framework');
+
+        // seeText and dontSeeText strip the HTML and compare against the plain text.
+        $this->seeText('Laravel is a PHP Framework.');
+        $this->dontSeeText('strong');
+    }
+
     public function testSeeInElement()
     {
         $this->setCrawler('<div>Laravel was created by <strong>Taylor Otwell</strong></div>');
