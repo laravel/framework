@@ -307,6 +307,27 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Set the unmapped global resource parameters to singular.
+     *
+     * @return void
+     */
+    public function singularResourceParameters()
+    {
+        ResourceRegistrar::singularParameters();
+    }
+
+    /**
+     * Set the global resource parameter mapping.
+     *
+     * @param  array $parameters
+     * @return void
+     */
+    public function resourceParameters(array $parameters = [])
+    {
+        ResourceRegistrar::setParameters($parameters);
+    }
+
+    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources

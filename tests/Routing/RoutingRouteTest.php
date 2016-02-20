@@ -5,6 +5,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Routing\ResourceRegistrar;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase
@@ -253,6 +254,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request3));
         $route->bind($request3);
         $this->assertEquals('bar', $route->parameter('foo', 'bar'));
+    }
+
+    public function testRouteParametersDefaultValue()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', ['uses' => 'RouteTestControllerWithParameterStub@returnParameter'])->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+        $router->get('foo/{bar?}', function ($bar = '') { return $bar; })->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
     /**
@@ -687,6 +698,48 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
+    public function testResourceRoutingParameters()
+    {
+        ResourceRegistrar::singularParameters();
+
+        $router = $this->getRouter();
+        $router->resource('foos', 'FooController');
+        $router->resource('foos.bars', 'FooController');
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+
+        ResourceRegistrar::setParameters(['foos' => 'oof', 'bazs' => 'b']);
+
+        $router = $this->getRouter();
+        $router->resource('bars.foos.bazs', 'FooController');
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('bars/{bar}/foos/{oof}/bazs/{b}', $routes[3]->getUri());
+
+        ResourceRegistrar::setParameters();
+        ResourceRegistrar::singularParameters(false);
+
+        $router = $this->getRouter();
+        $router->resource('foos', 'FooController', ['parameters' => 'singular']);
+        $router->resource('foos.bars', 'FooController', ['parameters' => 'singular']);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+
+        $router = $this->getRouter();
+        $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->getUri());
+    }
+
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();
@@ -840,6 +893,14 @@ class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controll
     public function index()
     {
         return 'Hello World';
+    }
+}
+
+class RouteTestControllerWithParameterStub extends Illuminate\Routing\Controller
+{
+    public function returnParameter($bar = '')
+    {
+        return $bar;
     }
 }
 
