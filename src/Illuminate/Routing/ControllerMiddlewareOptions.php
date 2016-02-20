@@ -5,7 +5,7 @@ namespace Illuminate\Routing;
 class ControllerMiddlewareOptions
 {
     /**
-     * The middleware options;.
+     * The middleware options.
      *
      * @var array
      */
