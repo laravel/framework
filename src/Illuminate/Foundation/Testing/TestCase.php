@@ -38,7 +38,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     protected $beforeApplicationDestroyedCallbacks = [];
 
     /**
-     * Indicates if we have made it throught the base setUp function.
+     * Indicates if we have made it through the base setUp function.
      *
      * @var bool
      */
