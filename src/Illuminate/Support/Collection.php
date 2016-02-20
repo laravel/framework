@@ -212,31 +212,62 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Filter items by the given key value pair.
+     * Filter items by the given key value pair (or array of pairs).
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param  string|array  $key
+     * @param  mixed|bool  $value
      * @param  bool  $strict
      * @return static
      */
-    public function where($key, $value, $strict = true)
+    public function where($key, $value = null, $strict = true)
     {
-        return $this->filter(function ($item) use ($key, $value, $strict) {
-            return $strict ? data_get($item, $key) === $value
-                           : data_get($item, $key) == $value;
-        });
+        if (is_array($key)) {
+            $conditions = $key;
+            $strict = $value;
+        } else {
+            $conditions = [$key => $value];
+        }
+
+        return $this->doWhere($conditions, $strict);
     }
 
     /**
-     * Filter items by the given key value pair using loose comparison.
+     * Filter items by the given key value pair (or array of pairs) using loose comparison.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
      * @return static
      */
-    public function whereLoose($key, $value)
+    public function whereLoose($key, $value = null)
     {
-        return $this->where($key, $value, false);
+        if (is_array($key)) {
+            $conditions = $key;
+        } else {
+            $conditions = [$key => $value];
+        }
+
+        return $this->doWhere($conditions, false);
+    }
+
+    /**
+     * Filter items by the given array of key value pairs.
+     *
+     * @param  array  $conditions
+     * @param  bool  $strict
+     * @return static
+     */
+    protected function doWhere($conditions, $strict)
+    {
+        return $this->filter(function ($item) use ($conditions, $strict) {
+
+            foreach ($conditions as $key => $value) {
+                if ($strict ? data_get($item, $key) !== $value : data_get($item, $key) != $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     /**
