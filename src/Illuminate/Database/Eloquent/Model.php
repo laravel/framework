@@ -75,6 +75,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $timestamps = true;
 
     /**
+     * Indicates if timestamps should be updated on next query.
+     *
+     * @var bool
+     */
+    protected $shouldUpdateTimestamps = true;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -1515,6 +1522,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // convenience. Then we will just continue saving the model instances.
             if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
                 $this->updateTimestamps();
+            } else {
+                $this->shouldUpdateTimestamps = false;
             }
 
             // Once we have run the update operation, we will fire the "updated" event for
@@ -1527,6 +1536,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
                 $this->fireModelEvent('updated', false);
             }
+
+            $this->shouldUpdateTimestamps = true;
         }
 
         return true;
@@ -1550,6 +1561,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // convenience. After, we will just continue saving these model instances.
         if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
             $this->updateTimestamps();
+        } else {
+            $this->shouldUpdateTimestamps = false;
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
@@ -1574,6 +1587,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->exists = true;
 
         $this->wasRecentlyCreated = true;
+
+        $this->shouldUpdateTimestamps = true;
 
         $this->fireModelEvent('created', false);
 
@@ -1709,6 +1724,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (! $this->exists && ! $this->isDirty(static::CREATED_AT)) {
             $this->setCreatedAt($time);
         }
+    }
+
+    /**
+     * Determine if timestamps should be updated.
+     *
+     * @return void
+     */
+    public function shouldUpdateTimestamps()
+    {
+        return $this->usesTimestamps() && $this->shouldUpdateTimestamps;
     }
 
     /**
