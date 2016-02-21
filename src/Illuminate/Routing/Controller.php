@@ -26,7 +26,7 @@ abstract class Controller
      *
      * @param  string  $middleware
      * @param  array   $options
-     * @return \Illuminate\Routing\MiddlewareOptions
+     * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
     public function middleware($middleware, array $options = [])
     {
