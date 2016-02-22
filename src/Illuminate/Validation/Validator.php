@@ -2426,23 +2426,6 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Format an array of custom extensions or replacers.
-     *
-     * @param  array  $array
-     * @return array
-     */
-    protected function formatArray(array $array)
-    {
-        if (empty($array)) {
-            return [];
-        }
-
-        $keys = array_map('\Illuminate\Support\Str::snake', array_keys($array));
-
-        return array_combine($keys, array_values($array));
-    }
-
-    /**
      * Register an array of custom implicit validator extensions.
      *
      * @param  array  $extensions
@@ -2504,6 +2487,23 @@ class Validator implements ValidatorContract
         if ($replacers = $this->formatArray($replacers)) {
             $this->replacers = array_merge($this->replacers, $replacers);
         }
+    }
+
+    /**
+     * Format an array of custom extensions or replacers.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    protected function formatArray(array $array)
+    {
+        if (empty($array)) {
+            return [];
+        }
+
+        $keys = array_map('\Illuminate\Support\Str::snake', array_keys($array));
+
+        return array_combine($keys, array_values($array));
     }
 
     /**
