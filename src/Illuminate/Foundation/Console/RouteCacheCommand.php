@@ -8,6 +8,8 @@ use Illuminate\Routing\RouteCollection;
 
 class RouteCacheCommand extends Command
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -90,7 +92,7 @@ class RouteCacheCommand extends Command
      */
     protected function buildRouteCacheFile(RouteCollection $routes)
     {
-        $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
+        $stub = $this->files->get($this->stub('foundation/routes.stub', __DIR__.'/stubs/routes.stub'));
 
         return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
     }

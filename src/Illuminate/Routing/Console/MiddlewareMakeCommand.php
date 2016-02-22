@@ -3,9 +3,12 @@
 namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class MiddlewareMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -34,7 +37,7 @@ class MiddlewareMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/middleware.stub';
+        return $this->stub('routing/middleware.stub', __DIR__.'/stubs/middleware.stub');
     }
 
     /**

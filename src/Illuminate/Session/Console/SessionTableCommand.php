@@ -5,9 +5,12 @@ namespace Illuminate\Session\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class SessionTableCommand extends Command
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -58,7 +61,7 @@ class SessionTableCommand extends Command
     {
         $fullPath = $this->createBaseMigration();
 
-        $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.stub'));
+        $this->files->put($fullPath, $this->files->get($this->stub('session/database.stub', __DIR__.'/stubs/database.stub')));
 
         $this->info('Migration created successfully!');
 

@@ -6,6 +6,8 @@ use Illuminate\Console\GeneratorCommand;
 
 class EventMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -45,7 +47,7 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/event.stub';
+        return $this->stub('foundation/event.stub', __DIR__.'/stubs/event.stub');
     }
 
     /**

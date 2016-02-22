@@ -6,6 +6,8 @@ use Illuminate\Console\GeneratorCommand;
 
 class TestMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+
     /**
      * The console command name.
      *
@@ -34,7 +36,7 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/test.stub';
+        return $this->stub('foundation/test.stub', __DIR__.'/stubs/test.stub');
     }
 
     /**
