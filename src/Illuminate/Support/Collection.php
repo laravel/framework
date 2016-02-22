@@ -213,21 +213,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return $this->filter(function ($item) use ($key, $value, $strict, $operator) {
             $itemKey = data_get($item, $key);
-            if ($strict && ($operator =='!=' || $operator == '!==')) {
+            if ($strict && ($operator == '!=' || $operator == '!==')) {
                 $operator = '!==';
             }
-            if ($strict && ($operator =='==' || $operator == '===')) {
+            if ($strict && ($operator == '==' || $operator == '===')) {
                 $operator = '===';
             }
             switch ($operator) {
-                case "==":  return $itemKey ==  $value;
-                case "===": return $itemKey === $value;
-                case "!=":  return $itemKey !=  $value;
-                case "!==": return $itemKey !== $value;
-                case ">=":  return $itemKey >=  $value;
-                case "=<":  return $itemKey <=  $value;
-                case ">":   return $itemKey >   $value;
-                case "<":   return $itemKey <   $value;
+                case '==':  return $itemKey ==  $value;
+                case '===': return $itemKey === $value;
+                case '!=':  return $itemKey !=  $value;
+                case '!==': return $itemKey !== $value;
+                case '>=':  return $itemKey >=  $value;
+                case '=<':  return $itemKey <=  $value;
+                case '>':   return $itemKey >   $value;
+                case '<':   return $itemKey <   $value;
                 default:    return $itemKey ==  $value;
             }
         });
