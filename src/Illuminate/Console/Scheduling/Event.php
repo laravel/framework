@@ -712,7 +712,7 @@ class Event
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  array  $addresses
-     * @param  bool  $includeEmpty
+     * @param  bool  $onlyIfOutputExists
      * @return void
      */
     protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
