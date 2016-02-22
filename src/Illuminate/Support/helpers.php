@@ -412,7 +412,7 @@ if (! function_exists('data_get')) {
 
         while (($segment = array_shift($key)) !== null) {
             if ($segment === '*') {
-                if (! is_array($target) && ! $target instanceof ArrayAccess) {
+                if (! Arr::accessible($target)) {
                     return value($default);
                 }
 
@@ -421,14 +421,8 @@ if (! function_exists('data_get')) {
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
             }
 
-            if (is_array($target)) {
-                if (! array_key_exists($segment, $target)) {
-                    return value($default);
-                }
-
-                $target = $target[$segment];
-            } elseif ($target instanceof ArrayAccess) {
-                if (! isset($target[$segment])) {
+            if (Arr::accessible($target)) {
+                if (! Arr::exists($target, $segment)) {
                     return value($default);
                 }
 
