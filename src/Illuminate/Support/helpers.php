@@ -813,10 +813,9 @@ if (! function_exists('str_slug')) {
     }
 }
 
-
 if (! function_exists('stub')) {
     /**
-     * Return a custom .stub file's path if one exists, if not, return default stub's path
+     * Return a custom .stub file's path if one exists, if not, return default stub's path.
      *
      * @param  string  $custom
      * @param  string  $default
@@ -824,10 +823,11 @@ if (! function_exists('stub')) {
      */
     function stub($custom, $default)
     {
-        $customWithPath = base_path('resources/stubs',$custom);
-        if(file_exists($customWithPath)) {
+        $customWithPath = base_path('resources/stubs', $custom);
+        if (file_exists($customWithPath)) {
             return $customWithPath;
         }
+
         return $default;
     }
 }
