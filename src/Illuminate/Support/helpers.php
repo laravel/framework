@@ -813,6 +813,25 @@ if (! function_exists('str_slug')) {
     }
 }
 
+
+if (! function_exists('stub')) {
+    /**
+     * Return a custom .stub file's path if one exists, if not, return default stub's path
+     *
+     * @param  string  $custom
+     * @param  string  $default
+     * @return string
+     */
+    function stub($custom, $default)
+    {
+        $customWithPath = base_path('resources/stubs',$custom);
+        if(file_exists($customWithPath)) {
+            return $customWithPath;
+        }
+        return $default;
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.

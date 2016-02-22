@@ -34,7 +34,7 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/provider.stub';
+        return stub('foundation/provider.stub', __DIR__.'/stubs/provider.stub');
     }
 
     /**

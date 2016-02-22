@@ -58,7 +58,7 @@ class CacheTableCommand extends Command
     {
         $fullPath = $this->createBaseMigration();
 
-        $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/cache.stub'));
+        $this->files->put($fullPath, $this->files->get(stub('cache/cache.stub', __DIR__.'/stubs/cache.stub')));
 
         $this->info('Migration created successfully!');
 

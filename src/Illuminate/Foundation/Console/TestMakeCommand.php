@@ -34,7 +34,7 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/test.stub';
+        return stub('foundation/test.stub', __DIR__.'/stubs/test.stub');
     }
 
     /**

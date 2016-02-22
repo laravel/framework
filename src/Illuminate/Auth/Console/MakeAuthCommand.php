@@ -62,7 +62,7 @@ class MakeAuthCommand extends Command
 
             file_put_contents(
                 app_path('Http/routes.php'),
-                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
+                file_get_contents(stub('auth/routes.stub', __DIR__.'/stubs/make/routes.stub')),
                 FILE_APPEND
             );
         }
@@ -102,7 +102,7 @@ class MakeAuthCommand extends Command
 
             $this->line('<info>Created View:</info> '.$path);
 
-            copy(__DIR__.'/stubs/make/views/'.$key, $path);
+            copy(stub('auth/views/'.$key, __DIR__.'/stubs/make/views/'.$key), $path);
         }
     }
 
@@ -116,7 +116,7 @@ class MakeAuthCommand extends Command
         return str_replace(
             '{{namespace}}',
             $this->getAppNamespace(),
-            file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
+            file_get_contents(stub('auth/controllers/HomeController.stub', __DIR__.'/stubs/make/controllers/HomeController.stub'))
         );
     }
 }

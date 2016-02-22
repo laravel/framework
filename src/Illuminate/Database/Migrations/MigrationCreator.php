@@ -68,7 +68,7 @@ class MigrationCreator
     protected function getStub($table, $create)
     {
         if (is_null($table)) {
-            return $this->files->get($this->getStubPath().'/blank.stub');
+            return stub('database/migrations_blank.stub', $this->files->get($this->getStubPath().'/blank.stub'));
         }
 
         // We also have stubs for creating new tables and modifying existing tables
@@ -77,7 +77,7 @@ class MigrationCreator
         else {
             $stub = $create ? 'create.stub' : 'update.stub';
 
-            return $this->files->get($this->getStubPath()."/{$stub}");
+            return stub('database/migrations_'.$stub, $this->files->get($this->getStubPath()."/{$stub}"));
         }
     }
 

@@ -69,7 +69,7 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/seeder.stub';
+        return stub('database/seeds_seeder.stub', __DIR__.'/stubs/seeder.stub');
     }
 
     /**

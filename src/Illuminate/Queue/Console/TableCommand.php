@@ -64,7 +64,7 @@ class TableCommand extends Command
         $fullPath = $this->createBaseMigration($table);
 
         $stub = str_replace(
-            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get(__DIR__.'/stubs/jobs.stub')
+            ['{{table}}', '{{tableClassName}}'], [$table, $tableClassName], $this->files->get(stub('queue/jobs.stub', __DIR__.'/stubs/jobs.stub'))
         );
 
         $this->files->put($fullPath, $stub);

@@ -36,10 +36,10 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('resource')) {
-            return __DIR__.'/stubs/controller.stub';
+            return stub('routing/controller.stub', __DIR__.'/stubs/controller.stub');
         }
 
-        return __DIR__.'/stubs/controller.plain.stub';
+        return stub('routing/controller.plain.stub', __DIR__.'/stubs/controller.plain.stub');
     }
 
     /**

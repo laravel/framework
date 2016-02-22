@@ -34,7 +34,7 @@ class MiddlewareMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/middleware.stub';
+        return stub('routing/middleware.stub', __DIR__.'/stubs/middleware.stub');
     }
 
     /**
