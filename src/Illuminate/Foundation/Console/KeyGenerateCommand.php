@@ -40,7 +40,7 @@ class KeyGenerateCommand extends Command
         if (file_exists($path)) {
             $content = str_replace('APP_KEY='.$this->laravel['config']['app.key'], 'APP_KEY='.$key, file_get_contents($path));
 
-            if (! str_contains($content, 'APP_KEY')) {
+            if (! Str::contains($content, 'APP_KEY')) {
                 $content = sprintf("%s\nAPP_KEY=%s\n", $content, $key);
             }
 
