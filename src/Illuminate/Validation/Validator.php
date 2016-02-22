@@ -2424,9 +2424,9 @@ class Validator implements ValidatorContract
             $keys = array_map('\Illuminate\Support\Str::snake', array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
-        }
 
-        $this->extensions = array_merge($this->extensions, $extensions);
+            $this->extensions = array_merge($this->extensions, $extensions);
+        }
     }
 
     /**
@@ -2492,9 +2492,9 @@ class Validator implements ValidatorContract
             $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
-        }
 
-        $this->replacers = array_merge($this->replacers, $replacers);
+            $this->replacers = array_merge($this->replacers, $replacers);
+        }
     }
 
     /**
