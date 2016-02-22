@@ -99,7 +99,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $globalAfterResolvingCallbacks = [];
 
     /**
-     * All of the after resolving callbacks by class type.
+     * All of the resolving callbacks by class type.
      *
      * @var array
      */
