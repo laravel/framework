@@ -202,6 +202,8 @@ class Worker
         }
 
         try {
+            $this->raiseBeforeJobEvent($connection, $job);
+
             // First we will fire off the job. Once it is done we will see if it will
             // be auto-deleted after processing and if so we will go ahead and run
             // the delete method on the job. Otherwise we will just keep moving.
@@ -225,6 +227,22 @@ class Worker
             }
 
             throw $e;
+        }
+    }
+
+    /**
+     * Raise the before queue job event.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseBeforeJobEvent($connection, Job $job)
+    {
+        if ($this->events) {
+            $data = json_decode($job->getRawBody(), true);
+
+            $this->events->fire(new Events\JobProcessing($connection, $job, $data));
         }
     }
 
