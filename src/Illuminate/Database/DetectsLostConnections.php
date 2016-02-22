@@ -26,6 +26,7 @@ trait DetectsLostConnections
             'decryption failed or bad record mac',
             'SSL connection has been closed unexpectedly',
             'Deadlock found when trying to get lock',
+            'Error writing data to the connection',
         ]);
     }
 }
