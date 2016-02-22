@@ -25,6 +25,25 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $redis->get('foo'));
     }
 
+    public function testRedisMultipleValuesAreReturned()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('mget')->once()->with(['prefix:foo', 'prefix:fizz', 'prefix:norf'])
+            ->andReturn([
+                serialize('bar'),
+                serialize('buzz'),
+                serialize('quz'),
+            ]);
+        $this->assertEquals([
+            'foo'   => 'bar',
+            'fizz'  => 'buzz',
+            'norf'  => 'quz',
+        ], $redis->many([
+            'foo', 'fizz', 'norf',
+        ]));
+    }
+
     public function testRedisValueIsReturnedForNumerics()
     {
         $redis = $this->getRedis();
@@ -39,6 +58,25 @@ class CacheRedisStoreTest extends PHPUnit_Framework_TestCase
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, serialize('foo'));
         $redis->put('foo', 'foo', 60);
+    }
+
+    public function testSetMultipleMethodProperlyCallsRedis()
+    {
+        $redis = $this->getRedis();
+        /** @var m\MockInterface $connection */
+        $connection = $redis->getRedis();
+        $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
+        $connection->shouldReceive('multi')->once();
+        $redis->getRedis()->shouldReceive('setex')->with('prefix:foo', 60 * 60, serialize('bar'));
+        $redis->getRedis()->shouldReceive('setex')->with('prefix:baz', 60 * 60, serialize('qux'));
+        $redis->getRedis()->shouldReceive('setex')->with('prefix:bar', 60 * 60, serialize('norf'));
+        $connection->shouldReceive('exec')->once();
+
+        $redis->putMany([
+            'foo'   => 'bar',
+            'baz'   => 'qux',
+            'bar' => 'norf',
+        ], 60);
     }
 
     public function testSetMethodProperlyCallsRedisForNumerics()

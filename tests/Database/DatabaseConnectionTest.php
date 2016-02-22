@@ -115,9 +115,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+        $connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->once()->with('connection.name.beganTransaction', $connection);
+        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Database\Events\TransactionBeginning'));
         $connection->beginTransaction();
     }
 
@@ -125,9 +125,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+        $connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->once()->with('connection.name.committed', $connection);
+        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Database\Events\TransactionCommitted'));
         $connection->commit();
     }
 
@@ -135,9 +135,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
+        $connection->expects($this->any())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->once()->with('connection.name.rollingBack', $connection);
+        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Database\Events\TransactionRolledBack'));
         $connection->rollBack();
     }
 
@@ -212,7 +212,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $connection = $this->getMockConnection();
         $connection->logQuery('foo', [], time());
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->once()->with('illuminate.query', ['foo', [], null, null]);
+        $events->shouldReceive('fire')->once()->with(m::type('Illuminate\Database\Events\QueryExecuted'));
         $connection->logQuery('foo', [], null);
     }
 
@@ -232,6 +232,25 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf('Illuminate\Database\Schema\Builder', $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testAlternateFetchModes()
+    {
+        $stmt = $this->getMock('PDOStatement');
+        $stmt->expects($this->exactly(3))->method('fetchAll')->withConsecutive(
+            [PDO::FETCH_ASSOC],
+            [PDO::FETCH_COLUMN, 3, []],
+            [PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]]
+        );
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo->expects($this->any())->method('prepare')->will($this->returnValue($stmt));
+        $connection = $this->getMockConnection([], $pdo);
+        $connection->setFetchMode(PDO::FETCH_ASSOC);
+        $connection->select('SELECT * FROM foo');
+        $connection->setFetchMode(PDO::FETCH_COLUMN, 3);
+        $connection->select('SELECT * FROM foo');
+        $connection->setFetchMode(PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]);
+        $connection->select('SELECT * FROM foo');
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

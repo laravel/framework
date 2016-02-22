@@ -119,28 +119,6 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
         $mailer->laterOn('queue', 10, 'foo', [1], 'callable');
     }
 
-    public function testMessagesCanBeLoggedInsteadOfSent()
-    {
-        $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());
-        $message = m::mock('Swift_Mime_Message');
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
-        $view = m::mock('StdClass');
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getTo')->once()->andReturn(['taylor@userscape.com' => 'Taylor']);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->never();
-        $logger = m::mock('Psr\Log\LoggerInterface');
-        $logger->shouldReceive('info')->once()->with('Pretending to mail message to: taylor@userscape.com');
-        $mailer->setLogger($logger);
-        $mailer->pretend();
-
-        $mailer->send('foo', ['data'], function ($m) {});
-    }
-
     public function testMailerCanResolveMailerClasses()
     {
         $mailer = $this->getMock('Illuminate\Mail\Mailer', ['createMessage'], $this->getMocks());

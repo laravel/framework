@@ -527,6 +527,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the break statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileBreak($expression)
+    {
+        return '<?php break; ?>';
+    }
+
+    /**
+     * Compile the continue statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileContinue($expression)
+    {
+        return '<?php continue; ?>';
+    }
+
+    /**
      * Compile the forelse statements into valid PHP.
      *
      * @param  string  $expression

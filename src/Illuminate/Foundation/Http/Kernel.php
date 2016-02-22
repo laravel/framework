@@ -5,9 +5,10 @@ namespace Illuminate\Foundation\Http;
 use Exception;
 use Throwable;
 use Illuminate\Routing\Router;
-use Illuminate\Pipeline\Pipeline;
+use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -50,6 +51,13 @@ class Kernel implements KernelContract
     protected $middleware = [];
 
     /**
+     * The application's route middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [];
+
+    /**
      * The application's route middleware.
      *
      * @var array
@@ -67,6 +75,10 @@ class Kernel implements KernelContract
     {
         $this->app = $app;
         $this->router = $router;
+
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            $router->middlewareGroup($key, $middleware);
+        }
 
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->middleware($key, $middleware);
@@ -90,9 +102,7 @@ class Kernel implements KernelContract
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
-            $this->reportException($e);
+            $this->reportException($e = new FatalThrowableError($e));
 
             $response = $this->renderException($request, $e);
         }
@@ -266,7 +276,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+        $this->app[ExceptionHandler::class]->report($e);
     }
 
     /**
@@ -278,7 +288,7 @@ class Kernel implements KernelContract
      */
     protected function renderException($request, Exception $e)
     {
-        return $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->render($request, $e);
+        return $this->app[ExceptionHandler::class]->render($request, $e);
     }
 
     /**

@@ -3,9 +3,8 @@
 namespace DummyNamespace;
 
 use DummyRootNamespaceJobs\Job;
-use Illuminate\Contracts\Bus\SelfHandling;
 
-class DummyClass extends Job implements SelfHandling
+class DummyClass extends Job
 {
     /**
      * Create a new job instance.

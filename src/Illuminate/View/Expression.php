@@ -2,45 +2,11 @@
 
 namespace Illuminate\View;
 
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 
-class Expression implements Htmlable
+/**
+ * @deprecated since version 5.2. Use Illuminate\Support\HtmlString.
+ */
+class Expression extends HtmlString
 {
-    /**
-     * The HTML string.
-     *
-     * @var string
-     */
-    protected $html;
-
-    /**
-     * Create a new HTML string instance.
-     *
-     * @param  string  $html
-     * @return void
-     */
-    public function __construct($html)
-    {
-        $this->html = $html;
-    }
-
-    /**
-     * Get the the HTML string.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->html;
-    }
-
-    /**
-     * Get the the HTML string.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toHtml();
-    }
 }

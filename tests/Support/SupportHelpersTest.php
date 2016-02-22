@@ -82,6 +82,29 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
     }
 
+    public function testArrayPluckWithNestedArrays()
+    {
+        $array = [
+            [
+                'account' => 'a',
+                'users' => [
+                    ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ],
+            ],
+            [
+                'account' => 'b',
+                'users' => [
+                    ['first' => 'abigail', 'last' => 'otwell'],
+                    ['first' => 'dayle', 'last' => 'rees'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals([['taylor'], ['abigail', 'dayle']], array_pluck($array, 'users.*.first'));
+        $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], array_pluck($array, 'users.*.first', 'account'));
+        $this->assertEquals([['taylorotwell@gmail.com'], [null, null]], array_pluck($array, 'users.*.email'));
+    }
+
     public function testArrayExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
@@ -127,7 +150,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(670, array_last($array, function ($key, $value) { return $value > 320; }));
     }
 
-    public function testArrayFetch()
+    public function testArrayPluck()
     {
         $data = [
             'post-1' => [
@@ -157,11 +180,20 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                     '#baz',
                 ],
             ],
-        ], array_fetch($data, 'comments'));
+        ], array_pluck($data, 'comments'));
 
-        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_fetch($data, 'comments.tags'));
-        $this->assertEquals([], array_fetch($data, 'foo'));
-        $this->assertEquals([], array_fetch($data, 'foo.bar'));
+        $this->assertEquals([['#foo', '#bar'], ['#baz']], array_pluck($data, 'comments.tags'));
+        $this->assertEquals([null, null], array_pluck($data, 'foo'));
+        $this->assertEquals([null, null], array_pluck($data, 'foo.bar'));
+    }
+
+    public function testArrayPrepend()
+    {
+        $array = array_prepend(['one', 'two', 'three', 'four'], 'zero');
+        $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $array);
+
+        $array = array_prepend(['one' => 1, 'two' => 2], 0, 'zero');
+        $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
     }
 
     public function testArrayFlatten()
@@ -309,6 +341,229 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
         $this->assertNull(data_get($arrayAccess, 'foo'));
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
+    }
+
+    public function testDataGetWithNestedArrays()
+    {
+        $array = [
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $array = [
+            'users' => [
+                ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
+                ['first' => 'abigail', 'last' => 'otwell'],
+                ['first' => 'dayle', 'last' => 'rees'],
+            ],
+            'posts' => null,
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
+        $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
+        $this->assertNull(data_get($array, 'posts.*.date'));
+    }
+
+    public function testDataGetWithDoubleNestedArraysCollapsesResult()
+    {
+        $array = [
+            'posts' => [
+                [
+                    'comments' => [
+                        ['author' => 'taylor', 'likes' => 4],
+                        ['author' => 'abigail', 'likes' => 3],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'abigail', 'likes' => 2],
+                        ['author' => 'dayle'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['author' => 'dayle'],
+                        ['author' => 'taylor', 'likes' => 1],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
+        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+    }
+
+    public function testDataFill()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'boom'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'noop'));
+        $this->assertEquals(['foo' => [], 'baz' => 'boom'], data_fill($data, 'foo.*', 'noop'));
+        $this->assertEquals(
+            ['foo' => ['bar' => 'kaboom'], 'baz' => 'boom'],
+            data_fill($data, 'foo.bar', 'kaboom')
+        );
+    }
+
+    public function testDataFillWithStar()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(
+            ['foo' => []],
+            data_fill($data, 'foo.*.bar', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], []]],
+            data_fill($data, 'bar', [['baz' => 'original'], []])
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
+            data_fill($data, 'bar.*.baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
+            data_fill($data, 'bar.*', 'noop')
+        );
+    }
+
+    public function testDataFillWithDoubleStar()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First'],
+                        (object) [],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) [],
+                        (object) ['name' => 'Second'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_fill($data, 'posts.*.comments.*.name', 'Filled');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First'],
+                        (object) ['name' => 'Filled'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Filled'],
+                        (object) ['name' => 'Second'],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
+    public function testDataSet()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'baz' => 'boom'],
+            data_set($data, 'baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'baz' => 'kaboom'],
+            data_set($data, 'baz', 'kaboom')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'baz' => 'kaboom'],
+            data_set($data, 'foo.*', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'boom'], 'baz' => 'kaboom'],
+            data_set($data, 'foo.bar', 'boom')
+        );
+    }
+
+    public function testDataSetWithStar()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(
+            ['foo' => []],
+            data_set($data, 'foo.*.bar', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'original'], []]],
+            data_set($data, 'bar', [['baz' => 'original'], []])
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => [['baz' => 'boom'], ['baz' => 'boom']]],
+            data_set($data, 'bar.*.baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
+            data_set($data, 'bar.*', 'overwritten')
+        );
+    }
+
+    public function testDataSetWithDoubleStar()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First'],
+                        (object) [],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) [],
+                        (object) ['name' => 'Second'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_set($data, 'posts.*.comments.*.name', 'Filled');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Filled'],
+                        (object) ['name' => 'Filled'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Filled'],
+                        (object) ['name' => 'Filled'],
+                    ],
+                ],
+            ],
+        ], $data);
     }
 
     public function testArraySort()

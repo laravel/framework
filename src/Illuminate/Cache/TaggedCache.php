@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
 {
+    use RetrievesMultipleKeys;
+
     /**
      * The tag set instance.
      *

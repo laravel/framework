@@ -98,6 +98,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
 
+        $items = new TestJsonSerializeObject;
+        $array = $method->invokeArgs($collection, [$items]);
+        $this->assertSame(['foo' => 'bar'], $array);
+
         $items = new Collection(['foo' => 'bar']);
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
@@ -119,10 +123,22 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo.array', 'bar.array'], $results);
     }
 
-    public function testToJsonEncodesTheToArrayResult()
+    public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection()
     {
-        $c = $this->getMock('Illuminate\Support\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $item1 = m::mock('JsonSerializable');
+        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
+        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $c = new Collection([$item1, $item2]);
+        $results = $c->jsonSerialize();
+
+        $this->assertEquals(['foo.json', 'bar.array'], $results);
+    }
+
+    public function testToJsonEncodesTheJsonSerializeResult()
+    {
+        $c = $this->getMock('Illuminate\Support\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
@@ -130,8 +146,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['toArray']);
-        $c->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['jsonSerialize']);
+        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }
@@ -249,14 +265,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection(['', 'Hello', '', 'World']);
         $this->assertEquals(['Hello', 'World'], $c->filter()->values()->toArray());
+
+        $c = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
+            return $key != 'id';
+        })->all());
     }
 
     public function testWhere()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
-
         $this->assertEquals([['v' => 3]], $c->where('v', 3)->values()->all());
+    }
+
+    public function testWhereLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
         $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereLoose('v', 3)->values()->all());
+    }
+
+    public function testWhereIn()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3]], $c->whereIn('v', [1, 3])->values()->all());
+    }
+
+    public function testWhereInLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3], ['v' => '3']], $c->whereInLoose('v', [1, 3])->values()->all());
     }
 
     public function testValues()
@@ -269,8 +306,51 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testFlatten()
     {
+        // Flat arrays are unaffected
+        $c = new Collection(['#foo', '#bar', '#baz']);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays are flattened with existing flat items
+        $c = new Collection([['#foo', '#bar'], '#baz']);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Sets of nested arrays are flattened
         $c = new Collection([['#foo', '#bar'], ['#baz']]);
         $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Deeply nested arrays are flattened
+        $c = new Collection([['#foo', ['#bar']], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested collections are flattened alongside arrays
+        $c = new Collection([new Collection(['#foo', '#bar']), ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested collections containing plain arrays are flattened
+        $c = new Collection([new Collection(['#foo', ['#bar']]), ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays containing collections are flattened
+        $c = new Collection([['#foo', new Collection(['#bar'])], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#baz'], $c->flatten()->all());
+
+        // Nested arrays containing collections containing arrays are flattened
+        $c = new Collection([['#foo', new Collection(['#bar', ['#zap']])], ['#baz']]);
+        $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], $c->flatten()->all());
+    }
+
+    public function testFlattenWithDepth()
+    {
+        // No depth flattens recursively
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], $c->flatten()->all());
+
+        // Specifying a depth only flattens to that depth
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', ['#bar', ['#baz']], '#zap'], $c->flatten(1)->all());
+
+        $c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], $c->flatten(2)->all());
     }
 
     public function testMergeNull()
@@ -301,6 +381,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c->diff(null)->all());
+    }
+
+    public function testDiffKeys()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['id' => 123, 'foo_bar' => 'Hello']);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2)->all());
     }
 
     public function testEach()
@@ -427,7 +514,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection(['zaeed', 'alan']);
         $reversed = $data->reverse();
 
-        $this->assertEquals(['alan', 'zaeed'], array_values($reversed->all()));
+        $this->assertSame([1 => 'alan', 0 => 'zaeed'], $reversed->all());
+
+        $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $reversed = $data->reverse();
+
+        $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
     }
 
     public function testFlip()
@@ -445,7 +537,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
         $this->assertEquals(4, $data->count());
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
-        $this->assertEquals([10], $data[3]->toArray());
+        $this->assertEquals([9 => 10], $data[3]->toArray());
     }
 
     public function testEvery()
@@ -537,7 +629,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);
         $data = $data->take(-2);
-        $this->assertEquals(['dayle', 'shawn'], $data->all());
+        $this->assertEquals([1 => 'dayle', 2 => 'shawn'], $data->all());
     }
 
     public function testMacroable()
@@ -713,6 +805,105 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
     }
 
+    public function testGroupByAttributePreservingKeys()
+    {
+        $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy('rating', true);
+
+        $expected_result = [
+            1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
+            2 => [30 => ['rating' => 2, 'url' => '2']],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveSingleGroup()
+    {
+        $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['rating'];
+        });
+
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveSingleGroupPreservingKeys()
+    {
+        $data = new Collection([10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1'], 30 => ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['rating'];
+        }, true);
+
+        $expected_result = [
+            1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
+            2 => [30 => ['rating' => 2, 'url' => '2']],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveMultipleGroups()
+    {
+        $data = new Collection([
+            ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ['user' => 3, 'roles' => ['Role_1']],
+        ]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['roles'];
+        });
+
+        $expected_result = [
+            'Role_1' => [
+                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+                ['user' => 3, 'roles' => ['Role_1']],
+            ],
+            'Role_2' => [
+                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ],
+            'Role_3' => [
+                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveMultipleGroupsPreservingKeys()
+    {
+        $data = new Collection([
+            10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            30 => ['user' => 3, 'roles' => ['Role_1']],
+        ]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['roles'];
+        }, true);
+
+        $expected_result = [
+            'Role_1' => [
+                10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+                20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+                30 => ['user' => 3, 'roles' => ['Role_1']],
+            ],
+            'Role_2' => [
+                20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ],
+            'Role_3' => [
+                10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
     public function testKeyByAttribute()
     {
         $data = new Collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
@@ -828,6 +1019,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection(['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $c->reject(function ($v) { return $v == 'baz'; })->values()->all());
+
+        $c = new Collection(['id' => 1, 'primary' => 'foo', 'secondary' => 'bar']);
+        $this->assertEquals(['primary' => 'foo', 'secondary' => 'bar'], $c->reject(function ($item, $key) {
+            return $key == 'id';
+        })->all());
     }
 
     public function testSearchReturnsIndexOfFirstFoundItem()
@@ -860,7 +1056,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
-        $this->assertEquals(['three', 'four'], $c->forPage(2, 2)->all());
+        $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
@@ -956,6 +1152,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $c = new Collection();
         $this->assertNull($c->avg());
     }
+
+    public function testJsonSerialize()
+    {
+        $c = new Collection([
+            new TestArrayableObject(),
+            new TestJsonableObject(),
+            new TestJsonSerializeObject(),
+            'baz',
+        ]);
+
+        $this->assertSame([
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            'baz',
+        ], $c->jsonSerialize());
+    }
 }
 
 class TestAccessorEloquentTestStub
@@ -1037,5 +1250,13 @@ class TestJsonableObject implements Jsonable
     public function toJson($options = 0)
     {
         return '{"foo":"bar"}';
+    }
+}
+
+class TestJsonSerializeObject implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return ['foo' => 'bar'];
     }
 }

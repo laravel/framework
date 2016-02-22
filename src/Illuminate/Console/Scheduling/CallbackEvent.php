@@ -28,6 +28,8 @@ class CallbackEvent extends Event
      * @param  string  $callback
      * @param  array  $parameters
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($callback, array $parameters = [])
     {
@@ -82,6 +84,8 @@ class CallbackEvent extends Event
      * Do not allow the event to overlap each other.
      *
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function withoutOverlapping()
     {
@@ -103,7 +107,7 @@ class CallbackEvent extends Event
      */
     protected function mutexPath()
     {
-        return storage_path('framework/schedule-'.md5($this->description));
+        return storage_path('framework/schedule-'.sha1($this->description));
     }
 
     /**

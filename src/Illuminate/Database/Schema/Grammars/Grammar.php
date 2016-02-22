@@ -277,6 +277,8 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection $connection
      * @return array
+     *
+     * @throws \RuntimeException
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
@@ -392,6 +394,9 @@ abstract class Grammar extends BaseGrammar
             case 'mediumtext':
             case 'longtext':
                 $type = 'text';
+                break;
+            case 'binary':
+                $type = 'blob';
                 break;
         }
 

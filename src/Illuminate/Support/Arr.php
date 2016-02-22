@@ -2,11 +2,23 @@
 
 namespace Illuminate\Support;
 
+use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
 {
     use Macroable;
+
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
 
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
@@ -31,6 +43,8 @@ class Arr
      * @param  array  $array
      * @param  callable  $callback
      * @return array
+     *
+     * @deprecated since version 5.2.
      */
     public static function build($array, callable $callback)
     {
@@ -56,11 +70,11 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if ($values instanceof Collection) {
-                $values = $values->all();
+            if (! static::accessible($values)) {
+                continue;
             }
 
-            $results = array_merge($results, $values);
+            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
         }
 
         return $results;
@@ -114,29 +128,19 @@ class Arr
     }
 
     /**
-     * Fetch a flattened array of a nested array element.
+     * Determine if the given key exists in the provided array.
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @return array
-     *
-     * @deprecated since version 5.1. Use pluck instead.
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
      */
-    public static function fetch($array, $key)
+    public static function exists($array, $key)
     {
-        foreach (explode('.', $key) as $segment) {
-            $results = [];
-
-            foreach ($array as $value) {
-                if (array_key_exists($segment, $value = (array) $value)) {
-                    $results[] = $value[$segment];
-                }
-            }
-
-            $array = array_values($results);
+        if (is_array($array)) {
+            return array_key_exists($key, $array);
         }
 
-        return array_values($results);
+        return $array->offsetExists($key);
     }
 
     /**
@@ -175,17 +179,30 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
+     * @param  int  $depth
      * @return array
      */
-    public static function flatten($array)
+    public static function flatten($array, $depth = INF)
     {
-        $return = [];
+        $result = [];
 
-        array_walk_recursive($array, function ($x) use (&$return) {
-            $return[] = $x;
-        });
+        foreach ($array as $item) {
+            $item = $item instanceof Collection ? $item->all() : $item;
 
-        return $return;
+            if (is_array($item)) {
+                if ($depth === 1) {
+                    $result = array_merge($result, $item);
+                    continue;
+                }
+
+                $result = array_merge($result, static::flatten($item, $depth - 1));
+                continue;
+            }
+
+            $result[] = $item;
+        }
+
+        return $result;
     }
 
     /**
@@ -208,27 +225,27 @@ class Arr
         foreach ($keys as $key) {
             $parts = explode('.', $key);
 
+            // clean up before each pass
+            $array = &$original;
+
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
-                    $parts = [];
+                    continue 2;
                 }
             }
 
             unset($array[array_shift($parts)]);
-
-            // clean up after each pass
-            $array = &$original;
         }
     }
 
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array   $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
@@ -244,7 +261,8 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
+                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
                 return value($default);
             }
 
@@ -312,7 +330,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array

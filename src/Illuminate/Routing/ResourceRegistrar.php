@@ -21,6 +21,27 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * The parameters set for this resource instance.
+     *
+     * @var array|string
+     */
+    protected $parameters;
+
+    /**
+     * The global parameter mapping.
+     *
+     * @var array
+     */
+    protected static $parameterMap = [];
+
+    /**
+     * Singular global parameters.
+     *
+     * @var bool
+     */
+    protected static $singularParameters = false;
+
+    /**
      * Create a new resource registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -41,6 +62,10 @@ class ResourceRegistrar
      */
     public function register($name, $controller, array $options = [])
     {
+        if (isset($options['parameters']) && ! isset($this->parameters)) {
+            $this->parameters = $options['parameters'];
+        }
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
@@ -52,7 +77,7 @@ class ResourceRegistrar
 
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
-        // place-holder on the route wildcards, which should be the base resources.
+        // place-holder on the route parameters, which should be the base resources.
         $base = $this->getResourceWildcard(last(explode('.', $name)));
 
         $defaults = $this->resourceDefaults;
@@ -76,7 +101,7 @@ class ResourceRegistrar
 
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
-        // place-holder on the route wildcards, which should be the base resources.
+        // place-holder on the route parameters, which should be the base resources.
         $callback = function ($me) use ($name, $controller, $options) {
             $me->resource($name, $controller, $options);
         };
@@ -132,9 +157,9 @@ class ResourceRegistrar
             return $resource;
         }
 
-        // Once we have built the base URI, we'll remove the wildcard holder for this
+        // Once we have built the base URI, we'll remove the parameter holder for this
         // base resource name so that the individual route adders can suffix these
-        // paths however they need to, as some do not have any wildcards at all.
+        // paths however they need to, as some do not have any parameters at all.
         $segments = explode('.', $resource);
 
         $uri = $this->getNestedResourceUri($segments);
@@ -221,13 +246,21 @@ class ResourceRegistrar
     }
 
     /**
-     * Format a resource wildcard for usage.
+     * Format a resource parameter for usage.
      *
      * @param  string  $value
      * @return string
      */
     public function getResourceWildcard($value)
     {
+        if (isset($this->parameters[$value])) {
+            $value = $this->parameters[$value];
+        } elseif (isset(static::$parameterMap[$value])) {
+            $value = static::$parameterMap[$value];
+        } elseif ($this->parameters === 'singular' || static::$singularParameters) {
+            $value = Str::singular($value);
+        }
+
         return str_replace('-', '_', $value);
     }
 
@@ -332,42 +365,11 @@ class ResourceRegistrar
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
-        $this->addPutResourceUpdate($name, $base, $controller, $options);
-
-        return $this->addPatchResourceUpdate($name, $base, $controller);
-    }
-
-    /**
-     * Add the update method for a resourceful route.
-     *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @param  array   $options
-     * @return \Illuminate\Routing\Route
-     */
-    protected function addPutResourceUpdate($name, $base, $controller, $options)
-    {
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
 
-        return $this->router->put($uri, $action);
-    }
-
-    /**
-     * Add the update method for a resourceful route.
-     *
-     * @param  string  $name
-     * @param  string  $base
-     * @param  string  $controller
-     * @return void
-     */
-    protected function addPatchResourceUpdate($name, $base, $controller)
-    {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
-
-        $this->router->patch($uri, $controller.'@update');
+        return $this->router->match(['PUT', 'PATCH'], $uri, $action);
     }
 
     /**
@@ -386,5 +388,36 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Set or unset the unmapped global parameters to singular.
+     *
+     * @return void
+     */
+    public static function singularParameters($singular = true)
+    {
+        static::$singularParameters = (bool) $singular;
+    }
+
+    /**
+     * Get the global parameter map.
+     *
+     * @return array
+     */
+    public static function getParameters()
+    {
+        return static::$parameterMap;
+    }
+
+    /**
+     * Set the global parameter mapping.
+     *
+     * @param  array $parameters
+     * @return void
+     */
+    public static function setParameters(array $parameters = [])
+    {
+        static::$parameterMap = $parameters;
     }
 }

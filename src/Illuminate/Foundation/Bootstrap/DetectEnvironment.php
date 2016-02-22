@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Dotenv;
-use InvalidArgumentException;
+use Dotenv\Dotenv;
+use Dotenv\Exception\InvalidPathException;
 use Illuminate\Contracts\Foundation\Application;
 
 class DetectEnvironment
@@ -16,14 +16,33 @@ class DetectEnvironment
      */
     public function bootstrap(Application $app)
     {
-        try {
-            Dotenv::load($app->environmentPath(), $app->environmentFile());
-        } catch (InvalidArgumentException $e) {
-            //
+        if (! $app->configurationIsCached()) {
+            $this->checkForSpecificEnvironmentFile($app);
+
+            try {
+                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+            } catch (InvalidPathException $e) {
+                //
+            }
+        }
+    }
+
+    /**
+     * Detect if a custom environment file matching the APP_ENV exists.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    protected function checkForSpecificEnvironmentFile($app)
+    {
+        if (! env('APP_ENV')) {
+            return;
         }
 
-        $app->detectEnvironment(function () {
-            return env('APP_ENV', 'production');
-        });
+        $file = $app->environmentFile().'.'.env('APP_ENV');
+
+        if (file_exists($app->environmentPath().'/'.$file)) {
+            $app->loadEnvironmentFrom($file);
+        }
     }
 }

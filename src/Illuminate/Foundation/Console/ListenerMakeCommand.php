@@ -55,7 +55,7 @@ class ListenerMakeCommand extends GeneratorCommand
 
         $event = $this->option('event');
 
-        if (! Str::startsWith($event, $this->laravel->getNamespace())) {
+        if (! Str::startsWith($event, $this->laravel->getNamespace()) && ! Str::startsWith($event, 'Illuminate')) {
             $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 

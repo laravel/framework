@@ -17,6 +17,20 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $repo->get('foo'));
     }
 
+    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArray()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => 'bar', 'bar' => 'baz']);
+        $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $repo->get(['foo', 'bar']));
+    }
+
+    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayWithDefaultValues()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => null, 'bar' => 'baz']);
+        $this->assertEquals(['foo' => 'default', 'bar' => 'baz'], $repo->get(['foo' => 'default', 'bar']));
+    }
+
     public function testDefaultValueIsReturned()
     {
         $repo = $this->getRepository();
@@ -70,6 +84,13 @@ class CacheRepositoryTest extends PHPUnit_Framework_TestCase
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
         $result = $repo->rememberForever('foo', function () { return 'bar'; });
         $this->assertEquals('bar', $result);
+    }
+
+    public function testPuttingMultipleItemsInCache()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
     public function testPutWithDatetimeInPastOrZeroMinutesDoesntSaveItem()

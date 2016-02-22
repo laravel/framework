@@ -49,7 +49,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function after($callback)
     {
-        $this->app['events']->listen('illuminate.queue.after', $callback);
+        $this->app['events']->listen(Events\JobProcessed::class, $callback);
     }
 
     /**
@@ -71,7 +71,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function failing($callback)
     {
-        $this->app['events']->listen('illuminate.queue.failed', $callback);
+        $this->app['events']->listen(Events\JobFailed::class, $callback);
     }
 
     /**
@@ -82,7 +82,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function stopping($callback)
     {
-        $this->app['events']->listen('illuminate.queue.stopping', $callback);
+        $this->app['events']->listen(Events\WorkerStopping::class, $callback);
     }
 
     /**
@@ -182,6 +182,10 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     protected function getConfig($name)
     {
+        if ($name === null || $name === 'null') {
+            return ['driver' => 'null'];
+        }
+
         return $this->app['config']["queue.connections.{$name}"];
     }
 

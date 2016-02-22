@@ -14,7 +14,6 @@ class CacheRateLimiterTest extends PHPUnit_Framework_TestCase
     public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(0);
         $cache->shouldReceive('has')->once()->with('key:lockout')->andReturn(true);
         $cache->shouldReceive('add')->never();
         $rateLimiter = new RateLimiter($cache);

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Http;
 
+use Exception;
 use ArrayObject;
+use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -79,6 +81,7 @@ class Response extends BaseResponse
     {
         return $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
+               $content instanceof JsonSerializable ||
                is_array($content);
     }
 
@@ -90,5 +93,18 @@ class Response extends BaseResponse
     public function getOriginalContent()
     {
         return $this->original;
+    }
+
+    /**
+     * Set the exception to attach to the response.
+     *
+     * @param  \Exception  $e
+     * @return $this
+     */
+    public function withException(Exception $e)
+    {
+        $this->exception = $e;
+
+        return $this;
     }
 }

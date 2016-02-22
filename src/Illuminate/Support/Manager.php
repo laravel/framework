@@ -76,7 +76,7 @@ abstract class Manager
      */
     protected function createDriver($driver)
     {
-        $method = 'create'.ucfirst($driver).'Driver';
+        $method = 'create'.Str::studly($driver).'Driver';
 
         // We'll check to see if a creator method exists for the given driver. If not we
         // will check for a custom driver creator, which allows developers to create

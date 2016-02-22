@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use BadMethodCallException;
+use Illuminate\Console\Events\ArtisanStarting;
 
 abstract class ServiceProvider
 {
@@ -134,7 +135,7 @@ abstract class ServiceProvider
                 return [];
             }
 
-            return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
+            return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
         if ($group && array_key_exists($group, static::$publishGroups)) {
@@ -173,8 +174,8 @@ abstract class ServiceProvider
         // give us the Artisan console instance which we will give commands to.
         $events = $this->app['events'];
 
-        $events->listen('artisan.start', function ($artisan) use ($commands) {
-            $artisan->resolveCommands($commands);
+        $events->listen(ArtisanStarting::class, function ($event) use ($commands) {
+            $event->artisan->resolveCommands($commands);
         });
     }
 
@@ -224,6 +225,8 @@ abstract class ServiceProvider
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {

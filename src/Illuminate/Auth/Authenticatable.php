@@ -5,6 +5,16 @@ namespace Illuminate\Auth;
 trait Authenticatable
 {
     /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return $this->getKeyName();
+    }
+
+    /**
      * Get the unique identifier for the user.
      *
      * @return mixed

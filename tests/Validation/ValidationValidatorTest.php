@@ -58,6 +58,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
     }
 
+    public function testFailingOnce()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Bail|Same:baz|In:qux']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+    }
+
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();
@@ -152,6 +160,20 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('Name is required!', $v->messages()->first('name'));
+
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required' => ':Attribute is required!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Name is required!', $v->messages()->first('name'));
+
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required' => ':ATTRIBUTE is required!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('NAME is required!', $v->messages()->first('name'));
     }
 
     public function testDisplayableValuesAreReplaced()
@@ -179,11 +201,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
-                 'type' => [
-                     '5'   => 'Short',
-                     '300' => 'Long',
-                    ],
-                ];
+            'type' => [
+                '5'   => 'Short',
+                '300' => 'Long',
+            ],
+        ];
         $v = new Validator($trans, ['type' => '4'], ['type' => 'in:5,300']);
         $v->addCustomValues($customValues);
         $this->assertFalse($v->passes());
@@ -194,11 +216,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
         $trans->addResource('array', ['validation.in' => ':attribute must be included in :values.'], 'en', 'messages');
         $customValues = [
-                 'type' => [
-                     '5'   => 'Short',
-                     '300' => 'Long',
-                    ],
-                ];
+            'type' => [
+                '5'   => 'Short',
+                '300' => 'Long',
+            ],
+        ];
         $v = new Validator($trans, ['type' => '4'], ['type' => 'in:5,300']);
         $v->setValueNames($customValues);
         $this->assertFalse($v->passes());
@@ -208,12 +230,38 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testCustomValidationLinesAreRespected()
     {
-        $trans = $this->getRealTranslator();
-        $trans->addResource('array', ['validation.required' => 'required!', 'validation.custom.name.required' => 'really required!'], 'en', 'messages');
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'name' => [
+                    'required' => 'really required!',
+                ],
+            ],
+        ]);
         $v = new Validator($trans, ['name' => ''], ['name' => 'Required']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('really required!', $v->messages()->first('name'));
+    }
+
+    public function testCustomValidationLinesAreRespectedWithAsterisks()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'name.*' => [
+                    'required' => 'all are really required!',
+                ],
+            ],
+        ]);
+        $v = new Validator($trans, ['name' => ['', '']], []);
+        $v->each('name', 'required|max:255');
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('all are really required!', $v->messages()->first('name.0'));
+        $this->assertEquals('all are really required!', $v->messages()->first('name.1'));
     }
 
     public function testInlineValidationMessagesAreRespected()
@@ -231,35 +279,26 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('require it please!', $v->messages()->first('name'));
     }
 
-    public function testSeveralSameInlineValidationMessagesAreRespected()
+    public function testInlineValidationMessagesAreRespectedWithAsterisks()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['name' => ['', '']], [], ['name.*.required' => 'all must be required!']);
+        $v->each('name', 'required|max:255');
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('all must be required!', $v->messages()->first('name.0'));
+        $this->assertEquals('all must be required!', $v->messages()->first('name.1'));
+    }
+
+    public function testValidateArray()
     {
         $trans = $this->getRealTranslator();
 
-        $data = [
-            'name' => '',
-            'foo' => 'bar',
-            'laravel' => 'framework',
-        ];
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
+        $this->assertTrue($v->passes());
 
-        $rules = [
-            'name' => 'Required',
-            'foo' => 'Boolean',
-            'laravel' => 'Numeric',
-        ];
-
-        $messages = [
-            'name.required' => 'validation failed',
-            'foo.boolean' => 'validation failed',
-            'laravel.numeric' => 'another failure',
-        ];
-
-        $v = new Validator($trans, $data, $rules, $messages);
+        $v = new Validator($trans, ['foo' => new Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
         $this->assertFalse($v->passes());
-        $v->messages()->setFormat(':message');
-
-        $this->assertEquals('validation failed', $v->messages()->first('name'));
-        $this->assertEquals('validation failed', $v->messages()->first('foo'));
-        $this->assertEquals('another failure', $v->messages()->first('laravel'));
     }
 
     public function testValidateRequired()
@@ -973,6 +1012,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users']);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(0);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
@@ -986,21 +1026,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1']);
-        $mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id', [])->andReturn(1);
-        $v->setPresenceVerifier($mock2);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id', [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,1,id_col']);
-        $mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock3->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id_col', [])->andReturn(2);
-        $v->setPresenceVerifier($mock3);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id_col', [])->andReturn(2);
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,NULL,id_col,foo,bar']);
-        $mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock3->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar'])->andReturn(2);
-        $v->setPresenceVerifier($mock3);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar'])->andReturn(2);
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
     }
 
@@ -1009,34 +1052,38 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users']);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(true);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email,account_id,1,name,taylor']);
-        $mock4 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock4->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(true);
-        $v->setPresenceVerifier($mock4);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(true);
+        $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email_addr']);
-        $mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock2->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, [])->andReturn(false);
-        $v->setPresenceVerifier($mock2);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, null, [])->andReturn(false);
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => ['foo']], ['email' => 'Exists:users,email_addr']);
-        $mock3 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock3->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', ['foo'], [])->andReturn(false);
-        $v->setPresenceVerifier($mock3);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', ['foo'], [])->andReturn(false);
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:connection.users']);
-        $mock5 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock5->shouldReceive('setConnection')->once()->with('connection');
-        $mock5->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(true);
-        $v->setPresenceVerifier($mock5);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with('connection');
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(true);
+        $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
 
@@ -1044,16 +1091,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['id' => 'foo'], ['id' => 'Integer|Exists:users,id']);
-        $mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock2->shouldReceive('getCount')->never();
-        $v->setPresenceVerifier($mock2);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('getCount')->never();
+        $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['id' => '1'], ['id' => 'Integer|Exists:users,id']);
-        $mock2 = m::mock('Illuminate\Validation\PresenceVerifierInterface');
-        $mock2->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, [])->andReturn(true);
-        $v->setPresenceVerifier($mock2);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, [])->andReturn(true);
+        $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
 
@@ -1077,14 +1125,279 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidateUrl()
+    /**
+     * @dataProvider validUrls
+     */
+    public function testValidateUrlWithValidUrls($validUrl)
     {
         $trans = $this->getRealTranslator();
-        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'Url']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'Url']);
+        $v = new Validator($trans, ['x' => $validUrl], ['x' => 'Url']);
         $this->assertTrue($v->passes());
+    }
+
+    /**
+     * @dataProvider invalidUrls
+     */
+    public function testValidateUrlWithInvalidUrls($invalidUrl)
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['x' => $invalidUrl], ['x' => 'Url']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function validUrls()
+    {
+        return [
+            ['aaa://fully.qualified.domain/path'],
+            ['aaas://fully.qualified.domain/path'],
+            ['about://fully.qualified.domain/path'],
+            ['acap://fully.qualified.domain/path'],
+            ['acct://fully.qualified.domain/path'],
+            ['acr://fully.qualified.domain/path'],
+            ['adiumxtra://fully.qualified.domain/path'],
+            ['afp://fully.qualified.domain/path'],
+            ['afs://fully.qualified.domain/path'],
+            ['aim://fully.qualified.domain/path'],
+            ['apt://fully.qualified.domain/path'],
+            ['attachment://fully.qualified.domain/path'],
+            ['aw://fully.qualified.domain/path'],
+            ['barion://fully.qualified.domain/path'],
+            ['beshare://fully.qualified.domain/path'],
+            ['bitcoin://fully.qualified.domain/path'],
+            ['blob://fully.qualified.domain/path'],
+            ['bolo://fully.qualified.domain/path'],
+            ['callto://fully.qualified.domain/path'],
+            ['cap://fully.qualified.domain/path'],
+            ['chrome://fully.qualified.domain/path'],
+            ['chrome-extension://fully.qualified.domain/path'],
+            ['cid://fully.qualified.domain/path'],
+            ['coap://fully.qualified.domain/path'],
+            ['coaps://fully.qualified.domain/path'],
+            ['com-eventbrite-attendee://fully.qualified.domain/path'],
+            ['content://fully.qualified.domain/path'],
+            ['crid://fully.qualified.domain/path'],
+            ['cvs://fully.qualified.domain/path'],
+            ['data://fully.qualified.domain/path'],
+            ['dav://fully.qualified.domain/path'],
+            ['dict://fully.qualified.domain/path'],
+            ['dlna-playcontainer://fully.qualified.domain/path'],
+            ['dlna-playsingle://fully.qualified.domain/path'],
+            ['dns://fully.qualified.domain/path'],
+            ['dntp://fully.qualified.domain/path'],
+            ['dtn://fully.qualified.domain/path'],
+            ['dvb://fully.qualified.domain/path'],
+            ['ed2k://fully.qualified.domain/path'],
+            ['example://fully.qualified.domain/path'],
+            ['facetime://fully.qualified.domain/path'],
+            ['fax://fully.qualified.domain/path'],
+            ['feed://fully.qualified.domain/path'],
+            ['feedready://fully.qualified.domain/path'],
+            ['file://fully.qualified.domain/path'],
+            ['filesystem://fully.qualified.domain/path'],
+            ['finger://fully.qualified.domain/path'],
+            ['fish://fully.qualified.domain/path'],
+            ['ftp://fully.qualified.domain/path'],
+            ['geo://fully.qualified.domain/path'],
+            ['gg://fully.qualified.domain/path'],
+            ['git://fully.qualified.domain/path'],
+            ['gizmoproject://fully.qualified.domain/path'],
+            ['go://fully.qualified.domain/path'],
+            ['gopher://fully.qualified.domain/path'],
+            ['gtalk://fully.qualified.domain/path'],
+            ['h323://fully.qualified.domain/path'],
+            ['ham://fully.qualified.domain/path'],
+            ['hcp://fully.qualified.domain/path'],
+            ['http://fully.qualified.domain/path'],
+            ['https://fully.qualified.domain/path'],
+            ['iax://fully.qualified.domain/path'],
+            ['icap://fully.qualified.domain/path'],
+            ['icon://fully.qualified.domain/path'],
+            ['im://fully.qualified.domain/path'],
+            ['imap://fully.qualified.domain/path'],
+            ['info://fully.qualified.domain/path'],
+            ['iotdisco://fully.qualified.domain/path'],
+            ['ipn://fully.qualified.domain/path'],
+            ['ipp://fully.qualified.domain/path'],
+            ['ipps://fully.qualified.domain/path'],
+            ['irc://fully.qualified.domain/path'],
+            ['irc6://fully.qualified.domain/path'],
+            ['ircs://fully.qualified.domain/path'],
+            ['iris://fully.qualified.domain/path'],
+            ['iris.beep://fully.qualified.domain/path'],
+            ['iris.lwz://fully.qualified.domain/path'],
+            ['iris.xpc://fully.qualified.domain/path'],
+            ['iris.xpcs://fully.qualified.domain/path'],
+            ['itms://fully.qualified.domain/path'],
+            ['jabber://fully.qualified.domain/path'],
+            ['jar://fully.qualified.domain/path'],
+            ['jms://fully.qualified.domain/path'],
+            ['keyparc://fully.qualified.domain/path'],
+            ['lastfm://fully.qualified.domain/path'],
+            ['ldap://fully.qualified.domain/path'],
+            ['ldaps://fully.qualified.domain/path'],
+            ['magnet://fully.qualified.domain/path'],
+            ['mailserver://fully.qualified.domain/path'],
+            ['mailto://fully.qualified.domain/path'],
+            ['maps://fully.qualified.domain/path'],
+            ['market://fully.qualified.domain/path'],
+            ['message://fully.qualified.domain/path'],
+            ['mid://fully.qualified.domain/path'],
+            ['mms://fully.qualified.domain/path'],
+            ['modem://fully.qualified.domain/path'],
+            ['ms-help://fully.qualified.domain/path'],
+            ['ms-settings://fully.qualified.domain/path'],
+            ['ms-settings-airplanemode://fully.qualified.domain/path'],
+            ['ms-settings-bluetooth://fully.qualified.domain/path'],
+            ['ms-settings-camera://fully.qualified.domain/path'],
+            ['ms-settings-cellular://fully.qualified.domain/path'],
+            ['ms-settings-cloudstorage://fully.qualified.domain/path'],
+            ['ms-settings-emailandaccounts://fully.qualified.domain/path'],
+            ['ms-settings-language://fully.qualified.domain/path'],
+            ['ms-settings-location://fully.qualified.domain/path'],
+            ['ms-settings-lock://fully.qualified.domain/path'],
+            ['ms-settings-nfctransactions://fully.qualified.domain/path'],
+            ['ms-settings-notifications://fully.qualified.domain/path'],
+            ['ms-settings-power://fully.qualified.domain/path'],
+            ['ms-settings-privacy://fully.qualified.domain/path'],
+            ['ms-settings-proximity://fully.qualified.domain/path'],
+            ['ms-settings-screenrotation://fully.qualified.domain/path'],
+            ['ms-settings-wifi://fully.qualified.domain/path'],
+            ['ms-settings-workplace://fully.qualified.domain/path'],
+            ['msnim://fully.qualified.domain/path'],
+            ['msrp://fully.qualified.domain/path'],
+            ['msrps://fully.qualified.domain/path'],
+            ['mtqp://fully.qualified.domain/path'],
+            ['mumble://fully.qualified.domain/path'],
+            ['mupdate://fully.qualified.domain/path'],
+            ['mvn://fully.qualified.domain/path'],
+            ['news://fully.qualified.domain/path'],
+            ['nfs://fully.qualified.domain/path'],
+            ['ni://fully.qualified.domain/path'],
+            ['nih://fully.qualified.domain/path'],
+            ['nntp://fully.qualified.domain/path'],
+            ['notes://fully.qualified.domain/path'],
+            ['oid://fully.qualified.domain/path'],
+            ['opaquelocktoken://fully.qualified.domain/path'],
+            ['pack://fully.qualified.domain/path'],
+            ['palm://fully.qualified.domain/path'],
+            ['paparazzi://fully.qualified.domain/path'],
+            ['pkcs11://fully.qualified.domain/path'],
+            ['platform://fully.qualified.domain/path'],
+            ['pop://fully.qualified.domain/path'],
+            ['pres://fully.qualified.domain/path'],
+            ['prospero://fully.qualified.domain/path'],
+            ['proxy://fully.qualified.domain/path'],
+            ['psyc://fully.qualified.domain/path'],
+            ['query://fully.qualified.domain/path'],
+            ['redis://fully.qualified.domain/path'],
+            ['rediss://fully.qualified.domain/path'],
+            ['reload://fully.qualified.domain/path'],
+            ['res://fully.qualified.domain/path'],
+            ['resource://fully.qualified.domain/path'],
+            ['rmi://fully.qualified.domain/path'],
+            ['rsync://fully.qualified.domain/path'],
+            ['rtmfp://fully.qualified.domain/path'],
+            ['rtmp://fully.qualified.domain/path'],
+            ['rtsp://fully.qualified.domain/path'],
+            ['rtsps://fully.qualified.domain/path'],
+            ['rtspu://fully.qualified.domain/path'],
+            ['secondlife://fully.qualified.domain/path'],
+            ['service://fully.qualified.domain/path'],
+            ['session://fully.qualified.domain/path'],
+            ['sftp://fully.qualified.domain/path'],
+            ['sgn://fully.qualified.domain/path'],
+            ['shttp://fully.qualified.domain/path'],
+            ['sieve://fully.qualified.domain/path'],
+            ['sip://fully.qualified.domain/path'],
+            ['sips://fully.qualified.domain/path'],
+            ['skype://fully.qualified.domain/path'],
+            ['smb://fully.qualified.domain/path'],
+            ['sms://fully.qualified.domain/path'],
+            ['smtp://fully.qualified.domain/path'],
+            ['snews://fully.qualified.domain/path'],
+            ['snmp://fully.qualified.domain/path'],
+            ['soap.beep://fully.qualified.domain/path'],
+            ['soap.beeps://fully.qualified.domain/path'],
+            ['soldat://fully.qualified.domain/path'],
+            ['spotify://fully.qualified.domain/path'],
+            ['ssh://fully.qualified.domain/path'],
+            ['steam://fully.qualified.domain/path'],
+            ['stun://fully.qualified.domain/path'],
+            ['stuns://fully.qualified.domain/path'],
+            ['submit://fully.qualified.domain/path'],
+            ['svn://fully.qualified.domain/path'],
+            ['tag://fully.qualified.domain/path'],
+            ['teamspeak://fully.qualified.domain/path'],
+            ['tel://fully.qualified.domain/path'],
+            ['teliaeid://fully.qualified.domain/path'],
+            ['telnet://fully.qualified.domain/path'],
+            ['tftp://fully.qualified.domain/path'],
+            ['things://fully.qualified.domain/path'],
+            ['thismessage://fully.qualified.domain/path'],
+            ['tip://fully.qualified.domain/path'],
+            ['tn3270://fully.qualified.domain/path'],
+            ['turn://fully.qualified.domain/path'],
+            ['turns://fully.qualified.domain/path'],
+            ['tv://fully.qualified.domain/path'],
+            ['udp://fully.qualified.domain/path'],
+            ['unreal://fully.qualified.domain/path'],
+            ['urn://fully.qualified.domain/path'],
+            ['ut2004://fully.qualified.domain/path'],
+            ['vemmi://fully.qualified.domain/path'],
+            ['ventrilo://fully.qualified.domain/path'],
+            ['videotex://fully.qualified.domain/path'],
+            ['view-source://fully.qualified.domain/path'],
+            ['wais://fully.qualified.domain/path'],
+            ['webcal://fully.qualified.domain/path'],
+            ['ws://fully.qualified.domain/path'],
+            ['wss://fully.qualified.domain/path'],
+            ['wtai://fully.qualified.domain/path'],
+            ['wyciwyg://fully.qualified.domain/path'],
+            ['xcon://fully.qualified.domain/path'],
+            ['xcon-userid://fully.qualified.domain/path'],
+            ['xfire://fully.qualified.domain/path'],
+            ['xmlrpc.beep://fully.qualified.domain/path'],
+            ['xmlrpc.beeps://fully.qualified.domain/path'],
+            ['xmpp://fully.qualified.domain/path'],
+            ['xri://fully.qualified.domain/path'],
+            ['ymsgr://fully.qualified.domain/path'],
+            ['z39.50://fully.qualified.domain/path'],
+            ['z39.50r://fully.qualified.domain/path'],
+            ['z39.50s://fully.qualified.domain/path'],
+            ['http://a.pl'],
+            ['http://localhost/url.php'],
+            ['http://local.dev'],
+            ['http://google.com'],
+            ['http://www.google.com'],
+            ['https://google.com'],
+            ['http://illuminate.dev'],
+            ['http://localhost'],
+            ['http://laravel.com/?'],
+            ['http://президент.рф/'],
+            ['http://스타벅스코리아.com'],
+            ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
+        ];
+    }
+
+    public function invalidUrls()
+    {
+        return [
+
+            ['aslsdlks'],
+            ['google.com'],
+            ['://google.com'],
+            ['http ://google.com'],
+            ['http:/google.com'],
+            ['http://goog_le.com'],
+            ['http://google.com::aa'],
+            ['http://google.com:aa'],
+            ['http://laravel.com?'],
+            ['http://laravel.com#'],
+            ['http://127.0.0.1:aa'],
+            ['http://[::1'],
+            ['foo://bar'],
+            ['javascript://test%0Aalert(321)'],
+        ];
     }
 
     public function testValidateActiveUrl()
@@ -1522,6 +1835,589 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, $data, ['foo' => 'Array']);
         $v->each('foo', 'numeric|min:4|max:16');
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foo', ['numeric', 'min:6', 'max:14']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, $data, ['foo' => 'Array']);
+        $v->each('foo', ['numeric', 'min:4', 'max:16']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateImplicitEachWithAsterisks()
+    {
+        $trans = $this->getRealTranslator();
+        $data = ['foo' => [5, 10, 15]];
+
+        // pipe rules fails
+        $v = new Validator($trans, $data, [
+            'foo' => 'Array',
+            'foo.*' => 'Numeric|Min:6|Max:16',
+        ]);
+        $this->assertFalse($v->passes());
+
+        // pipe passes
+        $v = new Validator($trans, $data, [
+            'foo' => 'Array',
+            'foo.*' => 'Numeric|Min:4|Max:16',
+        ]);
+        $this->assertTrue($v->passes());
+
+        // array rules fails
+        $v = new Validator($trans, $data, [
+            'foo' => 'Array',
+            'foo.*' => ['Numeric', 'Min:6', 'Max:16'],
+        ]);
+        $this->assertFalse($v->passes());
+
+        // array rules passes
+        $v = new Validator($trans, $data, [
+            'foo' => 'Array',
+            'foo.*' => ['Numeric', 'Min:4', 'Max:16'],
+        ]);
+        $this->assertTrue($v->passes());
+
+        // string passes
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => 'Required|String']);
+        $this->assertTrue($v->passes());
+
+        // numeric fails
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => 'Required|Numeric']);
+        $this->assertFalse($v->passes());
+
+        // nested array fails
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo' => 'Array', 'foo.*.name' => 'Required|String', 'foo.*.votes.*' => 'Required|Integer']);
+        $this->assertFalse($v->passes());
+
+        // multiple items passes
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String']]);
+        $this->assertTrue($v->passes());
+
+        // multiple items fails
+        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'Numeric']]);
+        $this->assertFalse($v->passes());
+
+        // nested arrays fails
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String'], 'foo.*.votes.*' => ['Required', 'Integer']]);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = ['names' => [['second' => 'I have no first']]];
+        $v = new Validator($trans, $data, ['names.*.first' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = [];
+        $v = new Validator($trans, $data, ['names.*.first' => 'required']);
+        $this->assertTrue($v->passes());
+
+        $data = ['names' => [['second' => 'I have no first']]];
+        $v = new Validator($trans, $data, ['names.*.first' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = ['people' => [
+            ['cars' => [['model' => 2005], []]],
+        ]];
+        $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = ['people' => [
+            ['name' => 'test', 'cars' => [['model' => 2005], ['name' => 'test2']]],
+        ]];
+        $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = ['people' => [
+            ['phones' => ['iphone', 'android'], 'cars' => [['model' => 2005], ['name' => 'test2']]],
+        ]];
+        $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = ['names' => [['second' => '2']]];
+        $v = new Validator($trans, $data, ['names.*.first' => 'sometimes|required']);
+        $this->assertTrue($v->passes());
+
+        $data = [
+            'people' => [
+                ['name' => 'Jon', 'email' => 'a@b.c'],
+                ['name' => 'Jon'],
+            ],
+        ];
+        $v = new Validator($trans, $data, ['people.*.email' => 'required']);
+        $this->assertFalse($v->passes());
+
+        $data = [
+            'people' => [
+                [
+                    'name' => 'Jon',
+                    'cars' => [
+                        ['model' => 2014],
+                    ],
+                ],
+                [
+                    'name' => 'Arya',
+                    'cars' => [
+                        ['name' => 'test'],
+                    ],
+                ],
+            ],
+        ];
+        $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateNestedArrayWithCommonParentChildKey()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = [
+            'products' => [
+                [
+                    'price' => 2,
+                    'options' => [
+                        ['price' => 1],
+                    ],
+                ],
+                [
+                    'price' => 2,
+                    'options' => [
+                        ['price' => 0],
+                    ],
+                ],
+            ],
+        ];
+        $v = new Validator($trans, $data, ['products.*.price' => 'numeric|min:1']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateNestedArrayWithNonNumericKeys()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = [
+            'item_amounts' => [
+                'item_123' => 2,
+            ],
+        ];
+
+        $v = new Validator($trans, $data, ['item_amounts.*' => 'numeric|min:5']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateImplicitEachWithAsterisksConfirmed()
+    {
+        $trans = $this->getRealTranslator();
+
+        // confirmed passes
+        $v = new Validator($trans, ['foo' => [
+            ['password' => 'foo0', 'password_confirmation' => 'foo0'],
+            ['password' => 'foo1', 'password_confirmation' => 'foo1'],
+        ]], ['foo.*.password' => 'confirmed']);
+        $this->assertTrue($v->passes());
+
+        // nested confirmed passes
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['password' => 'bar0', 'password_confirmation' => 'bar0'],
+                ['password' => 'bar1', 'password_confirmation' => 'bar1'],
+            ]],
+            ['bar' => [
+                ['password' => 'bar2', 'password_confirmation' => 'bar2'],
+                ['password' => 'bar3', 'password_confirmation' => 'bar3'],
+            ]],
+        ]], ['foo.*.bar.*.password' => 'confirmed']);
+        $this->assertTrue($v->passes());
+
+        // confirmed fails
+        $v = new Validator($trans, ['foo' => [
+            ['password' => 'foo0', 'password_confirmation' => 'bar0'],
+            ['password' => 'foo1'],
+        ]], ['foo.*.password' => 'confirmed']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.password'));
+        $this->assertTrue($v->messages()->has('foo.1.password'));
+
+        // nested confirmed fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['password' => 'bar0'],
+                ['password' => 'bar1', 'password_confirmation' => 'bar2'],
+            ]],
+        ]], ['foo.*.bar.*.password' => 'confirmed']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.password'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.password'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksDifferent()
+    {
+        $trans = $this->getRealTranslator();
+
+        // different passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'foo', 'last' => 'bar'],
+            ['name' => 'bar', 'last' => 'foo'],
+        ]], ['foo.*.name' => ['different:foo.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // nested different passes
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => 'foo', 'last' => 'bar'],
+                ['name' => 'bar', 'last' => 'foo'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['different:foo.*.bar.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // different fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'foo', 'last' => 'foo'],
+            ['name' => 'bar', 'last' => 'bar'],
+        ]], ['foo.*.name' => ['different:foo.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested different fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => 'foo', 'last' => 'foo'],
+                ['name' => 'bar', 'last' => 'bar'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['different:foo.*.bar.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksSame()
+    {
+        $trans = $this->getRealTranslator();
+
+        // same passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'foo', 'last' => 'foo'],
+            ['name' => 'bar', 'last' => 'bar'],
+        ]], ['foo.*.name' => ['same:foo.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // nested same passes
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => 'foo', 'last' => 'foo'],
+                ['name' => 'bar', 'last' => 'bar'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['same:foo.*.bar.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // same fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'foo', 'last' => 'bar'],
+            ['name' => 'bar', 'last' => 'foo'],
+        ]], ['foo.*.name' => ['same:foo.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested same fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => 'foo', 'last' => 'bar'],
+                ['name' => 'bar', 'last' => 'foo'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['same:foo.*.bar.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequired()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first'],
+            ['name' => 'second'],
+        ]], ['foo.*.name' => ['Required']]);
+        $this->assertTrue($v->passes());
+
+        // nested required passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first'],
+            ['name' => 'second'],
+        ]], ['foo.*.name' => ['Required']]);
+        $this->assertTrue($v->passes());
+
+        // required fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null],
+            ['name' => null, 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null],
+                ['name' => null],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredIf()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_if passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'foo'],
+            ['last' => 'bar'],
+        ]], ['foo.*.name' => ['Required_if:foo.*.last,foo']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_if passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'foo'],
+            ['last' => 'bar'],
+        ]], ['foo.*.name' => ['Required_if:foo.*.last,foo']]);
+        $this->assertTrue($v->passes());
+
+        // required_if fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo'],
+            ['name' => null, 'last' => 'foo'],
+        ]], ['foo.*.name' => ['Required_if:foo.*.last,foo']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_if fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'foo'],
+                ['name' => null, 'last' => 'foo'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_if:foo.*.bar.*.last,foo']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredUnless()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_unless passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo'],
+            ['name' => 'second', 'last' => 'bar'],
+        ]], ['foo.*.name' => ['Required_unless:foo.*.last,foo']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_unless passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo'],
+            ['name' => 'second', 'last' => 'foo'],
+        ]], ['foo.*.bar.*.name' => ['Required_unless:foo.*.bar.*.last,foo']]);
+        $this->assertTrue($v->passes());
+
+        // required_unless fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'baz'],
+            ['name' => null, 'last' => 'bar'],
+        ]], ['foo.*.name' => ['Required_unless:foo.*.last,foo']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_unless fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'bar'],
+                ['name' => null, 'last' => 'bar'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_unless:foo.*.bar.*.last,foo']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredWith()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_with passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'last'],
+            ['name' => 'second', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_with:foo.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_with passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'last'],
+            ['name' => 'second', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_with:foo.*.last']]);
+        $this->assertTrue($v->passes());
+
+        // required_with fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'last'],
+            ['name' => null, 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_with:foo.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_with fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'last'],
+                ['name' => null, 'last' => 'last'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_with:foo.*.bar.*.last']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredWithAll()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_with_all passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'last', 'middle' => 'middle'],
+            ['name' => 'second', 'last' => 'last', 'middle' => 'middle'],
+        ]], ['foo.*.name' => ['Required_with_all:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_with_all passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'last' => 'last', 'middle' => 'middle'],
+            ['name' => 'second', 'last' => 'last', 'middle' => 'middle'],
+        ]], ['foo.*.name' => ['Required_with_all:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        // required_with_all fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'last', 'middle' => 'middle'],
+            ['name' => null, 'last' => 'last', 'middle' => 'middle'],
+        ]], ['foo.*.name' => ['Required_with_all:foo.*.last,foo.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_with_all fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'last', 'middle' => 'middle'],
+                ['name' => null, 'last' => 'last', 'middle' => 'middle'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_with_all:foo.*.bar.*.last,foo.*.bar.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredWithout()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_without passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'middle' => 'middle'],
+            ['name' => 'second', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_without:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_without passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first', 'middle' => 'middle'],
+            ['name' => 'second', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_without:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        // required_without fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'last'],
+            ['name' => null, 'middle' => 'middle'],
+        ]], ['foo.*.name' => ['Required_without:foo.*.last,foo.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_without fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'last'],
+                ['name' => null, 'middle' => 'middle'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_without:foo.*.bar.*.last,foo.*.bar.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredWithoutAll()
+    {
+        $trans = $this->getRealTranslator();
+
+        // required_without_all passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first'],
+            ['name' => null, 'middle' => 'middle'],
+            ['name' => null, 'middle' => 'middle', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_without_all:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        // required_without_all fails
+        // nested required_without_all passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => 'first'],
+            ['name' => null, 'middle' => 'middle'],
+            ['name' => null, 'middle' => 'middle', 'last' => 'last'],
+        ]], ['foo.*.name' => ['Required_without_all:foo.*.last,foo.*.middle']]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'foo' => 'foo', 'bar' => 'bar'],
+            ['name' => null, 'foo' => 'foo', 'bar' => 'bar'],
+        ]], ['foo.*.name' => ['Required_without_all:foo.*.last,foo.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_without_all fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'foo' => 'foo', 'bar' => 'bar'],
+                ['name' => null, 'foo' => 'foo', 'bar' => 'bar'],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_without_all:foo.*.bar.*.last,foo.*.bar.*.middle']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
     }
 
     public function testValidateEachWithNonIndexedArray()
@@ -1550,15 +2446,16 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testValidateEachWithNonArrayWithoutArrayRule()
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
         $v->each('foo', ['min:7|max:13']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testInlineMessagesMayUseAsteriskForEachRules()
+    {
     }
 
     protected function getTranslator()
@@ -1572,5 +2469,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 
         return $trans;
+    }
+
+    public function getIlluminateArrayTranslator()
+    {
+        return new Illuminate\Translation\Translator(
+            new Illuminate\Translation\ArrayLoader, 'en'
+        );
     }
 }
