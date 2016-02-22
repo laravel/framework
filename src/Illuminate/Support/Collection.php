@@ -220,15 +220,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $operator = '===';
             }
             switch ($operator) {
-                case '==':  return $itemKey ==  $value;
-                case '===': return $itemKey === $value;
-                case '!=':  return $itemKey !=  $value;
-                case '!==': return $itemKey !== $value;
-                case '>=':  return $itemKey >=  $value;
-                case '=<':  return $itemKey <=  $value;
-                case '>':   return $itemKey >   $value;
-                case '<':   return $itemKey <   $value;
-                default:    return $itemKey ==  $value;
+                case '==':
+                    return $itemKey ==  $value;
+                case '===':
+                    return $itemKey === $value;
+                case '!=':
+                    return $itemKey !=  $value;
+                case '!==':
+                    return $itemKey !== $value;
+                case '>=':
+                    return $itemKey >=  $value;
+                case '=<':
+                    return $itemKey <=  $value;
+                case '>':
+                    return $itemKey >   $value;
+                case '<':
+                    return $itemKey <   $value;
+                default:
+                    return $itemKey ==  $value;
             }
         });
     }
