@@ -6,13 +6,20 @@ use Illuminate\Database\Migrations\Migration;
 class Create{{tableClassName}}Table extends Migration
 {
     /**
+     * Table name
+     *
+     * @var string
+     */
+    private $tableName = '{{table}}';
+
+    /**
      * Run the migrations.
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('{{table}}', function (Blueprint $table) {
+        Schema::create($this->tableName, function (Blueprint $table) {
             $table->increments('id');
             $table->text('connection');
             $table->text('queue');
@@ -28,6 +35,6 @@ class Create{{tableClassName}}Table extends Migration
      */
     public function down()
     {
-        Schema::drop('{{table}}');
+        Schema::drop($this->tableName);
     }
 }
