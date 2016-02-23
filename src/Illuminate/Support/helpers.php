@@ -859,9 +859,17 @@ if (! function_exists('value')) {
      * @param  mixed  $value
      * @return mixed
      */
-    function value($value)
+    function value($value, $recursive = false)
     {
-        return $value instanceof Closure ? $value() : $value;
+        if ($value instanceof Closure) {
+            if ($recursive) {
+                $value = value($value(), $recursive);
+            } else {
+                $value = $value();
+            }
+        }
+        
+        return $value;
     }
 }
 
