@@ -692,7 +692,7 @@ if (! function_exists('stub')) {
     function stub($custom, $default)
     {
         $path = base_path('resources/stubs/'.$custom);
-        
+
         if (file_exists($path)) {
             return $path;
         }
