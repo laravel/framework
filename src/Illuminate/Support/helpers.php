@@ -854,9 +854,11 @@ if (! function_exists('trait_uses_recursive')) {
 
 if (! function_exists('value')) {
     /**
-     * Return the default value of the given value.
+     * Return the default value of the given value. Can also return
+     * default value recursively.
      *
      * @param  mixed  $value
+     * @param  bool   $recursive
      * @return mixed
      */
     function value($value, $recursive = false)
@@ -868,7 +870,7 @@ if (! function_exists('value')) {
                 $value = $value();
             }
         }
-        
+
         return $value;
     }
 }
