@@ -3,10 +3,13 @@
 namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\StubWriterTrait;
 use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+    
     /**
      * The console command name.
      *
@@ -36,10 +39,10 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('resource')) {
-            return stub('routing/controller.stub', __DIR__.'/stubs/controller.stub');
+            return $this->stub('routing/controller.stub', __DIR__.'/stubs/controller.stub');
         }
 
-        return stub('routing/controller.plain.stub', __DIR__.'/stubs/controller.plain.stub');
+        return $this->stub('routing/controller.plain.stub', __DIR__.'/stubs/controller.plain.stub');
     }
 
     /**

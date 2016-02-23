@@ -4,10 +4,13 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\StubWriterTrait;
 use Symfony\Component\Console\Input\InputOption;
 
 class ListenerMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+    
     /**
      * The console command name.
      *
@@ -78,9 +81,9 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('queued')) {
-            return stub('foundation/listener-queued.stub', __DIR__.'/stubs/listener-queued.stub');
+            return $this->stub('foundation/listener-queued.stub', __DIR__.'/stubs/listener-queued.stub');
         } else {
-            return stub('foundation/listener.stub', __DIR__.'/stubs/listener.stub');
+            return $this->stub('foundation/listener.stub', __DIR__.'/stubs/listener.stub');
         }
     }
 

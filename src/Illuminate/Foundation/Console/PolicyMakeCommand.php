@@ -3,9 +3,12 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\StubWriterTrait;
 
 class PolicyMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+    
     /**
      * The console command name.
      *
@@ -34,7 +37,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return stub('foundation/policy.stub', __DIR__.'/stubs/policy.stub');
+        return $this->stub('foundation/policy.stub', __DIR__.'/stubs/policy.stub');
     }
 
     /**

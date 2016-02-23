@@ -3,9 +3,12 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\StubWriterTrait;
 
 class RequestMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+    
     /**
      * The console command name.
      *
@@ -34,7 +37,7 @@ class RequestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return stub('foundation/request.stub', __DIR__.'/stubs/request.stub');
+        return $this->stub('foundation/request.stub', __DIR__.'/stubs/request.stub');
     }
 
     /**

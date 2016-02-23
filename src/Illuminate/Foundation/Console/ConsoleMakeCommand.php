@@ -3,11 +3,14 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Foundation\StubWriterTrait;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ConsoleMakeCommand extends GeneratorCommand
 {
+    use StubWriterTrait;
+    
     /**
      * The console command name.
      *
@@ -50,7 +53,7 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return stub('foundation/console.stub', __DIR__.'/stubs/console.stub');
+        return $this->stub('foundation/console.stub', __DIR__.'/stubs/console.stub');
     }
 
     /**
