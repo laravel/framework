@@ -344,7 +344,7 @@ class Validator implements ValidatorContract
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
             foreach ($rules as $rule) {
-                $this->validate($attribute, $rule);
+                $this->validateAttribute($attribute, $rule);
 
                 if ($this->shouldStopValidating($attribute)) {
                     break;
@@ -373,13 +373,27 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Run the validator's rules against its data.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate()
+    {
+        if ($this->fails()) {
+            throw new ValidationException($this);
+        }
+    }
+
+    /**
      * Validate a given attribute against a rule.
      *
      * @param  string  $attribute
      * @param  string  $rule
      * @return void
      */
-    protected function validate($attribute, $rule)
+    protected function validateAttribute($attribute, $rule)
     {
         list($rule, $parameters) = $this->parseRule($rule);
 

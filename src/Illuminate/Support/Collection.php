@@ -215,16 +215,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
+     * @param  mixed  $operator
      * @param  mixed  $value
-     * @param  bool  $strict
      * @return static
      */
-    public function where($key, $value, $strict = true)
+    public function where($key, $operator, $value = null)
     {
-        return $this->filter(function ($item) use ($key, $value, $strict) {
-            return $strict ? data_get($item, $key) === $value
-                           : data_get($item, $key) == $value;
-        });
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '===';
+        }
+
+        return $this->filter($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
@@ -236,7 +239,36 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function whereLoose($key, $value)
     {
-        return $this->where($key, $value, false);
+        return $this->where($key, '=', $value);
+    }
+
+    /**
+     * Get an operator checker callback.
+     *
+     * @param  string  $key
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Closure
+     */
+    protected function operatorForWhere($key, $operator, $value)
+    {
+        return function ($item) use ($key, $operator, $value) {
+            $retrieved = data_get($item, $key);
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':  return $retrieved == $value;
+                case '===': return $retrieved === $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '<':   return $retrieved < $value;
+                case '>':   return $retrieved > $value;
+                case '<>':
+                case '!=':  return $retrieved != $value;
+                case '!==': return $retrieved !== $value;
+            }
+        };
     }
 
     /**
@@ -482,20 +514,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function pluck($value, $key = null)
     {
         return new static(Arr::pluck($this->items, $value, $key));
-    }
-
-    /**
-     * Alias for the "pluck" method.
-     *
-     * @param  string  $value
-     * @param  string|null  $key
-     * @return static
-     *
-     * @deprecated since version 5.2. Use the "pluck" method directly.
-     */
-    public function lists($value, $key = null)
-    {
-        return $this->pluck($value, $key);
     }
 
     /**
