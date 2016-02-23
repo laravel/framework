@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation;
+namespace Illuminate\Foundation\Console;
 
 trait StubWriterTrait
 {
