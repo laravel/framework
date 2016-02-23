@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Foundation\Console\StubWriterTrait;
 
 class JobMakeCommand extends GeneratorCommand
 {

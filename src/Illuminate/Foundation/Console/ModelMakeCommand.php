@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Foundation\Console\StubWriterTrait;
 
 class ModelMakeCommand extends GeneratorCommand
 {

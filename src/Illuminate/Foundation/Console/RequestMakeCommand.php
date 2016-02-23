@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\Console\StubWriterTrait;
 
 class RequestMakeCommand extends GeneratorCommand
 {
