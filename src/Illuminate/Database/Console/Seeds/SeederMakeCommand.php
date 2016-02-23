@@ -5,7 +5,7 @@ namespace Illuminate\Database\Console\Seeds;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\StubWriterTrait;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class SeederMakeCommand extends GeneratorCommand
 {

@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\StubWriterTrait;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class EventMakeCommand extends GeneratorCommand
 {

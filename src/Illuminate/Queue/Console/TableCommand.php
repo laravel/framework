@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\StubWriterTrait;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class TableCommand extends Command
 {

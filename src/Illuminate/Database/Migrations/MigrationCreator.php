@@ -5,7 +5,7 @@ namespace Illuminate\Database\Migrations;
 use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\StubWriterTrait;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class MigrationCreator
 {

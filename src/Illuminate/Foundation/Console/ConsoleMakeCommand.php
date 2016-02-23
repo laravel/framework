@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\StubWriterTrait;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class ConsoleMakeCommand extends GeneratorCommand
 {

@@ -5,7 +5,7 @@ namespace Illuminate\Cache\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\StubWriterTrait;
+use Illuminate\Foundation\Console\StubWriterTrait;
 
 class CacheTableCommand extends Command
 {
