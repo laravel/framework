@@ -13,6 +13,16 @@ class BcryptHasher implements HasherContract
      * @var int
      */
     protected $rounds = 10;
+    
+    /**
+     * Create a new BcryptHasher.
+     *
+     * @return  void
+     */
+    public function __construct()
+    {
+        $this->rounds = (int) env('HASHING_ROUNDS', 10);
+    }
 
     /**
      * Hash the given value.
