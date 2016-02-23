@@ -2,10 +2,11 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Contracts\Http\UploadedFile as UploadedFileContract;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
-class UploadedFile extends SymfonyUploadedFile
+class UploadedFile extends SymfonyUploadedFile implements UploadedFileContract
 {
     use Macroable;
 
