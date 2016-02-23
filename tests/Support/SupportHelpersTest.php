@@ -310,6 +310,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo', value('foo'));
         $this->assertEquals('foo', value(function () { return 'foo'; }));
+        $this->assertEquals('foo', value(function () { return function () { return 'foo'; }; }, true));
+        $this->assertEquals('foo', value(function () { return function () { return function() { return 'foo'; }; }; }, true));
     }
 
     public function testObjectGet()

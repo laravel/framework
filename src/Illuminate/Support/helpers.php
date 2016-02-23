@@ -854,14 +854,24 @@ if (! function_exists('trait_uses_recursive')) {
 
 if (! function_exists('value')) {
     /**
-     * Return the default value of the given value.
+     * Return the default value of the given value. Can also return
+     * default value recursively.
      *
      * @param  mixed  $value
+     * @param  bool   $recursive
      * @return mixed
      */
-    function value($value)
+    function value($value, $recursive = false)
     {
-        return $value instanceof Closure ? $value() : $value;
+        if ($value instanceof Closure) {
+            if ($recursive) {
+                $value = value($value(), $recursive);
+            } else {
+                $value = $value();
+            }
+        }
+
+        return $value;
     }
 }
 
