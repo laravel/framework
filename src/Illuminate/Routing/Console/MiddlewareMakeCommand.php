@@ -8,7 +8,7 @@ use Illuminate\Foundation\StubWriterTrait;
 class MiddlewareMakeCommand extends GeneratorCommand
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

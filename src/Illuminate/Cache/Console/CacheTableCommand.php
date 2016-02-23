@@ -10,7 +10,7 @@ use Illuminate\Foundation\StubWriterTrait;
 class CacheTableCommand extends Command
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

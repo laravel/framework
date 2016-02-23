@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 class ListenerMakeCommand extends GeneratorCommand
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

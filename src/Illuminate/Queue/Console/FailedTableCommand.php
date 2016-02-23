@@ -11,7 +11,7 @@ use Illuminate\Foundation\StubWriterTrait;
 class FailedTableCommand extends Command
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

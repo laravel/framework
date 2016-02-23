@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 class JobMakeCommand extends GeneratorCommand
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

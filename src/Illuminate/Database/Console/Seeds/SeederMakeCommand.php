@@ -10,7 +10,7 @@ use Illuminate\Foundation\StubWriterTrait;
 class SeederMakeCommand extends GeneratorCommand
 {
     use StubWriterTrait;
-    
+
     /**
      * The console command name.
      *

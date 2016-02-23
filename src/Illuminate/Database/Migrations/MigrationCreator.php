@@ -10,7 +10,7 @@ use Illuminate\Foundation\StubWriterTrait;
 class MigrationCreator
 {
     use StubWriterTrait;
-    
+
     /**
      * The filesystem instance.
      *
