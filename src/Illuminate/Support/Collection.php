@@ -227,7 +227,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $operator = '===';
         }
 
-        return $this->filter($this->operatorChecker($key, $operator, $value));
+        return $this->filter($this->operatorForWhere($key, $operator, $value));
     }
 
     /**
@@ -240,6 +240,35 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function whereLoose($key, $value)
     {
         return $this->where($key, '=', $value);
+    }
+
+    /**
+     * Get an operator checker callback.
+     *
+     * @param  string  $key
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Closure
+     */
+    protected function operatorForWhere($key, $operator, $value)
+    {
+        return function ($item) use ($key, $operator, $value) {
+            $retrieved = data_get($item, $key);
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':  return $retrieved == $value;
+                case '===': return $retrieved === $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '<':   return $retrieved < $value;
+                case '>':   return $retrieved > $value;
+                case '<>':
+                case '!=':  return $retrieved != $value;
+                case '!==': return $retrieved !== $value;
+            }
+        };
     }
 
     /**
@@ -985,35 +1014,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }, $this->items], $arrayableItems);
 
         return new static(call_user_func_array('array_map', $params));
-    }
-
-    /**
-     * Get an operator checker callback.
-     *
-     * @param  string  $key
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return \Closure
-     */
-    protected function operatorChecker($key, $operator, $value)
-    {
-        return function ($item) use ($key, $operator, $value) {
-            $retrieved = data_get($item, $key);
-
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '===': return $retrieved === $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<>':
-                case '!=':  return $retrieved != $value;
-                case '!==': return $retrieved !== $value;
-            }
-        };
     }
 
     /**
