@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use RuntimeException;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
@@ -239,33 +238,6 @@ class Str
     }
 
     /**
-     * Generate a more truly "random" bytes.
-     *
-     * @param  int  $length
-     * @return string
-     *
-     * @throws \RuntimeException
-     *
-     * @deprecated since version 5.2. Use random_bytes instead.
-     */
-    public static function randomBytes($length = 16)
-    {
-        if (PHP_MAJOR_VERSION >= 7 || defined('RANDOM_COMPAT_READ_BUFFER')) {
-            $bytes = random_bytes($length);
-        } elseif (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes($length, $strong);
-
-            if ($bytes === false || $strong === false) {
-                throw new RuntimeException('Unable to generate random string.');
-            }
-        } else {
-            throw new RuntimeException('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.');
-        }
-
-        return $bytes;
-    }
-
-    /**
      * Generate a "random" alpha-numeric string.
      *
      * Should not be considered sufficient for cryptography, etc.
@@ -281,21 +253,20 @@ class Str
     }
 
     /**
-     * Compares two strings using a constant-time algorithm.
+     * Replace a given value in the string sequentially with an array.
      *
-     * Note: This method will leak length information.
-     *
-     * Note: Adapted from Symfony\Component\Security\Core\Util\StringUtils.
-     *
-     * @param  string  $knownString
-     * @param  string  $userInput
-     * @return bool
-     *
-     * @deprecated since version 5.2. Use hash_equals instead.
+     * @param  string  $search
+     * @param  array   $replace
+     * @param  string  $subject
+     * @return string
      */
-    public static function equals($knownString, $userInput)
+    public static function replaceArray($search, array $replace, $subject)
     {
-        return hash_equals($knownString, $userInput);
+        foreach ($replace as $value) {
+            $subject = static::replaceFirst($search, $value, $subject);
+        }
+
+        return $subject;
     }
 
     /**

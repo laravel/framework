@@ -765,6 +765,17 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
 
         $router = $this->getRouter();
+        $router->resource('prefix/foo.bar', 'FooController');
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.create'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.store'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+
+        $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
             'index' => 'foo',
             'show' => 'bar',
@@ -854,13 +865,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Illuminate\Http\Response', $_SERVER['route.test.controller.middleware.class']);
     }
 
-    public function testControllerInspection()
-    {
-        $router = $this->getRouter();
-        $router->controller('home', 'RouteTestInspectedControllerStub');
-        $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
-    }
-
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -941,14 +945,6 @@ class RouteTestControllerParameterizedMiddlewareTwo
         $_SERVER['route.test.controller.middleware.parameters.two'] = [$parameter1, $parameter2];
 
         return $next($request);
-    }
-}
-
-class RouteTestInspectedControllerStub extends Illuminate\Routing\Controller
-{
-    public function getFoo()
-    {
-        return 'hello';
     }
 }
 

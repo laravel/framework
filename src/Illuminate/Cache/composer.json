@@ -14,9 +14,9 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "illuminate/contracts": "5.2.*",
-        "illuminate/support": "5.2.*",
+        "php": ">=5.6.4",
+        "illuminate/contracts": "5.3.*",
+        "illuminate/support": "5.3.*",
         "nesbot/carbon": "~1.20"
     },
     "autoload": {
@@ -26,13 +26,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.2-dev"
+            "dev-master": "5.3-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database cache driver (5.2.*).",
-        "illuminate/filesystem": "Required to use the file cache driver (5.2.*).",
-        "illuminate/redis": "Required to use the redis cache driver (5.2.*)."
+        "illuminate/database": "Required to use the database cache driver (5.3.*).",
+        "illuminate/filesystem": "Required to use the file cache driver (5.3.*).",
+        "illuminate/redis": "Required to use the redis cache driver (5.3.*)."
     },
     "minimum-stability": "dev"
 }

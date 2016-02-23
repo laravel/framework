@@ -2,6 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Validation\Factory;
+use Illuminate\Validation\Validator;
+use Illuminate\Validation\PresenceVerifierInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ValidationFactoryTest extends PHPUnit_Framework_TestCase
 {
@@ -12,14 +15,14 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testMakeMethodCreatesValidValidator()
     {
-        $translator = m::mock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
         $this->assertEquals($translator, $validator->getTranslator());
         $this->assertEquals(['foo' => 'bar'], $validator->getData());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
-        $presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $presence = m::mock(PresenceVerifierInterface::class);
         $noop1 = function () {};
         $noop2 = function () {};
         $noop3 = function () {};
@@ -32,7 +35,7 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['replacer' => $noop3], $validator->getReplacers());
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
-        $presence = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $presence = m::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
         $factory->setPresenceVerifier($presence);
@@ -42,15 +45,30 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($presence, $validator->getPresenceVerifier());
     }
 
+    public function testValidateCallsValidateOnTheValidator()
+    {
+        $validator = m::mock(Validator::class);
+        $translator = m::mock(TranslatorInterface::class);
+        $factory = m::mock(Factory::class.'[make]', [$translator]);
+
+        $factory->shouldReceive('make')->once()
+                ->with(['foo' => 'bar'], ['foo' => 'required'], [], [])
+                ->andReturn($validator);
+
+        $validator->shouldReceive('validate')->once();
+
+        $factory->validate(['foo' => 'bar'], ['foo' => 'required']);
+    }
+
     public function testCustomResolverIsCalled()
     {
         unset($_SERVER['__validator.factory']);
-        $translator = m::mock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $factory->resolver(function ($translator, $data, $rules) {
             $_SERVER['__validator.factory'] = true;
 
-            return new Illuminate\Validation\Validator($translator, $data, $rules);
+            return new Validator($translator, $data, $rules);
         });
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
 
