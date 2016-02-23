@@ -13,7 +13,7 @@ class BcryptHasher implements HasherContract
      * @var int
      */
     protected $rounds = 10;
-    
+
     /**
      * Create a new BcryptHasher.
      *
