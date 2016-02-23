@@ -138,6 +138,14 @@ class SupportStrTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('string', Str::random());
     }
 
+    public function testReplaceArray()
+    {
+        $this->assertEquals('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));
+        $this->assertEquals('foo/bar/baz/?', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?/?'));
+        $this->assertEquals('foo/bar', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?'));
+        $this->assertEquals('?/?/?', Str::replaceArray('x', ['foo', 'bar', 'baz'], '?/?/?'));
+    }
+
     public function testReplaceFirst()
     {
         $this->assertEquals('fooqux foobar', Str::replaceFirst('bar', 'qux', 'foobar foobar'));

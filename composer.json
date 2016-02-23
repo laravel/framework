@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6.4",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~3.0",
@@ -28,16 +28,15 @@
         "paragonie/random_compat": "~1.1",
         "psy/psysh": "0.7.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "2.8.*|3.0.*",
-        "symfony/debug": "2.8.*|3.0.*",
-        "symfony/finder": "2.8.*|3.0.*",
-        "symfony/http-foundation": "2.8.*|3.0.*",
-        "symfony/http-kernel": "2.8.*|3.0.*",
-        "symfony/polyfill-php56": "~1.0",
-        "symfony/process": "2.8.*|3.0.*",
-        "symfony/routing": "2.8.*|3.0.*",
-        "symfony/translation": "2.8.*|3.0.*",
-        "symfony/var-dumper": "2.8.*|3.0.*",
+        "symfony/console": "3.1.*",
+        "symfony/debug": "3.1.*",
+        "symfony/finder": "3.1.*",
+        "symfony/http-foundation": "3.1.*",
+        "symfony/http-kernel": "3.1.*",
+        "symfony/process": "3.1.*",
+        "symfony/routing": "3.1.*",
+        "symfony/translation": "3.1.*",
+        "symfony/var-dumper": "3.1.*",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
@@ -74,10 +73,10 @@
         "aws/aws-sdk-php": "~3.0",
         "mockery/mockery": "~0.9.2",
         "pda/pheanstalk": "~3.0",
-        "phpunit/phpunit": "~4.1",
+        "phpunit/phpunit": "~5.0",
         "predis/predis": "~1.0",
-        "symfony/css-selector": "2.8.*|3.0.*",
-        "symfony/dom-crawler": "2.8.*|3.0.*"
+        "symfony/css-selector": "3.1.*",
+        "symfony/dom-crawler": "3.1.*"
     },
     "autoload": {
         "classmap": [
@@ -93,7 +92,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.2-dev"
+            "dev-master": "5.3-dev"
         }
     },
     "suggest": {
@@ -106,8 +105,8 @@
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "symfony/css-selector": "Required to use some of the crawler integration testing tools (2.8.*|3.0.*).",
-        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (2.8.*|3.0.*)."
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (3.1.*).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (3.1.*)."
     },
     "minimum-stability": "dev"
 }
