@@ -2,10 +2,11 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Contracts\Http\UploadedFile as UploadedFileContract;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
-class UploadedFile extends SymfonyUploadedFile
+class UploadedFile extends SymfonyUploadedFile implements UploadedFileContract
 {
     use Macroable;
 
@@ -27,6 +28,26 @@ class UploadedFile extends SymfonyUploadedFile
     public function extension()
     {
         return $this->guessClientExtension();
+    }
+
+    /**
+     * Get the file size in bytes.
+     *
+     * @return int
+     */
+    public function size()
+    {
+        return $this->getClientSize();
+    }
+
+    /**
+     * Get the file mime type.
+     *
+     * @return string
+     */
+    public function mimeType()
+    {
+        return $this->getMimeType();
     }
 
     /**
