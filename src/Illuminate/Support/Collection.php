@@ -263,6 +263,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return function ($item) use ($key, $value) {
                     return data_get($item, $key) === $value;
                 };
+            case '<>':
+            case '!=':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) != $value;
+                };
+            case '!==':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) !== $value;
+                };
             case '<=':
                 return function ($item) use ($key, $value) {
                     return data_get($item, $key) <= $value;
@@ -278,15 +287,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             case '>':
                 return function ($item) use ($key, $value) {
                     return data_get($item, $key) > $value;
-                };
-            case '<>':
-            case '!=':
-                return function ($item) use ($key, $value) {
-                    return data_get($item, $key) != $value;
-                };
-            case '!==':
-                return function ($item) use ($key, $value) {
-                    return data_get($item, $key) !== $value;
                 };
         }
     }
