@@ -64,4 +64,17 @@ class ControllerMakeCommand extends GeneratorCommand
             ['resource', null, InputOption::VALUE_NONE, 'Generate a resource controller class.'],
         ];
     }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $namespace = $this->getNamespace($name);
+
+        return str_replace("use $namespace\Controller;\n", '', parent::buildClass($name));
+    }
 }
