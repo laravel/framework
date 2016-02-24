@@ -2934,6 +2934,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($value instanceof DateTime) {
             return Carbon::instance($value);
         }
+        
+        // If the value is a DateTimeImmutable instance, also skip the rest of these
+        // checks. Just return the DateTimeImmutable right away.
+        if($value instanceof DateTimeImmutable) {
+            return new Carbon($value->format('Y-m-d H:i:s.u'), $value->getTimeZone());
+        }
 
         // If this value is an integer, we will assume it is a UNIX timestamp's value
         // and format a Carbon object from this timestamp. This allows flexibility
