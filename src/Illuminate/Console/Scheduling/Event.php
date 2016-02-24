@@ -198,7 +198,7 @@ class Event
         $output = ProcessUtils::escapeArgument($this->output);
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
-		
+        
         if ($this->withoutOverlapping) {
             if (is_winnt()) {
                 $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
