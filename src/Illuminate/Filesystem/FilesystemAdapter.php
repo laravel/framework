@@ -230,6 +230,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if ($adapter instanceof AwsS3Adapter) {
             $path = $adapter->getPathPrefix().$path;
+
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
         } elseif ($adapter instanceof LocalAdapter) {
             return '/storage/'.$path;
