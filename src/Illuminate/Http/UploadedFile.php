@@ -31,6 +31,26 @@ class UploadedFile extends SymfonyUploadedFile implements UploadedFileContract
     }
 
     /**
+     * Get the file size in bytes.
+     *
+     * @return int
+     */
+    public function size()
+    {
+        return $this->getClientSize();
+    }
+
+    /**
+     * Get the file mime type.
+     *
+     * @return string
+     */
+    public function mimeType()
+    {
+        return $this->getMimeType();
+    }
+
+    /**
      * Get a filename for the file that is the MD5 hash of the contents.
      *
      * @return string
