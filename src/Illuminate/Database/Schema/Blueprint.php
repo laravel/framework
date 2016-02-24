@@ -934,7 +934,7 @@ class Blueprint
      * @param  array   $parameters
      * @return \Illuminate\Support\Fluent
      */
-    protected function addColumn($type, $name, array $parameters = [])
+    public function addColumn($type, $name, array $parameters = [])
     {
         $attributes = array_merge(compact('type', 'name'), $parameters);
 
