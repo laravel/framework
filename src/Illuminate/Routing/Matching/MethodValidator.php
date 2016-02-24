@@ -16,6 +16,6 @@ class MethodValidator implements ValidatorInterface
      */
     public function matches(Route $route, Request $request)
     {
-        return in_array($request->getMethod(), $route->methods());
+        return in_array($request->getMethod(), $route->getMethods());
     }
 }
