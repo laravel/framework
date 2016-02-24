@@ -252,23 +252,43 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function operatorForWhere($key, $operator, $value)
     {
-        return function ($item) use ($key, $operator, $value) {
-            $retrieved = data_get($item, $key);
-
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '===': return $retrieved === $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<>':
-                case '!=':  return $retrieved != $value;
-                case '!==': return $retrieved !== $value;
-            }
-        };
+        switch ($operator) {
+            default:
+            case '=':
+            case '==':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) == $value;
+                };
+            case '===':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) === $value;
+                };
+            case '<>':
+            case '!=':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) != $value;
+                };
+            case '!==':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) !== $value;
+                };
+            case '<=':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) <= $value;
+                };
+            case '>=':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) >= $value;
+                };
+            case '<':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) < $value;
+                };
+            case '>':
+                return function ($item) use ($key, $value) {
+                    return data_get($item, $key) > $value;
+                };
+        }
     }
 
     /**
