@@ -635,8 +635,6 @@ trait InteractsWithPages
                 return $option->getAttribute('value');
             }
         }
-
-        return;
     }
 
     /**
@@ -658,8 +656,6 @@ trait InteractsWithPages
                 return $radio->getAttribute('value');
             }
         }
-
-        return;
     }
 
     /**
