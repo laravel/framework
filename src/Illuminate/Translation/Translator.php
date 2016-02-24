@@ -41,7 +41,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * The message selector.
-     * 
+     *
      * @var \Symfony\Component\Translation\MessageSelector
      */
     protected $selector;
