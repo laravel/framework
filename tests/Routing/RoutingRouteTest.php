@@ -265,7 +265,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
         $router = $this->getRouter();
         $router->get('foo/bar', ['before' => 'foo:bar,baz|bar:boom', function () { return 'hello'; }]);
-        $router->filter('foo', function ($route, $request, $bar, $baz) { return; });
+        $router->filter('foo', function ($route, $request, $bar, $baz) {});
         $router->filter('bar', function ($route, $request, $boom) { return $boom; });
         $this->assertEquals('boom', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
