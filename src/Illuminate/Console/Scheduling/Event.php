@@ -199,8 +199,12 @@ class Event
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
+        if (is_winnt()) {
+
+        }
+
         if ($this->withoutOverlapping) {
-            if (DIRECTORY_SEPARATOR === '\\') {
+            if (is_winnt()) {
                 $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
             } else {
                 $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
