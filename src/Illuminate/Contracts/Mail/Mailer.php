@@ -19,7 +19,7 @@ interface Mailer
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return void
+     * @return int
      */
     public function send($view, array $data, $callback);
 
