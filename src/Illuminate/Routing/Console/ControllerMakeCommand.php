@@ -68,6 +68,8 @@ class ControllerMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
+     * Remove the base controller import if we are already in base namespace.
+     *
      * @param  string  $name
      * @return string
      */
