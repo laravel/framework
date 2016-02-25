@@ -120,7 +120,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function fullUrlWithQuery(array $query)
     {
         return count($this->query()) > 0
-                        ? $this->fullUrl().'&'.http_build_query($query)
+                        ? $this->url().'/?'.http_build_query(array_merge($this->query(), $query))
                         : $this->fullUrl().'?'.http_build_query($query);
     }
 
