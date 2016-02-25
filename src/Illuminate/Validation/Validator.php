@@ -1127,9 +1127,13 @@ class Validator implements ValidatorContract
      */
     protected function validateNoDuplicates($attribute, $value, $parameters)
     {
-        $data = array_filter(Arr::dot($this->data), function ($key) use ($attribute, $parameters) {
-            return $key != $attribute && Str::is($parameters[0], $key);
-        }, ARRAY_FILTER_USE_KEY);
+        $data = [];
+
+        foreach (Arr::dot($this->data) as $key => $val) {
+            if ($key != $attribute && Str::is($parameters[0], $key)) {
+                $data[$key] = $val;
+            }
+        }
 
         return ! in_array($value, array_values($data));
     }
