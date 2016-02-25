@@ -247,13 +247,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 default:
                 case '=':
                 case '==':  return $retrieved == $value;
-                case '===': return $retrieved === $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
+                case '!=':
+                case '<>':  return $retrieved != $value;
                 case '<':   return $retrieved < $value;
                 case '>':   return $retrieved > $value;
-                case '<>':
-                case '!=':  return $retrieved != $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '===': return $retrieved === $value;
                 case '!==': return $retrieved !== $value;
             }
         };
