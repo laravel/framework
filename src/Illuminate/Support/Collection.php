@@ -224,22 +224,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         if (func_num_args() == 2) {
             $value = $operator;
 
-            $operator = '===';
+            $operator = '=';
         }
 
         return $this->filter($this->operatorForWhere($key, $operator, $value));
-    }
-
-    /**
-     * Filter items by the given key value pair using loose comparison.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return static
-     */
-    public function whereLoose($key, $value)
-    {
-        return $this->where($key, '=', $value);
     }
 
     /**
