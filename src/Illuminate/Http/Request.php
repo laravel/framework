@@ -330,7 +330,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function filtered()
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             return $value === '' ? null : $value;
         }, $this->all());
     }
