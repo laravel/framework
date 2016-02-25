@@ -18,7 +18,9 @@ class VerifyPostSize
      */
     public function handle($request, Closure $next)
     {
-        if ($request->server('CONTENT_LENGTH') > $this->getPostMaxSize()) {
+        $postMaxSize = $this->getPostMaxSize();
+
+        if ($postMaxSize > 0 && $request->server('CONTENT_LENGTH') > $postMaxSize) {
             throw new PostTooLargeException;
         }
 
