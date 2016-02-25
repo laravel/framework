@@ -267,7 +267,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  bool  $strict
      * @return static
      */
-    public function whereIn($key, array $values, $strict = true)
+    public function whereIn($key, array $values, $strict = false)
     {
         return $this->filter(function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
@@ -275,15 +275,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Filter items by the given key value pair using loose comparison.
+     * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
      * @param  array  $values
      * @return static
      */
-    public function whereInLoose($key, array $values)
+    public function whereInStrict($key, array $values)
     {
-        return $this->whereIn($key, $values, false);
+        return $this->whereIn($key, $values, true);
     }
 
     /**
