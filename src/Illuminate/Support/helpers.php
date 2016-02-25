@@ -877,3 +877,15 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('is_winnt')) {
+    /**
+     * Determine whether the current envrionment is Windows NT based.
+     *
+     * @return bool
+     */
+    function is_winnt()
+    {
+        return substr(strtoupper(php_uname('s')), 0, 3) === 'WIN';
+    }
+}
