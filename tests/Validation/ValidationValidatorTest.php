@@ -1011,6 +1011,29 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateNoDuplicates()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'no_duplicates:foo.*']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['foo', 'bar']], ['foo.*' => 'no_duplicates:foo.*']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], ['id' => 1]]], ['foo.*.id' => 'no_duplicates:foo.*.id']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], ['id' => 2]]], ['foo.*.id' => 'no_duplicates:foo.*.id']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'no_duplicates:foo.*'], ['foo.*.no_duplicates' => 'There is a duplication!']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('There is a duplication!', $v->messages()->first('foo.0'));
+        $this->assertEquals('There is a duplication!', $v->messages()->first('foo.1'));
+    }
+
     public function testValidateUnique()
     {
         $trans = $this->getRealTranslator();

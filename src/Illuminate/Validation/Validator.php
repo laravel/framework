@@ -1118,6 +1118,23 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate an attribute is unique among other values.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNoDuplicates($attribute, $value, $parameters)
+    {
+        $data = array_filter(Arr::dot($this->data), function ($key) use ($attribute, $parameters) {
+            return $key != $attribute && Str::is($parameters[0], $key);
+        }, ARRAY_FILTER_USE_KEY);
+
+        return ! in_array($value, array_values($data));
+    }
+
+    /**
      * Validate the uniqueness of an attribute value on a given database table.
      *
      * If a database column is not specified, the attribute will be used.
