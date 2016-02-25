@@ -198,9 +198,13 @@ class Event
         $output = ProcessUtils::escapeArgument($this->output);
 
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
-
+        
         if ($this->withoutOverlapping) {
-            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
+            if (is_winnt()) {
+                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
+            } else {
+                $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
+            }
         } else {
             $command = $this->command.$redirect.$output.' 2>&1 &';
         }
@@ -215,7 +219,7 @@ class Event
      */
     protected function mutexPath()
     {
-        return storage_path('framework/schedule-'.sha1($this->expression.$this->command));
+        return storage_path('framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command));
     }
 
     /**
