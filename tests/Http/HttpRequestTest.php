@@ -18,6 +18,30 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertSame($request, $request->instance());
     }
 
+    public function testMethodMethod()
+    {
+        $request = Request::create('', 'GET');
+        $this->assertSame('GET', $request->method());
+
+        $request = Request::create('', 'HEAD');
+        $this->assertSame('HEAD', $request->method());
+
+        $request = Request::create('', 'POST');
+        $this->assertSame('POST', $request->method());
+
+        $request = Request::create('', 'PUT');
+        $this->assertSame('PUT', $request->method());
+
+        $request = Request::create('', 'PATCH');
+        $this->assertSame('PATCH', $request->method());
+
+        $request = Request::create('', 'DELETE');
+        $this->assertSame('DELETE', $request->method());
+
+        $request = Request::create('', 'OPTIONS');
+        $this->assertSame('OPTIONS', $request->method());
+    }
+
     public function testRootMethod()
     {
         $request = Request::create('http://example.com/foo/bar/script.php?test');
