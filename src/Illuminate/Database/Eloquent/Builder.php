@@ -381,7 +381,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function pluck($column, $key = null)
     {
@@ -398,7 +398,7 @@ class Builder
             }
         }
 
-        return collect($results);
+        return $this->model->newCollection($results);
     }
 
     /**
@@ -406,7 +406,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $key
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Eloquent\Collection
      *
      * @deprecated since version 5.2. Use the "pluck" method directly.
      */
