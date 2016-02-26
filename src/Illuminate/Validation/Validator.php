@@ -79,6 +79,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The array of wildcard attributes with their asterisks expanded.
+     *
+     * @var array
+     */
+    protected $implicitAttributes = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -126,13 +133,6 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $replacers = [];
-
-    /**
-     * The array of rules with asterisks.
-     *
-     * @var array
-     */
-    protected $implicitAttributes = [];
 
     /**
      * The size related validation rules.
@@ -298,6 +298,7 @@ class Validator implements ValidatorContract
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
                         $this->implicitAttributes[$attribute][] = $key;
+
                         $this->mergeRules($key, $ruleValue);
                     }
                 }
