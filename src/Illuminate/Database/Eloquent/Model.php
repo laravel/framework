@@ -9,6 +9,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
+use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -2935,6 +2936,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return Carbon::instance($value);
         }
 
+        if ($value instanceof DateTimeImmutable) {
+            return new Carbon(
+                $value->format('Y-m-d H:i:s.u'), $value->getTimeZone()
+            );
+        }
+
         // If this value is an integer, we will assume it is a UNIX timestamp's value
         // and format a Carbon object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
@@ -2963,7 +2970,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asTimeStamp($value)
     {
-        return (int) $this->asDateTime($value)->timestamp;
+        return $this->asDateTime($value)->getTimestamp();
     }
 
     /**
