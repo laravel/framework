@@ -1146,7 +1146,7 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return bool
      */
-    protected function validateNoDuplicates($attribute, $value, $parameters)
+    protected function validateDistinct($attribute, $value, $parameters)
     {
         $rawAttribute = '';
 
