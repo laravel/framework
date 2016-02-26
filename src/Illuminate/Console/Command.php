@@ -346,7 +346,7 @@ class Command extends SymfonyCommand
      * @param  null|int|string  $verbosity
      * @return void
      */
-    public function info($string, $verbosity = null)
+    public function info($string = '', $verbosity = null)
     {
         $this->line($string, 'info', $verbosity);
     }
@@ -359,7 +359,7 @@ class Command extends SymfonyCommand
      * @param  null|int|string  $verbosity
      * @return void
      */
-    public function line($string, $style = null, $verbosity = null)
+    public function line($string = '', $style = null, $verbosity = null)
     {
         $styled = $style ? "<$style>$string</$style>" : $string;
 
