@@ -148,7 +148,7 @@ class Validator implements ValidatorContract
      */
     protected $implicitRules = [
         'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Accepted',
+        'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
         // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
@@ -614,6 +614,18 @@ class Validator implements ValidatorContract
         }
 
         return true;
+    }
+
+    /**
+     * Validate that an attribute exists even if not filled.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validatePresent($attribute, $value)
+    {
+        return Arr::get($this->data, $attribute, '__NO_KEY__') != '__NO_KEY__';
     }
 
     /**
