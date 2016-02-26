@@ -137,6 +137,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $value = Arr::get($array, 'products.desk');
         $this->assertEquals(['price' => 100], $value);
 
+        // Test null array values
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+
         // Test direct ArrayAccess object
         $array = ['products' => ['desk' => ['price' => 100]]];
         $arrayAccessObject = new ArrayObject($array);
@@ -163,11 +168,16 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $value = Arr::get($array, 'parent.child.desk');
         $this->assertNull($value);
 
-        // Test null ArrayAccess object field
+        // Test missing ArrayAccess object field
         $arrayAccessObject = new ArrayObject(['products' => ['desk' => null]]);
         $array = ['parent' => $arrayAccessObject];
         $value = Arr::get($array, 'parent.products.desk.price');
         $this->assertNull($value);
+
+        // Test null ArrayAccess object fields
+        $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
+        $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
     }
 
     public function testHas()
@@ -177,6 +187,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::has($array, 'products.desk.price'));
         $this->assertFalse(Arr::has($array, 'products.foo'));
         $this->assertFalse(Arr::has($array, 'products.desk.foo'));
+
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
     }
 
     public function testIsAssoc()
