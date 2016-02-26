@@ -305,6 +305,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidatePresent()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], ['name' => 'present']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ''], ['name' => 'present']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], ['name' => 'a']]], ['foo.*.id' => 'present']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], []]], ['foo.*.id' => 'present']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], ['id' => '']]], ['foo.*.id' => 'present']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], ['id' => null]]], ['foo.*.id' => 'present']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getRealTranslator();
