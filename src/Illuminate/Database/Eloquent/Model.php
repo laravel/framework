@@ -2970,7 +2970,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function asTimeStamp($value)
     {
-        return (int) $this->asDateTime($value)->timestamp;
+        return $this->asDateTime($value)->getTimestamp();
     }
 
     /**
