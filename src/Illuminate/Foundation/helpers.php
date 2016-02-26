@@ -638,7 +638,7 @@ if (! function_exists('secure_url')) {
      * @param  mixed   $parameters
      * @return string
      */
-    function secure_url($path, $parameters = [])
+    function secure_url($path = null, $parameters = [])
     {
         return url($path, $parameters, true);
     }
