@@ -208,28 +208,9 @@ this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
-        $string = '{{--
-this is an extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely long comment
---}}';
-        $expected = '<?php /*
-this is an extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely
-extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely extremely long comment
-*/ ?>';
+        $string = '{{-- this is an ' . str_repeat('extremely ', 100) . 'long comment --}}';
+        $expected = '<?php /* this is an ' . str_repeat('extremely ', 100) . 'long comment */ ?>';
+
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
