@@ -128,6 +128,13 @@ class Validator implements ValidatorContract
     protected $replacers = [];
 
     /**
+     * The array of rules with asterisks.
+     *
+     * @var array
+     */
+    protected $implicitAttributes = [];
+
+    /**
      * The size related validation rules.
      *
      * @var array
@@ -290,6 +297,7 @@ class Validator implements ValidatorContract
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
+                        $this->implicitAttributes[$attribute][] = $key;
                         $this->mergeRules($key, $ruleValue);
                     }
                 }
@@ -1127,6 +1135,36 @@ class Validator implements ValidatorContract
     protected function validateNotIn($attribute, $value, $parameters)
     {
         return ! $this->validateIn($attribute, $value, $parameters);
+    }
+
+    /**
+     * Validate an attribute is unique among other values.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateNoDuplicates($attribute, $value, $parameters)
+    {
+        $rawAttribute = '';
+
+        foreach ($this->implicitAttributes as $raw => $dataAttributes) {
+            if (in_array($attribute, $dataAttributes)) {
+                $rawAttribute = $raw;
+                break;
+            }
+        }
+
+        $data = [];
+
+        foreach (Arr::dot($this->data) as $key => $val) {
+            if ($key != $attribute && Str::is($rawAttribute, $key)) {
+                $data[$key] = $val;
+            }
+        }
+
+        return ! in_array($value, array_values($data));
     }
 
     /**
