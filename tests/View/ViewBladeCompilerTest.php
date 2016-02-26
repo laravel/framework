@@ -343,6 +343,20 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testBreakStatementsWithExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break(TRUE)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if(TRUE) break; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testContinueStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -353,6 +367,20 @@ test
         $expected = '<?php for($i = 0; $i < 10; $i++): ?>
 test
 <?php continue; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testContinueStatementsWithExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@continue(TRUE)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if(TRUE) continue; ?>
 <?php endfor; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
