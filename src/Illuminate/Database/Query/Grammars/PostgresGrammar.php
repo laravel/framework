@@ -44,7 +44,7 @@ class PostgresGrammar extends Grammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value.'::date';
+        return $this->wrap($where['column']).'::date '.$where['operator'].' '.$value;
     }
 
     /**
