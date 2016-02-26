@@ -161,7 +161,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
-        $this->assertEquals('select * from "users" where "created_at" = ?::date', $builder->toSql());
+        $this->assertEquals('select * from "users" where "created_at"::date = ?', $builder->toSql());
         $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
     }
 
