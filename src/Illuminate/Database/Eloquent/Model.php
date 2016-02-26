@@ -9,7 +9,7 @@ use ArrayAccess;
 use Carbon\Carbon;
 use LogicException;
 use JsonSerializable;
-use DateTimeImmutable;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -2923,20 +2923,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function asDateTime($value)
     {
         // If this value is already a Carbon instance, we shall just return it as is.
-        // This prevents us having to reinstantiate a Carbon instance when we know
+        // This prevents us having to re-instantiate a Carbon instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
         if ($value instanceof Carbon) {
             return $value;
         }
 
-        // If the value is already a DateTime instance, we will just skip the rest of
-        // these checks since they will be a waste of time, and hinder performance
-        // when checking the field. We will just return the DateTime right away.
-        if ($value instanceof DateTime) {
-            return Carbon::instance($value);
-        }
-
-        if ($value instanceof DateTimeImmutable) {
+        // If the value already implements DateTimeInterface, we will just return a
+        // new Carbon instance.
+        if ($value instanceof DateTimeInterface) {
             return new Carbon(
                 $value->format('Y-m-d H:i:s.u'), $value->getTimeZone()
             );
