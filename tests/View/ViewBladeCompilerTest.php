@@ -208,8 +208,8 @@ this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
-        $string = '{{-- this is an ' . str_repeat('extremely ', 100) . 'long comment --}}';
-        $expected = '<?php /* this is an ' . str_repeat('extremely ', 100) . 'long comment */ ?>';
+        $string = sprintf('{{-- this is an %s long comment --}}', str_repeat('extremely ', 1000));
+        $expected = sprintf('<?php /* this is an %s long comment */ ?>', str_repeat('extremely ', 1000));
 
         $this->assertEquals($expected, $compiler->compileString($string));
     }
