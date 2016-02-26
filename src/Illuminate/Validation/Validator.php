@@ -148,7 +148,7 @@ class Validator implements ValidatorContract
      */
     protected $implicitRules = [
         'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Accepted',
+        'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
         // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
@@ -617,6 +617,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute exists even if not filled.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validatePresent($attribute, $value)
+    {
+        return Arr::has($this->data, $attribute);
+    }
+
+    /**
      * Validate the given attribute is filled if it is present.
      *
      * @param  string  $attribute
@@ -625,7 +637,7 @@ class Validator implements ValidatorContract
      */
     protected function validateFilled($attribute, $value)
     {
-        if (Arr::get(array_merge($this->data, $this->files), $attribute, '__NOT_PRESENT__') != '__NOT_PRESENT__') {
+        if (Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return $this->validateRequired($attribute, $value);
         }
 
