@@ -534,7 +534,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileBreak($expression)
     {
-        return '<?php break; ?>';
+        return $expression ? "<?php if{$expression} break; ?>" : '<?php break; ?>';
     }
 
     /**
@@ -545,7 +545,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileContinue($expression)
     {
-        return '<?php continue; ?>';
+        return $expression ? "<?php if{$expression} continue; ?>" : '<?php continue; ?>';
     }
 
     /**
