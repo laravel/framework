@@ -10,4 +10,9 @@ interface CanResetPassword
      * @return string
      */
     public function getEmailForPasswordReset();
+
+    /**
+     * Reset the user's password.
+     */
+    public function resetPassword($password);
 }

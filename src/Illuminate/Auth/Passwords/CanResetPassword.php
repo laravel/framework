@@ -13,4 +13,12 @@ trait CanResetPassword
     {
         return $this->email;
     }
+
+    /**
+     * Reset the user's password.
+     */
+    public function resetPassword($password)
+    {
+        $this->password = bcrypt($password);
+    }
 }
