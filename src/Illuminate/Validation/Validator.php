@@ -830,7 +830,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInArray($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'same');
+        $this->requireParameterCount(1, $parameters, 'in_array');
 
         $otherValues = Arr::where(Arr::dot($this->data), function ($key) use ($parameters) {
             return Str::is($parameters[0], $key);
