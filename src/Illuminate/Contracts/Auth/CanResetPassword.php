@@ -11,7 +11,6 @@ interface CanResetPassword
      */
     public function getEmailForPasswordReset();
 
-
     /**
      * Reset the user's password.
      */
