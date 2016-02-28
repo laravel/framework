@@ -4,6 +4,8 @@ use Mockery as m;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 
 class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
@@ -16,29 +18,32 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
     protected $app;
 
     /**
-     * @var \Mockery
+     * @return array
      */
-    protected $auth;
+    protected $credentials = [
+        'email' => 'someone@laravel.com',
+        'password' => 'secret_password',
+    ];
 
     /**
      * @var \Mockery
      */
-    protected $guard;
-
-    public function setUp()
+    protected function mockGuard()
     {
-        $this->guard = m::mock(Guard::class);
+        $guard = m::mock(Guard::class);
 
-        $this->auth = m::mock(AuthManager::class);
-        $this->auth->shouldReceive('guard')
+        $auth = m::mock(AuthManager::class);
+        $auth->shouldReceive('guard')
             ->once()
-            ->andReturn($this->guard);
+            ->andReturn($guard);
 
         $this->app = m::mock(Application::class);
         $this->app->shouldReceive('make')
             ->once()
             ->withArgs(['auth'])
-            ->andReturn($this->auth);
+            ->andReturn($auth);
+
+        return $guard;
     }
 
     public function tearDown()
@@ -48,7 +53,8 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 
     public function testSeeIsAuthenticated()
     {
-        $this->guard->shouldReceive('check')
+        $this->mockGuard()
+            ->shouldReceive('check')
             ->once()
             ->andReturn(true);
 
@@ -57,7 +63,8 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 
     public function testDontSeeIsAuthenticated()
     {
-        $this->guard->shouldReceive('check')
+        $this->mockGuard()
+            ->shouldReceive('check')
             ->once()
             ->andReturn(false);
 
@@ -66,10 +73,50 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 
     public function testSeeIsAuthenticatedAs()
     {
-        $this->guard->shouldReceive('user')
+        $this->mockGuard()
+            ->shouldReceive('user')
             ->once()
             ->andReturn('Someone');
 
         $this->seeIsAuthenticatedAs('Someone');
+    }
+
+    protected function setupProvider(array $credentials)
+    {
+        $user = m::mock(Authenticatable::class);
+
+        $provider = m::mock(UserProvider::class);
+
+        $provider->shouldReceive('retrieveByCredentials')
+            ->with($credentials)
+            ->andReturn($user);
+
+        $provider->shouldReceive('validateCredentials')
+            ->with($user, $credentials)
+            ->andReturn($this->credentials === $credentials);
+
+        $this->mockGuard()
+            ->shouldReceive('getProvider')
+            ->once()
+            ->andReturn($provider);
+    }
+
+    public function testSeeCredentials()
+    {
+        $this->setupProvider($this->credentials);
+
+        $this->seeCredentials($this->credentials);
+    }
+
+    public function testDontSeeCredentials()
+    {
+        $credentials = [
+            'email' => 'invalid',
+            'password' => 'credentials',
+        ];
+
+        $this->setupProvider($credentials);
+
+        $this->dontSeeCredentials($credentials);
     }
 }
