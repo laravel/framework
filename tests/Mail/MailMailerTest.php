@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use SuperClosure\Serializer;
+use SuperClosure\Analyzer\TokenAnalyzer;
 
 class MailMailerTest extends PHPUnit_Framework_TestCase
 {
@@ -91,9 +92,9 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     public function testMailerCanQueueMessagesToItselfWithSerializedClosures()
     {
         list($view, $swift) = $this->getMocks();
-        $mailer = new Illuminate\Mail\Mailer($view, $swift);
+        $mailer = new MailerWithFasterSerializer($view, $swift);
         $mailer->setQueue($queue = m::mock('Illuminate\Contracts\Queue\Queue'));
-        $serialized = (new Serializer)->serialize($closure = function () {});
+        $serialized = (new Serializer(new TokenAnalyzer))->serialize($closure = function () {});
         $queue->shouldReceive('push')->once()->with('mailer@handleQueuedMessage', ['view' => 'foo', 'data' => [1], 'callback' => $serialized], null);
 
         $mailer->queue('foo', [1], $closure);
@@ -192,6 +193,14 @@ class MailMailerTest extends PHPUnit_Framework_TestCase
     protected function getMocks()
     {
         return [m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer')];
+    }
+}
+
+class MailerWithFasterSerializer extends Illuminate\Mail\Mailer
+{
+    protected function serialize(Closure $closure)
+    {
+        return (new Serializer(new TokenAnalyzer))->serialize($closure);
     }
 }
 

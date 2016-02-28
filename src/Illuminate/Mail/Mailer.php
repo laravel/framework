@@ -254,8 +254,8 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Build the callable for a queued e-mail job.
      *
-     * @param  mixed  $callback
-     * @return mixed
+     * @param  \Closure|string  $callback
+     * @return string
      */
     protected function buildQueueCallable($callback)
     {
@@ -263,7 +263,18 @@ class Mailer implements MailerContract, MailQueueContract
             return $callback;
         }
 
-        return (new Serializer)->serialize($callback);
+        return $this->serialize($callback);
+    }
+
+    /**
+     * Serialize a closure for storage in queue.
+     *
+     * @param  \Closure  $closure
+     * @return string
+     */
+    protected function serialize(Closure $closure)
+    {
+        return (new Serializer)->serialize($closure);
     }
 
     /**
@@ -284,15 +295,26 @@ class Mailer implements MailerContract, MailQueueContract
      * Get the true callable for a queued e-mail message.
      *
      * @param  array  $data
-     * @return mixed
+     * @return \Closure|string
      */
     protected function getQueuedCallable(array $data)
     {
-        if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return unserialize($data['callback'])->getClosure();
+        return $this->unserializeIfApplicable($data['callback']);
+    }
+
+    /**
+     * Unserialize the string if is a serialized closure.
+     *
+     * @param  string  $callback
+     * @return \Closure|string
+     */
+    protected function unserializeIfApplicable($callback)
+    {
+        if (Str::contains($callback, 'SerializableClosure')) {
+            return (new Serializer)->unserialize($callback);
         }
 
-        return $data['callback'];
+        return $callback;
     }
 
     /**
