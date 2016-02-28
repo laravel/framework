@@ -38,6 +38,20 @@ class HasManyThrough extends Relation
      * @var string
      */
     protected $localKey;
+    
+    /**
+     * The `type` column's name of a polymorphic relation.
+     *
+     * @var string
+     */
+    protected $morphTypeColumn;
+    
+    /**
+     * The `type` column's value of a polymorphic relation.
+     *
+     * @var string
+     */
+    protected $morphTypeValue;
 
     /**
      * Create a new has many through relationship instance.
@@ -50,12 +64,14 @@ class HasManyThrough extends Relation
      * @param  string  $localKey
      * @return void
      */
-    public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey, $localKey)
+    public function __construct(Builder $query, Model $farParent, Model $parent, $firstKey, $secondKey, $localKey, $morphTypeColumn, $morphTypeValue)
     {
         $this->localKey = $localKey;
         $this->firstKey = $firstKey;
         $this->secondKey = $secondKey;
         $this->farParent = $farParent;
+        $this->morphTypeColumn = $morphTypeColumn;
+        $this->morphTypeValue = $morphTypeValue;
 
         parent::__construct($query, $parent);
     }
@@ -113,6 +129,10 @@ class HasManyThrough extends Relation
 
         $query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
 
+        if (!is_null($this->morphTypeColumn)) {
+            $query->where($this->morphTypeColumn, $this->morphTypeValue);
+        }
+        
         if ($this->parentSoftDeletes()) {
             $query->whereNull($this->parent->getQualifiedDeletedAtColumn());
         }
