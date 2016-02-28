@@ -5,17 +5,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 trait InteractsWithAuthentication
 {
     /**
-     * Return true if the user is authenticated, false otherwise.
-     *
-     * @param  string|null  $guard
-     * @return bool
-     */
-    protected function isAuthenticated($guard = null)
-    {
-        return $this->app->make('auth')->guard($guard)->check();
-    }
-
-    /**
      * Assert that the user is authenticated.
      *
      * @param string|null  $guard
@@ -42,6 +31,17 @@ trait InteractsWithAuthentication
     }
 
     /**
+     * Return true if the user is authenticated, false otherwise.
+     *
+     * @param  string|null  $guard
+     * @return bool
+     */
+    protected function isAuthenticated($guard = null)
+    {
+        return $this->app->make('auth')->guard($guard)->check();
+    }
+
+    /**
      * Assert that the user is authenticated as the given user.
      *
      * @param  $user
@@ -53,6 +53,38 @@ trait InteractsWithAuthentication
         $this->assertSame(
             $this->app->make('auth')->guard($guard)->user(), $user,
             'The logged in user is not the same'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given credentials are valid.
+     *
+     * @param  array  $credentials
+     * @param  string|null  $guard
+     * @return $this
+     */
+    public function seeCredentials(array $credentials, $guard = null)
+    {
+        $this->assertTrue(
+            $this->hasCredentials($credentials, $guard), 'The given credentials are invalid.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given credentials are invalid.
+     *
+     * @param  array  $credentials
+     * @param  string|null  $guard
+     * @return $this
+     */
+    public function dontSeeCredentials(array $credentials, $guard = null)
+    {
+        $this->assertFalse(
+            $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'
         );
 
         return $this;
@@ -72,39 +104,5 @@ trait InteractsWithAuthentication
         $user = $provider->retrieveByCredentials($credentials);
 
         return $user && $provider->validateCredentials($user, $credentials);
-    }
-
-    /**
-     * Assert that the given credentials are valid.
-     *
-     * @param  array  $credentials
-     * @param  string|null  $guard
-     * @return $this
-     */
-    public function seeCredentials(array $credentials, $guard = null)
-    {
-        $this->assertTrue(
-            $this->hasCredentials($credentials, $guard),
-            'The given credentials are invalid.'
-        );
-
-        return $this;
-    }
-
-    /**
-     * Assert that the given credentials are invalid.
-     *
-     * @param  array  $credentials
-     * @param  string|null  $guard
-     * @return $this
-     */
-    public function dontSeeCredentials(array $credentials, $guard = null)
-    {
-        $this->assertFalse(
-            $this->hasCredentials($credentials, $guard),
-            'The given credentials are valid.'
-        );
-
-        return $this;
     }
 }
