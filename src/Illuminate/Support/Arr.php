@@ -151,10 +151,10 @@ class Arr
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback, $default = null)
+    public static function first($array, callable $callback = null, $default = null)
     {
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
+            if (is_null($callback) || call_user_func($callback, $key, $value)) {
                 return $value;
             }
         }
@@ -170,7 +170,7 @@ class Arr
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback, $default = null)
+    public static function last($array, callable $callback = null, $default = null)
     {
         return static::first(array_reverse($array), $callback, $default);
     }
