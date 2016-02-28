@@ -894,7 +894,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $localKey = $localKey ?: $this->getKeyName();
 
         $morphTypeValue = $related;
-        
+
         return new HasManyThrough((new $related)->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $morphTypeColumn, $morphTypeValue);
     }
 
