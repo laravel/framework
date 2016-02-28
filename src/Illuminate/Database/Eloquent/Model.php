@@ -352,7 +352,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         if ($scope instanceof Closure) {
-            return static::$globalScopes[get_called_class()][uniqid('scope')] = $scope;
+            return static::$globalScopes[get_called_class()][spl_object_hash($scope)] = $scope;
         }
 
         if ($scope instanceof Scope) {
