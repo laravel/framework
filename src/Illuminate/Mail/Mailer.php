@@ -289,7 +289,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function getQueuedCallable(array $data)
     {
         if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return unserialize($data['callback'])->getClosure();
+            return (new Serializer)->unserialize($data['callback']);
         }
 
         return $data['callback'];
