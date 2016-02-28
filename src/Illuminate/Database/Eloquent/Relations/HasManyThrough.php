@@ -38,14 +38,14 @@ class HasManyThrough extends Relation
      * @var string
      */
     protected $localKey;
-    
+
     /**
      * The `type` column's name of a polymorphic relation.
      *
      * @var string
      */
     protected $morphTypeColumn;
-    
+
     /**
      * The `type` column's value of a polymorphic relation.
      *
@@ -129,7 +129,7 @@ class HasManyThrough extends Relation
 
         $query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
 
-        if (!is_null($this->morphTypeColumn)) {
+        if (! is_null($this->morphTypeColumn)) {
             $query->where($this->morphTypeColumn, $this->morphTypeValue);
         }
         
