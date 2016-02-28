@@ -132,7 +132,7 @@ class HasManyThrough extends Relation
         if (! is_null($this->morphTypeColumn)) {
             $query->where($this->morphTypeColumn, $this->morphTypeValue);
         }
-        
+
         if ($this->parentSoftDeletes()) {
             $query->whereNull($this->parent->getQualifiedDeletedAtColumn());
         }
