@@ -263,7 +263,18 @@ class Mailer implements MailerContract, MailQueueContract
             return $callback;
         }
 
-        return (new Serializer)->serialize($callback);
+        return $this->serialize($callback);
+    }
+
+    /**
+     * Serialize a closure for storage in queue.
+     *
+     * @param  \Closure  $closure
+     * @return string
+     */
+    protected function serialize(Closure $closure)
+    {
+        return (new Serializer)->serialize($closure);
     }
 
     /**
@@ -288,11 +299,22 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function getQueuedCallable(array $data)
     {
-        if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return (new Serializer)->unserialize($data['callback']);
+        return $this->unserializeIfApplicable($data['callback']);
+    }
+
+    /**
+     * Unserialize the string if is a serialized closure.
+     *
+     * @param  string  $callback
+     * @return \Closure|string
+     */
+    protected function unserializeIfApplicable($callback)
+    {
+        if (Str::contains($callback, 'SerializableClosure')) {
+            return (new Serializer)->unserialize($callback);
         }
 
-        return $data['callback'];
+        return $callback;
     }
 
     /**
