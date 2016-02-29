@@ -32,11 +32,16 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Get a filename for the file that is the MD5 hash of the contents.
      *
+     * @param  string  $path
      * @return string
      */
-    public function hashName()
+    public function hashName($path = null)
     {
-        return md5_file($this->path()).'.'.$this->extension();
+        if ($path) {
+            $path = rtrim($path, '/').'/';
+        }
+
+        return md5_file($path.$this->path()).'.'.$this->extension();
     }
 
     /**
