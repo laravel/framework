@@ -269,12 +269,12 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if ((is_array($array) && array_key_exists($segment, $array))
+                || ($array instanceof ArrayAccess && $array->offsetExists($segment))) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
@@ -298,12 +298,12 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if ((is_array($array) && array_key_exists($segment, $array))
+                || ($array instanceof ArrayAccess && $array->offsetExists($segment))) {
+                $array = $array[$segment];
+            } else {
                 return false;
             }
-
-            $array = $array[$segment];
         }
 
         return true;
