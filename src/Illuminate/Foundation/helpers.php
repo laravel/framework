@@ -265,6 +265,18 @@ if (! function_exists('csrf_field')) {
     }
 }
 
+if (! function_exists('csrf_meta_tag')) {
+    /**
+     * Generate a CSRF token meta tag.
+     *
+     * @return string
+     */
+    function csrf_meta_tag()
+    {
+        return new HtmlString('<meta name="csrf-token" content="'.csrf_token().'">');
+    }
+}
+
 if (! function_exists('csrf_token')) {
     /**
      * Get the CSRF token value.
