@@ -48,8 +48,11 @@ class UploadedFile extends SymfonyUploadedFile
     public static function createFromBase(SymfonyUploadedFile $file)
     {
         return $file instanceof static ? $file : new static(
-            $file->getPathname(), $file->getClientOriginalName(), $file->getClientMimeType(),
-            $file->getClientSize(), $file->getError()
+            $file->getPathname(),
+            $file->getClientOriginalName(),
+            $file->getClientMimeType(),
+            $file->getClientSize(),
+            $file->getError()
         );
     }
 }
