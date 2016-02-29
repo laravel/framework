@@ -147,12 +147,16 @@ class Arr
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback, $default = null)
+    public static function first($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : reset($array);
+        }
+
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $key, $value)) {
                 return $value;
@@ -166,12 +170,16 @@ class Arr
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback, $default = null)
+    public static function last($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : end($array);
+        }
+
         return static::first(array_reverse($array), $callback, $default);
     }
 
