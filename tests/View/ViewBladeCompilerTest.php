@@ -476,6 +476,22 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testSetStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@set ($set = true)';
+        $expected = '<?php ($set = true); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testUnsetStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@unset ($unset)';
+        $expected = '<?php unset($unset); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
