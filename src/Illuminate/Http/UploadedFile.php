@@ -41,7 +41,7 @@ class UploadedFile extends SymfonyUploadedFile
             $path = rtrim($path, '/').'/';
         }
 
-        return md5_file($path.$this->path()).'.'.$this->extension();
+        return $path.md5_file($this->path()).'.'.$this->extension();
     }
 
     /**
