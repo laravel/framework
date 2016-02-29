@@ -193,6 +193,19 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['foo' => null, 'bar' => ['baz' => null]];
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
+
+        $array = new ArrayObject(['foo' => 10, 'bar' => new ArrayObject(['baz' => 10])]);
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
+        $this->assertFalse(Arr::has($array, 'xxx'));
+        $this->assertFalse(Arr::has($array, 'xxx.yyy'));
+        $this->assertFalse(Arr::has($array, 'foo.xxx'));
+        $this->assertFalse(Arr::has($array, 'bar.xxx'));
+
+        $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
     }
 
     public function testIsAssoc()
