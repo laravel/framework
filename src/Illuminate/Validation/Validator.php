@@ -821,6 +821,25 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that the values of an attribute is in another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateInArray($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'in_array');
+
+        $otherValues = Arr::where(Arr::dot($this->data), function ($key) use ($parameters) {
+            return Str::is($parameters[0], $key);
+        });
+
+        return in_array($value, $otherValues);
+    }
+
+    /**
      * Validate that an attribute has a matching confirmation.
      *
      * @param  string  $attribute
@@ -1157,13 +1176,9 @@ class Validator implements ValidatorContract
             }
         }
 
-        $data = [];
-
-        foreach (Arr::dot($this->data) as $key => $val) {
-            if ($key != $attribute && Str::is($rawAttribute, $key)) {
-                $data[$key] = $val;
-            }
-        }
+        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $rawAttribute) {
+            return $key != $attribute &&  Str::is($rawAttribute, $key);
+        });
 
         return ! in_array($value, array_values($data));
     }
