@@ -153,8 +153,12 @@ class Arr
      */
     public static function first($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return !empty($array) ? reset($array) : value($default);
+        }
+
         foreach ($array as $key => $value) {
-            if (is_null($callback) || call_user_func($callback, $key, $value)) {
+            if (call_user_func($callback, $key, $value)) {
                 return $value;
             }
         }
@@ -172,6 +176,10 @@ class Arr
      */
     public static function last($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return !empty($array) ? end($array) : value($default);
+        }
+
         return static::first(array_reverse($array), $callback, $default);
     }
 
