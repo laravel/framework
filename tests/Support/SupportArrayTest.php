@@ -60,6 +60,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals(200, $value);
+        $this->assertEquals(100, Arr::first($array));
     }
 
     public function testIs()
@@ -80,6 +81,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [100, 200, 300];
         $last = Arr::last($array, function () { return true; });
         $this->assertEquals(300, $last);
+        $this->assertEquals(300, Arr::last($array));
     }
 
     public function testFlatten()
