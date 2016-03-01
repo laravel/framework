@@ -615,6 +615,18 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testCustomExtensionOverwritesCore()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler->directive('foreach', function ($expression) {
+            return '<?php custom(); ?>';
+        });
+
+        $string = '@foreach';
+        $expected = '<?php custom(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testRawTagsCanBeSetToLegacyValues()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
