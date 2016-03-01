@@ -476,11 +476,27 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testPhpStatementsAreCompiled()
+    public function testPhpStatementsWithExpressionAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testPhpStatementsWithoutExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@php';
+        $expected = '<?php ';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testEndphpStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@endphp';
+        $expected = ' ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
