@@ -383,6 +383,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a ltree type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeLtree(Fluent $column)
+    {
+        return 'ltree';
+    }
+
+    /**
      * Create the column definition for an enum type.
      *
      * @param  \Illuminate\Support\Fluent  $column
