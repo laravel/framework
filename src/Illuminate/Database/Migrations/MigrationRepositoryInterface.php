@@ -62,14 +62,14 @@ interface MigrationRepositoryInterface
     public function repositoryExists();
 
     /**
-     * Determine if the migration repository has the tag column
+     * Determine if the migration repository has the tag column.
      *
      * @return bool
      */
     public function repositoryTagColumnExists();
 
     /**
-     * Add the tags column if needed
+     * Add the tags column if needed.
      *
      * @return void
      */

@@ -151,7 +151,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Add the tags column if needed
+     * Add the tags column if needed.
      *
      * @return void
      */
@@ -165,7 +165,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Determine if the migration repository has the tag column
+     * Determine if the migration repository has the tag column.
      *
      * @return bool
      */

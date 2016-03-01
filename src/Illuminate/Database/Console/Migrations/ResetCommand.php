@@ -69,8 +69,7 @@ class ResetCommand extends Command
             $tags = $this->migrator->getAllTags();
 
             foreach ($tags as $tag => $path) {
-
-                $this->output->writeln("Resetting Migrations for tag: " . $tag);
+                $this->output->writeln('Resetting Migrations for tag: '.$tag);
 
                 $this->call('migrate:reset', [
                     '--pretend' => $this->input->getOption('pretend'),
@@ -78,10 +77,9 @@ class ResetCommand extends Command
                     '--force' => $this->input->getOption('force'),
                     '--tag' => $tag,
                 ]);
-
             }
 
-            $this->output->writeln("Resetting Core Migrations");
+            $this->output->writeln('Resetting Core Migrations');
 
             // Then call the default tag
             $this->call('migrate:reset', [

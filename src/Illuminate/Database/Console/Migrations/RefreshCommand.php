@@ -51,7 +51,7 @@ class RefreshCommand extends Command
             '--database' => $database,
             '--force' => $force,
             '--tag' => $tag,
-            '--tags' => $tags
+            '--tags' => $tags,
         ]);
 
         // The refresh command is essentially just a brief aggregate of a few other of
@@ -62,7 +62,7 @@ class RefreshCommand extends Command
             '--force' => $force,
             '--path' => $path,
             '--tag' => $tag,
-            '--tags' => $tags
+            '--tags' => $tags,
         ]);
 
         if ($this->needsSeeding()) {

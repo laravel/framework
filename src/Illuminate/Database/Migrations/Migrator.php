@@ -45,7 +45,7 @@ class Migrator
     protected $notes = [];
 
     /**
-     * Map of tag names to paths
+     * Map of tag names to paths.
      */
     protected $tags = [];
 
@@ -67,7 +67,7 @@ class Migrator
     }
 
     /**
-     * Register a tag path on the migrator instance
+     * Register a tag path on the migrator instance.
      *
      * @param  string $tag
      * @param  string $path
@@ -81,7 +81,7 @@ class Migrator
     }
 
     /**
-     * Fetch a path by tag
+     * Fetch a path by tag.
      *
      * @param  string $tag
      * @return string $path
@@ -92,7 +92,7 @@ class Migrator
     }
 
     /**
-     * Fetch all registered tags
+     * Fetch all registered tags.
      *
      * @return array $tags
      */
@@ -461,7 +461,7 @@ class Migrator
     }
 
     /**
-     * Add the tags column if needed
+     * Add the tags column if needed.
      *
      * @return void
      */

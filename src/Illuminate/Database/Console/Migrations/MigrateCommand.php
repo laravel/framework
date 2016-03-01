@@ -63,8 +63,7 @@ class MigrateCommand extends BaseCommand
             $tags = $this->migrator->getAllTags();
 
             foreach ($tags as $tag => $path) {
-
-                $this->output->writeln("Running Migrations for tag: " . $tag);
+                $this->output->writeln('Running Migrations for tag: '.$tag);
 
                 $this->call('migrate', [
                     '--pretend' => $this->input->getOption('pretend'),
@@ -74,10 +73,9 @@ class MigrateCommand extends BaseCommand
                     '--step' => $this->input->getOption('step'),
                     '--tag' => $tag,
                 ]);
-
             }
 
-            $this->output->writeln("Running Core Migrations");
+            $this->output->writeln('Running Core Migrations');
 
             // Then call the default tag
             $this->call('migrate', [
@@ -87,7 +85,6 @@ class MigrateCommand extends BaseCommand
                 '--path' => $this->input->getOption('path'),
                 '--step' => $this->input->getOption('step'),
             ]);
-
         } else {
             // The pretend option can be used for "simulating" the migration and grabbing
             // the SQL queries that would fire if the migration were to be run against
@@ -112,7 +109,7 @@ class MigrateCommand extends BaseCommand
             $this->migrator->run($path, [
                 'pretend' => $pretend,
                 'step' => $this->input->getOption('step'),
-                'tag' => $tag
+                'tag' => $tag,
             ]);
 
             // Once the migrator has run we will grab the note output and send it out to
