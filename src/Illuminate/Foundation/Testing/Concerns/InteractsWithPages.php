@@ -261,7 +261,7 @@ trait InteractsWithPages
         }
 
         if (! $this->hasSource($text)) {
-            $this->failWithContent("Couldn't find [$text] on the page");
+            $this->failPageInspection("Couldn't find [$text] on the page");
         }
 
         return $this;
@@ -276,7 +276,7 @@ trait InteractsWithPages
     public function dontSee($text)
     {
         if ($this->hasSource($text)) {
-            $this->failWithContent("The page should not contain [$text]");
+            $this->failPageInspection("The page should not contain [$text]");
         }
 
         return $this;
@@ -309,7 +309,7 @@ trait InteractsWithPages
         }
 
         if (! $this->hasText($text)) {
-            $this->failWithContent("Couldn't find the text [$text] on the page");
+            $this->failPageInspection("Couldn't find the text [$text] on the page");
         }
 
         return $this;
@@ -324,7 +324,7 @@ trait InteractsWithPages
     public function dontSeeText($text)
     {
         if ($this->hasText($text)) {
-            $this->failWithContent("The page should not contain the text [$text]");
+            $this->failPageInspection("The page should not contain the text [$text]");
         }
 
         return $this;
@@ -965,7 +965,13 @@ trait InteractsWithPages
         );
     }
 
-    protected function failWithContent($message)
+    /**
+     * Fail the test with the given error message.
+     *
+     * @param  string  $message
+     * @return void
+     */
+    protected function failPageInspection($message)
     {
         $this->fail($this->html().str_repeat("\n", 4).$message.'. Check content above.');
     }
