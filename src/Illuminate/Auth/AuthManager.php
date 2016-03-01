@@ -88,9 +88,9 @@ class AuthManager implements FactoryContract
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($name, $config);
-        } else {
-            return $this->{'create'.ucfirst($config['driver']).'Driver'}($name, $config);
         }
+
+        return $this->{'create'.ucfirst($config['driver']).'Driver'}($name, $config);
     }
 
     /**
