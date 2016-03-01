@@ -1461,14 +1461,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
-            $saved = $this->performUpdate($query, $options);
+            $saved = $this->performUpdate($query);
         }
 
         // If the model is brand new, we'll insert it into our database and set the
         // ID attribute on the model to the value of the newly inserted row's ID
         // which is typically an auto-increment value managed by the database.
         else {
-            $saved = $this->performInsert($query, $options);
+            $saved = $this->performInsert($query);
         }
 
         if ($saved) {
@@ -1514,10 +1514,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Perform a model update operation.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  array  $options
      * @return bool
      */
-    protected function performUpdate(Builder $query, array $options = [])
+    protected function performUpdate(Builder $query)
     {
         $dirty = $this->getDirty();
 
@@ -1532,7 +1531,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             // First we need to create a fresh query instance and touch the creation and
             // update timestamp on the model which are maintained by us for developer
             // convenience. Then we will just continue saving the model instances.
-            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
+            if ($this->timestamps) {
                 $this->updateTimestamps();
             }
 
@@ -1555,10 +1554,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Perform a model insert operation.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  array  $options
      * @return bool
      */
-    protected function performInsert(Builder $query, array $options = [])
+    protected function performInsert(Builder $query)
     {
         if ($this->fireModelEvent('creating') === false) {
             return false;
@@ -1567,7 +1565,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we'll need to create a fresh query instance and touch the creation and
         // update timestamps on this model, which are maintained by us for developer
         // convenience. After, we will just continue saving these model instances.
-        if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
+        if ($this->timestamps) {
             $this->updateTimestamps();
         }
 
