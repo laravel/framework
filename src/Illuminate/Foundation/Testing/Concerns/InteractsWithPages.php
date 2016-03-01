@@ -254,13 +254,15 @@ trait InteractsWithPages
      * @param  bool  $negate
      * @return $this
      */
-    protected function see($text, $negate = false)
+    public function see($text, $negate = false)
     {
-        $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
+        if ($negate) {
+            return $this->dontSee($text);
+        }
 
-        $pattern = $this->getEscapedPattern($text);
-
-        $this->$method("/$pattern/i", $this->html());
+        if (! $this->hasSource($text)) {
+            $this->failWithContent("Couldn't find [$text] on the page");
+        }
 
         return $this;
     }
@@ -271,9 +273,26 @@ trait InteractsWithPages
      * @param  string  $text
      * @return $this
      */
-    protected function dontSee($text)
+    public function dontSee($text)
     {
-        return $this->see($text, true);
+        if ($this->hasSource($text)) {
+            $this->failWithContent("The page should not contain [$text]");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the page contains the given text as part of the source.
+     *
+     * @param  string  $text
+     * @return int|bool
+     */
+    protected function hasSource($text)
+    {
+        $pattern = $this->getEscapedPattern($text);
+
+        return preg_match("/$pattern/i", $this->html());
     }
 
     /**
@@ -283,13 +302,15 @@ trait InteractsWithPages
      * @param  bool  $negate
      * @return $this
      */
-    protected function seeText($text, $negate = false)
+    public function seeText($text, $negate = false)
     {
-        $method = $negate ? 'assertNotRegExp' : 'assertRegExp';
+        if ($negate) {
+            return $this->dontSeeText($text);
+        }
 
-        $pattern = $this->getEscapedPattern($text);
-
-        $this->$method("/$pattern/i", $this->text());
+        if (! $this->hasText($text)) {
+            $this->failWithContent("Couldn't find the text [$text] on the page");
+        }
 
         return $this;
     }
@@ -300,9 +321,26 @@ trait InteractsWithPages
      * @param  string  $text
      * @return $this
      */
-    protected function dontSeeText($text)
+    public function dontSeeText($text)
     {
-        return $this->seeText($text, true);
+        if ($this->hasText($text)) {
+            $this->failWithContent("The page should not contain the text [$text]");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the page contains the given plain text.
+     *
+     * @param  string  $text
+     * @return int|bool
+     */
+    protected function hasText($text)
+    {
+        $pattern = $this->getEscapedPattern($text);
+
+        return preg_match("/$pattern/i", $this->text());
     }
 
     /**
@@ -925,5 +963,10 @@ trait InteractsWithPages
         return new UploadedFile(
             $file['tmp_name'], basename($uploads[$name]), $file['type'], $file['size'], $file['error'], true
         );
+    }
+
+    protected function failWithContent($message)
+    {
+        $this->fail($this->html().str_repeat("\n", 4).$message.'. Check content above.');
     }
 }
