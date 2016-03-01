@@ -714,7 +714,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compilePhp($expression)
     {
-        return "<?php {$expression}; ?>";
+        return $expression ? "<?php {$expression}; ?>" : '<?php ';
+    }
+
+    /**
+     * Compile end-php statement into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndphp($expression)
+    {
+        return ' ?>';
     }
 
     /**
