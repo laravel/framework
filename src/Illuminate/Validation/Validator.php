@@ -79,6 +79,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The array of wildcard attributes with their asterisks expanded.
+     *
+     * @var array
+     */
+    protected $implicitAttributes = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -147,8 +154,8 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $implicitRules = [
-        'Required', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Accepted',
+        'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
+        'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
         // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
@@ -290,6 +297,8 @@ class Validator implements ValidatorContract
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
                     if (! is_string($ruleKey) || Str::endsWith($key, $ruleKey)) {
+                        $this->implicitAttributes[$attribute][] = $key;
+
                         $this->mergeRules($key, $ruleValue);
                     }
                 }
@@ -631,6 +640,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate that an attribute exists even if not filled.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validatePresent($attribute, $value)
+    {
+        return Arr::has($this->data, $attribute);
+    }
+
+    /**
      * Validate the given attribute is filled if it is present.
      *
      * @param  string  $attribute
@@ -639,7 +660,7 @@ class Validator implements ValidatorContract
      */
     protected function validateFilled($attribute, $value)
     {
-        if (array_key_exists($attribute, $this->data) || array_key_exists($attribute, $this->files)) {
+        if (Arr::has(array_merge($this->data, $this->files), $attribute)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -811,6 +832,25 @@ class Validator implements ValidatorContract
         }
 
         return $count;
+    }
+
+    /**
+     * Validate that the values of an attribute is in another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateInArray($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'in_array');
+
+        $otherValues = Arr::where(Arr::dot($this->data), function ($key) use ($parameters) {
+            return Str::is($parameters[0], $key);
+        });
+
+        return in_array($value, $otherValues);
     }
 
     /**
@@ -1129,6 +1169,32 @@ class Validator implements ValidatorContract
     protected function validateNotIn($attribute, $value, $parameters)
     {
         return ! $this->validateIn($attribute, $value, $parameters);
+    }
+
+    /**
+     * Validate an attribute is unique among other values.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function validateDistinct($attribute, $value, $parameters)
+    {
+        $rawAttribute = '';
+
+        foreach ($this->implicitAttributes as $raw => $dataAttributes) {
+            if (in_array($attribute, $dataAttributes)) {
+                $rawAttribute = $raw;
+                break;
+            }
+        }
+
+        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $rawAttribute) {
+            return $key != $attribute &&  Str::is($rawAttribute, $key);
+        });
+
+        return ! in_array($value, array_values($data));
     }
 
     /**

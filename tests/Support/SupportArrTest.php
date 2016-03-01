@@ -60,6 +60,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals(200, $value);
+        $this->assertEquals(100, Arr::first($array));
     }
 
     public function testIs()
@@ -80,6 +81,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = [100, 200, 300];
         $last = Arr::last($array, function () { return true; });
         $this->assertEquals(300, $last);
+        $this->assertEquals(300, Arr::last($array));
     }
 
     public function testFlatten()
@@ -137,6 +139,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $value = Arr::get($array, 'products.desk');
         $this->assertEquals(['price' => 100], $value);
 
+        // Test null array values
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+
         // Test direct ArrayAccess object
         $array = ['products' => ['desk' => ['price' => 100]]];
         $arrayAccessObject = new ArrayObject($array);
@@ -163,11 +170,16 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $value = Arr::get($array, 'parent.child.desk');
         $this->assertNull($value);
 
-        // Test null ArrayAccess object field
+        // Test missing ArrayAccess object field
         $arrayAccessObject = new ArrayObject(['products' => ['desk' => null]]);
         $array = ['parent' => $arrayAccessObject];
         $value = Arr::get($array, 'parent.products.desk.price');
         $this->assertNull($value);
+
+        // Test null ArrayAccess object fields
+        $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
+        $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
     }
 
     public function testHas()
@@ -177,6 +189,23 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::has($array, 'products.desk.price'));
         $this->assertFalse(Arr::has($array, 'products.foo'));
         $this->assertFalse(Arr::has($array, 'products.desk.foo'));
+
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
+
+        $array = new ArrayObject(['foo' => 10, 'bar' => new ArrayObject(['baz' => 10])]);
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
+        $this->assertFalse(Arr::has($array, 'xxx'));
+        $this->assertFalse(Arr::has($array, 'xxx.yyy'));
+        $this->assertFalse(Arr::has($array, 'foo.xxx'));
+        $this->assertFalse(Arr::has($array, 'bar.xxx'));
+
+        $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
+        $this->assertTrue(Arr::has($array, 'foo'));
+        $this->assertTrue(Arr::has($array, 'bar.baz'));
     }
 
     public function testIsAssoc()

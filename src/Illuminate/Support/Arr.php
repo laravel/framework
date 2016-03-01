@@ -125,12 +125,16 @@ class Arr
      * Return the first element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback, $default = null)
+    public static function first($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : reset($array);
+        }
+
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $key, $value)) {
                 return $value;
@@ -144,12 +148,16 @@ class Arr
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback, $default = null)
+    public static function last($array, callable $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : end($array);
+        }
+
         return static::first(array_reverse($array), $callback, $default);
     }
 
@@ -223,7 +231,7 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
@@ -239,12 +247,11 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if (static::accessible($array) && static::exists($array, $segment)) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
@@ -253,7 +260,7 @@ class Arr
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @return bool
      */
@@ -268,11 +275,12 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+            if ((is_array($array) && array_key_exists($segment, $array))
+                || ($array instanceof ArrayAccess && $array->offsetExists($segment))) {
+                $array = $array[$segment];
+            } else {
                 return false;
             }
-
-            $array = $array[$segment];
         }
 
         return true;
