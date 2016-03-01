@@ -253,7 +253,7 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
@@ -269,12 +269,12 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
-                (! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+            if ((is_array($array) && array_key_exists($segment, $array))
+                || ($array instanceof ArrayAccess && $array->offsetExists($segment))) {
+                $array = $array[$segment];
+            } else {
                 return value($default);
             }
-
-            $array = $array[$segment];
         }
 
         return $array;
@@ -283,7 +283,7 @@ class Arr
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @return bool
      */
@@ -298,11 +298,12 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+            if ((is_array($array) && array_key_exists($segment, $array))
+                || ($array instanceof ArrayAccess && $array->offsetExists($segment))) {
+                $array = $array[$segment];
+            } else {
                 return false;
             }
-
-            $array = $array[$segment];
         }
 
         return true;
