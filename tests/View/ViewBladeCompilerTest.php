@@ -476,10 +476,10 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testSetStatementsAreCompiled()
+    public function testPhpStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $string = '@set ($set = true)';
+        $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
