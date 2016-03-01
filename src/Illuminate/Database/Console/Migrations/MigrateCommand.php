@@ -100,7 +100,7 @@ class MigrateCommand extends BaseCommand
             // so that migrations may be run for any path within the applications.
             if (! is_null($path = $this->input->getOption('path'))) {
                 $path = $this->laravel->basePath().'/'.$path;
-            } elseif (! is_null($tag)) {
+            } elseif (! empty($tag)) {
                 $path = $this->laravel->basePath().'/'.$this->migrator->getTagPath($tag);
             } else {
                 $path = $this->getMigrationPath();
