@@ -57,30 +57,70 @@ class MigrateCommand extends BaseCommand
 
         $this->prepareDatabase();
 
-        // The pretend option can be used for "simulating" the migration and grabbing
-        // the SQL queries that would fire if the migration were to be run against
-        // a database for real, which is helpful for double checking migrations.
-        $pretend = $this->input->getOption('pretend');
+        if ($this->input->getOption('tags')) {
 
-        // Next, we will check to see if a path option has been defined. If it has
-        // we will use the path relative to the root of this installation folder
-        // so that migrations may be run for any path within the applications.
-        if (! is_null($path = $this->input->getOption('path'))) {
-            $path = $this->laravel->basePath().'/'.$path;
+            // If the --tags option is provided loop through all tags and re-run the command with --tag=xxx instead
+            $tags = $this->migrator->getAllTags();
+
+            foreach ($tags as $tag => $path) {
+
+                $this->output->writeln("Running Migrations for tag: " . $tag);
+
+                $this->call('migrate', [
+                    '--pretend' => $this->input->getOption('pretend'),
+                    '--database' => $this->input->getOption('database'),
+                    '--force' => $this->input->getOption('force'),
+                    '--path' => $this->input->getOption('path'),
+                    '--step' => $this->input->getOption('step'),
+                    '--tag' => $tag,
+                ]);
+
+            }
+
+            $this->output->writeln("Running Core Migrations");
+
+            // Then call the default tag
+            $this->call('migrate', [
+                '--pretend' => $this->input->getOption('pretend'),
+                '--database' => $this->input->getOption('database'),
+                '--force' => $this->input->getOption('force'),
+                '--path' => $this->input->getOption('path'),
+                '--step' => $this->input->getOption('step'),
+            ]);
+
         } else {
-            $path = $this->getMigrationPath();
-        }
+            // The pretend option can be used for "simulating" the migration and grabbing
+            // the SQL queries that would fire if the migration were to be run against
+            // a database for real, which is helpful for double checking migrations.
+            $pretend = $this->input->getOption('pretend');
 
-        $this->migrator->run($path, [
-            'pretend' => $pretend,
-            'step' => $this->input->getOption('step'),
-        ]);
+            // Fetch the tag this command is run against, can be empty thats not an issue
+            // its by design meaning "core" migrations are run with an empty tag
+            $tag = $this->input->getOption('tag');
 
-        // Once the migrator has run we will grab the note output and send it out to
-        // the console screen, since the migrator itself functions without having
-        // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note) {
-            $this->output->writeln($note);
+            // Next, we will check to see if a path/tag option has been defined. If it has
+            // we will use the path relative to the root of this installation folder
+            // so that migrations may be run for any path within the applications.
+            if (! is_null($path = $this->input->getOption('path'))) {
+                $path = $this->laravel->basePath().'/'.$path;
+            } elseif (! empty($tag)) {
+                $path = $this->laravel->basePath().'/'.$this->migrator->getTagPath($tag);
+            } else {
+                $path = $this->getMigrationPath();
+            }
+
+            $this->migrator->run($path, [
+                'pretend' => $pretend,
+                'step' => $this->input->getOption('step'),
+                'tag' => $tag
+            ]);
+
+            // Once the migrator has run we will grab the note output and send it out to
+            // the console screen, since the migrator itself functions without having
+            // any instances of the OutputInterface contract passed into the class.
+            foreach ($this->migrator->getNotes() as $note) {
+                $this->output->writeln($note);
+            }
         }
 
         // Finally, if the "seed" option has been given, we will re-run the database
@@ -104,6 +144,13 @@ class MigrateCommand extends BaseCommand
             $options = ['--database' => $this->input->getOption('database')];
 
             $this->call('migrate:install', $options);
+
+            return;
+        }
+
+        // Not ideal but to maintain backwards compatability we need to check this every time, maybe remove in 5.3?
+        if (! $this->migrator->repositoryTagColumnExists()) {
+            $this->migrator->addTagColumn();
         }
     }
 
@@ -126,6 +173,10 @@ class MigrateCommand extends BaseCommand
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
             ['step', null, InputOption::VALUE_NONE, 'Force the migrations to be run so they can be rolled back individually.'],
+
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'Run migrations for a specific tag.'],
+
+            ['tags', null, InputOption::VALUE_NONE, 'Run migrations for all tags.'],
         ];
     }
 }

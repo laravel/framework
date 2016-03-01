@@ -60,7 +60,11 @@ class RollbackCommand extends Command
 
         $pretend = $this->input->getOption('pretend');
 
-        $this->migrator->rollback($pretend);
+        // Fetch the tag this command is run against, can be empty thats not an issue
+        // its by design meaning "core" migrations are run with an empty tag
+        $tag = $this->input->getOption('tag');
+
+        $this->migrator->rollback($pretend, $tag);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -83,6 +87,8 @@ class RollbackCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'Rollback last migrations batch for a specific tag.'],
         ];
     }
 }

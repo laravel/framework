@@ -132,9 +132,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             // table to hold the migration file's path as well as the tag and batch ID.
             $table->string('migration');
 
-            $table->string('tag');
-
             $table->integer('batch');
+
+            $table->string('tag')->nullable();
         });
     }
 
@@ -151,19 +151,29 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
+     * Add the tags column if needed
+     *
+     * @return void
+     */
+    public function addTagColumn()
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+
+        $schema->table($this->table, function ($table) {
+            $table->string('tag')->nullable();
+        });
+    }
+
+    /**
      * Determine if the migration repository has the tag column
      *
      * @return bool
      */
     public function repositoryTagColumnExists()
     {
-        if($this->repositoryExists())
-        {
-            $schema = $this->getConnection()->getSchemaBuilder();
-            return $schema->hasColumn($this->table, 'tag');
-        }
+        $schema = $this->getConnection()->getSchemaBuilder();
 
-        return false;
+        return $schema->hasColumn($this->table, 'tag');
     }
 
     /**

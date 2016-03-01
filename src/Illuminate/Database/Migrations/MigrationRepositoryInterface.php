@@ -69,6 +69,13 @@ interface MigrationRepositoryInterface
     public function repositoryTagColumnExists();
 
     /**
+     * Add the tags column if needed
+     *
+     * @return void
+     */
+    public function addTagColumn();
+
+    /**
      * Set the information source to gather data.
      *
      * @param  string  $name

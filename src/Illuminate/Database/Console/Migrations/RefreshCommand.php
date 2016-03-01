@@ -41,8 +41,17 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
+        // Fetch the tag/tags this command is run against, can be empty thats not an issue
+        // its by design meaning "core" migrations are run with an empty tag
+        $tag = $this->input->getOption('tag');
+
+        $tags = $this->input->getOption('tag');
+
         $this->call('migrate:reset', [
-            '--database' => $database, '--force' => $force,
+            '--database' => $database,
+            '--force' => $force,
+            '--tag' => $tag,
+            '--tags' => $tags
         ]);
 
         // The refresh command is essentially just a brief aggregate of a few other of
@@ -52,6 +61,8 @@ class RefreshCommand extends Command
             '--database' => $database,
             '--force' => $force,
             '--path' => $path,
+            '--tag' => $tag,
+            '--tags' => $tags
         ]);
 
         if ($this->needsSeeding()) {
@@ -103,6 +114,10 @@ class RefreshCommand extends Command
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
+
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'Rollback migrations for a specific tag.'],
+
+            ['tags', null, InputOption::VALUE_NONE, 'Rollback migrations for all tags.'],
         ];
     }
 }

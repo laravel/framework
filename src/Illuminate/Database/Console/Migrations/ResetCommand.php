@@ -64,9 +64,43 @@ class ResetCommand extends Command
             return;
         }
 
+        if ($this->input->getOption('tags')) {
+            // If the --tags option is provided loop through all tags and re-run the command with --tag=xxx instead
+            $tags = $this->migrator->getAllTags();
+
+            foreach ($tags as $tag => $path) {
+
+                $this->output->writeln("Resetting Migrations for tag: " . $tag);
+
+                $this->call('migrate:reset', [
+                    '--pretend' => $this->input->getOption('pretend'),
+                    '--database' => $this->input->getOption('database'),
+                    '--force' => $this->input->getOption('force'),
+                    '--tag' => $tag,
+                ]);
+
+            }
+
+            $this->output->writeln("Resetting Core Migrations");
+
+            // Then call the default tag
+            $this->call('migrate:reset', [
+                '--pretend' => $this->input->getOption('pretend'),
+                '--database' => $this->input->getOption('database'),
+                '--force' => $this->input->getOption('force'),
+            ]);
+
+            // Finally return, we don't do anything else
+            return;
+        }
+
         $pretend = $this->input->getOption('pretend');
 
-        $this->migrator->reset($pretend);
+        // Fetch the tag this command is run against, can be empty thats not an issue
+        // its by design meaning "core" migrations are run with an empty tag
+        $tag = $this->input->getOption('tag');
+
+        $this->migrator->reset($pretend, $tag);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -89,6 +123,10 @@ class ResetCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'Reset migrations for a specific tag.'],
+
+            ['tags', null, InputOption::VALUE_NONE, 'Reset migrations for all tags.'],
         ];
     }
 }

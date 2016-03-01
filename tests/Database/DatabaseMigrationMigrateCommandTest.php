@@ -18,9 +18,10 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false, 'tag' => '']);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('repositoryTagColumnExists')->once()->andReturn(true);
 
         $this->runCommand($command);
     }
@@ -33,10 +34,27 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false, 'tag' => '']);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
         $command->expects($this->once())->method('call')->with($this->equalTo('migrate:install'), $this->equalTo(['--database' => null]));
+
+        $this->runCommand($command);
+    }
+
+    public function testMigrationRepositoryTagColumnAddedWhenNecessary()
+    {
+        $params = [$migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor'];
+        $command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', ['call'], $params);
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false, 'tag' => '']);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('repositoryTagColumnExists')->once()->andReturn(false);
+        $migrator->shouldReceive('addTagColumn')->once()->andReturn(false);
 
         $this->runCommand($command);
     }
@@ -48,9 +66,10 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => true, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => true, 'step' => false, 'tag' => '']);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('repositoryTagColumnExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--pretend' => true]);
     }
@@ -62,9 +81,10 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => false, 'tag' => '']);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('repositoryTagColumnExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--database' => 'foo']);
     }
@@ -76,9 +96,10 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => true]);
+        $migrator->shouldReceive('run')->once()->with(__DIR__.'/migrations', ['pretend' => false, 'step' => true, 'tag' => '']);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('repositoryTagColumnExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--step' => true]);
     }

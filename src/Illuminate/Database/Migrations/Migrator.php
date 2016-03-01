@@ -45,6 +45,11 @@ class Migrator
     protected $notes = [];
 
     /**
+     * Map of tag names to paths
+     */
+    protected $tags = [];
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -62,13 +67,49 @@ class Migrator
     }
 
     /**
+     * Register a tag path on the migrator instance
+     *
+     * @param  string $tag
+     * @param  string $path
+     * @return $this
+     */
+    public function tag($tag, $path)
+    {
+        $this->tags[$tag] = $path;
+
+        return $this;
+    }
+
+    /**
+     * Fetch a path by tag
+     *
+     * @param  string $tag
+     * @return string $path
+     */
+    public function getTagPath($tag)
+    {
+        return $this->tags[$tag];
+    }
+
+    /**
+     * Fetch all registered tags
+     *
+     * @return array $tags
+     */
+    public function getAllTags()
+    {
+        return $this->tags;
+    }
+
+    /**
      * Run the outstanding migrations at a given path.
      *
      * @param  string  $path
      * @param  array  $options
+     * @param  string $tag
      * @return void
      */
-    public function run($path, array $options = [])
+    public function run($path, array $options = [], $tag = '')
     {
         $this->notes = [];
 
@@ -77,13 +118,13 @@ class Migrator
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
-        $ran = $this->repository->getRan();
+        $ran = $this->repository->getRan($tag);
 
         $migrations = array_diff($files, $ran);
 
         $this->requireFiles($path, $migrations);
 
-        $this->runMigrationList($migrations, $options);
+        $this->runMigrationList($migrations, $options, $tag);
     }
 
     /**
@@ -91,9 +132,10 @@ class Migrator
      *
      * @param  array  $migrations
      * @param  array  $options
+     * @param  string $tag
      * @return void
      */
-    public function runMigrationList($migrations, array $options = [])
+    public function runMigrationList($migrations, array $options = [], $tag = '')
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
@@ -104,7 +146,7 @@ class Migrator
             return;
         }
 
-        $batch = $this->repository->getNextBatchNumber();
+        $batch = $this->repository->getNextBatchNumber($tag);
 
         $pretend = Arr::get($options, 'pretend', false);
 
@@ -114,7 +156,7 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $this->runUp($file, $batch, $pretend, $tag);
 
             // If we are stepping through the migrations, then we will increment the
             // batch value for each individual migration that is run. That way we
@@ -131,9 +173,10 @@ class Migrator
      * @param  string  $file
      * @param  int     $batch
      * @param  bool    $pretend
+     * @param  string  $tag
      * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp($file, $batch, $pretend, $tag = '')
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -149,7 +192,7 @@ class Migrator
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+        $this->repository->log($file, $batch, $tag);
 
         $this->note("<info>Migrated:</info> $file");
     }
@@ -158,16 +201,17 @@ class Migrator
      * Rollback the last migration operation.
      *
      * @param  bool  $pretend
+     * @param  string  $tag
      * @return int
      */
-    public function rollback($pretend = false)
+    public function rollback($pretend = false, $tag = '')
     {
         $this->notes = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->repository->getLast();
+        $migrations = $this->repository->getLast($tag);
 
         $count = count($migrations);
 
@@ -189,13 +233,14 @@ class Migrator
      * Rolls all of the currently applied migrations back.
      *
      * @param  bool  $pretend
+     * @param  string $tag
      * @return int
      */
-    public function reset($pretend = false)
+    public function reset($pretend = false, $tag = '')
     {
         $this->notes = [];
 
-        $migrations = array_reverse($this->repository->getRan());
+        $migrations = array_reverse($this->repository->getRan($tag));
 
         $count = count($migrations);
 
@@ -403,6 +448,26 @@ class Migrator
     public function repositoryExists()
     {
         return $this->repository->repositoryExists();
+    }
+
+    /**
+     * Determine if the migration repository has the tags column.
+     *
+     * @return bool
+     */
+    public function repositoryTagColumnExists()
+    {
+        return $this->repository->repositoryTagColumnExists();
+    }
+
+    /**
+     * Add the tags column if needed
+     *
+     * @return void
+     */
+    public function addTagColumn()
+    {
+        return $this->repository->addTagColumn();
     }
 
     /**

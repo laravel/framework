@@ -29,9 +29,9 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
         $migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
             '1_foo',
         ]);
-        $migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
-        $migrator->getRepository()->shouldReceive('log')->once()->with('2_bar', 1);
-        $migrator->getRepository()->shouldReceive('log')->once()->with('3_baz', 1);
+        $migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->with('')->andReturn(1);
+        $migrator->getRepository()->shouldReceive('log')->once()->with('2_bar', 1, '');
+        $migrator->getRepository()->shouldReceive('log')->once()->with('3_baz', 1, '');
         $barMock = m::mock('stdClass');
         $barMock->shouldReceive('up')->once();
         $bazMock = m::mock('stdClass');

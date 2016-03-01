@@ -54,13 +54,19 @@ class StatusCommand extends BaseCommand
 
         $this->migrator->setConnection($this->input->getOption('database'));
 
+        // Fetch the tag this command is run against, can be empty thats not an issue
+        // its by design meaning "core" migrations are run with an empty tag
+        $tag = $this->input->getOption('tag');
+
         if (! is_null($path = $this->input->getOption('path'))) {
             $path = $this->laravel->basePath().'/'.$path;
+        } elseif (! empty($tag)) {
+            $path = $this->laravel->basePath().'/'.$this->migrator->getTagPath($tag);
         } else {
             $path = $this->getMigrationPath();
         }
 
-        $ran = $this->migrator->getRepository()->getRan();
+        $ran = $this->migrator->getRepository()->getRan($tag);
 
         $migrations = [];
 
@@ -97,6 +103,8 @@ class StatusCommand extends BaseCommand
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to use.'],
+
+            ['tag', null, InputOption::VALUE_OPTIONAL, 'Run migrations for a specific tag.'],
         ];
     }
 }
