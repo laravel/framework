@@ -1932,8 +1932,8 @@ class Validator implements ValidatorContract
         // The developer may dynamically specify the array of custom attributes
         // on this Validator instance. If the attribute exists in this array
         // it takes precedence over all other ways we can pull attributes.
-        if (isset($this->customAttributes[$attribute])) {
-            return $this->customAttributes[$attribute];
+        if ($customAttribute = $this->getCustomAttribute($attribute)) {
+            return $customAttribute;
         }
 
         $key = "validation.attributes.{$attribute}";
@@ -1949,6 +1949,19 @@ class Validator implements ValidatorContract
         // underscores are removed from the attribute name and that will be
         // used as default versions of the attribute's displayable names.
         return str_replace('_', ' ', Str::snake($attribute));
+    }
+
+    /**
+     * Get the value of a custom attribute.
+     *
+     * @param  string  $attribute
+     * @return string|null
+     */
+    protected function getCustomAttribute($attribute)
+    {
+        return array_first($this->customAttributes, function ($custom) use ($attribute) {
+            return Str::is($custom, $attribute);
+        });
     }
 
     /**

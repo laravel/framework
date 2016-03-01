@@ -180,6 +180,23 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('NAME is required!', $v->messages()->first('name'));
     }
 
+    public function testAttributeNamesAreReplacedInArrays()
+    {
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.string' => ':attribute must be a string!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ['Jon', 2]], ['name.*' => 'string']);
+        $v->setAttributeNames(['name.*' => 'Any name']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Any name must be a string!', $v->messages()->first('name.1'));
+
+        $v = new Validator($trans, ['users' => [['name' => 'Jon'], ['name' => 2]]], ['users.*.name' => 'string']);
+        $v->setAttributeNames(['users.*.name' => 'Any name']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Any name must be a string!', $v->messages()->first('users.1.name'));
+    }
+
     public function testDisplayableValuesAreReplaced()
     {
         //required_if:foo,bar
