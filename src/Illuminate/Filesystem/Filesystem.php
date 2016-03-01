@@ -170,17 +170,6 @@ class Filesystem
     }
 
     /**
-     * Extract the file extension from a file path.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public function extension($path)
-    {
-        return pathinfo($path, PATHINFO_EXTENSION);
-    }
-    
-    /**
      * Extract the trailing name component from a file path.
      *
      * @param  string  $path
@@ -190,7 +179,7 @@ class Filesystem
     {
         return pathinfo($path, PATHINFO_BASENAME);
     }
-    
+
     /**
      * Extract the parent directory from a file path.
      *
@@ -200,6 +189,17 @@ class Filesystem
     public function dirname($path)
     {
         return pathinfo($path, PATHINFO_DIRNAME);
+    }
+
+    /**
+     * Extract the file extension from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function extension($path)
+    {
+        return pathinfo($path, PATHINFO_EXTENSION);
     }
 
     /**
