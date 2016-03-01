@@ -532,9 +532,18 @@ class Container implements ArrayAccess, ContainerContract
     protected function getMethodDependencies($callback, array $parameters = [])
     {
         $dependencies = [];
+        $context = null;
+
+        if (is_string($callback)) {
+            $context = $callback;
+        }
+
+        if (is_array($callback)) {
+            $context = get_class($callback[0]).'@'.$callback[1];
+        }
 
         foreach ($this->getCallReflector($callback)->getParameters() as $parameter) {
-            $this->addDependencyForCallParameter($parameter, $parameters, $dependencies);
+            $this->addDependencyForCallParameter($parameter, $parameters, $dependencies, $context);
         }
 
         return array_merge($dependencies, $parameters);
@@ -565,16 +574,34 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $dependencies
+     * @param  string $context
      * @return mixed
      */
-    protected function addDependencyForCallParameter(ReflectionParameter $parameter, array &$parameters, &$dependencies)
-    {
+    protected function addDependencyForCallParameter(
+        ReflectionParameter $parameter,
+        array &$parameters,
+        &$dependencies,
+        $context = null
+    ) {
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
 
             unset($parameters[$parameter->name]);
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $this->make($parameter->getClass()->name);
+            $dependency = $parameter->getClass()->name;
+
+            if ($context) {
+                $methodContextual = $this->getContextualConcrete($context, $dependency);
+                $classContextual = null;
+
+                if ($this->isCallableWithAtSign($context)) {
+                    $classContextual = $this->getContextualConcrete(explode('@', $context)[0], $dependency);
+                }
+
+                $dependency = $methodContextual ?: ($classContextual ?: $dependency);
+            }
+
+            $dependencies[] = $this->make($dependency);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
@@ -664,7 +691,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcrete($abstract)
     {
-        if (! is_null($concrete = $this->getContextualConcrete($abstract))) {
+        if (! is_null($concrete = $this->getContextualConcrete(end($this->buildStack), $abstract))) {
             return $concrete;
         }
 
@@ -679,15 +706,16 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get the contextual concrete binding for the given abstract.
+     * Get the contextual concrete binding for the given concretion and abstract.
      *
+     * @param  string  $concrete
      * @param  string  $abstract
      * @return string|null
      */
-    protected function getContextualConcrete($abstract)
+    public function getContextualConcrete($concrete, $abstract)
     {
-        if (isset($this->contextual[end($this->buildStack)][$abstract])) {
-            return $this->contextual[end($this->buildStack)][$abstract];
+        if (isset($this->contextual[$concrete][$abstract])) {
+            return $this->contextual[$concrete][$abstract];
         }
     }
 
@@ -822,7 +850,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveNonClass(ReflectionParameter $parameter)
     {
-        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
+        if (! is_null($concrete = $this->getContextualConcrete(end($this->buildStack), '$'.$parameter->name))) {
             if ($concrete instanceof Closure) {
                 return call_user_func($concrete, $this);
             } else {

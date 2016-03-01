@@ -152,7 +152,7 @@ class Route
     protected function runCallable(Request $request)
     {
         $parameters = $this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses']), $this->action['uses']
         );
 
         return call_user_func_array($this->action['uses'], $parameters);
