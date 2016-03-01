@@ -707,6 +707,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the set statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileSet($expression)
+    {
+        return "<?php {$expression}; ?>";
+    }
+
+    /**
+     * Compile the unset statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileUnset($expression)
+    {
+        return "<?php unset{$expression}; ?>";
+    }
+
+    /**
      * Compile the extends statements into valid PHP.
      *
      * @param  string  $expression
