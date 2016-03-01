@@ -181,6 +181,22 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @unlink(__DIR__.'/foo.txt');
     }
 
+    public function testBasenameReturnsBasename()
+    {
+        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $files = new Filesystem;
+        $this->assertEquals('foo.txt', $files->basename(__DIR__.'/foo.txt'));
+        @unlink(__DIR__.'/foo.txt');
+    }
+
+    public function testDirnameReturnsDirectory()
+    {
+        file_put_contents(__DIR__.'/foo.txt', 'foo');
+        $files = new Filesystem;
+        $this->assertEquals(__DIR__, $files->dirname(__DIR__.'/foo.txt'));
+        @unlink(__DIR__.'/foo.txt');
+    }
+
     public function testTypeIndentifiesFile()
     {
         file_put_contents(__DIR__.'/foo.txt', 'foo');

@@ -207,6 +207,11 @@ this is a comment
 this is a comment
 */ ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = sprintf('{{-- this is an %s long comment --}}', str_repeat('extremely ', 1000));
+        $expected = sprintf('<?php /* this is an %s long comment */ ?>', str_repeat('extremely ', 1000));
+
+        $this->assertEquals($expected, $compiler->compileString($string));
     }
 
     public function testIfStatementsAreCompiled()
@@ -343,6 +348,20 @@ test
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testBreakStatementsWithExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@break(TRUE)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if(TRUE) break; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testContinueStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -353,6 +372,20 @@ test
         $expected = '<?php for($i = 0; $i < 10; $i++): ?>
 test
 <?php continue; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testContinueStatementsWithExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@continue(TRUE)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if(TRUE) continue; ?>
 <?php endfor; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
@@ -440,6 +473,22 @@ tag empty
 <?php endforeach; if ($__empty_1): ?>
 empty
 <?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testPhpStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@php($set = true)';
+        $expected = '<?php ($set = true); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testUnsetStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@unset ($unset)';
+        $expected = '<?php unset($unset); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 

@@ -32,11 +32,16 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Get a filename for the file that is the MD5 hash of the contents.
      *
+     * @param  string  $path
      * @return string
      */
-    public function hashName()
+    public function hashName($path = null)
     {
-        return md5_file($this->path()).'.'.$this->extension();
+        if ($path) {
+            $path = rtrim($path, '/').'/';
+        }
+
+        return $path.md5_file($this->path()).'.'.$this->extension();
     }
 
     /**
@@ -48,8 +53,11 @@ class UploadedFile extends SymfonyUploadedFile
     public static function createFromBase(SymfonyUploadedFile $file)
     {
         return $file instanceof static ? $file : new static(
-            $file->getPathname(), $file->getClientOriginalName(), $file->getClientMimeType(),
-            $file->getClientSize(), $file->getError()
+            $file->getPathname(),
+            $file->getClientOriginalName(),
+            $file->getClientMimeType(),
+            $file->getClientSize(),
+            $file->getError()
         );
     }
 }

@@ -325,6 +325,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = new DateTime('2015-04-17 22:59:01');
+        $this->assertInstanceOf(DateTime::class, $value);
+        $this->assertInstanceOf(DateTimeInterface::class, $value);
+        $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+        $value = new DateTimeImmutable('2015-04-17 22:59:01');
+        $this->assertInstanceOf(DateTimeImmutable::class, $value);
+        $this->assertInstanceOf(DateTimeInterface::class, $value);
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = '2015-04-17 22:59:01';
