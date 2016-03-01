@@ -707,12 +707,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Compile the set statements into valid PHP.
+     * Compile the raw PHP statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
-    protected function compileSet($expression)
+    protected function compilePhp($expression)
     {
         return "<?php {$expression}; ?>";
     }
