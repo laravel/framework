@@ -557,13 +557,15 @@ class Builder
      * Add a raw where clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  mixed   $bindings
      * @param  string  $boolean
      * @return $this
      */
-    public function whereRaw($sql, array $bindings = [], $boolean = 'and')
+    public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
         $type = 'raw';
+
+        $bindings = (array) $bindings;
 
         $this->wheres[] = compact('type', 'sql', 'boolean');
 
