@@ -196,6 +196,31 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
         $this->dontSeeIsSelected('availability', 'partial_time');
     }
 
+    protected function getMultipleSelectHtml()
+    {
+        return
+         '<select name="roles[]">'
+        .'    <option value="admin">Administrator</option>'
+        .'    <option value="user" selected>User</option>'
+        .'    <option value="journalist">Journalist</option>'
+        .'    <option value="reviewer" selected>Reviewer</option>'
+        .'</select>';
+    }
+
+    public function testSeeMultipleOptionsAreSelected()
+    {
+        $this->setCrawler($this->getMultipleSelectHtml());
+        $this->seeIsSelected('roles[]', 'user');
+        $this->seeIsSelected('roles[]', 'reviewer');
+    }
+
+    public function testDontSeeMultipleOptionsAreSelected()
+    {
+        $this->setCrawler($this->getMultipleSelectHtml());
+        $this->dontSeeIsSelected('roles[]', 'admin');
+        $this->dontSeeIsSelected('roles[]', 'journalist');
+    }
+
     protected function getRadiosHtml()
     {
         return

@@ -571,7 +571,7 @@ trait InteractsWithPages
      */
     public function seeIsSelected($selector, $expected)
     {
-        $this->assertEquals(
+        $this->assertContains(
             $expected, $this->getSelectedValue($selector),
             "The field [{$selector}] does not contain the selected value [{$expected}]."
         );
@@ -588,7 +588,7 @@ trait InteractsWithPages
      */
     public function dontSeeIsSelected($selector, $value)
     {
-        $this->assertNotEquals(
+        $this->assertNotContains(
             $value, $this->getSelectedValue($selector),
             "The field [{$selector}] contains the selected value [{$value}]."
         );
@@ -648,7 +648,9 @@ trait InteractsWithPages
         }
 
         if ($element == 'input') {
-            return $this->getCheckedValueFromRadioGroup($field);
+            $value = $this->getCheckedValueFromRadioGroup($field);
+
+            return $value ? [$value] : [];
         }
 
         throw new Exception("Given selector [$selector] is not a select or radio group.");
@@ -658,7 +660,7 @@ trait InteractsWithPages
      * Get the selected value from a select field.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler  $field
-     * @return string|null
+     * @return array
      *
      * @throws \Exception
      */
@@ -668,11 +670,15 @@ trait InteractsWithPages
             throw new Exception('Given element is not a select element.');
         }
 
+        $selected = [];
+
         foreach ($field->children() as $option) {
             if ($option->hasAttribute('selected')) {
-                return $option->getAttribute('value');
+                $selected[] = $option->getAttribute('value');
             }
         }
+
+        return $selected;
     }
 
     /**
