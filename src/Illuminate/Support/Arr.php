@@ -136,11 +136,11 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if (is_array($array)) {
-            return array_key_exists($key, $array);
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
         }
 
-        return $array->offsetExists($key);
+        return array_key_exists($key, $array);
     }
 
     /**
@@ -264,7 +264,7 @@ class Arr
             return $array;
         }
 
-        if (isset($array[$key])) {
+        if (static::exists($array, $key)) {
             return $array[$key];
         }
 
@@ -288,11 +288,11 @@ class Arr
      */
     public static function has($array, $key)
     {
-        if (empty($array) || is_null($key)) {
+        if (is_null($key)) {
             return false;
         }
 
-        if (array_key_exists($key, $array)) {
+        if (static::exists($array, $key)) {
             return true;
         }
 
