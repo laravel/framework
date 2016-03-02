@@ -158,7 +158,7 @@ class Arr
             return empty($array) ? value($default) : end($array);
         }
 
-        return static::first(array_reverse($array), $callback, $default);
+        return static::first(array_reverse($array, true), $callback, $default);
     }
 
     /**
