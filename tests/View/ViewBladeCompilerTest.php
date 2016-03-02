@@ -78,7 +78,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
     public function testCompileDoesntStoreFilesWhenCachePathIsNull()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('get')->never();
         $files->shouldReceive('put')->never();
         $compiler->compile('foo');
     }
@@ -476,11 +476,27 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testPhpStatementsAreCompiled()
+    public function testPhpStatementsWithExpressionAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testPhpStatementsWithoutExpressionAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@php';
+        $expected = '<?php ';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testEndphpStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@endphp';
+        $expected = ' ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -612,6 +628,18 @@ empty
 
         $string = '@customControl';
         $expected = '<?php echo custom_control(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testCustomExtensionOverwritesCore()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler->directive('foreach', function ($expression) {
+            return '<?php custom(); ?>';
+        });
+
+        $string = '@foreach';
+        $expected = '<?php custom(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 

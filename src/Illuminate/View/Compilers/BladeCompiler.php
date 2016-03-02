@@ -96,9 +96,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->setPath($path);
         }
 
-        $contents = $this->compileString($this->files->get($this->getPath()));
-
         if (! is_null($this->cachePath)) {
+            $contents = $this->compileString($this->files->get($this->getPath()));
+
             $this->files->put($this->getCompiledPath($this->getPath()), $contents);
         }
     }
@@ -266,10 +266,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         $callback = function ($match) {
-            if (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
-                $match[0] = $this->$method(Arr::get($match, 3));
-            } elseif (isset($this->customDirectives[$match[1]])) {
+            if (isset($this->customDirectives[$match[1]])) {
                 $match[0] = call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
+            } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
+                $match[0] = $this->$method(Arr::get($match, 3));
             }
 
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -714,7 +714,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compilePhp($expression)
     {
-        return "<?php {$expression}; ?>";
+        return $expression ? "<?php {$expression}; ?>" : '<?php ';
+    }
+
+    /**
+     * Compile end-php statement into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileEndphp($expression)
+    {
+        return ' ?>';
     }
 
     /**

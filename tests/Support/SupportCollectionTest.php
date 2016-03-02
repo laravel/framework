@@ -580,7 +580,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Illuminate\Support\Collection', $data);
         $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
-        $this->assertEquals(4, $data->count());
+        $this->assertCount(4, $data);
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
         $this->assertEquals([9 => 10], $data[3]->toArray());
     }
@@ -1122,21 +1122,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[0]);
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[1]);
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[2]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4], $c[0]->all());
         $this->assertEquals([2, 5], $c[1]->all());
         $this->assertEquals([3, 6], $c[2]->all());
 
         $c = new Collection([1, 2, 3]);
         $c = $c->zip([4, 5, 6], [7, 8, 9]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4, 7], $c[0]->all());
         $this->assertEquals([2, 5, 8], $c[1]->all());
         $this->assertEquals([3, 6, 9], $c[2]->all());
 
         $c = new Collection([1, 2, 3]);
         $c = $c->zip([4, 5, 6], [7]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4, 7], $c[0]->all());
         $this->assertEquals([2, 5, null], $c[1]->all());
         $this->assertEquals([3, 6, null], $c[2]->all());
