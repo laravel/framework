@@ -1167,14 +1167,7 @@ class Validator implements ValidatorContract
      */
     protected function validateDistinct($attribute, $value, $parameters)
     {
-        $rawAttribute = '';
-
-        foreach ($this->implicitAttributes as $raw => $dataAttributes) {
-            if (in_array($attribute, $dataAttributes)) {
-                $rawAttribute = $raw;
-                break;
-            }
-        }
+        $rawAttribute = $this->getRawAttribute($attribute);
 
         $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $rawAttribute) {
             return $key != $attribute &&  Str::is($rawAttribute, $key);
@@ -1929,14 +1922,16 @@ class Validator implements ValidatorContract
      */
     protected function getAttribute($attribute)
     {
+        $rawAttribute = $this->getRawAttribute($attribute);
+
         // The developer may dynamically specify the array of custom attributes
         // on this Validator instance. If the attribute exists in this array
         // it takes precedence over all other ways we can pull attributes.
-        if ($customAttribute = $this->getCustomAttribute($attribute)) {
-            return $customAttribute;
+        if (isset($this->customAttributes[$rawAttribute])) {
+            return $this->customAttributes[$rawAttribute];
         }
 
-        $key = "validation.attributes.{$attribute}";
+        $key = "validation.attributes.{$rawAttribute}";
 
         // We allow for the developer to specify language lines for each of the
         // attributes allowing for more displayable counterparts of each of
@@ -1948,20 +1943,27 @@ class Validator implements ValidatorContract
         // If no language line has been specified for the attribute all of the
         // underscores are removed from the attribute name and that will be
         // used as default versions of the attribute's displayable names.
-        return str_replace('_', ' ', Str::snake($attribute));
+        return str_replace('_', ' ', Str::snake($rawAttribute));
     }
 
     /**
-     * Get the value of a custom attribute.
+     * Get the raw attribute name.
      *
      * @param  string  $attribute
      * @return string|null
      */
-    protected function getCustomAttribute($attribute)
+    protected function getRawAttribute($attribute)
     {
-        return array_first($this->customAttributes, function ($custom) use ($attribute) {
-            return Str::is($custom, $attribute);
-        });
+        $rawAttribute = $attribute;
+
+        foreach ($this->implicitAttributes as $raw => $dataAttributes) {
+            if (in_array($attribute, $dataAttributes)) {
+                $rawAttribute = $raw;
+                break;
+            }
+        }
+
+        return $rawAttribute;
     }
 
     /**
