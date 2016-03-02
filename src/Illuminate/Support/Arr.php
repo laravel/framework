@@ -288,7 +288,7 @@ class Arr
      */
     public static function has($array, $key)
     {
-        if (empty($array) || is_null($key)) {
+        if (is_null($key)) {
             return false;
         }
 
