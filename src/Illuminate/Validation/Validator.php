@@ -1940,16 +1940,13 @@ class Validator implements ValidatorContract
             return $line;
         }
 
-        // If no language line has been specified for the attribute and
-        // the attribute is found to be an implicit attribute we will
-        // display the raw attribute as a default displayable name.
+        // When no language line has been specified for the attribute and it is
+        // also an implicit attribute we will display the raw attribute name
+        // and not modify it with any replacements before we display this.
         if (isset($this->implicitAttributes[$attributeName])) {
             return $attribute;
         }
 
-        // If the attribute is not found to be implicit all of the underscores
-        // are removed from the attribute name and that will be used as
-        // default versions of the attribute's displayable names.
         return str_replace('_', ' ', Str::snake($attribute));
     }
 
