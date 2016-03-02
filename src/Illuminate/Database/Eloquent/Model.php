@@ -387,7 +387,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return isset($modelScopes[$scope]) ? $modelScopes[$scope] : null;
         }
 
-        return Arr::first($modelScopes, function ($key, $value) use ($scope) {
+        return Arr::first($modelScopes, function ($value) use ($scope) {
             return $scope instanceof $value;
         });
     }
@@ -1023,7 +1023,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $self = __FUNCTION__;
 
-        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($key, $trace) use ($self) {
+        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) use ($self) {
             $caller = $trace['function'];
 
             return ! in_array($caller, Model::$manyMethods) && $caller != $self;

@@ -20,7 +20,7 @@ class Collection extends BaseCollection
             $key = $key->getKey();
         }
 
-        return Arr::first($this->items, function ($itemKey, $model) use ($key) {
+        return Arr::first($this->items, function ($model) use ($key) {
             return $model->getKey() == $key;
 
         }, $default);
