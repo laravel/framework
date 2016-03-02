@@ -1943,7 +1943,7 @@ class Validator implements ValidatorContract
         // If no language line has been specified for the attribute all of the
         // underscores are removed from the attribute name and that will be
         // used as default versions of the attribute's displayable names.
-        return str_replace('_', ' ', Str::snake($rawAttribute));
+        return str_replace('_', ' ', Str::snake($attribute));
     }
 
     /**
