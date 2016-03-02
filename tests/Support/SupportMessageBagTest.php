@@ -123,13 +123,13 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
     public function testCountReturnsCorrectValue()
     {
         $container = new MessageBag;
-        $this->assertEquals(0, $container->count());
+        $this->assertCount(0, $container);
 
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
         $container->add('boom', 'baz');
 
-        $this->assertEquals(3, $container->count());
+        $this->assertCount(3, $container);
     }
 
     public function testCountable()

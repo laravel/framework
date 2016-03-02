@@ -47,7 +47,7 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertSame(1, $this->routeCollection->count());
+        $this->assertCount(1, $this->routeCollection);
     }
 
     public function testRouteCollectionIsCountable()
