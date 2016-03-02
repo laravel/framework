@@ -2090,6 +2090,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Replace all place-holders for the in_array rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceInArray($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
+    }
+
+    /**
      * Replace all place-holders for the mimes rule.
      *
      * @param  string  $message
@@ -2193,20 +2207,6 @@ class Validator implements ValidatorContract
         $other = $this->getAttribute(array_shift($parameters));
 
         return str_replace([':other', ':values'], [$other, implode(', ', $parameters)], $message);
-    }
-
-    /**
-     * Replace all place-holders for the in_array rule.
-     *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
-     */
-    protected function replaceInArray($message, $attribute, $rule, $parameters)
-    {
-        return str_replace(':other', $this->getAttribute($parameters[0]), $message);
     }
 
     /**
