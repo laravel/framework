@@ -136,7 +136,7 @@ class Arr
         }
 
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
+            if (call_user_func($callback, $value, $key)) {
                 return $value;
             }
         }

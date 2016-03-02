@@ -55,7 +55,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, 200, 300];
 
-        $value = Arr::first($array, function ($key, $value) {
+        $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
 
