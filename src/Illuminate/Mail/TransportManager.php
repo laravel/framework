@@ -11,6 +11,7 @@ use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
+use Illuminate\Mail\Transport\SparkPostTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
@@ -116,6 +117,20 @@ class TransportManager extends Manager
         $client = new HttpClient(Arr::get($config, 'guzzle', []));
 
         return new MandrillTransport($client, $config['secret']);
+    }
+
+    /**
+     * Create an instance of the SparkPost Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\SparkPostTransport
+     */
+    protected function createSparkPostDriver()
+    {
+        $config = $this->app['config']->get('services.sparkpost', []);
+
+        $client = new HttpClient(Arr::get($config, 'guzzle', []));
+
+        return new SparkPostTransport($client, $config['secret']);
     }
 
     /**
