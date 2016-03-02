@@ -266,10 +266,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         $callback = function ($match) {
-            if (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
-                $match[0] = $this->$method(Arr::get($match, 3));
-            } elseif (isset($this->customDirectives[$match[1]])) {
+            if (isset($this->customDirectives[$match[1]])) {
                 $match[0] = call_user_func($this->customDirectives[$match[1]], Arr::get($match, 3));
+            } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
+                $match[0] = $this->$method(Arr::get($match, 3));
             }
 
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
