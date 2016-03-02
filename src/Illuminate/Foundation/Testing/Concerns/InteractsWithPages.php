@@ -673,6 +673,14 @@ trait InteractsWithPages
         $selected = [];
 
         foreach ($field->children() as $option) {
+            if ($option->nodeName === 'optgroup') {
+                foreach ($option->childNodes as $child) {
+                    if ($child->hasAttribute('selected')) {
+                        $selected[] = $child->getAttribute('value');
+                    }
+                }
+            }
+
             if ($option->hasAttribute('selected')) {
                 $selected[] = $option->getAttribute('value');
             }
