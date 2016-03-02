@@ -78,7 +78,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
     public function testCompileDoesntStoreFilesWhenCachePathIsNull()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), null);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('get')->never();
         $files->shouldReceive('put')->never();
         $compiler->compile('foo');
     }
