@@ -506,7 +506,7 @@ return $obj; });
 
         $container = new Container;
         $container->tag(['ContainerImplementationStub', 'ContainerImplementationStubTwo'], ['foo']);
-        $this->assertEquals(2, count($container->tagged('foo')));
+        $this->assertCount(2, $container->tagged('foo'));
         $this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
         $this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
 
