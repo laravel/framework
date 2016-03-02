@@ -22,9 +22,11 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testLastWithCallback()
     {
-        $data = new Collection([2, 4, 3, 2]);
-        $result = $data->last(function ($key, $value) { return $value > 2; });
-        $this->assertEquals(3, $result);
+        $data = new Collection([100, 200, 300]);
+        $result = $data->last(function ($key, $value) { return $value < 250; });
+        $this->assertEquals(200, $result);
+        $result = $data->last(function ($key, $value) { return $key < 2; });
+        $this->assertEquals(200, $result);
     }
 
     public function testLastWithCallbackAndDefault()
