@@ -136,11 +136,11 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if (is_array($array)) {
-            return array_key_exists($key, $array);
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
         }
 
-        return $array->offsetExists($key);
+        return array_key_exists($key, $array);
     }
 
     /**
