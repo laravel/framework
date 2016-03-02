@@ -199,6 +199,33 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('NAME is required!', $v->messages()->first('name'));
     }
 
+    public function testAttributeNamesAreReplacedInArrays()
+    {
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', [
+            'validation.string' => ':attribute must be a string!',
+            'validation.attributes.name.*' => 'Any name',
+        ], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ['Jon', 2]], ['name.*' => 'string']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Any name must be a string!', $v->messages()->first('name.1'));
+
+        $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.string' => ':attribute must be a string!'], 'en', 'messages');
+        $v = new Validator($trans, ['name' => ['Jon', 2]], ['name.*' => 'string']);
+        $v->setAttributeNames(['name.*' => 'Any name']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Any name must be a string!', $v->messages()->first('name.1'));
+
+        $v = new Validator($trans, ['users' => [['name' => 'Jon'], ['name' => 2]]], ['users.*.name' => 'string']);
+        $v->setAttributeNames(['users.*.name' => 'Any name']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Any name must be a string!', $v->messages()->first('users.1.name'));
+    }
+
     public function testDisplayableValuesAreReplaced()
     {
         //required_if:foo,bar
@@ -626,6 +653,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => [['bar_id' => 1], ['bar_id' => 2]], 'bar' => [['id' => 1, ['id' => 2]]]], ['foo.*.bar_id' => 'in_array:bar.*.id']);
         $this->assertTrue($v->passes());
+
+        $trans->addResource('array', ['validation.in_array' => 'The value of :attribute does not exist in :other.'], 'en', 'messages');
+        $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
+        $this->assertEquals('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
     }
 
     public function testValidateConfirmed()
