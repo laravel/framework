@@ -264,7 +264,7 @@ class Arr
             return $array;
         }
 
-        if (isset($array[$key])) {
+        if (static::exists($array, $key)) {
             return $array[$key];
         }
 
@@ -292,7 +292,7 @@ class Arr
             return false;
         }
 
-        if (array_key_exists($key, $array)) {
+        if (static::exists($array, $key)) {
             return true;
         }
 
