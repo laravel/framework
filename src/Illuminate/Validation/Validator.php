@@ -1167,10 +1167,10 @@ class Validator implements ValidatorContract
      */
     protected function validateDistinct($attribute, $value, $parameters)
     {
-        $rawAttribute = $this->getRawAttribute($attribute);
+        $attributeName = $this->getPrimaryAttribute($attribute);
 
-        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $rawAttribute) {
-            return $key != $attribute &&  Str::is($rawAttribute, $key);
+        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $attributeName) {
+            return $key != $attribute && Str::is($attributeName, $key);
         });
 
         return ! in_array($value, array_values($data));
@@ -1922,16 +1922,16 @@ class Validator implements ValidatorContract
      */
     protected function getAttribute($attribute)
     {
-        $rawAttribute = $this->getRawAttribute($attribute);
+        $attributeName = $this->getPrimaryAttribute($attribute);
 
         // The developer may dynamically specify the array of custom attributes
         // on this Validator instance. If the attribute exists in this array
         // it takes precedence over all other ways we can pull attributes.
-        if (isset($this->customAttributes[$rawAttribute])) {
-            return $this->customAttributes[$rawAttribute];
+        if (isset($this->customAttributes[$attributeName])) {
+            return $this->customAttributes[$attributeName];
         }
 
-        $key = "validation.attributes.{$rawAttribute}";
+        $key = "validation.attributes.{$attributeName}";
 
         // We allow for the developer to specify language lines for each of the
         // attributes allowing for more displayable counterparts of each of
@@ -1947,23 +1947,22 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get the raw attribute name.
+     * Get the primary attribute name.
+     *
+     * For example, if "name.0" is given, "name.*" will be returned.
      *
      * @param  string  $attribute
      * @return string|null
      */
-    protected function getRawAttribute($attribute)
+    protected function getPrimaryAttribute($attribute)
     {
-        $rawAttribute = $attribute;
-
-        foreach ($this->implicitAttributes as $raw => $dataAttributes) {
-            if (in_array($attribute, $dataAttributes)) {
-                $rawAttribute = $raw;
-                break;
+        foreach ($this->implicitAttributes as $unparsed => $parsed) {
+            if (in_array($attribute, $parsed)) {
+                return $unparsed;
             }
         }
 
-        return $rawAttribute;
+        return $attribute;
     }
 
     /**
