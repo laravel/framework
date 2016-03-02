@@ -83,6 +83,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $last = Arr::last($array, function ($key, $value) { return $value < 250; });
         $this->assertEquals(200, $last);
 
+        $last = Arr::last($array, function ($key, $value) { return $key < 2; });
+        $this->assertEquals(200, $last);
+
         $this->assertEquals(300, Arr::last($array));
     }
 
