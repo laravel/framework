@@ -649,7 +649,7 @@ trait InteractsWithPages
 
         if ($element == 'input') {
             $value = $this->getCheckedValueFromRadioGroup($field);
-            
+
             return $value ? [$value] : [];
         }
 
