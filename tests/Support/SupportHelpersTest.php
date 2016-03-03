@@ -356,6 +356,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
 
+        $arrayAccess = new SupportTestArrayAccess($array);
+        $this->assertEquals([], data_get($arrayAccess, '*.name'));
+
         $array = [
             'users' => [
                 ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
@@ -369,6 +372,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
         $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
         $this->assertNull(data_get($array, 'posts.*.date'));
+
+        $arrayAccess = new SupportTestArrayAccess($array);
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayAccess, 'users.*.first'));
     }
 
     public function testDataGetWithDoubleNestedArraysCollapsesResult()
