@@ -679,9 +679,7 @@ trait InteractsWithPages
                         $selected[] = $child->getAttribute('value');
                     }
                 }
-            }
-
-            if ($option->hasAttribute('selected')) {
+            } elseif ($option->hasAttribute('selected')) {
                 $selected[] = $option->getAttribute('value');
             }
         }
