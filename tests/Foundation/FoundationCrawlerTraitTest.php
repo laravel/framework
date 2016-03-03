@@ -126,6 +126,7 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
             ->withArgs(['selected'])
             ->once()
             ->andReturn(false);
+        $optionEmpty->nodeName = 'option';
 
         $optionFullTime = m::mock(Crawler::class)->makePartial();
         $optionFullTime->shouldReceive('hasAttribute')
@@ -136,6 +137,47 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
             ->withArgs(['value'])
             ->once()
             ->andReturn('full_time');
+        $optionFullTime->nodeName = 'option';
+
+        $select = m::mock(Crawler::class)->makePartial();
+        $select->shouldReceive('count')
+            ->once()
+            ->andReturn(1);
+        $select->shouldReceive('nodeName')
+            ->twice()
+            ->andReturn('select');
+        $select->shouldReceive('children')
+            ->once()
+            ->andReturn([$optionEmpty, $optionFullTime]);
+
+        return $select;
+    }
+
+    protected function mockOptGroupSelect()
+    {
+        $childEmpty = m::mock(Crawler::class)->makePartial();
+        $childEmpty->shouldReceive('hasAttribute')
+            ->withArgs(['selected'])
+            ->twice()
+            ->andReturn(false);
+
+        $childFullTime = m::mock(Crawler::class)->makePartial();
+        $childFullTime->shouldReceive('hasAttribute')
+            ->withArgs(['selected'])
+            ->twice()
+            ->andReturn(true);
+        $childFullTime->shouldReceive('getAttribute')
+            ->withArgs(['value'])
+            ->twice()
+            ->andReturn('full_time');
+
+        $optionEmpty = m::mock(Crawler::class)->makePartial();
+        $optionEmpty->nodeName = 'optgroup';
+        $optionEmpty->childNodes = [$childEmpty, $childFullTime];
+
+        $optionFullTime = m::mock(Crawler::class)->makePartial();
+        $optionFullTime->nodeName = 'optgroup';
+        $optionFullTime->childNodes = [$childEmpty, $childFullTime];
 
         $select = m::mock(Crawler::class)->makePartial();
         $select->shouldReceive('count')
@@ -167,6 +209,26 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
             ->withArgs(["*#availability, *[name='availability']"])
             ->once()
             ->andReturn($this->mockSelect());
+
+        $this->dontSeeIsSelected('availability', 'partial_time');
+    }
+
+    public function testSeeIsOptGroupSelected()
+    {
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["*#availability, *[name='availability']"])
+            ->once()
+            ->andReturn($this->mockOptGroupSelect());
+
+        $this->seeIsSelected('availability', 'full_time');
+    }
+
+    public function testDontSeeIsOptGroupSelected()
+    {
+        $this->crawler->shouldReceive('filter')
+            ->withArgs(["*#availability, *[name='availability']"])
+            ->once()
+            ->andReturn($this->mockOptGroupSelect());
 
         $this->dontSeeIsSelected('availability', 'partial_time');
     }
