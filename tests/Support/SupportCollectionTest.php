@@ -23,16 +23,16 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testLastWithCallback()
     {
         $data = new Collection([100, 200, 300]);
-        $result = $data->last(function ($key, $value) { return $value < 250; });
+        $result = $data->last(function ($value) { return $value < 250; });
         $this->assertEquals(200, $result);
-        $result = $data->last(function ($key, $value) { return $key < 2; });
+        $result = $data->last(function ($value, $key) { return $key < 2; });
         $this->assertEquals(200, $result);
     }
 
     public function testLastWithCallbackAndDefault()
     {
         $data = new Collection(['foo', 'bar']);
-        $result = $data->last(function ($key, $value) { return $value === 'baz'; }, 'default');
+        $result = $data->last(function ($value) { return $value === 'baz'; }, 'default');
         $this->assertEquals('default', $result);
     }
 
@@ -821,14 +821,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testFirstWithCallback()
     {
         $data = new Collection(['foo', 'bar', 'baz']);
-        $result = $data->first(function ($key, $value) { return $value === 'bar'; });
+        $result = $data->first(function ($value) { return $value === 'bar'; });
         $this->assertEquals('bar', $result);
     }
 
     public function testFirstWithCallbackAndDefault()
     {
         $data = new Collection(['foo', 'bar']);
-        $result = $data->first(function ($key, $value) { return $value === 'baz'; }, 'default');
+        $result = $data->first(function ($value) { return $value === 'baz'; }, 'default');
         $this->assertEquals('default', $result);
     }
 
