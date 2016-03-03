@@ -94,6 +94,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['ApplicationIntent'] = 'ReadOnly';
         }
 
+        if (isset($config['connectionPooling']) && $config['connectionPooling'] == false) {
+            $arguments['ConnectionPooling'] = '0';
+        }
+
         return $this->buildConnectString('sqlsrv', $arguments);
     }
 
