@@ -166,7 +166,7 @@ class Validator implements ValidatorContract
      */
     protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
     ];
 
     /**
@@ -1201,6 +1201,10 @@ class Validator implements ValidatorContract
 
         if (isset($parameters[2])) {
             list($idColumn, $id) = $this->getUniqueIds($parameters);
+
+            if (preg_match('/\[(.*)\]/', $id, $matches)) {
+                $id = $this->getValue($matches[1]);
+            }
 
             if (strtolower($id) == 'null') {
                 $id = null;
