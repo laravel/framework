@@ -26,7 +26,6 @@ class SparkPostTransport extends Transport
      *
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
-     * @param  string  $domain
      * @return void
      */
     public function __construct(ClientInterface $client, $key)
