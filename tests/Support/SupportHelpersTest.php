@@ -325,8 +325,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     {
         $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
         $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
-        $dottedArray = ['users' => ['first.name' => 'Taylor']];
-        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John'])]);
+        $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
+        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
 
         $this->assertEquals('Taylor', data_get($object, 'users.name.0'));
         $this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
@@ -334,6 +334,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
         $this->assertEquals('Not found', data_get($array, '0.users.3', function () { return 'Not found'; }));
         $this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
+        $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
         $this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
         $this->assertEquals(56, data_get($arrayAccess, 'price'));
         $this->assertEquals('John', data_get($arrayAccess, 'user.name'));
@@ -341,6 +342,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
         $this->assertNull(data_get($arrayAccess, 'foo'));
         $this->assertNull(data_get($arrayAccess, 'user.foo'));
+        $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
     }
 
     public function testDataGetWithNestedArrays()
@@ -687,7 +689,7 @@ class SupportTestArrayAccess implements ArrayAccess
 
     public function offsetExists($offset)
     {
-        return isset($this->attributes[$offset]);
+        return array_key_exists($offset, $this->attributes);
     }
 
     public function offsetGet($offset)
