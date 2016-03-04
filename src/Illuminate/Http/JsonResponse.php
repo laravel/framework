@@ -42,7 +42,7 @@ class JsonResponse extends BaseJsonResponse
     /**
      * {@inheritdoc}
      */
-    public function setData($data = [])
+    public function setData($data = [], $preEncoded = false)
     {
         if ($data instanceof Arrayable) {
             $this->data = json_encode($data->toArray(), $this->encodingOptions);
