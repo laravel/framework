@@ -356,8 +356,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
 
-        $arrayAccess = new SupportTestArrayAccess($array);
-        $this->assertEquals([], data_get($arrayAccess, '*.name'));
+        $iterable = new SupportTestIterable($array);
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($iterable, '*.name'));
 
         $array = [
             'users' => [
@@ -711,5 +711,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestIterable implements IteratorAggregate
+{
+    public $items;
+
+    public function __construct($items)
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->items);
     }
 }

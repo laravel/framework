@@ -64,7 +64,7 @@ if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array  $array
+     * @param  \Traversable|array  $array
      * @return array
      */
     function array_collapse($array)
@@ -219,7 +219,7 @@ if (! function_exists('array_pluck')) {
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array   $array
+     * @param  \Traversable|array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
@@ -412,7 +412,7 @@ if (! function_exists('data_get')) {
 
         while (($segment = array_shift($key)) !== null) {
             if ($segment === '*') {
-                if (! Arr::accessible($target)) {
+                if (! Arr::traversable($target)) {
                     return value($default);
                 }
 

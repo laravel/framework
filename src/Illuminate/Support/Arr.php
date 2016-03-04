@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use Traversable;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -62,7 +63,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array  $array
+     * @param  \Traversable|array  $array
      * @return array
      */
     public static function collapse($array)
@@ -72,6 +73,8 @@ class Arr
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
+            } elseif ($values instanceof Traversable) {
+                $values = iterator_to_array($values);
             } elseif (! is_array($values)) {
                 continue;
             }
@@ -339,7 +342,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  \Traversable|array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
@@ -489,6 +492,17 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Determine whether the given value is traversable using foreach.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function traversable($value)
+    {
+        return is_array($value) || $value instanceof Traversable;
     }
 
     /**
