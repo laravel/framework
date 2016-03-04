@@ -62,7 +62,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \Illuminate\Support\Collection|array  $array
+     * @param  array  $array
      * @return array
      */
     public static function collapse($array)
