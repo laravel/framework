@@ -68,6 +68,11 @@ class Arr
      */
     public static function collapse($array)
     {
+        // Iterate on the array for performance.
+        if ($array instanceof Collection) {
+            $array = $array->all();
+        }
+
         $results = [];
 
         foreach ($array as $values) {
@@ -349,6 +354,11 @@ class Arr
      */
     public static function pluck($array, $value, $key = null)
     {
+        // Iterate on the array for performance.
+        if ($array instanceof Collection) {
+            $array = $array->all();
+        }
+
         $results = [];
 
         list($value, $key) = static::explodePluckParameters($value, $key);
