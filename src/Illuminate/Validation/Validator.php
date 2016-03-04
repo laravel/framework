@@ -14,10 +14,9 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
+use Illuminate\Contracts\Http\UploadedFile;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class Validator implements ValidatorContract
@@ -208,10 +207,10 @@ class Validator implements ValidatorContract
         foreach ($data as $key => $value) {
             $key = ($arrayKey) ? "$arrayKey.$key" : $key;
 
-            // If this value is an instance of the HttpFoundation File class we will
+            // If this value is an instance of the UploadedFile interface, we will
             // remove it from the data array and add it to the files array, which
             // we use to conveniently separate out these files from other data.
-            if ($value instanceof File) {
+            if ($value instanceof UploadedFile) {
                 $this->files[$key] = $value;
 
                 unset($data[$key]);
@@ -632,8 +631,8 @@ class Validator implements ValidatorContract
             return false;
         } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
-        } elseif ($value instanceof File) {
-            return (string) $value->getPath() != '';
+        } elseif ($value instanceof UploadedFile) {
+            return (string) $value->path() != '';
         }
 
         return true;
@@ -1134,8 +1133,8 @@ class Validator implements ValidatorContract
             return $value;
         } elseif (is_array($value)) {
             return count($value);
-        } elseif ($value instanceof File) {
-            return $value->getSize() / 1024;
+        } elseif ($value instanceof UploadedFile) {
+            return $value->size() / 1024;
         }
 
         return mb_strlen($value);
@@ -1453,7 +1452,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+        return $value->path() != '' && in_array($value->extension(), $parameters);
     }
 
     /**
@@ -1470,7 +1469,7 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        return $value->getPath() != '' && in_array($value->getMimeType(), $parameters);
+        return $value->path() != '' && in_array($value->mimeType(), $parameters);
     }
 
     /**
@@ -1481,11 +1480,7 @@ class Validator implements ValidatorContract
      */
     public function isAValidFileInstance($value)
     {
-        if ($value instanceof UploadedFile && ! $value->isValid()) {
-            return false;
-        }
-
-        return $value instanceof File;
+        return $value instanceof UploadedFile && $value->isValid();
     }
 
     /**

@@ -2,7 +2,6 @@
 
 use Mockery as m;
 use Illuminate\Validation\Validator;
-use Symfony\Component\HttpFoundation\File\File;
 
 class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 {
@@ -347,7 +346,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => new Symfony\Component\HttpFoundation\File\File('/tmp/foo', false)], ['foo' => 'Array']);
+        $v = new Validator($trans, ['foo' => $this->getUploadedFile(['path' => 'foobar'])], ['foo' => 'Array']);
         $this->assertFalse($v->passes());
     }
 
@@ -404,11 +403,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Required']);
         $this->assertTrue($v->passes());
 
-        $file = new File('', false);
+        $file = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
         $this->assertFalse($v->passes());
 
-        $file = new File(__FILE__, false);
+        $file = $this->getUploadedFile(['path' => 'foobar']);
         $v = new Validator($trans, ['name' => $file], ['name' => 'Required']);
         $this->assertTrue($v->passes());
     }
@@ -431,17 +430,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['first' => 'Taylor', 'last' => 'Otwell'], ['last' => 'required_with:first']);
         $this->assertTrue($v->passes());
 
-        $file = new File('', false);
+        $file = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['file' => $file, 'foo' => ''], ['foo' => 'required_with:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File(__FILE__, false);
-        $foo = new File(__FILE__, false);
+        $file = $this->getUploadedFile(['path' => 'foobar']);
+        $foo = $this->getUploadedFile(['path' => 'foobar']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_with:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File(__FILE__, false);
-        $foo = new File('', false);
+        $file = $this->getUploadedFile(['path' => 'foobar']);
+        $foo = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_with:file']);
         $this->assertFalse($v->passes());
     }
@@ -477,35 +476,35 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['last' => 'Otwell'], ['last' => 'required_without:first']);
         $this->assertTrue($v->passes());
 
-        $file = new File('', false);
+        $file = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['file' => $file], ['foo' => 'required_without:file']);
         $this->assertFalse($v->passes());
 
-        $foo = new File('', false);
+        $foo = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertFalse($v->passes());
 
-        $foo = new File(__FILE__, false);
+        $foo = $this->getUploadedFile(['path' => 'foobar']);
         $v = new Validator($trans, ['foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File(__FILE__, false);
-        $foo = new File(__FILE__, false);
+        $file = $this->getUploadedFile(['path' => 'foobar']);
+        $foo = $this->getUploadedFile(['path' => 'foobar']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File(__FILE__, false);
-        $foo = new File('', false);
+        $file = $this->getUploadedFile(['path' => 'foobar']);
+        $foo = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File('', false);
-        $foo = new File(__FILE__, false);
+        $file = $this->getUploadedFile(['path' => '']);
+        $foo = $this->getUploadedFile(['path' => 'foobar']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertTrue($v->passes());
 
-        $file = new File('', false);
-        $foo = new File('', false);
+        $file = $this->getUploadedFile(['path' => '']);
+        $foo = $this->getUploadedFile(['path' => '']);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_without:file']);
         $this->assertFalse($v->passes());
     }
@@ -936,14 +935,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Size:4']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 3072]);
         $v = new Validator($trans, [], ['photo' => 'Size:3']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 4072]);
         $v = new Validator($trans, [], ['photo' => 'Size:3']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
@@ -976,14 +973,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Between:1,2']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 3072]);
         $v = new Validator($trans, [], ['photo' => 'Between:1,5']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 4072]);
         $v = new Validator($trans, [], ['photo' => 'Between:1,2']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
@@ -1010,14 +1005,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2]], ['foo' => 'Array|Min:3']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(3072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 3072]);
         $v = new Validator($trans, [], ['photo' => 'Min:2']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 4072]);
         $v = new Validator($trans, [], ['photo' => 'Min:10']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
@@ -1044,22 +1037,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Max:2']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['isValid', 'getSize'], [__FILE__, basename(__FILE__)]);
-        $file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
-        $file->expects($this->at(1))->method('getSize')->will($this->returnValue(3072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 3072, 'isValid' => true]);
         $v = new Validator($trans, [], ['photo' => 'Max:10']);
         $v->setFiles(['photo' => $file]);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['isValid', 'getSize'], [__FILE__, basename(__FILE__)]);
-        $file->expects($this->at(0))->method('isValid')->will($this->returnValue(true));
-        $file->expects($this->at(1))->method('getSize')->will($this->returnValue(4072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 4072, 'isValid' => true]);
         $v = new Validator($trans, [], ['photo' => 'Max:2']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['isValid'], [__FILE__, basename(__FILE__)]);
-        $file->expects($this->any())->method('isValid')->will($this->returnValue(false));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'isValid' => false]);
         $v = new Validator($trans, [], ['photo' => 'Max:10']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
@@ -1079,8 +1067,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->messages()->setFormat(':message');
         $this->assertEquals('string', $v->messages()->first('name'));
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', ['getSize'], [__FILE__, false]);
-        $file->expects($this->any())->method('getSize')->will($this->returnValue(4072));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'size' => 4072, 'isValid' => true]);
         $v = new Validator($trans, [], ['photo' => 'Max:3']);
         $v->setFiles(['photo' => $file]);
         $this->assertFalse($v->passes());
@@ -1568,37 +1555,30 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateImage()
     {
         $trans = $this->getRealTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'php', 'isValid' => true]);
         $v = new Validator($trans, [], ['x' => 'Image']);
         $v->setFiles(['x' => $file]);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, [], ['x' => 'Image']);
-        $file2 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('jpeg'));
+        $file2 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'jpeg', 'isValid' => true]);
         $v->setFiles(['x' => $file2]);
         $this->assertTrue($v->passes());
 
-        $file3 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file3->expects($this->any())->method('guessExtension')->will($this->returnValue('gif'));
+        $file3 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'gif', 'isValid' => true]);
         $v->setFiles(['x' => $file3]);
         $this->assertTrue($v->passes());
 
-        $file4 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file4->expects($this->any())->method('guessExtension')->will($this->returnValue('bmp'));
+        $file4 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'bmp', 'isValid' => true]);
         $v->setFiles(['x' => $file4]);
         $this->assertTrue($v->passes());
 
-        $file5 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
+        $file5 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'png', 'isValid' => true]);
         $v->setFiles(['x' => $file5]);
         $this->assertTrue($v->passes());
 
-        $file6 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
+        $file6 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'svg', 'isValid' => true]);
         $v->setFiles(['x' => $file6]);
         $this->assertTrue($v->passes());
     }
@@ -1609,29 +1589,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testValidateMimetypes()
     {
         $trans = $this->getRealTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file->expects($this->any())->method('validateMimetypes')->will($this->returnValue('php'));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'mimeType' => 'text/x-php', 'isValid' => true]);
         $v = new Validator($trans, [], ['x' => 'mimetypes:text/x-php']);
         $v->setFiles(['x' => $file]);
         $this->assertTrue($v->passes());
+
+        $file2 = $this->getUploadedFile(['path' => 'foobar', 'mimeType' => 'text/x-php', 'isValid' => false]);
+        $v = new Validator($trans, [], ['x' => 'mimetypes:text/x-php']);
+        $v->setFiles(['x' => $file2]);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateMime()
     {
         $trans = $this->getRealTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+        $file = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'php', 'isValid' => true]);
         $v = new Validator($trans, [], ['x' => 'mimes:php']);
         $v->setFiles(['x' => $file]);
         $this->assertTrue($v->passes());
 
-        $file2 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension', 'isValid'], $uploadedFile);
-        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
-        $file2->expects($this->any())->method('isValid')->will($this->returnValue(false));
+        $file2 = $this->getUploadedFile(['path' => 'foobar', 'extension' => 'php', 'isValid' => false]);
         $v = new Validator($trans, [], ['x' => 'mimes:php']);
         $v->setFiles(['x' => $file2]);
         $this->assertFalse($v->passes());
@@ -2618,6 +2597,28 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans->addLoader('array', new Symfony\Component\Translation\Loader\ArrayLoader);
 
         return $trans;
+    }
+
+    protected function getUploadedFile($params = [])
+    {
+        $file = m::mock('Illuminate\Contracts\Http\UploadedFile');
+        if (isset($params['path'])) {
+            $file->shouldReceive('path')->andReturn($params['path']);
+        }
+        if (isset($params['size'])) {
+            $file->shouldReceive('size')->andReturn($params['size']);
+        }
+        if (isset($params['isValid'])) {
+            $file->shouldReceive('isValid')->andReturn($params['isValid']);
+        }
+        if (isset($params['extension'])) {
+            $file->shouldReceive('extension')->andReturn($params['extension']);
+        }
+        if (isset($params['mimeType'])) {
+            $file->shouldReceive('mimeType')->andReturn($params['mimeType']);
+        }
+
+        return $file;
     }
 
     public function getIlluminateArrayTranslator()
