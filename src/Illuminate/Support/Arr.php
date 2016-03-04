@@ -258,7 +258,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -268,11 +268,9 @@ class Arr
             return $array;
         }
 
-        if (static::exists($array, $key)) {
-            return $array[$key];
-        }
+        $key = is_array($key) ? $key : explode('.', $key);
 
-        foreach (explode('.', $key) as $segment) {
+        foreach ($key as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
@@ -287,7 +285,7 @@ class Arr
      * Check if an item exists in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  string|array  $key
      * @return bool
      */
     public static function has($array, $key)
@@ -296,11 +294,9 @@ class Arr
             return false;
         }
 
-        if (static::exists($array, $key)) {
-            return true;
-        }
+        $key = is_array($key) ? $key : explode('.', $key);
 
-        foreach (explode('.', $key) as $segment) {
+        foreach ($key as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
