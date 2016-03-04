@@ -64,7 +64,7 @@ if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @return array
      */
     function array_collapse($array)

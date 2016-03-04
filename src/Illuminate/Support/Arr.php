@@ -62,7 +62,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @return array
      */
     public static function collapse($array)
@@ -70,11 +70,15 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if (! static::accessible($values)) {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            }
+
+            if (! is_array($values)) {
                 continue;
             }
 
-            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
+            $results = array_merge($results, $values);
         }
 
         return $results;
