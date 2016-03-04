@@ -180,6 +180,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertNull(Arr::get($array, 'foo', 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+
+        // Test dotted key
+        $dottedArray = ['first.name' => 'Taylor', 'first' => ['name' => 'taylor']];
+        $this->assertEquals('taylor', Arr::get($dottedArray, 'first.name'));
+        $this->assertEquals('Taylor', Arr::get($dottedArray, ['first.name']));
     }
 
     public function testHas()
