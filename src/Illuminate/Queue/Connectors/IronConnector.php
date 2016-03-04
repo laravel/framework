@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Connectors;
 
+use IronMQ\IronMQ;
+use Illuminate\Http\Request;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
-use Illuminate\Http\Request;
-use IronMQ\IronMQ;
 
 class IronConnector implements ConnectorInterface
 {
@@ -28,7 +28,6 @@ class IronConnector implements ConnectorInterface
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $crypt
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return void
      */
     public function __construct(EncrypterContract $crypt, Request $request)
@@ -42,7 +41,6 @@ class IronConnector implements ConnectorInterface
      *
      * @param  array  $config
      * @param  array  $config
-     *
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connect(array $config)

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Arr;
 use Illuminate\Queue\IronQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Illuminate\Support\Arr;
 
 class IronJob extends Job implements JobContract
 {
@@ -37,6 +37,7 @@ class IronJob extends Job implements JobContract
      * @param  \Illuminate\Queue\IronQueue  $iron
      * @param  object  $job
      * @param  bool  $pushed
+     * @return void
      */
     public function __construct(Container $container,
                                 IronQueue $iron,
@@ -89,7 +90,6 @@ class IronJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int  $delay
-     *
      * @return void
      */
     public function release($delay = 0)
@@ -107,7 +107,6 @@ class IronJob extends Job implements JobContract
      * Release a pushed job back onto the queue.
      *
      * @param  int  $delay
-     *
      * @return void
      */
     protected function recreateJob($delay)

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Queue\Jobs\IronJob;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
+use IronMQ\IronMQ;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use IronMQ\IronMQ;
+use Illuminate\Queue\Jobs\IronJob;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class IronQueue extends Queue implements QueueContract
 {
@@ -45,7 +45,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $default
      * @param  bool  $shouldEncrypt
-     *
      * @return void
      */
     public function __construct(IronMQ $iron, Request $request, $default, $shouldEncrypt = false)
@@ -62,7 +61,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed  $data
      * @param  string  $queue
-     *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -76,7 +74,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  array  $options
-     *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -94,7 +91,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  int  $delay
-     *
      * @return mixed
      */
     public function recreate($payload, $queue, $delay)
@@ -111,7 +107,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed  $data
      * @param  string  $queue
-     *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -127,7 +122,6 @@ class IronQueue extends Queue implements QueueContract
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
-     *
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
@@ -152,7 +146,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @param  string  $id
      * @param  string  $reservation_id
-     *
      * @return void
      */
     public function deleteMessage($queue, $id, $reservation_id)
@@ -164,8 +157,6 @@ class IronQueue extends Queue implements QueueContract
      * Marshal a push queue request and fire the job.
      *
      * @return \Illuminate\Http\Response
-     *
-     * @deprecated since version 5.1.
      */
     public function marshal()
     {
@@ -194,7 +185,6 @@ class IronQueue extends Queue implements QueueContract
      * Create a new IronJob for a pushed job.
      *
      * @param  object $job
-     *
      * @return \Illuminate\Queue\Jobs\IronJob
      */
     protected function createPushedIronJob($job)
@@ -208,7 +198,6 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed  $data
      * @param  string  $queue
-     *
      * @return string
      */
     protected function createPayload($job, $data = '', $queue = null)
@@ -222,7 +211,6 @@ class IronQueue extends Queue implements QueueContract
      * Parse the job body for firing.
      *
      * @param  string  $body
-     *
      * @return string
      */
     protected function parseJobBody($body)
@@ -234,7 +222,6 @@ class IronQueue extends Queue implements QueueContract
      * Get the queue or return the default.
      *
      * @param  string|null  $queue
-     *
      * @return string
      */
     public function getQueue($queue)
@@ -266,7 +253,6 @@ class IronQueue extends Queue implements QueueContract
      * Set the request instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return void
      */
     public function setRequest(Request $request)
