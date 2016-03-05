@@ -57,15 +57,7 @@ trait MakesHttpRequests
      */
     public function json($method, $uri, array $data = [], array $headers = [])
     {
-        $files = [];
-
-        foreach ($data as $key => $value) {
-            if ($value instanceof SymfonyUploadedFile) {
-                $files[$key] = $value;
-
-                unset($data[$key]);
-            }
-        }
+        $files = $this->extractFilesFromDataArray($data);
 
         $content = json_encode($data);
 
@@ -80,6 +72,27 @@ trait MakesHttpRequests
         );
 
         return $this;
+    }
+
+    /**
+     * Extract the file uploads from the given data array.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function extractFilesFromDataArray(&$data)
+    {
+        $files = [];
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof SymfonyUploadedFile) {
+                $files[$key] = $value;
+
+                unset($data[$key]);
+            }
+        }
+
+        return $files;
     }
 
     /**
