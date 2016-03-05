@@ -260,6 +260,54 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items by the given key using a less-than-or-equal condition.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereLte($key, $value)
+    {
+        return $this->where($key, '<=', $value);
+    }
+
+    /**
+     * Filter items by the given key using a less-than condition.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereLt($key, $value)
+    {
+        return $this->where($key, '<', $value);
+    }
+
+    /**
+     * Filter items by the given key using a greater-than-or-equal condition.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereGte($key, $value)
+    {
+        return $this->where($key, '>=', $value);
+    }
+
+    /**
+     * Filter items by the given key using a greater-than condition.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereGt($key, $value)
+    {
+        return $this->where($key, '>', $value);
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key
