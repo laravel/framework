@@ -293,6 +293,8 @@ class Validator implements ValidatorContract
 
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
+        $data = array_merge($data, $this->getExactAttributeValues($data, $attribute));
+
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
@@ -304,6 +306,37 @@ class Validator implements ValidatorContract
                 }
             }
         }
+    }
+
+    /**
+     * Get the exact attribute values in different iterations.
+     *
+     * @param  array $data
+     * @param  string $attribute
+     *
+     * @return array
+     */
+    public function getExactAttributeValues($data, $attribute)
+    {
+        $allKeys = [];
+
+        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
+
+        foreach ($data as $key => $value) {
+            if ((bool) preg_match('/^'.$pattern.'/', $key, $matches)) {
+                $allKeys[] = $matches[0];
+            }
+        }
+
+        $allKeys = array_unique($allKeys);
+
+        $exactData = [];
+
+        foreach ($allKeys as $key) {
+            $exactData[$key] = array_get($this->data, $key);
+        }
+
+        return $exactData;
     }
 
     /**
