@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use PHPUnit_Framework_Assert as PHPUnit;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 trait MakesHttpRequests
 {
@@ -56,6 +57,16 @@ trait MakesHttpRequests
      */
     public function json($method, $uri, array $data = [], array $headers = [])
     {
+        $files = [];
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof SymfonyUploadedFile) {
+                $files[$key] = $value;
+
+                unset($data[$key]);
+            }
+        }
+
         $content = json_encode($data);
 
         $headers = array_merge([
@@ -65,7 +76,7 @@ trait MakesHttpRequests
         ], $headers);
 
         $this->call(
-            $method, $uri, [], [], [], $this->transformHeadersToServerVars($headers), $content
+            $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
         );
 
         return $this;
