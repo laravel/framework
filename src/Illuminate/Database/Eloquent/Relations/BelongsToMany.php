@@ -84,6 +84,7 @@ class BelongsToMany extends Relation
         $this->otherKey = $otherKey;
         $this->foreignKey = $foreignKey;
         $this->relationName = $relationName;
+        $this->pivotColumns = [$foreignKey, $otherKey];
 
         parent::__construct($query, $parent);
     }
@@ -373,14 +374,12 @@ class BelongsToMany extends Relation
      */
     protected function getAliasedPivotColumns()
     {
-        $defaults = [$this->foreignKey, $this->otherKey];
-
         // We need to alias all of the pivot columns with the "pivot_" prefix so we
         // can easily extract them out of the models and put them into the pivot
         // relationships when they are retrieved and hydrated into the models.
         $columns = [];
 
-        foreach (array_merge($defaults, $this->pivotColumns) as $column) {
+        foreach ($this->pivotColumns as $column) {
             $columns[] = $this->table.'.'.$column.' as pivot_'.$column;
         }
 
@@ -1151,7 +1150,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Set the columns on the pivot table to retrieve.
+     * Set other columns on the pivot table to retrieve.
      *
      * @param  array|mixed  $columns
      * @return $this
@@ -1161,6 +1160,21 @@ class BelongsToMany extends Relation
         $columns = is_array($columns) ? $columns : func_get_args();
 
         $this->pivotColumns = array_merge($this->pivotColumns, $columns);
+
+        return $this;
+    }
+
+    /**
+     * Set specific columns on the pivot table to retrieve.
+     *
+     * @param  array|mixed  $columns
+     * @return $this
+     */
+    public function selectFromPivot($columns)
+    {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        $this->pivotColumns = $columns;
 
         return $this;
     }
