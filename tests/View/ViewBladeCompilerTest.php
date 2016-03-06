@@ -159,6 +159,19 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             '));
     }
 
+    public function testEscapedWithAtDirectivesAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('@foreach', $compiler->compileString('@@foreach'));
+        $this->assertEquals('@foreach($i as $x)', $compiler->compileString('@@foreach($i as $x)'));
+        $this->assertEquals('@continue @break', $compiler->compileString('@@continue @@break'));
+        $this->assertEquals('@foreach(
+            $i as $x
+        )', $compiler->compileString('@@foreach(
+            $i as $x
+        )'));
+    }
+
     public function testExtendsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
