@@ -30,7 +30,7 @@ class ConfigViewCommand extends Command
     {
         $section = $this->argument('section');
         if (! empty($section)) {
-            if (! array_key_exists($section, $this->laravel['config'])) {
+            if (! $this->laravel['config']->has($section)) {
                 $this->error($section.' does not exist in your configuration.');
 
                 return;
@@ -38,7 +38,7 @@ class ConfigViewCommand extends Command
 
             // If the requested string is a string, and not something that can be displayed in a table, then just print
             // it out in the console.
-            $config = $this->laravel['config'][$section];
+            $config = $this->laravel['config']->get($section);
             if (! is_array($config)) {
                 $this->line('<comment>'.$config.'</comment>');
 
@@ -49,7 +49,7 @@ class ConfigViewCommand extends Command
                 $section => $config,
             ];
         } else {
-            $configs = $this->laravel['config'];
+            $configs = $this->laravel['config']->all();
             ksort($configs);
         }
 
