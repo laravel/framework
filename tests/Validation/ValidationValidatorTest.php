@@ -2597,6 +2597,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testGetExplicitAddress() {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], []);
+
+        $method = new ReflectionMethod(Validator::class, 'getExplicitAddress');
+
+        $method->setAccessible(true);
+
+        $this->assertEquals('foo', $method->invoke($v, 'foo.*'));
+        $this->assertEquals('foo.bar', $method->invoke($v, 'foo.bar.*.baz'));
+        $this->assertEquals('foo.bar.1', $method->invoke($v, 'foo.bar.1'));
+    }
+
     public function testInlineMessagesMayUseAsteriskForEachRules()
     {
     }
