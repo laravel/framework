@@ -314,13 +314,13 @@ class Validator implements ValidatorContract
      */
     protected function initializeAttributeOnData($attribute)
     {
-        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
-            return $this->data;
-        }
-
-        $explicitAddress = str_replace_last('.', '', explode('*', $attribute)[0]);
+        $explicitAddress = $this->getExplicitAddress($attribute);
 
         $data = Arr::only($this->data, $explicitAddress);
+
+        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
+            return $data;
+        }
 
         return data_fill($data, $attribute, null);
     }
@@ -834,7 +834,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $explicitAddress = str_replace_last('.', '', explode('*', $parameters[0])[0]);
+        $explicitAddress = $this->getExplicitAddress($parameters[0]);
 
         $attributeData = Arr::only($this->data, $explicitAddress);
 
@@ -1175,7 +1175,7 @@ class Validator implements ValidatorContract
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        $explicitAddress = str_replace_last('.', '', explode('*', $attributeName)[0]);
+        $explicitAddress = $this->getExplicitAddress($attributeName);
 
         $attributeData = Arr::only($this->data, $explicitAddress);
 
@@ -2480,6 +2480,19 @@ class Validator implements ValidatorContract
         }
 
         return [];
+    }
+
+    /**
+     * Get the explicit part of the attribute name.
+     *
+     * E.g. 'foo.bar.2.baz' -> 'foo.bar'
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function getExplicitAddress($attribute)
+    {
+        return str_replace_last('.', '', explode('*', $attribute)[0]);
     }
 
     /**
