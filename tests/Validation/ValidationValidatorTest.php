@@ -2597,7 +2597,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testGetExplicitAddress() {
+    public function testGetExplicitAddress()
+    {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, [], []);
 
