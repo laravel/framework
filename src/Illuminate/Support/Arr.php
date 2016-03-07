@@ -331,7 +331,17 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        $attributeData = [];
+
+        foreach ((array) $keys as $key) {
+            if (! $keyValue = data_get($array, $key)) {
+                continue;
+            }
+
+            data_set($attributeData, $key, $keyValue);
+        }
+
+        return $attributeData;
     }
 
     /**

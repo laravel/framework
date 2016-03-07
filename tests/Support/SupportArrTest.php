@@ -222,6 +222,22 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+
+        $array = ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]];
+        $array = Arr::only($array, 'cat.cat1');
+        $this->assertEquals(['cat' => ['cat1' => ['name']]], $array);
+
+        $array = ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]];
+        $array = Arr::only($array, 'cat.cat1.name');
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], $array);
+
+        $array = ['cat' => ['cat1' => ['name' => '1', 'price' => 1, 'other']], ['cat2' => ['name' => 2]]];
+        $array = Arr::only($array, ['cat.cat1.name', 'cat.cat1.price']);
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1', 'price' => 1]]], $array);
+
+        $array = ['cat' => ['cat1' => ['name' => '1', 'price' => 1, 'other']], ['cat2' => ['name' => 2]]];
+        $array = Arr::only($array, ['cat.cat1.name', 'cat.cat1.price']);
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1', 'price' => 1]]], $array);
     }
 
     public function testPluck()
