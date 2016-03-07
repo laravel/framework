@@ -2485,14 +2485,14 @@ class Validator implements ValidatorContract
     /**
      * Get the explicit part of the attribute name.
      *
-     * E.g. 'foo.bar.2.baz' -> 'foo.bar'
+     * E.g. 'foo.bar.*.baz' -> 'foo.bar'
      *
      * @param  string  $attribute
      * @return string
      */
     protected function getExplicitAddress($attribute)
     {
-        return str_replace_last('.', '', explode('*', $attribute)[0]);
+        return rtrim(explode('*', $attribute)[0], '.');
     }
 
     /**
