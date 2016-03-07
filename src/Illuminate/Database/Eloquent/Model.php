@@ -1710,8 +1710,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return $keyAttribute;
-
-Sorry my
     }
 
     /**
