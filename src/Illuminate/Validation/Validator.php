@@ -1169,7 +1169,13 @@ class Validator implements ValidatorContract
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $attributeName) {
+        $explicitAddress = str_replace_last('.', '', explode('*', $attributeName)[0]);
+
+        $attributeData = [];
+
+        data_set($attributeData, $explicitAddress, data_get($this->data, $explicitAddress));
+
+        $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
         });
 
