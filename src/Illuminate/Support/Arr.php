@@ -331,19 +331,19 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        $attributeData = [];
+        $results = [];
 
         foreach ((array) $keys as $key) {
-            $keyValue = data_get($array, $key, '__missing__');
+            $keyValue = static::get($array, $key, '__missing__');
 
             if ($keyValue == '__missing__') {
                 continue;
             }
 
-            data_set($attributeData, $key, $keyValue);
+            static::set($results, $key, $keyValue);
         }
 
-        return $attributeData;
+        return $results;
     }
 
     /**
