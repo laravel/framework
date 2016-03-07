@@ -9,10 +9,10 @@ use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
 use Illuminate\Mail\Transport\SparkPostTransport;
-use Illuminate\Mail\Transport\SesTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager
@@ -100,9 +100,10 @@ class TransportManager extends Manager
     {
         $config = $this->app['config']->get('services.mailgun', []);
 
-        $client = new HttpClient(Arr::get($config, 'guzzle', []));
-
-        return new MailgunTransport($client, $config['secret'], $config['domain']);
+        return new MailgunTransport(
+            new HttpClient(Arr::get($config, 'guzzle', [])),
+            $config['secret'], $config['domain']
+        );
     }
 
     /**
@@ -114,9 +115,9 @@ class TransportManager extends Manager
     {
         $config = $this->app['config']->get('services.mandrill', []);
 
-        $client = new HttpClient(Arr::get($config, 'guzzle', []));
-
-        return new MandrillTransport($client, $config['secret']);
+        return new MandrillTransport(
+            new HttpClient(Arr::get($config, 'guzzle', [])), $config['secret']
+        );
     }
 
     /**
@@ -128,9 +129,9 @@ class TransportManager extends Manager
     {
         $config = $this->app['config']->get('services.sparkpost', []);
 
-        $client = new HttpClient(Arr::get($config, 'guzzle', []));
-
-        return new SparkPostTransport($client, $config['secret']);
+        return new SparkPostTransport(
+            new HttpClient(Arr::get($config, 'guzzle', [])), $config['secret']
+        );
     }
 
     /**
