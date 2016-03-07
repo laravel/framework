@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use Traversable;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -62,19 +63,24 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array  $array
+     * @param  \Traversable|array  $array
      * @return array
      */
     public static function collapse($array)
     {
+        // Iterate on the array for performance.
+        if ($array instanceof Collection) {
+            $array = $array->all();
+        }
+
         $results = [];
 
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
-            }
-
-            if (! is_array($values)) {
+            } elseif ($values instanceof Traversable) {
+                $values = iterator_to_array($values);
+            } elseif (! is_array($values)) {
                 continue;
             }
 
@@ -341,13 +347,18 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  \Traversable|array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
     {
+        // Iterate on the array for performance.
+        if ($array instanceof Collection) {
+            $array = $array->all();
+        }
+
         $results = [];
 
         list($value, $key) = static::explodePluckParameters($value, $key);
@@ -491,6 +502,17 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Determine whether the given value is traversable using foreach.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function traversable($value)
+    {
+        return is_array($value) || $value instanceof Traversable;
     }
 
     /**

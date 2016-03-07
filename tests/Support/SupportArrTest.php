@@ -357,6 +357,19 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
+    public function testTraversable()
+    {
+        $this->assertTrue(Arr::traversable([]));
+        $this->assertTrue(Arr::traversable([1, 2]));
+        $this->assertTrue(Arr::traversable(['a' => 1, 'b' => 2]));
+        $this->assertTrue(Arr::traversable(new Collection));
+
+        $this->assertFalse(Arr::traversable(null));
+        $this->assertFalse(Arr::traversable('abc'));
+        $this->assertFalse(Arr::traversable(new stdClass));
+        $this->assertFalse(Arr::traversable((object) ['a' => 1, 'b' => 2]));
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];

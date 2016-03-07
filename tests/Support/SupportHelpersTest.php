@@ -80,6 +80,15 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor', 'dayle'], array_pluck($array, ['user', 0]));
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, 'user.1', 'user.0'));
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
+
+        $array = new SupportTestIterable([
+            new SupportTestArrayAccess(['user' => new SupportTestArrayAccess(['taylor', 'otwell'])]),
+            collect(['user' => collect(['dayle', 'rees'])]),
+        ]);
+        $this->assertEquals(['taylor', 'dayle'], array_pluck($array, 'user.0'));
+        $this->assertEquals(['taylor', 'dayle'], array_pluck($array, ['user', 0]));
+        $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, 'user.1', 'user.0'));
+        $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], array_pluck($array, ['user', 1], ['user', 0]));
     }
 
     public function testArrayPluckWithNestedArrays()
@@ -99,6 +108,26 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 ],
             ],
         ];
+
+        $this->assertEquals([['taylor'], ['abigail', 'dayle']], array_pluck($array, 'users.*.first'));
+        $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], array_pluck($array, 'users.*.first', 'account'));
+        $this->assertEquals([['taylorotwell@gmail.com'], [null, null]], array_pluck($array, 'users.*.email'));
+
+        $array = new SupportTestIterable([
+            new SupportTestArrayAccess([
+                'account' => 'a',
+                'users' => new SupportTestIterable([
+                    new SupportTestArrayAccess(['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com']),
+                ]),
+            ]),
+            collect([
+                'account' => 'b',
+                'users' => collect([
+                    collect(['first' => 'abigail', 'last' => 'otwell']),
+                    collect(['first' => 'dayle', 'last' => 'rees']),
+                ]),
+            ]),
+        ]);
 
         $this->assertEquals([['taylor'], ['abigail', 'dayle']], array_pluck($array, 'users.*.first'));
         $this->assertEquals(['a' => ['taylor'], 'b' => ['abigail', 'dayle']], array_pluck($array, 'users.*.first', 'account'));
@@ -126,7 +155,7 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
 
     public function testArrayCollapse()
     {
-        $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
+        $array = [[1], [2], [3], new SupportTestIterable(['foo', 'bar']), collect(['baz', 'boom'])];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], array_collapse($array));
     }
 
@@ -356,8 +385,8 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
 
-        $arrayAccess = new SupportTestArrayAccess($array);
-        $this->assertEquals([], data_get($arrayAccess, '*.name'));
+        $iterable = new SupportTestIterable($array);
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($iterable, '*.name'));
 
         $array = [
             'users' => [
@@ -401,6 +430,34 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
                 ],
             ],
         ];
+
+        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
+        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+
+        $array = new SupportTestArrayAccess([
+            'posts' => new SupportTestIterable([
+                new SupportTestArrayAccess([
+                    'comments' => new SupportTestIterable([
+                        new SupportTestArrayAccess(['author' => 'taylor', 'likes' => 4]),
+                        new SupportTestArrayAccess(['author' => 'abigail', 'likes' => 3]),
+                    ]),
+                ]),
+                new SupportTestArrayAccess([
+                    'comments' => new SupportTestIterable([
+                        new SupportTestArrayAccess(['author' => 'abigail', 'likes' => 2]),
+                        new SupportTestArrayAccess(['author' => 'dayle']),
+                    ]),
+                ]),
+                collect([
+                    'comments' => collect([
+                        collect(['author' => 'dayle']),
+                        collect(['author' => 'taylor', 'likes' => 1]),
+                    ]),
+                ]),
+            ]),
+        ]);
 
         $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
@@ -711,5 +768,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestIterable implements IteratorAggregate
+{
+    public $items;
+
+    public function __construct($items)
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->items);
     }
 }
