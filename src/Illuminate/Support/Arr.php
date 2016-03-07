@@ -334,7 +334,9 @@ class Arr
         $attributeData = [];
 
         foreach ((array) $keys as $key) {
-            if (! $keyValue = data_get($array, $key)) {
+            $keyValue = data_get($array, $key, '__missing__');
+
+            if ($keyValue == '__missing__') {
                 continue;
             }
 
