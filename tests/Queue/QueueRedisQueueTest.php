@@ -82,23 +82,6 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
         $queue->release('default', json_encode(['attempts' => 1]), 1, 2);
     }
 
-    public function testMigrateExpiredJobs()
-    {
-        $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getTime'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $transaction = m::mock('StdClass');
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('transaction')->with(m::any(), m::type('Closure'))->andReturnUsing(function ($options, $callback) use ($transaction) {
-            $callback($transaction);
-        });
-        $transaction->shouldReceive('zrangebyscore')->once()->with('from', '-inf', 1)->andReturn(['foo', 'bar']);
-        $transaction->shouldReceive('multi')->once();
-        $transaction->shouldReceive('zremrangebyscore')->once()->with('from', '-inf', 1);
-        $transaction->shouldReceive('rpush')->once()->with('to', 'foo', 'bar');
-
-        $queue->migrateExpiredJobs('from', 'to');
-    }
-
     public function testNotExpireJobsWhenExpireNull()
     {
         $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getTime', 'migrateAllExpiredJobs'], [$redis = m::mock('Illuminate\Redis\Database'), 'default', null]);

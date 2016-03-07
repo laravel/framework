@@ -176,66 +176,18 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function migrateExpiredJobs($from, $to)
     {
-        $options = ['cas' => true, 'watch' => $from, 'retry' => 10];
-
-        $this->getConnection()->transaction($options, function ($transaction) use ($from, $to) {
-            // First we need to get all of jobs that have expired based on the current time
-            // so that we can push them onto the main queue. After we get them we simply
-            // remove them from this "delay" queues. All of this within a transaction.
-            $jobs = $this->getExpiredJobs(
-                $transaction, $from, $time = $this->getTime()
-            );
-
-            // If we actually found any jobs, we will remove them from the old queue and we
-            // will insert them onto the new (ready) "queue". This means they will stand
-            // ready to be processed by the queue worker whenever their turn comes up.
-            if (count($jobs) > 0) {
-                $this->removeExpiredJobs($transaction, $from, $time);
-
-                $this->pushExpiredJobsOntoNewQueue($transaction, $to, $jobs);
-            }
-        });
-    }
-
-    /**
-     * Get the expired jobs from a given queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $from
-     * @param  int  $time
-     * @return array
-     */
-    protected function getExpiredJobs($transaction, $from, $time)
-    {
-        return $transaction->zrangebyscore($from, '-inf', $time);
-    }
-
-    /**
-     * Remove the expired jobs from a given queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $from
-     * @param  int  $time
-     * @return void
-     */
-    protected function removeExpiredJobs($transaction, $from, $time)
-    {
-        $transaction->multi();
-
-        $transaction->zremrangebyscore($from, '-inf', $time);
-    }
-
-    /**
-     * Push all of the given jobs onto another queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $to
-     * @param  array  $jobs
-     * @return void
-     */
-    protected function pushExpiredJobsOntoNewQueue($transaction, $to, $jobs)
-    {
-        call_user_func_array([$transaction, 'rpush'], array_merge([$to], $jobs));
+        $redis = $this->getConnection();
+        $script = <<<LUA
+local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
+if(next(val) ~= nil) then
+    redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)
+    for i = 1, #val, 100 do
+        redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
+    end
+end
+return true
+LUA;
+        $redis->eval($script, 3, $from, $to, $this->getTime());
     }
 
     /**
