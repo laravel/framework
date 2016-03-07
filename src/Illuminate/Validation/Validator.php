@@ -1954,9 +1954,13 @@ class Validator implements ValidatorContract
             return $line;
         }
 
-        // If no language line has been specified for the attribute all of the
-        // underscores are removed from the attribute name and that will be
-        // used as default versions of the attribute's displayable names.
+        // When no language line has been specified for the attribute and it is
+        // also an implicit attribute we will display the raw attribute name
+        // and not modify it with any replacements before we display this.
+        if (isset($this->implicitAttributes[$attributeName])) {
+            return $attribute;
+        }
+
         return str_replace('_', ' ', Str::snake($attribute));
     }
 
@@ -1966,7 +1970,7 @@ class Validator implements ValidatorContract
      * For example, if "name.0" is given, "name.*" will be returned.
      *
      * @param  string  $attribute
-     * @return string|null
+     * @return string
      */
     protected function getPrimaryAttribute($attribute)
     {
