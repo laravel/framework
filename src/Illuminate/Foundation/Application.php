@@ -282,6 +282,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.public', $this->publicPath());
         $this->instance('path.storage', $this->storagePath());
         $this->instance('path.database', $this->databasePath());
+        $this->instance('path.bootstrap', $this->bootstrapPath());
     }
 
     /**
@@ -382,6 +383,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.storage', $path);
 
         return $this;
+    }
+
+    /**
+     * Get the path to the bootstrap directory.
+     *
+     * @return string
+     */
+    public function bootstrapPath()
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap';
     }
 
     /**
@@ -812,7 +823,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $this->basePath().'/bootstrap/cache/config.php';
+        return $this->bootstrapPath().'/cache/config.php';
     }
 
     /**
@@ -832,7 +843,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $this->basePath().'/bootstrap/cache/routes.php';
+        return $this->bootstrapPath().'/cache/routes.php';
     }
 
     /**
@@ -842,7 +853,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedCompilePath()
     {
-        return $this->basePath().'/bootstrap/cache/compiled.php';
+        return $this->bootstrapPath().'/cache/compiled.php';
     }
 
     /**
@@ -852,7 +863,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return $this->basePath().'/bootstrap/cache/services.php';
+        return $this->bootstrapPath().'/cache/services.php';
     }
 
     /**
