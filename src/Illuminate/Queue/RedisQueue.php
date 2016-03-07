@@ -177,7 +177,7 @@ class RedisQueue extends Queue implements QueueContract
     public function migrateExpiredJobs($from, $to)
     {
         $redis = $this->getConnection();
-        $script = <<<LUA
+        $script = <<<'LUA'
 local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
 if(next(val) ~= nil) then
     redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)

@@ -20,7 +20,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'host' => '127.0.0.1',
                 'port' => 6379,
                 'database' => 5,
-            ]]);
+            ],
+        ]);
         $this->redis->connection()->flushdb();
     }
 
@@ -69,6 +70,5 @@ class RedisQueueIntegrationTestJob
 
     public function handle()
     {
-        var_dump($this->i . ' handled');
     }
 }
