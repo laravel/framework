@@ -202,6 +202,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function testAttributeNamesAreReplacedInArrays()
     {
         $trans = $this->getRealTranslator();
+        $trans->addResource('array', ['validation.required' => ':attribute is required!'], 'en', 'messages');
+        $v = new Validator($trans, ['users' => [['country_code' => 'US'], ['country_code' => null]]], ['users.*.country_code' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('users.1.country_code is required!', $v->messages()->first('users.1.country_code'));
+
+        $trans = $this->getRealTranslator();
         $trans->addResource('array', [
             'validation.string' => ':attribute must be a string!',
             'validation.attributes.name.*' => 'Any name',

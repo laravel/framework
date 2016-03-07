@@ -5,7 +5,7 @@ use Illuminate\Http\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 
-class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
+class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
 {
     use MakesHttpRequests;
 
@@ -178,10 +178,10 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
     protected function getSelectHtml()
     {
         return
-         '<select name="availability">'
-        .'    <option value="partial_time">Partial time</option>'
-        .'    <option value="full_time" selected>Full time</option>'
-        .'</select>';
+         '<select name="availability">
+              <option value="partial_time">Partial time</option>
+              <option value="full_time" selected>Full time</option>
+          </select>';
     }
 
     public function testSeeOptionIsSelected()
@@ -194,6 +194,87 @@ class FoundationCrawlerTraitIntegrationTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler($this->getSelectHtml());
         $this->dontSeeIsSelected('availability', 'partial_time');
+    }
+
+    protected function getMultipleSelectHtml()
+    {
+        return
+         '<select name="roles[]">
+              <option value="admin">Administrator</option>
+              <option value="user" selected>User</option>
+              <option value="journalist">Journalist</option>
+              <option value="reviewer" selected>Reviewer</option>
+          </select>';
+    }
+
+    public function testSeeMultipleOptionsAreSelected()
+    {
+        $this->setCrawler($this->getMultipleSelectHtml());
+        $this->seeIsSelected('roles[]', 'user');
+        $this->seeIsSelected('roles[]', 'reviewer');
+    }
+
+    public function testDontSeeMultipleOptionsAreSelected()
+    {
+        $this->setCrawler($this->getMultipleSelectHtml());
+        $this->dontSeeIsSelected('roles[]', 'admin');
+        $this->dontSeeIsSelected('roles[]', 'journalist');
+    }
+
+    protected function getSelectWithOptGroupHtml()
+    {
+        return
+            '<select name="technology">
+                <optgroup label="PHP">
+                    <option value="laravel" selected>Laravel</option>
+                    <option value="symfony">Symfony</option>
+                </optgroup>
+                <optgroup label="JavaScript">
+                    <option value="angular">AngularJS</option>
+                    <option value="vue">Vue.js</option>
+                </optgroup>
+            </select>';
+    }
+
+    public function testSeeOptionInOptgroupIsSelected()
+    {
+        $this->setCrawler($this->getSelectWithOptGroupHtml());
+        $this->seeIsSelected('technology', 'laravel');
+    }
+
+    public function testDontseeOptionInOptgroupIsSelected()
+    {
+        $this->setCrawler($this->getSelectWithOptGroupHtml());
+        $this->dontSeeIsSelected('technology', 'symfony');
+    }
+
+    protected function getSelectMultipleWithOptGroupHtml()
+    {
+        return
+            '<select name="technologies[]">
+                <optgroup label="PHP">
+                    <option value="laravel" selected>Laravel</option>
+                    <option value="symfony">Symfony</option>
+                </optgroup>
+                <optgroup label="JavaScript">
+                    <option value="angular">AngularJS</option>
+                    <option value="vue" selected>Vue.js</option>
+                </optgroup>
+            </select>';
+    }
+
+    public function testSeeOptionsInOptgroupAreSelected()
+    {
+        $this->setCrawler($this->getSelectMultipleWithOptGroupHtml());
+        $this->seeIsSelected('technologies[]', 'laravel');
+        $this->seeIsSelected('technologies[]', 'vue');
+    }
+
+    public function testDontseeOptionsInOptgroupAreSelected()
+    {
+        $this->setCrawler($this->getSelectMultipleWithOptGroupHtml());
+        $this->dontSeeIsSelected('technologies[]', 'symfony');
+        $this->dontSeeIsSelected('technologies[]', 'angular');
     }
 
     protected function getRadiosHtml()

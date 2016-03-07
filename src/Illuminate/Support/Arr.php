@@ -40,7 +40,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @return array
      */
     public static function collapse($array)
@@ -48,11 +48,15 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if (! static::accessible($values)) {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            }
+
+            if (! is_array($values)) {
                 continue;
             }
 
-            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
+            $results = array_merge($results, $values);
         }
 
         return $results;
@@ -114,11 +118,11 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if (is_array($array)) {
-            return array_key_exists($key, $array);
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
         }
 
-        return $array->offsetExists($key);
+        return array_key_exists($key, $array);
     }
 
     /**
@@ -242,7 +246,7 @@ class Arr
             return $array;
         }
 
-        if (isset($array[$key])) {
+        if (static::exists($array, $key)) {
             return $array[$key];
         }
 
@@ -266,11 +270,11 @@ class Arr
      */
     public static function has($array, $key)
     {
-        if (empty($array) || is_null($key)) {
+        if (is_null($key)) {
             return false;
         }
 
-        if (array_key_exists($key, $array)) {
+        if (static::exists($array, $key)) {
             return true;
         }
 
