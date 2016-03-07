@@ -44,6 +44,12 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 2));
     }
 
+    public function testPaginatorCanGenerateUrlsWithQuery()
+    {
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com?sort_by=date', 'pageName' => 'foo']);
+        $this->assertEquals('http://website.com?sort_by=date&foo=2', $p->url($p->currentPage()));
+    }
+
     public function testLengthAwarePaginatorCanGenerateUrlsWithoutTrailingSlashes()
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com/test/', 'pageName' => 'foo']);
