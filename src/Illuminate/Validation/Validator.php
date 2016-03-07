@@ -307,7 +307,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Gather a copy of the data filled with any missing attributes.
+     * Gather a copy of the attribute data filled with any missing attributes.
      *
      * @param  string  $attribute
      * @return array
@@ -318,7 +318,9 @@ class Validator implements ValidatorContract
             return $this->data;
         }
 
-        $data = $this->data;
+        $explicitAddress = str_replace_last('.', '', explode('*', $attribute)[0]);
+
+        $data = Arr::only($this->data, $explicitAddress);
 
         return data_fill($data, $attribute, null);
     }
@@ -832,7 +834,11 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $otherValues = Arr::where(Arr::dot($this->data), function ($key) use ($parameters) {
+        $explicitAddress = str_replace_last('.', '', explode('*', $parameters[0])[0]);
+
+        $attributeData = Arr::only($this->data, $explicitAddress);
+
+        $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -1171,9 +1177,7 @@ class Validator implements ValidatorContract
 
         $explicitAddress = str_replace_last('.', '', explode('*', $attributeName)[0]);
 
-        $attributeData = [];
-
-        data_set($attributeData, $explicitAddress, data_get($this->data, $explicitAddress));
+        $attributeData = Arr::only($this->data, $explicitAddress);
 
         $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
