@@ -488,8 +488,8 @@ class Event
     /**
      * Schedule the event to run monthly on a given day and time.
      *
-     * @param int $day
-     * @param string $time
+     * @param int  $day
+     * @param string  $time
      * @return $this
      */
     public function monthlyOn($day = 1, $time = '0:0')
