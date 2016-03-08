@@ -691,7 +691,7 @@ if (! function_exists('trans')) {
      * @param  string  $locale
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */
-    function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    function trans($id = null, $locale = null, $parameters = [], $domain = 'messages')
     {
         if (is_null($id)) {
             return app('translator');
