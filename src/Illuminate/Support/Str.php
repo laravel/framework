@@ -271,12 +271,11 @@ class Str
      * Should not be considered sufficient for cryptography, etc.
      *
      * @param  int  $length
+     * @param  string  $pool
      * @return string
      */
-    public static function quickRandom($length = 16)
+    public static function quickRandom($length = 16, $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
-        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
         return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
