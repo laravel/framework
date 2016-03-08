@@ -610,7 +610,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function make($abstract, $parameters = array())
 	{
-		$abstract = $this->getAlias($abstract);
+		$abstract = $this->getAlias($abstract);is
 
 		if (isset($this->deferredServices[$abstract]))
 		{
@@ -971,7 +971,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	 */
 	public function isLocale($locale)
 	{
-		return $this->getLocale() === $locale;
+		return $this->getLocale() == $locale;
 	}
 
 	/**
