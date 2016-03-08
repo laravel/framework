@@ -779,7 +779,7 @@ class Blueprint
      */
     public function nullableTimestamps()
     {
-        return $this->timestamps();
+        $this->timestamps();
     }
 
     /**
