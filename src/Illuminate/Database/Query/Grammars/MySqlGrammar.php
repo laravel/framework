@@ -137,11 +137,22 @@ class MySqlGrammar extends Grammar
         }
 
         if (str_contains($value, '->')) {
-            $valuePath = explode('->', $value);
-
-            return array_shift($valuePath).'->'.'"$.'.implode('.', $valuePath).'"';
+            return $this->wrapJsonSelector($value);
         }
 
         return '`'.str_replace('`', '``', $value).'`';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        return array_shift($path).'->'.'"$.'.implode('.', $path).'"';
     }
 }
