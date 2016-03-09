@@ -220,11 +220,15 @@ class Worker
                 $job->release($delay);
             }
 
+            $this->raiseExceptionOccurredJobEvent($connection, $job, $e);
+
             throw $e;
         } catch (Throwable $e) {
             if (! $job->isDeleted()) {
                 $job->release($delay);
             }
+
+            $this->raiseExceptionOccurredJobEvent($connection, $job, $e);
 
             throw $e;
         }
@@ -259,6 +263,23 @@ class Worker
             $data = json_decode($job->getRawBody(), true);
 
             $this->events->fire(new Events\JobProcessed($connection, $job, $data));
+        }
+    }
+
+    /**
+     * Raise the exception occurred queue job event.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    protected function raiseExceptionOccurredJobEvent($connection, Job $job, $exception)
+    {
+        if ($this->events) {
+            $data = json_decode($job->getRawBody(), true);
+
+            $this->events->fire(new Events\JobExceptionOccurred($connection, $job, $data, $exception));
         }
     }
 
