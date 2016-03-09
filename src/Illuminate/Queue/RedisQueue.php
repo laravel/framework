@@ -133,11 +133,16 @@ class RedisQueue extends Queue implements QueueContract
             $this->migrateAllExpiredJobs($queue);
         }
 
-        $job = $this->getConnection()->lpop($queue);
+        $script = <<<'LUA'
+local job = redis.call('lpop', KEYS[1])
+if(job ~= nil) then
+    redis.call('zadd', KEYS[2], KEYS[3], job)
+end
+return job
+LUA;
+        $job = $this->getConnection()->eval($script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire);
 
         if (! is_null($job)) {
-            $this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
-
             return new RedisJob($this->container, $this, $job, $original);
         }
     }
