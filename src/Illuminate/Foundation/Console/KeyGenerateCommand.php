@@ -37,7 +37,7 @@ class KeyGenerateCommand extends Command
             return $this->line('<comment>'.$key.'</comment>');
         }
 
-        $path = base_path('.env');
+        $path = $app->environmentPath().'/'.$app->environmentFile();
 
         if (file_exists($path)) {
             $content = str_replace('APP_KEY='.$app['config']['app.key'], 'APP_KEY='.$key, file_get_contents($path));
