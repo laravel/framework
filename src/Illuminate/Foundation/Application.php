@@ -1021,6 +1021,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Determine if application locale equals the given locale.
+     *
+     * @param  string  $locale
+     * @return bool
+     */
+    public function isLocale($locale)
+    {
+        return $this->getLocale() == $locale;
+    }
+
+    /**
      * Register the core class aliases in the container.
      *
      * @return void
