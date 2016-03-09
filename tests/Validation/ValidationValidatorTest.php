@@ -302,6 +302,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('all are really required!', $v->messages()->first('name.1'));
     }
 
+    public function testValidationDotCustomDotAnythingCanBeTranslated()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'validation' => [
+                    'custom.*' => [
+                        'integer' => 'should be integer!',
+                    ],
+                ],
+            ],
+        ]);
+        $v = new Validator($trans, ['validation' => ['custom' => ['string', 'string']]], []);
+        $v->each('validation.custom', 'integer');
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('should be integer!', $v->messages()->first('validation.custom.0'));
+        $this->assertEquals('should be integer!', $v->messages()->first('validation.custom.1'));
+    }
+
     public function testInlineValidationMessagesAreRespected()
     {
         $trans = $this->getRealTranslator();
