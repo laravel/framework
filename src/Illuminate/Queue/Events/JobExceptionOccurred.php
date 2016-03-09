@@ -45,7 +45,7 @@ class JobExceptionOccurred
     {
         $this->job = $job;
         $this->data = $data;
-        $this->connectionName = $connectionName;
         $this->exception = $exception;
+        $this->connectionName = $connectionName;
     }
 }
