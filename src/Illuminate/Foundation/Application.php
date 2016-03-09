@@ -1021,7 +1021,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Determine if application locale equals the given locale.
+     * Determine if application locale is the given locale.
      *
      * @param  string  $locale
      * @return bool
