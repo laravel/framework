@@ -136,6 +136,12 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
+        if (str_contains($value, '->')) {
+            $valuePath = explode('->', $value);
+
+            return array_shift($valuePath).'->'.'"$.'.implode('.', $valuePath).'"';
+        }
+
         return '`'.str_replace('`', '``', $value).'`';
     }
 }
