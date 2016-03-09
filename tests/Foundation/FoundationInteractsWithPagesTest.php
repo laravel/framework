@@ -299,8 +299,8 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     protected function getCheckboxesHtml()
     {
         return
-             '<input type="checkbox" name="terms" checked>'
-            .'<input type="checkbox" name="list">';
+             '<input type="checkbox" name="terms" checked>
+              <input type="checkbox" name="list">';
     }
 
     public function testSeeCheckboxIsChecked()
@@ -313,6 +313,36 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler($this->getCheckboxesHtml());
         $this->dontSeeIsChecked('list');
+    }
+
+    public function testSeeElement()
+    {
+        $this->setCrawler('<image>');
+        $this->seeElement('image');
+    }
+
+    public function testSeeElementWithAttributes()
+    {
+        $this->setCrawler('<image width="100" height="50">');
+        $this->seeElement('image', ['width' => 100, 'height' => 50]);
+
+        $this->setCrawler('<select><option value="laravel" selected>Laravel</option>');
+        $this->seeElement('option', ['value' => 'laravel', 'selected']);
+
+        $this->setCrawler('<input name="name" id="name" type="text" required>');
+        $this->seeElement('#name', ['required']);
+    }
+
+    public function testDontSeeElement()
+    {
+        $this->setCrawler('<image class="img">');
+        $this->dontSeeElement('iframe');
+        $this->dontSeeElement('image', ['id']);
+        $this->dontSeeElement('image', ['class' => 'video']);
+
+        $this->setCrawler('<input type="text">');
+        $this->dontSeeElement('textarea');
+        $this->dontSeeElement('input', ['required']);
     }
 
     protected function getLayoutHtml()
