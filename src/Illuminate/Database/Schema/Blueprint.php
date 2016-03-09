@@ -774,7 +774,7 @@ class Blueprint
 
     /**
      * Add nullable creation and update timestamps to the table.
-     * 
+     *
      * Alias for self::timestamps().
      *
      * @return void
