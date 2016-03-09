@@ -10,6 +10,7 @@ use Illuminate\Queue\Console\RestartCommand;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
+use Illuminate\Queue\Connectors\IronConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\DatabaseConnector;
@@ -146,7 +147,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs', 'Iron'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -228,6 +229,37 @@ class QueueServiceProvider extends ServiceProvider
     {
         $manager->addConnector('sqs', function () {
             return new SqsConnector;
+        });
+    }
+
+    /**
+     * Register the IronMQ queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerIronConnector($manager)
+    {
+        $app = $this->app;
+
+        $manager->addConnector('iron', function () use ($app) {
+            return new IronConnector($app['encrypter'], $app['request']);
+        });
+
+        $this->registerIronRequestBinder();
+    }
+
+    /**
+     * Register the request rebinding event for the Iron queue.
+     *
+     * @return void
+     */
+    protected function registerIronRequestBinder()
+    {
+        $this->app->rebinding('request', function ($app, $request) {
+            if ($app['queue']->connected('iron')) {
+                $app['queue']->connection('iron')->setRequest($request);
+            }
         });
     }
 
