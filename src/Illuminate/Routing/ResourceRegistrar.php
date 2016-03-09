@@ -214,10 +214,14 @@ class ResourceRegistrar
             return $options['names'][$method];
         }
 
+        if (isset($options['as'])) {
+            return $options['as'].'.'.$method;
+        }
+
         // If a global prefix has been assigned to all names for this resource, we will
         // grab that so we can prepend it onto the name when we create this name for
         // the resource action. Otherwise we'll just use an empty string for here.
-        $prefix = isset($options['as']) ? $options['as'].'.' : '';
+        $prefix = isset($options['prefix']) ? $options['prefix'].'.' : '';
 
         if (! $this->router->hasGroupStack()) {
             return $prefix.$resource.'.'.$method;
