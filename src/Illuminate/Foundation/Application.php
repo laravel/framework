@@ -434,7 +434,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Get or check the current application environment.
      *
      * @param  mixed
-     * @return string
+     * @return string|bool
      */
     public function environment()
     {
@@ -1018,6 +1018,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this['translator']->setLocale($locale);
 
         $this['events']->fire('locale.changed', [$locale]);
+    }
+
+    /**
+     * Determine if application locale is the given locale.
+     *
+     * @param  string  $locale
+     * @return bool
+     */
+    public function isLocale($locale)
+    {
+        return $this->getLocale() == $locale;
     }
 
     /**

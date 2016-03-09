@@ -60,6 +60,9 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
 
         $event = new Event('php foo');
         $this->assertEquals('0 * * * * *', $event->everyFiveMinutes()->hourly()->getExpression());
+
+        $event = new Event('php foo');
+        $this->assertEquals('0 15 4 * * *', $event->monthlyOn(4, '15:00')->getExpression());
     }
 
     public function testEventIsDueCheck()

@@ -775,15 +775,17 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
+     * Alias for self::timestamps().
+     *
      * @return void
      */
     public function nullableTimestamps()
     {
-        return $this->timestamps();
+        $this->timestamps();
     }
 
     /**
-     * Add creation and update timestamps to the table.
+     * Add nullable creation and update timestamps to the table.
      *
      * @return void
      */
