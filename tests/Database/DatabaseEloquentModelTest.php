@@ -1295,6 +1295,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testUpdatingNonExistentModelFails()
+    {
+        $model = new EloquentModelStub;
+        $this->assertFalse($model->update());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
