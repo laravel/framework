@@ -1474,7 +1474,7 @@ class Builder
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = $this->getCountForPagination($columns);
+        $total = ($this->unions) ? $this->getUnionCountForPagination() : $this->getCountForPagination($columns);
 
         $results = $this->forPage($page, $perPage)->get($columns);
 
@@ -1504,6 +1504,17 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Get the count of the total records for union queries for the paginator.
+     *
+     * @param  array  $columns
+     * @return int
+     */
+    public function getUnionCountForPagination()
+    {
+        return count($this->get());
     }
 
     /**
