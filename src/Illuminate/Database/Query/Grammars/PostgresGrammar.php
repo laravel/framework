@@ -275,7 +275,7 @@ class PostgresGrammar extends Grammar
 
         $field = array_shift($path);
 
-        $wrappedPath = $this->wrapJsonAttributes($path);
+        $wrappedPath = $this->wrapJsonPathAttributes($path);
 
         $attribute = array_pop($wrappedPath);
 
@@ -287,12 +287,12 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Wrap the given JSON attributes.
+     * Wrap the attributes of the give JSON path.
      *
      * @param  array  $path
      * @return array
      */
-    protected function wrapJsonAttributes($path)
+    protected function wrapJsonPathAttributes($path)
     {
         return array_map(function ($attribute) {
             return "'$attribute'";
