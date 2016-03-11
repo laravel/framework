@@ -242,4 +242,59 @@ class PostgresGrammar extends Grammar
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
     }
+
+    /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapValue($value)
+    {
+        if ($value === '*') {
+            return $value;
+        }
+
+        if (str_contains($value, '->')) {
+            return $this->wrapJsonSelector($value);
+        }
+
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        $field = array_shift($path);
+
+        $wrappedPath = $this->wrapJsonAttributes($path);
+
+        $attribute = array_pop($wrappedPath);
+
+        if (! empty($wrappedPath)) {
+            return $field.'->'.implode('->', $wrappedPath).'->>'.$attribute;
+        }
+
+        return $field.'->>'.$attribute;
+    }
+
+    /**
+     * Wrap the given JSON attributes.
+     *
+     * @param  array  $path
+     * @return array
+     */
+    protected function wrapJsonAttributes($path)
+    {
+        return array_map(function ($attribute) {
+            return "'$attribute'";
+        }, $path);
+    }
 }
