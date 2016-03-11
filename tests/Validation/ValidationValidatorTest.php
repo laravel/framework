@@ -452,7 +452,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testRequiredIf()
     {
-// other field is a non array
+        // other field is a non array
         $trans = $this->getRealTranslator();
         $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
         $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'required_if:first,taylor']);
