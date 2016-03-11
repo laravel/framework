@@ -1165,6 +1165,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from `users` where items->"$.price.in_usd" = ? and items->"$.age" = ?', $builder->toSql());
     }
 
+    public function testPostgresWrappingJson()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select items->>\'price\' from "users" where items->>\'price\' = ? order by items->>\'price\' asc', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from "users" where items->\'price\'->>\'in_usd\' = ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from "users" where items->\'price\'->>\'in_usd\' = ? and items->>\'age\' = ?', $builder->toSql());
+    }
+
     public function testSQLiteOrderBy()
     {
         $builder = $this->getSQLiteBuilder();
