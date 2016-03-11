@@ -496,6 +496,8 @@ trait MakesHttpRequests
 
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
+        $this->resetPageContext();
+
         $request = Request::create(
             $this->currentUri, $method, $parameters,
             $cookies, $files, array_replace($this->serverVariables, $server), $content
