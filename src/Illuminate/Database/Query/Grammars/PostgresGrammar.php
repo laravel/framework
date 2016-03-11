@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar
 {
@@ -255,7 +256,7 @@ class PostgresGrammar extends Grammar
             return $value;
         }
 
-        if (str_contains($value, '->')) {
+        if (Str::contains($value, '->')) {
             return $this->wrapJsonSelector($value);
         }
 
