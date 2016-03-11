@@ -154,7 +154,7 @@ class TransportManager extends Manager
     {
         return new PreviewTransport(
             $this->app->make('Illuminate\Filesystem\Filesystem'),
-            $this->app->make('config')['mail.preview']
+            $this->app['config']['mail.preview']
         );
     }
 
