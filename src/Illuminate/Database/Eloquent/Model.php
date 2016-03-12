@@ -288,10 +288,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function bootIfNotBooted()
     {
-        $class = static::class;
-
-        if (! isset(static::$booted[$class])) {
-            static::$booted[$class] = true;
+        if (! isset(static::$booted[static::class])) {
+            static::$booted[static::class] = true;
 
             $this->fireModelEvent('booting', false);
 
@@ -318,9 +316,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected static function bootTraits()
     {
-        foreach (class_uses_recursive(static::class) as $trait) {
-            if (method_exists(static::class, $method = 'boot'.class_basename($trait))) {
-                forward_static_call([static::class, $method]);
+        $class = static::class;
+
+        foreach (class_uses_recursive($class) as $trait) {
+            if (method_exists($class, $method = 'boot'.class_basename($trait))) {
+                forward_static_call([$class, $method]);
             }
         }
     }
