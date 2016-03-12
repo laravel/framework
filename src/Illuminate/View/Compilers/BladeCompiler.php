@@ -78,6 +78,20 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $footer = [];
 
     /**
+     * Placeholder to temporary mark the position of verbatim blocks.
+     *
+     * @var string
+     */
+    protected $verbatimPlaceholder = '@__verbatim__@';
+
+    /**
+     * Array to temporary store the verbatim blocks found in the template.
+     *
+     * @var array
+     */
+    protected $verbatimBlocks = [];
+
+    /**
      * Counter to keep track of nested forelse statements.
      *
      * @var int
@@ -134,6 +148,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $result = '';
 
+        if (strpos($value, '@verbatim') !== false) {
+            $value = $this->storeVerbatimBlocks($value);
+        }
+
         $this->footer = [];
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
@@ -143,6 +161,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $result .= is_array($token) ? $this->parseToken($token) : $token;
         }
 
+        if (! empty($this->verbatimBlocks)) {
+            $result = $this->restoreVerbatimBlocks($result);
+        }
+
         // If there are any footer lines that need to get added to a template we will
         // add them here at the end of the template. This gets used mainly for the
         // template inheritance via the extends keyword that should be appended.
@@ -150,6 +172,38 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $result = ltrim($result, PHP_EOL)
                     .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
         }
+
+        return $result;
+    }
+
+    /**
+     * Store the verbatim blocks and replace them with a temporary placeholder.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storeVerbatimBlocks($value)
+    {
+        return preg_replace_callback('/@verbatim(.*?)@endverbatim/s', function ($matches) {
+            $this->verbatimBlocks[] = $matches[1];
+
+            return $this->verbatimPlaceholder;
+        }, $value);
+    }
+
+    /**
+     * Replace the raw placeholders with the original code stored in the raw blocks.
+     *
+     * @param  string  $result
+     * @return string
+     */
+    protected function restoreVerbatimBlocks($result)
+    {
+        $result = preg_replace_callback('/'.preg_quote($this->verbatimPlaceholder).'/', function () {
+            return array_shift($this->verbatimBlocks);
+        }, $result);
+
+        $this->verbatimBlocks = [];
 
         return $result;
     }
