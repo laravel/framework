@@ -406,4 +406,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
         $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
     }
+
+    public function testMapOver()
+    {
+        $array = ['foo' => 'php', 'bar' => 'hhmv'];
+        $map = ['foo' => 'fast', 'bar' => 'faster'];
+
+        $array = Arr::mapOver($array, $map);
+
+        $this->assertEquals(['fast' => 'php', 'faster' => 'hhmv'], $array);
+    }
 }
