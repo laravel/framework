@@ -306,6 +306,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the bootstrap directory.
+     *
+     * @return string
+     */
+    public function bootstrapPath()
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap';
+    }
+
+    /**
      * Get the path to the application configuration files.
      *
      * @return string
@@ -383,16 +393,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.storage', $path);
 
         return $this;
-    }
-
-    /**
-     * Get the path to the bootstrap directory.
-     *
-     * @return string
-     */
-    public function bootstrapPath()
-    {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap';
     }
 
     /**
