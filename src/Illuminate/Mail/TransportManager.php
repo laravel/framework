@@ -11,6 +11,7 @@ use Swift_MailTransport as MailTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
+use Illuminate\Mail\Transport\PreviewTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
 use Illuminate\Mail\Transport\SparkPostTransport;
 use Swift_SendmailTransport as SendmailTransport;
@@ -142,6 +143,19 @@ class TransportManager extends Manager
     protected function createLogDriver()
     {
         return new LogTransport($this->app->make('Psr\Log\LoggerInterface'));
+    }
+
+    /**
+     * Create an instance of the Preview Swift Transport driver.
+     *
+     * @return \Illuminate\Mail\Transport\PreviewTransport
+     */
+    protected function createPreviewDriver()
+    {
+        return new PreviewTransport(
+            $this->app->make('Illuminate\Filesystem\Filesystem'),
+            $this->app['config']['mail.preview']
+        );
     }
 
     /**
