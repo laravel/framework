@@ -296,6 +296,88 @@ trait InteractsWithPages
     }
 
     /**
+     * Assert that an element is present on the page.
+     *
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @return void
+     */
+    public function seeElement($selector, array $attributes = [])
+    {
+        if (! $this->hasElement($selector, $attributes)) {
+            $element = "[$selector]".(empty($attributes) ? '' : ' with attributes '.json_encode($attributes));
+
+            $this->failPageInspection("Couldn't find $element on the page");
+        }
+    }
+
+    /**
+     * Assert that an element is not present on the page.
+     *
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @return void
+     */
+    public function dontSeeElement($selector, array $attributes = [])
+    {
+        if ($this->hasElement($selector, $attributes)) {
+            $element = "[$selector]".(empty($attributes) ? '' : ' with attributes '.json_encode($attributes));
+
+            $this->failPageInspection("$element was found on the page");
+        }
+    }
+
+    /**
+     * Determine if the given selector is present on the page.
+     *
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @return bool
+     */
+    protected function hasElement($selector, array $attributes = [])
+    {
+        $elements = $this->crawler()->filter($selector);
+
+        if ($elements->count() == 0) {
+            return false;
+        }
+
+        if (empty($attributes)) {
+            return true;
+        }
+
+        $elements = $elements->reduce(function ($element) use ($attributes) {
+            return $this->hasAttributes($element, $attributes);
+        });
+
+        return $elements->count() > 0;
+    }
+
+    /**
+     * Determines if the given element has the given attributes.
+     *
+     * @param  Crawler  $element
+     * @param  array  $attributes
+     * @return bool
+     */
+    protected function hasAttributes(Crawler $element, array $attributes = [])
+    {
+        foreach ($attributes as $name => $value) {
+            if (is_numeric($name)) {
+                if ($element->attr($value) === null) {
+                    return false;
+                }
+            } else {
+                if ($element->attr($name) != $value) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Assert that a given string is seen on the current text.
      *
      * @param  string  $text
