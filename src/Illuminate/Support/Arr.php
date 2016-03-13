@@ -50,9 +50,7 @@ class Arr
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
-            }
-
-            if (! is_array($values)) {
+            } elseif (! is_array($values)) {
                 continue;
             }
 
@@ -319,7 +317,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array

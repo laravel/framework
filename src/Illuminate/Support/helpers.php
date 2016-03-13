@@ -396,7 +396,9 @@ if (! function_exists('data_get')) {
 
         while (($segment = array_shift($key)) !== null) {
             if ($segment === '*') {
-                if (! Arr::accessible($target)) {
+                if ($target instanceof Collection) {
+                    $target = $target->all();
+                } elseif (! is_array($target)) {
                     return value($default);
                 }
 

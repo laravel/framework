@@ -247,7 +247,7 @@ class AppNameCommand extends Command
      */
     protected function getBootstrapPath()
     {
-        return $this->laravel->basePath().'/bootstrap/app.php';
+        return $this->laravel->bootstrapPath().'/app.php';
     }
 
     /**

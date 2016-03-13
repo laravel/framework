@@ -1822,14 +1822,18 @@ class Validator implements ValidatorContract
      */
     protected function getCustomMessageFromTranslator($customKey)
     {
-        $shortKey = str_replace('validation.custom.', '', $customKey);
+        if (($message = $this->translator->trans($customKey)) !== $customKey) {
+            return $message;
+        }
+
+        $shortKey = preg_replace('/^validation\.custom\./', '', $customKey);
 
         $customMessages = Arr::dot(
             (array) $this->translator->trans('validation.custom')
         );
 
         foreach ($customMessages as $key => $message) {
-            if ($key === $shortKey || (Str::contains($key, ['*']) && Str::is($key, $shortKey))) {
+            if (Str::contains($key, ['*']) && Str::is($key, $shortKey)) {
                 return $message;
             }
         }

@@ -1279,12 +1279,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
-    public function testUpdatingNonExistentModelFails()
-    {
-        $model = new EloquentModelStub;
-        $this->assertFalse($model->update());
-    }
-
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1457,12 +1451,12 @@ class EloquentModelBootingTestStub extends Model
 {
     public static function unboot()
     {
-        unset(static::$booted[get_called_class()]);
+        unset(static::$booted[static::class]);
     }
 
     public static function isBooted()
     {
-        return array_key_exists(get_called_class(), static::$booted);
+        return array_key_exists(static::class, static::$booted);
     }
 }
 
