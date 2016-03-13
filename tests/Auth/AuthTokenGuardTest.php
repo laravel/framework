@@ -11,6 +11,25 @@ class AuthTokenGuardTest extends PHPUnit_Framework_TestCase
         Mockery::close();
     }
 
+    public function testQueryStringVariableNameIsConfigurable()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+        $request = Request::create('/', 'GET', ['foo' => 'bar']);
+        $guard = Mockery::mock(new TokenGuard($provider, $request, ['inputKey' => 'foo']))->shouldAllowMockingProtectedMethods();
+
+        $this->assertEquals('bar', $guard->getTokenForRequest());
+    }
+
+    public function testStorageKeyVariableNameIsConfigurable()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['foo' => 'bar']);
+        $request = Request::create('/', 'GET', ['api_token' => 'bar']);
+        $guard = Mockery::mock(new TokenGuard($provider, $request, ['storageKey' => 'foo']));
+
+        $guard->validate(['api_token' => 'bar']);
+    }
+
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = Mockery::mock(UserProvider::class);
