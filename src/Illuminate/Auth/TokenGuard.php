@@ -38,12 +38,12 @@ class TokenGuard implements Guard
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    public function __construct(UserProvider $provider, Request $request, array $config)
+    public function __construct(UserProvider $provider, Request $request, array $config = [])
     {
         $this->request = $request;
         $this->provider = $provider;
-        $this->inputKey = $config['inputKey'];
-        $this->storageKey = $config['storageKey'];
+        $this->inputKey = isset($config['inputKey']) ? $config['inputKey'] : 'api_token';
+        $this->storageKey = isset($config['storageKey']) ? $config['storageKey'] : 'api_token';
     }
 
     /**
