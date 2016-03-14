@@ -85,7 +85,7 @@ class Database implements DatabaseContract
      */
     public function command($method, array $parameters = [])
     {
-        return call_user_func_array([$this->clients['default'], $method], $parameters);
+        return $this->clients['default']->$method(...$parameters);
     }
 
     /**
@@ -101,7 +101,7 @@ class Database implements DatabaseContract
     {
         $loop = $this->connection($connection)->pubSubLoop();
 
-        call_user_func_array([$loop, $method], (array) $channels);
+        $loop->$method(...(array) $channels);
 
         foreach ($loop as $message) {
             if ($message->kind === 'message' || $message->kind === 'pmessage') {

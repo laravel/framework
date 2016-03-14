@@ -2938,7 +2938,7 @@ class Validator implements ValidatorContract
     {
         list($class, $method) = explode('@', $callback);
 
-        return call_user_func_array([$this->container->make($class), $method], $parameters);
+        return $this->container->make($class)->$method(...$parameters);
     }
 
     /**
@@ -2975,7 +2975,7 @@ class Validator implements ValidatorContract
     {
         list($class, $method) = explode('@', $callback);
 
-        return call_user_func_array([$this->container->make($class), $method], array_slice(func_get_args(), 1));
+        return $this->container->make($class)->$method(...array_slice(func_get_args(), 1));
     }
 
     /**

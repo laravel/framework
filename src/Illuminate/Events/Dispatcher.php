@@ -315,9 +315,7 @@ class Dispatcher implements DispatcherContract
         if (isset($this->listeners[$eventName])) {
             krsort($this->listeners[$eventName]);
 
-            $this->sorted[$eventName] = call_user_func_array(
-                'array_merge', $this->listeners[$eventName]
-            );
+            $this->sorted[$eventName] = array_merge(...$this->listeners[$eventName]);
         }
     }
 

@@ -118,7 +118,7 @@ class Gate implements GateContract
         return function () use ($callback) {
             list($class, $method) = explode('@', $callback);
 
-            return call_user_func_array([$this->resolvePolicy($class), $method], func_get_args());
+            return $this->resolvePolicy($class)->$method(...func_get_args());
         };
     }
 
@@ -365,9 +365,7 @@ class Gate implements GateContract
                 // into the policy before methods with the arguments and get the result.
                 $beforeArguments = array_merge([$user, $ability], $arguments);
 
-                $result = call_user_func_array(
-                    [$instance, 'before'], $beforeArguments
-                );
+                $result = $instance->before(...$beforeArguments);
 
                 // If we received a non-null result from the before method, we will return it
                 // as the result of a check. This allows developers to override the checks
@@ -385,9 +383,7 @@ class Gate implements GateContract
                 return false;
             }
 
-            return call_user_func_array(
-                [$instance, $ability], array_merge([$user], $arguments)
-            );
+            return $instance->$ability($user, ...$arguments);
         };
     }
 

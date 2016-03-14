@@ -235,7 +235,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function pushExpiredJobsOntoNewQueue($transaction, $to, $jobs)
     {
-        call_user_func_array([$transaction, 'rpush'], array_merge([$to], $jobs));
+        $transaction->rpush($to, ...$jobs);
     }
 
     /**

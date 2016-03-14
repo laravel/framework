@@ -131,11 +131,11 @@ class Command extends SymfonyCommand
         // set them all on the base command instance. This specifies what can get
         // passed into these commands as "parameters" to control the execution.
         foreach ($this->getArguments() as $arguments) {
-            call_user_func_array([$this, 'addArgument'], $arguments);
+            $this->addArgument(...$arguments);
         }
 
         foreach ($this->getOptions() as $options) {
-            call_user_func_array([$this, 'addOption'], $options);
+            $this->addOption(...$options);
         }
     }
 

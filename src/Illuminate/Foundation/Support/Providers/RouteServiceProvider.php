@@ -110,6 +110,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array([$this->app->make(Router::class), $method], $parameters);
+        return $this->app->make(Router::class)->$method(...$parameters);
     }
 }

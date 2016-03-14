@@ -264,7 +264,7 @@ class Collection extends BaseCollection
      */
     public function zip($items)
     {
-        return call_user_func_array([$this->toBase(), 'zip'], func_get_args());
+        return $this->toBase()->zip(...func_get_args());
     }
 
     /**

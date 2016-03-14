@@ -989,11 +989,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->getArrayableItems($items);
         }, func_get_args());
 
-        $params = array_merge([function () {
+        $result = array_map(function () {
             return new static(func_get_args());
-        }, $this->items], $arrayableItems);
+        }, $this->items, ...$arrayableItems);
 
-        return new static(call_user_func_array('array_map', $params));
+        return new static($result);
     }
 
     /**

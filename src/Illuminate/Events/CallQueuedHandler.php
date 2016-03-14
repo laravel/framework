@@ -38,9 +38,7 @@ class CallQueuedHandler
             $job, $this->container->make($data['class'])
         );
 
-        call_user_func_array(
-            [$handler, $data['method']], unserialize($data['data'])
-        );
+        $handler->{$data['method']}(...unserialize($data['data']));
 
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
@@ -74,7 +72,7 @@ class CallQueuedHandler
         $handler = $this->container->make($data['class']);
 
         if (method_exists($handler, 'failed')) {
-            call_user_func_array([$handler, 'failed'], unserialize($data['data']));
+            $handler->failed(...unserialize($data['data']));
         }
     }
 }
