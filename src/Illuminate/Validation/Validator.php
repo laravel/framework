@@ -1062,6 +1062,10 @@ class Validator implements ValidatorContract
     protected function validateUnique($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'unique');
+        //remove all space in parameters
+        array_walk($parameters, function(&$value){
+            $value = str_replace(' ', '', $value);
+        });
 
         list($connection, $table) = $this->parseTable($parameters[0]);
 
