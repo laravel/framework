@@ -518,7 +518,7 @@ class Builder
         return $this->whereNested(function ($query) use ($column) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
-                    call_user_func_array([$query, 'where'], $value);
+                    $query->where(...$value);
                 } else {
                     $query->where($key, '=', $value);
                 }

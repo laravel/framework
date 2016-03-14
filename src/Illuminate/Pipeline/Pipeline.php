@@ -120,8 +120,7 @@ class Pipeline implements PipelineContract
                 } else {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 
-                    return call_user_func_array([$this->container->make($name), $this->method],
-                            array_merge([$passable, $stack], $parameters));
+                    return $this->container->make($name)->{$this->method}($passable, $stack, ...$parameters);
                 }
             };
         };

@@ -214,6 +214,6 @@ class BroadcastManager implements FactoryContract
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array([$this->driver(), $method], $parameters);
+        return $this->driver()->$method(...$parameters);
     }
 }

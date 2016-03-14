@@ -18,9 +18,7 @@ trait RouteDependencyResolverTrait
      */
     protected function callWithDependencies($instance, $method)
     {
-        return call_user_func_array(
-            [$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
-        );
+        return $instance->$method(...$this->resolveClassMethodDependencies([], $instance, $method));
     }
 
     /**

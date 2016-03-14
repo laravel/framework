@@ -120,7 +120,7 @@ class CookieJar implements JarContract
         if (head(func_get_args()) instanceof Cookie) {
             $cookie = head(func_get_args());
         } else {
-            $cookie = call_user_func_array([$this, 'make'], func_get_args());
+            $cookie = $this->make(...func_get_args());
         }
 
         $this->queued[$cookie->getName()] = $cookie;
