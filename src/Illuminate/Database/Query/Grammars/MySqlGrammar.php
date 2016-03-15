@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class MySqlGrammar extends Grammar
@@ -136,7 +137,7 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
-        if (str_contains($value, '->')) {
+        if (Str::contains($value, '->')) {
             return $this->wrapJsonSelector($value);
         }
 
