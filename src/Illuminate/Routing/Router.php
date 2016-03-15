@@ -482,13 +482,13 @@ class Router implements RegistrarContract
      */
     protected static function formatGroupPrefix($new, $old)
     {
-        $oldPrefix = isset($old['prefix']) ? $old['prefix'] : null;
-
-        if (isset($new['prefix'])) {
-            return trim($oldPrefix, '/').'/'.trim($new['prefix'], '/');
+        if (isset($old['prefix'])) {
+            return isset($new['prefix'])
+                    ? trim($old['prefix'], '/').'/'.trim($new['prefix'], '/')
+                    : $old['prefix'];
         }
 
-        return $oldPrefix;
+        return isset($new['prefix']) ? trim($new['prefix'], '/') : null;
     }
 
     /**
