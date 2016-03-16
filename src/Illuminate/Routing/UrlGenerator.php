@@ -131,11 +131,11 @@ class UrlGenerator implements UrlGeneratorContract
      * Check if the current url have a specific keyword.
      *
      * @param  string $keyword
-     * @return true|false
+     * @return bool
      */
     public function has($keyword)
     {
-        return strpos($this->current(), $keyword);
+        return strpos($this->current(), $keyword) !== false;
     }
 
     /**
