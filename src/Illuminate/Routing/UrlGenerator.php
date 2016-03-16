@@ -128,6 +128,17 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Check if the current url have a specific keyword
+     *
+     * @param  string $keyword
+     * @return true|false
+     */
+    public function has($keyword)
+    {
+        return strpos($this->current(), $keyword);
+    }
+
+    /**
      * Get the URL for the previous request.
      *
      * @return string
