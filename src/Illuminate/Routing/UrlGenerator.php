@@ -128,7 +128,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Check if the current url have a specific keyword
+     * Check if the current url have a specific keyword.
      *
      * @param  string $keyword
      * @return true|false
