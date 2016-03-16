@@ -1149,7 +1149,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function offsetExists($key)
     {
-        return isset($this->bindings[$key]);
+        return $this->bound($key);
     }
 
     /**
