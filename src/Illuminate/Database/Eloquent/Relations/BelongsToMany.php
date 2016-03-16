@@ -115,7 +115,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * set a "where in" clause for a pivot table column.
+     * Set a "where in" clause for a pivot table column.
      *
      * @param  string  $column
      * @param  mixed   $values
@@ -131,7 +131,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Set an or where clause for a pivot table column.
+     * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
      * @param  string  $operator
