@@ -72,6 +72,13 @@ class Validator implements ValidatorContract
     protected $files = [];
 
     /**
+     * The initial rules provided.
+     *
+     * @var array
+     */
+    protected $initialRules;
+
+    /**
      * The rules to be applied to the data.
      *
      * @var array
@@ -185,11 +192,9 @@ class Validator implements ValidatorContract
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
+        $this->initialRules = $rules;
 
-        // Explode the rules first so that the implicit ->each calls are made...
-        $rules = $this->explodeRules($rules);
-
-        $this->rules = array_merge((array) $this->rules, $rules);
+        $this->setRules($rules);
     }
 
     /**
@@ -2625,11 +2630,15 @@ class Validator implements ValidatorContract
      * Set the data under validation.
      *
      * @param  array  $data
-     * @return void
+     * @return $this
      */
     public function setData(array $data)
     {
         $this->data = $this->parseData($data);
+
+        $this->setRules($this->initialRules);
+
+        return $this;
     }
 
     /**
@@ -2650,7 +2659,13 @@ class Validator implements ValidatorContract
      */
     public function setRules(array $rules)
     {
-        $this->rules = $this->explodeRules($rules);
+        $this->initialRules = $rules;
+
+        $this->rules = [];
+
+        $rules = $this->explodeRules($this->initialRules);
+
+        $this->rules = array_merge($this->rules, $rules);
 
         return $this;
     }
