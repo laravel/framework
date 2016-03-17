@@ -278,7 +278,7 @@ class Validator implements ValidatorContract
 
         if (call_user_func($callback, $payload)) {
             foreach ((array) $attribute as $key) {
-                $this->mergeRules($key, $rules);
+                $this->mergeInitialRules($key, $rules);
             }
         }
     }
@@ -345,6 +345,25 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Merges additional initial rules into a given key.
+     *
+     * @param  $attribute
+     * @param  $rules
+     */
+    public function mergeInitialRules($attribute, $rules)
+    {
+        $current = isset($this->initialRules[$attribute]) ? $this->initialRules[$attribute] : '';
+
+        if (is_array($rules)) {
+            $rules = array_reduce($rules, function ($carry, $item) {
+                return ltrim($carry.'|'.$item, '|');
+            });
+        }
+
+        $this->initialRules[$attribute] = ltrim($current.'|'.$rules, '|');
+    }
+
+    /**
      * Determine if the data passes the validation rules.
      *
      * @return bool
@@ -356,7 +375,7 @@ class Validator implements ValidatorContract
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
-        foreach ($this->rules as $attribute => $rules) {
+        foreach ($this->getRules() as $attribute => $rules) {
             foreach ($rules as $rule) {
                 $this->validate($attribute, $rule);
 
@@ -2636,8 +2655,6 @@ class Validator implements ValidatorContract
     {
         $this->data = $this->parseData($data);
 
-        $this->setRules($this->initialRules);
-
         return $this;
     }
 
@@ -2648,6 +2665,10 @@ class Validator implements ValidatorContract
      */
     public function getRules()
     {
+        $rules = $this->explodeRules($this->initialRules);
+
+        $this->rules = array_merge($this->rules, $rules);
+
         return $this->rules;
     }
 
@@ -2662,10 +2683,6 @@ class Validator implements ValidatorContract
         $this->initialRules = $rules;
 
         $this->rules = [];
-
-        $rules = $this->explodeRules($this->initialRules);
-
-        $this->rules = array_merge($this->rules, $rules);
 
         return $this;
     }
