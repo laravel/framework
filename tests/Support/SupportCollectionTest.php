@@ -1169,6 +1169,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             'baz',
         ], $c->jsonSerialize());
     }
+
+    public function testCombineWithArray()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6
+        ];
+
+        $c = new Collection(array_keys($expected));
+        $actual = $c->combine(array_values($expected))->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testCombineWithCollection()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6
+        ];
+
+        $keyCollection = new Collection(array_keys($expected));
+        $valueCollection = new Collection(array_values($expected));
+        $actual = $keyCollection->combine($valueCollection)->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
 }
 
 class TestAccessorEloquentTestStub
