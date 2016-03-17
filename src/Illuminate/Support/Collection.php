@@ -1118,7 +1118,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Combines the collection as keys together with items as values
      *
      * e.g. new Collection([1, 2, 3])->combine([4, 5, 6]);
-     *      => [1=>4, 2=>5, 3->6]
+     *      => [1=>4, 2=>5, 3=>6]
      *
      * @param  mixed  $items
      * @return static
