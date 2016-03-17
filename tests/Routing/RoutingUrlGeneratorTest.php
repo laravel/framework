@@ -384,4 +384,9 @@ class RoutableInterfaceStub implements UrlRoutable
     {
         return 'key';
     }
+
+    public function mutateRouteKey($key)
+    {
+        return $key;
+    }
 }

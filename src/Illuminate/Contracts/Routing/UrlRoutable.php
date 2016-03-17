@@ -17,4 +17,12 @@ interface UrlRoutable
      * @return string
      */
     public function getRouteKeyName();
+
+    /**
+     * Mutate route param back to the model's key value.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function mutateRouteKey($key);
 }

@@ -1991,6 +1991,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Mutate route param back to the model's key value.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function mutateRouteKey($key)
+    {
+        return $key;
+    }
+
+    /**
      * Determine if the model uses timestamps.
      *
      * @return bool
