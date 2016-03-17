@@ -749,9 +749,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileExtends($expression)
     {
-        if (Str::startsWith($expression, '(')) {
-            $expression = substr($expression, 1, -1);
-        }
+        $expression = $this->stripParentheses($expression);
 
         $data = "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
 
@@ -768,9 +766,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileInclude($expression)
     {
-        if (Str::startsWith($expression, '(')) {
-            $expression = substr($expression, 1, -1);
-        }
+        $expression = $this->stripParentheses($expression);
 
         return "<?php echo \$__env->make($expression, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
     }
@@ -931,6 +927,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $tags = $escaped ? $this->escapedTags : $this->contentTags;
 
         return array_map('stripcslashes', $tags);
+    }
+
+    /**
+     * Strips the Parentheses from a given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function stripParentheses($expression)
+    {
+        if (Str::startsWith($expression, '(')) {
+            $expression = substr($expression, 1, -1);
+        }
+
+        return $expression;
     }
 
     /**
