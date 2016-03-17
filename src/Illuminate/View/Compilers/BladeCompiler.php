@@ -859,6 +859,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Strip the parentheses from the given expression.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function stripParentheses($expression)
+    {
+        if (Str::startsWith($expression, '(')) {
+            $expression = substr($expression, 1, -1);
+        }
+
+        return $expression;
+    }
+
+    /**
      * Get the extensions used by the compiler.
      *
      * @return array
@@ -981,21 +996,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $tags = $escaped ? $this->escapedTags : $this->contentTags;
 
         return array_map('stripcslashes', $tags);
-    }
-
-    /**
-     * Strips the Parentheses from a given expression.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function stripParentheses($expression)
-    {
-        if (Str::startsWith($expression, '(')) {
-            $expression = substr($expression, 1, -1);
-        }
-
-        return $expression;
     }
 
     /**
