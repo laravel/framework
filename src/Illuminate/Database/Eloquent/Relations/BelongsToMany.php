@@ -127,7 +127,7 @@ class BelongsToMany extends Relation
     {
         $this->pivotWheres[] = func_get_args();
 
-        return $this->whereIn($column, $values, $boolean, $not);
+        return $this->whereIn($this->table.'.'.$column, $values, $boolean, $not);
     }
 
     /**
