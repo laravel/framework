@@ -1175,7 +1175,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $expected = [
             1 => 4,
             2 => 5,
-            3 => 6
+            3 => 6,
         ];
 
         $c = new Collection(array_keys($expected));
@@ -1189,7 +1189,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $expected = [
             1 => 4,
             2 => 5,
-            3 => 6
+            3 => 6,
         ];
 
         $keyCollection = new Collection(array_keys($expected));
