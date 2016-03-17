@@ -956,6 +956,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('id', $model->getRouteKeyName());
     }
 
+    public function testRouteKeyParamCanBeMutated()
+    {
+        $model = new EloquentModelRoutableStub;
+        $this->assertEquals('foo', $model->mutateRouteKey('hashed_foo'));
+    }
+
+    public function testRouteKeyParamPassedOnByDefault()
+    {
+        $model = new EloquentModelStub;
+        $this->assertEquals('foo', $model->mutateRouteKey('foo'));
+    }
+
     public function testCloneModelMakesAFreshCopyOfTheModel()
     {
         $class = new EloquentModelStub;
@@ -1565,4 +1577,12 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentModelRoutableStub extends Model
+{
+    public function mutateRouteKey($key)
+    {
+        return str_replace('hashed_', '', $key);
+    }
 }

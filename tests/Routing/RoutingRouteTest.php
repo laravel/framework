@@ -978,6 +978,11 @@ class RouteModelBindingStub
         return 'id';
     }
 
+    public function mutateRouteKey($key)
+    {
+        return $key;
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -996,6 +1001,11 @@ class RouteModelBindingNullStub
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    public function mutateRouteKey($key)
+    {
+        return $key;
     }
 
     public function where($key, $value)

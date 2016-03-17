@@ -756,7 +756,7 @@ class Router implements RegistrarContract
 
                 $route->setParameter(
                     $parameter->name, $model->where(
-                        $model->getRouteKeyName(), $parameters[$parameter->name]
+                        $model->getRouteKeyName(), $model->mutateRouteKey($parameters[$parameter->name])
                     )->{$method}()
                 );
             }
@@ -881,10 +881,10 @@ class Router implements RegistrarContract
             // For model binders, we will attempt to retrieve the models using the first
             // method on the model instance. If we cannot retrieve the models we'll
             // throw a not found exception otherwise we will return the instance.
-            $instance = $this->container->make($class);
+            $model = $this->container->make($class);
 
-            if ($model = $instance->where($instance->getRouteKeyName(), $value)->first()) {
-                return $model;
+            if ($instance = $model->where($model->getRouteKeyName(), $model->mutateRouteKey($value))->first()) {
+                return $instance;
             }
 
             // If a callback was supplied to the method we will call that to determine
