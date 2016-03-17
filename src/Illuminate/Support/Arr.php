@@ -240,6 +240,10 @@ class Arr
      */
     public static function get($array, $key, $default = null)
     {
+        if (! $array) {
+            return value($default);
+        }
+
         if (is_null($key)) {
             return $array;
         }
@@ -268,6 +272,10 @@ class Arr
      */
     public static function has($array, $key)
     {
+        if (! $array) {
+            return false;
+        }
+
         if (is_null($key)) {
             return false;
         }

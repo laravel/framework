@@ -268,6 +268,16 @@ return $obj; });
         $this->assertFalse($container->bound('object'));
     }
 
+    public function testBoundInstanceAndAliasCheckViaArrayAccess()
+    {
+        $container = new Container;
+        $container->instance('object', new StdClass);
+        $container->alias('object', 'alias');
+
+        $this->assertTrue(isset($container['object']));
+        $this->assertTrue(isset($container['alias']));
+    }
+
     public function testReboundListeners()
     {
         unset($_SERVER['__test.rebind']);
