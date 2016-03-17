@@ -2635,6 +2635,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
     }
 
+    public function testUsingSettersWithImplicitRules()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => ['a', 'b', 'c']], ['foo.*' => 'string']);
+        $v->setData(['foo' => ['a', 'b', 'c', 4]]);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => ['a', 'b', 'c']], ['foo.*' => 'string']);
+        $v->setRules(['foo.*' => 'integer']);
+        $this->assertFalse($v->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Symfony\Component\Translation\TranslatorInterface');

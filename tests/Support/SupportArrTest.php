@@ -185,6 +185,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertNull(Arr::get($array, 'foo', 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+
+        // Test $array not an array
+        $this->assertEquals('default', Arr::get(null, 'foo', 'default'));
+        $this->assertEquals('default', Arr::get(false, 'foo', 'default'));
     }
 
     public function testHas()
@@ -211,6 +215,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
+
+        $this->assertFalse(Arr::has(null, 'foo'));
+        $this->assertFalse(Arr::has(false, 'foo'));
     }
 
     public function testIsAssoc()
