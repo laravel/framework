@@ -1,13 +1,14 @@
-<?php namespace Illuminate\Queue\Connectors;
+<?php
 
-interface ConnectorInterface {
+namespace Illuminate\Queue\Connectors;
 
-	/**
-	 * Establish a queue connection.
-	 *
-	 * @param  array  $config
-	 * @return \Illuminate\Contracts\Queue\Queue
-	 */
-	public function connect(array $config);
-
+interface ConnectorInterface
+{
+    /**
+     * Establish a queue connection.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Queue\Queue
+     */
+    public function connect(array $config);
 }

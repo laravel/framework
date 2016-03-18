@@ -1,13 +1,14 @@
-<?php namespace Illuminate\Contracts\Filesystem;
+<?php
 
-interface Factory {
+namespace Illuminate\Contracts\Filesystem;
 
-	/**
-	 * Get a filesystem implementation.
-	 *
-	 * @param  string  $name
-	 * @return \Illuminate\Contracts\Filesystem\Filesystem
-	 */
-	public function disk($name = null);
-
+interface Factory
+{
+    /**
+     * Get a filesystem implementation.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function disk($name = null);
 }

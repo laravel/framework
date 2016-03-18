@@ -1,4 +1,6 @@
-<?php namespace Illuminate\View;
+<?php
+
+namespace Illuminate\View;
 
 use Closure;
 use ArrayAccess;
@@ -12,7 +14,6 @@ use Illuminate\Contracts\View\View as ViewContract;
 
 class View implements ArrayAccess, ViewContract
 {
-
     /**
      * The view factory instance.
      *
@@ -58,7 +59,7 @@ class View implements ArrayAccess, ViewContract
      * @param  array   $data
      * @return void
      */
-    public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = array())
+    public function __construct(Factory $factory, EngineInterface $engine, $view, $path, $data = [])
     {
         $this->view = $view;
         $this->path = $path;
@@ -186,7 +187,7 @@ class View implements ArrayAccess, ViewContract
      * @param  array   $data
      * @return $this
      */
-    public function nest($key, $view, array $data = array())
+    public function nest($key, $view, array $data = [])
     {
         return $this->with($key, $this->factory->make($view, $data));
     }

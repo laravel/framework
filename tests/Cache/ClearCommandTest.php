@@ -4,81 +4,75 @@ use Mockery as m;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 
-class ClearCommandTest extends PHPUnit_Framework_TestCase {
+class ClearCommandTest extends PHPUnit_Framework_TestCase
+{
+    public function tearDown()
+    {
+        m::close();
+    }
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    public function testClearWithNoStoreOption()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+        );
 
+        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
 
-	public function testClearWithNoStoreOption()
-	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+        $app = new Application();
+        $command->setLaravel($app);
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('flush')->once();
 
-		$app = new Application();
-		$command->setLaravel($app);
+        $this->runCommand($command);
+    }
 
-		$cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
-		$cacheRepository->shouldReceive('flush')->once();
+    public function testClearWithStoreOption()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+        );
 
-		$this->runCommand($command);
-	}
+        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
 
+        $app = new Application();
+        $command->setLaravel($app);
 
-	public function testClearWithStoreOption()
-	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+        $cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('flush')->once();
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
+        $this->runCommand($command, ['store' => 'foo']);
+    }
 
-		$app = new Application();
-		$command->setLaravel($app);
+    public function testClearWithInvalidStoreOption()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager')
+        );
 
-		$cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
-		$cacheRepository->shouldReceive('flush')->once();
+        $cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
 
-		$this->runCommand($command, ['store' => 'foo']);
-	}
+        $app = new Application();
+        $command->setLaravel($app);
 
+        $cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('\InvalidArgumentException');
+        $cacheRepository->shouldReceive('flush')->never();
+        $this->setExpectedException('InvalidArgumentException');
 
-	public function testClearWithInvalidStoreOption()
-	{
-		$command = new ClearCommandTestStub(
-			$cacheManager = m::mock('Illuminate\Cache\CacheManager')
-		);
+        $this->runCommand($command, ['store' => 'bar']);
+    }
 
-		$cacheRepository = m::mock('\Illuminate\Contracts\Cache\Repository');
-
-		$app = new Application();
-		$command->setLaravel($app);
-
-		$cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('\InvalidArgumentException');
-		$cacheRepository->shouldReceive('flush')->never();
-		$this->setExpectedException('InvalidArgumentException');
-
-		$this->runCommand($command, ['store' => 'bar']);
-	}
-
-
-	protected function runCommand($command, $input = array())
-	{
-		return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
-	}
-
+    protected function runCommand($command, $input = [])
+    {
+        return $command->run(new Symfony\Component\Console\Input\ArrayInput($input), new Symfony\Component\Console\Output\NullOutput);
+    }
 }
 
-class ClearCommandTestStub extends ClearCommand {
-
-	public function call($command, array $arguments = array())
-	{
-		//
-	}
-
+class ClearCommandTestStub extends ClearCommand
+{
+    public function call($command, array $arguments = [])
+    {
+        //
+    }
 }

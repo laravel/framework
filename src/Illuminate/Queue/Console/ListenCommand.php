@@ -1,145 +1,144 @@
-<?php namespace Illuminate\Queue\Console;
+<?php
+
+namespace Illuminate\Queue\Console;
 
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ListenCommand extends Command {
+class ListenCommand extends Command
+{
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'queue:listen';
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name = 'queue:listen';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Listen to a given queue';
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description = 'Listen to a given queue';
+    /**
+     * The queue listener instance.
+     *
+     * @var \Illuminate\Queue\Listener
+     */
+    protected $listener;
 
-	/**
-	 * The queue listener instance.
-	 *
-	 * @var \Illuminate\Queue\Listener
-	 */
-	protected $listener;
+    /**
+     * Create a new queue listen command.
+     *
+     * @param  \Illuminate\Queue\Listener  $listener
+     * @return void
+     */
+    public function __construct(Listener $listener)
+    {
+        parent::__construct();
 
-	/**
-	 * Create a new queue listen command.
-	 *
-	 * @param  \Illuminate\Queue\Listener  $listener
-	 * @return void
-	 */
-	public function __construct(Listener $listener)
-	{
-		parent::__construct();
+        $this->listener = $listener;
+    }
 
-		$this->listener = $listener;
-	}
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->setListenerOptions();
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		$this->setListenerOptions();
+        $delay = $this->input->getOption('delay');
 
-		$delay = $this->input->getOption('delay');
+        // The memory limit is the amount of memory we will allow the script to occupy
+        // before killing it and letting a process manager restart it for us, which
+        // is to protect us against any memory leaks that will be in the scripts.
+        $memory = $this->input->getOption('memory');
 
-		// The memory limit is the amount of memory we will allow the script to occupy
-		// before killing it and letting a process manager restart it for us, which
-		// is to protect us against any memory leaks that will be in the scripts.
-		$memory = $this->input->getOption('memory');
+        $connection = $this->input->getArgument('connection');
 
-		$connection = $this->input->getArgument('connection');
+        $timeout = $this->input->getOption('timeout');
 
-		$timeout = $this->input->getOption('timeout');
+        // We need to get the right queue for the connection which is set in the queue
+        // configuration file for the application. We will pull it based on the set
+        // connection being run for the queue operation currently being executed.
+        $queue = $this->getQueue($connection);
 
-		// We need to get the right queue for the connection which is set in the queue
-		// configuration file for the application. We will pull it based on the set
-		// connection being run for the queue operation currently being executed.
-		$queue = $this->getQueue($connection);
+        $this->listener->listen(
+            $connection, $queue, $delay, $memory, $timeout
+        );
+    }
 
-		$this->listener->listen(
-			$connection, $queue, $delay, $memory, $timeout
-		);
-	}
+    /**
+     * Get the name of the queue connection to listen on.
+     *
+     * @param  string  $connection
+     * @return string
+     */
+    protected function getQueue($connection)
+    {
+        if (is_null($connection)) {
+            $connection = $this->laravel['config']['queue.default'];
+        }
 
-	/**
-	 * Get the name of the queue connection to listen on.
-	 *
-	 * @param  string  $connection
-	 * @return string
-	 */
-	protected function getQueue($connection)
-	{
-		if (is_null($connection))
-		{
-			$connection = $this->laravel['config']['queue.default'];
-		}
+        $queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
 
-		$queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
+        return $this->input->getOption('queue') ?: $queue;
+    }
 
-		return $this->input->getOption('queue') ?: $queue;
-	}
+    /**
+     * Set the options on the queue listener.
+     *
+     * @return void
+     */
+    protected function setListenerOptions()
+    {
+        $this->listener->setEnvironment($this->laravel->environment());
 
-	/**
-	 * Set the options on the queue listener.
-	 *
-	 * @return void
-	 */
-	protected function setListenerOptions()
-	{
-		$this->listener->setEnvironment($this->laravel->environment());
+        $this->listener->setSleep($this->option('sleep'));
 
-		$this->listener->setSleep($this->option('sleep'));
+        $this->listener->setMaxTries($this->option('tries'));
 
-		$this->listener->setMaxTries($this->option('tries'));
+        $this->listener->setOutputHandler(function ($type, $line) {
+            $this->output->write($line);
+        });
+    }
 
-		$this->listener->setOutputHandler(function($type, $line)
-		{
-			$this->output->write($line);
-		});
-	}
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['connection', InputArgument::OPTIONAL, 'The name of connection'],
+        ];
+    }
 
-	/**
-	 * Get the console command arguments.
-	 *
-	 * @return array
-	 */
-	protected function getArguments()
-	{
-		return array(
-			array('connection', InputArgument::OPTIONAL, 'The name of connection'),
-		);
-	}
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null],
 
-	/**
-	 * Get the console command options.
-	 *
-	 * @return array
-	 */
-	protected function getOptions()
-	{
-		return array(
-			array('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on', null),
+            ['delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0],
 
-			array('delay', null, InputOption::VALUE_OPTIONAL, 'Amount of time to delay failed jobs', 0),
+            ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
-			array('memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128),
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60],
 
-			array('timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 60),
+            ['sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3],
 
-			array('sleep', null, InputOption::VALUE_OPTIONAL, 'Seconds to wait before checking queue for jobs', 3),
-
-			array('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0),
-		);
-	}
-
+            ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
+        ];
+    }
 }

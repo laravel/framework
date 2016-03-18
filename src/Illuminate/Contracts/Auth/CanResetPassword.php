@@ -1,12 +1,13 @@
-<?php namespace Illuminate\Contracts\Auth;
+<?php
 
-interface CanResetPassword {
+namespace Illuminate\Contracts\Auth;
 
-	/**
-	 * Get the e-mail address where password reset links are sent.
-	 *
-	 * @return string
-	 */
-	public function getEmailForPasswordReset();
-
+interface CanResetPassword
+{
+    /**
+     * Get the e-mail address where password reset links are sent.
+     *
+     * @return string
+     */
+    public function getEmailForPasswordReset();
 }

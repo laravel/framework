@@ -1,13 +1,14 @@
-<?php namespace Illuminate\Session;
+<?php
 
-interface ExistenceAwareInterface {
+namespace Illuminate\Session;
 
-	/**
-	 * Set the existence state for the session.
-	 *
-	 * @param  bool  $value
-	 * @return \SessionHandlerInterface
-	 */
-	public function setExists($value);
-
+interface ExistenceAwareInterface
+{
+    /**
+     * Set the existence state for the session.
+     *
+     * @param  bool  $value
+     * @return \SessionHandlerInterface
+     */
+    public function setExists($value);
 }
