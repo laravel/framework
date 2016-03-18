@@ -133,6 +133,21 @@ class Filesystem
 
         return $success;
     }
+    
+    /**
+     * Delete the file if it exists at the given path.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function deleteIfExists($path)
+    {
+        if ($this->exists($path)) {
+            return $this->delete($path);
+        }
+        
+        return false;
+    }
 
     /**
      * Move a file to a new location.
