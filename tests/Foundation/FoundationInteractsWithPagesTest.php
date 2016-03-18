@@ -334,6 +334,25 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->dontSeeIsSelected('availability', 'partial_time');
     }
 
+    public function testGetRadioOptions()
+    {
+        $this->setCrawler($this->getRadiosHtml());
+        $this->assertEquals(
+            ['partial_time', 'full_time'],
+            $this->getSelectOptionsValues('availability')
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The field [availability] does not contain a valid option [invalid_option].
+     */
+    public function testSelectInvalidRadioOption()
+    {
+        $this->setCrawler($this->getRadiosHtml());
+        $this->select('invalid_option', 'availability');
+    }
+
     protected function getCheckboxesHtml()
     {
         return

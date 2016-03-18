@@ -781,19 +781,23 @@ trait InteractsWithPages
     {
         $field = $this->filterByNameOrId($selector);
 
-        if ($field->nodeName() !== 'select') {
-            throw new Exception('Given element is not a select element.');
+        if ($field->nodeName() === 'select') {
+            $children = $field->children();
+        } else {
+            $children = $field;
         }
 
         $optionsValues = [];
 
-        foreach ($field->children() as $option) {
+        foreach ($children as $option) {
             if ($option->nodeName === 'optgroup') {
                 foreach ($option->childNodes as $child) {
                     $optionsValues[] = $child->getAttribute('value');
                 }
-            } else {
+            } elseif ($option->nodeName === 'option' or $option->getAttribute('type') === 'radio') {
                 $optionsValues[] = $option->getAttribute('value');
+            } else {
+                throw new Exception('Given element is neither a select element nor a radio input.');
             }
         }
 
