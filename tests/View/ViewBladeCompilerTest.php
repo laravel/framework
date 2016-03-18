@@ -192,7 +192,7 @@ test';
         $string = '@push(\'foo\')
 test
 @endpush';
-        $expected = '<?php $__env->startSection(\'foo\'); ?>
+        $expected = '<?php $__env->startSectionPush(\'foo\'); ?>
 test
 <?php $__env->appendSection(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
