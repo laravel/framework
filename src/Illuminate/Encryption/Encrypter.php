@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Encryption;
 
+use Illuminate\Support\Str;
 use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Core\Util\SecureRandom;
 
 class Encrypter {
 
@@ -157,12 +157,7 @@ class Encrypter {
 	 */
 	protected function validMac(array $payload)
 	{
-		if ( ! function_exists('openssl_random_pseudo_bytes'))
-		{
-			throw new \RuntimeException('OpenSSL extension is required.');
-		}
-
-		$bytes = (new SecureRandom)->nextBytes(16);
+		$bytes = Str::randomBytes(16);
 
 		$calcMac = hash_hmac('sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true);
 

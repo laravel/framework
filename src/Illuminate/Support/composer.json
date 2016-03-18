@@ -8,7 +8,8 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "paragonie/random_compat": "~1.3"
     },
     "require-dev": {
         "jeremeamia/superclosure": "~1.0.1",

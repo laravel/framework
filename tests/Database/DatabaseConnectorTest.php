@@ -28,7 +28,8 @@ class DatabaseConnectorTest extends PHPUnit_Framework_TestCase {
 		$connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(array('options')));
 		$connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(array('options')))->will($this->returnValue($connection));
 		$connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
-		$connection->shouldReceive('execute')->once();
+		$connection->shouldReceive('prepare')->once()->with('set session sql_mode=\'\'')->andReturn($connection);
+		$connection->shouldReceive('execute')->times(2);
 		$connection->shouldReceive('exec')->zeroOrMoreTimes();
 		$result = $connector->connect($config);
 

@@ -207,24 +207,30 @@ class Str {
 	 *
 	 * @param  int  $length
 	 * @return string
-	 *
-	 * @throws \RuntimeException
 	 */
 	public static function random($length = 16)
 	{
-		if (function_exists('openssl_random_pseudo_bytes'))
+		$string = '';
+
+		while (($len = strlen($string)) < $length)
 		{
-			$bytes = openssl_random_pseudo_bytes($length * 2);
-
-			if ($bytes === false)
-			{
-				throw new \RuntimeException('Unable to generate random string.');
-			}
-
-			return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
+			$size = $length - $len;
+			$bytes = static::randomBytes($size);
+			$string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
 		}
 
-		return static::quickRandom($length);
+		return $string;
+	}
+
+	/**
+	 * Generate a more truly "random" bytes.
+	 *
+	 * @param  int  $length
+	 * @return string
+	 */
+	public static function randomBytes($length = 16)
+	{
+		return random_bytes($length);
 	}
 
 	/**
