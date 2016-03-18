@@ -219,8 +219,6 @@ class Str
      *
      * @param  int  $length
      * @return string
-     *
-     * @throws \RuntimeException
      */
     public static function random($length = 16)
     {
