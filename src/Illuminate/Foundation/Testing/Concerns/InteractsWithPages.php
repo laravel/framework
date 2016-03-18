@@ -770,6 +770,37 @@ trait InteractsWithPages
     }
 
     /**
+     * Get the options' values from a select field.
+     *
+     * @param  string  $selector
+     * @return array
+     *
+     * @throws \Exception
+     */
+    protected function getSelectOptionsValues($selector)
+    {
+        $field = $this->filterByNameOrId($selector);
+
+        if ($field->nodeName() !== 'select') {
+            throw new Exception('Given element is not a select element.');
+        }
+
+        $optionsValues = [];
+
+        foreach ($field->children() as $option) {
+            if ($option->nodeName === 'optgroup') {
+                foreach ($option->childNodes as $child) {
+                    $optionsValues[] = $child->getAttribute('value');
+                }
+            } else {
+                $optionsValues[] = $option->getAttribute('value');
+            }
+        }
+
+        return $optionsValues;
+    }
+
+    /**
      * Get the checked value from a radio group.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler  $radioGroup
@@ -876,9 +907,17 @@ trait InteractsWithPages
      * @param  string  $option
      * @param  string  $element
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     protected function select($option, $element)
     {
+        if (! in_array($option, $this->getSelectOptionsValues($element))) {
+            throw new InvalidArgumentException(
+                "The field [{$element}] does not contain a valid option [{$option}]."
+            );
+        }
+
         return $this->storeInput($element, $option);
     }
 
