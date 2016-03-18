@@ -543,6 +543,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a collection by using this collection for keys and another for its values.
+     *
+     * @param  mixed  $values
+     * @return static
+     */
+    public function combine($values)
+    {
+        return new static(array_combine($this->all(), $this->getArrayableItems($values)));
+    }
+
+    /**
      * Get the min value of a given key.
      *
      * @param  string|null  $key
@@ -1112,20 +1123,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function offsetUnset($key)
     {
         unset($this->items[$key]);
-    }
-
-    /**
-     * Combines the collection as keys together with items as values.
-     *
-     * e.g. new Collection([1, 2, 3])->combine([4, 5, 6]);
-     *      => [1=>4, 2=>5, 3=>6]
-     *
-     * @param  mixed  $items
-     * @return static
-     */
-    public function combine($items)
-    {
-        return new static(array_combine($this->all(), $this->getArrayableItems($items)));
     }
 
     /**
