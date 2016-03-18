@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Password;
 
 trait ResetsPasswords
@@ -83,7 +84,10 @@ trait ResetsPasswords
      */
     protected function getEmailSubject()
     {
-        return property_exists($this, 'subject') ? $this->subject : 'Your Password Reset Link';
+        $mailSubject = Lang::has('passwords.reset_link_email_subject')
+                        ? Lang::get('passwords.reset_link_email_subject')
+                        : 'Your Password Reset Link';
+        return property_exists($this, 'subject') ? $this->subject : $mailSubject;
     }
 
     /**
