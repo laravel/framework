@@ -18,7 +18,6 @@
         "ext-openssl": "*",
         "illuminate/contracts": "5.0.*",
         "illuminate/support": "5.0.*",
-        "paragonie/random_compat": "~1.3",
         "symfony/security-core": "2.6.*"
     },
     "autoload": {
