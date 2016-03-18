@@ -1,144 +1,143 @@
-<?php namespace Illuminate\Foundation;
+<?php
+
+namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
 
-class ConfigPublisher {
+class ConfigPublisher
+{
+    /**
+     * The filesystem instance.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
 
-	/**
-	 * The filesystem instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
+    /**
+     * The destination of the config files.
+     *
+     * @var string
+     */
+    protected $publishPath;
 
-	/**
-	 * The destination of the config files.
-	 *
-	 * @var string
-	 */
-	protected $publishPath;
+    /**
+     * The path to the application's packages.
+     *
+     * @var string
+     */
+    protected $packagePath;
 
-	/**
-	 * The path to the application's packages.
-	 *
-	 * @var string
-	 */
-	protected $packagePath;
+    /**
+     * Create a new configuration publisher instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  string  $publishPath
+     * @return void
+     */
+    public function __construct(Filesystem $files, $publishPath)
+    {
+        $this->files = $files;
+        $this->publishPath = $publishPath;
+    }
 
-	/**
-	 * Create a new configuration publisher instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @param  string  $publishPath
-	 * @return void
-	 */
-	public function __construct(Filesystem $files, $publishPath)
-	{
-		$this->files = $files;
-		$this->publishPath = $publishPath;
-	}
+    /**
+     * Publish configuration files from a given path.
+     *
+     * @param  string  $package
+     * @param  string  $source
+     * @return bool
+     */
+    public function publish($package, $source)
+    {
+        $destination = $this->getDestinationPath($package);
 
-	/**
-	 * Publish configuration files from a given path.
-	 *
-	 * @param  string  $package
-	 * @param  string  $source
-	 * @return bool
-	 */
-	public function publish($package, $source)
-	{
-		$destination = $this->getDestinationPath($package);
+        $this->makeDestination($destination);
 
-		$this->makeDestination($destination);
+        return $this->files->copyDirectory($source, $destination);
+    }
 
-		return $this->files->copyDirectory($source, $destination);
-	}
+    /**
+     * Publish the configuration files for a package.
+     *
+     * @param  string  $package
+     * @param  string  $packagePath
+     * @return bool
+     */
+    public function publishPackage($package, $packagePath = null)
+    {
+        // First we will figure out the source of the package's configuration location
+        // which we do by convention. Once we have that we will move the files over
+        // to the "main" configuration directory for this particular application.
+        $path = $packagePath ?: $this->packagePath;
 
-	/**
-	 * Publish the configuration files for a package.
-	 *
-	 * @param  string  $package
-	 * @param  string  $packagePath
-	 * @return bool
-	 */
-	public function publishPackage($package, $packagePath = null)
-	{
-		// First we will figure out the source of the package's configuration location
-		// which we do by convention. Once we have that we will move the files over
-		// to the "main" configuration directory for this particular application.
-		$path = $packagePath ?: $this->packagePath;
+        $source = $this->getSource($package, $path);
 
-		$source = $this->getSource($package, $path);
+        return $this->publish($package, $source);
+    }
 
-		return $this->publish($package, $source);
-	}
+    /**
+     * Get the source configuration directory to publish.
+     *
+     * @param  string  $package
+     * @param  string  $packagePath
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getSource($package, $packagePath)
+    {
+        $source = $packagePath."/{$package}/src/config";
 
-	/**
-	 * Get the source configuration directory to publish.
-	 *
-	 * @param  string  $package
-	 * @param  string  $packagePath
-	 * @return string
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	protected function getSource($package, $packagePath)
-	{
-		$source = $packagePath."/{$package}/src/config";
+        if (! $this->files->isDirectory($source)) {
+            throw new \InvalidArgumentException('Configuration not found.');
+        }
 
-		if ( ! $this->files->isDirectory($source))
-		{
-			throw new \InvalidArgumentException("Configuration not found.");
-		}
+        return $source;
+    }
 
-		return $source;
-	}
+    /**
+     * Create the destination directory if it doesn't exist.
+     *
+     * @param  string  $destination
+     * @return void
+     */
+    protected function makeDestination($destination)
+    {
+        if (! $this->files->isDirectory($destination)) {
+            $this->files->makeDirectory($destination, 0777, true);
+        }
+    }
 
-	/**
-	 * Create the destination directory if it doesn't exist.
-	 *
-	 * @param  string  $destination
-	 * @return void
-	 */
-	protected function makeDestination($destination)
-	{
-		if ( ! $this->files->isDirectory($destination))
-		{
-			$this->files->makeDirectory($destination, 0777, true);
-		}
-	}
+    /**
+     * Determine if a given package has already been published.
+     *
+     * @param  string  $package
+     * @return bool
+     */
+    public function alreadyPublished($package)
+    {
+        return $this->files->isDirectory($this->getDestinationPath($package));
+    }
 
-	/**
-	 * Determine if a given package has already been published.
-	 *
-	 * @param  string  $package
-	 * @return bool
-	 */
-	public function alreadyPublished($package)
-	{
-		return $this->files->isDirectory($this->getDestinationPath($package));
-	}
+    /**
+     * Get the target destination path for the configuration files.
+     *
+     * @param  string  $package
+     * @return string
+     */
+    public function getDestinationPath($package)
+    {
+        return $this->publishPath."/packages/{$package}";
+    }
 
-	/**
-	 * Get the target destination path for the configuration files.
-	 *
-	 * @param  string  $package
-	 * @return string
-	 */
-	public function getDestinationPath($package)
-	{
-		return $this->publishPath."/packages/{$package}";
-	}
-
-	/**
-	 * Set the default package path.
-	 *
-	 * @param  string  $packagePath
-	 * @return void
-	 */
-	public function setPackagePath($packagePath)
-	{
-		$this->packagePath = $packagePath;
-	}
-
+    /**
+     * Set the default package path.
+     *
+     * @param  string  $packagePath
+     * @return void
+     */
+    public function setPackagePath($packagePath)
+    {
+        $this->packagePath = $packagePath;
+    }
 }

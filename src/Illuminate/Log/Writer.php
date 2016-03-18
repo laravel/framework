@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Log;
+<?php
+
+namespace Illuminate\Log;
 
 use Closure;
 use Illuminate\Events\Dispatcher;
@@ -10,302 +12,289 @@ use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class Writer {
+class Writer
+{
+    /**
+     * The Monolog logger instance.
+     *
+     * @var \Monolog\Logger
+     */
+    protected $monolog;
 
-	/**
-	 * The Monolog logger instance.
-	 *
-	 * @var \Monolog\Logger
-	 */
-	protected $monolog;
+    /**
+     * All of the error levels.
+     *
+     * @var array
+     */
+    protected $levels = [
+        'debug',
+        'info',
+        'notice',
+        'warning',
+        'error',
+        'critical',
+        'alert',
+        'emergency',
+    ];
 
-	/**
-	 * All of the error levels.
-	 *
-	 * @var array
-	 */
-	protected $levels = array(
-		'debug',
-		'info',
-		'notice',
-		'warning',
-		'error',
-		'critical',
-		'alert',
-		'emergency',
-	);
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected $dispatcher;
 
-	/**
-	 * The event dispatcher instance.
-	 *
-	 * @var \Illuminate\Events\Dispatcher
-	 */
-	protected $dispatcher;
+    /**
+     * Create a new log writer instance.
+     *
+     * @param  \Monolog\Logger  $monolog
+     * @param  \Illuminate\Events\Dispatcher  $dispatcher
+     * @return void
+     */
+    public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
+    {
+        $this->monolog = $monolog;
 
-	/**
-	 * Create a new log writer instance.
-	 *
-	 * @param  \Monolog\Logger  $monolog
-	 * @param  \Illuminate\Events\Dispatcher  $dispatcher
-	 * @return void
-	 */
-	public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
-	{
-		$this->monolog = $monolog;
+        if (isset($dispatcher)) {
+            $this->dispatcher = $dispatcher;
+        }
+    }
 
-		if (isset($dispatcher))
-		{
-			$this->dispatcher = $dispatcher;
-		}
-	}
+    /**
+     * Call Monolog with the given method and parameters.
+     *
+     * @param  string  $method
+     * @param  mixed   $parameters
+     * @return mixed
+     */
+    protected function callMonolog($method, $parameters)
+    {
+        if (is_array($parameters[0])) {
+            $parameters[0] = json_encode($parameters[0]);
+        }
 
-	/**
-	 * Call Monolog with the given method and parameters.
-	 *
-	 * @param  string  $method
-	 * @param  mixed   $parameters
-	 * @return mixed
-	 */
-	protected function callMonolog($method, $parameters)
-	{
-		if (is_array($parameters[0]))
-		{
-			$parameters[0] = json_encode($parameters[0]);
-		}
+        return call_user_func_array([$this->monolog, $method], $parameters);
+    }
 
-		return call_user_func_array(array($this->monolog, $method), $parameters);
-	}
+    /**
+     * Register a file log handler.
+     *
+     * @param  string  $path
+     * @param  string  $level
+     * @return void
+     */
+    public function useFiles($path, $level = 'debug')
+    {
+        $level = $this->parseLevel($level);
 
-	/**
-	 * Register a file log handler.
-	 *
-	 * @param  string  $path
-	 * @param  string  $level
-	 * @return void
-	 */
-	public function useFiles($path, $level = 'debug')
-	{
-		$level = $this->parseLevel($level);
+        $this->monolog->pushHandler($handler = new StreamHandler($path, $level));
 
-		$this->monolog->pushHandler($handler = new StreamHandler($path, $level));
+        $handler->setFormatter($this->getDefaultFormatter());
+    }
 
-		$handler->setFormatter($this->getDefaultFormatter());
-	}
+    /**
+     * Register a daily file log handler.
+     *
+     * @param  string  $path
+     * @param  int     $days
+     * @param  string  $level
+     * @return void
+     */
+    public function useDailyFiles($path, $days = 0, $level = 'debug')
+    {
+        $level = $this->parseLevel($level);
 
-	/**
-	 * Register a daily file log handler.
-	 *
-	 * @param  string  $path
-	 * @param  int     $days
-	 * @param  string  $level
-	 * @return void
-	 */
-	public function useDailyFiles($path, $days = 0, $level = 'debug')
-	{
-		$level = $this->parseLevel($level);
+        $this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
 
-		$this->monolog->pushHandler($handler = new RotatingFileHandler($path, $days, $level));
+        $handler->setFormatter($this->getDefaultFormatter());
+    }
 
-		$handler->setFormatter($this->getDefaultFormatter());
-	}
+    /**
+     * Register an error_log handler.
+     *
+     * @param  string  $level
+     * @param  int     $messageType
+     * @return void
+     */
+    public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
+    {
+        $level = $this->parseLevel($level);
 
-	/**
-	 * Register an error_log handler.
-	 *
-	 * @param  string  $level
-	 * @param  int     $messageType
-	 * @return void
-	 */
-	public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
-	{
-		$level = $this->parseLevel($level);
+        $this->monolog->pushHandler($handler = new ErrorLogHandler($messageType, $level));
 
-		$this->monolog->pushHandler($handler = new ErrorLogHandler($messageType, $level));
+        $handler->setFormatter($this->getDefaultFormatter());
+    }
 
-		$handler->setFormatter($this->getDefaultFormatter());
-	}
+    /**
+     * Get a default Monolog formatter instance.
+     *
+     * @return \Monolog\Formatter\LineFormatter
+     */
+    protected function getDefaultFormatter()
+    {
+        return new LineFormatter(null, null, true);
+    }
 
-	/**
-	 * Get a default Monolog formatter instance.
-	 *
-	 * @return \Monolog\Formatter\LineFormatter
-	 */
-	protected function getDefaultFormatter()
-	{
-		return new LineFormatter(null, null, true);
-	}
+    /**
+     * Parse the string level into a Monolog constant.
+     *
+     * @param  string  $level
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseLevel($level)
+    {
+        switch ($level) {
+            case 'debug':
+                return MonologLogger::DEBUG;
 
-	/**
-	 * Parse the string level into a Monolog constant.
-	 *
-	 * @param  string  $level
-	 * @return int
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	protected function parseLevel($level)
-	{
-		switch ($level)
-		{
-			case 'debug':
-				return MonologLogger::DEBUG;
+            case 'info':
+                return MonologLogger::INFO;
 
-			case 'info':
-				return MonologLogger::INFO;
+            case 'notice':
+                return MonologLogger::NOTICE;
 
-			case 'notice':
-				return MonologLogger::NOTICE;
+            case 'warning':
+                return MonologLogger::WARNING;
 
-			case 'warning':
-				return MonologLogger::WARNING;
+            case 'error':
+                return MonologLogger::ERROR;
 
-			case 'error':
-				return MonologLogger::ERROR;
+            case 'critical':
+                return MonologLogger::CRITICAL;
 
-			case 'critical':
-				return MonologLogger::CRITICAL;
+            case 'alert':
+                return MonologLogger::ALERT;
 
-			case 'alert':
-				return MonologLogger::ALERT;
+            case 'emergency':
+                return MonologLogger::EMERGENCY;
 
-			case 'emergency':
-				return MonologLogger::EMERGENCY;
+            default:
+                throw new \InvalidArgumentException('Invalid log level.');
+        }
+    }
 
-			default:
-				throw new \InvalidArgumentException("Invalid log level.");
-		}
-	}
+    /**
+     * Register a new callback handler for when
+     * a log event is triggered.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function listen(Closure $callback)
+    {
+        if (! isset($this->dispatcher)) {
+            throw new \RuntimeException('Events dispatcher has not been set.');
+        }
 
-	/**
-	 * Register a new callback handler for when
-	 * a log event is triggered.
-	 *
-	 * @param  \Closure  $callback
-	 * @return void
-	 *
-	 * @throws \RuntimeException
-	 */
-	public function listen(Closure $callback)
-	{
-		if ( ! isset($this->dispatcher))
-		{
-			throw new \RuntimeException("Events dispatcher has not been set.");
-		}
+        $this->dispatcher->listen('illuminate.log', $callback);
+    }
 
-		$this->dispatcher->listen('illuminate.log', $callback);
-	}
+    /**
+     * Get the underlying Monolog instance.
+     *
+     * @return \Monolog\Logger
+     */
+    public function getMonolog()
+    {
+        return $this->monolog;
+    }
 
-	/**
-	 * Get the underlying Monolog instance.
-	 *
-	 * @return \Monolog\Logger
-	 */
-	public function getMonolog()
-	{
-		return $this->monolog;
-	}
+    /**
+     * Get the event dispatcher instance.
+     *
+     * @return \Illuminate\Events\Dispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this->dispatcher;
+    }
 
-	/**
-	 * Get the event dispatcher instance.
-	 *
-	 * @return \Illuminate\Events\Dispatcher
-	 */
-	public function getEventDispatcher()
-	{
-		return $this->dispatcher;
-	}
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param  \Illuminate\Events\Dispatcher
+     * @return void
+     */
+    public function setEventDispatcher(Dispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
-	/**
-	 * Set the event dispatcher instance.
-	 *
-	 * @param  \Illuminate\Events\Dispatcher
-	 * @return void
-	 */
-	public function setEventDispatcher(Dispatcher $dispatcher)
-	{
-		$this->dispatcher = $dispatcher;
-	}
+    /**
+     * Fires a log event.
+     *
+     * @param  string  $level
+     * @param  string  $message
+     * @param  array   $context
+     * @return void
+     */
+    protected function fireLogEvent($level, $message, array $context = [])
+    {
+        // If the event dispatcher is set, we will pass along the parameters to the
+        // log listeners. These are useful for building profilers or other tools
+        // that aggregate all of the log messages for a given "request" cycle.
+        if (isset($this->dispatcher)) {
+            $this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
+        }
+    }
 
-	/**
-	 * Fires a log event.
-	 *
-	 * @param  string  $level
-	 * @param  string  $message
-	 * @param  array   $context
-	 * @return void
-	 */
-	protected function fireLogEvent($level, $message, array $context = array())
-	{
-		// If the event dispatcher is set, we will pass along the parameters to the
-		// log listeners. These are useful for building profilers or other tools
-		// that aggregate all of the log messages for a given "request" cycle.
-		if (isset($this->dispatcher))
-		{
-			$this->dispatcher->fire('illuminate.log', compact('level', 'message', 'context'));
-		}
-	}
+    /**
+     * Dynamically pass log calls into the writer.
+     *
+     * @param  mixed (level, param, param)
+     * @return mixed
+     */
+    public function write()
+    {
+        $level = head(func_get_args());
 
-	/**
-	 * Dynamically pass log calls into the writer.
-	 *
-	 * @param  mixed (level, param, param)
-	 * @return mixed
-	 */
-	public function write()
-	{
-		$level = head(func_get_args());
+        return call_user_func_array([$this, $level], array_slice(func_get_args(), 1));
+    }
 
-		return call_user_func_array(array($this, $level), array_slice(func_get_args(), 1));
-	}
+    /**
+     * Dynamically handle error additions.
+     *
+     * @param  string  $method
+     * @param  mixed   $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (in_array($method, $this->levels)) {
+            $this->formatParameters($parameters);
 
-	/**
-	 * Dynamically handle error additions.
-	 *
-	 * @param  string  $method
-	 * @param  mixed   $parameters
-	 * @return mixed
-	 *
-	 * @throws \BadMethodCallException
-	 */
-	public function __call($method, $parameters)
-	{
-		if (in_array($method, $this->levels))
-		{
-			$this->formatParameters($parameters);
+            call_user_func_array([$this, 'fireLogEvent'], array_merge([$method], $parameters));
 
-			call_user_func_array(array($this, 'fireLogEvent'), array_merge(array($method), $parameters));
+            $method = 'add'.ucfirst($method);
 
-			$method = 'add'.ucfirst($method);
+            return $this->callMonolog($method, $parameters);
+        }
 
-			return $this->callMonolog($method, $parameters);
-		}
+        throw new \BadMethodCallException("Method [$method] does not exist.");
+    }
 
-		throw new \BadMethodCallException("Method [$method] does not exist.");
-	}
-
-	/**
-	 * Format the parameters for the logger.
-	 *
-	 * @param  mixed  $parameters
-	 * @return void
-	 */
-	protected function formatParameters(&$parameters)
-	{
-		if (isset($parameters[0]))
-		{
-			if (is_array($parameters[0]))
-			{
-				$parameters[0] = var_export($parameters[0], true);
-			}
-			elseif ($parameters[0] instanceof JsonableInterface)
-			{
-				$parameters[0] = $parameters[0]->toJson();
-			}
-			elseif ($parameters[0] instanceof ArrayableInterface)
-			{
-				$parameters[0] = var_export($parameters[0]->toArray(), true);
-			}
-		}
-	}
-
+    /**
+     * Format the parameters for the logger.
+     *
+     * @param  mixed  $parameters
+     * @return void
+     */
+    protected function formatParameters(&$parameters)
+    {
+        if (isset($parameters[0])) {
+            if (is_array($parameters[0])) {
+                $parameters[0] = var_export($parameters[0], true);
+            } elseif ($parameters[0] instanceof JsonableInterface) {
+                $parameters[0] = $parameters[0]->toJson();
+            } elseif ($parameters[0] instanceof ArrayableInterface) {
+                $parameters[0] = var_export($parameters[0]->toArray(), true);
+            }
+        }
+    }
 }

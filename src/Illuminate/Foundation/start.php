@@ -24,11 +24,10 @@ error_reporting(-1);
 |
 */
 
-if ( ! extension_loaded('mcrypt'))
-{
-	echo 'Mcrypt PHP extension required.'.PHP_EOL;
+if (! extension_loaded('mcrypt')) {
+    echo 'Mcrypt PHP extension required.'.PHP_EOL;
 
-	exit(1);
+    exit(1);
 }
 
 /*
@@ -72,9 +71,8 @@ $app->instance('app', $app);
 |
 */
 
-if (isset($unitTesting))
-{
-	$app['env'] = $env = $testEnvironment;
+if (isset($unitTesting)) {
+    $app['env'] = $env = $testEnvironment;
 }
 
 /*
@@ -117,7 +115,7 @@ $app->registerCoreContainerAliases();
 */
 
 with($envVariables = new EnvironmentVariables(
-	$app->getEnvironmentVariablesLoader()))->load($env);
+    $app->getEnvironmentVariablesLoader()))->load($env);
 
 /*
 |--------------------------------------------------------------------------
@@ -132,7 +130,7 @@ with($envVariables = new EnvironmentVariables(
 
 $app->instance('config', $config = new Config(
 
-	$app->getConfigLoader(), $env
+    $app->getConfigLoader(), $env
 
 ));
 
@@ -149,7 +147,9 @@ $app->instance('config', $config = new Config(
 
 $app->startExceptionHandling();
 
-if ($env != 'testing') ini_set('display_errors', 'Off');
+if ($env != 'testing') {
+    ini_set('display_errors', 'Off');
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -220,52 +220,57 @@ $app->getProviderRepository()->load($app, $providers);
 |
 */
 
-$app->booted(function() use ($app, $env)
-{
+$app->booted(function () use ($app, $env) {
 
-	/*
-	|--------------------------------------------------------------------------
-	| Load The Application Start Script
-	|--------------------------------------------------------------------------
-	|
-	| The start scripts gives this application the opportunity to override
-	| any of the existing IoC bindings, as well as register its own new
-	| bindings for things like repositories, etc. We'll load it here.
-	|
-	*/
+    /*
+    |--------------------------------------------------------------------------
+    | Load The Application Start Script
+    |--------------------------------------------------------------------------
+    |
+    | The start scripts gives this application the opportunity to override
+    | any of the existing IoC bindings, as well as register its own new
+    | bindings for things like repositories, etc. We'll load it here.
+    |
+    */
 
-	$path = $app['path'].'/start/global.php';
+    $path = $app['path'].'/start/global.php';
 
-	if (file_exists($path)) require $path;
+    if (file_exists($path)) {
+        require $path;
+    }
 
-	/*
-	|--------------------------------------------------------------------------
-	| Load The Environment Start Script
-	|--------------------------------------------------------------------------
-	|
-	| The environment start script is only loaded if it exists for the app
-	| environment currently active, which allows some actions to happen
-	| in one environment while not in the other, keeping things clean.
-	|
-	*/
+    /*
+    |--------------------------------------------------------------------------
+    | Load The Environment Start Script
+    |--------------------------------------------------------------------------
+    |
+    | The environment start script is only loaded if it exists for the app
+    | environment currently active, which allows some actions to happen
+    | in one environment while not in the other, keeping things clean.
+    |
+    */
 
-	$path = $app['path']."/start/{$env}.php";
+    $path = $app['path']."/start/{$env}.php";
 
-	if (file_exists($path)) require $path;
+    if (file_exists($path)) {
+        require $path;
+    }
 
-	/*
-	|--------------------------------------------------------------------------
-	| Load The Application Routes
-	|--------------------------------------------------------------------------
-	|
-	| The Application routes are kept separate from the application starting
-	| just to keep the file a little cleaner. We'll go ahead and load in
-	| all of the routes now and return the application to the callers.
-	|
-	*/
+    /*
+    |--------------------------------------------------------------------------
+    | Load The Application Routes
+    |--------------------------------------------------------------------------
+    |
+    | The Application routes are kept separate from the application starting
+    | just to keep the file a little cleaner. We'll go ahead and load in
+    | all of the routes now and return the application to the callers.
+    |
+    */
 
-	$routes = $app['path'].'/routes.php';
+    $routes = $app['path'].'/routes.php';
 
-	if (file_exists($routes)) require $routes;
+    if (file_exists($routes)) {
+        require $routes;
+    }
 
 });

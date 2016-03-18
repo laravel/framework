@@ -1,3 +1,7 @@
-<?php namespace Illuminate\Container;
+<?php
 
-class BindingResolutionException extends \Exception {}
+namespace Illuminate\Container;
+
+class BindingResolutionException extends \Exception
+{
+}

@@ -1,29 +1,29 @@
-<?php namespace Illuminate\Foundation\Testing;
+<?php
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase {
+namespace Illuminate\Foundation\Testing;
 
-	use ApplicationTrait, AssertionsTrait;
+abstract class TestCase extends \PHPUnit_Framework_TestCase
+{
+    use ApplicationTrait, AssertionsTrait;
 
-	/**
-	 * Setup the test environment.
-	 *
-	 * @return void
-	 */
-	public function setUp()
-	{
-		if ( ! $this->app)
-		{
-			$this->refreshApplication();
-		}
-	}
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        if (! $this->app) {
+            $this->refreshApplication();
+        }
+    }
 
-	/**
-	 * Creates the application.
-	 *
-	 * Needs to be implemented by subclasses.
-	 *
-	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
-	 */
-	abstract public function createApplication();
-
+    /**
+     * Creates the application.
+     *
+     * Needs to be implemented by subclasses.
+     *
+     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     */
+    abstract public function createApplication();
 }

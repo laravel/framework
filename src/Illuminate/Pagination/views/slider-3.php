@@ -1,5 +1,5 @@
 <?php
-	$presenter = new Illuminate\Pagination\BootstrapPresenter($paginator);
+    $presenter = new Illuminate\Pagination\BootstrapPresenter($paginator);
 ?>
 
 <?php if ($paginator->getLastPage() > 1): ?>

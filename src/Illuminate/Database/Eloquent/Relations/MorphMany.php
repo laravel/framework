@@ -1,47 +1,47 @@
-<?php namespace Illuminate\Database\Eloquent\Relations;
+<?php
+
+namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 
-class MorphMany extends MorphOneOrMany {
+class MorphMany extends MorphOneOrMany
+{
+    /**
+     * Get the results of the relationship.
+     *
+     * @return mixed
+     */
+    public function getResults()
+    {
+        return $this->query->get();
+    }
 
-	/**
-	 * Get the results of the relationship.
-	 *
-	 * @return mixed
-	 */
-	public function getResults()
-	{
-		return $this->query->get();
-	}
+    /**
+     * Initialize the relation on a set of models.
+     *
+     * @param  array   $models
+     * @param  string  $relation
+     * @return array
+     */
+    public function initRelation(array $models, $relation)
+    {
+        foreach ($models as $model) {
+            $model->setRelation($relation, $this->related->newCollection());
+        }
 
-	/**
-	 * Initialize the relation on a set of models.
-	 *
-	 * @param  array   $models
-	 * @param  string  $relation
-	 * @return array
-	 */
-	public function initRelation(array $models, $relation)
-	{
-		foreach ($models as $model)
-		{
-			$model->setRelation($relation, $this->related->newCollection());
-		}
+        return $models;
+    }
 
-		return $models;
-	}
-
-	/**
-	 * Match the eagerly loaded results to their parents.
-	 *
-	 * @param  array   $models
-	 * @param  \Illuminate\Database\Eloquent\Collection  $results
-	 * @param  string  $relation
-	 * @return array
-	 */
-	public function match(array $models, Collection $results, $relation)
-	{
-		return $this->matchMany($models, $results, $relation);
-	}
-
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  array   $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
+     * @return array
+     */
+    public function match(array $models, Collection $results, $relation)
+    {
+        return $this->matchMany($models, $results, $relation);
+    }
 }

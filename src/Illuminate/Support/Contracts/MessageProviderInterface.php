@@ -1,12 +1,13 @@
-<?php namespace Illuminate\Support\Contracts;
+<?php
 
-interface MessageProviderInterface {
+namespace Illuminate\Support\Contracts;
 
-	/**
-	 * Get the messages for the instance.
-	 *
-	 * @return \Illuminate\Support\MessageBag
-	 */
-	public function getMessageBag();
-
+interface MessageProviderInterface
+{
+    /**
+     * Get the messages for the instance.
+     *
+     * @return \Illuminate\Support\MessageBag
+     */
+    public function getMessageBag();
 }

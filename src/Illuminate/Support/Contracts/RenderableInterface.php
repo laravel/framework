@@ -1,12 +1,13 @@
-<?php namespace Illuminate\Support\Contracts;
+<?php
 
-interface RenderableInterface {
+namespace Illuminate\Support\Contracts;
 
-	/**
-	 * Get the evaluated contents of the object.
-	 *
-	 * @return string
-	 */
-	public function render();
-
+interface RenderableInterface
+{
+    /**
+     * Get the evaluated contents of the object.
+     *
+     * @return string
+     */
+    public function render();
 }
