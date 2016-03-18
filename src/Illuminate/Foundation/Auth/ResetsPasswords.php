@@ -85,9 +85,9 @@ trait ResetsPasswords
     protected function getEmailSubject()
     {
         $mailSubject = Lang::has('passwords.reset_link_email_subject')
-                        ? Lang::get('passwords.reset_link_email_subject')
-                        : 'Your Password Reset Link';
-                        
+            ? Lang::get('passwords.reset_link_email_subject')
+            : 'Your Password Reset Link';
+
         return property_exists($this, 'subject') ? $this->subject : $mailSubject;
     }
 
