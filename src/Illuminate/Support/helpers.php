@@ -203,7 +203,7 @@ if (! function_exists('array_last')) {
 
 if (! function_exists('array_only')) {
     /**
-     * Get a subset of the items from the given array using "dot" notation.
+     * Get a subset of the items from the given array.
      *
      * @param  array  $array
      * @param  array|string  $keys

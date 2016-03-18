@@ -2611,6 +2611,19 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar.1', $method->invoke($v, 'foo.bar.1'));
     }
 
+    public function testExtractData()
+    {
+        $method = new ReflectionMethod(Validator::class, 'extractData');
+        $method->setAccessible(true);
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]], []);
+        $this->assertEquals(['cat' => ['cat1' => ['name']]], $method->invoke($v, 'cat.cat1'));
+
+        $v = new Validator($trans, ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]], []);
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], $method->invoke($v, 'cat.cat1.name'));
+    }
+
     public function testInlineMessagesMayUseAsteriskForEachRules()
     {
     }

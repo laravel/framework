@@ -122,12 +122,6 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $array = ['name' => 'taylor', 'age' => 26];
         $this->assertEquals(['name' => 'taylor'], array_only($array, ['name']));
         $this->assertSame([], array_only($array, ['nonExistingKey']));
-
-        $array = ['name' => 'jon', 'is_wilding' => false];
-        $this->assertEquals(['is_wilding' => false], array_only($array, ['is_wilding']));
-
-        $array = ['person' => ['name' => 'jon'], 'is_wilding' => false];
-        $this->assertEquals(['person' => ['name' => 'jon']], array_only($array, ['person.age', 'person.name']));
     }
 
     public function testArrayCollapse()
