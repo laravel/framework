@@ -133,7 +133,7 @@ class Filesystem
 
         return $success;
     }
-    
+
     /**
      * Delete the file if it exists at the given path.
      *
@@ -145,7 +145,7 @@ class Filesystem
         if ($this->exists($path)) {
             return $this->delete($path);
         }
-        
+
         return false;
     }
 
