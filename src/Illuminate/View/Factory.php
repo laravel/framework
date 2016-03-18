@@ -528,6 +528,14 @@ class Factory implements FactoryContract
             $this->extendSection($section, $content);
         }
     }
+
+    /**
+     * Start injecting content into a push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
     public function startSectionPush($section, $content = '')
     {
         if (! isset($this->sections[$section])) {
@@ -891,6 +899,7 @@ class Factory implements FactoryContract
 
     /**
      * Get the section from the last element.
+     *
      * @param  string  $section
      * @return string|null
      */
@@ -901,6 +910,7 @@ class Factory implements FactoryContract
 
     /**
      * Set the section to the last element.
+     *
      * @param  string  $section
      * @param  string  $content
      * @param  bool  $append
