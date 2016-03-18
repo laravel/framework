@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Support;
 
+use RuntimeException;
 use Stringy\StaticStringy;
 use Illuminate\Support\Traits\Macroable;
 
@@ -207,6 +208,8 @@ class Str {
 	 *
 	 * @param  int  $length
 	 * @return string
+	 *
+	 * @throws \RuntimeException
 	 */
 	public static function random($length = 16)
 	{
@@ -227,10 +230,29 @@ class Str {
 	 *
 	 * @param  int  $length
 	 * @return string
+	 *
+	 * @throws \RuntimeException
 	 */
 	public static function randomBytes($length = 16)
 	{
-		return random_bytes($length);
+		if (function_exists('random_bytes'))
+		{
+			$bytes = random_bytes($length);
+		}
+		elseif (function_exists('openssl_random_pseudo_bytes'))
+		{
+			$bytes = openssl_random_pseudo_bytes($length, $strong);
+			if ($bytes === false || $strong === false)
+			{
+				throw new RuntimeException('Unable to generate random string.');
+			}
+		}
+		else
+		{
+			throw new RuntimeException('OpenSSL extension is required for PHP 5 users.');
+		}
+
+		return $bytes;
 	}
 
 	/**
