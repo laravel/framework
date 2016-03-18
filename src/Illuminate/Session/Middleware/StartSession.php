@@ -66,7 +66,6 @@ class StartSession
         // add the session identifier cookie to the application response headers now.
         if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
-
             $this->collectGarbage($session);
             if($config['expire_on_close']) {
                 $sessionCookieName = $session->getName();
