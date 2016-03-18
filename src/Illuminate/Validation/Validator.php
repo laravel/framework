@@ -316,7 +316,7 @@ class Validator implements ValidatorContract
     {
         $explicitAddress = $this->getExplicitAddress($attribute);
 
-        $data = Arr::only($this->data, $explicitAddress);
+        $data = $this->extractData($explicitAddress);
 
         if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
             return $data;
@@ -836,7 +836,7 @@ class Validator implements ValidatorContract
 
         $explicitAddress = $this->getExplicitAddress($parameters[0]);
 
-        $attributeData = Arr::only($this->data, $explicitAddress);
+        $attributeData = $this->extractData($explicitAddress);
 
         $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
             return Str::is($parameters[0], $key);
@@ -1177,7 +1177,7 @@ class Validator implements ValidatorContract
 
         $explicitAddress = $this->getExplicitAddress($attributeName);
 
-        $attributeData = Arr::only($this->data, $explicitAddress);
+        $attributeData = $this->extractData($explicitAddress);
 
         $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
@@ -2493,6 +2493,27 @@ class Validator implements ValidatorContract
     protected function getExplicitAddress($attribute)
     {
         return rtrim(explode('*', $attribute)[0], '.');
+    }
+
+    /**
+     * Get the explicit part of the attribute name.
+     *
+     * E.g. 'foo.bar.*.baz' -> 'foo.bar'
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function extractData($key)
+    {
+        $results = [];
+
+        $keyValue = Arr::get($this->data, $key, '__missing__');
+
+        if ($keyValue != '__missing__') {
+            Arr::set($results, $key, $keyValue);
+        }
+
+        return $results;
     }
 
     /**
