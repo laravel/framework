@@ -844,7 +844,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compilePush($expression)
     {
-        return "<?php \$__env->startSection{$expression}; ?>";
+        return "<?php \$__env->startSectionPush{$expression}; ?>";
     }
 
     /**

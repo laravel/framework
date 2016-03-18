@@ -516,6 +516,26 @@ class Factory implements FactoryContract
      */
     public function startSection($section, $content = '')
     {
+        if (! isset($this->sections[$section])) {
+            $this->sections[$section] = [];
+            $this->sections[$section][0] = null;
+        }
+        if ($content === '') {
+            if (ob_start()) {
+                $this->sectionStack[] = $section;
+            }
+        } else {
+            $this->extendSection($section, $content);
+        }
+    }
+    public function startSectionPush($section, $content = '')
+    {
+        if (! isset($this->sections[$section])) {
+            $this->sections[$section] = [];
+        }
+        if (! isset($this->sections[$section][$this->renderCount])) {
+            $this->sections[$section][$this->renderCount] = null;
+        }
         if ($content === '') {
             if (ob_start()) {
                 $this->sectionStack[] = $section;
@@ -567,7 +587,7 @@ class Factory implements FactoryContract
         $last = array_pop($this->sectionStack);
 
         if ($overwrite) {
-            $this->sections[$last] = ob_get_clean();
+            $this->setSectionContent($last, ob_get_clean());
         } else {
             $this->extendSection($last, ob_get_clean());
         }
@@ -589,11 +609,7 @@ class Factory implements FactoryContract
 
         $last = array_pop($this->sectionStack);
 
-        if (isset($this->sections[$last])) {
-            $this->sections[$last] .= ob_get_clean();
-        } else {
-            $this->sections[$last] = ob_get_clean();
-        }
+        $this->setSectionContent($last, ob_get_clean(), true);
 
         return $last;
     }
@@ -607,11 +623,10 @@ class Factory implements FactoryContract
      */
     protected function extendSection($section, $content)
     {
-        if (isset($this->sections[$section])) {
-            $content = str_replace('@parent', $content, $this->sections[$section]);
+        if (! is_null($this->getSectionContent($section))) {
+            $content = str_replace('@parent', $content, $this->getSectionContent($section));
         }
-
-        $this->sections[$section] = $content;
+        $this->setSectionContent($section, $content);
     }
 
     /**
@@ -626,7 +641,7 @@ class Factory implements FactoryContract
         $sectionContent = $default;
 
         if (isset($this->sections[$section])) {
-            $sectionContent = $this->sections[$section];
+            $sectionContent = implode(array_reverse($this->sections[$section]));
         }
 
         $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
@@ -872,6 +887,35 @@ class Factory implements FactoryContract
     public function getSections()
     {
         return $this->sections;
+    }
+
+    /**
+     * Get the section from the last element.
+     * @param  string  $section
+     * @return string|null
+     */
+    public function getSectionContent($section)
+    {
+        return end($this->sections[$section]);
+    }
+
+    /**
+     * Set the section to the last element.
+     * @param  string  $section
+     * @param  string  $content
+     * @param  bool  $append
+     * @return void
+     */
+    public function setSectionContent($section, $content, $append = false)
+    {
+        end($this->sections[$section]);
+        $key = key($this->sections[$section]);
+
+        if (is_null($this->sections[$section][$key]) || $append === false) {
+            $this->sections[$section][$key] = $content;
+        } else {
+            $this->sections[$section][$key] .= $content;
+        }
     }
 
     /**
