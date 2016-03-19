@@ -1905,6 +1905,22 @@ class Builder
     }
 
     /**
+     * Insert or update a record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return bool
+     */
+    public function updateOrInsert(array $attributes, array $values = [])
+    {
+        if (! $this->where($attributes)->first()) {
+            return $this->insert(array_merge($attributes, $values));
+        }
+
+        return (bool) $this->where($attributes)->take(1)->update($values);
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
