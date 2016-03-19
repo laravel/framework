@@ -163,6 +163,7 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('@foreach', $compiler->compileString('@@foreach'));
+        $this->assertEquals('@verbatim @continue @endverbatim', $compiler->compileString('@@verbatim @@continue @@endverbatim'));
         $this->assertEquals('@foreach($i as $x)', $compiler->compileString('@@foreach($i as $x)'));
         $this->assertEquals('@continue @break', $compiler->compileString('@@continue @@break'));
         $this->assertEquals('@foreach(
