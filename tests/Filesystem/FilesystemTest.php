@@ -294,6 +294,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     {
         if (defined('HHVM_VERSION')) {
             $this->markTestSkipped('Skip HHVM test due to bug: https://github.com/facebook/hhvm/issues/5657');
+
             return;
         }
 
