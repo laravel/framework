@@ -248,6 +248,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add primary key `bar`(`foo`)', $statements[0]);
     }
 
+    public function testAddingPrimaryKeyWithAlgorithm()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->primary('foo', 'bar', 'hash');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add primary key `bar` using hash(`foo`)', $statements[0]);
+    }
+
     public function testAddingUniqueKey()
     {
         $blueprint = new Blueprint('users');
@@ -266,6 +276,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
+    }
+
+    public function testAddingIndexWithAlgorithm()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], 'baz', 'hash');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
     public function testAddingForeignKey()
