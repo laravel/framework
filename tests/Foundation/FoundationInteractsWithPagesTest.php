@@ -196,6 +196,25 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->dontSeeIsSelected('availability', 'partial_time');
     }
 
+    public function testGetSelectOptionsValues()
+    {
+        $this->setCrawler($this->getSelectHtml());
+        $this->assertEquals(
+            ['partial_time', 'full_time'],
+            $this->getSelectOptionsValues('availability')
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The field [availability] does not contain a valid option [invalid_option].
+     */
+    public function testSelectInvalidOption()
+    {
+        $this->setCrawler($this->getSelectHtml());
+        $this->select('invalid_option', 'availability');
+    }
+
     protected function getMultipleSelectHtml()
     {
         return
@@ -248,6 +267,25 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->dontSeeIsSelected('technology', 'symfony');
     }
 
+    public function testGetSelectOptionsValuesInOptgroup()
+    {
+        $this->setCrawler($this->getSelectWithOptGroupHtml());
+        $this->assertEquals(
+            ['laravel', 'symfony', 'angular', 'vue'],
+            $this->getSelectOptionsValues('technology')
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The field [technology] does not contain a valid option [pascal].
+     */
+    public function testSelectInvalidOptionWithOptgroup()
+    {
+        $this->setCrawler($this->getSelectWithOptGroupHtml());
+        $this->select('pascal', 'technology');
+    }
+
     protected function getSelectMultipleWithOptGroupHtml()
     {
         return
@@ -294,6 +332,25 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler($this->getRadiosHtml());
         $this->dontSeeIsSelected('availability', 'partial_time');
+    }
+
+    public function testGetRadioOptions()
+    {
+        $this->setCrawler($this->getRadiosHtml());
+        $this->assertEquals(
+            ['partial_time', 'full_time'],
+            $this->getSelectOptionsValues('availability')
+        );
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The field [availability] does not contain a valid option [invalid_option].
+     */
+    public function testSelectInvalidRadioOption()
+    {
+        $this->setCrawler($this->getRadiosHtml());
+        $this->select('invalid_option', 'availability');
     }
 
     protected function getCheckboxesHtml()
