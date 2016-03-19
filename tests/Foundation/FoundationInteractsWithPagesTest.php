@@ -124,9 +124,9 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->dontSeeLink('Symfony', 'https://symfonyc.com');
     }
 
-    protected function getInputHtml()
+    protected function getInputHtml($name = 'framework', $value = 'Laravel')
     {
-        return '<input type="text" name="framework" value="Laravel">';
+        return sprintf('<input type="text" name="%s" value="%s">', $name, $value);
     }
 
     public function testSeeInInput()
@@ -139,6 +139,10 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler($this->getInputHtml());
         $this->dontSeeInField('framework', 'Rails');
+        $this->dontSeeInField('framework', 'laravel');
+
+        $this->setCrawler($this->getInputHtml('number', ''));
+        $this->dontSeeInField('number', '0');
     }
 
     protected function getInputArrayHtml()
@@ -194,6 +198,22 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler($this->getSelectHtml());
         $this->dontSeeIsSelected('availability', 'partial_time');
+    }
+
+    protected function getEmptySelectHtml()
+    {
+        return
+          '<select name="category">
+              <option value="" selected>Select</option>
+              <option value="0">Other</option>
+          </select>';
+    }
+
+    public function testDontSeeOptionIsSelectedInEmptySelect()
+    {
+        $this->setCrawler($this->getEmptySelectHtml());
+        $this->dontSeeIsSelected('category', '0');
+        $this->dontSeeIsSelected('category', 0);
     }
 
     protected function getMultipleSelectHtml()
