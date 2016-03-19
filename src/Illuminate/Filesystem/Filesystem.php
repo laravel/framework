@@ -45,7 +45,7 @@ class Filesystem
     }
 
     /**
-     * Get contents of a file with shared access
+     * Get contents of a file with shared access.
      *
      * @param  string  $path
      * @return string
@@ -56,7 +56,7 @@ class Filesystem
         $handle = fopen($path, 'r');
         if ($handle) {
             if (flock($handle, LOCK_SH)) {
-                while (!feof($handle)) {
+                while (! feof($handle)) {
                     $contents .= fread($handle, 1048576);
                 }
             }
