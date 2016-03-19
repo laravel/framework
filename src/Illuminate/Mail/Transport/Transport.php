@@ -67,4 +67,19 @@ abstract class Transport implements Swift_Transport
             }
         }
     }
+
+    /**
+     * Get the number of recipients.
+     *
+     * @param  \Swift_Mime_MimeEntity $entity
+     * @return int
+     */
+    protected function getCount(Swift_Mime_MimeEntity $entity)
+    {
+        $contacts = array_merge(
+            (array) $entity->getTo(), (array) $entity->getCc(), (array) $entity->getBcc()
+        );
+
+        return count($contacts);
+    }
 }
