@@ -2496,21 +2496,19 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get the explicit part of the attribute name.
-     *
-     * E.g. 'foo.bar.*.baz' -> 'foo.bar'
+     * Extract only the given attribute's values from the data.
      *
      * @param  string  $attribute
-     * @return string
+     * @return array
      */
-    protected function extractData($key)
+    protected function extractData($attribute)
     {
         $results = [];
 
-        $keyValue = Arr::get($this->data, $key, '__missing__');
+        $value = Arr::get($this->data, $attribute, '__missing__');
 
-        if ($keyValue != '__missing__') {
-            Arr::set($results, $key, $keyValue);
+        if ($value != '__missing__') {
+            Arr::set($results, $attribute, $value);
         }
 
         return $results;
