@@ -292,6 +292,11 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
 
     public function testSharedGet()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Skip HHVM test due to bug: https://github.com/facebook/hhvm/issues/5657');
+            return;
+        }
+
         $content = '';
         for ($i = 0; $i < 1000000; ++$i) {
             $content .= $i;
