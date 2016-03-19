@@ -12,7 +12,7 @@ class HasSource extends PageConstraint
     protected $source;
 
     /**
-     * Create a new has source instance.
+     * Create a new constraint instance.
      *
      * @param  string  $source
      * @return void

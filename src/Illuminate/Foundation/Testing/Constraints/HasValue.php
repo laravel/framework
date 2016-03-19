@@ -9,8 +9,6 @@ class HasValue extends FormFieldConstraint
     /**
      * Get the valid elements.
      *
-     * Multiple elements should be separated by commas without spaces.
-     *
      * @return string
      */
     protected function validElements()
@@ -19,7 +17,7 @@ class HasValue extends FormFieldConstraint
     }
 
     /**
-     * Check if the input or textarea contains the expected value in the given Crawler.
+     * Check if the input contains the expected value.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool

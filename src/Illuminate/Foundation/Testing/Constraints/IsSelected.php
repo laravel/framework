@@ -9,8 +9,6 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the valid elements.
      *
-     * Multiple elements should be separated by commas without spaces.
-     *
      * @return string
      */
     protected function validElements()
@@ -19,7 +17,7 @@ class IsSelected extends FormFieldConstraint
     }
 
     /**
-     * Check if the select or radio is selected in the given crawler.
+     * Determine if the select or radio element is selected.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
@@ -37,6 +35,7 @@ class IsSelected extends FormFieldConstraint
      * @param  string  $selector
      * @param  \Symfony\Component\DomCrawler\Crawler  $crawler
      * @return array
+     *
      * @throws \PHPUnit_Framework_ExpectationFailedException
      */
     public function getSelectedValue(Crawler $crawler)

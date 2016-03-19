@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Testing\Constraints;
 class ReversePageConstraint extends PageConstraint
 {
     /**
-     * The page constraint instance to be reversed.
+     * The page constraint instance.
      *
      * @var \Illuminate\Foundation\Testing\Constraints\PageConstraint
      */
@@ -34,7 +34,7 @@ class ReversePageConstraint extends PageConstraint
     }
 
     /**
-     * Return the description of the failure.
+     * Get the description of the failure.
      *
      * This method will attempt to negate the original description.
      *
@@ -50,7 +50,7 @@ class ReversePageConstraint extends PageConstraint
     }
 
     /**
-     * Returns a string representation of the object.
+     * Get a string representation of the object.
      *
      * @return string
      */

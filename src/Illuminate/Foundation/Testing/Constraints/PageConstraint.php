@@ -10,7 +10,56 @@ use PHPUnit_Framework_ExpectationFailedException as FailedExpection;
 abstract class PageConstraint extends PHPUnit_Framework_Constraint
 {
     /**
-     * Throws an exception for the given compared value and test description.
+     * Make sure we obtain the HTML from the crawler or the response.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @return string
+     */
+    protected function html($crawler)
+    {
+        return is_object($crawler) ? $crawler->html() : $crawler;
+    }
+
+    /**
+     * Make sure we obtain the HTML from the crawler or the response.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @return string
+     */
+    protected function text($crawler)
+    {
+        return is_object($crawler) ? $crawler->text() : strip_tags($crawler);
+    }
+
+    /**
+     * Create a crawler instance if the given value is not already a Crawler.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
+     * @return \Symfony\Component\DomCrawler\Crawler
+     */
+    protected function crawler($crawler)
+    {
+        return is_object($crawler) ? $crawler : new Crawler($crawler);
+    }
+
+    /**
+     * Get the escaped text pattern for the constraint.
+     *
+     * @param  string  $text
+     * @return string
+     */
+    protected function getEscapedPattern($text)
+    {
+        $rawPattern = preg_quote($text, '/');
+
+        $escapedPattern = preg_quote(e($text), '/');
+
+        return $rawPattern == $escapedPattern
+            ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+    }
+
+    /**
+     * Throw an exception for the given comparison and test description.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @param  string  $description
@@ -42,7 +91,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     }
 
     /**
-     * Returns the description of the failure.
+     * Get the description of the failure.
      *
      * @return string
      */
@@ -52,63 +101,14 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     }
 
     /**
-     * Returns a string representation of the object.
+     * Get a string representation of the object.
      *
-     * This is just a placeholder to avoid having to define this method when it is not necessary.
+     * Placeholder method to avoid forcing definition of this method.
      *
      * @return string
      */
     public function toString()
     {
         return '';
-    }
-
-    /**
-     * Get the escaped text pattern.
-     *
-     * @param  string  $text
-     * @return string
-     */
-    protected function getEscapedPattern($text)
-    {
-        $rawPattern = preg_quote($text, '/');
-
-        $escapedPattern = preg_quote(e($text), '/');
-
-        return $rawPattern == $escapedPattern
-            ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
-    }
-
-    /**
-     * Make sure we are working with a crawler instead of the response string.
-     *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
-     * @return \Symfony\Component\DomCrawler\Crawler
-     */
-    protected function crawler($crawler)
-    {
-        return is_object($crawler) ? $crawler : new Crawler($crawler);
-    }
-
-    /**
-     * Make sure we obtain the HTML from the crawler or the response.
-     *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
-     * @return string
-     */
-    protected function html($crawler)
-    {
-        return is_object($crawler) ? $crawler->html() : $crawler;
-    }
-
-    /**
-     * Make sure we obtain the HTML from the crawler or the response.
-     *
-     * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
-     * @return string
-     */
-    protected function text($crawler)
-    {
-        return is_object($crawler) ? $crawler->text() : strip_tags($crawler);
     }
 }

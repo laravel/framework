@@ -5,9 +5,9 @@ namespace Illuminate\Foundation\Testing\Constraints;
 class IsChecked extends FormFieldConstraint
 {
     /**
-     * Return a new is checked instance.
+     * Create a new constraint instance.
      *
-     * @param  string  $selector element's name or ID
+     * @param  string  $selector
      * @return void
      */
     public function __construct($selector)
@@ -18,8 +18,6 @@ class IsChecked extends FormFieldConstraint
     /**
      * Get the valid elements.
      *
-     * Multiple elements should be separated by commas without spaces.
-     *
      * @return string
      */
     protected function validElements()
@@ -28,7 +26,7 @@ class IsChecked extends FormFieldConstraint
     }
 
     /**
-     * Check if the checkbox is found and checked in the given crawler.
+     * Determine if the checkbox is checked.
      *
      * @param  \Symfony\Component\DomCrawler\Crawler|string  $crawler
      * @return bool
