@@ -1109,7 +1109,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @return \Illuminate\Contracts\Console\Kernel|\Illuminate\Contracts\Http\Kernel
      */
-    protected function getKernel()
+    public function getKernel()
     {
         $kernelContract = $this->runningInConsole()
                     ? 'Illuminate\Contracts\Console\Kernel'
