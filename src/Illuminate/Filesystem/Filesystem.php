@@ -56,12 +56,15 @@ class Filesystem
         $contents = '';
         $handle = fopen($path, 'r');
         if ($handle) {
-            if (flock($handle, LOCK_SH)) {
-                while (! feof($handle)) {
-                    $contents .= fread($handle, 1048576);
+            try {
+                if (flock($handle, LOCK_SH)) {
+                    while (! feof($handle)) {
+                        $contents .= fread($handle, 1048576);
+                    }
                 }
+            } finally {
+                fclose($handle);
             }
-            fclose($handle);
         }
 
         return $contents;
