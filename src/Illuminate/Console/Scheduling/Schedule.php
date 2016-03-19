@@ -15,6 +15,13 @@ class Schedule
     protected $events = [];
 
     /**
+     * Indicates if the schedule has been registered.
+     *
+     * @var bool
+     */
+    protected $eventsRegistered = false;
+
+    /**
      * Add a new callback event to the schedule.
      *
      * @param  string  $callback
@@ -101,6 +108,11 @@ class Schedule
      */
     public function dueEvents($app)
     {
+        if (! $this->eventsRegistered) {
+            $app->make('Illuminate\Contracts\Console\Kernel')->schedule($this);
+            $this->eventsRegistered = true;
+        }
+
         return array_filter($this->events, function ($event) use ($app) {
             return $event->isDue($app);
         });
