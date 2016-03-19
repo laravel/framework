@@ -38,6 +38,7 @@ class Filesystem
             if ($lock) {
                 return $this->sharedGet($path, $lock);
             }
+
             return file_get_contents($path);
         }
 
@@ -62,6 +63,7 @@ class Filesystem
             }
             fclose($handle);
         }
+
         return $contents;
     }
 
