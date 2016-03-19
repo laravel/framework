@@ -7,16 +7,21 @@ use Symfony\Component\DomCrawler\Crawler;
 class HasElement extends PageConstraint
 {
     /**
+     * The name or ID of the element.
+     *
      * @var string
      */
     protected $selector;
+
     /**
+     * The attributes the element should have.
+     *
      * @var array
      */
     protected $attributes;
 
     /**
-     * Create a new has element instance.
+     * Create a new constraint instance.
      *
      * @param  string  $selector
      * @param  array  $attributes

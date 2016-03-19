@@ -12,7 +12,7 @@ class HasText extends PageConstraint
     protected $text;
 
     /**
-     * Create a has text instance.
+     * Create a new constraint instance.
      *
      * @param  string  $text
      * @return void

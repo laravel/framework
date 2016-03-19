@@ -7,24 +7,24 @@ use Symfony\Component\DomCrawler\Crawler;
 abstract class FormFieldConstraint extends PageConstraint
 {
     /**
-     * Name or ID of the element.
+     * The name or ID of the element.
      *
      * @var string
      */
     protected $selector;
 
     /**
-     * Expected value.
+     * The expected value.
      *
      * @var string
      */
     protected $value;
 
     /**
-     * Create a new form field constraint instance.
+     * Create a new constraint instance.
      *
-     * @param  string  $selector  element's name or ID
-     * @param  mixed  $value  expected value
+     * @param  string  $selector
+     * @param  mixed  $value
      * @return void
      */
     public function __construct($selector, $value)
@@ -52,27 +52,31 @@ abstract class FormFieldConstraint extends PageConstraint
      */
     protected function field(Crawler $crawler)
     {
-        $name = str_replace('#', '', $this->selector);
-
-        $id = str_replace(['[', ']'], ['\\[', '\\]'], $name);
-
-        $elements = explode(',', $this->validElements());
-
-        array_walk($elements, function (&$element) use ($name, $id) {
-            $element = "{$element}#{$id}, {$element}[name='{$name}']";
-        });
-
-        $field = $crawler->filter(implode(', ', $elements));
+        $field = $crawler->filter(implode(', ', $this->getElements()));
 
         if ($field->count() > 0) {
             return $field;
         }
 
-        $description = sprintf(
+        $this->fail($crawler, sprintf(
             'There is no %s with the name or ID [%s]',
             $this->validElements(), $this->selector
-        );
+        ));
+    }
 
-        $this->fail($crawler, $description);
+    /**
+     * Get the elements relevant to the selector.
+     *
+     * @return array
+     */
+    protected function getElements()
+    {
+        $name = str_replace('#', '', $this->selector);
+
+        $id = str_replace(['[', ']'], ['\\[', '\\]'], $name);
+
+        return collect(explode(',', $this->validElements()))->map(function ($element) use ($name, $id) {
+            return "{$element}#{$id}, {$element}[name='{$name}']";
+        })->all();
     }
 }

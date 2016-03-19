@@ -7,16 +7,21 @@ use Symfony\Component\DomCrawler\Crawler;
 class HasInElement extends PageConstraint
 {
     /**
+     * The name or ID of the element.
+     *
      * @var string
      */
     protected $element;
+
     /**
+     * The text expected to be found.
+     *
      * @var string
      */
     protected $text;
 
     /**
-     * Create a new has in element instance.
+     * Create a new constraint instance.
      *
      * @param  string  $element
      * @param  string  $text
@@ -24,8 +29,8 @@ class HasInElement extends PageConstraint
      */
     public function __construct($element, $text)
     {
-        $this->element = $element;
         $this->text = $text;
+        $this->element = $element;
     }
 
     /**

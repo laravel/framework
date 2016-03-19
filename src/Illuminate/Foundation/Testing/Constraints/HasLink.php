@@ -8,20 +8,21 @@ use Illuminate\Support\Facades\URL;
 class HasLink extends PageConstraint
 {
     /**
-     * The expected text to be found.
+     * The text expected to be found.
      *
      * @var string
      */
     protected $text;
+
     /**
-     * The expected URL linked in the <a> tag.
+     * The URL expected to be linked in the <a> tag.
      *
      * @var string|null
      */
     protected $url;
 
     /**
-     * Create a new has link instance.
+     * Create a new constraint instance.
      *
      * @param  string  $text
      * @param  string|null  $url
@@ -29,8 +30,8 @@ class HasLink extends PageConstraint
      */
     public function __construct($text, $url = null)
     {
-        $this->text = $text;
         $this->url = $url;
+        $this->text = $text;
     }
 
     /**
@@ -47,8 +48,8 @@ class HasLink extends PageConstraint
             return false;
         }
 
-        // If the URL is null, we assume the developer only wants to find a link
-        // with the given text regardless of the URL. So, if we find the link
+        // If the URL is null we assume the developer only wants to find a link
+        // with the given text regardless of the URL. So if we find the link
         // we will return true. Otherwise, we will look for the given URL.
         if ($this->url == null) {
             return true;
