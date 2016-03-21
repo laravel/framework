@@ -1105,20 +1105,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Get the used kernel object.
-     *
-     * @return \Illuminate\Contracts\Console\Kernel|\Illuminate\Contracts\Http\Kernel
-     */
-    protected function getKernel()
-    {
-        $kernelContract = $this->runningInConsole()
-                    ? 'Illuminate\Contracts\Console\Kernel'
-                    : 'Illuminate\Contracts\Http\Kernel';
-
-        return $this->make($kernelContract);
-    }
-
-    /**
      * Get the application namespace.
      *
      * @return string
