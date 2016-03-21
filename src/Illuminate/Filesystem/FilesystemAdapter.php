@@ -155,25 +155,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $paths = is_array($paths) ? $paths : func_get_args();
 
         foreach ($paths as $path) {
-            $this->driver->delete($path);
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete the file if it exists at the given path.
-     *
-     * @param  string|array  $paths
-     * @return bool
-     */
-    public function deleteIfExists($paths)
-    {
-        $paths = is_array($paths) ? $paths : func_get_args();
-
-        foreach ($paths as $path) {
-            if ($this->exists($path)) {
+            try {
                 $this->driver->delete($path);
+            } catch (FileNotFoundException $e) {
+                //
             }
         }
 
