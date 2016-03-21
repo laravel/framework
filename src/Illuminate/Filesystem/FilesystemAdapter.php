@@ -162,6 +162,25 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Delete the file if it exists at the given path.
+     *
+     * @param  string|array  $paths
+     * @return bool
+     */
+    public function deleteIfExists($paths)
+    {
+        $paths = is_array($paths) ? $paths : func_get_args();
+
+        foreach ($paths as $path) {
+            if ($this->exists($path)) {
+                $this->driver->delete($path);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Copy a file to a new location.
      *
      * @param  string  $from
