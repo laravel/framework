@@ -39,6 +39,6 @@ class SesTransport extends Transport
             ],
         ]);
 
-        return $this->getCount($message);
+        return $this->numberOfRecipients($message);
     }
 }

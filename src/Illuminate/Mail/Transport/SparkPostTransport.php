@@ -59,7 +59,7 @@ class SparkPostTransport extends Transport
 
         $this->client->post('https://api.sparkpost.com/api/v1/transmissions', $options);
 
-        return $this->getCount($message);
+        return $this->numberOfRecipients($message);
     }
 
     /**
