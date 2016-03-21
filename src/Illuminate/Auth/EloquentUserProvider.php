@@ -90,14 +90,16 @@ class EloquentUserProvider implements UserProvider
         // Then we can execute the query and, if we found a user, return it in a
         // Eloquent User "model" that will be utilized by the Guard instances.
         $query = $this->createModel()->newQuery();
-
+        $wheres = 0;
+        
         foreach ($credentials as $key => $value) {
             if (! Str::contains($key, 'password')) {
                 $query->where($key, $value);
+                $wheres += 1;
             }
         }
 
-        return $query->first();
+        return $wheres === 0 ? null : $query->first();
     }
 
     /**
