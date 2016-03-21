@@ -1913,7 +1913,7 @@ class Builder
      */
     public function updateOrInsert(array $attributes, array $values = [])
     {
-        if (! $this->where($attributes)->first()) {
+        if (! $this->where($attributes)->exists()) {
             return $this->insert(array_merge($attributes, $values));
         }
 
