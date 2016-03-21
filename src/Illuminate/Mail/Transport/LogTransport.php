@@ -35,7 +35,7 @@ class LogTransport extends Transport
 
         $this->logger->debug($this->getMimeEntityString($message));
 
-        return $this->getCount($message);
+        return $this->numberOfRecipients($message);
     }
 
     /**
