@@ -63,7 +63,9 @@ class FileStore implements Store
         // just return null. Otherwise, we'll get the contents of the file and get
         // the expiration UNIX timestamps from the start of the file's contents.
         try {
-            $expire = substr($contents = $this->files->get($path, true), 0, 10);
+            $expire = substr(
+                $contents = $this->files->get($path, true), 0, 10
+            );
         } catch (Exception $e) {
             return ['data' => null, 'time' => null];
         }
