@@ -85,11 +85,25 @@ class Factory implements FactoryContract
     protected $sections = [];
 
     /**
+     * All of the finished, captured push sections.
+     *
+     * @var array
+     */
+    protected $pushContentsStack = [];
+
+    /**
      * The stack of in-progress sections.
      *
      * @var array
      */
     protected $sectionStack = [];
+
+    /**
+     * The stack of in-progress push sections.
+     *
+     * @var array
+     */
+    protected $pushStack = [];
 
     /**
      * The number of active rendering operations.
@@ -634,6 +648,78 @@ class Factory implements FactoryContract
         return str_replace(
             '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
         );
+    }
+
+    /**
+     * Start injecting content into a push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    public function startPush($section, $content = '')
+    {
+        if ($content === '') {
+            if (ob_start()) {
+                $this->pushStack[] = $section;
+            }
+        } else {
+            $this->extendPush($section, $content);
+        }
+    }
+
+    /**
+     * Stop injecting content into a push section.
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function stopPush()
+    {
+        if (empty($this->pushStack)) {
+            throw new InvalidArgumentException('Cannot end a section without first starting one.');
+        }
+
+        $last = array_pop($this->pushStack);
+
+        $this->extendPush($last, ob_get_clean());
+
+        return $last;
+    }
+
+    /**
+     * Append content to a given push section.
+     *
+     * @param  string  $section
+     * @param  string  $content
+     * @return void
+     */
+    protected function extendPush($section, $content)
+    {
+        if (! isset($this->pushContentsStack[$section])) {
+            $this->pushContentsStack[$section] = [];
+        }
+        if (! isset($this->pushContentsStack[$section][$this->renderCount])) {
+            $this->pushContentsStack[$section][$this->renderCount] = $content;
+        } else {
+            $this->pushContentsStack[$section][$this->renderCount] .= $content;
+        }
+    }
+
+    /**
+     * Get the string contents of a push section.
+     *
+     * @param  string  $section
+     * @param  string  $default
+     * @return string
+     */
+    public function yieldPushContent($section, $default = '')
+    {
+        if (! isset($this->pushContentsStack[$section])) {
+            return $default;
+        }
+
+        return implode(array_reverse($this->pushContentsStack[$section]));
     }
 
     /**
