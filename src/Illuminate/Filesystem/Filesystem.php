@@ -35,11 +35,7 @@ class Filesystem
     public function get($path, $lock = false)
     {
         if ($this->isFile($path)) {
-            if ($lock) {
-                return $this->sharedGet($path, $lock);
-            }
-
-            return file_get_contents($path);
+            return $lock ? $this->sharedGet($path, $lock) : file_get_contents($path);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
@@ -54,7 +50,9 @@ class Filesystem
     public function sharedGet($path)
     {
         $contents = '';
+
         $handle = fopen($path, 'r');
+
         if ($handle) {
             try {
                 if (flock($handle, LOCK_SH)) {
