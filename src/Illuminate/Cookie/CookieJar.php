@@ -28,7 +28,7 @@ class CookieJar implements JarContract
      * @var bool
      */
     protected $secure = false;
-	
+
 	/**
      * The default httpOnly setting (defaults to false).
      *
@@ -57,7 +57,7 @@ class CookieJar implements JarContract
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = null)
     {
-        list($path, $domain, $secure , $httpOnly) = $this->getPathAndDomain($path, $domain, $secure, $httpOnly);
+        list($path, $domain, $secure, $httpOnly) = $this->getPathAndDomain($path, $domain, $secure, $httpOnly);
 
         $time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
 
@@ -155,10 +155,7 @@ class CookieJar implements JarContract
      */
     protected function getPathAndDomain($path, $domain, $secure = null, $httpOnly = null)
     {
-        return [$path ?: $this->path, $domain ?: $this->domain
-            , isset($secure) ? $secure : $this->secure
-            , isset($httpOnly) ? $httpOnly : $this->httpOnly
-        ];
+        return [$path ?: $this->path, $domain ?: $this->domain, isset($secure) ? $secure : $this->secure, isset($httpOnly) ? $httpOnly : $this->httpOnly];
     }
 
     /**

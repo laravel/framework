@@ -129,7 +129,6 @@ class VerifyCsrfToken
      */
     protected function addCookieToResponse($request, $response)
     {
-	
         $response->headers->setCookie(
             cookie()->make(
                 'XSRF-TOKEN', $request->session()->token(), 120
