@@ -28,6 +28,13 @@ class CookieJar implements JarContract
      * @var bool
      */
     protected $secure = false;
+	
+	/**
+     * The default httpOnly setting (defaults to false).
+     *
+     * @var bool
+     */
+    protected $httpOnly = true;
 
     /**
      * All of the cookies queued for sending.
@@ -48,9 +55,9 @@ class CookieJar implements JarContract
      * @param  bool    $httpOnly
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = null)
     {
-        list($path, $domain, $secure) = $this->getPathAndDomain($path, $domain, $secure);
+        list($path, $domain, $secure , $httpOnly) = $this->getPathAndDomain($path, $domain, $secure, $httpOnly);
 
         $time = ($minutes == 0) ? 0 : time() + ($minutes * 60);
 
@@ -68,7 +75,7 @@ class CookieJar implements JarContract
      * @param  bool    $httpOnly
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = true)
+    public function forever($name, $value, $path = null, $domain = null, $secure = null, $httpOnly = null)
     {
         return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
     }
@@ -143,11 +150,15 @@ class CookieJar implements JarContract
      * @param  string  $path
      * @param  string  $domain
      * @param  bool    $secure
+     * @param  bool    $httpOnly
      * @return array
      */
-    protected function getPathAndDomain($path, $domain, $secure = false)
+    protected function getPathAndDomain($path, $domain, $secure = null, $httpOnly = null)
     {
-        return [$path ?: $this->path, $domain ?: $this->domain, $secure ?: $this->secure];
+        return [$path ?: $this->path, $domain ?: $this->domain
+            , isset($secure) ? $secure : $this->secure
+            , isset($httpOnly) ? $httpOnly : $this->httpOnly
+        ];
     }
 
     /**
@@ -156,11 +167,12 @@ class CookieJar implements JarContract
      * @param  string  $path
      * @param  string  $domain
      * @param  bool    $secure
+     * @param  bool    $httpOnly
      * @return $this
      */
-    public function setDefaultPathAndDomain($path, $domain, $secure = false)
+    public function setDefaultPathAndDomain($path, $domain, $secure = false, $httpOnly = true)
     {
-        list($this->path, $this->domain, $this->secure) = [$path, $domain, $secure];
+        list($this->path, $this->domain, $this->secure, $this->httpOnly) = [$path, $domain, $secure, $httpOnly];
 
         return $this;
     }
