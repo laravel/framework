@@ -29,7 +29,7 @@ class CookieJar implements JarContract
      */
     protected $secure = false;
 
-	/**
+    /**
      * The default httpOnly setting (defaults to true).
      *
      * @var bool
