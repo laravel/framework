@@ -30,13 +30,13 @@ class CookieJar implements JarContract
     protected $secure = false;
 
 	/**
-     * The default httpOnly setting (defaults to false).
+     * The default httpOnly setting (defaults to true).
      *
      * @var bool
      */
     protected $httpOnly = true;
 
-    /**
+	/**
      * All of the cookies queued for sending.
      *
      * @var array
