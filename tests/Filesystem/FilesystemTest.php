@@ -289,4 +289,39 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists(__DIR__.'/foo');
         @rmdir(__DIR__.'/foo');
     }
+
+    public function testSharedGet()
+    {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Skip HHVM test due to bug: https://github.com/facebook/hhvm/issues/5657');
+
+            return;
+        }
+
+        $content = '';
+        for ($i = 0; $i < 1000000; ++$i) {
+            $content .= $i;
+        }
+        $result = 1;
+
+        for ($i = 1; $i <= 20; ++$i) {
+            $pid = pcntl_fork();
+
+            if (! $pid) {
+                $files = new Filesystem;
+                $files->put(__DIR__.'/file.txt', $content, true);
+                $read = $files->get(__DIR__.'/file.txt', true);
+
+                exit(($read === $content) ? 1 : 0);
+            }
+        }
+
+        while (pcntl_waitpid(0, $status) != -1) {
+            $status = pcntl_wexitstatus($status);
+            $result *= $status;
+        }
+
+        $this->assertTrue($result === 1);
+        @unlink(__DIR__.'/file.txt');
+    }
 }
