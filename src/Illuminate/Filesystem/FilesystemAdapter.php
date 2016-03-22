@@ -155,7 +155,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $paths = is_array($paths) ? $paths : func_get_args();
 
         foreach ($paths as $path) {
-            $this->driver->delete($path);
+            try {
+                $this->driver->delete($path);
+            } catch (FileNotFoundException $e) {
+                //
+            }
         }
 
         return true;
