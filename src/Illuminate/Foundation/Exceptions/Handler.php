@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Exceptions;
 
 use Closure;
 use Exception;
+use ReflectionFunction;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -104,6 +105,10 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        if ($response = $this->callCustomHandlers($e)) {
+            return $response;
+        }
+
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
         } elseif ($e instanceof ModelNotFoundException) {
@@ -119,6 +124,39 @@ class Handler implements ExceptionHandlerContract
         } else {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
+    }
+
+    /**
+     * Call every custom handler to handle the given exception.
+     *
+     * @param  \Exception  $e
+     * @return mixed
+     */
+    protected function callCustomHandlers(Exception $e)
+    {
+        foreach ($this->handlers as $handler) {
+            if ($this->handlesException($handler, $e) && $response = $handler($e)) {
+                return $response;
+            }
+        }
+    }
+
+    /**
+     * Determine whether the given handler handles the provided exception.
+     *
+     * @param  \Closure  $callback
+     * @param  \Exception  $e
+     * @return mixed
+     */
+    protected function handlesException(Closure $callback, Exception $e)
+    {
+        $reflection = new ReflectionFunction($callback);
+
+        if (! $params = $reflection->getParameters()) {
+            return true;
+        }
+
+        return $params[0]->getClass() ? $params[0]->getClass()->isInstance($e) : true;
     }
 
     /**
