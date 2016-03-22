@@ -577,7 +577,7 @@ empty
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<?php if ($__env->exists(\'foo\')) echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(\'foo\')'));
-        $this->assertEquals('<?php if ($__env->exists(name(foo)) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(name(foo))'));
+        $this->assertEquals('<?php if ($__env->exists(name(foo))) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(name(foo))'));
     }
 
     public function testShowEachAreCompiled()

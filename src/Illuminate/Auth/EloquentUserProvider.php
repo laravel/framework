@@ -86,20 +86,22 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
+        if (empty($credentials)) {
+            return;
+        }
+
         // First we will add each credential element to the query as a where clause.
         // Then we can execute the query and, if we found a user, return it in a
         // Eloquent User "model" that will be utilized by the Guard instances.
         $query = $this->createModel()->newQuery();
-        $wheres = 0;
-        
+
         foreach ($credentials as $key => $value) {
             if (! Str::contains($key, 'password')) {
                 $query->where($key, $value);
-                $wheres += 1;
             }
         }
 
-        return $wheres === 0 ? null : $query->first();
+        return $query->first();
     }
 
     /**
