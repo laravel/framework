@@ -111,19 +111,23 @@ class Handler implements ExceptionHandlerContract
 
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
-        } elseif ($e instanceof ModelNotFoundException) {
+        }
+
+        if ($e instanceof ValidationException && $e->getResponse()) {
+            return $e->getResponse();
+        }
+
+        if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
-        } elseif ($e instanceof ValidationException && $e->getResponse()) {
-            return $e->getResponse();
         }
 
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
-        } else {
-            return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
+
+        return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
     }
 
     /**
