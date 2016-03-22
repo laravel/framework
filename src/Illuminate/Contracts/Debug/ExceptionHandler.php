@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Debug;
 
+use Closure;
 use Exception;
 
 interface ExceptionHandler
@@ -31,4 +32,12 @@ interface ExceptionHandler
      * @return void
      */
     public function renderForConsole($output, Exception $e);
+
+    /**
+     * Register a custom exception handler.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function register(Closure $callback);
 }

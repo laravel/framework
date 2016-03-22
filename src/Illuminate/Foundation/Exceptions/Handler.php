@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Closure;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
@@ -32,6 +33,13 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $dontReport = [];
+
+    /**
+     * A list of the custom exception handlers.
+     *
+     * @var array
+     */
+    protected $handlers = [];
 
     /**
      * Create a new exception handler instance.
@@ -214,5 +222,16 @@ EOF;
     protected function isHttpException(Exception $e)
     {
         return $e instanceof HttpException;
+    }
+
+    /**
+     * Register a custom exception handler.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function register(Closure $callback)
+    {
+        array_unshift($this->handlers, $callback);
     }
 }
