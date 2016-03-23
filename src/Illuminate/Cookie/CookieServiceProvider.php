@@ -16,7 +16,7 @@ class CookieServiceProvider extends ServiceProvider
         $this->app->singleton('cookie', function ($app) {
             $config = $app['config']['session'];
 
-            return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain'], $config['secure'], $config['http_only']);
+            return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain'], $config['secure'], data_get($config,'http_only',true));
         });
     }
 }

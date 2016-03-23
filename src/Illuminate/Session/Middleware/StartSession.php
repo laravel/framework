@@ -3,6 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
@@ -177,8 +178,9 @@ class StartSession
         }
 
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
-            $response->headers->setCookie(cookie()->make(
-                $session->getName(), $session->getId(), $this->getCookieExpirationDate()
+            $response->headers->setCookie(new Cookie(
+                $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
+                $config['path'], $config['domain'], Arr::get($config, 'secure', false), Arr::get($config, 'http_only', true)
             ));
         }
     }
@@ -202,7 +204,7 @@ class StartSession
     {
         $config = $this->manager->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : $config['lifetime'];
+        return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
     }
 
     /**
