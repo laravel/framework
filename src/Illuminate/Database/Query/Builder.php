@@ -324,7 +324,7 @@ class Builder
 
     /**
      * Creates a join clause with given table. Checks if the table is a closure
-     * to enable custom query instead of the table name
+     * to enable custom query instead of the table name.
      *
      * @param  string                                                   $type
      * @param  string|\Closure|\Illuminate\Database\Query\Expression    $table
@@ -338,7 +338,7 @@ class Builder
         // we need to prepare the statement before compiling the query
         if ($joinClause->table instanceof \Closure) {
 
-            /** @var Builder $query */
+            /* @var Builder $query */
             $joinQuery = $this->newQuery();
 
             // Similar to the sub-select clause, we will create a new query instance so
@@ -348,14 +348,14 @@ class Builder
 
             // merge the bindings for the statements to pass values
             // used in the query
-            $this->addBinding($joinQuery->getBindings(), "join");
+            $this->addBinding($joinQuery->getBindings(), 'join');
 
             // compile the query and wrap it in brackets
-            $table = "(" . $joinQuery->getGrammar()->compileSelect($joinQuery) . ")";
+            $table = '('.$joinQuery->getGrammar()->compileSelect($joinQuery).')';
 
             // build the sql statement with a raw expression to enable compile
             // also add a alias for sql query. Uses the table
-            $joinClause->table =  $this->raw($table . " AS " . $joinQuery->from);
+            $joinClause->table = $this->raw($table.' AS '.$joinQuery->from);
         }
 
         return $joinClause;
@@ -381,7 +381,6 @@ class Builder
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
         if ($one instanceof Closure) {
-
             call_user_func($one, $join);
 
             $this->joins[] = $join;
@@ -393,7 +392,6 @@ class Builder
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
         else {
-
             $this->joins[] = $join->on(
                 $one, $operator, $two, 'and', $where
             );
