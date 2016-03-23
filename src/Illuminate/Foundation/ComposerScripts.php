@@ -54,7 +54,7 @@ class ComposerScripts
      * Creates a Laravel application instance.
      *
      * @param  string  $basePath
-     * @return \Illuminate\Foundation\Application
+     * @return \Illuminate\Contracts\Foundation\Application
      */
     protected static function createApplication($basePath)
     {
