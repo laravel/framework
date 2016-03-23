@@ -800,13 +800,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     /**
      * Test the closure in the join that supports custom select query
      * on the table name. Creates alias for the table you are setting in the
-     * inner closure
+     * inner closure.
      */
-    public function testJoinsClosureQueryBuilder() {
+    public function testJoinsClosureQueryBuilder()
+    {
         $builder = $this->getBuilder();
 
         // enable the raw on connection
-        $innerSql ='(select * from "contacts" where "is_active" = ?) AS contacts';
+        $innerSql = '(select * from "contacts" where "is_active" = ?) AS contacts';
         $builder->getConnection()->shouldReceive('raw')->once()
             ->with($innerSql)
             ->andReturn(new \Illuminate\Database\Query\Expression($innerSql));
@@ -814,16 +815,16 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $joinRunned = false;
 
         // check if the bindings work before adding join
-        $builder->where("id", "<", 10);
-        $builder->join(function($builder) use(&$joinRunned) {
+        $builder->where('id', '<', 10);
+        $builder->join(function ($builder) use (&$joinRunned) {
             $joinRunned = true;
-            $builder->from("contacts")->where("is_active", 1);
-        }, "users", "users.id", "contacts.user_id");
+            $builder->from('contacts')->where('is_active', 1);
+        }, 'users', 'users.id', 'contacts.user_id');
 
         // check if the bindings work after adding join
-        $builder->where("id", ">", 2);
+        $builder->where('id', '>', 2);
 
-        $this->assertTrue($joinRunned, "the closure should be runned");
+        $this->assertTrue($joinRunned, 'the closure should be runned');
 
         $this->assertEquals(
             'select * inner join (select * from "contacts" where "is_active" = ?) AS contacts on "users" users.id "contacts"."user_id" where "id" < ? and "id" > ?',
@@ -831,7 +832,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         );
         // check bindings
         $this->assertEquals([
-            1, 10, 2
+            1, 10, 2,
         ], $builder->getBindings());
     }
 
@@ -1132,7 +1133,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,insert]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
-            new Illuminate\Database\Query\Grammars\Grammar,
+            new Illuminate\Database\Query\Grammars\Grammar(),
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ]);
 
@@ -1144,7 +1145,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
-            new Illuminate\Database\Query\Grammars\Grammar,
+            new Illuminate\Database\Query\Grammars\Grammar(),
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ]);
 
@@ -1188,7 +1189,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', []);
         $builder->from('users')->truncate();
 
-        $sqlite = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
+        $sqlite = new Illuminate\Database\Query\Grammars\SQLiteGrammar();
         $builder = $this->getBuilder();
         $builder->from('users');
         $this->assertEquals([
@@ -1495,7 +1496,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getBuilder()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\Grammar;
+        $grammar = new Illuminate\Database\Query\Grammars\Grammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -1503,7 +1504,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getPostgresBuilder()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\PostgresGrammar;
+        $grammar = new Illuminate\Database\Query\Grammars\PostgresGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -1511,7 +1512,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getMySqlBuilder()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -1519,7 +1520,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getSQLiteBuilder()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\SQLiteGrammar;
+        $grammar = new Illuminate\Database\Query\Grammars\SQLiteGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -1527,7 +1528,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getSqlServerBuilder()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar;
+        $grammar = new Illuminate\Database\Query\Grammars\SqlServerGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -1535,8 +1536,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     protected function getMySqlBuilderWithProcessor()
     {
-        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
+        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar();
+        $processor = new Illuminate\Database\Query\Processors\MySqlProcessor();
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
     }
