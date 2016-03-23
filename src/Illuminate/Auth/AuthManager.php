@@ -89,12 +89,12 @@ class AuthManager implements FactoryContract
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($name, $config);
         } else {
-            $driverMethod = 'create'.ucfirst($driver).'Driver';
+            $driverMethod = 'create'.ucfirst($name).'Driver';
 
             if (method_exists($this, $driverMethod)) {
                 return $this->{$driverMethod}($name, $config);
             } else {
-                throw new InvalidArgumentException("Auth guard driver [{$driver}] is not defined.");
+                throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
             }
         }
     }
