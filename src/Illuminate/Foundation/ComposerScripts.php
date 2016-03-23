@@ -4,7 +4,7 @@ namespace Illuminate\Foundation;
 
 use Composer\Script\Event;
 
-class Composer
+class ComposerScripts
 {
     /**
      * Handle the post-install Composer event.
