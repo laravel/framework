@@ -797,6 +797,44 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1, 'UK', 'US'], $builder->getBindings());
     }
 
+    /**
+     * Test the closure in the join that supports custom select query
+     * on the table name. Creates alias for the table you are setting in the
+     * inner closure
+     */
+    public function testJoinsClosureQueryBuilder() {
+        $builder = $this->getBuilder();
+
+        // enable the raw on connection
+        $innerSql ='(select * from "contacts" where "is_active" = ?) AS contacts';
+        $builder->getConnection()->shouldReceive('raw')->once()
+            ->with($innerSql)
+            ->andReturn(new \Illuminate\Database\Query\Expression($innerSql));
+
+        $joinRunned = false;
+
+        // check if the bindings work before adding join
+        $builder->where("id", "<", 10);
+        $builder->join(function($builder) use(&$joinRunned) {
+            $joinRunned = true;
+            $builder->from("contacts")->where("is_active", 1);
+        }, "users", "users.id", "contacts.user_id");
+
+        // check if the bindings work after adding join
+        $builder->where("id", ">", 2);
+
+        $this->assertTrue($joinRunned, "the closure should be runned");
+
+        $this->assertEquals(
+            'select * inner join (select * from "contacts" where "is_active" = ?) AS contacts on "users" users.id "contacts"."user_id" where "id" < ? and "id" > ?',
+            $builder->toSql()
+        );
+        // check bindings
+        $this->assertEquals([
+            1, 10, 2
+        ], $builder->getBindings());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();
