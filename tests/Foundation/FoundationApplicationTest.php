@@ -158,7 +158,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase
         $app['Illuminate\Contracts\Debug\ExceptionHandler'] = $handler = m::mock('Illuminate\Contracts\Debug\ExceptionHandler');
         $handler->shouldReceive('register')->once()->with($closure);
 
-        $app->catch($closure);
+        $app->handleException($closure);
     }
 }
 
