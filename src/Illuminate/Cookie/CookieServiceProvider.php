@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cookie;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
 class CookieServiceProvider extends ServiceProvider
@@ -16,7 +17,7 @@ class CookieServiceProvider extends ServiceProvider
         $this->app->singleton('cookie', function ($app) {
             $config = $app['config']['session'];
 
-            return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain'], $config['secure']);
+            return (new CookieJar)->setDefaultPathAndDomain($config['path'], $config['domain'], $config['secure'], Arr::get($config, 'http_only', true));
         });
     }
 }
