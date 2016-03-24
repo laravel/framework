@@ -1627,7 +1627,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $uploadedFile = [__FILE__, '', null, null, null, true];
 
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension'], $uploadedFile);
-        $file->expects($this->any())->method('validateMimetypes')->will($this->returnValue('php'));
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
         $v = new Validator($trans, [], ['x' => 'mimetypes:text/x-php']);
         $v->setFiles(['x' => $file]);
         $this->assertTrue($v->passes());
