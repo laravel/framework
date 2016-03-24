@@ -36,7 +36,7 @@ class CookieJar implements JarContract
      */
     protected $httpOnly = true;
 
-	/**
+    /**
      * All of the cookies queued for sending.
      *
      * @var array
