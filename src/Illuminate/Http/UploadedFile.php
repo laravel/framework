@@ -26,7 +26,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function extension()
     {
-        return $this->guessClientExtension();
+        return $this->guessExtension();
     }
 
     /**
