@@ -1945,28 +1945,32 @@ class Validator implements ValidatorContract
      */
     protected function getAttribute($attribute)
     {
-        $attributeName = $this->getPrimaryAttribute($attribute);
+        $primaryAttribute = $this->getPrimaryAttribute($attribute);
 
-        // The developer may dynamically specify the array of custom attributes
-        // on this Validator instance. If the attribute exists in this array
-        // it takes precedence over all other ways we can pull attributes.
-        if (isset($this->customAttributes[$attributeName])) {
-            return $this->customAttributes[$attributeName];
-        }
+        $expectedAttributes = $attribute != $primaryAttribute ? [$attribute, $primaryAttribute] : [$attribute];
 
-        $key = "validation.attributes.{$attributeName}";
+        foreach ($expectedAttributes as $expectedAttributeName) {
+            // The developer may dynamically specify the array of custom attributes
+            // on this Validator instance. If the attribute exists in this array
+            // it takes precedence over all other ways we can pull attributes.
+            if (isset($this->customAttributes[$expectedAttributeName])) {
+                return $this->customAttributes[$expectedAttributeName];
+            }
 
-        // We allow for the developer to specify language lines for each of the
-        // attributes allowing for more displayable counterparts of each of
-        // the attributes. This provides the ability for simple formats.
-        if (($line = $this->translator->trans($key)) !== $key) {
-            return $line;
+            $key = "validation.attributes.{$expectedAttributeName}";
+
+            // We allow for the developer to specify language lines for each of the
+            // attributes allowing for more displayable counterparts of each of
+            // the attributes. This provides the ability for simple formats.
+            if (($line = $this->translator->trans($key)) !== $key) {
+                return $line;
+            }
         }
 
         // When no language line has been specified for the attribute and it is
         // also an implicit attribute we will display the raw attribute name
         // and not modify it with any replacements before we display this.
-        if (isset($this->implicitAttributes[$attributeName])) {
+        if (isset($this->implicitAttributes[$primaryAttribute])) {
             return $attribute;
         }
 
