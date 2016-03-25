@@ -368,7 +368,7 @@ class Builder
     public function chunkById($count, callable $callback, $idField)
     {
         $lastId = null;
-        $results = $this->forPageById($count, $idField)->get();
+        $results = $this->pageAfterId($count, $idField)->get();
 
         while (! $results->isEmpty()) {
             if (call_user_func($callback, $results) === false) {
@@ -379,7 +379,7 @@ class Builder
                 $lastId = last($results->all())->{$idField};
             }
 
-            $results = $this->forPageById($count, $idField, $lastId)->get();
+            $results = $this->pageAfterId($count, $idField, $lastId)->get();
         }
 
         return true;
