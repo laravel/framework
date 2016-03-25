@@ -25,7 +25,7 @@ trait AuthenticatesUsers
      *
      * @return \Illuminate\Http\Response
      */
-    public function showLoginForm()
+    protected function showLoginForm()
     {
         $view = property_exists($this, 'loginView')
                     ? $this->loginView : 'auth.authenticate';
@@ -54,7 +54,7 @@ trait AuthenticatesUsers
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    protected function login(Request $request)
     {
         $this->validateLogin($request);
 
@@ -171,7 +171,7 @@ trait AuthenticatesUsers
      *
      * @return \Illuminate\Http\Response
      */
-    public function logout()
+    protected function logout()
     {
         Auth::guard($this->getGuard())->logout();
 
