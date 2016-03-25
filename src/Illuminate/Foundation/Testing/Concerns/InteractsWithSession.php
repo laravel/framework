@@ -118,7 +118,7 @@ trait InteractsWithSession
     public function assertSessionMissing($key)
     {
         if (is_array($key)) {
-        	foreach ( $key as $k ) {
+        	foreach ($key as $k) {
             	$this->assertSessionMissing($k);
         	}
         } else {
