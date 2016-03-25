@@ -239,6 +239,18 @@ breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
+    
+    public function testHasStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@has ("section")
+breeze
+@endif';
+        $expected = '<?php if(!empty(trim(\$__env->yieldContent("section")))): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
 
     public function testCanStatementsAreCompiled()
     {
