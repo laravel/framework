@@ -667,10 +667,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $expression
      * @return string
      */
-     protected function compileHas($expression)
-     {
+    protected function compileHas($expression)
+    {
         return "<?php if(!empty(trim(\$__env->yieldContent{$expression}))): ?>";
-     }
+    }
 
     /**
      * Compile the forelse statements into valid PHP.
