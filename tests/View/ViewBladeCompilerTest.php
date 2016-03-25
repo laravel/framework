@@ -426,9 +426,9 @@ test
         $string = '@foreach ($this->getUsers() as $user)
 test
 @endforeach';
-        $expected = '<?php foreach($this->getUsers() as $user): ?>
+        $expected = '<?php $__env->addLoop($this->getUsers()); foreach($this->getUsers() as $user): $__env->incrementLoopIndices(); ?>
 test
-<?php endforeach; ?>';
+<?php endforeach; $__env->popLoop(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -441,12 +441,33 @@ user info
 tag info
 @endforeach
 @endforeach';
-        $expected = '<?php foreach($this->getUsers() as $user): ?>
+        $expected = '<?php $__env->addLoop($this->getUsers()); foreach($this->getUsers() as $user): $__env->incrementLoopIndices(); ?>
 user info
-<?php foreach($user->tags as $tag): ?>
+<?php $__env->addLoop($user->tags); foreach($user->tags as $tag): $__env->incrementLoopIndices(); ?>
 tag info
-<?php endforeach; ?>
-<?php endforeach; ?>';
+<?php endforeach; $__env->popLoop(); ?>
+<?php endforeach; $__env->popLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testLoopContentHolderIsExtractedFromForeachStatements()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $string = '@foreach ($some_uSers1 as $user)';
+        $expected = '<?php $__env->addLoop($some_uSers1); foreach($some_uSers1 as $user): $__env->incrementLoopIndices(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@foreach ($users->get() as $user)';
+        $expected = '<?php $__env->addLoop($users->get()); foreach($users->get() as $user): $__env->incrementLoopIndices(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@foreach (range(1, 4) as $user)';
+        $expected = '<?php $__env->addLoop(range(1, 4)); foreach(range(1, 4) as $user): $__env->incrementLoopIndices(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@foreach (   $users as $user)';
+        $expected = '<?php $__env->addLoop($users); foreach(   $users as $user): $__env->incrementLoopIndices(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
