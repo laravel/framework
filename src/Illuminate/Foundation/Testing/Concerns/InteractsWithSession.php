@@ -118,9 +118,9 @@ trait InteractsWithSession
     public function assertSessionMissing($key)
     {
         if (is_array($key)) {
-        	foreach ($key as $k) {
-            	$this->assertSessionMissing($k);
-        	}
+            foreach ($key as $k) {
+                $this->assertSessionMissing($k);
+            }
         } else {
             PHPUnit::assertFalse($this->app['session.store']->has($key), "Session has key: $key");
         }
