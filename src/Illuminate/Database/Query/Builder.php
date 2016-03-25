@@ -1315,6 +1315,23 @@ class Builder
     }
 
     /**
+     * Set the limit and query for the next set of results, given the
+     * last scene ID in a set.
+     *
+     * @param int $perPage
+     * @param $idField
+     * @param int $lastId
+     * @return Builder|static
+     */
+    public function forPageById($perPage = 15, $idField, $lastId = 0)
+    {
+        return $this->select($idField)
+            ->where($idField, '>', $lastId)
+            ->orderBy($idField, 'asc')
+            ->take($perPage);
+    }
+
+    /**
      * Add a union statement to the query.
      *
      * @param  \Illuminate\Database\Query\Builder|\Closure  $query
@@ -1606,6 +1623,37 @@ class Builder
             $page++;
 
             $results = $this->forPage($page, $count)->get();
+        }
+
+        return true;
+    }
+
+    /**
+     * Chunk the results of a query, when the ID to query by is known.
+     *
+     * Because if we know the ID to key by, then we can get through each page much faster,
+     * especially in larger sets of data.
+     *
+     * @param $count
+     * @param callable $callback
+     * @param $idField
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $idField)
+    {
+        $lastId = null;
+        $results = $this->forPageById($count, $idField)->get();
+
+        while (! $results->isEmpty()) {
+            if (call_user_func($callback, $results) === false) {
+                return false;
+            }
+
+            if ($idField) {
+                $lastId = last($results->all())->{$idField};
+            }
+
+            $results = $this->forPageById($count, $idField, $lastId)->get();
         }
 
         return true;
