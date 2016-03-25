@@ -111,7 +111,7 @@ class HasManyThrough extends Relation
 
         $foreignKey = $this->related->getTable().'.'.$this->secondKey;
 
-        $query->join($this->parent->getTable(), $this->getQualifiedParentKeyName(), '=', $foreignKey);
+        $query->join($this->parent->getTable(), $this->getThroughKey(), '=', $foreignKey);
 
         if ($this->parentSoftDeletes()) {
             $query->whereNull($this->parent->getQualifiedDeletedAtColumn());
