@@ -239,7 +239,7 @@ breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
-    
+
     public function testHasStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
