@@ -3,6 +3,7 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -28,6 +29,10 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
         $key = (string) $key;
+
+        if (Str::startsWith($key, 'base64:')) {
+            $key = base64_decode(substr($key, 7));
+        }
 
         if (static::supported($key, $cipher)) {
             $this->key = $key;
