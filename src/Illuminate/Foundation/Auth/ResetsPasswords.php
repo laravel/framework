@@ -56,7 +56,7 @@ trait ResetsPasswords
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function sendResetLinkEmail(Request $request)
+    protected function sendResetLinkEmail(Request $request)
     {
         $this->validate($request, ['email' => 'required|email']);
 
@@ -131,7 +131,7 @@ trait ResetsPasswords
      * @param  string|null  $token
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm(Request $request, $token = null)
+    protected function showResetForm(Request $request, $token = null)
     {
         if (is_null($token)) {
             return $this->getEmail();
@@ -167,7 +167,7 @@ trait ResetsPasswords
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function reset(Request $request)
+    protected function reset(Request $request)
     {
         $this->validate($request, $this->getResetValidationRules());
 
