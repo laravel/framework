@@ -118,7 +118,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @return mixed
      *
-     * @throws \\Illuminate\Http\Exception\HttpResponseExceptio
+     * @throws \\Illuminate\Http\Exception\HttpResponseException
      */
     protected function failedAuthorization()
     {
