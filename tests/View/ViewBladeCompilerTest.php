@@ -246,7 +246,7 @@ breeze
         $string = '@has ("section")
 breeze
 @endif';
-        $expected = '<?php if(!empty(trim(\$__env->yieldContent("section")))): ?>
+        $expected = '<?php if(!empty(trim($__env->yieldContent("section")))): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
