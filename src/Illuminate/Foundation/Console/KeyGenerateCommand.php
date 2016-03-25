@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 
 class KeyGenerateCommand extends Command
