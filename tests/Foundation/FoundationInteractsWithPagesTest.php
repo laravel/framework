@@ -46,6 +46,13 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->see('Web Artisans');
     }
 
+    public function testSeeWithSpecialCharacters()
+    {
+        $this->setCrawler($this->getHtmlTemplate('(Ver más)'));
+
+        $this->see('(Ver más)');
+    }
+
     public function testDontSee()
     {
         $this->setCrawler('<p>The PHP Framework For Web Artisans</p>');
@@ -69,6 +76,14 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
     {
         $this->setCrawler('<div>Laravel was created by <strong>Taylor Otwell</strong></div>');
         $this->seeInElement('strong', 'Taylor');
+    }
+
+    public function testSeeInElementWithSpecialCharacters()
+    {
+        $this->setCrawler(
+            $this->getHtmlTemplate('<div>Laravel es un framework de <strong>código abierto</strong></div>')
+        );
+        $this->seeInElement('strong', 'código');
     }
 
     public function testSeeInElementSearchInAllElements()
@@ -413,5 +428,22 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
                         ->dontSee('Elegant applications');
                 });
         });
+    }
+
+    /**
+     * Make sure that the HTML will be encoded as UTF-8 by the Symfony crawler.
+     *
+     * @param  string  $content
+     * @return string
+     */
+    protected function getHtmlTemplate($content)
+    {
+        return '<!doctype html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                    </head>
+                    <body>'.$content.'</body>
+                </html>';
     }
 }
