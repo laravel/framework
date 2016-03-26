@@ -631,6 +631,21 @@ if (! function_exists('secure_asset')) {
     }
 }
 
+if (! function_exists('secure_route')) {
+    /**
+     * Generate a HTTPS URL to a named route.
+     *
+     * @param  string  $name
+     * @param  array   $parameters
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string
+     */
+    function secure_route($name, $parameters = [], $route = null)
+    {
+        return secure_url(route($name, $parameters = [], false, $route = null));
+    }
+}
+
 if (! function_exists('secure_url')) {
     /**
      * Generate a HTTPS url for the application.
