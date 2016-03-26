@@ -64,7 +64,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
     {
         $iv = Str::randomBytes($this->getIvSize());
 
-        $value = openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
+        $value = \openssl_encrypt(serialize($value), $this->cipher, $this->key, 0, $iv);
 
         if ($value === false) {
             throw new EncryptException('Could not encrypt the data.');
@@ -98,7 +98,7 @@ class Encrypter extends BaseEncrypter implements EncrypterContract
 
         $iv = base64_decode($payload['iv']);
 
-        $decrypted = openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
+        $decrypted = \openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
         if ($decrypted === false) {
             throw new DecryptException('Could not decrypt the data.');
