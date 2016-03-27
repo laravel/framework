@@ -708,7 +708,7 @@ class MySqlGrammar extends Grammar
 
     /**
      * Get the SQL for a "generated" column modifier.
-     * 
+     *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null
