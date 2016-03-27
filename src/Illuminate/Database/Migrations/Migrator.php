@@ -262,7 +262,7 @@ class Migrator
             return [];
         }
 
-        $files = array_map(function ($file) use($path) {
+        $files = array_map(function ($file) use ($path) {
             $file = str_replace(['.php', $path], '', $file);
 
             return ltrim($file, '/\\');
