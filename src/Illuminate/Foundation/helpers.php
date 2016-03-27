@@ -609,7 +609,7 @@ if (! function_exists('route')) {
      * @param  string  $name
      * @param  array   $parameters
      * @param  bool    $absolute
-     * @param  \Illuminate\Routing\Route  $route
+     * @param  \Illuminate\Routing\Route|null  $route
      * @return string
      */
     function route($name, $parameters = [], $absolute = true, $route = null)
@@ -637,7 +637,7 @@ if (! function_exists('secure_route')) {
      *
      * @param  string  $name
      * @param  array   $parameters
-     * @param  \Illuminate\Routing\Route  $route
+     * @param  \Illuminate\Routing\Route|null  $route
      * @return string
      */
     function secure_route($name, $parameters = [], $route = null)
