@@ -841,6 +841,28 @@ class Blueprint
     }
 
     /**
+     * Create a new IP address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function ipAddress($column)
+    {
+        return $this->addColumn('ipAddress', $column);
+    }
+
+    /**
+     * Create a new MAC address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function macAddress($column)
+    {
+        return $this->addColumn('macAddress', $column);
+    }
+
+    /**
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name
