@@ -436,10 +436,10 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the value is trueish.
+     * Apply the callback's query changes if the value is truthy.
      *
-     * @param $value
-     * @param $callback
+     * @param bool     $value
+     * @param \Closure $callback
      *
      * @return \Illuminate\Database\Query\Builder
      */
