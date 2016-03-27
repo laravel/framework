@@ -528,7 +528,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $blueprint = new Blueprint('users');
         $blueprint->ipAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        
+
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add column "foo" inet not null', $statements[0]);
     }

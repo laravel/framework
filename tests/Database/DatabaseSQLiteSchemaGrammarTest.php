@@ -505,7 +505,6 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
-
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
