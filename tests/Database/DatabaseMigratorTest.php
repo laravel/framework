@@ -17,7 +17,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
         $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
-            __DIR__.'/dir'
+            __DIR__.'/dir',
         ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/2_bar.php',
@@ -55,7 +55,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
         $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
-            __DIR__.'/dir'
+            __DIR__.'/dir',
         ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/2_bar.php',
@@ -107,7 +107,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
         $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
-            __DIR__.'/dir'
+            __DIR__.'/dir',
         ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/1_foo.php',
