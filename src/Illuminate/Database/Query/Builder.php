@@ -434,7 +434,7 @@ class Builder
     {
         return $this->joinWhere($table, $one, $operator, $two, 'right');
     }
-    
+
     /**
      * Apply the callback's query changes if the value is trueish.
      *
