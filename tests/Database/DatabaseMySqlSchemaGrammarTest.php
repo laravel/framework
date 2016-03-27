@@ -266,6 +266,12 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
+
+        $blueprint->index('foo->bar->baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(2, count($statements));
+        $this->assertEquals('alter table `users` add index `users_foo_bar_baz_index`(`foo_bar_baz`)', $statements[1]);
     }
 
     public function testAddingForeignKey()
@@ -672,6 +678,16 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
+    public function testGeneratedColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo->bar->baz')->generated();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo_bar_baz` varchar(255) generated always as (json_unquote(foo->"$.bar.baz")) not null', $statements[0]);
     }
 
     protected function getConnection()

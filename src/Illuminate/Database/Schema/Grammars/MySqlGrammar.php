@@ -13,7 +13,7 @@ class MySqlGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Nullable', 'Default', 'Increment', 'Comment', 'After', 'First'];
+    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Generated','Nullable', 'Default', 'Increment', 'Comment', 'After', 'First'];
 
     /**
      * The possible column serials.
@@ -707,6 +707,20 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Get the SQL for a "generated" column modifier.
+     * 
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyGenerated(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->generated)) {
+            return ' generated always as (json_unquote('.$this->wrapJsonSelector($column->name).'))';
+        }
+    }
+
+    /**
      * Wrap a single string in keyword identifiers.
      *
      * @param  string  $value
@@ -718,6 +732,19 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
-        return '`'.str_replace('`', '``', $value).'`';
+        return '`'.str_replace(['`', '->'], ['``', '_'], $value).'`';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        return array_shift($path).'->'.'"$.'.implode('.', $path).'"';
     }
 }
