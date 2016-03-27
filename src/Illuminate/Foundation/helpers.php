@@ -642,7 +642,7 @@ if (! function_exists('secure_route')) {
      */
     function secure_route($name, $parameters = [], $route = null)
     {
-        return secure_url(route($name, $parameters = [], false, $route = null));
+        return secure_url(route($name, $parameters, false, $route));
     }
 }
 
