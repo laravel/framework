@@ -434,6 +434,25 @@ class Builder
     {
         return $this->joinWhere($table, $one, $operator, $two, 'right');
     }
+    
+    /**
+     * Apply the callback's query changes if the value is trueish.
+     *
+     * @param $value
+     * @param $callback
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function when($value, $callback)
+    {
+        $builder = $this;
+
+        if ($value) {
+            $builder = call_user_func($callback, $builder);
+        }
+
+        return $builder;
+    }
 
     /**
      * Add a basic where clause to the query.
