@@ -13,7 +13,7 @@ class MySqlGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Generated','Nullable', 'Default', 'Increment', 'Comment', 'After', 'First'];
+    protected $modifiers = ['Unsigned', 'Charset', 'Collate', 'Generated', 'Nullable', 'Default', 'Increment', 'Comment', 'After', 'First'];
 
     /**
      * The possible column serials.
