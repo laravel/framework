@@ -897,7 +897,6 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('bar', 'GET'))->getContent();
     }
 
-
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
