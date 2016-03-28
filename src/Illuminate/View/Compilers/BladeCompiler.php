@@ -693,7 +693,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileSet($expression)
     {
-        return "<?php {$expression}; ?>"
+        return "<?php {$expression}; ?>";
     }
 
     /**
