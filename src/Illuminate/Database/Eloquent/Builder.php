@@ -355,31 +355,29 @@ class Builder
     }
 
     /**
-     * Chunk the results of a query, when the ID to query by is known.
+     * Chunk the results of a query by comparing numeric IDs.
      *
-     * Because if we know the ID to key by, then we can get through each page much faster,
-     * especially in larger sets of data.
-     *
-     * @param $count
-     * @param callable $callback
-     * @param $idField
+     * @param int  $count
+     * @param callable  $callback
+     * @param string  $column
      * @return bool
      */
-    public function chunkById($count, callable $callback, $idField)
+    public function chunkById($count, callable $callback, $column = 'id')
     {
         $lastId = null;
-        $results = $this->pageAfterId($count, $idField)->get();
+
+        $results = $this->pageAfterId($count, 0, $column)->get();
 
         while (! $results->isEmpty()) {
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
-            if ($idField) {
-                $lastId = last($results->all())->{$idField};
+            if ($column) {
+                $lastId = $results->last()->{$column};
             }
 
-            $results = $this->pageAfterId($count, $idField, $lastId)->get();
+            $results = $this->pageAfterId($count, $lastId, $column)->get();
         }
 
         return true;
