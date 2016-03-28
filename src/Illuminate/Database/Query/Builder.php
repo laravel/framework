@@ -1665,7 +1665,7 @@ class Builder
             }
 
             if ($column) {
-                $lastId = last($results->all())->{$column};
+                $lastId = last($results)->{$column};
             }
 
             $results = $this->pageAfterId($count, $lastId, $column)->get();
