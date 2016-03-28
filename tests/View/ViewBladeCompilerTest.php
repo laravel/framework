@@ -426,7 +426,7 @@ test
         $string = '@foreach ($this->getUsers() as $user)
 test
 @endforeach';
-        $expected = '<?php $__env->addLoop($this->getUsers()); foreach($this->getUsers() as $user): $__env->incrementLoopIndices(); ?>
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>
 test
 <?php endforeach; $__env->popLoop(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -441,9 +441,9 @@ user info
 tag info
 @endforeach
 @endforeach';
-        $expected = '<?php $__env->addLoop($this->getUsers()); foreach($this->getUsers() as $user): $__env->incrementLoopIndices(); ?>
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>
 user info
-<?php $__env->addLoop($user->tags); foreach($user->tags as $tag): $__env->incrementLoopIndices(); ?>
+<?php $__currentLoopData = $user->tags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); ?>
 tag info
 <?php endforeach; $__env->popLoop(); ?>
 <?php endforeach; $__env->popLoop(); ?>';
@@ -455,19 +455,19 @@ tag info
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
         $string = '@foreach ($some_uSers1 as $user)';
-        $expected = '<?php $__env->addLoop($some_uSers1); foreach($some_uSers1 as $user): $__env->incrementLoopIndices(); ?>';
+        $expected = '<?php $__currentLoopData = $some_uSers1; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
         $string = '@foreach ($users->get() as $user)';
-        $expected = '<?php $__env->addLoop($users->get()); foreach($users->get() as $user): $__env->incrementLoopIndices(); ?>';
+        $expected = '<?php $__currentLoopData = $users->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
         $string = '@foreach (range(1, 4) as $user)';
-        $expected = '<?php $__env->addLoop(range(1, 4)); foreach(range(1, 4) as $user): $__env->incrementLoopIndices(); ?>';
+        $expected = '<?php $__currentLoopData = range(1, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
 
         $string = '@foreach (   $users as $user)';
-        $expected = '<?php $__env->addLoop($users); foreach(   $users as $user): $__env->incrementLoopIndices(); ?>';
+        $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
