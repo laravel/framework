@@ -193,9 +193,9 @@ test';
         $string = '@push(\'foo\')
 test
 @endpush';
-        $expected = '<?php $__env->startSection(\'foo\'); ?>
+        $expected = '<?php $__env->startPush(\'foo\'); ?>
 test
-<?php $__env->appendSection(); ?>';
+<?php $__env->stopPush(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -203,7 +203,7 @@ test
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@stack(\'foo\')';
-        $expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
+        $expected = '<?php echo $__env->yieldPushContent(\'foo\'); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
