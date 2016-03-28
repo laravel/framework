@@ -579,7 +579,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileForeach($expression)
     {
-        return "<?php foreach{$expression}: ?>";
+        preg_match('/\( *(.*) *as *([^\)]*)/', $expression, $matches);
+
+        $iteratee = trim($matches[1]);
+
+        $iteration = trim($matches[2]);
+
+        return "<?php \$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData); foreach(\$__currentLoopData as {$iteration}): \$__env->incrementLoopIndices(); ?>";
     }
 
     /**
@@ -726,7 +732,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndforeach($expression)
     {
-        return '<?php endforeach; ?>';
+        return '<?php endforeach; $__env->popLoop(); ?>';
     }
 
     /**
