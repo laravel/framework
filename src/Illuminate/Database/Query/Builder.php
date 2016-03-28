@@ -1659,7 +1659,7 @@ class Builder
 
         $results = $this->pageAfterId($count, 0, $column)->get();
 
-        while (! $results->isEmpty()) {
+        while (! empty($results)) {
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
