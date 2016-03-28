@@ -1057,16 +1057,19 @@ class RoutingTestUserModel extends Model
     {
         return 'id';
     }
+
     public function where($key, $value)
     {
         $this->value = $value;
 
         return $this;
     }
+
     public function first()
     {
         return $this;
     }
+
     public function firstOrFail()
     {
         return $this;
