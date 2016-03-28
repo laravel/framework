@@ -16,28 +16,33 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
+        $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
+            __DIR__.'/dir',
+        ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/2_bar.php',
             __DIR__.'/1_foo.php',
-            __DIR__.'/3_baz.php',
+        ]);
+        $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/dir/*_*.php')->andReturn([
+            __DIR__.'/dir/3_baz.php',
         ]);
 
         $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/2_bar.php');
         $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/1_foo.php');
-        $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/3_baz.php');
+        $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/dir/3_baz.php');
 
         $migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
             '1_foo',
         ]);
         $migrator->getRepository()->shouldReceive('getNextBatchNumber')->once()->andReturn(1);
         $migrator->getRepository()->shouldReceive('log')->once()->with('2_bar', 1);
-        $migrator->getRepository()->shouldReceive('log')->once()->with('3_baz', 1);
+        $migrator->getRepository()->shouldReceive('log')->once()->with('dir/3_baz', 1);
         $barMock = m::mock('stdClass');
         $barMock->shouldReceive('up')->once();
         $bazMock = m::mock('stdClass');
         $bazMock->shouldReceive('up')->once();
         $migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('2_bar'))->will($this->returnValue($barMock));
-        $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('3_baz'))->will($this->returnValue($bazMock));
+        $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('dir/3_baz'))->will($this->returnValue($bazMock));
 
         $migrator->run(__DIR__);
     }
@@ -49,14 +54,19 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
+        $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
+            __DIR__.'/dir',
+        ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/2_bar.php',
             __DIR__.'/1_foo.php',
-            __DIR__.'/3_baz.php',
+        ]);
+        $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/dir/*_*.php')->andReturn([
+            __DIR__.'/dir/3_baz.php',
         ]);
         $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/2_bar.php');
         $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/1_foo.php');
-        $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/3_baz.php');
+        $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/dir/3_baz.php');
         $migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
             '1_foo',
         ]);
@@ -71,7 +81,7 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
         $bazMock->shouldReceive('up')->once();
 
         $migrator->expects($this->at(0))->method('resolve')->with($this->equalTo('2_bar'))->will($this->returnValue($barMock));
-        $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('3_baz'))->will($this->returnValue($bazMock));
+        $migrator->expects($this->at(1))->method('resolve')->with($this->equalTo('dir/3_baz'))->will($this->returnValue($bazMock));
 
         $connection = m::mock('stdClass');
         $connection->shouldReceive('pretend')->with(m::type('Closure'))->andReturnUsing(function ($closure) {
@@ -96,12 +106,20 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'),
             m::mock('Illuminate\Filesystem\Filesystem'),
         ]);
+        $migrator->getFilesystem()->shouldReceive('directories')->once()->with(__DIR__)->andReturn([
+            __DIR__.'/dir',
+        ]);
         $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/*_*.php')->andReturn([
             __DIR__.'/1_foo.php',
         ]);
+        $migrator->getFilesystem()->shouldReceive('glob')->once()->with(__DIR__.'/dir/*_*.php')->andReturn([
+            __DIR__.'/dir/2_bar.php',
+        ]);
         $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/1_foo.php');
+        $migrator->getFilesystem()->shouldReceive('requireOnce')->with(__DIR__.'/dir/2_bar.php');
         $migrator->getRepository()->shouldReceive('getRan')->once()->andReturn([
             '1_foo',
+            'dir/2_bar',
         ]);
 
         $migrator->run(__DIR__);

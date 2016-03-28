@@ -248,7 +248,12 @@ class Migrator
      */
     public function getMigrationFiles($path)
     {
-        $files = $this->files->glob($path.'/*_*.php');
+        $directories = array_merge([$path], $this->files->directories($path));
+        $files = [];
+
+        foreach ($directories as $directory) {
+            $files = array_merge($files, $this->files->glob($directory.'/*_*.php'));
+        }
 
         // Once we have the array of files in the directory we will just remove the
         // extension and take the basename of the file which is all we need when
@@ -257,8 +262,10 @@ class Migrator
             return [];
         }
 
-        $files = array_map(function ($file) {
-            return str_replace('.php', '', basename($file));
+        $files = array_map(function ($file) use ($path) {
+            $file = str_replace(['.php', $path], '', $file);
+
+            return ltrim($file, '/\\');
 
         }, $files);
 
