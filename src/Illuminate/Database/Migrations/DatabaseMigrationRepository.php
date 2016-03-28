@@ -43,11 +43,13 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Get the ran migrations.
      *
+     * @param string $tag
      * @return array
      */
-    public function getRan()
+    public function getRan($tag = '')
     {
         return $this->table()
+                ->where('tag', $tag)
                 ->orderBy('batch', 'asc')
                 ->orderBy('migration', 'asc')
                 ->pluck('migration');
@@ -56,11 +58,12 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Get the last migration batch.
      *
+     * @param  string $tag
      * @return array
      */
-    public function getLast()
+    public function getLast($tag = '')
     {
-        $query = $this->table()->where('batch', $this->getLastBatchNumber());
+        $query = $this->table()->where('tag', $tag)->where('batch', $this->getLastBatchNumber());
 
         return $query->orderBy('migration', 'desc')->get();
     }
@@ -70,11 +73,12 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @param  string  $file
      * @param  int     $batch
+     * @param  string  $tag
      * @return void
      */
-    public function log($file, $batch)
+    public function log($file, $batch, $tag = '')
     {
-        $record = ['migration' => $file, 'batch' => $batch];
+        $record = ['migration' => $file, 'batch' => $batch, 'tag' => $tag];
 
         $this->table()->insert($record);
     }
@@ -83,31 +87,34 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      * Remove a migration from the log.
      *
      * @param  object  $migration
+     * @param  string  $tag
      * @return void
      */
-    public function delete($migration)
+    public function delete($migration, $tag = '')
     {
-        $this->table()->where('migration', $migration->migration)->delete();
+        $this->table()->where('migration', $migration->migration)->where('tag', $tag)->delete();
     }
 
     /**
      * Get the next migration batch number.
      *
+     * @param  string  $tag
      * @return int
      */
-    public function getNextBatchNumber()
+    public function getNextBatchNumber($tag = '')
     {
-        return $this->getLastBatchNumber() + 1;
+        return $this->getLastBatchNumber($tag) + 1;
     }
 
     /**
      * Get the last migration batch number.
      *
+     * @param  string  $tag
      * @return int
      */
-    public function getLastBatchNumber()
+    public function getLastBatchNumber($tag = '')
     {
-        return $this->table()->max('batch');
+        return $this->table()->where('tag', $tag)->max('batch');
     }
 
     /**
@@ -122,10 +129,12 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         $schema->create($this->table, function ($table) {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
-            // table to hold the migration file's path as well as the batch ID.
+            // table to hold the migration file's path as well as the tag and batch ID.
             $table->string('migration');
 
             $table->integer('batch');
+
+            $table->string('tag')->nullable();
         });
     }
 
@@ -139,6 +148,32 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         $schema = $this->getConnection()->getSchemaBuilder();
 
         return $schema->hasTable($this->table);
+    }
+
+    /**
+     * Add the tags column if needed.
+     *
+     * @return void
+     */
+    public function addTagColumn()
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+
+        $schema->table($this->table, function ($table) {
+            $table->string('tag')->nullable();
+        });
+    }
+
+    /**
+     * Determine if the migration repository has the tag column.
+     *
+     * @return bool
+     */
+    public function repositoryTagColumnExists()
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+
+        return $schema->hasColumn($this->table, 'tag');
     }
 
     /**
