@@ -662,17 +662,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Compile the has statements into valid PHP.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileHas($expression)
-    {
-        return "<?php if(!empty(trim(\$__env->yieldContent{$expression}))): ?>";
-    }
-
-    /**
      * Compile the forelse statements into valid PHP.
      *
      * @param  string  $expression
@@ -683,6 +672,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $empty = '$__empty_'.$this->forelseCounter--;
 
         return "<?php endforeach; if ({$empty}): ?>";
+    }
+
+    /**
+     * Compile the has section statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasSection($expression)
+    {
+        return "<?php if (! empty(trim(\$__env->yieldContent{$expression}))): ?>";
     }
 
     /**
