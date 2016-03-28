@@ -662,6 +662,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the has statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHas($expression)
+    {
+        return "<?php if(!empty(trim(\$__env->yieldContent{$expression}))): ?>";
+    }
+
+    /**
      * Compile the forelse statements into valid PHP.
      *
      * @param  string  $expression
