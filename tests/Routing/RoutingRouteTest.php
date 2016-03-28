@@ -5,6 +5,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\ResourceRegistrar;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -861,6 +862,18 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
     }
 
+    public function testImplicitBindings()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', function (RoutingTestUserModel $bar) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            return $bar->value;
+        });
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -1035,5 +1048,27 @@ class RoutingTestMiddlewareGroupTwo
     public function handle($request, $next, $parameter = null)
     {
         return new \Illuminate\Http\Response('caught '.$parameter);
+    }
+}
+
+class RoutingTestUserModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+    public function first()
+    {
+        return $this;
+    }
+    public function firstOrFail()
+    {
+        return $this;
     }
 }
