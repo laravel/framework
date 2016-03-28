@@ -687,7 +687,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
     /**
      * Compile the set statement into valid PHP.
-     * 
+     *
      * @param  string  $expression
      * @return string
      */
