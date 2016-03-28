@@ -940,6 +940,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor/2015/otwell', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsMultipleModelsAndParametersWithOptinal()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('hello/{foo}/{year?}/{bar?}', function (RoutingTestUserModel $foo, $year = null, RoutingTestTeamModel $bar = null) use ($phpunit) {
+            $phpunit->assertEquals('taylor', $foo->value);
+            $phpunit->assertNull($year);
+
+            return 'hello';
+        });
+
+        // this makes sure the callback is called
+        $this->assertEquals('hello', $router->dispatch(Request::create('hello/taylor', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
