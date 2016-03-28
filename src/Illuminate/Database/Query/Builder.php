@@ -436,6 +436,24 @@ class Builder
     }
 
     /**
+     * Apply the callback's query changes if the given "value" is true.
+     *
+     * @param bool  $value
+     * @param \Closure  $callback
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function when($value, $callback)
+    {
+        $builder = $this;
+
+        if ($value) {
+            $builder = call_user_func($callback, $builder);
+        }
+
+        return $builder;
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
@@ -1317,6 +1335,22 @@ class Builder
     }
 
     /**
+     * Constrain the query to the next "page" of results after a given ID.
+     *
+     * @param int  $perPage
+     * @param int  $column
+     * @param string  $column
+     * @return Builder|static
+     */
+    public function pageAfterId($perPage = 15, $lastId = 0, $column = 'id')
+    {
+        return $this->select($column)
+                    ->where($column, '>', $lastId)
+                    ->orderBy($column, 'asc')
+                    ->take($perPage);
+    }
+
+    /**
      * Add a union statement to the query.
      *
      * @param  \Illuminate\Database\Query\Builder|\Closure  $query
@@ -1606,6 +1640,35 @@ class Builder
             $page++;
 
             $results = $this->forPage($page, $count)->get();
+        }
+
+        return true;
+    }
+
+    /**
+     * Chunk the results of a query by comparing numeric IDs.
+     *
+     * @param int  $count
+     * @param callable  $callback
+     * @param string  $column
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = 'id')
+    {
+        $lastId = null;
+
+        $results = $this->pageAfterId($count, 0, $column)->get();
+
+        while (! $results->isEmpty()) {
+            if (call_user_func($callback, $results) === false) {
+                return false;
+            }
+
+            if ($column) {
+                $lastId = $results->last()->{$column};
+            }
+
+            $results = $this->pageAfterId($count, $lastId, $column)->get();
         }
 
         return true;
