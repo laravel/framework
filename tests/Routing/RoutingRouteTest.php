@@ -874,6 +874,25 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithOptionalParameter()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', function (RoutingTestUserModel $bar = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            return $bar->value;
+        });
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('bar/{foo?}', function (RoutingTestUserModel $foo = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertNull($foo->value);
+        });
+        $router->dispatch(Request::create('bar', 'GET'))->getContent();
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
