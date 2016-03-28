@@ -436,6 +436,25 @@ class Builder
     }
 
     /**
+     * Apply the callback's query changes if the value is truthy.
+     *
+     * @param bool     $value
+     * @param \Closure $callback
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function when($value, $callback)
+    {
+        $builder = $this;
+
+        if ($value) {
+            $builder = call_user_func($callback, $builder);
+        }
+
+        return $builder;
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
