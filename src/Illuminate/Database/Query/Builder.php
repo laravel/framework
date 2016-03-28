@@ -436,11 +436,10 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the value is truthy.
+     * Apply the callback's query changes if the given "value" is true.
      *
-     * @param bool     $value
-     * @param \Closure $callback
-     *
+     * @param bool  $value
+     * @param \Closure  $callback
      * @return \Illuminate\Database\Query\Builder
      */
     public function when($value, $callback)
