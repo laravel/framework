@@ -85,18 +85,18 @@ class Factory implements FactoryContract
     protected $sections = [];
 
     /**
-     * All of the finished, captured push sections.
-     *
-     * @var array
-     */
-    protected $pushContentsStack = [];
-
-    /**
      * The stack of in-progress sections.
      *
      * @var array
      */
     protected $sectionStack = [];
+
+    /**
+     * All of the finished, captured push sections.
+     *
+     * @var array
+     */
+    protected $pushes = [];
 
     /**
      * The stack of in-progress push sections.
@@ -696,13 +696,13 @@ class Factory implements FactoryContract
      */
     protected function extendPush($section, $content)
     {
-        if (! isset($this->pushContentsStack[$section])) {
-            $this->pushContentsStack[$section] = [];
+        if (! isset($this->pushes[$section])) {
+            $this->pushes[$section] = [];
         }
-        if (! isset($this->pushContentsStack[$section][$this->renderCount])) {
-            $this->pushContentsStack[$section][$this->renderCount] = $content;
+        if (! isset($this->pushes[$section][$this->renderCount])) {
+            $this->pushes[$section][$this->renderCount] = $content;
         } else {
-            $this->pushContentsStack[$section][$this->renderCount] .= $content;
+            $this->pushes[$section][$this->renderCount] .= $content;
         }
     }
 
@@ -715,11 +715,11 @@ class Factory implements FactoryContract
      */
     public function yieldPushContent($section, $default = '')
     {
-        if (! isset($this->pushContentsStack[$section])) {
+        if (! isset($this->pushes[$section])) {
             return $default;
         }
 
-        return implode(array_reverse($this->pushContentsStack[$section]));
+        return implode(array_reverse($this->pushes[$section]));
     }
 
     /**
@@ -732,8 +732,10 @@ class Factory implements FactoryContract
         $this->renderCount = 0;
 
         $this->sections = [];
-
         $this->sectionStack = [];
+
+        $this->pushes = [];
+        $this->pushStack = [];
     }
 
     /**
