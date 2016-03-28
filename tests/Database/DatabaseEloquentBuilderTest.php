@@ -194,6 +194,22 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    public function testChunkPaginatesUsingWhereBetweenIds()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[pageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 'someIdField', 2)->andReturn($builder);
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 'someIdField', 10)->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(3)->andReturn(
+            new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            new Collection([(object) ['someIdField' => 10]]),
+            new Collection([])
+        );
+
+        $builder->chunkById(2, function ($results) {}, 'someIdField');
+    }
+
     public function testPluckReturnsTheMutatedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
