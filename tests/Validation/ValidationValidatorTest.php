@@ -1200,7 +1200,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
-        $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:connection.users']);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with('connection');
@@ -1219,6 +1218,13 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', '1', 'id_col', [])->andReturn(2);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['users' => [['id' => 1, 'email' => 'foo']]], ['users.*.email' => 'Unique:users,email,[users.*.id]']);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', '1', 'id', [])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
 
