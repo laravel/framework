@@ -592,6 +592,28 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for an IP address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIpAddress(Fluent $column)
+    {
+        return 'varchar';
+    }
+
+    /**
+     * Create the column definition for a MAC address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMacAddress(Fluent $column)
+    {
+        return 'varchar';
+    }
+
+    /**
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
