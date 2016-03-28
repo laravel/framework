@@ -110,7 +110,7 @@ trait InteractsWithSession
     }
 
     /**
-     * Assert that the session has not a given key.
+     * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
      * @return void
@@ -122,7 +122,7 @@ trait InteractsWithSession
                 $this->assertSessionMissing($k);
             }
         } else {
-            PHPUnit::assertFalse($this->app['session.store']->has($key), "Session has key: $key");
+            PHPUnit::assertFalse($this->app['session.store']->has($key), "Session has unexpected key: $key");
         }
     }
 
