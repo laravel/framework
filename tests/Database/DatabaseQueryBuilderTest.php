@@ -1470,6 +1470,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from [users](1,2)', $builder->toSql());
     }
 
+    public function testChunkPaginatesUsingId()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('pageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(3)->andReturn(
+            [(object) ['someIdField' => 1], (object) ['someIdField' => 2]],
+            [(object) ['someIdField' => 10]],
+            []
+        );
+
+        $builder->chunkById(2, function ($results) {}, 'someIdField');
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
@@ -1516,5 +1533,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+    }
+
+    /**
+     * @return m\MockInterface
+     */
+    protected function getMockQueryBuilder()
+    {
+
+        $builder = m::mock('Illuminate\Database\Query\Builder[pageAfterId,get]', [
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            new Illuminate\Database\Query\Grammars\Grammar,
+            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        ]);
+
+        return $builder;
     }
 }
