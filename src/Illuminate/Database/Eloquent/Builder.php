@@ -1141,12 +1141,13 @@ class Builder
         $whereSlice = array_slice($wheres, $sliceFrom, $sliceTo - $sliceFrom);
 
         $whereBooleans = collect($whereSlice)->pluck('boolean');
+        $firstBoolean = $whereBooleans->first();
 
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
-            $query->wheres[] = $this->nestWhereSlice($whereSlice);
+            $query->wheres[] = $this->nestWhereSlice($whereSlice, $firstBoolean);
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
         }
@@ -1156,15 +1157,16 @@ class Builder
      * Create a where array with nested where conditions.
      *
      * @param  array  $whereSlice
+     * @param  string  $boolean
      * @return array
      */
-    protected function nestWhereSlice($whereSlice)
+    protected function nestWhereSlice($whereSlice, $boolean = 'and')
     {
         $whereGroup = $this->getQuery()->forNestedWhere();
 
         $whereGroup->wheres = $whereSlice;
 
-        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => 'and'];
+        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => $boolean];
     }
 
     /**
