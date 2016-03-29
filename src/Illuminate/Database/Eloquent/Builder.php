@@ -330,8 +330,8 @@ class Builder
     /**
      * Chunk the results of the query.
      *
-     * @param  int  $count
-     * @param  callable  $callback
+     * @param  int      $count
+     * @param  callable $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -357,9 +357,9 @@ class Builder
     /**
      * Chunk the results of a query by comparing numeric IDs.
      *
-     * @param int  $count
-     * @param callable  $callback
-     * @param string  $column
+     * @param int      $count
+     * @param callable $callback
+     * @param string   $column
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id')
