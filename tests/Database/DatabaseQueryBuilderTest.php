@@ -1479,9 +1479,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
 
         $builder->shouldReceive('get')->times(3)->andReturn(
-            [(object) ['someIdField' => 1], (object) ['someIdField' => 2]],
-            [(object) ['someIdField' => 10]],
-            []
+            collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            collect([(object) ['someIdField' => 10]]),
+            collect([])
         );
 
         $builder->chunkById(2, function ($results) {}, 'someIdField');
