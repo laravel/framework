@@ -1650,23 +1650,23 @@ class Builder
      *
      * @param int      $count
      * @param callable $callback
-     * @param string   $idColumn
+     * @param string   $column
      * @return bool
      */
-    public function chunkById($count, callable $callback, $idColumn = 'id')
+    public function chunkById($count, callable $callback, $column = 'id')
     {
         $lastId = null;
 
-        $results = $this->pageAfterId($count, 0, $idColumn)->get();
+        $results = $this->pageAfterId($count, 0, $column)->get();
 
         while (! empty($results)) {
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
-            $lastId = last($results)->{$idColumn};
+            $lastId = last($results)->{$column};
 
-            $results = $this->pageAfterId($count, $lastId, $idColumn)->get();
+            $results = $this->pageAfterId($count, $lastId, $column)->get();
         }
 
         return true;
