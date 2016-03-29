@@ -194,7 +194,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         });
     }
 
-    public function testChunkPaginatesUsingWhereBetweenIds()
+    public function testChunkPaginatesUsingId()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[pageAfterId,get]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('pageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);

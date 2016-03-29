@@ -373,9 +373,7 @@ class Builder
                 return false;
             }
 
-            if ($column) {
-                $lastId = $results->last()->{$column};
-            }
+            $lastId = $results->last()->{$column};
 
             $results = $this->pageAfterId($count, $lastId, $column)->get();
         }
