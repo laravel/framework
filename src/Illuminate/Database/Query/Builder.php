@@ -1664,13 +1664,7 @@ class Builder
                 return false;
             }
 
-<<<<<<< HEAD
-            if ($column) {
-                $lastId = $results->last()->{$column};
-            }
-=======
-            $lastId = last($results)->{$column};
->>>>>>> 5.2
+            $lastId = $results->last()->{$column};
 
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
