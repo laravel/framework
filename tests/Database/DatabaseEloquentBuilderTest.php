@@ -196,10 +196,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChunkPaginatesUsingId()
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder[pageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('pageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('pageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
-        $builder->shouldReceive('pageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
 
         $builder->shouldReceive('get')->times(3)->andReturn(
             new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
