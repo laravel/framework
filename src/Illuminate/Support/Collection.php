@@ -605,6 +605,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Count the number of pages when "paginating" the collection.
+     *
+     * @param  int  $perPage
+     * @return int
+     */
+    public function countPages($perPage)
+    {
+        return (int) ceil($this->count() / $perPage);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed

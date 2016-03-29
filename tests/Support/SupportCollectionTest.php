@@ -1072,10 +1072,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testPaginate()
     {
-        $c = new Collection(['one', 'two', 'three', 'four']);
+        $c = new Collection(['one', 'two', 'three', 'four', 'five']);
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
         $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
-        $this->assertEquals([], $c->forPage(3, 2)->all());
+        $this->assertEquals([4 => 'five'], $c->forPage(3, 2)->all());
+        $this->assertEquals([], $c->forPage(4, 2)->all());
+
+        $this->assertEquals(3, $c->countPages(2));
     }
 
     public function testPrepend()
