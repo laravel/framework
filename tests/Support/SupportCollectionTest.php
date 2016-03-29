@@ -1058,6 +1058,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['one', 'two'], $c->forPage(1, 2)->all());
         $this->assertEquals([2 => 'three', 3 => 'four'], $c->forPage(2, 2)->all());
         $this->assertEquals([], $c->forPage(3, 2)->all());
+
+        $this->assertEquals(2, $c->countPages(2));
     }
 
     public function testPrepend()
