@@ -69,7 +69,7 @@ class Str
     public static function contains($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
+            if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }
         }
@@ -87,7 +87,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle === substr($haystack, -strlen($needle))) {
+            if ((string) $needle === mb_substr($haystack, -mb_strlen($needle))) {
                 return true;
             }
         }
@@ -183,7 +183,7 @@ class Str
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if (! isset($matches[0]) || strlen($value) === strlen($matches[0])) {
+        if (! isset($matches[0]) || mb_strlen($value) === mb_strlen($matches[0])) {
             return $value;
         }
 
@@ -224,12 +224,12 @@ class Str
     {
         $string = '';
 
-        while (($len = strlen($string)) < $length) {
+        while (($len = mb_strlen($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= mb_substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
@@ -260,7 +260,7 @@ class Str
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+        return mb_substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
     /**
@@ -291,10 +291,10 @@ class Str
      */
     public static function replaceFirst($search, $replace, $subject)
     {
-        $position = strpos($subject, $search);
+        $position = mb_strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, mb_strlen($search));
         }
 
         return $subject;
@@ -310,10 +310,10 @@ class Str
      */
     public static function replaceLast($search, $replace, $subject)
     {
-        $position = strrpos($subject, $search);
+        $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, mb_strlen($search));
         }
 
         return $subject;
@@ -395,7 +395,7 @@ class Str
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/', '', $value);
 
-            $value = strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
+            $value = mb_strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
         }
 
         return static::$snakeCache[$key] = $value;
@@ -411,7 +411,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) {
+            if ($needle != '' && mb_strpos($haystack, $needle) === 0) {
                 return true;
             }
         }
