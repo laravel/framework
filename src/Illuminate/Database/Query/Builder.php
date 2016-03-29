@@ -1621,8 +1621,8 @@ class Builder
     /**
      * Chunk the results of the query.
      *
-     * @param  int  $count
-     * @param  callable  $callback
+     * @param  int      $count
+     * @param  callable $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
