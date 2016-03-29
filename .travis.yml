@@ -20,8 +20,8 @@ matrix:
 
 sudo: false
 
-before-install:
-  - composer self-update
+before_install:
+  - travis_retry composer self-update
 
 install:
   - if [[ $setup = 'basic' ]]; then travis_retry composer install --no-interaction --prefer-dist; fi
