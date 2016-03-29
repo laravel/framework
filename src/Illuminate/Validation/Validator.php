@@ -298,6 +298,10 @@ class Validator implements ValidatorContract
 
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
 
+        $data = array_merge($data, $this->extractValuesForWildcards(
+            $data, $attribute
+        ));
+
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $ruleKey => $ruleValue) {
@@ -326,6 +330,36 @@ class Validator implements ValidatorContract
         $data = $this->data;
 
         return data_fill($data, $attribute, null);
+    }
+
+    /**
+     * Get all of the exact attribute values for a given wildcard attribute.
+     *
+     * @param  array  $data
+     * @param  string  $attribute
+     * @return array
+     */
+    public function extractValuesForWildcards($data, $attribute)
+    {
+        $keys = [];
+
+        $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute));
+
+        foreach ($data as $key => $value) {
+            if ((bool) preg_match('/^'.$pattern.'/', $key, $matches)) {
+                $keys[] = $matches[0];
+            }
+        }
+
+        $keys = array_unique($keys);
+
+        $data = [];
+
+        foreach ($keys as $key) {
+            $data[$key] = array_get($this->data, $key);
+        }
+
+        return $data;
     }
 
     /**

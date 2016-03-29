@@ -2008,32 +2008,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->passes();
     }
 
-    public function testValidateEach()
-    {
-        $trans = $this->getRealTranslator();
-        $data = ['foo' => [5, 10, 15]];
-
-        $v = new Validator($trans, $data, ['foo' => 'Array']);
-        $v->each('foo', ['numeric|min:6|max:14']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, $data, ['foo' => 'Array']);
-        $v->each('foo', ['numeric|min:4|max:16']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, $data, ['foo' => 'Array']);
-        $v->each('foo', 'numeric|min:4|max:16');
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, $data, ['foo' => 'Array']);
-        $v->each('foo', ['numeric', 'min:6', 'max:14']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, $data, ['foo' => 'Array']);
-        $v->each('foo', ['numeric', 'min:4', 'max:16']);
-        $this->assertTrue($v->passes());
-    }
-
     public function testValidateImplicitEachWithAsterisks()
     {
         $trans = $this->getRealTranslator();
@@ -2166,6 +2140,38 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ],
         ];
         $v = new Validator($trans, $data, ['people.*.cars.*.model' => 'required']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testImplicitEachWithAsterisksWithArrayValues()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'size:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'size:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans,
+            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'min:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,
+            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'between:3,6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo.*.votes' => ['Required', 'Size:2']]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,
+            ['foo' => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
+            ['foo.*.votes' => ['Required', 'Size:2']]);
         $this->assertFalse($v->passes());
     }
 
