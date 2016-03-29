@@ -1335,10 +1335,10 @@ class Builder
     /**
      * Constrain the query to the next "page" of results after a given ID.
      *
-     * @param int  $perPage
-     * @param int  $column
-     * @param string  $column
-     * @return Builder|static
+     * @param  int    $perPage
+     * @param  int    $lastId
+     * @param  string $column
+     * @return \Illuminate\Database\Query\Builder|static
      */
     public function pageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
@@ -1648,9 +1648,9 @@ class Builder
     /**
      * Chunk the results of a query by comparing numeric IDs.
      *
-     * @param int  $count
-     * @param callable  $callback
-     * @param string  $column
+     * @param int      $count
+     * @param callable $callback
+     * @param string   $idColumn
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id')
