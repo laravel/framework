@@ -575,6 +575,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRouteMiddlewareAppliedOnlyOnce()
+    {
+        $router = $this->getRouter();
+        $router->group(['middleware' => 'foo'], function () use ($router) {
+            $router->get('bar', function () { return 'hello'; })->middleware(['foo', 'foo']);
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            ['foo'],
+            $route->middleware()
+        );
+    }
+
     public function testRoutePrefixing()
     {
         /*

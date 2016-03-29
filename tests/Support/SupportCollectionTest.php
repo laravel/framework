@@ -416,6 +416,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testUnionNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->union(null)->all());
+    }
+
+    public function testUnionArray()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(['id' => 1])->all());
+    }
+
+    public function testUnionCollection()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(new Collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
     public function testDiffCollection()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
