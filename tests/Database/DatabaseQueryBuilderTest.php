@@ -1540,7 +1540,6 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
      */
     protected function getMockQueryBuilder()
     {
-
         $builder = m::mock('Illuminate\Database\Query\Builder[pageAfterId,get]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new Illuminate\Database\Query\Grammars\Grammar,
