@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Mockery;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
 trait MocksApplicationServices
@@ -14,6 +15,13 @@ trait MocksApplicationServices
      * @var array
      */
     protected $firedEvents = [];
+
+    /**
+     * All of the fired model events.
+     *
+     * @var array
+     */
+    protected $firedModelEvents = [];
 
     /**
      * All of the dispatched jobs.
@@ -102,6 +110,88 @@ trait MocksApplicationServices
     }
 
     /**
+     * Mock the model event dispatcher so all events are silenced and collected.
+     *
+     * @return $this
+     */
+    protected function withoutModelEvents()
+    {
+        $mock = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+
+        $mock->shouldReceive('fire')->andReturnUsing(function ($called) {
+            $this->firedModelEvents[] = $called;
+        });
+
+        $mock->shouldReceive('until')->andReturnUsing(function ($called) {
+            $this->firedModelEvents[] = $called;
+
+            return true;
+        });
+
+        $mock->shouldReceive('listen')->andReturnUsing(function ($event, $listener, $priority) {
+            //
+        });
+
+        Model::setEventDispatcher($mock);
+
+        return $this;
+    }
+
+    /**
+     * Specify a list of events that should be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|string  $events
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function expectsModelEvents($events)
+    {
+        $events = is_array($events) ? $events : func_get_args();
+
+        $this->withoutModelEvents();
+
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            $fired = $this->getFiredModelEvents($events);
+
+            if ($eventsNotFired = array_diff($events, $fired)) {
+                throw new Exception(
+                    'These expected events were not fired: ['.implode(', ', $eventsNotFired).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Specify a list of events that should not be fired for the given operation.
+     *
+     * These events will be mocked, so that handlers will not actually be executed.
+     *
+     * @param  array|string  $events
+     * @return $this
+     */
+    public function doesntExpectModelEvents($events)
+    {
+        $events = is_array($events) ? $events : func_get_args();
+
+        $this->withoutModelEvents();
+
+        $this->beforeApplicationDestroyed(function () use ($events) {
+            if ($fired = $this->getFiredModelEvents($events)) {
+                throw new Exception(
+                    'These unexpected events were fired: ['.implode(', ', $fired).']'
+                );
+            }
+        });
+
+        return $this;
+    }
+
+    /**
      * Specify a list of observers that will not run for the given operation.
      *
      * @param  array|string  $observers
@@ -129,6 +219,17 @@ trait MocksApplicationServices
     protected function getFiredEvents(array $events)
     {
         return $this->getDispatched($events, $this->firedEvents);
+    }
+
+    /**
+     * Filter the given events against the fired events.
+     *
+     * @param  array  $events
+     * @return array
+     */
+    protected function getFiredModelEvents(array $events)
+    {
+        return $this->getDispatched($events, $this->firedModelEvents);
     }
 
     /**
