@@ -1338,9 +1338,9 @@ class Builder
      * @param  int  $perPage
      * @param  int  $lastId
      * @param  string  $column
-     * @return  \Illuminate\Database\Query\Builder|static
+     * @return \Illuminate\Database\Query\Builder|static
      */
-    public function pageAfterId($perPage = 15, $lastId = 0, $column = 'id')
+    public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
         return $this->select($column)
                     ->where($column, '>', $lastId)
@@ -1651,13 +1651,13 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @return  bool
+     * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
         $lastId = null;
 
-        $results = $this->pageAfterId($count, 0, $column)->get();
+        $results = $this->forPageAfterId($count, 0, $column)->get();
 
         while (! empty($results)) {
             if (call_user_func($callback, $results) === false) {
@@ -1666,7 +1666,7 @@ class Builder
 
             $lastId = last($results)->{$column};
 
-            $results = $this->pageAfterId($count, $lastId, $column)->get();
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
 
         return true;

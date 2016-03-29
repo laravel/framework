@@ -332,7 +332,7 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @return  bool
+     * @return bool
      */
     public function chunk($count, callable $callback)
     {
@@ -360,13 +360,13 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @return  bool
+     * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id')
     {
         $lastId = null;
 
-        $results = $this->pageAfterId($count, 0, $column)->get();
+        $results = $this->forPageAfterId($count, 0, $column)->get();
 
         while (! $results->isEmpty()) {
             if (call_user_func($callback, $results) === false) {
@@ -375,7 +375,7 @@ class Builder
 
             $lastId = $results->last()->{$column};
 
-            $results = $this->pageAfterId($count, $lastId, $column)->get();
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
 
         return true;
