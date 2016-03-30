@@ -5,11 +5,11 @@ use Illuminate\Routing\Router;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
-use Illuminate\Auth\Access\Middleware\Authorize;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Foundation\Auth\Access\Middleware\Authorize;
 
-class AuthorizeTest extends PHPUnit_Framework_TestCase
+class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 {
     protected $container;
     protected $user;

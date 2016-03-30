@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Auth\Access\Middleware;
+namespace Illuminate\Foundation\Auth\Access\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
