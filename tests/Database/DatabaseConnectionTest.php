@@ -193,7 +193,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
-        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception);}]);
+        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
     }
 
     /**
@@ -210,7 +210,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())->method('tryAgainIfCausedByLostConnection');
         $mock->beginTransaction();
 
-        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception);}]);
+        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
     }
 
     public function testFromCreatesNewQueryBuilder()
