@@ -87,7 +87,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle === mb_substr($haystack, -mb_strlen($needle))) {
+            if ((string) $needle === static::substr($haystack, -static::length($needle))) {
                 return true;
             }
         }
@@ -183,7 +183,7 @@ class Str
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if (! isset($matches[0]) || mb_strlen($value) === mb_strlen($matches[0])) {
+        if (! isset($matches[0]) || static::length($value) === static::length($matches[0])) {
             return $value;
         }
 
@@ -224,12 +224,12 @@ class Str
     {
         $string = '';
 
-        while (($len = mb_strlen($string)) < $length) {
+        while (($len = static::length($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
 
-            $string .= mb_substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= static::substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
@@ -260,7 +260,7 @@ class Str
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        return mb_substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+        return static::substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
     /**
@@ -294,7 +294,7 @@ class Str
         $position = mb_strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, mb_strlen($search));
+            return substr_replace($subject, $replace, $position, static::length($search));
         }
 
         return $subject;
@@ -313,7 +313,7 @@ class Str
         $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, mb_strlen($search));
+            return substr_replace($subject, $replace, $position, static::length($search));
         }
 
         return $subject;
@@ -369,7 +369,7 @@ class Str
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
-        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
+        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', static::lower($title));
 
         // Replace all separator characters and whitespace by a single separator
         $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
@@ -395,7 +395,7 @@ class Str
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/', '', $value);
 
-            $value = mb_strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
+            $value = static::lower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
         }
 
         return static::$snakeCache[$key] = $value;
