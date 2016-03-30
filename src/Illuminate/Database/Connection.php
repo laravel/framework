@@ -610,6 +610,10 @@ class Connection implements ConnectionInterface
         try {
             $result = $this->runQueryCallback($query, $bindings, $callback);
         } catch (QueryException $e) {
+            if ($this->transactions >= 1) {
+                throw $e;
+            }
+
             $result = $this->tryAgainIfCausedByLostConnection(
                 $e, $query, $bindings, $callback
             );
