@@ -30,6 +30,16 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
+     * Get the file's extension supplied by the client.
+     *
+     * @return string
+     */
+    public function clientExtension()
+    {
+        return $this->guessClientExtension();
+    }
+
+    /**
      * Get a filename for the file that is the MD5 hash of the contents.
      *
      * @param  string  $path
