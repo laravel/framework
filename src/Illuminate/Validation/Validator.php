@@ -363,13 +363,33 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Merge additional rules into a given attribute.
+     * Merge additional rules into a given attribute(s).
      *
      * @param  string  $attribute
      * @param  string|array  $rules
      * @return void
      */
     public function mergeRules($attribute, $rules)
+    {
+        if (is_array($attribute)) {
+            foreach ($attribute as $innerAttribute => $innerRules) {
+                $this->mergeRulesForAttribute($innerAttribute, $innerRules);
+            }
+
+            return;
+        }
+
+        return $this->mergeRulesForAttribute($attribute, $rules);
+    }
+
+    /**
+     * Merge additional rules into a given attribute.
+     *
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return void
+     */
+    protected function mergeRulesForAttribute($attribute, $rules)
     {
         $current = isset($this->rules[$attribute]) ? $this->rules[$attribute] : [];
 
