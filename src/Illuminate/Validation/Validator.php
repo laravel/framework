@@ -367,7 +367,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string|array  $rules
-     * @return void
+     * @return $this
      */
     public function mergeRules($attribute, $rules)
     {
@@ -376,7 +376,7 @@ class Validator implements ValidatorContract
                 $this->mergeRulesForAttribute($innerAttribute, $innerRules);
             }
 
-            return;
+            return $this;
         }
 
         return $this->mergeRulesForAttribute($attribute, $rules);
@@ -387,7 +387,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string|array  $rules
-     * @return void
+     * @return $this
      */
     protected function mergeRulesForAttribute($attribute, $rules)
     {
@@ -396,6 +396,8 @@ class Validator implements ValidatorContract
         $merge = head($this->explodeRules([$rules]));
 
         $this->rules[$attribute] = array_merge($current, $merge);
+
+        return $this;
     }
 
     /**
