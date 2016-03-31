@@ -534,7 +534,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user)  && ! empty($this->user->getRememberToken())) {
+        if (! is_null($this->user)) {
             $this->refreshRememberToken($user);
         }
 
@@ -574,9 +574,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function refreshRememberToken(AuthenticatableContract $user)
     {
-        $user->setRememberToken($token = Str::random(60));
+        if(! empty($user->getRememberToken())) {
+            $user->setRememberToken($token = Str::random(60));
 
-        $this->provider->updateRememberToken($user, $token);
+            $this->provider->updateRememberToken($user, $token);
+        }
     }
 
     /**
