@@ -17,13 +17,7 @@ class DetectEnvironment
     public function bootstrap(Application $app)
     {
         if (! $app->configurationIsCached()) {
-            $this->checkForSpecificEnvironmentFile($app);
-
-            try {
-                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-            } catch (InvalidPathException $e) {
-                //
-            }
+            $this->loadEnvironment($app);
         }
     }
 
@@ -44,5 +38,24 @@ class DetectEnvironment
         if (file_exists($app->environmentPath().'/'.$file)) {
             $app->loadEnvironmentFrom($file);
         }
+    }
+
+    /**
+     * Load the environment.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @return mixed
+     */
+    public function loadEnvironment(Application $app)
+    {
+        $this->checkForSpecificEnvironmentFile($app);
+
+        try {
+            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+        } catch (InvalidPathException $e) {
+            //
+        }
+
+        return $_ENV;
     }
 }
