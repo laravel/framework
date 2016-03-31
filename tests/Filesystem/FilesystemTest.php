@@ -331,7 +331,10 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         mkdir(__DIR__.'/foo');
         file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz(){};');
         $filesystem->requireOnce(__DIR__.'/foo/foo.php');
+        file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz_changed(){};');
+        $filesystem->requireOnce(__DIR__.'/foo/foo.php');
         $this->assertTrue(function_exists('random_function_xyz'));
+        $this->assertFalse(function_exists('random_function_xyz_changed'));
         @unlink(__DIR__.'/foo/foo.php');
         @rmdir(__DIR__.'/foo');
     }
@@ -357,7 +360,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         file_put_contents(__DIR__.'/foo/foo.txt', 'contents');
         $this->assertTrue($filesystem->isFile(__DIR__.'/foo/foo.txt'));
         $this->assertFalse($filesystem->isFile(__DIR__.'./foo'));
-        @unlink('/foo/foo.txt');
+        @unlink(__DIR__.'/foo/foo.txt');
         @rmdir(__DIR__.'/foo');
     }
 }
