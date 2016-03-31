@@ -369,7 +369,7 @@ class Validator implements ValidatorContract
      * @param  string|array  $rules
      * @return $this
      */
-    public function mergeRules($attribute, $rules)
+    public function mergeRules($attribute, $rules = [])
     {
         if (is_array($attribute)) {
             foreach ($attribute as $innerAttribute => $innerRules) {
