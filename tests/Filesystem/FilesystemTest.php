@@ -357,7 +357,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         file_put_contents(__DIR__.'/foo/foo.txt', 'contents');
         $this->assertTrue($filesystem->isFile(__DIR__.'/foo/foo.txt'));
         $this->assertFalse($filesystem->isFile(__DIR__.'./foo'));
-        @unlink('/foo/foo.txt');
+        @unlink(__DIR__.'/foo/foo.txt');
         @rmdir(__DIR__.'/foo');
     }
 }
