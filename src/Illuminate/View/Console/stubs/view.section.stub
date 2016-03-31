@@ -1,0 +1,4 @@
+@extends('extend_name')
+@section('section_name')
+
+@endsection
