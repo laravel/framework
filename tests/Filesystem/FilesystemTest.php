@@ -290,6 +290,9 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @rmdir(__DIR__.'/foo');
     }
 
+    /**
+     * @requires extension pcntl
+     */
     public function testSharedGet()
     {
         if (defined('HHVM_VERSION')) {
