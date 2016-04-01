@@ -54,6 +54,8 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $files->deleteDirectory(__DIR__.'/foo');
         $this->assertFalse(is_dir(__DIR__.'/foo'));
         $this->assertFileNotExists(__DIR__.'/foo/file.txt');
+        @unlink(__DIR__.'/foo/file.txt');
+        @rmdir(__DIR__.'/foo');
     }
 
     public function testCleanDirectory()
@@ -64,6 +66,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $files->cleanDirectory(__DIR__.'/foo');
         $this->assertTrue(is_dir(__DIR__.'/foo'));
         $this->assertFileNotExists(__DIR__.'/foo/file.txt');
+        @unlink(__DIR__.'/foo/file.txt');
         @rmdir(__DIR__.'/foo');
     }
 
