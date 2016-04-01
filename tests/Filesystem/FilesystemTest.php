@@ -290,6 +290,9 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         @rmdir(__DIR__.'/foo');
     }
 
+    /**
+     * @requires extension pcntl
+     */
     public function testSharedGet()
     {
         if (defined('HHVM_VERSION')) {
@@ -323,5 +326,44 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($result === 1);
         @unlink(__DIR__.'/file.txt');
+    }
+
+    public function testRequireOnceRequiresFileProperly()
+    {
+        $filesystem = new Filesystem;
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz(){};');
+        $filesystem->requireOnce(__DIR__.'/foo/foo.php');
+        file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz_changed(){};');
+        $filesystem->requireOnce(__DIR__.'/foo/foo.php');
+        $this->assertTrue(function_exists('random_function_xyz'));
+        $this->assertFalse(function_exists('random_function_xyz_changed'));
+        @unlink(__DIR__.'/foo/foo.php');
+        @rmdir(__DIR__.'/foo');
+    }
+
+    public function testCopyCopiesFileProperly()
+    {
+        $filesystem = new Filesystem;
+        $data = 'contents';
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.txt', $data);
+        $filesystem->copy(__DIR__.'/foo/foo.txt', __DIR__.'/foo/foo2.txt');
+        $this->assertTrue(file_exists(__DIR__.'/foo/foo2.txt'));
+        $this->assertEquals($data, file_get_contents(__DIR__.'/foo/foo2.txt'));
+        @unlink(__DIR__.'/foo/foo.txt');
+        @unlink(__DIR__.'/foo/foo2.txt');
+        @rmdir(__DIR__.'/foo');
+    }
+
+    public function testIsFileChecksFilesProperly()
+    {
+        $filesystem = new Filesystem;
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.txt', 'contents');
+        $this->assertTrue($filesystem->isFile(__DIR__.'/foo/foo.txt'));
+        $this->assertFalse($filesystem->isFile(__DIR__.'./foo'));
+        @unlink(__DIR__.'/foo/foo.txt');
+        @rmdir(__DIR__.'/foo');
     }
 }

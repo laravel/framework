@@ -140,6 +140,17 @@ class Grammar extends BaseGrammar
         foreach ($joins as $join) {
             $table = $this->wrapTable($join->table);
 
+            $type = $join->type;
+
+            // Cross joins generate a cartesian product between the first table and the joined
+            // table. Since they don't expect any "on" clauses to perform the join, we just
+            // just append the SQL statement and jump to the next iteration of this loop.
+            if ($type === 'cross') {
+                $sql[] = "cross join $table";
+
+                continue;
+            }
+
             // First we need to build all of the "on" clauses for the join. There may be many
             // of these clauses so we will need to iterate through each one and build them
             // separately, then we'll join them up into a single string when we're done.
@@ -155,8 +166,6 @@ class Grammar extends BaseGrammar
             $clauses[0] = $this->removeLeadingBoolean($clauses[0]);
 
             $clauses = implode(' ', $clauses);
-
-            $type = $join->type;
 
             // Once we have everything ready to go, we will just concatenate all the parts to
             // build the final join statement SQL for the query and we can then return the

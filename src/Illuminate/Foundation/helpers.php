@@ -336,10 +336,13 @@ if (! function_exists('elixir')) {
      */
     function elixir($file, $buildDirectory = 'build')
     {
-        static $manifest = null;
+        static $manifest;
+        static $manifestPath;
 
-        if (is_null($manifest)) {
+        if (is_null($manifest) || $manifestPath !== $buildDirectory) {
             $manifest = json_decode(file_get_contents(public_path($buildDirectory.'/rev-manifest.json')), true);
+
+            $manifestPath = $buildDirectory;
         }
 
         if (isset($manifest[$file])) {

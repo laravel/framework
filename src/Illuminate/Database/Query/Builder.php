@@ -436,6 +436,19 @@ class Builder
     }
 
     /**
+     * Add a "cross join" clause to the query.
+     *
+     * @param  string  $table
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function crossJoin($table)
+    {
+        $this->joins[] = new JoinClause('cross', $table);
+
+        return $this;
+    }
+
+    /**
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param  bool  $value

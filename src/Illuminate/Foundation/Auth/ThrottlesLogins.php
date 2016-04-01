@@ -58,9 +58,7 @@ trait ThrottlesLogins
      */
     protected function sendLockoutResponse(Request $request)
     {
-        $seconds = app(RateLimiter::class)->availableIn(
-            $this->getThrottleKey($request)
-        );
+        $seconds = $this->secondsRemainingOnLockout($request);
 
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
@@ -80,6 +78,19 @@ trait ThrottlesLogins
         return Lang::has('auth.throttle')
             ? Lang::get('auth.throttle', ['seconds' => $seconds])
             : 'Too many login attempts. Please try again in '.$seconds.' seconds.';
+    }
+
+    /**
+     * Get the lockout seconds.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return int
+     */
+    protected function secondsRemainingOnLockout(Request $request)
+    {
+        return app(RateLimiter::class)->availableIn(
+            $this->getThrottleKey($request)
+        );
     }
 
     /**
