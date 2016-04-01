@@ -62,9 +62,7 @@ trait ResetsPasswords
 
         $broker = $this->getBroker();
 
-        $response = Password::broker($broker)->sendResetLink($request->only('email'), function (Message $message) {
-            $message->subject($this->getEmailSubject());
-        });
+        $response = Password::broker($broker)->sendResetLink($request->only('email'), $this->getEmailOptionsClosure());
 
         switch ($response) {
             case Password::RESET_LINK_SENT:
@@ -74,6 +72,18 @@ trait ResetsPasswords
             default:
                 return $this->getSendResetLinkEmailFailureResponse($response);
         }
+    }
+
+    /**
+     * Get the closure which is used to configure email options.
+     *
+     * @return \Closure
+     */
+    protected function getEmailOptionsClosure()
+    {
+        return function (Message $message) {
+            $message->subject($this->getEmailSubject());
+        };
     }
 
     /**
