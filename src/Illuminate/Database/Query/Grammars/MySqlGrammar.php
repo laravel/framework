@@ -154,6 +154,8 @@ class MySqlGrammar extends Grammar
     {
         $path = explode('->', $value);
 
-        return array_shift($path).'->'.'"$.'.implode('.', $path).'"';
+        $field = $this->wrapValue(array_shift($path));
+
+        return $field.'->'.'"$.'.implode('.', $path).'"';
     }
 }
