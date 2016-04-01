@@ -3082,7 +3082,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return array
+     * @return mixed|array
      */
     public function getOriginal($key = null, $default = null)
     {
