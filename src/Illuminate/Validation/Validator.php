@@ -323,9 +323,9 @@ class Validator implements ValidatorContract
      */
     protected function initializeAttributeOnData($attribute)
     {
-        $explicitAddress = $this->getExplicitAddress($attribute);
+        $explicitPath = $this->getLeadingExplicitAttributePath($attribute);
 
-        $data = $this->extractData($explicitAddress);
+        $data = $this->extractDataFromPath($explicitPath);
 
         if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
             return $data;
@@ -895,9 +895,9 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $explicitAddress = $this->getExplicitAddress($parameters[0]);
+        $explicitPath = $this->getLeadingExplicitAttributePath($parameters[0]);
 
-        $attributeData = $this->extractData($explicitAddress);
+        $attributeData = $this->extractDataFromPath($explicitPath);
 
         $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
             return Str::is($parameters[0], $key);
@@ -1236,9 +1236,9 @@ class Validator implements ValidatorContract
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        $explicitAddress = $this->getExplicitAddress($attributeName);
+        $explicitPath = $this->getLeadingExplicitAttributePath($attributeName);
 
-        $attributeData = $this->extractData($explicitAddress);
+        $attributeData = $this->extractDataFromPath($explicitPath);
 
         $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
@@ -2580,21 +2580,25 @@ class Validator implements ValidatorContract
      *
      * E.g. 'foo.bar.*.baz' -> 'foo.bar'
      *
+     * Allows us to not spin through all of the flattened data for some operations.
+     *
      * @param  string  $attribute
      * @return string
      */
-    protected function getExplicitAddress($attribute)
+    protected function getLeadingExplicitAttributePath($attribute)
     {
         return rtrim(explode('*', $attribute)[0], '.');
     }
 
     /**
-     * Extract only the given attribute's values from the data.
+     * Extract data based on the given dot-notated path.
+     *
+     * Used to extract a sub-section of the data for faster iteration.
      *
      * @param  string  $attribute
      * @return array
      */
-    protected function extractData($attribute)
+    protected function extractDataFromPath($attribute)
     {
         $results = [];
 
