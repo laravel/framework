@@ -1467,12 +1467,12 @@ class EloquentModelBootingTestStub extends Model
 {
     public static function unboot()
     {
-        unset(static::$booted[get_called_class()]);
+        unset(static::$booted[static::class]);
     }
 
     public static function isBooted()
     {
-        return array_key_exists(get_called_class(), static::$booted);
+        return array_key_exists(static::class, static::$booted);
     }
 }
 

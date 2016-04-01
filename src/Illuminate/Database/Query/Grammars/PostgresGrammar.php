@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class PostgresGrammar extends Grammar
@@ -241,5 +242,60 @@ class PostgresGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
+    }
+
+    /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapValue($value)
+    {
+        if ($value === '*') {
+            return $value;
+        }
+
+        if (Str::contains($value, '->')) {
+            return $this->wrapJsonSelector($value);
+        }
+
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        $field = array_shift($path);
+
+        $wrappedPath = $this->wrapJsonPathAttributes($path);
+
+        $attribute = array_pop($wrappedPath);
+
+        if (! empty($wrappedPath)) {
+            return $field.'->'.implode('->', $wrappedPath).'->>'.$attribute;
+        }
+
+        return $field.'->>'.$attribute;
+    }
+
+    /**
+     * Wrap the attributes of the give JSON path.
+     *
+     * @param  array  $path
+     * @return array
+     */
+    protected function wrapJsonPathAttributes($path)
+    {
+        return array_map(function ($attribute) {
+            return "'$attribute'";
+        }, $path);
     }
 }

@@ -118,7 +118,7 @@ class VerifyCsrfToken
             return false;
         }
 
-        return hash_equals((string) $request->session()->token(), (string) $token);
+        return hash_equals($sessionToken, $token);
     }
 
     /**

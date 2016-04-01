@@ -275,7 +275,7 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table `users` add constraint users_foo_id_foreign foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
+        $this->assertEquals('alter table `users` add constraint `users_foo_id_foreign` foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
     }
 
     public function testAddingIncrementingID()
@@ -672,6 +672,26 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
+    public function testAddingIpAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` varchar(45) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
     }
 
     protected function getConnection()

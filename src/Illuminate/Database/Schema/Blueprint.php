@@ -775,15 +775,17 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
+     * Alias for self::timestamps().
+     *
      * @return void
      */
     public function nullableTimestamps()
     {
-        return $this->timestamps();
+        $this->timestamps();
     }
 
     /**
-     * Add creation and update timestamps to the table.
+     * Add nullable creation and update timestamps to the table.
      *
      * @return void
      */
@@ -836,6 +838,28 @@ class Blueprint
     public function uuid($column)
     {
         return $this->addColumn('uuid', $column);
+    }
+
+    /**
+     * Create a new IP address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function ipAddress($column)
+    {
+        return $this->addColumn('ipAddress', $column);
+    }
+
+    /**
+     * Create a new MAC address column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function macAddress($column)
+    {
+        return $this->addColumn('macAddress', $column);
     }
 
     /**

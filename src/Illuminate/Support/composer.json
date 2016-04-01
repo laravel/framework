@@ -17,7 +17,8 @@
         "php": ">=5.5.9",
         "ext-mbstring": "*",
         "doctrine/inflector": "~1.0",
-        "illuminate/contracts": "5.2.*"
+        "illuminate/contracts": "5.2.*",
+        "paragonie/random_compat": "~1.4"
     },
     "autoload": {
         "psr-4": {
@@ -35,7 +36,6 @@
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
         "jeremeamia/superclosure": "Required to be able to serialize closures (~2.2).",
-        "paragonie/random_compat": "Provides a compatible interface like PHP7's random_bytes() in PHP 5 projects (~1.1).",
         "symfony/polyfill-php56": "Required to use the hash_equals function on PHP 5.5 (~1.0).",
         "symfony/process": "Required to use the composer class (2.8.*|3.0.*).",
         "symfony/var-dumper": "Improves the dd function (2.8.*|3.0.*)."

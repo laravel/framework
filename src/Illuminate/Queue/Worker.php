@@ -213,17 +213,28 @@ class Worker
 
             return ['job' => $job, 'failed' => false];
         } catch (Exception $e) {
-            // If we catch an exception, we will attempt to release the job back onto
-            // the queue so it is not lost. This will let is be retried at a later
-            // time by another listener (or the same one). We will do that here.
-            if (! $job->isDeleted()) {
-                $job->release($delay);
+            try {
+                $this->raiseExceptionOccurredJobEvent($connection, $job, $e);
+            } finally {
+                // If we catch an exception, we will attempt to release the job back onto
+                // the queue so it is not lost. This will let is be retried at a later
+                // time by another listener (or the same one). We will do that here.
+                if (! $job->isDeleted()) {
+                    $job->release($delay);
+                }
             }
 
             throw $e;
         } catch (Throwable $e) {
-            if (! $job->isDeleted()) {
-                $job->release($delay);
+            try {
+                $this->raiseExceptionOccurredJobEvent($connection, $job, $e);
+            } finally {
+                // If we catch an exception, we will attempt to release the job back onto
+                // the queue so it is not lost. This will let is be retried at a later
+                // time by another listener (or the same one). We will do that here.
+                if (! $job->isDeleted()) {
+                    $job->release($delay);
+                }
             }
 
             throw $e;
@@ -259,6 +270,23 @@ class Worker
             $data = json_decode($job->getRawBody(), true);
 
             $this->events->fire(new Events\JobProcessed($connection, $job, $data));
+        }
+    }
+
+    /**
+     * Raise the exception occurred queue job event.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    protected function raiseExceptionOccurredJobEvent($connection, Job $job, $exception)
+    {
+        if ($this->events) {
+            $data = json_decode($job->getRawBody(), true);
+
+            $this->events->fire(new Events\JobExceptionOccurred($connection, $job, $data, $exception));
         }
     }
 

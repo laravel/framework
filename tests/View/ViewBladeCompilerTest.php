@@ -159,6 +159,20 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
             '));
     }
 
+    public function testEscapedWithAtDirectivesAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('@foreach', $compiler->compileString('@@foreach'));
+        $this->assertEquals('@verbatim @continue @endverbatim', $compiler->compileString('@@verbatim @@continue @@endverbatim'));
+        $this->assertEquals('@foreach($i as $x)', $compiler->compileString('@@foreach($i as $x)'));
+        $this->assertEquals('@continue @break', $compiler->compileString('@@continue @@break'));
+        $this->assertEquals('@foreach(
+            $i as $x
+        )', $compiler->compileString('@@foreach(
+            $i as $x
+        )'));
+    }
+
     public function testExtendsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -179,9 +193,9 @@ test';
         $string = '@push(\'foo\')
 test
 @endpush';
-        $expected = '<?php $__env->startSection(\'foo\'); ?>
+        $expected = '<?php $__env->startPush(\'foo\'); ?>
 test
-<?php $__env->appendSection(); ?>';
+<?php $__env->stopPush(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -189,7 +203,7 @@ test
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@stack(\'foo\')';
-        $expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
+        $expected = '<?php echo $__env->yieldPushContent(\'foo\'); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -221,6 +235,18 @@ this is a comment
 breeze
 @endif';
         $expected = '<?php if(name(foo(bar))): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testHasSectionStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@hasSection("section")
+breeze
+@endif';
+        $expected = '<?php if (! empty(trim($__env->yieldContent("section")))): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -508,6 +534,42 @@ empty
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testVerbatimBlocksAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@verbatim {{ $a }} @if($b) {{ $b }} @endif @endverbatim';
+        $expected = ' {{ $a }} @if($b) {{ $b }} @endif ';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testVerbatimBlocksWithMultipleLinesAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = 'Some text
+@verbatim
+    {{ $a }}
+    @if($b)
+        {{ $b }}
+    @endif
+@endverbatim';
+        $expected = 'Some text
+
+    {{ $a }}
+    @if($b)
+        {{ $b }}
+    @endif
+';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
+    public function testMultipleVerbatimBlocksAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@verbatim {{ $a }} @endverbatim {{ $b }} @verbatim {{ $c }} @endverbatim';
+        $expected = ' {{ $a }}  <?php echo e($b); ?>  {{ $c }} ';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testStatementThatContainsNonConsecutiveParanthesisAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -521,6 +583,13 @@ empty
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals('<?php echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(\'foo\')'));
         $this->assertEquals('<?php echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@include(name(foo))'));
+    }
+
+    public function testIncludeIfsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $this->assertEquals('<?php if ($__env->exists(\'foo\')) echo $__env->make(\'foo\', array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(\'foo\')'));
+        $this->assertEquals('<?php if ($__env->exists(name(foo))) echo $__env->make(name(foo), array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $compiler->compileString('@includeIf(name(foo))'));
     }
 
     public function testShowEachAreCompiled()

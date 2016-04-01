@@ -289,4 +289,81 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists(__DIR__.'/foo');
         @rmdir(__DIR__.'/foo');
     }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSharedGet()
+    {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Skip HHVM test due to bug: https://github.com/facebook/hhvm/issues/5657');
+
+            return;
+        }
+
+        $content = '';
+        for ($i = 0; $i < 1000000; ++$i) {
+            $content .= $i;
+        }
+        $result = 1;
+
+        for ($i = 1; $i <= 20; ++$i) {
+            $pid = pcntl_fork();
+
+            if (! $pid) {
+                $files = new Filesystem;
+                $files->put(__DIR__.'/file.txt', $content, true);
+                $read = $files->get(__DIR__.'/file.txt', true);
+
+                exit(($read === $content) ? 1 : 0);
+            }
+        }
+
+        while (pcntl_waitpid(0, $status) != -1) {
+            $status = pcntl_wexitstatus($status);
+            $result *= $status;
+        }
+
+        $this->assertTrue($result === 1);
+        @unlink(__DIR__.'/file.txt');
+    }
+
+    public function testRequireOnceRequiresFileProperly()
+    {
+        $filesystem = new Filesystem;
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz(){};');
+        $filesystem->requireOnce(__DIR__.'/foo/foo.php');
+        file_put_contents(__DIR__.'/foo/foo.php', '<?php function random_function_xyz_changed(){};');
+        $filesystem->requireOnce(__DIR__.'/foo/foo.php');
+        $this->assertTrue(function_exists('random_function_xyz'));
+        $this->assertFalse(function_exists('random_function_xyz_changed'));
+        @unlink(__DIR__.'/foo/foo.php');
+        @rmdir(__DIR__.'/foo');
+    }
+
+    public function testCopyCopiesFileProperly()
+    {
+        $filesystem = new Filesystem;
+        $data = 'contents';
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.txt', $data);
+        $filesystem->copy(__DIR__.'/foo/foo.txt', __DIR__.'/foo/foo2.txt');
+        $this->assertTrue(file_exists(__DIR__.'/foo/foo2.txt'));
+        $this->assertEquals($data, file_get_contents(__DIR__.'/foo/foo2.txt'));
+        @unlink(__DIR__.'/foo/foo.txt');
+        @unlink(__DIR__.'/foo/foo2.txt');
+        @rmdir(__DIR__.'/foo');
+    }
+
+    public function testIsFileChecksFilesProperly()
+    {
+        $filesystem = new Filesystem;
+        mkdir(__DIR__.'/foo');
+        file_put_contents(__DIR__.'/foo/foo.txt', 'contents');
+        $this->assertTrue($filesystem->isFile(__DIR__.'/foo/foo.txt'));
+        $this->assertFalse($filesystem->isFile(__DIR__.'./foo'));
+        @unlink(__DIR__.'/foo/foo.txt');
+        @rmdir(__DIR__.'/foo');
+    }
 }
