@@ -2585,7 +2585,7 @@ class Validator implements ValidatorContract
      */
     protected function getExplicitAddress($attribute)
     {
-        return rtrim(explode('*', $attribute)[0], '.');
+        return rtrim(explode('*', $attribute)[0], '.') ?: null;
     }
 
     /**
