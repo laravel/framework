@@ -1262,7 +1262,6 @@ class Validator implements ValidatorContract
         $this->requireParameterCount(1, $parameters, 'unique');
 
         list($connection, $table) = $this->parseTable($parameters[0]);
-
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.

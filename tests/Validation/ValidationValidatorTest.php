@@ -1223,6 +1223,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @group testing
+     */
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
         $trans = $this->getRealTranslator();
@@ -2648,12 +2651,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testGetExplicitAddress()
+    public function testGetLeadingExplicitAttributePath()
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, [], []);
 
-        $method = new ReflectionMethod(Validator::class, 'getExplicitAddress');
+        $method = new ReflectionMethod(Validator::class, 'getLeadingExplicitAttributePath');
 
         $method->setAccessible(true);
 
@@ -2662,9 +2665,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar.1', $method->invoke($v, 'foo.bar.1'));
     }
 
-    public function testExtractData()
+    public function testExtractDataFromPath()
     {
-        $method = new ReflectionMethod(Validator::class, 'extractData');
+        $method = new ReflectionMethod(Validator::class, 'extractDataFromPath');
         $method->setAccessible(true);
         $trans = $this->getRealTranslator();
 
