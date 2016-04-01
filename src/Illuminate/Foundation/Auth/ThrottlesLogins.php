@@ -58,7 +58,7 @@ trait ThrottlesLogins
      */
     protected function sendLockoutResponse(Request $request)
     {
-        $seconds = $this->getLockoutSeconds($request);
+        $seconds = $this->secondsRemainingOnLockout($request);
 
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
@@ -86,7 +86,7 @@ trait ThrottlesLogins
      * @param  \Illuminate\Http\Request  $request
      * @return int
      */
-    protected function getLockoutSeconds(Request $request)
+    protected function secondsRemainingOnLockout(Request $request)
     {
         return app(RateLimiter::class)->availableIn(
             $this->getThrottleKey($request)
