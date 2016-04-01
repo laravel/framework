@@ -81,7 +81,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" drop constraint users_pkey', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "users_pkey"', $statements[0]);
     }
 
     public function testDropUnique()
@@ -91,7 +91,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" drop constraint foo', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
     public function testDropIndex()
@@ -101,7 +101,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('drop index foo', $statements[0]);
+        $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
     public function testDropForeign()
@@ -111,7 +111,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" drop constraint foo', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
     public function testDropTimestamps()
@@ -161,7 +161,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add constraint bar unique ("foo")', $statements[0]);
+        $this->assertEquals('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -171,7 +171,7 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
+        $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
     public function testAddingIncrementingID()
@@ -511,6 +511,26 @@ class DatabasePostgresSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add column "foo" uuid not null', $statements[0]);
+    }
+
+    public function testAddingIpAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "foo" inet not null', $statements[0]);
+    }
+
+    public function testAddingMacAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "foo" macaddr not null', $statements[0]);
     }
 
     protected function getConnection()

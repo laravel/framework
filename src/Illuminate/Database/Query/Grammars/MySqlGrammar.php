@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class MySqlGrammar extends Grammar
@@ -136,6 +137,23 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
+        if (Str::contains($value, '->')) {
+            return $this->wrapJsonSelector($value);
+        }
+
         return '`'.str_replace('`', '``', $value).'`';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $path = explode('->', $value);
+
+        return array_shift($path).'->'.'"$.'.implode('.', $path).'"';
     }
 }

@@ -62,7 +62,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @return array
      */
     public static function collapse($array)
@@ -70,11 +70,13 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if (! static::accessible($values)) {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            } elseif (! is_array($values)) {
                 continue;
             }
 
-            $results = array_merge($results, $values instanceof Collection ? $values->all() : $values);
+            $results = array_merge($results, $values);
         }
 
         return $results;
@@ -260,6 +262,10 @@ class Arr
      */
     public static function get($array, $key, $default = null)
     {
+        if (! $array) {
+            return value($default);
+        }
+
         if (is_null($key)) {
             return $array;
         }
@@ -288,6 +294,10 @@ class Arr
      */
     public static function has($array, $key)
     {
+        if (! $array) {
+            return false;
+        }
+
         if (is_null($key)) {
             return false;
         }
@@ -337,7 +347,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  array  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array

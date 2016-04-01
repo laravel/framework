@@ -486,6 +486,20 @@ class Event
     }
 
     /**
+     * Schedule the event to run monthly on a given day and time.
+     *
+     * @param int  $day
+     * @param string  $time
+     * @return $this
+     */
+    public function monthlyOn($day = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $day);
+    }
+
+    /**
      * Schedule the event to run quarterly.
      *
      * @return $this

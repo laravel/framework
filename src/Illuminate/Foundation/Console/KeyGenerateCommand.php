@@ -2,18 +2,16 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'key:generate';
+    protected $signature = 'key:generate {--show : Display the key instead of modifying files}';
 
     /**
      * The console command description.
@@ -29,23 +27,16 @@ class KeyGenerateCommand extends Command
      */
     public function fire()
     {
-        $key = $this->getRandomKey($this->laravel['config']['app.cipher']);
+        $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
         }
 
-        $path = base_path('.env');
-
-        if (file_exists($path)) {
-            $content = str_replace('APP_KEY='.$this->laravel['config']['app.key'], 'APP_KEY='.$key, file_get_contents($path));
-
-            if (! Str::contains($content, 'APP_KEY')) {
-                $content = sprintf("%s\nAPP_KEY=%s\n", $content, $key);
-            }
-
-            file_put_contents($path, $content);
-        }
+        // Next, we will replace the application key in the environment file so it is
+        // automatically setup for this developer. This key gets generated using a
+        // secure random byte generator and is later base64 encoded for storage.
+        $this->setKeyInEnvironmentFile($key);
 
         $this->laravel['config']['app.key'] = $key;
 
@@ -53,29 +44,29 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Generate a random key for the application.
+     * Set the environmeny key in the environment file.
      *
-     * @param  string  $cipher
-     * @return string
+     * @param  string  $key
+     * @return void
      */
-    protected function getRandomKey($cipher)
+    protected function setKeyInEnvironmentFile($key)
     {
-        if ($cipher === 'AES-128-CBC') {
-            return Str::random(16);
-        }
-
-        return Str::random(32);
+        file_put_contents($this->laravel->environmentFilePath(), str_replace(
+            'APP_KEY='.$this->laravel['config']['app.key'],
+            'APP_KEY='.$key,
+            file_get_contents($this->laravel->environmentFilePath())
+        ));
     }
 
     /**
-     * Get the console command options.
+     * Generate a random key for the application.
      *
-     * @return array
+     * @return string
      */
-    protected function getOptions()
+    protected function generateRandomKey()
     {
-        return [
-            ['show', null, InputOption::VALUE_NONE, 'Simply display the key instead of modifying files.'],
-        ];
+        return 'base64:'.base64_encode(random_bytes(
+            $this->laravel['config']['app.cipher'] == 'AES-128-CBC' ? 16 : 32
+        ));
     }
 }

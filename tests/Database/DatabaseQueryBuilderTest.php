@@ -118,6 +118,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from "public"."users"', $builder->toSql());
     }
 
+    public function testWhenCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(true, function ($callback) {
+            return $callback->where('id', '=', 1);
+        });
+        $this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, function ($callback) {
+            return $callback->where('id', '=', 1);
+        });
+        $this->assertEquals('select * from "users"', $builder->toSql());
+    }
+
     public function testBasicWheres()
     {
         $builder = $this->getBuilder();
@@ -688,6 +703,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['bar', 'foo'], $builder->getBindings());
     }
 
+    public function testCrossJoins()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('sizes')->crossJoin('colors');
+        $this->assertEquals('select * from "sizes" cross join "colors"', $builder->toSql());
+    }
+
     public function testComplexJoin()
     {
         $builder = $this->getBuilder();
@@ -1090,6 +1112,34 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateOrInsertMethod()
+    {
+        $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,insert]', [
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            new Illuminate\Database\Query\Grammars\Grammar,
+            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        ]);
+
+        $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->shouldReceive('exists')->once()->andReturn(false);
+        $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
+
+        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+
+        $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            new Illuminate\Database\Query\Grammars\Grammar,
+            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        ]);
+
+        $builder->shouldReceive('where')->twice()->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->shouldReceive('exists')->once()->andReturn(true);
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('update')->once()->with(['name' => 'bar'])->andReturn(1);
+
+        $this->assertEquals(true, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+    }
+
     public function testDeleteMethod()
     {
         $builder = $this->getBuilder();
@@ -1144,6 +1194,40 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users');
         $this->assertEquals('select * from `users`', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJson()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereRaw('items->"$.price" = 1');
+        $this->assertEquals('select * from `users` where items->"$.price" = 1', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select items->"$.price" from `users` where items->"$.price" = ? order by items->"$.price" asc', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from `users` where items->"$.price.in_usd" = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from `users` where items->"$.price.in_usd" = ? and items->"$.age" = ?', $builder->toSql());
+    }
+
+    public function testPostgresWrappingJson()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select items->>\'price\' from "users" where items->>\'price\' = ? order by items->>\'price\' asc', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from "users" where items->\'price\'->>\'in_usd\' = ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from "users" where items->\'price\'->>\'in_usd\' = ? and items->>\'age\' = ?', $builder->toSql());
     }
 
     public function testSQLiteOrderBy()
@@ -1393,6 +1477,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from [users](1,2)', $builder->toSql());
     }
 
+    public function testChunkPaginatesUsingId()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(3)->andReturn(
+            [(object) ['someIdField' => 1], (object) ['someIdField' => 2]],
+            [(object) ['someIdField' => 10]],
+            []
+        );
+
+        $builder->chunkById(2, function ($results) {}, 'someIdField');
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
@@ -1439,5 +1540,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $processor = new Illuminate\Database\Query\Processors\MySqlProcessor;
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+    }
+
+    /**
+     * @return m\MockInterface
+     */
+    protected function getMockQueryBuilder()
+    {
+        $builder = m::mock('Illuminate\Database\Query\Builder[forPageAfterId,get]', [
+            m::mock('Illuminate\Database\ConnectionInterface'),
+            new Illuminate\Database\Query\Grammars\Grammar,
+            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        ]);
+
+        return $builder;
     }
 }

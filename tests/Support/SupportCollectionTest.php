@@ -371,6 +371,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testUnionNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->union(null)->all());
+    }
+
+    public function testUnionArray()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(['id' => 1])->all());
+    }
+
+    public function testUnionCollection()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(new Collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
     public function testDiffCollection()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -1168,6 +1186,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             ['foo' => 'bar'],
             'baz',
         ], $c->jsonSerialize());
+    }
+
+    public function testCombineWithArray()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $c = new Collection(array_keys($expected));
+        $actual = $c->combine(array_values($expected))->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testCombineWithCollection()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $keyCollection = new Collection(array_keys($expected));
+        $valueCollection = new Collection(array_values($expected));
+        $actual = $keyCollection->combine($valueCollection)->toArray();
+
+        $this->assertSame($expected, $actual);
     }
 }
 

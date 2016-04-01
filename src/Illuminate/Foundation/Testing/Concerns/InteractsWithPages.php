@@ -3,13 +3,21 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
-use Exception;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Foundation\Testing\HttpException;
+use Illuminate\Foundation\Testing\Constraints\HasText;
+use Illuminate\Foundation\Testing\Constraints\HasLink;
+use Illuminate\Foundation\Testing\Constraints\HasValue;
+use Illuminate\Foundation\Testing\Constraints\HasSource;
+use Illuminate\Foundation\Testing\Constraints\IsChecked;
+use Illuminate\Foundation\Testing\Constraints\HasElement;
+use Illuminate\Foundation\Testing\Constraints\IsSelected;
+use Illuminate\Foundation\Testing\Constraints\HasInElement;
+use Illuminate\Foundation\Testing\Constraints\PageConstraint;
+use Illuminate\Foundation\Testing\Constraints\ReversePageConstraint;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 trait InteractsWithPages
@@ -75,9 +83,19 @@ trait InteractsWithPages
 
         $this->crawler = new Crawler($this->response->getContent(), $this->currentUri);
 
-        $this->subCrawlers = [];
-
         return $this;
+    }
+
+    /**
+     * Clean the crawler and the subcrawlers values to reset the page context.
+     *
+     * @return void
+     */
+    protected function resetPageContext()
+    {
+        $this->crawler = null;
+
+        $this->subCrawlers = [];
     }
 
     /**
@@ -202,49 +220,33 @@ trait InteractsWithPages
      */
     protected function crawler()
     {
-        return ! empty($this->subCrawlers)
-                        ? end($this->subCrawlers)
-                        : $this->crawler;
+        if (! empty($this->subCrawlers)) {
+            return end($this->subCrawlers);
+        }
+
+        return $this->crawler;
     }
 
     /**
-     * Get the HTML from the current context or the full response.
+     * Assert the given constraint.
      *
-     * @return string
+     * @param  string  $constraint
+     * @param  bool  $reverse
+     * @param  string  $message
+     * @return $this
      */
-    protected function html()
+    protected function assertInPage(PageConstraint $constraint, $reverse = false, $message = '')
     {
-        return $this->crawler()
-            ? $this->crawler()->html()
-            : $this->response->getContent();
-    }
+        if ($reverse) {
+            $constraint = new ReversePageConstraint($constraint);
+        }
 
-    /**
-     * Get the plain text from the current context or the full response.
-     *
-     * @return string
-     */
-    protected function text()
-    {
-        return $this->crawler()
-            ? $this->crawler()->text()
-            : strip_tags($this->response->getContent());
-    }
+        self::assertThat(
+            $this->crawler() ?: $this->response->getContent(),
+            $constraint, $message
+        );
 
-    /**
-     * Get the escaped text pattern.
-     *
-     * @param  string  $text
-     * @return string
-     */
-    protected function getEscapedPattern($text)
-    {
-        $rawPattern = preg_quote($text, '/');
-
-        $escapedPattern = preg_quote(e($text), '/');
-
-        return $rawPattern == $escapedPattern
-            ? $rawPattern : "({$rawPattern}|{$escapedPattern})";
+        return $this;
     }
 
     /**
@@ -256,15 +258,7 @@ trait InteractsWithPages
      */
     public function see($text, $negate = false)
     {
-        if ($negate) {
-            return $this->dontSee($text);
-        }
-
-        if (! $this->hasSource($text)) {
-            $this->failPageInspection("Couldn't find [$text] on the page");
-        }
-
-        return $this;
+        return $this->assertInPage(new HasSource($text), $negate);
     }
 
     /**
@@ -275,24 +269,32 @@ trait InteractsWithPages
      */
     public function dontSee($text)
     {
-        if ($this->hasSource($text)) {
-            $this->failPageInspection("The page should not contain [$text]");
-        }
-
-        return $this;
+        return $this->assertInPage(new HasSource($text), true);
     }
 
     /**
-     * Check if the page contains the given text as part of the source.
+     * Assert that an element is present on the page.
      *
-     * @param  string  $text
-     * @return int|bool
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @param  bool  $negate
+     * @return $this
      */
-    protected function hasSource($text)
+    public function seeElement($selector, array $attributes = [], $negate = false)
     {
-        $pattern = $this->getEscapedPattern($text);
+        return $this->assertInPage(new HasElement($selector, $attributes), $negate);
+    }
 
-        return preg_match("/$pattern/i", $this->html());
+    /**
+     * Assert that an element is not present on the page.
+     *
+     * @param  string  $selector
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function dontSeeElement($selector, array $attributes = [])
+    {
+        return $this->assertInPage(new HasElement($selector, $attributes), true);
     }
 
     /**
@@ -304,15 +306,7 @@ trait InteractsWithPages
      */
     public function seeText($text, $negate = false)
     {
-        if ($negate) {
-            return $this->dontSeeText($text);
-        }
-
-        if (! $this->hasText($text)) {
-            $this->failPageInspection("Couldn't find the text [$text] on the page");
-        }
-
-        return $this;
+        return $this->assertInPage(new HasText($text), $negate);
     }
 
     /**
@@ -323,24 +317,7 @@ trait InteractsWithPages
      */
     public function dontSeeText($text)
     {
-        if ($this->hasText($text)) {
-            $this->failPageInspection("The page should not contain the text [$text]");
-        }
-
-        return $this;
-    }
-
-    /**
-     * Check if the page contains the given plain text.
-     *
-     * @param  string  $text
-     * @return int|bool
-     */
-    protected function hasText($text)
-    {
-        $pattern = $this->getEscapedPattern($text);
-
-        return preg_match("/$pattern/i", $this->text());
+        return $this->assertInPage(new HasText($text), true);
     }
 
     /**
@@ -353,16 +330,7 @@ trait InteractsWithPages
      */
     public function seeInElement($element, $text, $negate = false)
     {
-        if ($negate) {
-            return $this->dontSeeInElement($element, $text);
-        }
-
-        $this->assertTrue(
-            $this->hasInElement($element, $text),
-            "Element [$element] should contain the expected text [{$text}]"
-        );
-
-        return $this;
+        return $this->assertInPage(new HasInElement($element, $text), $negate);
     }
 
     /**
@@ -374,56 +342,20 @@ trait InteractsWithPages
      */
     public function dontSeeInElement($element, $text)
     {
-        $this->assertFalse(
-            $this->hasInElement($element, $text),
-            "Element [$element] should not contain the expected text [{$text}]"
-        );
-
-        return $this;
-    }
-
-    /**
-     * Check if the page contains text within the given element.
-     *
-     * @param  string  $element
-     * @param  string  $text
-     * @return bool
-     */
-    protected function hasInElement($element, $text)
-    {
-        $elements = $this->crawler()->filter($element);
-
-        $pattern = $this->getEscapedPattern($text);
-
-        foreach ($elements as $element) {
-            $element = new Crawler($element);
-
-            if (preg_match("/$pattern/i", $element->html())) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->assertInPage(new HasInElement($element, $text), true);
     }
 
     /**
      * Assert that a given link is seen on the page.
      *
-     * @param  string  $text
-     * @param  string|null  $url
+     * @param  string $text
+     * @param  string|null $url
+     * @param  bool  $negate
      * @return $this
      */
-    public function seeLink($text, $url = null)
+    public function seeLink($text, $url = null, $negate = false)
     {
-        $message = "No links were found with expected text [{$text}]";
-
-        if ($url) {
-            $message .= " and URL [{$url}]";
-        }
-
-        $this->assertTrue($this->hasLink($text, $url), "{$message}.");
-
-        return $this;
+        return $this->assertInPage(new HasLink($text, $url), $negate);
     }
 
     /**
@@ -435,65 +367,7 @@ trait InteractsWithPages
      */
     public function dontSeeLink($text, $url = null)
     {
-        $message = "A link was found with expected text [{$text}]";
-
-        if ($url) {
-            $message .= " and URL [{$url}]";
-        }
-
-        $this->assertFalse($this->hasLink($text, $url), "{$message}.");
-
-        return $this;
-    }
-
-    /**
-     * Check if the page has a link with the given $text and optional $url.
-     *
-     * @param  string  $text
-     * @param  string|null  $url
-     * @return bool
-     */
-    protected function hasLink($text, $url = null)
-    {
-        $links = $this->crawler()->selectLink($text);
-
-        if ($links->count() == 0) {
-            return false;
-        }
-
-        // If the URL is null, we assume the developer only wants to find a link
-        // with the given text regardless of the URL. So, if we find the link
-        // we will return true now. Otherwise, we look for the given URL.
-        if ($url == null) {
-            return true;
-        }
-
-        $absoluteUrl = $this->addRootToRelativeUrl($url);
-
-        foreach ($links as $link) {
-            $linkHref = $link->getAttribute('href');
-
-            if ($linkHref == $url || $linkHref == $absoluteUrl) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Add a root if the URL is relative (helper method of the hasLink function).
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function addRootToRelativeUrl($url)
-    {
-        if (! Str::startsWith($url, ['http', 'https'])) {
-            return $this->app->make('url')->to($url);
-        }
-
-        return $url;
+        return $this->assertInPage(new HasLink($text, $url), true);
     }
 
     /**
@@ -501,16 +375,12 @@ trait InteractsWithPages
      *
      * @param  string  $selector
      * @param  string  $expected
+     * @param  bool  $negate
      * @return $this
      */
-    public function seeInField($selector, $expected)
+    public function seeInField($selector, $expected, $negate = false)
     {
-        $this->assertSame(
-            $expected, $this->getInputOrTextAreaValue($selector),
-            "The field [{$selector}] does not contain the expected value [{$expected}]."
-        );
-
-        return $this;
+        return $this->assertInPage(new HasValue($selector, $expected), $negate);
     }
 
     /**
@@ -522,61 +392,20 @@ trait InteractsWithPages
      */
     public function dontSeeInField($selector, $value)
     {
-        $this->assertNotSame(
-            $this->getInputOrTextAreaValue($selector), $value,
-            "The input [{$selector}] should not contain the value [{$value}]."
-        );
-
-        return $this;
-    }
-
-    /**
-     * Assert that the given checkbox is selected.
-     *
-     * @param  string  $selector
-     * @return $this
-     */
-    public function seeIsChecked($selector)
-    {
-        $this->assertTrue(
-            $this->isChecked($selector),
-            "The checkbox [{$selector}] is not checked."
-        );
-
-        return $this;
-    }
-
-    /**
-     * Assert that the given checkbox is not selected.
-     *
-     * @param  string  $selector
-     * @return $this
-     */
-    public function dontSeeIsChecked($selector)
-    {
-        $this->assertFalse(
-            $this->isChecked($selector),
-            "The checkbox [{$selector}] is checked."
-        );
-
-        return $this;
+        return $this->assertInPage(new HasValue($selector, $value), true);
     }
 
     /**
      * Assert that the expected value is selected.
      *
      * @param  string  $selector
-     * @param  string  $expected
+     * @param  string  $value
+     * @param  bool  $negate
      * @return $this
      */
-    public function seeIsSelected($selector, $expected)
+    public function seeIsSelected($selector, $value, $negate = false)
     {
-        $this->assertContains(
-            $expected, $this->getSelectedValue($selector),
-            "The field [{$selector}] does not contain the selected value [{$expected}]."
-        );
-
-        return $this;
+        return $this->assertInPage(new IsSelected($selector, $value), $negate);
     }
 
     /**
@@ -588,137 +417,30 @@ trait InteractsWithPages
      */
     public function dontSeeIsSelected($selector, $value)
     {
-        $this->assertNotContains(
-            $value, $this->getSelectedValue($selector),
-            "The field [{$selector}] contains the selected value [{$value}]."
-        );
-
-        return $this;
+        return $this->assertInPage(new IsSelected($selector, $value), true);
     }
 
     /**
-     * Get the value of an input or textarea.
+     * Assert that the given checkbox is selected.
      *
      * @param  string  $selector
-     * @return string
-     *
-     * @throws \Exception
+     * @param  bool  $negate
+     * @return $this
      */
-    protected function getInputOrTextAreaValue($selector)
+    public function seeIsChecked($selector, $negate = false)
     {
-        $field = $this->filterByNameOrId($selector, ['input', 'textarea']);
-
-        if ($field->count() == 0) {
-            throw new Exception("There are no elements with the name or ID [$selector].");
-        }
-
-        $element = $field->nodeName();
-
-        if ($element == 'input') {
-            return $field->attr('value');
-        }
-
-        if ($element == 'textarea') {
-            return $field->text();
-        }
-
-        throw new Exception("Given selector [$selector] is not an input or textarea.");
+        return $this->assertInPage(new IsChecked($selector), $negate);
     }
 
     /**
-     * Get the selected value of a select field or radio group.
+     * Assert that the given checkbox is not selected.
      *
      * @param  string  $selector
-     * @return string|null
-     *
-     * @throws \Exception
+     * @return $this
      */
-    protected function getSelectedValue($selector)
+    public function dontSeeIsChecked($selector)
     {
-        $field = $this->filterByNameOrId($selector);
-
-        if ($field->count() == 0) {
-            throw new Exception("There are no elements with the name or ID [$selector].");
-        }
-
-        $element = $field->nodeName();
-
-        if ($element == 'select') {
-            return $this->getSelectedValueFromSelect($field);
-        }
-
-        if ($element == 'input') {
-            $value = $this->getCheckedValueFromRadioGroup($field);
-
-            return $value ? [$value] : [];
-        }
-
-        throw new Exception("Given selector [$selector] is not a select or radio group.");
-    }
-
-    /**
-     * Get the selected value from a select field.
-     *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $field
-     * @return array
-     *
-     * @throws \Exception
-     */
-    protected function getSelectedValueFromSelect(Crawler $field)
-    {
-        if ($field->nodeName() !== 'select') {
-            throw new Exception('Given element is not a select element.');
-        }
-
-        $selected = [];
-
-        foreach ($field->children() as $option) {
-            if ($option->hasAttribute('selected')) {
-                $selected[] = $option->getAttribute('value');
-            }
-        }
-
-        return $selected;
-    }
-
-    /**
-     * Get the checked value from a radio group.
-     *
-     * @param  \Symfony\Component\DomCrawler\Crawler  $radioGroup
-     * @return string|null
-     *
-     * @throws \Exception
-     */
-    protected function getCheckedValueFromRadioGroup(Crawler $radioGroup)
-    {
-        if ($radioGroup->nodeName() !== 'input' || $radioGroup->attr('type') !== 'radio') {
-            throw new Exception('Given element is not a radio button.');
-        }
-
-        foreach ($radioGroup as $radio) {
-            if ($radio->hasAttribute('checked')) {
-                return $radio->getAttribute('value');
-            }
-        }
-    }
-
-    /**
-     * Return true if the given checkbox is checked, false otherwise.
-     *
-     * @param  string  $selector
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    protected function isChecked($selector)
-    {
-        $checkbox = $this->filterByNameOrId($selector, "input[type='checkbox']");
-
-        if ($checkbox->count() == 0) {
-            throw new Exception("There are no checkbox elements with the name or ID [$selector].");
-        }
-
-        return $checkbox->attr('checked') !== null;
+        return $this->assertInPage(new IsChecked($selector), true);
     }
 
     /**
@@ -969,16 +691,5 @@ trait InteractsWithPages
         return new UploadedFile(
             $file['tmp_name'], basename($uploads[$name]), $file['type'], $file['size'], $file['error'], true
         );
-    }
-
-    /**
-     * Fail the test with the given error message.
-     *
-     * @param  string  $message
-     * @return void
-     */
-    protected function failPageInspection($message)
-    {
-        $this->fail($this->html().str_repeat("\n", 4).$message.'. Check content above.');
     }
 }

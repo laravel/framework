@@ -5,6 +5,19 @@ use Illuminate\Support\Collection;
 
 class SupportArrTest extends PHPUnit_Framework_TestCase
 {
+    public function testAccessible()
+    {
+        $this->assertTrue(Arr::accessible([]));
+        $this->assertTrue(Arr::accessible([1, 2]));
+        $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
+        $this->assertTrue(Arr::accessible(new Collection));
+
+        $this->assertFalse(Arr::accessible(null));
+        $this->assertFalse(Arr::accessible('abc'));
+        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
+    }
+
     public function testAdd()
     {
         $array = Arr::add(['name' => 'Desk'], 'price', 100);
@@ -61,19 +74,6 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(200, $value);
         $this->assertEquals(100, Arr::first($array));
-    }
-
-    public function testIs()
-    {
-        $this->assertTrue(Arr::accessible([]));
-        $this->assertTrue(Arr::accessible([1, 2]));
-        $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
-        $this->assertTrue(Arr::accessible(new Collection));
-
-        $this->assertFalse(Arr::accessible(null));
-        $this->assertFalse(Arr::accessible('abc'));
-        $this->assertFalse(Arr::accessible(new stdClass));
-        $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
     public function testLast()
@@ -180,6 +180,10 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertNull(Arr::get($array, 'foo', 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+
+        // Test $array not an array
+        $this->assertEquals('default', Arr::get(null, 'foo', 'default'));
+        $this->assertEquals('default', Arr::get(false, 'foo', 'default'));
     }
 
     public function testHas()
@@ -206,6 +210,9 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
+
+        $this->assertFalse(Arr::has(null, 'foo'));
+        $this->assertFalse(Arr::has(false, 'foo'));
     }
 
     public function testIsAssoc()

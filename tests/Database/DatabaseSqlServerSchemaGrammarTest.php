@@ -71,7 +71,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" drop constraint foo', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
     public function testDropUnique()
@@ -81,7 +81,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('drop index foo on "users"', $statements[0]);
+        $this->assertEquals('drop index "foo" on "users"', $statements[0]);
     }
 
     public function testDropIndex()
@@ -91,7 +91,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('drop index foo on "users"', $statements[0]);
+        $this->assertEquals('drop index "foo" on "users"', $statements[0]);
     }
 
     public function testDropForeign()
@@ -101,7 +101,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" drop constraint foo', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
     public function testDropTimestamps()
@@ -141,7 +141,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('alter table "users" add constraint bar primary key ("foo")', $statements[0]);
+        $this->assertEquals('alter table "users" add constraint "bar" primary key ("foo")', $statements[0]);
     }
 
     public function testAddingUniqueKey()
@@ -151,7 +151,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('create unique index bar on "users" ("foo")', $statements[0]);
+        $this->assertEquals('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -161,7 +161,7 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals(1, count($statements));
-        $this->assertEquals('create index baz on "users" ("foo", "bar")', $statements[0]);
+        $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
     public function testAddingIncrementingID()
@@ -511,6 +511,26 @@ class DatabaseSqlServerSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table "users" add "foo" uniqueidentifier not null', $statements[0]);
+    }
+
+    public function testAddingIpAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" nvarchar(45) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add "foo" nvarchar(17) not null', $statements[0]);
     }
 
     protected function getConnection()

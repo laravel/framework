@@ -102,7 +102,7 @@ class Route
     /**
      * Create a new Route instance.
      *
-     * @param  array   $methods
+     * @param  array|string  $methods
      * @param  string  $uri
      * @param  \Closure|array  $action
      * @return void
@@ -235,18 +235,41 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            $middlewares = (array) Arr::get($this->action, 'middleware', []);
+
+            if (is_string($this->action['uses'])) {
+                $middlewares = array_merge(
+                    $middlewares, $this->controllerMiddleware()
+                );
+            }
+
+            return $middlewares;
         }
 
         if (is_string($middleware)) {
             $middleware = [$middleware];
         }
 
-        $this->action['middleware'] = array_merge(
+        $this->action['middleware'] = array_unique(array_merge(
             (array) Arr::get($this->action, 'middleware', []), $middleware
-        );
+        ));
 
         return $this;
+    }
+
+    /**
+     * Get the controller middleware for the route.
+     *
+     * @return array
+     */
+    protected function controllerMiddleware()
+    {
+        list($class, $method) = explode('@', $this->action['uses']);
+
+        $controller = $this->container->make($class);
+
+        return (new ControllerDispatcher($this->router, $this->container))
+                    ->getMiddleware($controller, $method);
     }
 
     /**
@@ -520,7 +543,7 @@ class Route
     /**
      * Parse the route action into a standard array.
      *
-     * @param  callable|array  $action
+     * @param  callable|array|null  $action
      * @return array
      *
      * @throws \UnexpectedValueException

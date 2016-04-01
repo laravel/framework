@@ -25,7 +25,7 @@
         "monolog/monolog": "~1.11",
         "mtdowling/cron-expression": "~1.0",
         "nesbot/carbon": "~1.20",
-        "paragonie/random_compat": "~1.1",
+        "paragonie/random_compat": "~1.4",
         "psy/psysh": "0.7.*",
         "swiftmailer/swiftmailer": "~5.1",
         "symfony/console": "2.8.*|3.0.*",
