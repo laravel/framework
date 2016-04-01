@@ -95,6 +95,6 @@ class AuthorizesResourcesController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->authorizeResource('user', 'App\User', [], $request);
+        $this->authorizeResource('App\User', 'user', [], $request);
     }
 }

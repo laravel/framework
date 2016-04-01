@@ -6,8 +6,8 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Http\Middleware\Authorize;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use Illuminate\Foundation\Auth\Access\Middleware\Authorize;
 
 class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 {
