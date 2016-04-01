@@ -85,6 +85,50 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
+    public function testPopProperlyPopsDelayedJobOffOfRedis()
+    {
+        // Push an item into queue
+        $job = new RedisQueueIntegrationTestJob(10);
+        $this->queue->later(-10, $job);
+
+        // Pop and check it is popped correctly
+        $before = time();
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $after = time();
+
+        // Check reserved queue
+        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $reservedJob = array_keys($result)[0];
+        $score = $result[$reservedJob];
+        $this->assertGreaterThanOrEqual($score, $before + 60);
+        $this->assertLessThanOrEqual($score, $after + 60);
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
+    }
+
+    public function testPopPopsDelayedJobOffOfRedisWhenExpireNull()
+    {
+        $this->queue->setExpire(null);
+
+        // Push an item into queue
+        $job = new RedisQueueIntegrationTestJob(10);
+        $this->queue->later(-10, $job);
+
+        // Pop and check it is popped correctly
+        $before = time();
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $after = time();
+
+        // Check reserved queue
+        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
+        $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
+        $reservedJob = array_keys($result)[0];
+        $score = $result[$reservedJob];
+        $this->assertGreaterThanOrEqual($score, $before);
+        $this->assertLessThanOrEqual($score, $after);
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
+    }
+
     public function testNotExpireJobsWhenExpireNull()
     {
         $this->queue->setExpire(null);

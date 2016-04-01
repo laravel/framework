@@ -129,8 +129,10 @@ class RedisQueue extends Queue implements QueueContract
 
         $queue = $this->getQueue($queue);
 
+        $this->migrateExpiredJobs($queue.':delayed', $queue);
+
         if (! is_null($this->expire)) {
-            $this->migrateAllExpiredJobs($queue);
+            $this->migrateExpiredJobs($queue.':reserved', $queue);
         }
 
         $script = <<<'LUA'
@@ -157,19 +159,6 @@ LUA;
     public function deleteReserved($queue, $job)
     {
         $this->getConnection()->zrem($this->getQueue($queue).':reserved', $job);
-    }
-
-    /**
-     * Migrate all of the waiting jobs in the queue.
-     *
-     * @param  string  $queue
-     * @return void
-     */
-    protected function migrateAllExpiredJobs($queue)
-    {
-        $this->migrateExpiredJobs($queue.':delayed', $queue);
-
-        $this->migrateExpiredJobs($queue.':reserved', $queue);
     }
 
     /**
