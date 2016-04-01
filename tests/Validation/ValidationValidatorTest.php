@@ -2657,6 +2657,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $method->setAccessible(true);
 
+        $this->assertEquals(null, $method->invoke($v, '*.email'));
         $this->assertEquals('foo', $method->invoke($v, 'foo.*'));
         $this->assertEquals('foo.bar', $method->invoke($v, 'foo.bar.*.baz'));
         $this->assertEquals('foo.bar.1', $method->invoke($v, 'foo.bar.1'));
@@ -2667,6 +2668,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $method = new ReflectionMethod(Validator::class, 'extractData');
         $method->setAccessible(true);
         $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [['email' => 'mail'], ['email' => 'mail2']], []);
+        $this->assertEquals([['email' => 'mail'], ['email' => 'mail2']], $method->invoke($v, null));
 
         $v = new Validator($trans, ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]], []);
         $this->assertEquals(['cat' => ['cat1' => ['name']]], $method->invoke($v, 'cat.cat1'));
