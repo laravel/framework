@@ -1256,7 +1256,7 @@ class Validator implements ValidatorContract
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
-        $column = isset($parameters[1]) ? $parameters[1] : $attribute;
+        $column = $this->guessColumnIfNotGiven($attribute, isset($parameters[1]) ? $parameters[1] : null);
 
         list($idColumn, $id) = [null, null];
 
@@ -1344,7 +1344,7 @@ class Validator implements ValidatorContract
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
         // that the columns being "verified" shares the given attribute's name.
-        $column = isset($parameters[1]) ? $parameters[1] : $attribute;
+        $column = $this->guessColumnIfNotGiven($attribute, isset($parameters[1]) ? $parameters[1] : null);
 
         $expected = (is_array($value)) ? count($value) : 1;
 
@@ -1404,6 +1404,24 @@ class Validator implements ValidatorContract
         }
 
         return $extra;
+    }
+
+    /**
+     * Guess the database column from the given attribute name if not given already.
+     *
+     * @param  string  $attribute
+     * @param  string  $column
+     * @return string
+     */
+    public function guessColumnIfNotGiven($attribute, $column = null)
+    {
+        if ($column) {
+            return $column;
+        }
+
+        return in_array($attribute, array_collapse($this->implicitAttributes))
+               && ! is_numeric($last = last(explode('.', $attribute)))
+               ? $last : $attribute;
     }
 
     /**
