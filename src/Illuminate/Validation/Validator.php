@@ -316,18 +316,20 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Gather a copy of the data filled with any missing attributes.
+     * Gather a copy of the attribute data filled with any missing attributes.
      *
      * @param  string  $attribute
      * @return array
      */
     protected function initializeAttributeOnData($attribute)
     {
-        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
-            return $this->data;
-        }
+        $explicitPath = $this->getLeadingExplicitAttributePath($attribute);
 
-        $data = $this->data;
+        $data = $this->extractDataFromPath($explicitPath);
+
+        if (! Str::contains($attribute, '*') || Str::endsWith($attribute, '*')) {
+            return $data;
+        }
 
         return data_fill($data, $attribute, null);
     }
@@ -893,7 +895,11 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'in_array');
 
-        $otherValues = Arr::where(Arr::dot($this->data), function ($key) use ($parameters) {
+        $explicitPath = $this->getLeadingExplicitAttributePath($parameters[0]);
+
+        $attributeData = $this->extractDataFromPath($explicitPath);
+
+        $otherValues = Arr::where(Arr::dot($attributeData), function ($key) use ($parameters) {
             return Str::is($parameters[0], $key);
         });
 
@@ -1230,7 +1236,11 @@ class Validator implements ValidatorContract
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        $data = Arr::where(Arr::dot($this->data), function ($key) use ($attribute, $attributeName) {
+        $explicitPath = $this->getLeadingExplicitAttributePath($attributeName);
+
+        $attributeData = $this->extractDataFromPath($explicitPath);
+
+        $data = Arr::where(Arr::dot($attributeData), function ($key) use ($attribute, $attributeName) {
             return $key != $attribute && Str::is($attributeName, $key);
         });
 
@@ -1252,7 +1262,6 @@ class Validator implements ValidatorContract
         $this->requireParameterCount(1, $parameters, 'unique');
 
         list($connection, $table) = $this->parseTable($parameters[0]);
-
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
@@ -2580,6 +2589,42 @@ class Validator implements ValidatorContract
         }
 
         return [];
+    }
+
+    /**
+     * Get the explicit part of the attribute name.
+     *
+     * E.g. 'foo.bar.*.baz' -> 'foo.bar'
+     *
+     * Allows us to not spin through all of the flattened data for some operations.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function getLeadingExplicitAttributePath($attribute)
+    {
+        return rtrim(explode('*', $attribute)[0], '.') ?: null;
+    }
+
+    /**
+     * Extract data based on the given dot-notated path.
+     *
+     * Used to extract a sub-section of the data for faster iteration.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function extractDataFromPath($attribute)
+    {
+        $results = [];
+
+        $value = Arr::get($this->data, $attribute, '__missing__');
+
+        if ($value != '__missing__') {
+            Arr::set($results, $attribute, $value);
+        }
+
+        return $results;
     }
 
     /**
