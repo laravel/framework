@@ -341,6 +341,7 @@ if (! function_exists('elixir')) {
 
         if (is_null($manifest) || $manifestPath !== $buildDirectory) {
             $manifest = json_decode(file_get_contents(public_path($buildDirectory.'/rev-manifest.json')), true);
+
             $manifestPath = $buildDirectory;
         }
 
