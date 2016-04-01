@@ -1193,19 +1193,19 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereRaw('items->"$.price" = 1');
-        $this->assertEquals('select * from `users` where items->"$.price" = 1', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->"$.price" = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select items->"$.price" from `users` where items->"$.price" = ? order by items->"$.price" asc', $builder->toSql());
+        $this->assertEquals('select `items`->"$.price" from `users` where `items`->"$.price" = ? order by `items`->"$.price" asc', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
-        $this->assertEquals('select * from `users` where items->"$.price.in_usd" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
-        $this->assertEquals('select * from `users` where items->"$.price.in_usd" = ? and items->"$.age" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ? and `items`->"$.age" = ?', $builder->toSql());
     }
 
     public function testPostgresWrappingJson()
