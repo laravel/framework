@@ -238,12 +238,9 @@ class Route
             $middlewares = (array) Arr::get($this->action, 'middleware', []);
 
             if (is_string($this->action['uses'])) {
-                list($class, $method) = explode('@', $this->action['uses']);
-                $controller = $this->container->make($class);
-
-                $controllerMiddlewares = (new ControllerDispatcher($this->router, $this->container))
-                    ->getMiddleware($controller, $method);
-                $middlewares = array_merge($middlewares, $controllerMiddlewares);
+                $middlewares = array_merge(
+                    $middlewares, $this->controllerMiddleware()
+                );
             }
 
             return $middlewares;
@@ -258,6 +255,21 @@ class Route
         ));
 
         return $this;
+    }
+
+    /**
+     * Get the controller middleware for the route.
+     *
+     * @return array
+     */
+    protected function controllerMiddleware()
+    {
+        list($class, $method) = explode('@', $this->action['uses']);
+
+        $controller = $this->container->make($class);
+
+        return (new ControllerDispatcher($this->router, $this->container))
+                    ->getMiddleware($controller, $method);
     }
 
     /**
