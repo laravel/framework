@@ -1235,7 +1235,7 @@ class Validator implements ValidatorContract
      */
     protected function validateActiveUrl($attribute, $value)
     {
-        if(!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
@@ -1383,7 +1383,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        if (!is_string($value) || strtotime($value) === false) {
+        if (! is_string($value) || strtotime($value) === false) {
             return false;
         }
 
@@ -1404,7 +1404,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'date_format');
 
-        if(!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
@@ -1425,7 +1425,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'before');
 
-        if(!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
@@ -1467,7 +1467,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if(!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
