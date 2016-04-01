@@ -1164,6 +1164,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['cat' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 2]]]]], ['cat.*.prod.*.id' => 'distinct']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 1]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 2]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'distinct'], ['foo.*.distinct' => 'There is a duplication!']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -1217,6 +1223,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @group testing
+     */
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
         $trans = $this->getRealTranslator();
@@ -2661,6 +2670,37 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
         $v->each('foo', ['min:7|max:13']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testGetLeadingExplicitAttributePath()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [], []);
+
+        $method = new ReflectionMethod(Validator::class, 'getLeadingExplicitAttributePath');
+
+        $method->setAccessible(true);
+
+        $this->assertEquals(null, $method->invoke($v, '*.email'));
+        $this->assertEquals('foo', $method->invoke($v, 'foo.*'));
+        $this->assertEquals('foo.bar', $method->invoke($v, 'foo.bar.*.baz'));
+        $this->assertEquals('foo.bar.1', $method->invoke($v, 'foo.bar.1'));
+    }
+
+    public function testExtractDataFromPath()
+    {
+        $method = new ReflectionMethod(Validator::class, 'extractDataFromPath');
+        $method->setAccessible(true);
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [['email' => 'mail'], ['email' => 'mail2']], []);
+        $this->assertEquals([['email' => 'mail'], ['email' => 'mail2']], $method->invoke($v, null));
+
+        $v = new Validator($trans, ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]], []);
+        $this->assertEquals(['cat' => ['cat1' => ['name']]], $method->invoke($v, 'cat.cat1'));
+
+        $v = new Validator($trans, ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]], []);
+        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], $method->invoke($v, 'cat.cat1.name'));
     }
 
     public function testInlineMessagesMayUseAsteriskForEachRules()
