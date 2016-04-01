@@ -280,7 +280,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         for ($i = 1; $i <= 20; ++$i) {
             $pid = pcntl_fork();
 
-            if (!$pid) {
+            if (! $pid) {
                 $files = new Filesystem();
                 $files->put(static::TEMP_DIR.'/file.txt', $content, true);
                 $read = $files->get(static::TEMP_DIR.'/file.txt', true);
