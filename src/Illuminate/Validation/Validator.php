@@ -363,19 +363,41 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Merge additional rules into a given attribute(s).
+     *
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return $this
+     */
+    public function mergeRules($attribute, $rules = [])
+    {
+        if (is_array($attribute)) {
+            foreach ($attribute as $innerAttribute => $innerRules) {
+                $this->mergeRulesForAttribute($innerAttribute, $innerRules);
+            }
+
+            return $this;
+        }
+
+        return $this->mergeRulesForAttribute($attribute, $rules);
+    }
+
+    /**
      * Merge additional rules into a given attribute.
      *
      * @param  string  $attribute
      * @param  string|array  $rules
-     * @return void
+     * @return $this
      */
-    public function mergeRules($attribute, $rules)
+    protected function mergeRulesForAttribute($attribute, $rules)
     {
         $current = isset($this->rules[$attribute]) ? $this->rules[$attribute] : [];
 
         $merge = head($this->explodeRules([$rules]));
 
         $this->rules[$attribute] = array_merge($current, $merge);
+
+        return $this;
     }
 
     /**
@@ -1248,7 +1270,8 @@ class Validator implements ValidatorContract
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
-        $column = isset($parameters[1]) ? $parameters[1] : $attribute;
+        $column = isset($parameters[1])
+                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         list($idColumn, $id) = [null, null];
 
@@ -1336,11 +1359,14 @@ class Validator implements ValidatorContract
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
         // that the columns being "verified" shares the given attribute's name.
-        $column = isset($parameters[1]) ? $parameters[1] : $attribute;
+        $column = isset($parameters[1])
+                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
 
         $expected = (is_array($value)) ? count($value) : 1;
 
-        return $this->getExistCount($connection, $table, $column, $value, $parameters) >= $expected;
+        return $this->getExistCount(
+            $connection, $table, $column, $value, $parameters
+        ) >= $expected;
     }
 
     /**
@@ -1396,6 +1422,22 @@ class Validator implements ValidatorContract
         }
 
         return $extra;
+    }
+
+    /**
+     * Guess the database column from the given attribute name.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    public function guessColumnForQuery($attribute)
+    {
+        if (in_array($attribute, array_collapse($this->implicitAttributes))
+                && ! is_numeric($last = last(explode('.', $attribute)))) {
+            return $last;
+        }
+
+        return $attribute;
     }
 
     /**

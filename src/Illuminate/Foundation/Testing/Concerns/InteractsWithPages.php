@@ -235,7 +235,7 @@ trait InteractsWithPages
      * @param  string  $message
      * @return $this
      */
-    protected function assertInPage(PageConstraint $constraint, $reverse = false, $message = 'Something')
+    protected function assertInPage(PageConstraint $constraint, $reverse = false, $message = '')
     {
         if ($reverse) {
             $constraint = new ReversePageConstraint($constraint);

@@ -1236,6 +1236,18 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], ['*.email' => 'unique:users', '*.type' => 'exists:user_types']);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->twice()->with(null);
+        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidationExists()
     {
         $trans = $this->getRealTranslator();

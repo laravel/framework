@@ -703,6 +703,13 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['bar', 'foo'], $builder->getBindings());
     }
 
+    public function testCrossJoins()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('sizes')->crossJoin('colors');
+        $this->assertEquals('select * from "sizes" cross join "colors"', $builder->toSql());
+    }
+
     public function testComplexJoin()
     {
         $builder = $this->getBuilder();
