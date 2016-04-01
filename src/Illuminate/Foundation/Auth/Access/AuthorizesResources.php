@@ -9,13 +9,13 @@ trait AuthorizesResources
     /**
      * Authorize a resource action.
      *
-     * @param  string  $name
      * @param  string  $model
+     * @param  string  $name
      * @param  array  $options
      * @param  \Illuminate\Http\Request|null  $request
      * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
-    public function authorizeResource($name, $model, array $options = [], $request = null)
+    public function authorizeResource($model, $name = null, array $options = [], $request = null)
     {
         $action = with($request ?: request())->route()->getActionName();
 
@@ -25,10 +25,6 @@ trait AuthorizesResources
             'index' => 'view', 'create' => 'create', 'store' => 'create', 'show' => 'view',
             'edit' => 'update', 'update' => 'update', 'delete' => 'delete',
         ];
-
-        if (property_exists($this, 'abilityMap')) {
-            $map = array_merge($map, $this->abilityMap);
-        }
 
         if (! in_array($method, array_keys($map))) {
             return new ControllerMiddlewareOptions($options);
