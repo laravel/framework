@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing\Middleware;
 
+use Lang;
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,13 +74,28 @@ class ThrottleRequests
      */
     protected function buildResponse($key, $maxAttempts)
     {
-        $response = new Response('Too Many Attempts.', 429);
+        $seconds = $this->limiter->availableIn($key);
+
+        $response = new Response($this->getRequestErrorMessage($seconds), 429);
 
         return $this->addHeaders(
             $response, $maxAttempts,
             $this->calculateRemainingAttempts($key, $maxAttempts),
-            $this->limiter->availableIn($key)
+            $seconds
         );
+    }
+
+    /**
+     * Get the request error message.
+     *
+     * @param  int  $seconds
+     * @return string
+     */
+    protected function getRequestErrorMessage($seconds)
+    {
+        return Lang::has('request.throttle')
+            ? Lang::get('request.throttle', ['seconds' => $seconds])
+            : 'Too Many Attempts. Please try again in '.$seconds.' seconds.';
     }
 
     /**
