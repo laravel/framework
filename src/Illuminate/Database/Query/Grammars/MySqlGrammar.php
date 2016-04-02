@@ -156,6 +156,12 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapValue(array_shift($path));
 
-        return $field.'->'.'"$.'.implode('.', $path).'"';
+        $path = '$.'.implode('.', $path);
+
+        $path = str_replace('\\', '\\\\', $path);
+        $path = str_replace('"', '\\"', $path);
+        $path = '"'.$path.'"';
+
+        return $field.'->'.$path;
     }
 }
