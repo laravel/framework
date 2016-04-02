@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Redis\Database;
 use Mockery as m;
@@ -72,8 +73,15 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         // Pop and check it is popped correctly
         $before = time();
-        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        /** @var RedisJob $redisJob */
+        $redisJob = $this->queue->pop();
         $after = time();
+
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getRedisJob())->data->command));
+        $this->assertEquals(1, $redisJob->attempts());
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
+        $this->assertEquals(2, json_decode($redisJob->getReservedJob())->attempts);
+        $this->assertEquals($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:reserved'));
@@ -153,17 +161,18 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $this->redis->connection()->zcard('queues:default:reserved'));
         $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
 
-        $reservedJob = array_keys($result)[1];
-        $score = $result[$reservedJob];
-        $this->assertGreaterThanOrEqual($score, $before);
-        $this->assertLessThanOrEqual($score, $after);
-        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
-
-        $reservedFailedJob = array_keys($result)[0];
-        $failedScore = $result[$reservedFailedJob];
-        $this->assertGreaterThanOrEqual($failedScore, $beforeFailPop);
-        $this->assertLessThanOrEqual($failedScore, $afterFailPop);
-        $this->assertEquals($failed, unserialize(json_decode($reservedFailedJob)->data->command));
+        foreach ($result as $payload => $score) {
+            $command = unserialize(json_decode($payload)->data->command);
+            $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $command);
+            $this->assertContains($command->i, [10, -20]);
+            if ($command->i == 10) {
+                $this->assertGreaterThanOrEqual($score, $before);
+                $this->assertLessThanOrEqual($score, $after);
+            } else {
+                $this->assertGreaterThanOrEqual($score, $beforeFailPop);
+                $this->assertLessThanOrEqual($score, $afterFailPop);
+            }
+        }
     }
 
     public function testExpireJobsWhenExpireSet()
@@ -186,6 +195,55 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThanOrEqual($score, $before + 30);
         $this->assertLessThanOrEqual($score, $after + 30);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
+    }
+
+    public function testDeleteAndRelease()
+    {
+        //push a job into queue
+        $job = new RedisQueueIntegrationTestJob(30);
+        $this->queue->push($job);
+
+        //pop and release the job
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
+        $redisJob = $this->queue->pop();
+        $before = time();
+        $this->queue->deleteAndRelease('default', $redisJob->getReservedJob(), 1000);
+        $after = time();
+
+        //check the content of delayed queue
+        $this->assertEquals(1, $this->redis->connection()->zcard('queues:default:delayed'));
+
+        $results = $this->redis->connection()->zrangebyscore('queues:default:delayed', -INF, INF, 'withscores');
+
+        $payload = array_keys($results)[0];
+
+        $score = $results[$payload];
+
+        $this->assertGreaterThanOrEqual($before + 1000, $score);
+        $this->assertLessThanOrEqual($after + 1000, $score);
+
+        $decoded = json_decode($payload);
+
+        $this->assertEquals(2, $decoded->attempts);
+        $this->assertEquals($job, unserialize($decoded->data->command));
+
+        //check if the queue has no ready item yet
+        $this->assertNull($this->queue->pop());
+    }
+
+    public function testDeleteAndReleaseInThePast()
+    {
+        //push an item into queue
+        $job = new RedisQueueIntegrationTestJob(30);
+        $this->queue->push($job);
+
+        //pop and release the job in the past
+        /** @var RedisJob $redisJob */
+        $redisJob = $this->queue->pop();
+        $this->queue->deleteAndRelease('default', $redisJob->getReservedJob(), -3);
+
+        //check if the queue has the job ready
+        $this->assertInstanceOf(RedisJob::class, $this->queue->pop());
     }
 }
 

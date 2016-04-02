@@ -55,14 +55,4 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
         $queue->later($date, 'foo', ['data']);
     }
-
-    public function testReleaseMethod()
-    {
-        $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getTime'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
-        $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('zadd')->once()->with('queues:default:delayed', 2, json_encode(['attempts' => 2]));
-
-        $queue->release('default', json_encode(['attempts' => 1]), 1, 2);
-    }
 }

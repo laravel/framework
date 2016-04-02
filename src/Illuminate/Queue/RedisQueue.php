@@ -102,22 +102,6 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
-     * Release a reserved job back onto the queue.
-     *
-     * @param  string  $queue
-     * @param  string  $payload
-     * @param  int  $delay
-     * @param  int  $attempts
-     * @return void
-     */
-    public function release($queue, $payload, $delay, $attempts)
-    {
-        $payload = $this->setMeta($payload, 'attempts', $attempts);
-
-        $this->getConnection()->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
-    }
-
-    /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
@@ -137,15 +121,19 @@ class RedisQueue extends Queue implements QueueContract
 
         $script = <<<'LUA'
 local job = redis.call('lpop', KEYS[1])
-if(job ~= nil) then
-    redis.call('zadd', KEYS[2], KEYS[3], job)
+local reserved = false
+if(job ~= false) then
+    reserved = cjson.decode(job)
+    reserved['attempts'] = reserved['attempts'] + 1
+    reserved = cjson.encode(reserved)
+    redis.call('zadd', KEYS[2], KEYS[3], reserved)
 end
-return job
+return {job, reserved}
 LUA;
-        $job = $this->getConnection()->eval($script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire);
+        list($job, $reserved) = $this->getConnection()->eval($script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire);
 
-        if (! is_null($job)) {
-            return new RedisJob($this->container, $this, $job, $original);
+        if ($reserved) {
+            return new RedisJob($this->container, $this, $job, $reserved, $original);
         }
     }
 
@@ -159,6 +147,25 @@ LUA;
     public function deleteReserved($queue, $job)
     {
         $this->getConnection()->zrem($this->getQueue($queue).':reserved', $job);
+    }
+
+    /**
+     * Delete a reserved job from the reserved queue and release it back onto the main queue.
+     *
+     * @param string $queue
+     * @param string $job
+     * @param int $delay
+     */
+    public function deleteAndRelease($queue, $job, $delay)
+    {
+        $queue = $this->getQueue($queue);
+
+        $script = <<<'LUA'
+redis.call('zrem', KEYS[2], KEYS[3])
+redis.call('zadd', KEYS[1], KEYS[4], KEYS[3])
+return true
+LUA;
+        $this->getConnection()->eval($script, 4, $queue.':delayed', $queue.':reserved', $job, $this->getTime() + $delay);
     }
 
     /**
