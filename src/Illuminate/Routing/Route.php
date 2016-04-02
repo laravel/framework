@@ -269,7 +269,7 @@ class Route
         $controller = $this->container->make($class);
 
         return (new ControllerDispatcher($this->router, $this->container))
-                    ->getMiddleware($controller, $method);
+            ->getMiddleware($controller, $method);
     }
 
     /**
