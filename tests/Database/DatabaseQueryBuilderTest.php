@@ -1215,6 +1215,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ? and `items`->"$.age" = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('field`safe`from`sql`injection->price', '=', 1);
+        $this->assertEquals('select * from `users` where `field``safe``from``sql``injection`->"$.price" = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->value_safe_from_sql_injection_\'"\\', '=', 1);
         $this->assertEquals('select * from `users` where `items`->"$.value_safe_from_sql_injection_\'\\"\\\\" = ?', $builder->toSql());
     }
