@@ -187,8 +187,13 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
 
         // Test $array not an array
-        $this->assertEquals('default', Arr::get(null, 'foo', 'default'));
-        $this->assertEquals('default', Arr::get(false, 'foo', 'default'));
+        $this->assertSame('default', Arr::get(null, 'foo', 'default'));
+        $this->assertSame('default', Arr::get(false, 'foo', 'default'));
+        $this->assertSame('default', Arr::get(null, null, 'default'));
+
+        // Test $array is empty and key is null
+        $this->assertSame([], Arr::get([], null));
+        $this->assertSame([], Arr::get([], null, 'default'));
     }
 
     public function testHas()

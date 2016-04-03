@@ -235,15 +235,7 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            $middlewares = (array) Arr::get($this->action, 'middleware', []);
-
-            if (is_string($this->action['uses'])) {
-                $middlewares = array_merge(
-                    $middlewares, $this->controllerMiddleware()
-                );
-            }
-
-            return $middlewares;
+            return (array) Arr::get($this->action, 'middleware', []);
         }
 
         if (is_string($middleware)) {
@@ -269,7 +261,7 @@ class Route
         $controller = $this->container->make($class);
 
         return (new ControllerDispatcher($this->router, $this->container))
-                    ->getMiddleware($controller, $method);
+            ->getMiddleware($controller, $method);
     }
 
     /**
