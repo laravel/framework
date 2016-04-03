@@ -178,6 +178,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function testExpireJobsWhenExpireSet()
     {
         $this->queue->setExpire(30);
+
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
@@ -197,7 +198,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
-    public function testDeleteAndRelease()
+    public function testRelease()
     {
         //push a job into queue
         $job = new RedisQueueIntegrationTestJob(30);
@@ -207,7 +208,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
         $before = time();
-        $this->queue->deleteAndRelease('default', $redisJob->getReservedJob(), 1000);
+        $redisJob->release(1000);
         $after = time();
 
         //check the content of delayed queue
@@ -231,19 +232,33 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->queue->pop());
     }
 
-    public function testDeleteAndReleaseInThePast()
+    public function testReleaseInThePast()
     {
-        //push an item into queue
         $job = new RedisQueueIntegrationTestJob(30);
         $this->queue->push($job);
 
-        //pop and release the job in the past
         /** @var RedisJob $redisJob */
         $redisJob = $this->queue->pop();
-        $this->queue->deleteAndRelease('default', $redisJob->getReservedJob(), -3);
+        $redisJob->release(-3);
 
-        //check if the queue has the job ready
         $this->assertInstanceOf(RedisJob::class, $this->queue->pop());
+    }
+
+    public function testDelete()
+    {
+        $job = new RedisQueueIntegrationTestJob(30);
+        $this->queue->push($job);
+
+        /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
+        $redisJob = $this->queue->pop();
+
+        $redisJob->delete();
+
+        $this->assertEquals(0, $this->redis->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(0, $this->redis->connection()->zcard('queues:default:reserved'));
+        $this->assertEquals(0, $this->redis->connection()->llen('queues:default'));
+
+        $this->assertNull($this->queue->pop());
     }
 }
 
