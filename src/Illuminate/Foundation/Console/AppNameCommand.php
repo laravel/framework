@@ -69,7 +69,7 @@ class AppNameCommand extends Command
     public function fire()
     {
         if (! preg_match('/^[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)*$/', $this->argument('name'))) {
-            throw new Exception('Invalied App Name');
+            throw new Exception('Invalid app name.');
         }
 
         $this->currentRoot = trim($this->laravel->getNamespace(), '\\');
