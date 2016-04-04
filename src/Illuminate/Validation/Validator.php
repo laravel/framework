@@ -1733,10 +1733,6 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if (! is_string($value)) {
-            return false;
-        }
-
         if ($format = $this->getDateFormat($attribute)) {
             return $this->validateAfterWithFormat($format, $value, $parameters);
         }
