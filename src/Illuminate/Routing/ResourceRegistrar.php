@@ -83,8 +83,35 @@ class ResourceRegistrar
         $defaults = $this->resourceDefaults;
 
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
-            $this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
+            $this->addWheres(
+                $this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options),
+                $options
+            );
         }
+    }
+
+    /**
+     * Add any parameter patterns to the route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addWheres($route, array $options = [])
+    {
+        if (empty($options['where'])) {
+            return $route;
+        }
+
+        if (! isset($this->wheres)) {
+            array_walk($options['where'], function ($item, $key) use (&$wheres) {
+                $wheres[$this->getResourceWildcard($key)] = $item;
+            });
+
+            $this->wheres = $wheres;
+        }
+
+        return $route->where($this->wheres);
     }
 
     /**
