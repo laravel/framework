@@ -431,7 +431,7 @@ class Validator implements ValidatorContract
             call_user_func($after);
         }
 
-        return count($this->messages->all()) === 0;
+        return $this->messages->isEmpty();
     }
 
     /**
