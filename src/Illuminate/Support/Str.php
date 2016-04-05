@@ -283,9 +283,9 @@ class Str
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLength = static::length($knownString, '8bit');
+        $knownLength = mb_strlen($knownString, '8bit');
 
-        if (static::length($userInput, '8bit') !== $knownLength) {
+        if (mb_strlen($userInput, '8bit') !== $knownLength) {
             return false;
         }
 
