@@ -71,7 +71,6 @@ class HasLink extends PageConstraint
     /**
      * Add a root if the URL is relative (helper method of the hasLink function).
      *
-     * @param  string  $url
      * @return string
      */
     protected function absoluteUrl()
