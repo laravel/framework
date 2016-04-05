@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Testing;
 trait DatabaseMigrations
 {
     /**
-     * Run the database migrations for the application.
+     * Define hooks to migrate the database before and after each test.
      *
      * @return void
      */

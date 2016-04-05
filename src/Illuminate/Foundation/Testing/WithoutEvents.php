@@ -7,7 +7,7 @@ use Exception;
 trait WithoutEvents
 {
     /**
-     * Prevent all event handlers from running.
+     * Prevent all event handles from being executed.
      *
      * @throws \Exception
      */
