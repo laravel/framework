@@ -8,7 +8,7 @@ trait WithoutMiddleware
 {
     /**
      * Disable all middleware for the test class.
-     * 
+     *
      * @throws \Exception
      */
     public function disableMiddlewareForAllTests()
