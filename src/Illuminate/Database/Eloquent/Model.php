@@ -2669,7 +2669,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 .'Illuminate\Database\Eloquent\Relations\Relation');
         }
 
-        return $this->relations[$method] = $relations->getResults();
+        $this->setRelation($method, $results = $relations->getResults());
+
+        return $results;
     }
 
     /**

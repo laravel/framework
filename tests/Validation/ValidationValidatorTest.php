@@ -2118,6 +2118,15 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testSometimesFailOnEmptyArrayInImplicitRules()
+    {
+        $trans = $this->getRealTranslator();
+
+        $data = ['names' => [['second' => []]]];
+        $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()
     {
         $trans = $this->getRealTranslator();
