@@ -182,7 +182,12 @@ trait ResetsPasswords
      */
     public function reset(Request $request)
     {
-        $this->validate($request, $this->getResetValidationRules());
+        $this->validate(
+            $request,
+            $this->getResetValidationRules(),
+            $this->getResetValidationMessages(),
+            $this->getResetValidationCustomAttributes()
+        );
 
         $credentials = $request->only(
             'email', 'password', 'password_confirmation', 'token'
@@ -215,6 +220,26 @@ trait ResetsPasswords
             'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
         ];
+    }
+
+    /**
+     * Get the password reset validation messages.
+     *
+     * @return array
+     */
+    protected function getResetValidationMessages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the password reset validation custom attributes.
+     *
+     * @return array
+     */
+    protected function getResetValidationCustomAttributes()
+    {
+        return [];
     }
 
     /**
