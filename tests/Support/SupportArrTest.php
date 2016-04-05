@@ -41,6 +41,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
         $this->assertEquals(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::dot([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::dot(['foo' => []]);
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]]);
+        $this->assertEquals(['foo.bar' => []], $array);
     }
 
     public function testExcept()

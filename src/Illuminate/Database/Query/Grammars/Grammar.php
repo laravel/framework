@@ -142,9 +142,9 @@ class Grammar extends BaseGrammar
 
             $type = $join->type;
 
-            // Cross joins generate a cartesian product between the first table and the joined
-            // table. Since they don't expect any "on" clauses to perform the join, we just
-            // just append the SQL statement and jump to the next iteration of this loop.
+            // Cross joins generate a cartesian product between the first table and the
+            // joined table. Since they don't expect any "on" clauses to perform the
+            // join, we append the SQL and jump to the next iteration of the loop.
             if ($type === 'cross') {
                 $sql[] = "cross join $table";
 
