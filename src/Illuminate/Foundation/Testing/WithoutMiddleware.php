@@ -7,7 +7,7 @@ use Exception;
 trait WithoutMiddleware
 {
     /**
-     * Disable all middleware for the test class.
+     * Prevent all middleware from being executed for this test class.
      *
      * @throws \Exception
      */
