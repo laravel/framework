@@ -117,12 +117,15 @@ class Pipeline implements PipelineContract
                 // the appropriate method and arguments, returning the results back out.
                 if ($pipe instanceof Closure) {
                     return call_user_func($pipe, $passable, $stack);
-                } else {
+                } elseif (! is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
-
-                    return call_user_func_array([$this->container->make($name), $this->method],
-                            array_merge([$passable, $stack], $parameters));
+                    $pipe = $this->container->make($name);
+                    $parameters = array_merge([$passable, $stack], $parameters);
+                } else {
+                    $parameters = [$passable, $stack];
                 }
+
+                return call_user_func_array([$pipe, $this->method], $parameters);
             };
         };
     }

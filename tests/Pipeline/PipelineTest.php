@@ -27,6 +27,21 @@ class PipelineTest extends PHPUnit_Framework_TestCase
         unset($_SERVER['__test.pipe.two']);
     }
 
+    public function testPipelineUsageWithObjects()
+    {
+        $result = (new Pipeline(new Illuminate\Container\Container))
+            ->send('foo')
+            ->through([new PipelineTestPipeOne])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
     public function testPipelineUsageWithParameters()
     {
         $parameters = ['one', 'two'];
