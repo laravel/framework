@@ -308,12 +308,12 @@ class Store implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($name)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($name) ? $name : func_get_args();
 
         foreach ($keys as $value) {
-            if (!$this->get($value)) {
+            if (! $this->get($value)) {
                 return false;
             }
         }
