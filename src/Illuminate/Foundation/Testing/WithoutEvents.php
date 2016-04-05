@@ -7,6 +7,8 @@ use Exception;
 trait WithoutEvents
 {
     /**
+     * Prevent all event handlers from running.
+     * 
      * @throws \Exception
      */
     public function disableEventsForAllTests()
