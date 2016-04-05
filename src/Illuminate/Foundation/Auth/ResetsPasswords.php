@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 
@@ -226,6 +227,7 @@ trait ResetsPasswords
     protected function resetPassword($user, $password)
     {
         $user->password = bcrypt($password);
+        $user->remember_token = Str::random(60);
 
         $user->save();
 
