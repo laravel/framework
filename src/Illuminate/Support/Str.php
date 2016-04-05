@@ -69,7 +69,7 @@ class Str
     public static function contains($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
+            if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }
         }
@@ -87,7 +87,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle === substr($haystack, -strlen($needle))) {
+            if ((string) $needle === static::substr($haystack, -static::length($needle))) {
                 return true;
             }
         }
@@ -106,7 +106,7 @@ class Str
     {
         $quoted = preg_quote($cap, '/');
 
-        return preg_replace('/(?:'.$quoted.')+$/', '', $value).$cap;
+        return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
     }
 
     /**
@@ -129,7 +129,7 @@ class Str
         // pattern such as "library/*", making any string check convenient.
         $pattern = str_replace('\*', '.*', $pattern);
 
-        return (bool) preg_match('#^'.$pattern.'\z#', $value);
+        return (bool) preg_match('#^'.$pattern.'\z#u', $value);
     }
 
     /**
@@ -183,7 +183,7 @@ class Str
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
-        if (! isset($matches[0]) || strlen($value) === strlen($matches[0])) {
+        if (! isset($matches[0]) || static::length($value) === static::length($matches[0])) {
             return $value;
         }
 
@@ -224,12 +224,12 @@ class Str
     {
         $string = '';
 
-        while (($len = strlen($string)) < $length) {
+        while (($len = static::length($string)) < $length) {
             $size = $length - $len;
 
             $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= static::substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
 
         return $string;
@@ -260,7 +260,7 @@ class Str
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+        return static::substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
     }
 
     /**
@@ -393,9 +393,9 @@ class Str
         }
 
         if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/', '', $value);
+            $value = preg_replace('/\s+/u', '', $value);
 
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
+            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
         }
 
         return static::$snakeCache[$key] = $value;
@@ -411,7 +411,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) {
+            if ($needle != '' && mb_strpos($haystack, $needle) === 0) {
                 return true;
             }
         }
