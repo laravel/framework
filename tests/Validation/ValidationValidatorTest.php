@@ -2647,6 +2647,31 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
     }
 
+    public function testValidateImplicitEachWithAsterisksBeforeAndAfter()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => [
+            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+        ]], ['foo.*.start' => ['before:foo.*.end']]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [
+            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+        ]], ['foo.*.end' => ['before:foo.*.start']]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => [
+            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+        ]], ['foo.*.end' => ['after:foo.*.start']]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [
+            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+        ]], ['foo.*.start' => ['after:foo.*.end']]);
+        $this->assertTrue($v->fails());
+    }
+
     public function testValidateEachWithNonIndexedArray()
     {
         $trans = $this->getRealTranslator();
