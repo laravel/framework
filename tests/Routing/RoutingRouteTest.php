@@ -587,6 +587,34 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             ['foo'],
             $route->middleware()
         );
+
+        $router = $this->getRouter();
+        $router->group(['middleware' => 'web'], function () use ($router) {
+            $router->group(['middleware' => 'web'], function () use ($router) {
+                $router->get('bar', function () { return 'hello'; });
+            });
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            ['web'],
+            $route->middleware()
+        );
+
+        $router = $this->getRouter();
+        $router->group(['middleware' => ['web', 'foo']], function () use ($router) {
+            $router->group(['middleware' => 'web'], function () use ($router) {
+                $router->group(['middleware' => ['web', 'foo', 'baz']], function () use ($router) {
+                    $router->get('bar', function () { return 'hello'; });
+                });
+            });
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            array_values(['web', 'foo', 'baz']),
+            array_values($route->middleware())
+        );
     }
 
     public function testRoutePrefixing()
