@@ -78,7 +78,6 @@ class View implements ArrayAccess, ViewContract
      * @return string
      *
      * @throws \Exception
-     * @throws \Throwable
      */
     public function render(callable $callback = null)
     {
