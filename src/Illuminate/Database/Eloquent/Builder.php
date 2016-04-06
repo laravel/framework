@@ -306,30 +306,6 @@ class Builder
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
 
-            $continue = (yield $row);
-
-            if ($continue === false) {
-                return;
-            }
-        }
-    }
-
-    /**
-     * Traverses through a result set using a cursor.
-     *
-     * @return void
-     */
-    public function traverse()
-    {
-        $builder = $this->applyScopes();
-
-        $statement = $builder->query->fetch();
-
-        while ($row = $statement->fetch()) {
-            // On each result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
-
             if ($row === false) {
                 return;
             }
