@@ -371,34 +371,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Run a select statement against the database and returns a 'cursor'.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  bool  $useReadPdo
-     * @return mixed
-     */
-    public function fetch($query, $bindings = [], $useReadPdo = true)
-    {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
-            if ($me->pretending()) {
-                return [];
-            }
-
-            // For select statements, we'll simply execute the query and return an array
-            // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
-            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
-
-            $statement->setFetchMode($me->getFetchMode());
-
-            $statement->execute($me->prepareBindings($bindings));
-
-            return $statement;
-        });
-    }
-
-    /**
      * Get the PDO connection to use for a select query.
      *
      * @param  bool  $useReadPdo
