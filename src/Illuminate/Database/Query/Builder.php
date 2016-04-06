@@ -1644,6 +1644,18 @@ class Builder
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @return mixed
+     */
+    public function fetch()
+    {
+        $results = $this->connection->fetch($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+
+        return $results;
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param  int  $count
