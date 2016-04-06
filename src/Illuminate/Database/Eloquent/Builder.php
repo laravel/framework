@@ -307,7 +307,7 @@ class Builder
             // keep the memory low for spinning through large result sets for working.
 
             $continue = (yield $row);
-            
+
             if ($continue === false) {
                 return;
             }
