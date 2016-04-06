@@ -313,7 +313,7 @@ class Store implements SessionInterface
         $keys = is_array($name) ? $name : func_get_args();
 
         foreach ($keys as $value) {
-            if (! $this->get($value)) {
+            if (is_null($this->get($value))) {
                 return false;
             }
         }
