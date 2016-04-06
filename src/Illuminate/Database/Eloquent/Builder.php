@@ -291,27 +291,30 @@ class Builder
     }
 
     /**
-     * Fetch the row from the result set.
-     *
-     * @param  callable  $callback
-     * @return bool
+     * Traverses through a result set using a cursor.
+     *     
+     * @return void     
      */
-    public function fetch(callable $callback)
+    public function traverse()
     {
         $builder = $this->applyScopes();
 
-        $statement = $this->query->fetch();
+        $statement = $builder->query->fetch();
+
 
         while ($row = $statement->fetch()) {
             // On each result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
-            if (call_user_func($callback, $row) === false) {
-                return false;
+
+            $continue = (yield $row);
+            
+            if ($continue === false) {
+                return;
             }
+
         }
 
-        return true;
     }
 
     /**
