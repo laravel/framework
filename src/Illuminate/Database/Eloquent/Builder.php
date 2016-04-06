@@ -302,7 +302,6 @@ class Builder
 
         $statement = $this->query->fetch();
 
-
         while ($row = $statement->fetch()) {
             // On each result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
@@ -310,7 +309,6 @@ class Builder
             if (call_user_func($callback, $row) === false) {
                 return false;
             }
-
         }
 
         return true;
