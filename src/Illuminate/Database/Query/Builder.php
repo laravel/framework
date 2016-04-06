@@ -1641,7 +1641,7 @@ class Builder
         $results = $this->connection->fetch($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
 
         return $results;
-    }    
+    }
 
     /**
      * Chunk the results of the query.
