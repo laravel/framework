@@ -74,10 +74,13 @@ class Worker
      * @param  int     $memory
      * @param  int     $sleep
      * @param  int     $maxTries
+     * @param  int     $timeout
      * @return array
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0, $timeout = 0)
     {
+        $start = time();
+
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
@@ -89,7 +92,7 @@ class Worker
                 $this->sleep($sleep);
             }
 
-            if ($this->memoryExceeded($memory) || $this->queueShouldRestart($lastRestart)) {
+            if ($this->memoryExceeded($memory) || $this->timeoutReached($start, $timeout) || $this->queueShouldRestart($lastRestart)) {
                 $this->stop();
             }
         }
@@ -337,6 +340,18 @@ class Worker
     public function memoryExceeded($memoryLimit)
     {
         return (memory_get_usage() / 1024 / 1024) >= $memoryLimit;
+    }
+
+    /**
+     * Determine if the timeout has been reached.
+     *
+     * @param  int  $start
+     * @param  int  $timeout
+     * @return bool
+     */
+    protected function timeoutReached($start, $timeout)
+    {
+        return $timeout > 0 && $start + $timeout < time();
     }
 
     /**
