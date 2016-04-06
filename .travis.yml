@@ -18,6 +18,9 @@ matrix:
 
 sudo: false
 
+services:
+  - redis-server
+
 before_install:
   - travis_retry composer self-update
 
