@@ -2681,6 +2681,39 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testCombineValidators()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'required|string']);
+        $v2 = new Validator($trans, ['bar' => 1], ['bar' => 'required|integer']);
+        $v->combine($v2);
+
+        $this->assertEquals(['foo' => '1', 'bar' => '1'], $v->getData());
+        $this->assertEquals(['foo' => ['required', 'string'], 'bar' => ['required', 'integer']], $v->getRules());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'required']);
+        $v2 = new Validator($trans, ['foo' => 2], ['foo' => 'integer']);
+        $v->combine($v2);
+
+        $this->assertEquals(['foo' => ['1', 2]], $v->getData());
+        $this->assertEquals(['foo.0' => ['required'], 'foo.1' => ['integer']], $v->getRules());
+
+        $v = new Validator($trans, ['foo' => [1, 2]], ['foo' => 'array']);
+        $v2 = new Validator($trans, ['foo' => [3, 4]], ['foo' => 'array']);
+        $v->combine($v2);
+
+        $this->assertEquals(['foo' => [1, 2, 3, 4]], $v->getData());
+        $this->assertEquals(['foo' => ['array']], $v->getRules());
+
+        $v = new Validator($trans, ['users' => [['name' => 'a']]], ['users.*.name' => 'required']);
+        $v2 = new Validator($trans, ['users' => [['name' => 'b']]], ['users.*.name' => 'string']);
+        $v->combine($v2);
+
+        $this->assertEquals(['users' => [['name' => 'a'], ['name' => 'b']]], $v->getData());
+        $this->assertEquals(['users.0.name' => ['required', 'string'], 'users.1.name' => ['required', 'string']], $v->getRules());
+    }
+
     public function testGetLeadingExplicitAttributePath()
     {
         $trans = $this->getRealTranslator();
