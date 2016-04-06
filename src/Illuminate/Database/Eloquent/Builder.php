@@ -292,15 +292,14 @@ class Builder
 
     /**
      * Traverses through a result set using a cursor.
-     *     
-     * @return void     
+     *
+     * @return void
      */
     public function traverse()
     {
         $builder = $this->applyScopes();
 
         $statement = $builder->query->fetch();
-
 
         while ($row = $statement->fetch()) {
             // On each result set, we will pass them to the callback and then let the
@@ -312,9 +311,7 @@ class Builder
             if ($continue === false) {
                 return;
             }
-
         }
-
     }
 
     /**
