@@ -170,7 +170,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         $message = $message->getSwiftMessage();
 
-        return $this->sendSwiftMessage($message);
+        $this->sendSwiftMessage($message);
     }
 
     /**
