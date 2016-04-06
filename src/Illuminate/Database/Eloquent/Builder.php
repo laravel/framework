@@ -291,7 +291,7 @@ class Builder
     }
 
     /**
-     * Fetch the row from the result set
+     * Fetch the row from the result set.
      *
      * @param  callable  $callback
      * @return bool
@@ -314,7 +314,7 @@ class Builder
         }
 
         return true;
-    }    
+    }
 
     /**
      * Execute the query as a "select" statement.

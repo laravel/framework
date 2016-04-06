@@ -343,7 +343,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Run a select statement against the database and return 'cursor'
+     * Run a select statement against the database and returns a 'cursor'.
      *
      * @param  string  $query
      * @param  array  $bindings
@@ -366,7 +366,7 @@ class Connection implements ConnectionInterface
 
             return $statement;
         });
-    }    
+    }
 
     /**
      * Get the PDO connection to use for a select query.

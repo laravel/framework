@@ -1638,7 +1638,7 @@ class Builder
      */
     public function fetch()
     {
-        $results =  $this->connection->fetch($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+        $results = $this->connection->fetch($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
 
         return $results;
     }    
