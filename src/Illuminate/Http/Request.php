@@ -583,7 +583,7 @@ class Request extends SymfonyRequest implements ArrayAccess
 
         $split = explode('/', $actual);
 
-        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
+        if (isset($split[1]) && @preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
             return true;
         }
 
