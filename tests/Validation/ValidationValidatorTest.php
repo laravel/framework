@@ -2516,6 +2516,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->messages()->has('foo.0.name'));
         $this->assertTrue($v->messages()->has('foo.1.name'));
 
+        $v = new Validator($trans, ['fields' => [
+            'fr' => ['name' => '', 'content' => 'ragnar'],
+            'es' => ['name' => '', 'content' => 'lagertha'],
+        ]], ['fields.*.name' => 'required_with:fields.*.content']);
+        $this->assertFalse($v->passes());
+
         // nested required_with fails
         $v = new Validator($trans, ['foo' => [
             ['bar' => [
