@@ -22,10 +22,8 @@ class FoundationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Initialize the form request with data from the given request.
+     * Bootstrap the application services.
      *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $form
-     * @param  \Symfony\Component\HttpFoundation\Request  $current
      * @return void
      */
     public function boot()
