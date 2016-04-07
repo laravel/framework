@@ -435,6 +435,10 @@ class Router implements RegistrarContract
      */
     public static function mergeGroup($new, $old)
     {
+        if (isset($new['middleware'], $old['middleware'])) {
+            $new['middleware'] = array_diff((array) $new['middleware'], (array) $old['middleware']);
+        }
+
         $new['namespace'] = static::formatUsesPrefix($new, $old);
 
         $new['prefix'] = static::formatGroupPrefix($new, $old);
