@@ -250,4 +250,37 @@ class PasswordBroker implements PasswordBrokerContract
     {
         return $this->tokens;
     }
+
+    /**
+     * Generate a password reset token.
+     *
+     * @param CanResetPasswordContract $user
+     * @return string
+     */
+    public function generateToken(CanResetPasswordContract $user)
+    {
+        return $this->tokens->create($user);
+    }
+
+    /**
+     * Delete password reset token.
+     *
+     * @param string $token
+     */
+    public function deleteToken($token)
+    {
+        $this->tokens->delete($token);
+    }
+
+    /**
+     * Validate password reset token.
+     *
+     * @param CanResetPasswordContract $user
+     * @param string $token
+     * @return bool
+     */
+    public function validateToken(CanResetPasswordContract $user, $token)
+    {
+        return $this->tokens->exists($user, $token);
+    }
 }
