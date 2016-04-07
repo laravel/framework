@@ -39,8 +39,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
         $writePdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
         $writePdo->expects($this->never())->method('prepare');
-        $statement = $this->getMock('PDOStatement', ['execute', 'fetchAll']);
-        $statement->expects($this->once())->method('execute')->with($this->equalTo(['foo' => 'bar']));
+        $statement = $this->getMock('PDOStatement', ['execute', 'fetchAll', 'bindValue']);
+        $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
+        $statement->expects($this->once())->method('execute');
         $statement->expects($this->once())->method('fetchAll')->will($this->returnValue(['boom']));
         $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue($statement));
         $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
@@ -81,8 +82,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     public function testStatementProperlyCallsPDO()
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
-        $statement = $this->getMock('PDOStatement', ['execute']);
-        $statement->expects($this->once())->method('execute')->with($this->equalTo(['bar']))->will($this->returnValue('foo'));
+        $statement = $this->getMock('PDOStatement', ['execute', 'bindValue']);
+        $statement->expects($this->once())->method('bindValue')->with(1, 'bar', 2);
+        $statement->expects($this->once())->method('execute')->will($this->returnValue('foo'));
         $pdo->expects($this->once())->method('prepare')->with($this->equalTo('foo'))->will($this->returnValue($statement));
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
         $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['bar']))->will($this->returnValue(['bar']));
@@ -97,8 +99,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     public function testAffectingStatementProperlyCallsPDO()
     {
         $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
-        $statement = $this->getMock('PDOStatement', ['execute', 'rowCount']);
-        $statement->expects($this->once())->method('execute')->with($this->equalTo(['foo' => 'bar']));
+        $statement = $this->getMock('PDOStatement', ['execute', 'rowCount', 'bindValue']);
+        $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
+        $statement->expects($this->once())->method('execute');
         $statement->expects($this->once())->method('rowCount')->will($this->returnValue(['boom']));
         $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue($statement));
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
