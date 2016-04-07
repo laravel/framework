@@ -122,6 +122,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('foo/bar', 'GET'));
     }
 
+    public function testFluentRoutingWithControllerAction()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar')->uses('RouteTestControllerStub@index');
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->group(['namespace' => 'App'], function ($router) {
+            $router->get('foo/bar')->uses('RouteTestControllerStub@index');
+        });
+        $action = $router->getRoutes()->getRoutes()[0]->getAction();
+        $this->assertEquals('App\\RouteTestControllerStub@index', $action['controller']);
+    }
+
     public function testMiddlewareGroups()
     {
         unset($_SERVER['__middleware.group']);
