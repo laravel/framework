@@ -1083,9 +1083,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'Url']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['x' => ['fdsfds', 'fdsfds']], ['x' => 'Url']);
-        $this->assertFalse($v->passes());
-
         $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'Url']);
         $this->assertTrue($v->passes());
     }
@@ -1094,9 +1091,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_url']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['x' => ['fdsfs', 'fdsfds']], ['x' => 'active_url']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'active_url']);
@@ -1330,9 +1324,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => 'Not a date'], ['x' => 'date']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date']);
-        $this->assertTrue($v->fails());
-
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->passes());
 
@@ -1344,9 +1335,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['x' => '22000-01-01'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date_format:Y-m-d']);
-        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfter()
@@ -1356,14 +1344,8 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'Before:2012-01-01']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => ['2000-01-01']], ['x' => 'Before:2012-01-01']);
-        $this->assertFalse($v->passes());
-
         $v = new Validator($trans, ['x' => '2012-01-01'], ['x' => 'After:2000-01-01']);
         $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['x' => ['2012-01-01']], ['x' => 'After:2000-01-01']);
-        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['start' => '2012-01-01', 'ends' => '2013-01-01'], ['start' => 'After:2000-01-01', 'ends' => 'After:start']);
         $this->assertTrue($v->passes());
@@ -1385,16 +1367,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => '31/12/2000'], ['x' => 'before:31/02/2012']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['x' => ['31/12/2000']], ['x' => 'before:31/02/2012']);
-        $this->assertTrue($v->fails());
-
         $v = new Validator($trans, ['x' => '31/12/2000'], ['x' => 'date_format:d/m/Y|before:31/12/2012']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'after:31/12/2000']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['x' => ['31/12/2012']], ['x' => 'after:31/12/2000']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '31/12/2012'], ['x' => 'date_format:d/m/Y|after:31/12/2000']);
