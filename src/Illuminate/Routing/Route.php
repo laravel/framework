@@ -267,6 +267,7 @@ class Route
     /**
      * Get the parameters that are listed in the route / controller signature.
      *
+     * @param string|null  $subClass
      * @return array
      */
     public function signatureParameters($subClass = null)
