@@ -1650,7 +1650,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        if (! is_string($value) || strtotime($value) === false) {
+        if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
             return false;
         }
 
@@ -1671,7 +1671,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'date_format');
 
-        if (! is_string($value)) {
+        if (! is_string($value) && ! is_numeric($value)) {
             return false;
         }
 
@@ -1692,7 +1692,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'before');
 
-        if (! is_string($value)) {
+        if (! is_string($value) && ! is_numeric($value)) {
             return false;
         }
 
@@ -1734,7 +1734,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if (! is_string($value)) {
+        if (! is_string($value) && ! is_numeric($value)) {
             return false;
         }
 
