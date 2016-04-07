@@ -242,30 +242,21 @@ class PasswordBroker implements PasswordBrokerContract
     }
 
     /**
-     * Get the password reset token repository implementation.
+     * Create a new password reset token for the given user.
      *
-     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
-     */
-    public function getRepository()
-    {
-        return $this->tokens;
-    }
-
-    /**
-     * Generate a password reset token.
-     *
-     * @param CanResetPasswordContract $user
+     * @param  CanResetPasswordContract $user
      * @return string
      */
-    public function generateToken(CanResetPasswordContract $user)
+    public function createToken(CanResetPasswordContract $user)
     {
         return $this->tokens->create($user);
     }
 
     /**
-     * Delete password reset token.
+     * Delete the given password reset token.
      *
-     * @param string $token
+     * @param  string  $token
+     * @return void
      */
     public function deleteToken($token)
     {
@@ -273,14 +264,24 @@ class PasswordBroker implements PasswordBrokerContract
     }
 
     /**
-     * Validate password reset token.
+     * Validate the given password reset token.
      *
-     * @param CanResetPasswordContract $user
-     * @param string $token
+     * @param  CanResetPasswordContract $user
+     * @param  string $token
      * @return bool
      */
-    public function validateToken(CanResetPasswordContract $user, $token)
+    public function tokenExists(CanResetPasswordContract $user, $token)
     {
         return $this->tokens->exists($user, $token);
+    }
+
+    /**
+     * Get the password reset token repository implementation.
+     *
+     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     */
+    public function getRepository()
+    {
+        return $this->tokens;
     }
 }
