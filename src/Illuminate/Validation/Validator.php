@@ -121,7 +121,7 @@ class Validator implements ValidatorContract
     protected $customAttributes = [];
 
     /**
-     * The array of custom displayabled values.
+     * The array of custom displayable values.
      *
      * @var array
      */
