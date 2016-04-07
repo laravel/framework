@@ -427,4 +427,33 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
         $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
     }
+
+    public function testTranspose()
+    {
+        $this->assertEquals([[1, 4, 7], [2, 5, 8], [3, 6, 9]], Arr::transpose([[1, 2, 3], [4, 5, 6], [7, 8, 9]]));
+
+        // with a single array
+        $this->assertEquals([1, 2, 3], Arr::transpose([[1, 2, 3]]));
+
+        // with an associative array
+        $array = [
+            'names' =>  ['adam', 'ben', 'claire'],
+            'ages' => [24, 32, 52],
+            'emails' => ['adam@example.com', 'ben@example.com', 'claire@example.com'],
+        ];
+
+        $expected = [
+            ['adam', 24, 'adam@example.com'],
+            ['ben', 32, 'ben@example.com'],
+            ['claire', 52, 'claire@example.com'],
+        ];
+
+        $this->assertEquals($expected, Arr::transpose($array));
+
+        // with arrays of different lengths
+        $array = [['a', 'b', 'c', 'd'], ['apple', 'box', 'car']];
+        $expected = [['a', 'apple'], ['b', 'box'], ['c', 'car'], ['d', null]];
+
+        $this->assertEquals($expected, Arr::transpose($array));
+    }
 }

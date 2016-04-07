@@ -500,6 +500,19 @@ class Arr
     }
 
     /**
+     * Transpose each item in the array, interchanging the row and column indexes.
+     *
+     * @param  array $arrayOfArrays
+     * @return mixed
+     */
+    public static function transpose(array $arrayOfArrays)
+    {
+        array_unshift($arrayOfArrays, null);
+
+        return call_user_func_array('array_map', $arrayOfArrays);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
