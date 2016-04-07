@@ -333,7 +333,7 @@ class Migrator
 
         $class = Str::studly($file);
 
-        return new $class;
+        return app($class);
     }
 
     /**
