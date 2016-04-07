@@ -242,9 +242,9 @@ class Route
             $middleware = [$middleware];
         }
 
-        $this->action['middleware'] = array_unique(array_merge(
+        $this->action['middleware'] = array_merge(
             (array) Arr::get($this->action, 'middleware', []), $middleware
-        ));
+        );
 
         return $this;
     }
