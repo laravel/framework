@@ -1636,9 +1636,9 @@ class Builder
      *
      * @return mixed
      */
-    public function fetch()
+    public function cursor()
     {
-        $results = $this->connection->fetch($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+        $results = $this->connection->cursor($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
 
         return $results;
     }

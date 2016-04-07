@@ -343,14 +343,14 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Run a select statement against the database and returns a 'cursor'.
+     * Run a select statement against the database and returns a cursor.
      *
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
      * @return mixed
      */
-    public function fetch($query, $bindings = [], $useReadPdo = true)
+    public function cursor($query, $bindings = [], $useReadPdo = true)
     {
         return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
             if ($me->pretending()) {

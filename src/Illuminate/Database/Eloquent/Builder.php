@@ -295,11 +295,11 @@ class Builder
      *
      * @return void
      */
-    public function traverse()
+    public function cursor()
     {
         $builder = $this->applyScopes();
 
-        $statement = $builder->query->fetch();
+        $statement = $builder->query->cursor();
 
         while ($row = $statement->fetch()) {
             // On each result set, we will pass them to the callback and then let the
@@ -310,7 +310,10 @@ class Builder
                 return;
             }
 
-            yield $row;
+            //Hydrate and yield an Eloquent Model
+            $model = $this->model->newFromBuilder($row);
+
+            yield $model;
         }
     }
 
