@@ -824,20 +824,29 @@ class Route
      */
     public function uses($action)
     {
-        if (is_string($action)) {
-            $groupStack = last($this->router->getGroupStack());
+        $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
-            if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
-                $action = $groupStack['namespace'].'\\'.$action;
-            }
-        }
-
-        $action = $this->parseAction([
+        return $this->setAction(array_merge($this->action, $this->parseAction([
             'uses' => $action,
             'controller' => $action,
-        ]);
+        ])));
+    }
 
-        return $this->setAction(array_merge($this->action, $action));
+    /**
+     * Parse a string based action for the "uses" fluent method.
+     *
+     * @param  string  $action
+     * @return string
+     */
+    protected function addGroupNamespaceToStringUses($action)
+    {
+        $groupStack = last($this->router->getGroupStack());
+
+        if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
+            return $groupStack['namespace'].'\\'.$action;
+        }
+
+        return $action;
     }
 
     /**
