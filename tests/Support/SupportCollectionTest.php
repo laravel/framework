@@ -1216,6 +1216,23 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testPropertyOverloading()
+    {
+        $collection = new Collection([
+            'foo' => 1,
+            'bar' => 2,
+        ]);
+
+        $this->assertEquals($collection->foo, 1);
+
+        $collection->put('baz', 3);
+        $this->assertTrue(isset($collection->baz));
+        $this->assertEquals($collection->baz, 3);
+
+        unset($collection->baz);
+        $this->assertFalse(isset($collection->baz));
+    }
 }
 
 class TestAccessorEloquentTestStub
