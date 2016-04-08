@@ -824,7 +824,20 @@ class Route
      */
     public function uses($action)
     {
-        return $this->setAction(array_merge($this->action, $this->parseAction($action)));
+        if (is_string($action)) {
+            $groupStack = last($this->router->getGroupStack());
+
+            if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
+                $action = $groupStack['namespace'].'\\'.$action;
+            }
+        }
+
+        $action = $this->parseAction([
+            'uses' => $action,
+            'controller' => $action,
+        ]);
+
+        return $this->setAction(array_merge($this->action, $action));
     }
 
     /**
