@@ -449,9 +449,7 @@ class Route
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
         $params = $this->matchToKeys(
-
             array_slice($this->bindPathParameters($request), 1)
-
         );
 
         // If the route has a regular expression for the host part of the URI, we will
