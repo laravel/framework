@@ -59,7 +59,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a create table command.
+     * Compile a column addition table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
