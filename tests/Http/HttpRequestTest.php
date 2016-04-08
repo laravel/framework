@@ -553,6 +553,15 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($request->accepts('application/baz+json'));
         $this->assertFalse($request->acceptsHtml());
         $this->assertFalse($request->acceptsJson());
+
+        // Should not be handled as regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '.+/.+']);
+        $this->assertFalse($request->accepts('application/json'));
+        $this->assertFalse($request->accepts('application/baz+json'));
+
+        // Should not produce compilation error on invalid regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '(/(']);
+        $this->assertFalse($request->accepts('text/html'));
     }
 
     /**
