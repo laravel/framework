@@ -190,9 +190,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertNull(Arr::get($array, 'foo', 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
 
+        // Test null key returns the whole array
+        $array = ['foo', 'bar'];
+        $this->assertEquals($array, Arr::get($array, null));
+
         // Test $array not an array
         $this->assertSame('default', Arr::get(null, 'foo', 'default'));
         $this->assertSame('default', Arr::get(false, 'foo', 'default'));
+
+        // Test $array not an array and key is null
         $this->assertSame('default', Arr::get(null, null, 'default'));
 
         // Test $array is empty and key is null
@@ -225,8 +231,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
 
+        $array = ['foo', 'bar'];
+        $this->assertFalse(Arr::has($array, null));
+
         $this->assertFalse(Arr::has(null, 'foo'));
         $this->assertFalse(Arr::has(false, 'foo'));
+
+        $this->assertFalse(Arr::has(null, null));
+        $this->assertFalse(Arr::has([], null));
     }
 
     public function testIsAssoc()
