@@ -16,6 +16,7 @@ class HasMany extends HasOneOrMany
         if ($key = $this->getParentKey()) {
             return $this->query->get();
         }
+
         return new Collection;
     }
 
