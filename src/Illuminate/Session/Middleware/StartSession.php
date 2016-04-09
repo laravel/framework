@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
 use Illuminate\Session\CookieSessionHandler;
-use Illuminate\Session\CacheBasedSessionHandler;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Session\CacheBasedSessionHandler;
 
 class StartSession
 {
