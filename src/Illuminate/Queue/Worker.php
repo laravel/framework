@@ -222,7 +222,7 @@ class Worker
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $delay
-     * @param  \Exception $e;
+     * @param  \Throwable  $e
      * @return void
      */
     protected function handleJobException($connection, Job $job, $delay, $e)
