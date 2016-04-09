@@ -120,16 +120,29 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testWhenCallback()
     {
-        $callback = function ($query) {
+        $callbackQuery = function ($query) {
             return $query->where('id', '=', 1);
         };
 
+        $callbackNull = function ($query) {
+            $query->where('id', '=', 1);
+        };
+
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(true, $callback)->where('email', 'foo');
+        $builder->select('*')->from('users')->when(true, $callbackQuery)->where('email', 'foo');
         $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $builder->select('*')->from('users')->when(false, $callbackQuery)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
+
+        // Return builder if callback return null.
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(true, $callbackNull)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, $callbackNull)->where('email', 'foo');
         $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
     }
 
