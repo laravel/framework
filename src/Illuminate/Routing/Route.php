@@ -449,9 +449,7 @@ class Route
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
         $params = $this->matchToKeys(
-
             array_slice($this->bindPathParameters($request), 1)
-
         );
 
         // If the route has a regular expression for the host part of the URI, we will
@@ -824,7 +822,29 @@ class Route
      */
     public function uses($action)
     {
-        return $this->setAction(array_merge($this->action, $this->parseAction($action)));
+        $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
+
+        return $this->setAction(array_merge($this->action, $this->parseAction([
+            'uses' => $action,
+            'controller' => $action,
+        ])));
+    }
+
+    /**
+     * Parse a string based action for the "uses" fluent method.
+     *
+     * @param  string  $action
+     * @return string
+     */
+    protected function addGroupNamespaceToStringUses($action)
+    {
+        $groupStack = last($this->router->getGroupStack());
+
+        if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
+            return $groupStack['namespace'].'\\'.$action;
+        }
+
+        return $action;
     }
 
     /**

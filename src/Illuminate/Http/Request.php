@@ -661,14 +661,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $split = explode('/', $actual);
 
-        if (isset($split[1])) {
-            $split[0] = preg_quote($split[0], '#');
-            $split[1] = preg_quote($split[1], '#');
-
-            return preg_match('#'.$split[0].'/.+\+'.$split[1].'#', $type);
-        }
-
-        return false;
+        return isset($split[1]) && preg_match('#'.preg_quote($split[0], '#').'/.+\+'.preg_quote($split[1], '#').'#', $type);
     }
 
     /**
