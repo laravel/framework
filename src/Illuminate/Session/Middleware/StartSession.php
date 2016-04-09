@@ -147,7 +147,7 @@ class StartSession
         // Cache based sessions use their own mechanism to invalidate entries
         // once their lifetime expires so there's no need to perform the garbage
         // collection for them.
-        if (! $this->usingCacheBasedSessions()) {
+        if (! $this->sessionUsesCacheBasedHandler($session)) {
             $config = $this->manager->getSessionConfig();
 
             // Here we will see if this request hits the garbage collection lottery by hitting
@@ -251,16 +251,13 @@ class StartSession
     }
 
     /**
-     * Determine if the session is using cache based sessions.
+     * Determine if the session is using a cache based session handler instance.
      *
+     * @param  \Illuminate\Session\SessionInterface  $session
      * @return bool
      */
-    protected function usingCacheBasedSessions()
+    protected function sessionUsesCacheBasedHandler(SessionInterface $session)
     {
-        if (! $this->sessionConfigured()) {
-            return false;
-        }
-
-        return $this->manager->driver()->getHandler() instanceof CacheBasedSessionHandler;
+        return $session->getHandler() instanceof CacheBasedSessionHandler;
     }
 }
