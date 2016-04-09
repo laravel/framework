@@ -24,7 +24,9 @@ class CollectGarbageJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param \SessionHandlerInterface $sessionHandler
+     * @param  \SessionHandlerInterface  $sessionHandler
+     * @param  int  $sessionLifetime
+     * @return void
      */
     public function __construct(SessionHandlerInterface $sessionHandler, $sessionLifetime)
     {

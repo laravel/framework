@@ -26,7 +26,7 @@ class StartSession
     /**
      * The bus dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \Illuminate\Contracts\Bus\Dispatcher|null
      */
     protected $dispatcher;
 
@@ -41,10 +41,10 @@ class StartSession
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Bus\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(SessionManager $manager, DispatcherContract $dispatcher)
+    public function __construct(SessionManager $manager, DispatcherContract $dispatcher = null)
     {
         $this->manager = $manager;
         $this->dispatcher = $dispatcher;
@@ -160,7 +160,11 @@ class StartSession
         // the odds needed to perform garbage collection on any given request. If we do
         // hit it, we'll call this handler to let it delete all the expired sessions.
         if ($this->configHitsLottery($config)) {
-            $this->dispatcher->dispatch(new CollectGarbageJob($session->getHandler(), $this->getSessionLifetimeInSeconds()));
+            if ($this->dispatcher) {
+                $this->dispatcher->dispatch(new CollectGarbageJob($session->getHandler(), $this->getSessionLifetimeInSeconds()));
+            } else {
+                $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            }
         }
     }
 
