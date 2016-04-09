@@ -8,8 +8,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\CacheBasedSessionHandler;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class StartSession
@@ -143,13 +144,18 @@ class StartSession
      */
     protected function collectGarbage(SessionInterface $session)
     {
-        $config = $this->manager->getSessionConfig();
+        // Cache based sessions use their own mechanism to invalidate entries
+        // once their lifetime expires so there's no need to perform the garbage
+        // collection for them.
+        if (! $this->usingCacheBasedSessions()) {
+            $config = $this->manager->getSessionConfig();
 
-        // Here we will see if this request hits the garbage collection lottery by hitting
-        // the odds needed to perform garbage collection on any given request. If we do
-        // hit it, we'll call this handler to let it delete all the expired sessions.
-        if ($this->configHitsLottery($config)) {
-            $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            // Here we will see if this request hits the garbage collection lottery by hitting
+            // the odds needed to perform garbage collection on any given request. If we do
+            // hit it, we'll call this handler to let it delete all the expired sessions.
+            if ($this->configHitsLottery($config)) {
+                $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            }
         }
     }
 
@@ -242,5 +248,19 @@ class StartSession
         }
 
         return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
+    }
+
+    /**
+     * Determine if the session is using cache based sessions.
+     *
+     * @return bool
+     */
+    protected function usingCacheBasedSessions()
+    {
+        if (! $this->sessionConfigured()) {
+            return false;
+        }
+
+        return $this->manager->driver()->getHandler() instanceof CacheBasedSessionHandler;
     }
 }
