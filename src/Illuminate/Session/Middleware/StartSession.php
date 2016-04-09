@@ -144,18 +144,21 @@ class StartSession
      */
     protected function collectGarbage(SessionInterface $session)
     {
-        // Cache based sessions use their own mechanism to invalidate entries
-        // once their lifetime expires so there's no need to perform the garbage
-        // collection for them.
-        if (! $this->sessionUsesCacheBasedHandler($session)) {
-            $config = $this->manager->getSessionConfig();
+        // Some session handlers like cache based sessions use their own
+        // mechanism to invalidate entries once their lifetime expires.
+        // There's no need to perform a garbage collection for those kind of
+        // session handlers.
+        if (! $this->gcNeeded($session)) {
+            return;
+        }
 
-            // Here we will see if this request hits the garbage collection lottery by hitting
-            // the odds needed to perform garbage collection on any given request. If we do
-            // hit it, we'll call this handler to let it delete all the expired sessions.
-            if ($this->configHitsLottery($config)) {
-                $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
-            }
+        $config = $this->manager->getSessionConfig();
+
+        // Here we will see if this request hits the garbage collection lottery by hitting
+        // the odds needed to perform garbage collection on any given request. If we do
+        // hit it, we'll call this handler to let it delete all the expired sessions.
+        if ($this->configHitsLottery($config)) {
+            $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
         }
     }
 
@@ -251,13 +254,14 @@ class StartSession
     }
 
     /**
-     * Determine if the session is using a cache based session handler instance.
+     * Determines if the specified session needs garbage collection for expired
+     * sessions.
      *
      * @param  \Illuminate\Session\SessionInterface  $session
      * @return bool
      */
-    protected function sessionUsesCacheBasedHandler(SessionInterface $session)
+    protected function gcNeeded(SessionInterface $session)
     {
-        return $session->getHandler() instanceof CacheBasedSessionHandler;
+        return ! ($session->getHandler() instanceof CacheBasedSessionHandler);
     }
 }
