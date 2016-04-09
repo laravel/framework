@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Http\Exception\MaintenanceModeException;
 
 class CheckForMaintenanceMode
 {
@@ -33,12 +33,12 @@ class CheckForMaintenanceMode
      * @param  \Closure  $next
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Illuminate\Http\Exception\MaintenanceModeException
      */
     public function handle($request, Closure $next)
     {
         if ($this->app->isDownForMaintenance()) {
-            throw new HttpException(503);
+            throw new MaintenanceModeException();
         }
 
         return $next($request);
