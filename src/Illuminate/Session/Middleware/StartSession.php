@@ -8,12 +8,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Session\CollectGarbageJob;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class StartSession
 {
+    use DispatchesJobs;
+
     /**
      * The session manager.
      *
@@ -149,7 +153,7 @@ class StartSession
         // the odds needed to perform garbage collection on any given request. If we do
         // hit it, we'll call this handler to let it delete all the expired sessions.
         if ($this->configHitsLottery($config)) {
-            $session->getHandler()->gc($this->getSessionLifetimeInSeconds());
+            $this->dispatch(new CollectGarbageJob($session->getHandler(), $this->getSessionLifetimeInSeconds()));
         }
     }
 
