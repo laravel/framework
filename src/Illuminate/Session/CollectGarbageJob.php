@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
 use SessionHandlerInterface;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class CollectGarbageJob implements ShouldQueue
 {
@@ -12,26 +12,26 @@ class CollectGarbageJob implements ShouldQueue
      *
      * @var \SessionHandlerInterface
      */
-    protected $sessionHandler;
+    protected $handler;
 
     /**
      * Session lifetime in seconds.
      *
      * @var int
      */
-    protected $sessionLifetime;
+    protected $lifetime;
 
     /**
      * Create a new job instance.
      *
-     * @param  \SessionHandlerInterface  $sessionHandler
-     * @param  int  $sessionLifetime
+     * @param  \SessionHandlerInterface  $handler
+     * @param  int  $lifetime
      * @return void
      */
-    public function __construct(SessionHandlerInterface $sessionHandler, $sessionLifetime)
+    public function __construct(SessionHandlerInterface $handler, $lifetime)
     {
-        $this->sessionHandler = $sessionHandler;
-        $this->sessionLifetime = $sessionLifetime;
+        $this->handler = $handler;
+        $this->lifetime = $lifetime;
     }
 
     /**
@@ -41,6 +41,6 @@ class CollectGarbageJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->sessionHandler->gc($this->sessionLifetime);
+        $this->handler->gc($this->lifetime);
     }
 }
