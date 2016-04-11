@@ -105,21 +105,6 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Get internal container instance.
-     *
-     * @return \Illuminate\Contracts\Container\Container
-     * @throws \RuntimeException
-     */
-    protected function getContainer()
-    {
-        if (! $this->container) {
-            throw new RuntimeException('Container is not set up in pipe.');
-        }
-
-        return $this->container;
-    }
-
-    /**
      * Get a Closure that represents a slice of the application onion.
      *
      * @return \Closure
@@ -182,5 +167,20 @@ class Pipeline implements PipelineContract
         }
 
         return [$name, $parameters];
+    }
+
+    /**
+     * Get the container instance.
+     *
+     * @return \Illuminate\Contracts\Container\Container
+     * @throws \RuntimeException
+     */
+    protected function getContainer()
+    {
+        if (! $this->container) {
+            throw new RuntimeException('A container instance has not been passed to the Pipeline.');
+        }
+
+        return $this->container;
     }
 }
