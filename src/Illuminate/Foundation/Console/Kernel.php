@@ -146,6 +146,17 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Register the given command with the console application.
+     *
+     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @return void
+     */
+    public function registerCommand($command)
+    {
+        $this->getArtisan()->add($command);
+    }
+
+    /**
      * Run an Artisan console command by name.
      *
      * @param  string  $command
@@ -212,17 +223,6 @@ class Kernel implements KernelContract
         // all of the available deferred providers which will make all of the commands
         // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
-    }
-
-    /**
-     * Register the given command to the console application.
-     *
-     * @param  \Symfony\Component\Console\Command\Command  $command
-     * @return void
-     */
-    public function registerCommand($command)
-    {
-        $this->getArtisan()->add($command);
     }
 
     /**
