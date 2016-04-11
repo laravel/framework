@@ -233,6 +233,11 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            if (static::exists($array, $key)) {
+                unset($array[$key]);
+                continue;
+            }
+
             $parts = explode('.', $key);
 
             // clean up before each pass
