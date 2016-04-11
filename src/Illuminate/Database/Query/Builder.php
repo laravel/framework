@@ -457,13 +457,13 @@ class Builder
      */
     public function when($value, $callback)
     {
-        $builder = $this;
-
         if ($value) {
-            $builder = call_user_func($callback, $builder);
+            $builder = call_user_func($callback, $this);
+
+            return is_null($builder) ? $this : $builder;
         }
 
-        return $builder;
+        return $this;
     }
 
     /**
