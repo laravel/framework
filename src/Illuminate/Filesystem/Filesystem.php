@@ -35,7 +35,7 @@ class Filesystem
     public function get($path, $lock = false)
     {
         if ($this->isFile($path)) {
-            return $lock ? $this->sharedGet($path, $lock) : file_get_contents($path);
+            return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
