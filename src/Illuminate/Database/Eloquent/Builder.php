@@ -155,7 +155,7 @@ class Builder
     }
 
     /**
-     * Find a model by its primary key.
+     * Find multiple models by their primary keys.
      *
      * @param  array  $ids
      * @param  array  $columns
