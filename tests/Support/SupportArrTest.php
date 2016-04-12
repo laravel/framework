@@ -458,7 +458,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         // Does not work for nested keys
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
-        Arr::forget($array, ['emails.joe@example.com','emails.jane@localhost']);
+        Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
 }
