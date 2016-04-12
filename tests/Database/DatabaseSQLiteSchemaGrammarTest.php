@@ -138,6 +138,16 @@ class DatabaseSQLiteSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
+    public function testAddingTinyIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+    }
+
     public function testAddingSmallIncrementingID()
     {
         $blueprint = new Blueprint('users');
