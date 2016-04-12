@@ -305,6 +305,18 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $name = Arr::pull($array, 'name');
         $this->assertEquals('Desk', $name);
         $this->assertEquals(['price' => 100], $array);
+
+        // Only works on first level keys
+        $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
+        $name = Arr::pull($array, 'joe@example.com');
+        $this->assertEquals('Joe', $name);
+        $this->assertEquals(['jane@localhost' => 'Jane'], $array);
+
+        // Does not work for nested keys
+        $array = ['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']];
+        $name = Arr::pull($array, 'emails.joe@example.com');
+        $this->assertEquals(null, $name);
+        $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
     }
 
     public function testSet()
@@ -438,5 +450,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
         $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+
+        // Only works on first level keys
+        $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];
+        Arr::forget($array, 'joe@example.com');
+        $this->assertEquals(['jane@example.com' => 'Jane'], $array);
+
+        // Does not work for nested keys
+        $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
+        Arr::forget($array, ['emails.joe@example.com','emails.jane@localhost']);
+        $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
 }
