@@ -237,7 +237,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
             return $adapter->getClient()->getObjectUrl($adapter->getBucket(), $path);
         } elseif ($adapter instanceof LocalAdapter) {
-            return '/storage/'.$path;
+            return $adapter->getPathPrefix().$path;
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }
