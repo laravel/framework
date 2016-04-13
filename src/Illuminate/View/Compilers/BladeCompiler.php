@@ -903,7 +903,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return "<?php echo app('url')->asset$expression; ?>";
     }
-    
+
     /**
      * Strip the parentheses from the given expression.
      *
