@@ -861,7 +861,7 @@ if (! function_exists('value')) {
 
 if (! function_exists('windows_os')) {
     /**
-     * Determine whether the current envrionment is Windows based.
+     * Determine whether the current environment is Windows based.
      *
      * @return bool
      */

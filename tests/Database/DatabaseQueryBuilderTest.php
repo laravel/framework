@@ -120,17 +120,17 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testWhenCallback()
     {
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(true, function ($callback) {
-            return $callback->where('id', '=', 1);
-        });
-        $this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
+        $callback = function ($query) {
+            return $query->where('id', '=', 1);
+        };
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->when(false, function ($callback) {
-            return $callback->where('id', '=', 1);
-        });
-        $this->assertEquals('select * from "users"', $builder->toSql());
+        $builder->select('*')->from('users')->when(true, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
     }
 
     public function testBasicWheres()
