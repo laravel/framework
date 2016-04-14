@@ -1021,7 +1021,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
-
         }, $this->items);
     }
 
