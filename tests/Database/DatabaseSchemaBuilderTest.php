@@ -34,4 +34,20 @@ class DatabaseSchemaBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
     }
+
+    public function testGetColumnTypeAddsPrefix()
+    {
+        $connection = m::mock('Illuminate\Database\Connection');
+        $column = m::mock('StdClass');
+        $type = m::mock('StdClass');
+        $grammar = m::mock('StdClass');
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $builder = new Builder($connection);
+        $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
+        $connection->shouldReceive('getDoctrineColumn')->once()->with('prefix_users', 'id')->andReturn($column);
+        $column->shouldReceive('getType')->once()->andReturn($type);
+        $type->shouldReceive('getName')->once()->andReturn('integer');
+
+        $this->assertEquals($builder->getColumnType('users', 'id'), 'integer');
+    }
 }
