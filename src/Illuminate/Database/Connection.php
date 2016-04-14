@@ -332,31 +332,30 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $this->bindValues($me->prepareBindings($bindings), $statement);
+            $this->bindValues($statement, $me->prepareBindings($bindings));
 
             $statement->execute();
 
             $fetchArgument = $me->getFetchArgument();
 
-            return isset($fetchArgument) ?
-                $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument()) :
-                $statement->fetchAll($me->getFetchMode());
+            return isset($fetchArgument)
+                    ? $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument())
+                    : $statement->fetchAll($me->getFetchMode());
         });
     }
 
     /**
      * Bind values to their parameters in the given statement.
      *
-     * @param  array  $bindings
      * @param  \PDOStatement $statement
+     * @param  array  $bindings
      * @return void
      */
-    public function bindValues($bindings, $statement)
+    public function bindValues($statement, $bindings)
     {
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
-                is_string($key) ? $key : $key + 1,
-                $value,
+                is_string($key) ? $key : $key + 1, $value,
                 filter_var($value, FILTER_VALIDATE_INT) !== false ? PDO::PARAM_INT : PDO::PARAM_STR
             );
         }
@@ -425,7 +424,7 @@ class Connection implements ConnectionInterface
 
             $statement = $this->getPdo()->prepare($query);
 
-            $this->bindValues($me->prepareBindings($bindings), $statement);
+            $this->bindValues($statement, $me->prepareBindings($bindings));
 
             return $statement->execute();
         });
@@ -450,7 +449,7 @@ class Connection implements ConnectionInterface
             // to execute the statement and then we'll use PDO to fetch the affected.
             $statement = $me->getPdo()->prepare($query);
 
-            $this->bindValues($me->prepareBindings($bindings), $statement);
+            $this->bindValues($statement, $me->prepareBindings($bindings));
 
             $statement->execute();
 
