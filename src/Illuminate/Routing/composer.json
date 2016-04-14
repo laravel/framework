@@ -37,7 +37,8 @@
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (5.2.*)."
+        "illuminate/console": "Required to use the make commands (5.2.*).",
+        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "minimum-stability": "dev"
 }
