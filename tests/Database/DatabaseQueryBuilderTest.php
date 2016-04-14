@@ -708,6 +708,14 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('sizes')->crossJoin('colors');
         $this->assertEquals('select * from "sizes" cross join "colors"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('tableB')->join('tableA', 'tableA.column1', '=', 'tableB.column2', 'cross');
+        $this->assertEquals('select * from "tableB" cross join "tableA" on "tableA"."column1" = "tableB"."column2"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('tableB')->crossJoin('tableA', 'tableA.column1', '=', 'tableB.column2');
+        $this->assertEquals('select * from "tableB" cross join "tableA" on "tableA"."column1" = "tableB"."column2"', $builder->toSql());
     }
 
     public function testComplexJoin()
