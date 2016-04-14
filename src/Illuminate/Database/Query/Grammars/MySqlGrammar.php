@@ -127,7 +127,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Check for a JSON selector
+     * Check for a JSON selector.
      *
      * @param  string  $value
      * @return bool
@@ -161,13 +161,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Removes one where binding from the query
+     * Removes one where binding from the query.
      *
      * @param  Builder $query
      * @param  array   $where
      * @return void
      */
-    protected function removeWhereBindingFromQuery(Builder $query, $where){
+    protected function removeWhereBindingFromQuery(Builder $query, $where)
+    {
         $wheres = $query->wheres;
         $offset = array_search($where, $wheres);
 

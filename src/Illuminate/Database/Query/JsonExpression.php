@@ -23,7 +23,7 @@ class JsonExpression extends Expression
     }
 
     /**
-     * Get the value of a JSON using the correct type
+     * Get the value of a JSON using the correct type.
      *
      * @param  mixed  $value
      * @return string
@@ -40,7 +40,7 @@ class JsonExpression extends Expression
                 return '?';
         }
 
-        throw new \IllegalArgumentException('JSON value is of illegal type: ' . $type);
+        throw new \IllegalArgumentException('JSON value is of illegal type: '.$type);
     }
 
     /**
