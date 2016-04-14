@@ -1357,8 +1357,7 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
-        return $this->select($column)
-                    ->where($column, '>', $lastId)
+        return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
     }
