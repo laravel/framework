@@ -839,12 +839,12 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the gramar operators
+     * Get the gramar operators.
      *
      * @return array
      */
     public function getOperators()
     {
-        return $this->operators;
+        return isset($this->operators)?$this->operators:[];
     }
 }
