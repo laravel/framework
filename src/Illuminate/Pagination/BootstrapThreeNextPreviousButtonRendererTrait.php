@@ -2,6 +2,8 @@
 
 namespace Illuminate\Pagination;
 
+use Illuminate\Support\Facades\Lang;
+
 trait BootstrapThreeNextPreviousButtonRendererTrait
 {
     /**
@@ -10,8 +12,12 @@ trait BootstrapThreeNextPreviousButtonRendererTrait
      * @param  string  $text
      * @return string
      */
-    public function getPreviousButton($text = '&laquo;')
+    public function getPreviousButton($text = null)
     {
+        if (empty($text)) {
+            $text = Lang::has('pagination.previous') ? Lang::get('pagination.previous') : '&laquo;';
+        }
+
         // If the current page is less than or equal to one, it means we can't go any
         // further back in the pages, so we will render a disabled previous button
         // when that is the case. Otherwise, we will give it an active "status".
@@ -32,8 +38,12 @@ trait BootstrapThreeNextPreviousButtonRendererTrait
      * @param  string  $text
      * @return string
      */
-    public function getNextButton($text = '&raquo;')
+    public function getNextButton($text = null)
     {
+        if (empty($text)) {
+            $text = Lang::has('pagination.next') ? Lang::get('pagination.next') : '&raquo;';
+        }
+
         // If the current page is greater than or equal to the last page, it means we
         // can't go any further into the pages, as we're already on this last page
         // that is available, so we will make it the "next" link style disabled.
