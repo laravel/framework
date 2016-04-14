@@ -845,6 +845,6 @@ class Grammar extends BaseGrammar
      */
     public function getOperators()
     {
-        return isset($this->operators)?$this->operators:[];
+        return isset($this->operators) ? $this->operators : [];
     }
 }
