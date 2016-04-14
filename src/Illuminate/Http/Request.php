@@ -376,6 +376,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Intersect an array of items with the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function intersect($keys)
+    {
+        return array_filter($this->only($keys));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
