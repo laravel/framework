@@ -61,7 +61,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a create table command.
+     * Compile a column addition command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command

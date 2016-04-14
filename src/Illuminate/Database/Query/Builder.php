@@ -439,10 +439,17 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
+     * @param  string  $first
+     * @param  string  $operator
+     * @param  string  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function crossJoin($table)
+    public function crossJoin($table, $first = null, $operator = null, $second = null)
     {
+        if ($first) {
+            return $this->join($table, $first, $operator, $second, 'cross');
+        }
+
         $this->joins[] = new JoinClause('cross', $table);
 
         return $this;
@@ -1357,8 +1364,7 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
-        return $this->select($column)
-                    ->where($column, '>', $lastId)
+        return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
     }
