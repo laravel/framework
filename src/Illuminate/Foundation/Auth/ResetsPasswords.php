@@ -118,7 +118,7 @@ trait ResetsPasswords
      */
     protected function getSendResetLinkEmailFailureResponse($response)
     {
-        return redirect()->back()->withErrors(['email' => trans($response)]);
+        return redirect()->back()->withErrors(['email' => trans($response)])->withInput();
     }
 
     /**
