@@ -82,6 +82,14 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
+    public function testScopesStartingWithOrBooleanArePreserved()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->orApproved();
+
+        $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) or ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+    }
+
     public function testHasQueryWhereBothModelsHaveGlobalScopes()
     {
         $query = EloquentGlobalScopesWithRelationModel::has('related')->where('bar', 'baz');
@@ -114,6 +122,11 @@ class EloquentClosureGlobalScopesTestModel extends Illuminate\Database\Eloquent\
     public function scopeApproved($query)
     {
         return $query->where('approved', 1)->orWhere('should_approve', 0);
+    }
+
+    public function scopeOrApproved($query)
+    {
+        return $query->orWhere('approved', 1)->orWhere('should_approve', 0);
     }
 }
 

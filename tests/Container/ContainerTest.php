@@ -4,6 +4,20 @@ use Illuminate\Container\Container;
 
 class ContainerContainerTest extends PHPUnit_Framework_TestCase
 {
+    public function testContainerSingleton()
+    {
+        $container = Container::setInstance(new Container);
+
+        $this->assertSame($container, Container::getInstance());
+
+        Container::setInstance(null);
+
+        $container2 = Container::getInstance();
+
+        $this->assertInstanceOf(Container::class, $container2);
+        $this->assertNotSame($container, $container2);
+    }
+
     public function testClosureResolution()
     {
         $container = new Container;
@@ -173,18 +187,25 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     public function testExtendInstancesArePreserved()
     {
         $container = new Container;
-        $container->bind('foo', function () { $obj = new StdClass; $obj->foo = 'bar';
+        $container->bind('foo', function () {
+            $obj = new StdClass;
+            $obj->foo = 'bar';
 
-return $obj; });
+            return $obj;
+        });
         $obj = new StdClass;
         $obj->foo = 'foo';
         $container->instance('foo', $obj);
-        $container->extend('foo', function ($obj, $container) { $obj->bar = 'baz';
+        $container->extend('foo', function ($obj, $container) {
+            $obj->bar = 'baz';
 
-return $obj; });
-        $container->extend('foo', function ($obj, $container) { $obj->baz = 'foo';
+            return $obj;
+        });
+        $container->extend('foo', function ($obj, $container) {
+            $obj->baz = 'foo';
 
-return $obj; });
+            return $obj;
+        });
         $this->assertEquals('foo', $container->make('foo')->foo);
     }
 
@@ -192,9 +213,11 @@ return $obj; });
     {
         $container = new Container;
         $container->bind('ContainerLazyExtendStub');
-        $container->extend('ContainerLazyExtendStub', function ($obj, $container) { $obj->init();
+        $container->extend('ContainerLazyExtendStub', function ($obj, $container) {
+            $obj->init();
 
-return $obj; });
+            return $obj;
+        });
         $this->assertFalse(ContainerLazyExtendStub::$initialized);
         $container->make('ContainerLazyExtendStub');
         $this->assertTrue(ContainerLazyExtendStub::$initialized);

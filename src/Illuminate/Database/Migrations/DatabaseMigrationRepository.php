@@ -50,7 +50,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         return $this->table()
                 ->orderBy('batch', 'asc')
                 ->orderBy('migration', 'asc')
-                ->pluck('migration');
+                ->pluck('migration')->all();
     }
 
     /**
@@ -62,7 +62,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $query = $this->table()->where('batch', $this->getLastBatchNumber());
 
-        return $query->orderBy('migration', 'desc')->get();
+        return $query->orderBy('migration', 'desc')->get()->all();
     }
 
     /**

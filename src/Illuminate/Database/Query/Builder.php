@@ -595,13 +595,15 @@ class Builder
      * Add a raw where clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  mixed   $bindings
      * @param  string  $boolean
      * @return $this
      */
-    public function whereRaw($sql, array $bindings = [], $boolean = 'and')
+    public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
         $type = 'raw';
+
+        $bindings = (array) $bindings;
 
         $this->wheres[] = compact('type', 'sql', 'boolean');
 
@@ -1474,20 +1476,18 @@ class Builder
      * Execute the query and get the first result.
      *
      * @param  array   $columns
-     * @return mixed|static
+     * @return \stdClass|array|null
      */
     public function first($columns = ['*'])
     {
-        $results = $this->take(1)->get($columns);
-
-        return count($results) > 0 ? reset($results) : null;
+        return $this->take(1)->get($columns)->first();
     }
 
     /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return array|static[]
+     * @return \Illuminate\Support\Collection
      */
     public function get($columns = ['*'])
     {
@@ -1501,7 +1501,7 @@ class Builder
 
         $this->columns = $original;
 
-        return $results;
+        return collect($results);
     }
 
     /**
@@ -1571,7 +1571,7 @@ class Builder
 
         $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
 
-        $results = $this->get();
+        $results = $this->get()->all();
 
         $this->aggregate = null;
 
@@ -1648,7 +1648,7 @@ class Builder
     {
         $results = $this->forPage($page = 1, $count)->get();
 
-        while (count($results) > 0) {
+        while (! $results->isEmpty()) {
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
@@ -1678,12 +1678,12 @@ class Builder
 
         $results = $this->forPageAfterId($count, 0, $column)->get();
 
-        while (! empty($results)) {
+        while (! $results->isEmpty()) {
             if (call_user_func($callback, $results) === false) {
                 return false;
             }
 
-            $lastId = last($results)->{$column};
+            $lastId = $results->last()->{$column};
 
             $results = $this->forPageAfterId($count, $lastId, $column)->get();
         }
@@ -1720,7 +1720,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string|null  $key
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)
     {
@@ -1729,25 +1729,10 @@ class Builder
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
         // are only keyed by the column itself. We'll strip the table out here.
-        return Arr::pluck(
-            $results,
+        return $results->pluck(
             $this->stripTableForPluck($column),
             $this->stripTableForPluck($key)
         );
-    }
-
-    /**
-     * Alias for the "pluck" method.
-     *
-     * @param  string  $column
-     * @param  string|null  $key
-     * @return array
-     *
-     * @deprecated since version 5.2. Use the "pluck" method directly.
-     */
-    public function lists($column, $key = null)
-    {
-        return $this->pluck($column, $key);
     }
 
     /**
@@ -1770,7 +1755,7 @@ class Builder
      */
     public function implode($column, $glue = '')
     {
-        return implode($glue, $this->pluck($column));
+        return $this->pluck($column)->implode($glue);
     }
 
     /**
@@ -1896,7 +1881,7 @@ class Builder
 
         $this->bindings['select'] = $previousSelectBindings;
 
-        if (isset($results[0])) {
+        if (! $results->isEmpty()) {
             $result = array_change_key_case((array) $results[0]);
 
             return $result['aggregate'];
