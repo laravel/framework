@@ -226,6 +226,7 @@ trait MocksApplicationServices
      * These observers will be mocked, so that they will not actually be executed.
      *
      * @param array|string $observers
+     * @return $this
      */
     public function withoutObservers($observers)
     {
@@ -236,5 +237,7 @@ trait MocksApplicationServices
                 return $this->getMockBuilder($observer)->disableOriginalConstructor()->getMock();
             });
         }, $observers);
+
+        return $this;
     }
 }
