@@ -221,7 +221,7 @@ trait MocksApplicationServices
     }
 
     /**
-     * Specify a list of observers that will not run for the given operation
+     * Specify a list of observers that will not run for the given operation.
      *
      * These observers will be mocked, so that they will not actually be executed.
      *
