@@ -2282,9 +2282,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         static::unguard();
 
-        $result = $callback();
-
-        static::reguard();
+        try {
+            $result = $callback();
+        } finally {
+            static::reguard();
+        }
 
         return $result;
     }
