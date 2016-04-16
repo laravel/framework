@@ -450,7 +450,7 @@ class Builder
      * This only works when the `SQL_CALC_FOUND_ROWS` option is enabled on the
      * underlying base query builder.
      *
-     * @return integer
+     * @return int
      */
     public function foundRows()
     {
