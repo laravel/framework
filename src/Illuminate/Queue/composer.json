@@ -20,8 +20,8 @@
         "illuminate/container": "5.3.*",
         "illuminate/support": "5.3.*",
         "nesbot/carbon": "~1.20",
-        "symfony/process": "3.1.*",
-        "symfony/debug": "3.1.*"
+        "symfony/debug": "3.1.*",
+        "symfony/process": "3.1.*"
     },
     "autoload": {
         "psr-4": {
