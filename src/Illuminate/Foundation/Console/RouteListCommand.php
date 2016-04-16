@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
-use Illuminate\Routing\Controller;
 use Symfony\Component\Console\Input\InputOption;
 
 class RouteListCommand extends Command
@@ -138,54 +137,7 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        $middlewares = array_values($route->middleware());
-
-        $actionName = $route->getActionName();
-
-        if (! empty($actionName) && $actionName !== 'Closure') {
-            $middlewares = array_merge($middlewares, $this->getControllerMiddleware($actionName));
-        }
-
-        return implode(',', $middlewares);
-    }
-
-    /**
-     * Get the middleware for the given Controller@action name.
-     *
-     * @param  string  $actionName
-     * @return array
-     */
-    protected function getControllerMiddleware($actionName)
-    {
-        Controller::setRouter($this->laravel['router']);
-
-        $segments = explode('@', $actionName);
-
-        return $this->getControllerMiddlewareFromInstance(
-            $this->laravel->make($segments[0]), $segments[1]
-        );
-    }
-
-    /**
-     * Get the middlewares for the given controller instance and method.
-     *
-     * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $method
-     * @return array
-     */
-    protected function getControllerMiddlewareFromInstance($controller, $method)
-    {
-        $middleware = $this->router->getMiddleware();
-
-        $results = [];
-
-        foreach ($controller->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
-                $results[] = Arr::get($middleware, $name, $name);
-            }
-        }
-
-        return $results;
+        return implode(',', $route->middleware());
     }
 
     /**
@@ -198,7 +150,7 @@ class RouteListCommand extends Command
     protected function methodExcludedByOptions($method, array $options)
     {
         return (! empty($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
+        (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**
@@ -210,8 +162,8 @@ class RouteListCommand extends Command
     protected function filterRoute(array $route)
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
+            $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+            $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
             return;
         }
 

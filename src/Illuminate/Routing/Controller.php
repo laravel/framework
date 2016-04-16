@@ -8,44 +8,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 abstract class Controller
 {
     /**
-     * The middleware registered on the controller.
-     *
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
      * The router instance.
      *
      * @var \Illuminate\Routing\Router
      */
     protected static $router;
-
-    /**
-     * Register middleware on the controller.
-     *
-     * @param  array|string  $middleware
-     * @param  array   $options
-     * @return \Illuminate\Routing\ControllerMiddlewareOptions
-     */
-    public function middleware($middleware, array $options = [])
-    {
-        foreach ((array) $middleware as $middlewareName) {
-            $this->middleware[$middlewareName] = &$options;
-        }
-
-        return new ControllerMiddlewareOptions($options);
-    }
-
-    /**
-     * Get the middleware assigned to the controller.
-     *
-     * @return array
-     */
-    public function getMiddleware()
-    {
-        return $this->middleware;
-    }
 
     /**
      * Get the router instance.
@@ -78,6 +45,16 @@ abstract class Controller
     public function callAction($method, $parameters)
     {
         return call_user_func_array([$this, $method], $parameters);
+    }
+
+    /**
+     * The middleware registered on the controller.
+     *
+     * @return array
+     */
+    public static function middleware()
+    {
+        return [];
     }
 
     /**

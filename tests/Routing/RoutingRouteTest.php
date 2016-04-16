@@ -589,6 +589,24 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRouteMiddlewareCollection()
+    {
+        $router = $this->getRouter();
+        $router->group(['prefix' => 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
+            $router->get('bar', 'RouteTestControllerStub@index')->middleware('baz:gaz');
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $route = $routes[0];
+        $this->assertEquals(
+            [
+                'boo:foo', 'baz:gaz', 'RouteTestControllerMiddleware',
+                'RouteTestControllerParameterizedMiddlewareOne:0',
+                'RouteTestControllerParameterizedMiddlewareTwo:foo,bar',
+            ],
+            $route->middleware()
+        );
+    }
+
     public function testRoutePrefixing()
     {
         /*
@@ -919,30 +937,34 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
 
 class RouteTestControllerStub extends Illuminate\Routing\Controller
 {
-    public function __construct()
-    {
-        $this->middleware('RouteTestControllerMiddleware');
-        $this->middleware('RouteTestControllerParameterizedMiddlewareOne:0');
-        $this->middleware('RouteTestControllerParameterizedMiddlewareTwo:foo,bar');
-        $this->middleware('RouteTestControllerExceptMiddleware', ['except' => 'index']);
-    }
-
     public function index()
     {
         return 'Hello World';
+    }
+
+    public static function middleware()
+    {
+        return [
+            'RouteTestControllerMiddleware',
+            'RouteTestControllerParameterizedMiddlewareOne:0',
+            'RouteTestControllerParameterizedMiddlewareTwo:foo,bar',
+            'RouteTestControllerExceptMiddleware' => ['except' => 'index'],
+        ];
     }
 }
 
 class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controller
 {
-    public function __construct()
-    {
-        $this->middleware('web');
-    }
-
     public function index()
     {
         return 'Hello World';
+    }
+
+    public static function middleware()
+    {
+        return [
+            'web',
+        ];
     }
 }
 

@@ -1,74 +1,77 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Routing\Controller;
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Auth\Access\AuthorizesResources;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
 {
     public function testIndexMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('index'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:view,App\User');
+        $gate->shouldReceive('authorize')->with('view', ['App\User'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('index'));
     }
 
     public function testCreateMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('create'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $gate->shouldReceive('authorize')->with('create', ['App\User'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('create'));
     }
 
     public function testStoreMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('store'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:create,App\User');
+        $gate->shouldReceive('authorize')->with('create', ['App\User'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('store'));
     }
 
     public function testShowMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('show'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:view,user');
+        $gate->shouldReceive('authorize')->with('view', ['user'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('show'));
     }
 
     public function testEditMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('edit'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $gate->shouldReceive('authorize')->with('update', ['user'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('edit'));
     }
 
     public function testUpdateMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('update'));
+        $gate = $this->getGate();
 
-        $this->assertHasMiddleware($controller, 'can:update,user');
+        $gate->shouldReceive('authorize')->with('update', ['user'])->once();
+
+        $controller = new AuthorizesResourcesController($this->request('update'));
     }
 
     public function testDeleteMethod()
     {
+        $gate = $this->getGate();
+
+        $gate->shouldReceive('authorize')->with('delete', ['user'])->once();
+
         $controller = new AuthorizesResourcesController($this->request('delete'));
-
-        $this->assertHasMiddleware($controller, 'can:delete,user');
-    }
-
-    /**
-     * Assert that the given middleware has been registered on the given controller.
-     *
-     * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $middleware
-     * @return void
-     */
-    protected function assertHasMiddleware($controller, $middleware)
-    {
-        $this->assertTrue(
-            in_array($middleware, array_keys($controller->getMiddleware())),
-            "The [{$middleware}] middleware was not registered"
-        );
     }
 
     /**
@@ -87,6 +90,17 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
             return new Route('GET', 'foo', $action);
         });
     }
+
+    public function getGate()
+    {
+        $container = new Container;
+        Container::setInstance($container);
+
+        $gate = m::mock(new Gate($container, function () { return (object) ['id' => 1]; }));
+        $container->instance(GateContract::class, $gate);
+
+        return $gate;
+    }
 }
 
 class AuthorizesResourcesController extends Controller
@@ -95,6 +109,6 @@ class AuthorizesResourcesController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->authorizeResource('App\User', 'user', [], $request);
+        $this->authorizeResource('App\User', 'user', $request);
     }
 }

@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 
 class ControllerDispatcher
@@ -81,7 +80,7 @@ class ControllerDispatcher
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->getMiddleware($instance, $method);
+        $middleware = $shouldSkipMiddleware ? [] : $route->controllerMiddleware();
 
         // Here we will make a stack onion instance to execute this request in, which gives
         // us the ability to define middlewares on controllers. We will return the given
@@ -94,39 +93,6 @@ class ControllerDispatcher
                             $request, $this->call($instance, $route, $method)
                         );
                     });
-    }
-
-    /**
-     * Get the middleware for the controller instance.
-     *
-     * @param  \Illuminate\Routing\Controller  $instance
-     * @param  string  $method
-     * @return array
-     */
-    public function getMiddleware($instance, $method)
-    {
-        $results = new Collection;
-
-        foreach ($instance->getMiddleware() as $name => $options) {
-            if (! $this->methodExcludedByOptions($method, $options)) {
-                $results[] = $this->router->resolveMiddlewareClassName($name);
-            }
-        }
-
-        return $results->flatten()->all();
-    }
-
-    /**
-     * Determine if the given options exclude a particular method.
-     *
-     * @param  string  $method
-     * @param  array  $options
-     * @return bool
-     */
-    public function methodExcludedByOptions($method, array $options)
-    {
-        return (isset($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
     }
 
     /**

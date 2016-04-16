@@ -235,7 +235,15 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            $middlewares = (array) Arr::get($this->action, 'middleware', []);
+
+            if (is_string($this->action['uses'])) {
+                $middlewares = array_merge(
+                    $middlewares, $this->controllerMiddleware()
+                );
+            }
+
+            return $middlewares;
         }
 
         if (is_string($middleware)) {
@@ -254,14 +262,50 @@ class Route
      *
      * @return array
      */
-    protected function controllerMiddleware()
+    public function controllerMiddleware()
     {
         list($class, $method) = explode('@', $this->action['uses']);
 
-        $controller = $this->container->make($class);
+        $middlewares = [];
 
-        return (new ControllerDispatcher($this->router, $this->container))
-            ->getMiddleware($controller, $method);
+        foreach (call_user_func($class.'::middleware') as $key => $value) {
+            list($middleware, $options) = $this->extractMiddlewareInformation($key, $value);
+
+            if (! $this->methodExcludedByOptions($method, $options)) {
+                $middlewares[] = $middleware;
+            }
+        }
+
+        return $middlewares;
+    }
+
+    /**
+     * Determine if the given options exclude a particular method.
+     *
+     * @param  string  $method
+     * @param  array  $options
+     * @return bool
+     */
+    public function methodExcludedByOptions($method, array $options)
+    {
+        return (isset($options['only']) && ! in_array($method, (array) $options['only'])) ||
+        (! empty($options['except']) && in_array($method, (array) $options['except']));
+    }
+
+    /**
+     * Extract a middleware name and options.
+     *
+     * @param  int|string  $key
+     * @param  string|array  $value
+     * @return array
+     */
+    public function extractMiddlewareInformation($key, $value)
+    {
+        if (is_string($key)) {
+            return [$key, $value];
+        }
+
+        return [$value, []];
     }
 
     /**
