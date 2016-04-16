@@ -79,6 +79,15 @@ class Builder
     public $distinct = false;
 
     /**
+     * Whether to include `SQL_CALC_FOUND_ROWS` in the query.
+     *
+     * Only applicable when using MySQL.
+     *
+     * @var bool
+     */
+    public $sqlCalcFoundRows = false;
+
+    /**
      * The table which the query is targeting.
      *
      * @var string
@@ -305,6 +314,18 @@ class Builder
     public function distinct()
     {
         $this->distinct = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables `SQL_CALC_FOUND_ROWS` for this query.
+     *
+     * @return $this
+     */
+    public function sqlCalcFoundRows()
+    {
+        $this->sqlCalcFoundRows = true;
 
         return $this;
     }
