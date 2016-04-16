@@ -91,18 +91,18 @@ c
 
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
 
-        $files->put(__DIR__.'/fixtures/a.php', $compiler->compileString('
+        $files->put(__DIR__.'/fixtures/aa.php', $compiler->compileString('
 a
 @stack("me")'));
 
-        $files->put(__DIR__.'/fixtures/b.php', $compiler->compileString('
+        $files->put(__DIR__.'/fixtures/bb.php', $compiler->compileString('
 @push("me")
 b
 @endpush("me")'));
 
-        $files->put(__DIR__.'/fixtures/c.php', $compiler->compileString('
-@extends("a")
-@include("b")
+        $files->put(__DIR__.'/fixtures/cc.php', $compiler->compileString('
+@extends("aa")
+@include("bb")
 @push("me")
 c
 @endpush("me")'));
@@ -118,11 +118,11 @@ c
         });
         $factory->getDispatcher()->shouldReceive('fire');
 
-        $this->assertEquals("a\nc\nb\n", $factory->make('c')->render());
+        $this->assertEquals("a\nc\nb\n", $factory->make('cc')->render());
 
-        $files->delete(__DIR__.'/fixtures/a.php');
-        $files->delete(__DIR__.'/fixtures/b.php');
-        $files->delete(__DIR__.'/fixtures/c.php');
+        $files->delete(__DIR__.'/fixtures/aa.php');
+        $files->delete(__DIR__.'/fixtures/bb.php');
+        $files->delete(__DIR__.'/fixtures/cc.php');
     }
 
     protected function getFactory()
@@ -133,6 +133,7 @@ c
             m::mock('Illuminate\Contracts\Events\Dispatcher')
         );
     }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
