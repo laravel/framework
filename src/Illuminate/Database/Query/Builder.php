@@ -724,6 +724,14 @@ class Builder
             $this->addBinding($query->getBindings(), 'where');
         }
 
+        if (count($query->joins)) {
+            foreach ($query->joins as $join) {
+                $this->joins[] = $join;
+
+                $this->addBinding($join->bindings, 'join');
+            }
+        }
+
         return $this;
     }
 
