@@ -8,6 +8,13 @@ use Illuminate\Database\Grammar as BaseGrammar;
 class Grammar extends BaseGrammar
 {
     /**
+     * The grammar specific operators.
+     *
+     * @var array
+     */
+    protected $operators = [];
+
+    /**
      * The components that make up a select clause.
      *
      * @var array
@@ -839,12 +846,12 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the gramar operators.
+     * Get the gramar specific operators.
      *
      * @return array
      */
     public function getOperators()
     {
-        return isset($this->operators) ? $this->operators : [];
+        return $this->operators;
     }
 }
