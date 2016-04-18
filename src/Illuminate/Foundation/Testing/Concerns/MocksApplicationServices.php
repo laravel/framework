@@ -224,7 +224,7 @@ trait MocksApplicationServices
      * Check if the given class exists in an array of dispatched classes.
      *
      * @param  string  $needle
-     * @param  arra  $haystack
+     * @param  array  $haystack
      * @return bool
      */
     protected function wasDispatched($needle, array $haystack)
