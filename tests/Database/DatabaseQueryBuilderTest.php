@@ -1204,6 +1204,63 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from `users`', $builder->toSql());
     }
 
+    public function testMySqlWrappingJsonWithString()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->sku', '=', 'foo-bar');
+        $this->assertEquals('select * from `users` where `items`->"$.sku" = ?', $builder->toSql());
+        $this->assertCount(1, $builder->getRawBindings()['where']);
+        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
+    }
+
+    public function testMySqlWrappingJsonWithInteger()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price', '=', 1);
+        $this->assertEquals('select * from `users` where `items`->"$.price" = 1', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithDouble()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price', '=', 1.5);
+        $this->assertEquals('select * from `users` where `items`->"$.price" = 1.5', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithBoolean()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', true);
+        $this->assertEquals('select * from `users` where `items`->"$.available" = true', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithBooleanAndIntegerThatLooksLikeOne()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
+        $this->assertEquals('select * from `users` where `items`->"$.available" = true and `items`->"$.active" = false and `items`->"$.number_available" = 0', $builder->toSql());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testMySqlWrappingJsonInvalidArrayValue()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', ['i', 'am', 'invalid']);
+        $builder->toSql();
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testMySqlWrappingJsonInvalidObjectValue()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', new stdClass);
+        $builder->toSql();
+    }
+
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
@@ -1212,15 +1269,21 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select `items`->"$.price" from `users` where `items`->"$.price" = ? order by `items`->"$.price" asc', $builder->toSql());
+        $this->assertEquals('select `items`->"$.price" from `users` where `items`->"$.price" = 1 order by `items`->"$.price" asc', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
-        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
-        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = ? and `items`->"$.age" = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where `items`->"$.price.in_usd" = 1 and `items`->"$.age" = 2', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->sku', '=', 'foo-bar')->where('items->pi', '=', 3.141592653);
+        $this->assertEquals('select * from `users` where `items`->"$.sku" = ? and `items`->"$.pi" = 3.141592653', $builder->toSql());
+        $this->assertCount(1, $builder->getRawBindings()['where']);
+        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
     }
 
     public function testPostgresWrappingJson()
