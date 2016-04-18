@@ -579,7 +579,7 @@ class Builder
      */
     protected function invalidOperatorAndValue($operator, $value)
     {
-        $isOperator = in_array($operator, $this->operators) && in_array($operator, $this->grammar->getOperators());
+        $isOperator = in_array($operator, $this->operators);
 
         return $isOperator && $operator != '=' && is_null($value);
     }
