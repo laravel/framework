@@ -71,7 +71,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
-        "mockery/mockery": "~0.9.2",
+        "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~5.0",
         "predis/predis": "~1.0",
