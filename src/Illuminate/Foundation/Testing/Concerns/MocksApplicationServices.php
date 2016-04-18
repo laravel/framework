@@ -219,4 +219,25 @@ trait MocksApplicationServices
 
         return false;
     }
+
+    /**
+     * Specify a list of observers that will not run for the given operation.
+     *
+     * These observers will be mocked, so that they will not actually be executed.
+     *
+     * @param array|string $observers
+     * @return $this
+     */
+    public function withoutObservers($observers)
+    {
+        $observers = is_array($observers) ? $observers : [$observers];
+
+        array_map(function ($observer) {
+            $this->app->bind($observer, function () use ($observer) {
+                return $this->getMockBuilder($observer)->disableOriginalConstructor()->getMock();
+            });
+        }, $observers);
+
+        return $this;
+    }
 }
