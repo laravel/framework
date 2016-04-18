@@ -15,7 +15,7 @@ class ViewFlowTest extends PHPUnit_Framework_TestCase
         $files = new Filesystem;
         $this->tempDir = __DIR__.'/tmp';
 
-        if (!$files->exists($this->tempDir)) {
+        if (! $files->exists($this->tempDir)) {
             $files->makeDirectory($this->tempDir);
         }
     }
