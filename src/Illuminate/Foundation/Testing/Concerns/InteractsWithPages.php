@@ -211,6 +211,8 @@ trait InteractsWithPages
         $callback();
 
         array_pop($this->subCrawlers);
+
+        return $this;
     }
 
     /**
