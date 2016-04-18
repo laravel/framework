@@ -837,4 +837,14 @@ class Grammar extends BaseGrammar
     {
         return preg_replace('/and |or /i', '', $value, 1);
     }
+
+    /**
+     * Get the gramar operators.
+     *
+     * @return array
+     */
+    public function getOperators()
+    {
+        return isset($this->operators) ? $this->operators : [];
+    }
 }
