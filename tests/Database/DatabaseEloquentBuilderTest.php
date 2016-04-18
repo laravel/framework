@@ -439,6 +439,14 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testPostgresOperatorsWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '@>', 'bar');
+        $result = $builder->where('foo', '@>', 'bar');
+        $this->assertEquals($result, $builder);
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
