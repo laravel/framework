@@ -7,6 +7,21 @@ use Illuminate\Routing\ControllerMiddlewareOptions;
 trait AuthorizesResources
 {
     /**
+     * Map of resource methods to ability names.
+     *
+     * @var array
+     */
+    protected $resourceAbilityMap = [
+        'index'  => 'view',
+        'create' => 'create',
+        'store'  => 'create',
+        'show'   => 'view',
+        'edit'   => 'update',
+        'update' => 'update',
+        'delete' => 'delete',
+    ];
+
+    /**
      * Authorize a resource action based on the incoming request.
      *
      * @param  string  $model
@@ -17,21 +32,16 @@ trait AuthorizesResources
      */
     public function authorizeResource($model, $name = null, array $options = [], $request = null)
     {
-        $action = with($request ?: request())->route()->getActionName();
+        $method = array_last(explode('@', with($request ?: request())->route()->getActionName()));
 
-        $map = [
-            'index' => 'view', 'create' => 'create', 'store' => 'create', 'show' => 'view',
-            'edit' => 'update', 'update' => 'update', 'delete' => 'delete',
-        ];
-
-        if (! in_array($method = array_last(explode('@', $action)), array_keys($map))) {
+        if (! in_array($method, array_keys($this->resourceAbilityMap))) {
             return new ControllerMiddlewareOptions($options);
         }
 
-        $name = $name ?: strtolower(class_basename($model));
+        if (! in_array($method, ['index', 'create', 'store'])) {
+            $model = $name ?: strtolower(class_basename($model));
+        }
 
-        $model = in_array($method, ['index', 'create', 'store']) ? $model : $name;
-
-        return $this->middleware("can:{$map[$method]},{$model}", $options);
+        return $this->middleware("can:{$this->resourceAbilityMap[$method]},{$model}", $options);
     }
 }
