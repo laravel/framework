@@ -812,6 +812,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         Model::reguard();
     }
 
+    public function testUnguardedCallDoesNotChangeUnguardedStateOnException()
+    {
+        try {
+            Model::unguarded(function () {
+                throw new Exception;
+            });
+        } catch (Exception $e) {
+            // ignore the exception
+        }
+        $this->assertFalse(Model::isUnguarded());
+    }
+
     public function testHasOneCreatesProperRelation()
     {
         $model = new EloquentModelStub;
