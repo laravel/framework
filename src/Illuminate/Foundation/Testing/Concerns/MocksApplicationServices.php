@@ -96,7 +96,7 @@ trait MocksApplicationServices
     /**
      * Specify a list of observers that will not run for the given operation.
      *
-     * @param  array|string $observers
+     * @param  array|string  $observers
      * @return $this
      */
     public function withoutObservers($observers)
@@ -224,7 +224,7 @@ trait MocksApplicationServices
      * Check if the given class exists in an array of dispatched classes.
      *
      * @param  string  $needle
-     * @param  array   $haystack
+     * @param  arra  $haystack
      * @return bool
      */
     protected function wasDispatched($needle, array $haystack)
