@@ -126,11 +126,15 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+        $errors = [$this->loginUsername() => $this->getFailedLoginMessage()];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($errors, 422);
+        }
+
         return redirect()->back()
             ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $this->getFailedLoginMessage(),
-            ]);
+            ->withErrors($errors);
     }
 
     /**
