@@ -61,11 +61,11 @@ trait ThrottlesLogins
         $errors = [
             $this->loginUsername() => $this->getLockoutErrorMessage(
                 $this->secondsRemainingOnLockout($request)
-            )
+            ),
         ];
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json($errors, 422);
+            return response()->json($errors, 429);
         }
 
         return redirect()->back()
