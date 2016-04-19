@@ -612,12 +612,11 @@ if (! function_exists('route')) {
      * @param  string  $name
      * @param  array   $parameters
      * @param  bool    $absolute
-     * @param  \Illuminate\Routing\Route  $route
      * @return string
      */
-    function route($name, $parameters = [], $absolute = true, $route = null)
+    function route($name, $parameters = [], $absolute = true)
     {
-        return app('url')->route($name, $parameters, $absolute, $route);
+        return app('url')->route($name, $parameters, $absolute);
     }
 }
 
