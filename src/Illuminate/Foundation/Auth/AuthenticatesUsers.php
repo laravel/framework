@@ -161,16 +161,6 @@ trait AuthenticatesUsers
      *
      * @return \Illuminate\Http\Response
      */
-    public function getLogout()
-    {
-        return $this->logout();
-    }
-
-    /**
-     * Log the user out of the application.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function logout()
     {
         Auth::guard($this->getGuard())->logout();
