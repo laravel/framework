@@ -1457,7 +1457,8 @@ class Validator implements ValidatorContract
      */
     protected function validateEmail($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+        $valueParts = explode('@', $value);
+        return count($valueParts) == 2 && filter_var($valueParts[0].'@'.idn_to_ascii($valueParts[1]), FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
