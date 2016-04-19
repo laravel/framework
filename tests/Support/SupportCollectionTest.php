@@ -1216,6 +1216,121 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testTransposeWithMultiDimensionalArray()
+    {
+        $collection = new Collection([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]);
+
+        $expected = new Collection([
+            [1, 4, 7],
+            [2, 5, 8],
+            [3, 6, 9],
+        ]);
+
+        $this->assertEquals($expected, $collection->transpose());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testTransposeWithSingleArray()
+    {
+        $collection = new Collection([1, 2, 3]);
+
+        $collection->transpose();
+    }
+
+    public function testTransposeWithAssociativeArray()
+    {
+        $collection = new Collection([
+            'names' =>  ['adam', 'ben', 'claire'],
+            'ages' => [24, 32, 52],
+            'emails' => ['adam@example.com', 'ben@example.com', 'claire@example.com'],
+        ]);
+
+        $expected = new Collection([
+            ['adam', 24, 'adam@example.com'],
+            ['ben', 32, 'ben@example.com'],
+            ['claire', 52, 'claire@example.com'],
+        ]);
+
+        $this->assertEquals($expected, $collection->transpose());
+    }
+
+    public function testTransposeWithCollectionOfCollections()
+    {
+        $collection = new Collection([
+            new Collection([1, 2, 3]),
+            new Collection([4, 5, new Collection(['foo', 'bar'])]),
+            new Collection([7, 8, 9]),
+        ]);
+
+        $expected = new Collection([
+            new Collection([1, 4, 7]),
+            new Collection([2, 5, 8]),
+            new Collection([3, new Collection(['foo', 'bar']), 9]),
+        ]);
+
+        $this->assertEquals($expected, $collection->transpose());
+    }
+
+    public function testTransposeWithMixedCollection()
+    {
+        $collection = new Collection([
+            new Collection([1, 2, 3]),
+            [4, 5, 6],
+        ]);
+
+        $expected = new Collection([
+            new Collection([1, 4]),
+            new Collection([2, 5]),
+            new Collection([3, 6]),
+        ]);
+
+        $this->assertEquals($expected, $collection->transpose());
+    }
+
+    public function testPassesWithEvenNumbers()
+    {
+        $evenCollection = new Collection([2, 4, 6, 8, 10]);
+        $oddCollection = new Collection([1, 3, 5, 7, 9]);
+        $mixedCollection = new Collection([1, 2, 3, 4, 5]);
+        $emptyCollection = new Collection();
+
+        $isEven = function ($n) {
+            return $n % 2 == 0;
+        };
+
+        $this->assertTrue($evenCollection->passes($isEven));
+        $this->assertFalse($oddCollection->passes($isEven));
+        $this->assertFalse($mixedCollection->passes($isEven));
+        $this->assertTrue($emptyCollection->passes($isEven));
+    }
+
+    public function testPassesMultiDimensionalArrays()
+    {
+        $collectionOfArrays = new Collection([
+            [1, 2, 3],
+            [4, 5, 6],
+        ]);
+
+        $collectionOfInts = new Collection([1, 2, 3]);
+
+        $collectionOfMixedTypes = new Collection([
+            ['foo' => 'bar'],
+            1,
+            'string',
+            new \stdClass(),
+        ]);
+
+        $this->assertTrue($collectionOfArrays->passes('is_array'));
+        $this->assertFalse($collectionOfInts->passes('is_array'));
+        $this->assertFalse($collectionOfMixedTypes->passes('is_array'));
+    }
 }
 
 class TestAccessorEloquentTestStub

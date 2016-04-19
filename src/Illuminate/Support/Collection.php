@@ -605,6 +605,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if the callback is true for all items in the collection.
+     *
+     * @param  callable $callback
+     *
+     * @return bool
+     */
+    public function passes(callable $callback)
+    {
+        foreach ($this->items as $item) {
+            if (! $callback($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
@@ -936,6 +954,35 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Transpose each item in the collection, interchanging the row and column indexes.
+     *
+     * @return static
+     */
+    public function transpose()
+    {
+        if ($this->passes('is_array')) {
+            return new static(Arr::transpose($this->items));
+        }
+
+        if ($this->contains(function ($key, $item) { return $item instanceof self; })) {
+
+            // convert any sub collections to an array
+            $subArrays = array_map(function ($subItem) {
+                return $this->getArrayableItems($subItem);
+            }, $this->items);
+
+            $transposedSubArrays = Arr::transpose($subArrays);
+
+            // convert the transposed sub arrays back to collections
+            $subCollections = array_map(['static', 'make'], $transposedSubArrays);
+
+            return new static($subCollections);
+        }
+
+        throw new InvalidArgumentException('Can only transpose multi-dimensional arrays or collections of collections.');
     }
 
     /**
