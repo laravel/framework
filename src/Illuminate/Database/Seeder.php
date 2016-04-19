@@ -23,14 +23,14 @@ abstract class Seeder
 
     /**
      * What seeders must be run before this seeder.
-     * 
+     *
      * @var array
      */
     protected $dependencies = [];
 
     /**
      * What seeders have been run already.
-     * 
+     *
      * @var array
      */
     protected $seedersRun = [];
