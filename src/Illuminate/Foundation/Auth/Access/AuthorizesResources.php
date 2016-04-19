@@ -7,21 +7,6 @@ use Illuminate\Routing\ControllerMiddlewareOptions;
 trait AuthorizesResources
 {
     /**
-     * Map of resource methods to ability names.
-     *
-     * @var array
-     */
-    protected $resourceAbilityMap = [
-        'index'  => 'view',
-        'create' => 'create',
-        'store'  => 'create',
-        'show'   => 'view',
-        'edit'   => 'update',
-        'update' => 'update',
-        'delete' => 'delete',
-    ];
-
-    /**
      * Authorize a resource action based on the incoming request.
      *
      * @param  string  $model
@@ -34,7 +19,9 @@ trait AuthorizesResources
     {
         $method = array_last(explode('@', with($request ?: request())->route()->getActionName()));
 
-        if (! in_array($method, array_keys($this->resourceAbilityMap))) {
+        $map = $this->resourceAbilityMap();
+
+        if (! in_array($method, array_keys($map))) {
             return new ControllerMiddlewareOptions($options);
         }
 
@@ -42,6 +29,24 @@ trait AuthorizesResources
             $model = $name ?: strtolower(class_basename($model));
         }
 
-        return $this->middleware("can:{$this->resourceAbilityMap[$method]},{$model}", $options);
+        return $this->middleware("can:{$map[$method]},{$model}", $options);
+    }
+
+    /**
+     * Get the map of resource methods to ability names.
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return [
+            'index'  => 'view',
+            'create' => 'create',
+            'store'  => 'create',
+            'show'   => 'view',
+            'edit'   => 'update',
+            'update' => 'update',
+            'delete' => 'delete',
+        ];
     }
 }
