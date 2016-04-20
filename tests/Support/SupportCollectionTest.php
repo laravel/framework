@@ -1261,6 +1261,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testReduce()
+    {
+        $data = new Collection([1, 2, 3]);
+        $this->assertEquals(6, $data->reduce(function ($carry, $element) { return $carry += $element; }));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
+    {
+        $data = new Collection([1, 2, 3]);
+        $data->random(4);
+    }
 }
 
 class TestAccessorEloquentTestStub
