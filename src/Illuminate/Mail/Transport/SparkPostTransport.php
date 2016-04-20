@@ -87,7 +87,7 @@ class SparkPostTransport extends Transport
         }
 
         $recipients = array_map(function ($address) {
-            return ['address' => [ 'email' => $address ,'header_to' => $address]];
+            return ['address' => ['email' => $address, 'header_to' => $address]];
         }, $to);
 
         return $recipients;
@@ -102,7 +102,7 @@ class SparkPostTransport extends Transport
     protected function getFrom(Swift_Mime_Message $message)
     {
         $from = array_map(function ($email, $name) {
-            return [ 'name' => $name, 'email' => $email ];
+            return ['name' => $name, 'email' => $email];
         }, array_keys($message->getFrom()), $message->getFrom());
 
         return $from[0];
