@@ -42,7 +42,7 @@ class SparkPostTransport extends Transport
         $this->beforeSendPerformed($message);
 
         $recipients = $this->getRecipients($message);
-        //dd($recipients);
+
         $message->setBcc([]);
 
         $options = [
@@ -83,18 +83,14 @@ class SparkPostTransport extends Transport
         }
 
         if ($message->getBcc()) {
-            $bcc = array_merge($bcc, array_keys($message->getBcc()));
-            $recipients_bcc = array_map(function ($address) {
-                return ['address' => [ 'email' => $address ,'header_to' => $address] ];
-            }, $bcc);
+            $to = array_merge($bcc, array_keys($message->getBcc()));
         }
 
-        $recipients_to = array_map(function ($address) {
-            return ['address' => [ 'email' => $address] ];
-//            return compact('address');
+        $recipients = array_map(function ($address) {
+            return ['address' => [ 'email' => $address ,'header_to' => $address] ];
         }, $to);
 
-        return (isset($recipients_bcc)) ? $recipients_to + $recipients_bcc : $recipients_to;
+        return $recipients;
     }
 
     /**
