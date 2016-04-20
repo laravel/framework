@@ -54,7 +54,7 @@ class SparkPostTransport extends Transport
                 'content' => [
                     'html' => $message->getBody(),
                     'from' => $this->getFrom($message),
-                    'subject' => $message->getSubject()
+                    'subject' => $message->getSubject(),
                 ],
             ],
         ];
@@ -87,24 +87,23 @@ class SparkPostTransport extends Transport
         }
 
         $recipients = array_map(function ($address) {
-            return ['address' => [ 'email' => $address ,'header_to' => $address] ];
+            return ['address' => [ 'email' => $address ,'header_to' => $address]];
         }, $to);
 
         return $recipients;
     }
 
     /**
-     * Get From in a format needed by SparkPost
+     * Get From in a format needed by SparkPost.
      *
      * @param Swift_Mime_Message $message
      * @return array
      */
     protected function getFrom(Swift_Mime_Message $message)
     {
-
         $from = array_map(function ($email, $name) {
             return [ 'name' => $name, 'email' => $email ];
-        }, array_keys($message->getFrom()), $message->getFrom() );
+        }, array_keys($message->getFrom()), $message->getFrom());
 
         return $from[0];
     }
