@@ -10,3 +10,4 @@
 .travis.yml export-ignore
 phpunit.php export-ignore
 phpunit.xml export-ignore
+CONTRIBUTING.md export-ignore
