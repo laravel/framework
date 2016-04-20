@@ -9,3 +9,4 @@
 .php_cs export-ignore
 .travis.yml export-ignore
 phpunit.xml export-ignore
+CHANGELOG.md export-ignore
