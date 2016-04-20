@@ -125,7 +125,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     {
         $expiresAt = Carbon::parse($token['created_at'])->addSeconds($this->expires);
 
-        return $expiresAt->lt(new Carbon);
+        return $expiresAt->isPast();
     }
 
     /**
