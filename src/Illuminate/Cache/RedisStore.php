@@ -107,7 +107,7 @@ class RedisStore extends TaggableStore implements Store
      */
     public function putMany(array $values, $minutes)
     {
-        $this->connection()->multi();
+        $this->connection()->multi(\Redis::PIPELINE);
 
         foreach ($values as $key => $value) {
             $this->put($key, $value, $minutes);
