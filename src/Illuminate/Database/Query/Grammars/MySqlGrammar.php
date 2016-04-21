@@ -90,7 +90,7 @@ class MySqlGrammar extends Grammar
         $columns = [];
 
         foreach ($values as $key => $value) {
-            if($this->isJsonSelector($key)){
+            if ($this->isJsonSelector($key)) {
                 $columns[] = $this->prepareJsonUpdateColumn($key, new JsonExpression($value));
             } else {
                 $columns[] = $this->wrap($key).' = '.$this->parameter($value);
@@ -127,7 +127,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Prepares the update column for JSON selectors using the JSON_SET MySQL function
+     * Prepares the update column for JSON selectors using the JSON_SET MySQL function.
      *
      * @param  string         $key
      * @param  JsonExpression $value
