@@ -332,7 +332,7 @@ class Validator implements ValidatorContract
             return $data;
         }
 
-        return data_fill($data, $attribute, null);
+        return data_set($data, $attribute, null, true);
     }
 
     /**
