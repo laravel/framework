@@ -38,6 +38,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
                 $table->increments('id');
+                $table->string('name')->nullable();
                 $table->string('email');
                 $table->timestamps();
             });
@@ -162,6 +163,32 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $query = EloquentTestUser::groupBy('email')->getQuery();
 
         $this->assertEquals(3, $query->getCountForPagination());
+    }
+
+    public function testFirstOrCreate()
+    {
+        $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertEquals('taylorotwell@gmail.com', $user1->email);
+        $this->assertNull($user1->name);
+
+        $user2 = EloquentTestUser::firstOrCreate(
+            ['email' => 'taylorotwell@gmail.com'],
+            ['name' => 'Taylor Otwell']
+        );
+
+        $this->assertEquals($user1->id, $user2->id);
+        $this->assertEquals('taylorotwell@gmail.com', $user2->email);
+        $this->assertNull($user2->name);
+
+        $user3 = EloquentTestUser::firstOrCreate(
+            ['email' => 'abigailotwell@gmail.com'],
+            ['name' => 'Abigail Otwell']
+        );
+
+        $this->assertNotEquals($user3->id, $user1->id);
+        $this->assertEquals('abigailotwell@gmail.com', $user3->email);
+        $this->assertEquals('Abigail Otwell', $user3->name);
     }
 
     public function testPluck()
