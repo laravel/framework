@@ -257,9 +257,13 @@ breeze
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@can (\'update\', [$post])
 breeze
+@elsecan(\'delete\', [$post])
+sneeze
 @endcan';
         $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
 breeze
+<?php elseif (Gate::check(\'delete\', [$post])): ?>
+sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
@@ -269,9 +273,13 @@ breeze
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@cannot (\'update\', [$post])
 breeze
+@elsecannot(\'delete\', [$post])
+sneeze
 @endcannot';
         $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
 breeze
+<?php elseif (Gate::denies(\'delete\', [$post])): ?>
+sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }

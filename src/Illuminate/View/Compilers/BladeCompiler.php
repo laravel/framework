@@ -629,6 +629,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Compile the else-can statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElsecan($expression)
+    {
+        return "<?php elseif (Gate::check{$expression}): ?>";
+    }
+
+    /**
      * Compile the cannot statements into valid PHP.
      *
      * @param  string  $expression
@@ -637,6 +648,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileCannot($expression)
     {
         return "<?php if (Gate::denies{$expression}): ?>";
+    }
+
+    /**
+     * Compile the else-can statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElsecannot($expression)
+    {
+        return "<?php elseif (Gate::denies{$expression}): ?>";
     }
 
     /**
