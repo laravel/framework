@@ -102,7 +102,7 @@ class SparkPostTransport extends Transport
     protected function getFrom(Swift_Mime_Message $message)
     {
         $from = array_map(function ($email, $name) {
-            return ['name' => $name, 'email' => $email];
+            return compact('name', 'email');
         }, array_keys($message->getFrom()), $message->getFrom());
 
         return $from[0];
