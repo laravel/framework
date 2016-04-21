@@ -231,15 +231,16 @@ class Builder
      * Get the first record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes)
+    public function firstOrCreate(array $attributes, array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
-        $instance = $this->model->newInstance($attributes);
+        $instance = $this->model->newInstance($attributes + $values);
 
         $instance->save();
 
