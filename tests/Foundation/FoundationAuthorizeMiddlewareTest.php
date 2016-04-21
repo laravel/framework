@@ -1,13 +1,18 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Routing\ResponseFactory;
+use Illuminate\View\Factory as ViewFactory;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Middleware\Authorize;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 {
@@ -20,7 +25,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->user = new stdClass;
 
-        $this->container = new Container;
+        $this->container = Container::setInstance(new Container);
 
         $this->container->singleton(GateContract::class, function () {
             return new Gate($this->container, function () {
@@ -31,36 +36,59 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->router = new Router(new Dispatcher, $this->container);
     }
 
+    public function tearDown()
+    {
+        m::close();
+    }
+
+    public function testUnauthenticated()
+    {
+        $this->user = null;
+        $this->container->alias(Redirector::class, 'redirect');
+        $this->container->bind(ResponseFactoryContract::class, function () {
+            return new ResponseFactory(m::mock(ViewFactory::class), m::mock(Redirector::class));
+        });
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':access-dashboard',
+            'uses' => function () { return 'success'; },
+        ]);
+
+        $response = $this->router->dispatch($this->request('dashboard', 'GET', true));
+
+        $this->assertEquals($response->getStatusCode(), 401);
+    }
+
     public function testSimpleAbilityUnauthorized()
     {
         $this->setExpectedException(AuthorizationException::class);
 
-        $this->gate()->define('view-dashboard', function ($user, $additional = null) {
+        $this->gate()->define('access-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
 
             return false;
         });
 
         $this->router->get('dashboard', [
-            'middleware' => Authorize::class.':view-dashboard',
+            'middleware' => Authorize::class.':access-dashboard',
             'uses' => function () { return 'success'; },
         ]);
 
-        $this->router->dispatch(Request::create('dashboard', 'GET'));
+        $this->router->dispatch($this->request('dashboard', 'GET'));
     }
 
     public function testSimpleAbilityAuthorized()
     {
-        $this->gate()->define('view-dashboard', function ($user) {
+        $this->gate()->define('access-dashboard', function ($user) {
             return true;
         });
 
         $this->router->get('dashboard', [
-            'middleware' => Authorize::class.':view-dashboard',
+            'middleware' => Authorize::class.':access-dashboard',
             'uses' => function () { return 'success'; },
         ]);
 
-        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+        $response = $this->router->dispatch($this->request('dashboard', 'GET'));
 
         $this->assertEquals($response->content(), 'success');
     }
@@ -80,7 +108,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
             'uses' => function () { return 'success'; },
         ]);
 
-        $this->router->dispatch(Request::create('users/create', 'GET'));
+        $this->router->dispatch($this->request('users/create', 'GET'));
     }
 
     public function testModelTypeAuthorized()
@@ -96,7 +124,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
             'uses' => function () { return 'success'; },
         ]);
 
-        $response = $this->router->dispatch(Request::create('users/create', 'GET'));
+        $response = $this->router->dispatch($this->request('users/create', 'GET'));
 
         $this->assertEquals($response->content(), 'success');
     }
@@ -120,7 +148,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
             'uses' => function () { return 'success'; },
         ]);
 
-        $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
+        $this->router->dispatch($this->request('posts/1/edit', 'GET'));
     }
 
     public function testModelAuthorized()
@@ -140,7 +168,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
             'uses' => function () { return 'success'; },
         ]);
 
-        $response = $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
+        $response = $this->router->dispatch($this->request('posts/1/edit', 'GET'));
 
         $this->assertEquals($response->content(), 'success');
     }
@@ -153,5 +181,26 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     protected function gate()
     {
         return $this->container->make(GateContract::class);
+    }
+
+    /**
+     * Create an instance of the request class.
+     *
+     * @param  string  $url
+     * @param  string  $method
+     * @param  bool  $ajax
+     * @return \Illuminate\Http\Request
+     */
+    protected function request($url, $method, $ajax = false)
+    {
+        $request = Request::create($url, $method)->setUserResolver(function () {
+            return $this->user;
+        });
+
+        if ($ajax) {
+            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        }
+
+        return $request;
     }
 }

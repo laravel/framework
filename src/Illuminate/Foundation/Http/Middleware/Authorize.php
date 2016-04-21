@@ -8,6 +8,13 @@ use Illuminate\Contracts\Auth\Access\Gate;
 class Authorize
 {
     /**
+     * The URL to which to redirect an unauthenticated request.
+     *
+     * @var string
+     */
+    protected $loginPath = 'login';
+
+    /**
      * The gate instance.
      *
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -38,6 +45,10 @@ class Authorize
      */
     public function handle($request, Closure $next, $ability, $model = null)
     {
+        if (! $request->user()) {
+            return $this->unauthenticated($request);
+        }
+
         $this->gate->authorize($ability, $this->getGateArguments($request, $model));
 
         return $next($request);
@@ -64,5 +75,20 @@ class Authorize
         }
 
         return $request->route($model);
+    }
+
+    /**
+     * Create an unauthenticated response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function unauthenticated($request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response('Unauthorized.', 401);
+        } else {
+            return redirect()->guest($this->loginPath);
+        }
     }
 }
