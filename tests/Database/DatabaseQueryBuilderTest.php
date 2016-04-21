@@ -488,12 +488,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testGroupBys()
     {
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email');
+        $this->assertEquals('select * from "users" group by "email"', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->groupBy('id', 'email');
         $this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->groupBy(['id', 'email']);
         $this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy(new Raw('DATE(created_at)'));
+        $this->assertEquals('select * from "users" group by DATE(created_at)', $builder->toSql());
     }
 
     public function testOrderBys()
