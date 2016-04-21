@@ -149,7 +149,7 @@ class MemcachedStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        $this->memcached->set($this->prefix.$key, $value);
     }
 
     /**
