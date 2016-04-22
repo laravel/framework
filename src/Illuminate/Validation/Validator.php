@@ -2428,7 +2428,7 @@ class Validator implements ValidatorContract
      */
     public function attributes()
     {
-        return array_merge($this->data, $this->files);
+        return $this->data + $this->files;
     }
 
     /**
@@ -2816,7 +2816,7 @@ class Validator implements ValidatorContract
 
         $rules = $this->explodeRules($this->initialRules);
 
-        $this->rules = array_merge($this->rules, $rules);
+        $this->rules = $this->rules + $rules;
 
         return $this;
     }
