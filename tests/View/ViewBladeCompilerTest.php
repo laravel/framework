@@ -232,7 +232,7 @@ breeze
         $string = '@can (\'update\', [$post])
 breeze
 @endcan';
-        $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'update\', [$post])): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -244,7 +244,7 @@ breeze
         $string = '@cannot (\'update\', [$post])
 breeze
 @endcannot';
-        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'update\', [$post])): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
