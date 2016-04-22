@@ -499,6 +499,18 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Determine if a header is set on the request.
+     *
+     * @param  string  $key
+     *
+     * @return boolean
+     */
+    public function hasHeader($key)
+    {
+        return ! is_null($this->header($key));
+    }
+
+    /**
      * Retrieve a header from the request.
      *
      * @param  string  $key
