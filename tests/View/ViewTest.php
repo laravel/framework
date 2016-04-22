@@ -59,7 +59,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
         }));
 
         $this->assertEquals('contents', $view->render(function () {
-            return; // null
+            //
         }));
     }
 
@@ -126,6 +126,18 @@ class ViewTest extends PHPUnit_Framework_TestCase
     public function testViewArrayAccess()
     {
         $view = $this->getView(['foo' => 'bar']);
+        $this->assertInstanceOf('ArrayAccess', $view);
+        $this->assertTrue($view->offsetExists('foo'));
+        $this->assertEquals($view->offsetGet('foo'), 'bar');
+        $view->offsetSet('foo', 'baz');
+        $this->assertEquals($view->offsetGet('foo'), 'baz');
+        $view->offsetUnset('foo');
+        $this->assertFalse($view->offsetExists('foo'));
+    }
+
+    public function testViewConstructedWithObjectData()
+    {
+        $view = $this->getView(new DataObjectStub);
         $this->assertInstanceOf('ArrayAccess', $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');
@@ -214,4 +226,9 @@ class ViewTest extends PHPUnit_Framework_TestCase
             $data
         );
     }
+}
+
+class DataObjectStub
+{
+    public $foo = 'bar';
 }

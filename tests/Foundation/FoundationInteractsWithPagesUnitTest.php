@@ -2,11 +2,11 @@
 
 use Mockery as m;
 use Symfony\Component\DomCrawler\Crawler;
-use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithPages;
 
-class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
+class FoundationInteractsWithPagesUnitTest extends PHPUnit_Framework_TestCase
 {
-    use MakesHttpRequests;
+    use InteractsWithPages;
 
     public function setUp()
     {
@@ -102,73 +102,24 @@ class FoundationCrawlerTraitTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Given selector [select] is not an input or textarea
+     * @expectedException        \PHPUnit_Framework_ExpectationFailedException
+     * @expectedExceptionMessage Failed asserting that the field [select] contains the expected value [selected_value]: There is no input,textarea with the name or ID [select].
      */
     public function testSeeInFieldWrongElementException()
     {
-        $select = m::mock(Crawler::class)->makePartial();
-        $select->shouldReceive('count')->andReturn(1);
-        $select->shouldReceive('nodeName')->once()->andReturn('select');
+        $node = m::mock(Crawler::class)->makePartial();
+        $node->shouldReceive('count')->andReturn(0);
 
         $this->crawler->shouldReceive('filter')
             ->withArgs(["input#select, input[name='select'], textarea#select, textarea[name='select']"])
             ->once()
-            ->andReturn($select);
+            ->andReturn($node);
+
+        $this->crawler->shouldReceive('html')
+            ->once()
+            ->andReturn('<html>');
 
         $this->seeInField('select', 'selected_value');
-    }
-
-    protected function mockSelect()
-    {
-        $optionEmpty = m::mock(Crawler::class)->makePartial();
-        $optionEmpty->shouldReceive('hasAttribute')
-            ->withArgs(['selected'])
-            ->once()
-            ->andReturn(false);
-
-        $optionFullTime = m::mock(Crawler::class)->makePartial();
-        $optionFullTime->shouldReceive('hasAttribute')
-            ->withArgs(['selected'])
-            ->once()
-            ->andReturn(true);
-        $optionFullTime->shouldReceive('getAttribute')
-            ->withArgs(['value'])
-            ->once()
-            ->andReturn('full_time');
-
-        $select = m::mock(Crawler::class)->makePartial();
-        $select->shouldReceive('count')
-            ->once()
-            ->andReturn(1);
-        $select->shouldReceive('nodeName')
-            ->twice()
-            ->andReturn('select');
-        $select->shouldReceive('children')
-            ->once()
-            ->andReturn([$optionEmpty, $optionFullTime]);
-
-        return $select;
-    }
-
-    public function testSeeIsSelected()
-    {
-        $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#availability, *[name='availability']"])
-            ->once()
-            ->andReturn($this->mockSelect());
-
-        $this->seeIsSelected('availability', 'full_time');
-    }
-
-    public function testDontSeeIsSelected()
-    {
-        $this->crawler->shouldReceive('filter')
-            ->withArgs(["*#availability, *[name='availability']"])
-            ->once()
-            ->andReturn($this->mockSelect());
-
-        $this->dontSeeIsSelected('availability', 'partial_time');
     }
 
     protected function mockCheckbox($checked = true)

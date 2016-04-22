@@ -25,14 +25,20 @@ class SyncQueue extends Queue implements QueueContract
         $queueJob = $this->resolveJob($this->createPayload($job, $data, $queue));
 
         try {
+            $this->raiseBeforeJobEvent($queueJob);
+
             $queueJob->fire();
 
             $this->raiseAfterJobEvent($queueJob);
         } catch (Exception $e) {
+            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
+
             $this->handleFailedJob($queueJob);
 
             throw $e;
         } catch (Throwable $e) {
+            $this->raiseExceptionOccurredJobEvent($queueJob, $e);
+
             $this->handleFailedJob($queueJob);
 
             throw $e;
@@ -91,6 +97,21 @@ class SyncQueue extends Queue implements QueueContract
     }
 
     /**
+     * Raise the before queue job event.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseBeforeJobEvent(Job $job)
+    {
+        $data = json_decode($job->getRawBody(), true);
+
+        if ($this->container->bound('events')) {
+            $this->container['events']->fire(new Events\JobProcessing('sync', $job, $data));
+        }
+    }
+
+    /**
      * Raise the after queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -102,6 +123,22 @@ class SyncQueue extends Queue implements QueueContract
 
         if ($this->container->bound('events')) {
             $this->container['events']->fire(new Events\JobProcessed('sync', $job, $data));
+        }
+    }
+
+    /**
+     * Raise the exception occurred queue job event.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    protected function raiseExceptionOccurredJobEvent(Job $job, $exception)
+    {
+        $data = json_decode($job->getRawBody(), true);
+
+        if ($this->container->bound('events')) {
+            $this->container['events']->fire(new Events\JobExceptionOccurred('sync', $job, $data, $exception));
         }
     }
 

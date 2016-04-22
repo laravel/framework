@@ -18,6 +18,30 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertSame($request, $request->instance());
     }
 
+    public function testMethodMethod()
+    {
+        $request = Request::create('', 'GET');
+        $this->assertSame('GET', $request->method());
+
+        $request = Request::create('', 'HEAD');
+        $this->assertSame('HEAD', $request->method());
+
+        $request = Request::create('', 'POST');
+        $this->assertSame('POST', $request->method());
+
+        $request = Request::create('', 'PUT');
+        $this->assertSame('PUT', $request->method());
+
+        $request = Request::create('', 'PATCH');
+        $this->assertSame('PATCH', $request->method());
+
+        $request = Request::create('', 'DELETE');
+        $this->assertSame('DELETE', $request->method());
+
+        $request = Request::create('', 'OPTIONS');
+        $this->assertSame('OPTIONS', $request->method());
+    }
+
     public function testRootMethod()
     {
         $request = Request::create('http://example.com/foo/bar/script.php?test');
@@ -96,6 +120,18 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $request = Request::create('https://foo.com', 'GET');
         $this->assertEquals('https://foo.com', $request->fullUrl());
+
+        $request = Request::create('https://foo.com', 'GET');
+        $this->assertEquals('https://foo.com?coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
+
+        $request = Request::create('https://foo.com?a=b', 'GET');
+        $this->assertEquals('https://foo.com/?a=b', $request->fullUrl());
+
+        $request = Request::create('https://foo.com?a=b', 'GET');
+        $this->assertEquals('https://foo.com/?a=b&coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
+
+        $request = Request::create('https://foo.com?a=b', 'GET');
+        $this->assertEquals('https://foo.com/?a=c', $request->fullUrlWithQuery(['a' => 'c']));
     }
 
     public function testIsMethod()
@@ -352,14 +388,14 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
     public function testAllInputReturnsInputAndFiles()
     {
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
+        $file = $this->getMock('Illuminate\Http\UploadedFile', null, [__FILE__, 'photo.jpg']);
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => 'bar'], [], ['baz' => $file]);
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
     public function testAllInputReturnsNestedInputAndFiles()
     {
-        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', null, [__FILE__, 'photo.jpg']);
+        $file = $this->getMock('Illuminate\Http\UploadedFile', null, [__FILE__, 'photo.jpg']);
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], ['foo' => ['photo' => $file]]);
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
@@ -505,6 +541,27 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($request->accepts('text/foo'));
         $this->assertTrue($request->accepts('application/json'));
         $this->assertTrue($request->accepts('application/baz+json'));
+    }
+
+    public function testBadAcceptHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pt-PT; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)']);
+        $this->assertFalse($request->accepts(['text/html', 'application/json']));
+        $this->assertFalse($request->accepts('text/html'));
+        $this->assertFalse($request->accepts('text/foo'));
+        $this->assertFalse($request->accepts('application/json'));
+        $this->assertFalse($request->accepts('application/baz+json'));
+        $this->assertFalse($request->acceptsHtml());
+        $this->assertFalse($request->acceptsJson());
+
+        // Should not be handled as regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '.+/.+']);
+        $this->assertFalse($request->accepts('application/json'));
+        $this->assertFalse($request->accepts('application/baz+json'));
+
+        // Should not produce compilation error on invalid regex.
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '(/(']);
+        $this->assertFalse($request->accepts('text/html'));
     }
 
     /**

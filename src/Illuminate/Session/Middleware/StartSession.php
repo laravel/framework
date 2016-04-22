@@ -97,7 +97,9 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        with($session = $this->getSession($request))->setRequestOnHandler($request);
+        $session = $this->getSession($request);
+
+        $session->setRequestOnHandler($request);
 
         $session->start();
 

@@ -209,9 +209,19 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @return array
      */
-    public function getMessages()
+    public function messages()
     {
         return $this->messages;
+    }
+
+    /**
+     * Get the raw messages in the container.
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages();
     }
 
     /**

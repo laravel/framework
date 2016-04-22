@@ -72,6 +72,20 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
         $t->choice('foo', 10, ['replace']);
     }
 
+    public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
+    {
+        $t = $this->getMock('Illuminate\Translation\Translator', ['get'], [$this->getLoader(), 'en']);
+        $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->will($this->returnValue('line'));
+        $t->setSelector($selector = m::mock('Symfony\Component\Translation\MessageSelector'));
+        $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
+
+        $values = ['foo', 'bar', 'baz'];
+        $t->choice('foo', $values, ['replace']);
+
+        $values = new Illuminate\Support\Collection(['foo', 'bar', 'baz']);
+        $t->choice('foo', $values, ['replace']);
+    }
+
     protected function getLoader()
     {
         return m::mock('Illuminate\Translation\LoaderInterface');

@@ -29,7 +29,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(DispatcherContract $events)
     {
-        foreach ($this->listen as $event => $listeners) {
+        foreach ($this->listens() as $event => $listeners) {
             foreach ($listeners as $listener) {
                 $events->listen($event, $listener);
             }

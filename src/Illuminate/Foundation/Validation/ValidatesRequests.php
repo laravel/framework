@@ -18,6 +18,26 @@ trait ValidatesRequests
     protected $validatesRequestErrorBag;
 
     /**
+     * Run the validation routine against the given validator.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return void
+     */
+    public function validateWith($validator, Request $request = null)
+    {
+        $request = $request ?: app('request');
+
+        if (is_array($validator)) {
+            $validator = $this->getValidationFactory()->make($request->all(), $validator);
+        }
+
+        if ($validator->fails()) {
+            $this->throwValidationException($request, $validator);
+        }
+    }
+
+    /**
      * Validate the given request with the given rules.
      *
      * @param  \Illuminate\Http\Request  $request
