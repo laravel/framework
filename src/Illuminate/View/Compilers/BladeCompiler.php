@@ -625,7 +625,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileCan($expression)
     {
-        return "<?php if (Gate::check{$expression}): ?>";
+        return "<?php if (app('Illuminate\\Contracts\\Auth\\Access\\Gate')->check{$expression}): ?>";
     }
 
     /**
@@ -636,7 +636,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileCannot($expression)
     {
-        return "<?php if (Gate::denies{$expression}): ?>";
+        return "<?php if (app('Illuminate\\Contracts\\Auth\\Access\\Gate')->denies{$expression}): ?>";
     }
 
     /**
