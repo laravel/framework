@@ -502,7 +502,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Determine if a header is set on the request.
      *
      * @param  string  $key
-     * @return boolean
+     * @return bool
      */
     public function hasHeader($key)
     {
