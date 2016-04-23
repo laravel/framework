@@ -831,7 +831,7 @@ class Blueprint
     {
         return $this->addColumn('binary', $column);
     }
-    
+
     /**
      * Create a new binary column on the table.
      *
