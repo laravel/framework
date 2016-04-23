@@ -46,9 +46,24 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         if (in_array('dblib', $this->getAvailableDrivers())) {
             return $this->getDblibDsn($config);
         } elseif (in_array('odbc', $this->getAvailableDrivers())) {
-            return 'odbc:'.(isset($config('ODBC_DATA_SOURCE_NAME')) ? $config('ODBC_DATA_SOURCE_NAME') : '');
+            return $this->getOdbcDsn($config);
         } else {
             return $this->getSqlSrvDsn($config);
+        }
+    }
+
+    /**
+     * Get the DSN string for a ODBC connection.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function getOdbcDsn(array $config)
+    {
+        if (isset($config['ODBC_DATA_SOURCE_NAME'])) {
+            return 'odbc:'.$config['ODBC_DATA_SOURCE_NAME'];
+        } else {
+            return '';
         }
     }
 
