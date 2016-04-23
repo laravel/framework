@@ -210,6 +210,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Return only those items that were registered in rules method.
+     *
+     * @return array
+     */
+    public function validatedOnly()
+    {
+        $rules = $this->container->call([$this, 'rules']);
+
+        return $this->only(array_keys($rules));
+    }
+
+    /**
      * Set custom messages for validator errors.
      *
      * @return array
