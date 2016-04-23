@@ -82,7 +82,7 @@ class RateLimiter
      */
     public function resetAttempts($key)
     {
-        return $this->cache->forget($key;
+        return $this->cache->forget($key);
     }
 
     /**
