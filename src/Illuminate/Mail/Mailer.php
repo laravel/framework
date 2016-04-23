@@ -47,6 +47,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $from;
 
     /**
+     * The global to address and name.
+     *
+     * @var array
+     */
+    protected $to;
+
+    /**
      * The IoC container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
@@ -111,7 +118,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return int
+     * @return void
      */
     public function raw($text, $callback)
     {
@@ -124,7 +131,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return int
+     * @return void
      */
     public function plain($view, array $data, $callback)
     {
@@ -247,8 +254,8 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Build the callable for a queued e-mail job.
      *
-     * @param  mixed  $callback
-     * @return mixed
+     * @param  \Closure|string  $callback
+     * @return string
      */
     protected function buildQueueCallable($callback)
     {
@@ -277,12 +284,12 @@ class Mailer implements MailerContract, MailQueueContract
      * Get the true callable for a queued e-mail message.
      *
      * @param  array  $data
-     * @return mixed
+     * @return \Closure|string
      */
     protected function getQueuedCallable(array $data)
     {
         if (Str::contains($data['callback'], 'SerializableClosure')) {
-            return unserialize($data['callback'])->getClosure();
+            return (new Serializer)->unserialize($data['callback']);
         }
 
         return $data['callback'];
@@ -425,7 +432,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $view
      * @param  array  $data
-     * @return \Illuminate\View\View
+     * @return string
      */
     protected function getView($view, $data)
     {

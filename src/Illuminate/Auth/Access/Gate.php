@@ -98,7 +98,7 @@ class Gate implements GateContract
     {
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
-        } elseif (is_string($callback) && str_contains($callback, '@')) {
+        } elseif (is_string($callback) && Str::contains($callback, '@')) {
             $this->abilities[$ability] = $this->buildAbilityCallback($callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
@@ -279,7 +279,7 @@ class Gate implements GateContract
      */
     protected function callBeforeCallbacks($user, $ability, array $arguments)
     {
-        $arguments = array_merge([$user, $ability], $arguments);
+        $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
             if (! is_null($result = call_user_func_array($before, $arguments))) {
@@ -299,7 +299,7 @@ class Gate implements GateContract
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
-        $arguments = array_merge([$user, $ability, $result], $arguments);
+        $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
             call_user_func_array($after, $arguments);
@@ -369,7 +369,7 @@ class Gate implements GateContract
                     [$instance, 'before'], $beforeArguments
                 );
 
-                // If we recieved a non-null result from the before method, we will return it
+                // If we received a non-null result from the before method, we will return it
                 // as the result of a check. This allows developers to override the checks
                 // in the policy and return a result for all rules defined in the class.
                 if (! is_null($result)) {

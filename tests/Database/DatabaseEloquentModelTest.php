@@ -325,12 +325,22 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = new DateTime('2015-04-17 22:59:01');
+        $this->assertInstanceOf(DateTime::class, $value);
+        $this->assertInstanceOf(DateTimeInterface::class, $value);
+        $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+        $value = new DateTimeImmutable('2015-04-17 22:59:01');
+        $this->assertInstanceOf(DateTimeImmutable::class, $value);
+        $this->assertInstanceOf(DateTimeInterface::class, $value);
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = '2015-04-17 22:59:01';
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
 
         $value = '2015-04-17';
+        $this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
+
+        $value = '2015-4-17';
         $this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
 
         $value = '1429311541';
@@ -552,9 +562,14 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     public function testConnectionManagement()
     {
         EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $model = new EloquentModelStub;
-        $model->setConnection('foo');
-        $resolver->shouldReceive('connection')->once()->with('foo')->andReturn('bar');
+        $model = m::mock('EloquentModelStub[getConnectionName,connection]');
+
+        $retval = $model->setConnection('foo');
+        $this->assertEquals($retval, $model);
+        $this->assertEquals('foo', $model->connection);
+
+        $model->shouldReceive('getConnectionName')->once()->andReturn('somethingElse');
+        $resolver->shouldReceive('connection')->once()->with('somethingElse')->andReturn('bar');
 
         $this->assertEquals('bar', $model->getConnection());
     }
@@ -795,6 +810,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', $model->name);
         $this->assertTrue(Model::isUnguarded());
         Model::reguard();
+    }
+
+    public function testUnguardedCallDoesNotChangeUnguardedStateOnException()
+    {
+        try {
+            Model::unguarded(function () {
+                throw new Exception;
+            });
+        } catch (Exception $e) {
+            // ignore the exception
+        }
+        $this->assertFalse(Model::isUnguarded());
     }
 
     public function testHasOneCreatesProperRelation()
@@ -1274,6 +1301,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertNull($array['timestampAttribute']);
     }
 
+    public function testUpdatingNonExistentModelFails()
+    {
+        $model = new EloquentModelStub;
+        $this->assertFalse($model->update());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1296,6 +1329,7 @@ class EloquentTestObserverStub
 
 class EloquentModelStub extends Model
 {
+    public $connection;
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = 'EloquentModelSaveStub';
@@ -1445,12 +1479,12 @@ class EloquentModelBootingTestStub extends Model
 {
     public static function unboot()
     {
-        unset(static::$booted[get_called_class()]);
+        unset(static::$booted[static::class]);
     }
 
     public static function isBooted()
     {
-        return array_key_exists(get_called_class(), static::$booted);
+        return array_key_exists(static::class, static::$booted);
     }
 }
 

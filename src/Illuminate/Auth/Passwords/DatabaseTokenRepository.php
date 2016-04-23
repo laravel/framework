@@ -123,19 +123,9 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function tokenExpired($token)
     {
-        $expirationTime = strtotime($token['created_at']) + $this->expires;
+        $expiresAt = Carbon::parse($token['created_at'])->addSeconds($this->expires);
 
-        return $expirationTime < $this->getCurrentTime();
-    }
-
-    /**
-     * Get the current UNIX timestamp.
-     *
-     * @return int
-     */
-    protected function getCurrentTime()
-    {
-        return time();
+        return $expiresAt->isPast();
     }
 
     /**

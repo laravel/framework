@@ -314,6 +314,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  mixed  $parameters
      * @param  bool   $absolute
      * @return string
+     *
+     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     protected function toRoute($route, $parameters, $absolute)
     {
@@ -394,7 +396,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function addQueryString($uri, array $parameters)
     {
-        // If the URI has a fragment, we will move it to the end of the URI since it will
+        // If the URI has a fragment, we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
         if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {

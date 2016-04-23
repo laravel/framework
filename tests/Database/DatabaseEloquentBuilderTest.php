@@ -112,6 +112,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn(['bar']);
         $builder->shouldReceive('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
@@ -124,6 +125,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('applyScopes')->andReturnSelf();
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn([]);
         $builder->shouldReceive('eagerLoadRelations')->never();
         $builder->setModel($this->getMockModel());
@@ -190,6 +192,22 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
             return false;
         });
+    }
+
+    public function testChunkPaginatesUsingId()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturn($builder);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
+
+        $builder->shouldReceive('get')->times(3)->andReturn(
+            new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            new Collection([(object) ['someIdField' => 10]]),
+            new Collection([])
+        );
+
+        $builder->chunkById(2, function ($results) {}, 'someIdField');
     }
 
     public function testPluckReturnsTheMutatedAttributesOfAModel()
@@ -420,6 +438,14 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testPostgresOperatorsWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '@>', 'bar');
+        $result = $builder->where('foo', '@>', 'bar');
+        $this->assertEquals($result, $builder);
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
@@ -515,6 +541,41 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($builder->toSql(), $result);
     }
 
+    public function testSelfHasNested()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $nestedSql = $model->whereHas('parentFoo', function ($q) {
+            $q->has('childFoo');
+        })->toSql();
+
+        $dotSql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $nestedSql = preg_replace($aliasRegex, $alias, $nestedSql);
+        $dotSql = preg_replace($aliasRegex, $alias, $dotSql);
+
+        $this->assertEquals($nestedSql, $dotSql);
+    }
+
+    public function testSelfHasNestedUsesAlias()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $sql = $model->has('parentFoo.childFoo')->toSql();
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $sql);
+
+        $this->assertContains('"self_related_stubs"."parent_id" = "self_alias_hash"."id"', $sql);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -608,4 +669,39 @@ class EloquentBuilderTestModelCloseRelatedStub extends Illuminate\Database\Eloqu
 
 class EloquentBuilderTestModelFarRelatedStub extends Illuminate\Database\Eloquent\Model
 {
+}
+
+class EloquentBuilderTestModelSelfRelatedStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'self_related_stubs';
+
+    public function parentFoo()
+    {
+        return $this->belongsTo('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'parent');
+    }
+
+    public function childFoo()
+    {
+        return $this->hasOne('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'child');
+    }
+
+    public function childFoos()
+    {
+        return $this->hasMany('EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'children');
+    }
+
+    public function parentBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
+    }
+
+    public function childBars()
+    {
+        return $this->belongsToMany('EloquentBuilderTestModelSelfRelatedStub', 'self_pivot', 'parent_id', 'child_id', 'child_bars');
+    }
+
+    public function bazes()
+    {
+        return $this->hasMany('EloquentBuilderTestModelFarRelatedStub', 'foreign_key', 'id', 'bar');
+    }
 }

@@ -184,6 +184,35 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock->transaction(function ($connection) { $connection->reconnect(); });
     }
 
+    public function testRunMethodRetriesOnFailure()
+    {
+        $method = (new ReflectionClass('Illuminate\Database\Connection'))->getMethod('run');
+        $method->setAccessible(true);
+
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
+        $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
+
+        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\QueryException
+     */
+    public function testRunMethodNeverRetriesIfWithinTransaction()
+    {
+        $method = (new ReflectionClass('Illuminate\Database\Connection'))->getMethod('run');
+        $method->setAccessible(true);
+
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction']);
+        $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
+        $pdo->expects($this->once())->method('beginTransaction');
+        $mock->expects($this->never())->method('tryAgainIfCausedByLostConnection');
+        $mock->beginTransaction();
+
+        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
+    }
+
     public function testFromCreatesNewQueryBuilder()
     {
         $conn = $this->getMockConnection();
@@ -232,6 +261,25 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf('Illuminate\Database\Schema\Builder', $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testAlternateFetchModes()
+    {
+        $stmt = $this->getMock('PDOStatement');
+        $stmt->expects($this->exactly(3))->method('fetchAll')->withConsecutive(
+            [PDO::FETCH_ASSOC],
+            [PDO::FETCH_COLUMN, 3, []],
+            [PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]]
+        );
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo->expects($this->any())->method('prepare')->will($this->returnValue($stmt));
+        $connection = $this->getMockConnection([], $pdo);
+        $connection->setFetchMode(PDO::FETCH_ASSOC);
+        $connection->select('SELECT * FROM foo');
+        $connection->setFetchMode(PDO::FETCH_COLUMN, 3);
+        $connection->select('SELECT * FROM foo');
+        $connection->setFetchMode(PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]);
+        $connection->select('SELECT * FROM foo');
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

@@ -32,6 +32,15 @@ class AuthManager implements FactoryContract
     protected $guards = [];
 
     /**
+     * The user resolver shared by various services.
+     *
+     * Determines the default user for Gate, Request, and the Authenticatable contract.
+     *
+     * @var \Closure
+     */
+    protected $userResolver;
+
+    /**
      * Create a new Auth manager instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -40,6 +49,10 @@ class AuthManager implements FactoryContract
     public function __construct($app)
     {
         $this->app = $app;
+
+        $this->userResolver = function ($guard = null) {
+            return $this->guard($guard)->user();
+        };
     }
 
     /**
@@ -62,6 +75,8 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -74,7 +89,13 @@ class AuthManager implements FactoryContract
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($name, $config);
         } else {
-            return $this->{'create'.ucfirst($config['driver']).'Driver'}($name, $config);
+            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+            if (method_exists($this, $driverMethod)) {
+                return $this->{$driverMethod}($name, $config);
+            } else {
+                throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
+            }
         }
     }
 
@@ -130,7 +151,7 @@ class AuthManager implements FactoryContract
      */
     public function createTokenDriver($name, $config)
     {
-        // The token guard implemetns a basic API token based guard implementation
+        // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
         // user in the database or another persistence layer where users are.
         $guard = new TokenGuard(
@@ -202,6 +223,29 @@ class AuthManager implements FactoryContract
 
             return $guard;
         });
+    }
+
+    /**
+     * Get the user resolver callback.
+     *
+     * @return \Closure
+     */
+    public function userResolver()
+    {
+        return $this->userResolver;
+    }
+
+    /**
+     * Set the callback to be used to resolve users.
+     *
+     * @param  \Closure  $userResolver
+     * @return $this
+     */
+    public function resolveUsersUsing(Closure $userResolver)
+    {
+        $this->userResolver = $userResolver;
+
+        return $this;
     }
 
     /**

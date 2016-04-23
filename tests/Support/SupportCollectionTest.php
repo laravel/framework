@@ -34,6 +34,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testLastWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->last(null, 'default');
+        $this->assertEquals('default', $result);
+    }
+
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
@@ -268,9 +275,25 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testWhere()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
-
         $this->assertEquals([['v' => 3]], $c->where('v', 3)->values()->all());
+    }
+
+    public function testWhereLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
         $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereLoose('v', 3)->values()->all());
+    }
+
+    public function testWhereIn()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3]], $c->whereIn('v', [1, 3])->values()->all());
+    }
+
+    public function testWhereInLoose()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $this->assertEquals([['v' => 1], ['v' => 3], ['v' => '3']], $c->whereInLoose('v', [1, 3])->values()->all());
     }
 
     public function testValues()
@@ -348,6 +371,24 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testUnionNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->union(null)->all());
+    }
+
+    public function testUnionArray()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(['id' => 1])->all());
+    }
+
+    public function testUnionCollection()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(new Collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
     public function testDiffCollection()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -358,6 +399,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c->diff(null)->all());
+    }
+
+    public function testDiffKeys()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['id' => 123, 'foo_bar' => 'Hello']);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2)->all());
     }
 
     public function testEach()
@@ -505,7 +553,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Illuminate\Support\Collection', $data);
         $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
-        $this->assertEquals(4, $data->count());
+        $this->assertCount(4, $data);
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
         $this->assertEquals([9 => 10], $data[3]->toArray());
     }
@@ -757,6 +805,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testFirstWithDefaultAndWithoutCallback()
+    {
+        $data = new Collection;
+        $result = $data->first(null, 'default');
+        $this->assertEquals('default', $result);
+    }
+
     public function testGroupByAttribute()
     {
         $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
@@ -766,6 +821,105 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $result = $data->groupBy('url');
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+    }
+
+    public function testGroupByAttributePreservingKeys()
+    {
+        $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy('rating', true);
+
+        $expected_result = [
+            1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
+            2 => [30 => ['rating' => 2, 'url' => '2']],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveSingleGroup()
+    {
+        $data = new Collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['rating'];
+        });
+
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveSingleGroupPreservingKeys()
+    {
+        $data = new Collection([10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1'], 30 => ['rating' => 2, 'url' => '2']]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['rating'];
+        }, true);
+
+        $expected_result = [
+            1 => [10 => ['rating' => 1, 'url' => '1'], 20 => ['rating' => 1, 'url' => '1']],
+            2 => [30 => ['rating' => 2, 'url' => '2']],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveMultipleGroups()
+    {
+        $data = new Collection([
+            ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ['user' => 3, 'roles' => ['Role_1']],
+        ]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['roles'];
+        });
+
+        $expected_result = [
+            'Role_1' => [
+                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+                ['user' => 3, 'roles' => ['Role_1']],
+            ],
+            'Role_2' => [
+                ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ],
+            'Role_3' => [
+                ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    public function testGroupByClosureWhereItemsHaveMultipleGroupsPreservingKeys()
+    {
+        $data = new Collection([
+            10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            30 => ['user' => 3, 'roles' => ['Role_1']],
+        ]);
+
+        $result = $data->groupBy(function ($item) {
+            return $item['roles'];
+        }, true);
+
+        $expected_result = [
+            'Role_1' => [
+                10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+                20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+                30 => ['user' => 3, 'roles' => ['Role_1']],
+            ],
+            'Role_2' => [
+                20 => ['user' => 2, 'roles' => ['Role_1', 'Role_2']],
+            ],
+            'Role_3' => [
+                10 => ['user' => 1, 'roles' => ['Role_1', 'Role_3']],
+            ],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
     }
 
     public function testKeyByAttribute()
@@ -941,21 +1095,21 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[0]);
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[1]);
         $this->assertInstanceOf('Illuminate\Support\Collection', $c[2]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4], $c[0]->all());
         $this->assertEquals([2, 5], $c[1]->all());
         $this->assertEquals([3, 6], $c[2]->all());
 
         $c = new Collection([1, 2, 3]);
         $c = $c->zip([4, 5, 6], [7, 8, 9]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4, 7], $c[0]->all());
         $this->assertEquals([2, 5, 8], $c[1]->all());
         $this->assertEquals([3, 6, 9], $c[2]->all());
 
         $c = new Collection([1, 2, 3]);
         $c = $c->zip([4, 5, 6], [7]);
-        $this->assertEquals(3, $c->count());
+        $this->assertCount(3, $c);
         $this->assertEquals([1, 4, 7], $c[0]->all());
         $this->assertEquals([2, 5, null], $c[1]->all());
         $this->assertEquals([3, 6, null], $c[2]->all());
@@ -1015,6 +1169,67 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
         $c = new Collection();
         $this->assertNull($c->avg());
+    }
+
+    public function testJsonSerialize()
+    {
+        $c = new Collection([
+            new TestArrayableObject(),
+            new TestJsonableObject(),
+            new TestJsonSerializeObject(),
+            'baz',
+        ]);
+
+        $this->assertSame([
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            'baz',
+        ], $c->jsonSerialize());
+    }
+
+    public function testCombineWithArray()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $c = new Collection(array_keys($expected));
+        $actual = $c->combine(array_values($expected))->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testCombineWithCollection()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $keyCollection = new Collection(array_keys($expected));
+        $valueCollection = new Collection(array_values($expected));
+        $actual = $keyCollection->combine($valueCollection)->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testReduce()
+    {
+        $data = new Collection([1, 2, 3]);
+        $this->assertEquals(6, $data->reduce(function ($carry, $element) { return $carry += $element; }));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
+    {
+        $data = new Collection([1, 2, 3]);
+        $data->random(4);
     }
 }
 

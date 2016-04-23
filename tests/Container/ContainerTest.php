@@ -268,6 +268,16 @@ return $obj; });
         $this->assertFalse($container->bound('object'));
     }
 
+    public function testBoundInstanceAndAliasCheckViaArrayAccess()
+    {
+        $container = new Container;
+        $container->instance('object', new StdClass);
+        $container->alias('object', 'alias');
+
+        $this->assertTrue(isset($container['object']));
+        $this->assertTrue(isset($container['alias']));
+    }
+
     public function testReboundListeners()
     {
         unset($_SERVER['__test.rebind']);
@@ -506,7 +516,7 @@ return $obj; });
 
         $container = new Container;
         $container->tag(['ContainerImplementationStub', 'ContainerImplementationStubTwo'], ['foo']);
-        $this->assertEquals(2, count($container->tagged('foo')));
+        $this->assertCount(2, $container->tagged('foo'));
         $this->assertInstanceOf('ContainerImplementationStub', $container->tagged('foo')[0]);
         $this->assertInstanceOf('ContainerImplementationStubTwo', $container->tagged('foo')[1]);
 

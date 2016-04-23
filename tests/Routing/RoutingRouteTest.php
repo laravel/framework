@@ -5,6 +5,8 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Routing\ResourceRegistrar;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoutingRouteTest extends PHPUnit_Framework_TestCase
@@ -100,6 +102,38 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             return 'caught';
         });
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Route for [foo/bar] has no action.
+     */
+    public function testFluentRouting()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar')->uses(function () { return 'hello'; });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $router->post('foo/bar')->uses(function () { return 'hello'; });
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'POST'))->getContent());
+        $router->get('foo/bar')->uses(function () { return 'middleware'; })->middleware('RouteTestControllerMiddleware');
+        $this->assertEquals('middleware', $router->dispatch(Request::create('foo/bar'))->getContent());
+        $this->assertContains('RouteTestControllerMiddleware', $router->getCurrentRoute()->middleware());
+        $router->get('foo/bar');
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+    }
+
+    public function testFluentRoutingWithControllerAction()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar')->uses('RouteTestControllerStub@index');
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->group(['namespace' => 'App'], function ($router) {
+            $router->get('foo/bar')->uses('RouteTestControllerStub@index');
+        });
+        $action = $router->getRoutes()->getRoutes()[0]->getAction();
+        $this->assertEquals('App\\RouteTestControllerStub@index', $action['controller']);
     }
 
     public function testMiddlewareGroups()
@@ -235,6 +269,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($route->matches($request3));
         $route->bind($request3);
         $this->assertEquals('bar', $route->parameter('foo', 'bar'));
+    }
+
+    public function testRouteParametersDefaultValue()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', ['uses' => 'RouteTestControllerWithParameterStub@returnParameter'])->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+
+        $router->get('foo/{bar?}', function ($bar = '') { return $bar; })->defaults('bar', 'foo');
+        $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
     /**
@@ -669,6 +713,48 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
+    public function testResourceRoutingParameters()
+    {
+        ResourceRegistrar::singularParameters();
+
+        $router = $this->getRouter();
+        $router->resource('foos', 'FooController');
+        $router->resource('foos.bars', 'FooController');
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+
+        ResourceRegistrar::setParameters(['foos' => 'oof', 'bazs' => 'b']);
+
+        $router = $this->getRouter();
+        $router->resource('bars.foos.bazs', 'FooController');
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('bars/{bar}/foos/{oof}/bazs/{b}', $routes[3]->getUri());
+
+        ResourceRegistrar::setParameters();
+        ResourceRegistrar::singularParameters(false);
+
+        $router = $this->getRouter();
+        $router->resource('foos', 'FooController', ['parameters' => 'singular']);
+        $router->resource('foos.bars', 'FooController', ['parameters' => 'singular']);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}', $routes[3]->getUri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->getUri());
+
+        $router = $this->getRouter();
+        $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->getUri());
+    }
+
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();
@@ -790,6 +876,37 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('home/foo', 'GET'))->getContent());
     }
 
+    public function testImplicitBindings()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', function (RoutingTestUserModel $bar) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            return $bar->value;
+        });
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingsWithOptionalParameter()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', function (RoutingTestUserModel $bar = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+            return $bar->value;
+        });
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('bar/{foo?}', function (RoutingTestUserModel $foo = null) use ($phpunit) {
+            $phpunit->assertInstanceOf(RoutingTestUserModel::class, $foo);
+            $phpunit->assertNull($foo->value);
+        });
+        $router->dispatch(Request::create('bar', 'GET'))->getContent();
+    }
+
     protected function getRouter()
     {
         return new Router(new Illuminate\Events\Dispatcher);
@@ -822,6 +939,14 @@ class RouteTestControllerMiddlewareGroupStub extends Illuminate\Routing\Controll
     public function index()
     {
         return 'Hello World';
+    }
+}
+
+class RouteTestControllerWithParameterStub extends Illuminate\Routing\Controller
+{
+    public function returnParameter($bar = '')
+    {
+        return $bar;
     }
 }
 
@@ -956,5 +1081,30 @@ class RoutingTestMiddlewareGroupTwo
     public function handle($request, $next, $parameter = null)
     {
         return new \Illuminate\Http\Response('caught '.$parameter);
+    }
+}
+
+class RoutingTestUserModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return $this;
+    }
+
+    public function firstOrFail()
+    {
+        return $this;
     }
 }

@@ -41,6 +41,8 @@ trait ValidatesWhenResolvedTrait
      *
      * @param  \Illuminate\Validation\Validator  $validator
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Validation\ValidationException
      */
     protected function failedValidation(Validator $validator)
     {
@@ -64,7 +66,7 @@ trait ValidatesWhenResolvedTrait
     /**
      * Handle a failed authorization attempt.
      *
-     * @return mixed
+     * @throws \Illuminate\Contracts\Validation\UnauthorizedException
      */
     protected function failedAuthorization()
     {

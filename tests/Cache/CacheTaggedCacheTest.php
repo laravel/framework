@@ -71,7 +71,23 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $redis->forever('key1', 'key1:value');
     }
 
-    public function testRedisCacheForeverTagsCanBeFlushed()
+    public function testRedisCacheTagsPushStandardKeysCorrectly()
+    {
+        $store = m::mock('Illuminate\Contracts\Cache\Store');
+        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
+        $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
+        $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $store->shouldReceive('getPrefix')->andReturn('prefix:');
+        $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
+        $conn->shouldReceive('lpush')->once()->with('prefix:foo:standard', 'prefix:'.sha1('foo|bar').':key1');
+        $conn->shouldReceive('lpush')->once()->with('prefix:bar:standard', 'prefix:'.sha1('foo|bar').':key1');
+        $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
+
+        $redis->put('key1', 'key1:value');
+    }
+
+    public function testRedisCacheTagsCanBeFlushed()
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
@@ -79,12 +95,23 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $redis = new Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
+
+        // Forever tag keys
         $conn->shouldReceive('lrange')->once()->with('prefix:foo:forever', 0, -1)->andReturn(['key1', 'key2']);
         $conn->shouldReceive('lrange')->once()->with('prefix:bar:forever', 0, -1)->andReturn(['key3']);
         $conn->shouldReceive('del')->once()->with('key1', 'key2');
         $conn->shouldReceive('del')->once()->with('key3');
         $conn->shouldReceive('del')->once()->with('prefix:foo:forever');
         $conn->shouldReceive('del')->once()->with('prefix:bar:forever');
+
+        // Standard tag keys
+        $conn->shouldReceive('lrange')->once()->with('prefix:foo:standard', 0, -1)->andReturn(['key4', 'key5']);
+        $conn->shouldReceive('lrange')->once()->with('prefix:bar:standard', 0, -1)->andReturn(['key6']);
+        $conn->shouldReceive('del')->once()->with('key4', 'key5');
+        $conn->shouldReceive('del')->once()->with('key6');
+        $conn->shouldReceive('del')->once()->with('prefix:foo:standard');
+        $conn->shouldReceive('del')->once()->with('prefix:bar:standard');
+
         $tagSet->shouldReceive('reset')->once();
 
         $redis->flush();

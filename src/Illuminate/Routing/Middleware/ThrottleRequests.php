@@ -3,8 +3,8 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use Illuminate\Http\Response;
 use Illuminate\Cache\RateLimiter;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleRequests
 {
@@ -40,23 +40,17 @@ class ThrottleRequests
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
-            return new Response('Too Many Attempts.', 429, [
-                'Retry-After' => $this->limiter->availableIn($key),
-                'X-RateLimit-Limit' => $maxAttempts,
-                'X-RateLimit-Remaining' => 0,
-            ]);
+            return $this->buildResponse($key, $maxAttempts);
         }
 
         $this->limiter->hit($key, $decayMinutes);
 
         $response = $next($request);
 
-        $response->headers->add([
-            'X-RateLimit-Limit' => $maxAttempts,
-            'X-RateLimit-Remaining' => $maxAttempts - $this->limiter->attempts($key) + 1,
-        ]);
-
-        return $response;
+        return $this->addHeaders(
+            $response, $maxAttempts,
+            $this->calculateRemainingAttempts($key, $maxAttempts)
+        );
     }
 
     /**
@@ -68,5 +62,60 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         return $request->fingerprint();
+    }
+
+    /**
+     * Create a 'too many attempts' response.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return \Illuminate\Http\Response
+     */
+    protected function buildResponse($key, $maxAttempts)
+    {
+        $response = new Response('Too Many Attempts.', 429);
+
+        return $this->addHeaders(
+            $response, $maxAttempts,
+            $this->calculateRemainingAttempts($key, $maxAttempts),
+            $this->limiter->availableIn($key)
+        );
+    }
+
+    /**
+     * Add the limit header information to the given response.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param  int  $maxAttempts
+     * @param  int  $remainingAttempts
+     * @param  int|null  $retryAfter
+     * @return \Illuminate\Http\Response
+     */
+    protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
+    {
+        $headers = [
+            'X-RateLimit-Limit' => $maxAttempts,
+            'X-RateLimit-Remaining' => $remainingAttempts,
+        ];
+
+        if (! is_null($retryAfter)) {
+            $headers['Retry-After'] = $retryAfter;
+        }
+
+        $response->headers->add($headers);
+
+        return $response;
+    }
+
+    /**
+     * Calculate the number of remaining attempts.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return int
+     */
+    protected function calculateRemainingAttempts($key, $maxAttempts)
+    {
+        return $maxAttempts - $this->limiter->attempts($key) + 1;
     }
 }

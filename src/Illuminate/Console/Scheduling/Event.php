@@ -142,23 +142,7 @@ class Event
      */
     public function run(Container $container)
     {
-        if (count($this->afterCallbacks) > 0 || count($this->beforeCallbacks) > 0) {
-            $this->runCommandInForeground($container);
-        } else {
-            $this->runCommandInBackground();
-        }
-    }
-
-    /**
-     * Run the command in the background using exec.
-     *
-     * @return void
-     */
-    protected function runCommandInBackground()
-    {
-        chdir(base_path());
-
-        exec($this->buildCommand());
+        $this->runCommandInForeground($container);
     }
 
     /**
@@ -216,7 +200,11 @@ class Event
         $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
 
         if ($this->withoutOverlapping) {
-            $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
+            if (windows_os()) {
+                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
+            } else {
+                $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
+            }
         } else {
             $command = $this->command.$redirect.$output.' 2>&1 &';
         }
@@ -231,7 +219,7 @@ class Event
      */
     protected function mutexPath()
     {
-        return storage_path('framework/schedule-'.sha1($this->expression.$this->command));
+        return storage_path('framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command));
     }
 
     /**
@@ -498,6 +486,20 @@ class Event
     }
 
     /**
+     * Schedule the event to run monthly on a given day and time.
+     *
+     * @param int  $day
+     * @param string  $time
+     * @return $this
+     */
+    public function monthlyOn($day = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $day);
+    }
+
+    /**
      * Schedule the event to run quarterly.
      *
      * @return $this
@@ -692,11 +694,12 @@ class Event
      * E-mail the results of the scheduled operation.
      *
      * @param  array|mixed  $addresses
+     * @param  bool  $onlyIfOutputExists
      * @return $this
      *
      * @throws \LogicException
      */
-    public function emailOutputTo($addresses)
+    public function emailOutputTo($addresses, $onlyIfOutputExists = false)
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             throw new LogicException('Must direct output to a file in order to e-mail results.');
@@ -704,9 +707,22 @@ class Event
 
         $addresses = is_array($addresses) ? $addresses : func_get_args();
 
-        return $this->then(function (Mailer $mailer) use ($addresses) {
-            $this->emailOutput($mailer, $addresses);
+        return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
+            $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
         });
+    }
+
+    /**
+     * E-mail the results of the scheduled operation if it produces output.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function emailWrittenOutputTo($addresses)
+    {
+        return $this->emailOutputTo($addresses, true);
     }
 
     /**
@@ -714,11 +730,18 @@ class Event
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  array  $addresses
+     * @param  bool  $onlyIfOutputExists
      * @return void
      */
-    protected function emailOutput(Mailer $mailer, $addresses)
+    protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
-        $mailer->raw(file_get_contents($this->output), function ($m) use ($addresses) {
+        $text = file_get_contents($this->output);
+
+        if ($onlyIfOutputExists && empty($text)) {
+            return;
+        }
+
+        $mailer->raw($text, function ($m) use ($addresses) {
             $m->subject($this->getEmailSubject());
 
             foreach ($addresses as $address) {

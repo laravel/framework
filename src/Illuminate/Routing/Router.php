@@ -121,10 +121,10 @@ class Router implements RegistrarContract
      * Register a new GET route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function get($uri, $action)
+    public function get($uri, $action = null)
     {
         return $this->addRoute(['GET', 'HEAD'], $uri, $action);
     }
@@ -133,10 +133,10 @@ class Router implements RegistrarContract
      * Register a new POST route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function post($uri, $action)
+    public function post($uri, $action = null)
     {
         return $this->addRoute('POST', $uri, $action);
     }
@@ -145,10 +145,10 @@ class Router implements RegistrarContract
      * Register a new PUT route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function put($uri, $action)
+    public function put($uri, $action = null)
     {
         return $this->addRoute('PUT', $uri, $action);
     }
@@ -157,10 +157,10 @@ class Router implements RegistrarContract
      * Register a new PATCH route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function patch($uri, $action)
+    public function patch($uri, $action = null)
     {
         return $this->addRoute('PATCH', $uri, $action);
     }
@@ -169,10 +169,10 @@ class Router implements RegistrarContract
      * Register a new DELETE route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function delete($uri, $action)
+    public function delete($uri, $action = null)
     {
         return $this->addRoute('DELETE', $uri, $action);
     }
@@ -181,10 +181,10 @@ class Router implements RegistrarContract
      * Register a new OPTIONS route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function options($uri, $action)
+    public function options($uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
     }
@@ -193,10 +193,10 @@ class Router implements RegistrarContract
      * Register a new route responding to all verbs.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function any($uri, $action)
+    public function any($uri, $action = null)
     {
         $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -208,10 +208,10 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function match($methods, $uri, $action)
+    public function match($methods, $uri, $action = null)
     {
         return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
     }
@@ -236,7 +236,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $uri
      * @param  string  $controller
-     * @param  array   $names
+     * @param  array  $names
      * @return void
      *
      * @deprecated since version 5.2.
@@ -273,7 +273,7 @@ class Router implements RegistrarContract
      * @param  array   $route
      * @param  string  $controller
      * @param  string  $method
-     * @param  array   $names
+     * @param  array  $names
      * @return void
      *
      * @deprecated since version 5.2.
@@ -307,6 +307,27 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Set the unmapped global resource parameters to singular.
+     *
+     * @return void
+     */
+    public function singularResourceParameters()
+    {
+        ResourceRegistrar::singularParameters();
+    }
+
+    /**
+     * Set the global resource parameter mapping.
+     *
+     * @param  array  $parameters
+     * @return void
+     */
+    public function resourceParameters(array $parameters = [])
+    {
+        ResourceRegistrar::setParameters($parameters);
+    }
+
+    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources
@@ -324,7 +345,7 @@ class Router implements RegistrarContract
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     public function resource($name, $controller, array $options = [])
@@ -363,7 +384,7 @@ class Router implements RegistrarContract
     /**
      * Create a route group with shared attributes.
      *
-     * @param  array     $attributes
+     * @param  array  $attributes
      * @param  \Closure  $callback
      * @return void
      */
@@ -491,7 +512,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string  $action
+     * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
     protected function addRoute($methods, $uri, $action)
@@ -504,7 +525,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function createRoute($methods, $uri, $action)
@@ -537,7 +558,7 @@ class Router implements RegistrarContract
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed   $action
+     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute($methods, $uri, $action)
@@ -916,6 +937,42 @@ class Router implements RegistrarContract
     }
 
     /**
+     * Add a middleware to the beginning of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function prependMiddlewareToGroup($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+            array_unshift($this->middlewareGroups[$group], $middleware);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a middleware to the end of a middleware group.
+     *
+     * If the middleware is already in the group, it will not be added again.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function pushMiddlewareToGroup($group, $middleware)
+    {
+        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+            $this->middlewareGroups[$group][] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a model binder for a wildcard.
      *
      * @param  string  $key
@@ -971,7 +1028,7 @@ class Router implements RegistrarContract
     /**
      * Create a class based binding using the IoC container.
      *
-     * @param  string    $binding
+     * @param  string  $binding
      * @return \Closure
      */
     public function createClassBinding($binding)
@@ -1107,7 +1164,7 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Alias for the "currentRouteNamed" method.
+     * Alias for the "currentRouteName" method.
      *
      * @param  mixed  string
      * @return bool

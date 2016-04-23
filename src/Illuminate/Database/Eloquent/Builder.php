@@ -141,7 +141,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -155,7 +155,7 @@ class Builder
     }
 
     /**
-     * Find a model by its primary key.
+     * Find multiple models by their primary keys.
      *
      * @param  array  $ids
      * @param  array  $columns
@@ -197,6 +197,72 @@ class Builder
     }
 
     /**
+     * Find a model by its primary key or return fresh model instance.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function findOrNew($id, $columns = ['*'])
+    {
+        if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $this->model->newInstance();
+    }
+
+    /**
+     * Get the first record matching the attributes or instantiate it.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrNew(array $attributes)
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->model->newInstance($attributes);
+    }
+
+    /**
+     * Get the first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreate(array $attributes)
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        $instance = $this->model->newInstance($attributes);
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
+     * Create or update a record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        $instance->fill($values)->save();
+
+        return $instance;
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param  array  $columns
@@ -232,16 +298,18 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        $models = $this->getModels($columns);
+        $builder = $this->applyScopes();
+
+        $models = $builder->getModels($columns);
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
         if (count($models) > 0) {
-            $models = $this->eagerLoadRelations($models);
+            $models = $builder->eagerLoadRelations($models);
         }
 
-        return $this->model->newCollection($models);
+        return $builder->getModel()->newCollection($models);
     }
 
     /**
@@ -287,6 +355,33 @@ class Builder
     }
 
     /**
+     * Chunk the results of a query by comparing numeric IDs.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @param  string  $column
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = 'id')
+    {
+        $lastId = null;
+
+        $results = $this->forPageAfterId($count, 0, $column)->get();
+
+        while (! $results->isEmpty()) {
+            if (call_user_func($callback, $results) === false) {
+                return false;
+            }
+
+            $lastId = $results->last()->{$column};
+
+            $results = $this->forPageAfterId($count, $lastId, $column)->get();
+        }
+
+        return true;
+    }
+
+    /**
      * Execute a callback over each item while chunking.
      *
      * @param  callable  $callback
@@ -295,13 +390,13 @@ class Builder
      */
     public function each(callable $callback, $count = 1000)
     {
-        if (is_null($this->orders) && is_null($this->unionOrders)) {
+        if (is_null($this->query->orders) && is_null($this->query->unionOrders)) {
             $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
         }
 
         return $this->chunk($count, function ($results) use ($callback) {
             foreach ($results as $key => $value) {
-                if ($callback($item, $key) === false) {
+                if ($callback($value, $key) === false) {
                     return false;
                 }
             }
@@ -405,15 +500,15 @@ class Builder
      */
     public function update(array $values)
     {
-        return $this->query->update($this->addUpdatedAtColumn($values));
+        return $this->toBase()->update($this->addUpdatedAtColumn($values));
     }
 
     /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  int  $amount
+     * @param  array  $extra
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = [])
@@ -427,8 +522,8 @@ class Builder
      * Decrement a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int     $amount
-     * @param  array   $extra
+     * @param  int  $amount
+     * @param  array  $extra
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])
@@ -466,7 +561,7 @@ class Builder
             return call_user_func($this->onDelete, $this);
         }
 
-        return $this->query->delete();
+        return $this->toBase()->delete();
     }
 
     /**
@@ -498,7 +593,7 @@ class Builder
      */
     public function getModels($columns = ['*'])
     {
-        $results = $this->toBase()->get($columns);
+        $results = $this->query->get($columns);
 
         $connection = $this->model->getConnectionName();
 
@@ -528,8 +623,8 @@ class Builder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array     $models
-     * @param  string    $name
+     * @param  array  $models
+     * @param  string  $name
      * @param  \Closure  $constraints
      * @return array
      */
@@ -850,9 +945,9 @@ class Builder
         // Here we have the "has" query and the original relation. We need to copy over any
         // where clauses the developer may have put in the relationship function over to
         // the has query, and then copy the bindings from the "has" query to the main.
-        $relationQuery = $relation->getBaseQuery();
+        $relationQuery = $relation->toBase();
 
-        $hasQuery->mergeWheres(
+        $hasQuery->withoutGlobalScopes()->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
     }

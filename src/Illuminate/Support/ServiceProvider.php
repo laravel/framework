@@ -104,7 +104,7 @@ abstract class ServiceProvider
      */
     protected function publishes(array $paths, $group = null)
     {
-        $class = get_class($this);
+        $class = static::class;
 
         if (! array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
@@ -135,7 +135,7 @@ abstract class ServiceProvider
                 return [];
             }
 
-            return array_intersect(static::$publishes[$provider], static::$publishGroups[$group]);
+            return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
         if ($group && array_key_exists($group, static::$publishGroups)) {
@@ -225,6 +225,8 @@ abstract class ServiceProvider
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {

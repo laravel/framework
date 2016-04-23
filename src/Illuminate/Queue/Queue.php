@@ -140,7 +140,7 @@ abstract class Queue
      *
      * @param  \Closure  $job
      * @param  mixed     $data
-     * @return string
+     * @return array
      */
     protected function createClosurePayload($job, $data)
     {

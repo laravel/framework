@@ -214,7 +214,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Determine if the recaller cookie is in a valid format.
      *
-     * @param  string  $recaller
+     * @param  mixed  $recaller
      * @return bool
      */
     protected function validRecaller($recaller)
@@ -734,7 +734,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function getName()
     {
-        return 'login_'.$this->name.'_'.sha1(get_class($this));
+        return 'login_'.$this->name.'_'.sha1(static::class);
     }
 
     /**
@@ -744,7 +744,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function getRecallerName()
     {
-        return 'remember_'.$this->name.'_'.sha1(get_class($this));
+        return 'remember_'.$this->name.'_'.sha1(static::class);
     }
 
     /**

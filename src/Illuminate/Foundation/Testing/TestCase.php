@@ -10,6 +10,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     use Concerns\InteractsWithContainer,
         Concerns\MakesHttpRequests,
         Concerns\ImpersonatesUsers,
+        Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithSession,
@@ -37,7 +38,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     protected $beforeApplicationDestroyedCallbacks = [];
 
     /**
-     * Indicates if we have made it throught the base setUp function.
+     * Indicates if we have made it through the base setUp function.
      *
      * @var bool
      */
@@ -57,7 +58,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         if (! $this->app) {
             $this->refreshApplication();
@@ -91,7 +92,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(get_class($this)));
+        $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[DatabaseTransactions::class])) {
             $this->beginDatabaseTransaction();
@@ -115,7 +116,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown()
     {
         if (class_exists('Mockery')) {
             Mockery::close();

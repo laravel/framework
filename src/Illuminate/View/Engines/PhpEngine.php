@@ -33,7 +33,7 @@ class PhpEngine implements EngineInterface
 
         ob_start();
 
-        extract($__data);
+        extract($__data, EXTR_SKIP);
 
         // We'll evaluate the contents of the view inside a try/catch block so we can
         // flush out any stray output that might get out before an error occurs or
