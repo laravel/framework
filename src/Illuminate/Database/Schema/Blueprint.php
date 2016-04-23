@@ -840,7 +840,7 @@ class Blueprint
      */
     public function mediumBinary($column)
     {
-        return $this->addColumn('meiumBinary', $column);
+        return $this->addColumn('mediumBinary', $column);
     }
 
     /**
