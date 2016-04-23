@@ -163,7 +163,6 @@ class Validator implements ValidatorContract
     protected $implicitRules = [
         'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
-        // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
     ];
 
     /**
@@ -551,6 +550,7 @@ class Validator implements ValidatorContract
     {
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
+               $this->failsNullableCheck($attribute, $value) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -564,7 +564,7 @@ class Validator implements ValidatorContract
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
     {
-        return $this->validateRequired($attribute, $value) || $this->isImplicit($rule);
+        return $this->validatePresent($attribute, $value) || $this->isImplicit($rule);
     }
 
     /**
@@ -579,6 +579,22 @@ class Validator implements ValidatorContract
             return array_key_exists($attribute, Arr::dot($this->data))
                 || in_array($attribute, array_keys($this->data))
                 || array_key_exists($attribute, $this->files);
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the attribute fails the nullable check.
+     *
+     * @param  string  $rule
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function failsNullableCheck($attribute, $value)
+    {
+        if ($this->hasRule($attribute, ['Nullable'])) {
+            return ! is_null($value);
         }
 
         return true;
@@ -655,6 +671,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * "Indicate" validation should pass if value is null.
+     *
+     * Always returns true, just lets us put "nullable" in rules.
+     *
+     * @return bool
+     */
+    protected function validateNullable()
+    {
+        return true;
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
@@ -712,7 +740,7 @@ class Validator implements ValidatorContract
      */
     protected function validatePresent($attribute, $value)
     {
-        return Arr::has($this->data, $attribute);
+        return Arr::has(array_merge($this->data, $this->files), $attribute);
     }
 
     /**
@@ -992,11 +1020,7 @@ class Validator implements ValidatorContract
      */
     protected function validateArray($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_array($value);
+        return $value === '' || is_array($value);
     }
 
     /**
@@ -1008,13 +1032,9 @@ class Validator implements ValidatorContract
      */
     protected function validateBoolean($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
         $acceptable = [true, false, 0, 1, '0', '1'];
 
-        return is_null($value) || in_array($value, $acceptable, true);
+        return $value === '' || in_array($value, $acceptable, true);
     }
 
     /**
@@ -1026,11 +1046,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInteger($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return $value === '' || filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
@@ -1042,11 +1058,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNumeric($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_numeric($value);
+        return $value === '' || is_numeric($value);
     }
 
     /**
@@ -1058,11 +1070,7 @@ class Validator implements ValidatorContract
      */
     protected function validateString($attribute, $value)
     {
-        if (! $this->hasAttribute($attribute)) {
-            return true;
-        }
-
-        return is_null($value) || is_string($value);
+        return is_string($value);
     }
 
     /**
