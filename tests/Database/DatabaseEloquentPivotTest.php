@@ -105,7 +105,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class DatabaseEloquentPivotTestJsonCastStub  extends Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestJsonCastStub extends Illuminate\Database\Eloquent\Relations\Pivot
 {
     protected $casts = ['data' => 'array'];
 }
