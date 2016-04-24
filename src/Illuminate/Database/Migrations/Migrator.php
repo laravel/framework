@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -107,14 +109,23 @@ class Migrator
         $batch = $this->repository->getNextBatchNumber();
 
         $pretend = Arr::get($options, 'pretend', false);
-
-        $step = Arr::get($options, 'step', false);
+        $step    = Arr::get($options, 'step', false);
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            DB::beginTransaction();
+
+            $success = $this->runUp($file, $batch, $pretend);
+
+            if ($success) {
+              DB::commit();
+            } else {
+              // If the migration was not successful, back out
+              DB::rollback();
+              break;
+            }
 
             // If we are stepping through the migrations, then we will increment the
             // batch value for each individual migration that is run. That way we
@@ -144,14 +155,57 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $migration->up();
+        try {
+          $migration->up();
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+          // Once we have run a migrations class, we will log that it was run in this
+          // repository so that we don't try to run it next time we do a migration
+          // in the application. A migration repository keeps the migrate order.
+          $this->repository->log($file, $batch);
 
-        $this->note("<info>Migrated:</info> $file");
+          $this->note("<info>Migrated:</info> $file");
+
+          return true;
+        } catch (Exception $e) {
+          $this->handleException($file, $e);
+          return false;
+        }
+    }
+
+    private function handleException($file, $exception)
+    {
+      $trace      = $exception->getTrace();
+      $offsetFile = strlen(base_path()) + 1;
+
+      // We'll switch the order of the trace so we start with the migration
+      // file rather than end with it. After all, the migration file is where
+      // the error most likely occurred.
+      $ourTrace = [];
+      foreach($trace as $point) {
+        array_unshift($ourTrace, [
+          'file' => substr($point['file'], $offsetFile),
+          'line' => $point['line']
+        ]);
+
+        // We are not interested in the rest of the trace, only the migration
+        // and maybe the files that it dealt with
+        if (basename($point['file']) === "{$file}.php") {
+          break;
+        }
+      }
+
+      // Pretty print
+      $message = "<info>An error occurred while running migrations:</info>\n\n";
+      $message .= "<error>" . $exception->getMessage() . "</error>\n\n";
+
+      foreach($ourTrace as $point) {
+        $line = str_pad($point['line'], 5);
+        $file = $point['file'];
+
+        $message .= "  <comment>Line:</comment> {$line} <comment>File:</comment> {$file}\n";
+      }
+
+      $this->note($message);
     }
 
     /**
