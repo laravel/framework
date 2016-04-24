@@ -115,6 +115,54 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testEmptyExistingAttributesAreValidated()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'array']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'boolean']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'numeric']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'integer']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'string']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => null], ['x' => 'string']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'string', 'y' => 'numeric', 'z' => 'integer', 'a' => 'boolean', 'b' => 'array']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => []], ['x' => 'string']);
+        $this->assertTrue($v->fails());
+    }
+
+    public function testNullable()
+    {
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null, 'z' => null, 'a' => null, 'b' => null,
+        ], [
+            'x' => 'string|nullable', 'y' => 'integer|nullable', 'z' => 'numeric|nullable', 'a' => 'array|nullable', 'b' => 'bool|nullable',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null, 'z' => null, 'a' => null, 'b' => null,
+        ], [
+            'x' => 'string', 'y' => 'integer', 'z' => 'numeric', 'a' => 'array', 'b' => 'bool',
+        ]);
+        $this->assertTrue($v->fails());
+    }
+
     public function testProperLanguageLineIsSet()
     {
         $trans = $this->getRealTranslator();
