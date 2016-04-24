@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\McryptEncrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
 {
@@ -15,7 +16,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
     public function testEncryptionUsingBase64EncodedKey()
     {
-        $e = new Encrypter('base64:'.base64_encode(random_bytes(16)));
+        $e = new Encrypter(random_bytes(16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
@@ -28,7 +29,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $this->assertNotEquals('bar', $encrypted);
         $this->assertEquals('bar', $e->decrypt($encrypted));
 
-        $e = new Encrypter('base64:'.base64_encode(random_bytes(32)), 'AES-256-CBC');
+        $e = new Encrypter(random_bytes(32), 'AES-256-CBC');
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
@@ -100,9 +101,9 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         }
 
         $key = Str::random(32);
-        $encrypter = new Illuminate\Encryption\McryptEncrypter($key);
+        $encrypter = new McryptEncrypter($key);
         $encrypted = $encrypter->encrypt('foo');
-        $openSslEncrypter = new Illuminate\Encryption\Encrypter($key, 'AES-256-CBC');
+        $openSslEncrypter = new Encrypter($key, 'AES-256-CBC');
 
         $this->assertEquals('foo', $openSslEncrypter->decrypt($encrypted));
     }
