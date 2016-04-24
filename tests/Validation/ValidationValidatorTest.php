@@ -2131,6 +2131,10 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getRealTranslator();
 
+        $data = ['companies' => ['spark']];
+        $v = new Validator($trans, $data, ['companies.*.name' => 'required']);
+        $this->assertFalse($v->passes());
+
         $data = ['names' => [['second' => 'I have no first']]];
         $v = new Validator($trans, $data, ['names.*.first' => 'required']);
         $this->assertFalse($v->passes());
