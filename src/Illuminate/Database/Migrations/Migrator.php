@@ -352,6 +352,8 @@ class Migrator
 
             $this->note("<info>{$name}:</info> {$query['query']}");
         }
+
+        return true;
     }
 
     /**
