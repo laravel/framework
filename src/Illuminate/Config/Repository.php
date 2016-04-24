@@ -4,6 +4,7 @@ namespace Illuminate\Config;
 
 use ArrayAccess;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
 class Repository implements ArrayAccess, ConfigContract
@@ -46,7 +47,13 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function get($key, $default = null)
     {
-        return Arr::get($this->items, $key, $default);
+        $value = Arr::get($this->items, $key, $default);
+
+        if (is_string($value) && Str::startsWith($value, 'base64:')) {
+            $value = base64_decode(substr($value, 7));
+        }
+
+        return $value;
     }
 
     /**
