@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -337,6 +338,19 @@ trait MakesHttpRequests
     protected function seeJsonSubset(array $data)
     {
         $this->assertArraySubset($data, $this->decodeResponseJson());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response can pass the test of closure.
+     *
+     * @param  \Closure  $closure
+     * @return $this
+     */
+    public function seeDecodedJson(Closure $closure)
+    {
+        call_user_func($closure, $this->decodeResponseJson());
 
         return $this;
     }

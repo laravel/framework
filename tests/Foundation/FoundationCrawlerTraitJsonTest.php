@@ -26,6 +26,17 @@ class FoundationCrawlerTraitJsonTest extends PHPUnit_Framework_TestCase
         $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
+
+    public function testSeeDecodedJson()
+    {
+        $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
+
+        $this->seeDecodedJson(function ($json) {
+            $this->assertEquals((new JsonSerializableMixedResourcesStub)->jsonSerialize(), $json);
+
+            $this->assertCount(3, $json['bars']);
+        });
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
