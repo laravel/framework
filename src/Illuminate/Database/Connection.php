@@ -1206,4 +1206,16 @@ class Connection implements ConnectionInterface
 
         return $grammar;
     }
+
+    /**
+     * Some database such as MySQL do not "entirely" support transactions
+     * even though it has some support. For example, creating a table and
+     * rolling it back does not work in MySQL.
+     *
+     * @return bool
+     */
+    public function hasFullTransactionSupport()
+    {
+        return false;
+    }
 }

@@ -48,4 +48,9 @@ class PostgresConnection extends Connection
     {
         return new DoctrineDriver;
     }
+
+    public function hasFullTransactionSupport()
+    {
+        return true;
+    }
 }

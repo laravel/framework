@@ -32,7 +32,11 @@ class DatabaseMigratorTest extends PHPUnit_Framework_TestCase
             '1_foo',
         ]);
 
+        $connectionMock = m::mock('stdClass');
+        $connectionMock->shouldReceive('hasFullTransactionSupport')->andReturn(true);
+
         // Each migration should be done within a transaction
+        DB::shouldReceive('connection')->andReturn($connectionMock);
         DB::shouldReceive('beginTransaction')->times(2);
         DB::shouldReceive('commit')->times(2);
 

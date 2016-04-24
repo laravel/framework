@@ -115,15 +115,12 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            DB::beginTransaction();
+            $success = $this->runMigration(
+                'runUp', $file, $batch, $pretend
+            );
 
-            $success = $this->runUp($file, $batch, $pretend);
-
-            if ($success) {
-                DB::commit();
-            } else {
-                // If the migration was not successful, back out
-                DB::rollback();
+            // If a migration failed, do not run the rest
+            if (! $success) {
                 break;
             }
 
@@ -134,6 +131,39 @@ class Migrator
                 $batch++;
             }
         }
+    }
+
+    /**
+     * Runs a particular migration. Based on the function specified,
+     * takes additional arguments.
+     *
+     * @param string $func The function that acts on the migration
+     * @param mixed $args,... The arguments to pass to func
+     * @return bool The return of $func. It should idicate whether the
+     *              migration ran successfully
+     */
+    protected function runMigration($func, $args)
+    {
+        $args = func_get_args();
+        $args = array_splice($args, 1); // Exclude $func
+
+        if (DB::connection()->hasFullTransactionSupport()) {
+            DB::beginTransaction();
+
+            $success = call_user_func_array([$this, $func], $args);
+
+            if ($success) {
+                DB::commit();
+            } else {
+                // If the migration was not successful,
+                // undo any potential schema changes
+                DB::rollback();
+            }
+        } else {
+            $success = call_user_func_array([$this, $func], $args);
+        }
+
+        return $success;
     }
 
     /**
@@ -168,26 +198,27 @@ class Migrator
             return true;
         } catch (Exception $e) {
             $this->handleException($file, $e);
+
             return false;
         }
     }
 
     private function handleException($file, $exception)
     {
-        $trace      = $exception->getTrace();
+        $trace = $exception->getTrace();
         $offsetFile = strlen(base_path()) + 1;
-        $ourTrace   = [];
+        $ourTrace = [];
 
-        foreach($trace as $point) {
+        foreach ($trace as $point) {
             // Only interested in lines and files
-            if (!isset($point['file'])) {
+            if (! isset($point['file'])) {
                 continue;
             }
 
             // Basically reversing the trace and doing an array_map
             array_unshift($ourTrace, [
                 'file' => substr($point['file'], $offsetFile),
-                'line' => $point['line']
+                'line' => $point['line'],
             ]);
 
             // We are not interested in the rest of the trace, only the migration
@@ -199,9 +230,9 @@ class Migrator
 
         // Pretty print
         $message = "<info>An error occurred while running migrations:</info>\n\n";
-        $message .= "<error>" . $exception->getMessage() . "</error>\n\n";
+        $message .= '<error>'.$exception->getMessage()."</error>\n\n";
 
-        foreach($ourTrace as $point) {
+        foreach ($ourTrace as $point) {
             $line = str_pad($point['line'], 5);
             $file = $point['file'];
 
@@ -235,15 +266,9 @@ class Migrator
             // to what they run on "up". It lets us backtrack through the migrations
             // and properly reverse the entire database schema operation that ran.
             foreach ($migrations as $migration) {
-                DB::beginTransaction();
-
-                $success = $this->runDown((object)$migration, $pretend);
-
-                if ($success) {
-                    DB::commit();
-                } else {
-                    DB::rollback();
-                }
+                $this->runMigration(
+                    'runDown', (object) $migration, $pretend
+                );
             }
         }
 
@@ -308,6 +333,7 @@ class Migrator
             return true;
         } catch (Exception $e) {
             $this->handleException($file, $e);
+
             return false;
         }
     }
