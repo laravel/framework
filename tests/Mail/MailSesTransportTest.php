@@ -42,7 +42,7 @@ class MailSesTransportTest extends PHPUnit_Framework_TestCase
         $client = $this->getMockBuilder('Aws\Ses\SesClient')
             ->setMethods(['sendRawEmail'])
             ->disableOriginalConstructor()
-            ->getMock();
+            ->createMock();
         $transport = new SesTransport($client);
 
         $client->expects($this->once())

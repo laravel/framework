@@ -89,7 +89,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
 
     public function testToJsonEncodesTheToArrayResult()
     {
-        $fluent = $this->getMock('Illuminate\Support\Fluent', ['toArray']);
+        $fluent = $this->createMock('Illuminate\Support\Fluent', ['toArray']);
         $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $fluent->toJson();
 

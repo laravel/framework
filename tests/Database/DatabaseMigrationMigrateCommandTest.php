@@ -28,7 +28,7 @@ class DatabaseMigrationMigrateCommandTest extends PHPUnit_Framework_TestCase
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
         $params = [$migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor'];
-        $command = $this->getMock('Illuminate\Database\Console\Migrations\MigrateCommand', ['call'], $params);
+        $command = $this->createMock('Illuminate\Database\Console\Migrations\MigrateCommand', ['call'], $params);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

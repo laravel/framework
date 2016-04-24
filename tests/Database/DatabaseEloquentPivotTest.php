@@ -81,7 +81,7 @@ class DatabaseEloquentPivotTest extends PHPUnit_Framework_TestCase
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->guard([]);
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = $this->getMock('Illuminate\Database\Eloquent\Relations\Pivot', ['newQuery'], [$parent, ['foo' => 'bar'], 'table']);
+        $pivot = $this->createMock('Illuminate\Database\Eloquent\Relations\Pivot', ['newQuery'], [$parent, ['foo' => 'bar'], 'table']);
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';

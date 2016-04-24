@@ -26,7 +26,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
-        $repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
+        $repo = $this->createMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
         ]);
         $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));
@@ -69,7 +69,7 @@ class DatabaseMigrationRepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne()
     {
-        $repo = $this->getMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
+        $repo = $this->createMock('Illuminate\Database\Migrations\DatabaseMigrationRepository', ['getLastBatchNumber'], [
             m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
         ]);
         $repo->expects($this->once())->method('getLastBatchNumber')->will($this->returnValue(1));

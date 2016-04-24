@@ -11,7 +11,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     public function testServersAreAddedCorrectly()
     {
-        $connector = $this->getMock('Illuminate\Cache\MemcachedConnector', ['getMemcached']);
+        $connector = $this->createMock('Illuminate\Cache\MemcachedConnector', ['getMemcached']);
         $memcached = m::mock('stdClass');
         $memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
         $memcached->shouldReceive('getVersion')->once()->andReturn([]);
@@ -26,7 +26,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionThrownOnBadConnection()
     {
-        $connector = $this->getMock('Illuminate\Cache\MemcachedConnector', ['getMemcached']);
+        $connector = $this->createMock('Illuminate\Cache\MemcachedConnector', ['getMemcached']);
         $memcached = m::mock('stdClass');
         $memcached->shouldReceive('addServer')->once()->with('localhost', 11211, 100);
         $memcached->shouldReceive('getVersion')->once()->andReturn(['255.255.255']);

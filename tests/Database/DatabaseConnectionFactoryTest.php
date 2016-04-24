@@ -18,7 +18,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testMakeCallsCreateConnection()
     {
-        $factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector', 'createConnection'], [$container = m::mock('Illuminate\Container\Container')]);
+        $factory = $this->createMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector', 'createConnection'], [$container = m::mock('Illuminate\Container\Container')]);
         $container->shouldReceive('bound')->andReturn(false);
         $connector = m::mock('stdClass');
         $config = ['driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo'];
@@ -35,7 +35,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testMakeCallsCreateConnectionForReadWrite()
     {
-        $factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector', 'createConnection'], [$container = m::mock('Illuminate\Container\Container')]);
+        $factory = $this->createMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector', 'createConnection'], [$container = m::mock('Illuminate\Container\Container')]);
         $container->shouldReceive('bound')->andReturn(false);
         $connector = m::mock('stdClass');
         $config = [
@@ -61,7 +61,7 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testMakeCanCallTheContainer()
     {
-        $factory = $this->getMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector'], [$container = m::mock('Illuminate\Container\Container')]);
+        $factory = $this->createMock('Illuminate\Database\Connectors\ConnectionFactory', ['createConnector'], [$container = m::mock('Illuminate\Container\Container')]);
         $container->shouldReceive('bound')->andReturn(true);
         $connector = m::mock('stdClass');
         $config = ['driver' => 'mysql', 'prefix' => 'prefix', 'database' => 'database', 'name' => 'foo'];

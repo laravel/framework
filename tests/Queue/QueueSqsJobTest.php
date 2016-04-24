@@ -23,7 +23,7 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
             ->setMethods(['deleteMessage'])
             ->disableOriginalConstructor()
-            ->getMock();
+            ->createMock();
 
         // Use Mockery to mock the IoC Container
         $this->mockedContainer = m::mock('Illuminate\Container\Container');
@@ -59,8 +59,8 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
             ->setMethods(['deleteMessage'])
             ->disableOriginalConstructor()
-            ->getMock();
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->mockedSqsClient, $this->queueName, $this->account]);
+            ->createMock();
+        $queue = $this->createMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->mockedSqsClient, $this->queueName, $this->account]);
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects($this->once())->method('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
@@ -72,8 +72,8 @@ class QueueSqsJobTest extends PHPUnit_Framework_TestCase
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
             ->setMethods(['changeMessageVisibility'])
             ->disableOriginalConstructor()
-            ->getMock();
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->mockedSqsClient, $this->queueName, $this->account]);
+            ->createMock();
+        $queue = $this->createMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->mockedSqsClient, $this->queueName, $this->account]);
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects($this->once())->method('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
