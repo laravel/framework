@@ -49,6 +49,6 @@ class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase
     {
         $files = m::mock('Illuminate\Filesystem\Filesystem');
 
-        return $this->getMock('Illuminate\Database\Migrations\MigrationCreator', ['getDatePrefix'], [$files]);
+        return $this->createMock('Illuminate\Database\Migrations\MigrationCreator', ['getDatePrefix'], [$files]);
     }
 }

@@ -60,7 +60,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase
     public function testDelayedPushProperlyPushesJobOntoIronWithTimestamp()
     {
         $now = Carbon\Carbon::now();
-        $queue = $this->getMock('Illuminate\Queue\IronQueue', ['getTime'], [$iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true]);
+        $queue = $this->createMock('Illuminate\Queue\IronQueue', ['getTime'], [$iron = m::mock('IronMQ\IronMQ'), m::mock('Illuminate\Http\Request'), 'default', true]);
         $crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
         $queue->setEncrypter($crypt);
         $queue->expects($this->once())->method('getTime')->will($this->returnValue($now->getTimestamp()));
@@ -99,7 +99,7 @@ class QueueIronQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushedJobsCanBeMarshaled()
     {
-        $queue = $this->getMock('Illuminate\Queue\IronQueue', ['createPushedIronJob'], [$iron = m::mock('IronMQ\IronMQ'), $request = m::mock('Illuminate\Http\Request'), 'default', true]);
+        $queue = $this->createMock('Illuminate\Queue\IronQueue', ['createPushedIronJob'], [$iron = m::mock('IronMQ\IronMQ'), $request = m::mock('Illuminate\Http\Request'), 'default', true]);
         $crypt = m::mock('Illuminate\Contracts\Encryption\Encrypter');
         $queue->setEncrypter($crypt);
         $request->shouldReceive('header')->once()->with('iron-message-id')->andReturn('message-id');

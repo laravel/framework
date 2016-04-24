@@ -36,10 +36,10 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testSelectProperlyCallsPDO()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
-        $writePdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['prepare']);
+        $writePdo = $this->createMock('DatabaseConnectionTestMockPDO', ['prepare']);
         $writePdo->expects($this->never())->method('prepare');
-        $statement = $this->getMock('PDOStatement', ['execute', 'fetchAll']);
+        $statement = $this->createMock('PDOStatement', ['execute', 'fetchAll']);
         $statement->expects($this->once())->method('execute')->with($this->equalTo(['foo' => 'bar']));
         $statement->expects($this->once())->method('fetchAll')->will($this->returnValue(['boom']));
         $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue($statement));
@@ -80,8 +80,8 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testStatementProperlyCallsPDO()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
-        $statement = $this->getMock('PDOStatement', ['execute']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['prepare']);
+        $statement = $this->createMock('PDOStatement', ['execute']);
         $statement->expects($this->once())->method('execute')->with($this->equalTo(['bar']))->will($this->returnValue('foo'));
         $pdo->expects($this->once())->method('prepare')->with($this->equalTo('foo'))->will($this->returnValue($statement));
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
@@ -96,8 +96,8 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testAffectingStatementProperlyCallsPDO()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['prepare']);
-        $statement = $this->getMock('PDOStatement', ['execute', 'rowCount']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['prepare']);
+        $statement = $this->createMock('PDOStatement', ['execute', 'rowCount']);
         $statement->expects($this->once())->method('execute')->with($this->equalTo(['foo' => 'bar']));
         $statement->expects($this->once())->method('rowCount')->will($this->returnValue(['boom']));
         $pdo->expects($this->once())->method('prepare')->with('foo')->will($this->returnValue($statement));
@@ -113,7 +113,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testBeganTransactionFiresEventsIfSet()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -123,7 +123,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testCommitedFiresEventsIfSet()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -133,7 +133,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testRollBackedFiresEventsIfSet()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->expects($this->once())->method('getName')->will($this->returnValue('name'));
         $connection->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -143,7 +143,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testTransactionMethodRunsSuccessfully()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit']);
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('commit');
@@ -153,7 +153,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testTransactionMethodRollsbackAndThrows()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('rollBack');
@@ -170,7 +170,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
      */
     public function testTransactionMethodDisallowPDOChanging()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('rollBack');
         $pdo->expects($this->never())->method('commit');
@@ -189,7 +189,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $method = (new ReflectionClass('Illuminate\Database\Connection'))->getMethod('run');
         $method->setAccessible(true);
 
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
@@ -204,7 +204,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $method = (new ReflectionClass('Illuminate\Database\Connection'))->getMethod('run');
         $method->setAccessible(true);
 
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction']);
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO', ['beginTransaction']);
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $pdo->expects($this->once())->method('beginTransaction');
         $mock->expects($this->never())->method('tryAgainIfCausedByLostConnection');
@@ -267,7 +267,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;
         $defaults = ['getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar'];
-        $connection = $this->getMock('Illuminate\Database\Connection', array_merge($defaults, $methods), [$pdo]);
+        $connection = $this->createMock('Illuminate\Database\Connection', array_merge($defaults, $methods), [$pdo]);
         $connection->enableQueryLog();
 
         return $connection;

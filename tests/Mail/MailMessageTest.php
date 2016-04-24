@@ -12,7 +12,7 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
     public function testBasicAttachment()
     {
         $swift = m::mock('StdClass');
-        $message = $this->getMock('Illuminate\Mail\Message', ['createAttachmentFromPath'], [$swift]);
+        $message = $this->createMock('Illuminate\Mail\Message', ['createAttachmentFromPath'], [$swift]);
         $attachment = m::mock('StdClass');
         $message->expects($this->once())->method('createAttachmentFromPath')->with($this->equalTo('foo.jpg'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
@@ -24,7 +24,7 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
     public function testDataAttachment()
     {
         $swift = m::mock('StdClass');
-        $message = $this->getMock('Illuminate\Mail\Message', ['createAttachmentFromData'], [$swift]);
+        $message = $this->createMock('Illuminate\Mail\Message', ['createAttachmentFromData'], [$swift]);
         $attachment = m::mock('StdClass');
         $message->expects($this->once())->method('createAttachmentFromData')->with($this->equalTo('foo'), $this->equalTo('name'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
