@@ -262,7 +262,7 @@ sneeze
 @endcan';
         $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'update\', [$post])): ?>
 breeze
-<?php elseif (Gate::check(\'delete\', [$post])): ?>
+<?php elseif (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'delete\', [$post])): ?>
 sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -278,7 +278,7 @@ sneeze
 @endcannot';
         $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'update\', [$post])): ?>
 breeze
-<?php elseif (Gate::denies(\'delete\', [$post])): ?>
+<?php elseif (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'delete\', [$post])): ?>
 sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
