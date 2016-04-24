@@ -260,7 +260,7 @@ breeze
 @elsecan(\'delete\', [$post])
 sneeze
 @endcan';
-        $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'update\', [$post])): ?>
 breeze
 <?php elseif (Gate::check(\'delete\', [$post])): ?>
 sneeze
@@ -276,7 +276,7 @@ breeze
 @elsecannot(\'delete\', [$post])
 sneeze
 @endcannot';
-        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'update\', [$post])): ?>
 breeze
 <?php elseif (Gate::denies(\'delete\', [$post])): ?>
 sneeze

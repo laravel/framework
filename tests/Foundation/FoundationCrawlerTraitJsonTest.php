@@ -8,7 +8,7 @@ class FoundationCrawlerTraitJsonTest extends PHPUnit_Framework_TestCase
 
     public function testSeeJsonStructure()
     {
-        $this->response = new \Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
+        $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
 
         // At root
         $this->seeJsonStructure(['foo']);
@@ -23,7 +23,7 @@ class FoundationCrawlerTraitJsonTest extends PHPUnit_Framework_TestCase
         $this->seeJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
         // Wildcard (repeating structure) at root
-        $this->response = new \Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
+        $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 }
