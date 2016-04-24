@@ -176,12 +176,15 @@ class Migrator
     {
         $trace      = $exception->getTrace();
         $offsetFile = strlen(base_path()) + 1;
+        $ourTrace   = [];
 
-        // We'll switch the order of the trace so we start with the migration
-        // file rather than end with it. After all, the migration file is where
-        // the error most likely occurred.
-        $ourTrace = [];
         foreach($trace as $point) {
+            // Only interested in lines and files
+            if (!isset($point['file'])) {
+                continue;
+            }
+
+            // Basically reversing the trace and doing an array_map
             array_unshift($ourTrace, [
                 'file' => substr($point['file'], $offsetFile),
                 'line' => $point['line']
@@ -232,7 +235,15 @@ class Migrator
             // to what they run on "up". It lets us backtrack through the migrations
             // and properly reverse the entire database schema operation that ran.
             foreach ($migrations as $migration) {
-                $this->runDown((object) $migration, $pretend);
+                DB::beginTransaction();
+
+                $success = $this->runDown((object)$migration, $pretend);
+
+                if ($success) {
+                    DB::commit();
+                } else {
+                    DB::rollback();
+                }
             }
         }
 
@@ -284,14 +295,21 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $instance->down();
+        try {
+            $instance->down();
 
-        // Once we have successfully run the migration "down" we will remove it from
-        // the migration repository so it will be considered to have not been run
-        // by the application then will be able to fire by any later operation.
-        $this->repository->delete($migration);
+            // Once we have successfully run the migration "down" we will remove it from
+            // the migration repository so it will be considered to have not been run
+            // by the application then will be able to fire by any later operation.
+            $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info> $file");
+            $this->note("<info>Rolled back:</info> $file");
+
+            return true;
+        } catch (Exception $e) {
+            $this->handleException($file, $e);
+            return false;
+        }
     }
 
     /**
