@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Encryption\McryptEncrypter;
 
 class EncrypterTest extends PHPUnit_Framework_TestCase
 {
