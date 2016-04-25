@@ -94,18 +94,16 @@ class SparkPostTransport extends Transport
     }
 
     /**
-     * Get From in a format needed by SparkPost.
+     * Get the "from" contacts in the format required by SparkPost.
      *
-     * @param Swift_Mime_Message $message
+     * @param  Swift_Mime_Message  $message
      * @return array
      */
     protected function getFrom(Swift_Mime_Message $message)
     {
-        $from = array_map(function ($email, $name) {
+        return array_map(function ($email, $name) {
             return compact('name', 'email');
-        }, array_keys($message->getFrom()), $message->getFrom());
-
-        return $from[0];
+        }, array_keys($message->getFrom()), $message->getFrom())[0];
     }
 
     /**
