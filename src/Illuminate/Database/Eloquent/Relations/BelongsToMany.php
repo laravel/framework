@@ -68,6 +68,13 @@ class BelongsToMany extends Relation
     protected $pivotUpdatedAt;
 
     /**
+     * The custom pivot model to use.
+     *
+     * @var string
+     */
+    protected $using;
+
+    /**
      * Create a new belongs to many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -214,6 +221,19 @@ class BelongsToMany extends Relation
         }
 
         return $this->related->newCollection($models);
+    }
+
+    /**
+     * Set a custom pivot model to use.
+     *
+     * @param  string  $pivot_model_name
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function using($pivot_model_name)
+    {
+        $this->using = $pivot_model_name;
+
+        return $this;
     }
 
     /**
@@ -408,11 +428,28 @@ class BelongsToMany extends Relation
         // relationships when they are retrieved and hydrated into the models.
         $columns = [];
 
-        foreach (array_merge($defaults, $this->pivotColumns) as $column) {
+        foreach (array_merge($defaults, $this->getPivotModelColumns(), $this->pivotColumns) as $column) {
             $columns[] = $this->table.'.'.$column.' as pivot_'.$column;
         }
 
         return array_unique($columns);
+    }
+
+    /**
+     * Retrieve necessary columns from the custom pivot model.
+     *
+     * @return array
+     */
+    protected function getPivotModelColumns()
+    {
+        $columns = [];
+ 
+        if($this->using){
+            $custom_pivot_class = $this->using;
+            $columns = $custom_pivot_class::getPivotColumns();
+        }
+ 
+        return $columns;
     }
 
     /**
@@ -1162,7 +1199,7 @@ class BelongsToMany extends Relation
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
-        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists);
+        $pivot = $this->related->newPivot($this->parent, $attributes, $this->table, $exists, $this->using);
 
         return $pivot->setPivotKeys($this->foreignKey, $this->otherKey);
     }

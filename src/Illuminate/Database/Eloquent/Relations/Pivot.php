@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use ReflectionClass;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,6 +37,13 @@ class Pivot extends Model
     protected $guarded = [];
 
     /**
+     * The attributes that should be loaded into the pivot model.
+     *
+     * @var array
+     */
+    protected $include = [];
+
+    /**
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -59,6 +67,8 @@ class Pivot extends Model
 
         $this->syncOriginal();
 
+        $this->eagerLoadRelations();
+
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
         // from the developer's point of view. We can use the parents to get these.
@@ -80,6 +90,18 @@ class Pivot extends Model
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
         return $query->where($this->otherKey, $this->getAttribute($this->otherKey));
+    }
+
+    /**
+     * Eager load any defined relations.
+     *
+     * @return null
+     */
+    protected function eagerLoadRelations()
+    {
+        foreach ($this->with as $relation) {
+            $this->relations[$relation] = $this->$relation()->getResults();
+        }
     }
 
     /**
