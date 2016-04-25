@@ -52,7 +52,9 @@ class SparkPostTransport extends Transport
             'json' => [
                 'recipients' => $recipients,
                 'content' => [
-                    'email_rfc822' => $message->toString(),
+                    'html' => $message->getBody(),
+                    'from' => $this->getFrom($message),
+                    'subject' => $message->getSubject(),
                 ],
             ],
         ];
@@ -70,7 +72,7 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        $to = [];
+        $to = $bcc = [];
 
         if ($message->getTo()) {
             $to = array_merge($to, array_keys($message->getTo()));
@@ -81,14 +83,29 @@ class SparkPostTransport extends Transport
         }
 
         if ($message->getBcc()) {
-            $to = array_merge($to, array_keys($message->getBcc()));
+            $to = array_merge($bcc, array_keys($message->getBcc()));
         }
 
         $recipients = array_map(function ($address) {
-            return compact('address');
+            return ['address' => ['email' => $address, 'header_to' => $address]];
         }, $to);
 
         return $recipients;
+    }
+
+    /**
+     * Get From in a format needed by SparkPost.
+     *
+     * @param Swift_Mime_Message $message
+     * @return array
+     */
+    protected function getFrom(Swift_Mime_Message $message)
+    {
+        $from = array_map(function ($email, $name) {
+            return compact('name', 'email');
+        }, array_keys($message->getFrom()), $message->getFrom());
+
+        return $from[0];
     }
 
     /**
