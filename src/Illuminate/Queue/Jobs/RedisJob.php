@@ -42,9 +42,9 @@ class RedisJob extends Job implements JobContract
     public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $queue)
     {
         $this->job = $job;
-        $this->reserved = $reserved;
         $this->redis = $redis;
         $this->queue = $queue;
+        $this->reserved = $reserved;
         $this->container = $container;
     }
 
@@ -145,6 +145,7 @@ class RedisJob extends Job implements JobContract
 
     /**
      * Get the underlying reserved Redis job.
+     *
      * @return string
      */
     public function getReservedJob()
