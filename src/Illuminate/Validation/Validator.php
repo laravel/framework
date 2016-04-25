@@ -421,11 +421,19 @@ class Validator implements ValidatorContract
      * Combine a validator instance into the current instance.
      *
      * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @return void
+     * @return \Illuminate\Contracts\Validation\Validator
      */
     public function combine(ValidatorContract $validator)
     {
         $newRules = $this->initialRules;
+
+        $newData = $this->parseData(
+            array_merge_recursive($this->getData(), $validator->getData())
+        );
+
+        $newCustomMessages = array_merge($this->getCustomMessages(), $validator->getCustomMessages());
+
+        $newCustomAttributes = array_merge($this->getCustomAttributes(), $validator->getCustomAttributes());
 
         foreach ($validator->initialRules as $attribute => $rule) {
             if (Str::contains($attribute, '*')) {
@@ -449,11 +457,7 @@ class Validator implements ValidatorContract
             }
         }
 
-        $this->data = $this->parseData(
-            array_merge_recursive($this->getData(), $validator->getData())
-        );
-
-        $this->setRules($newRules);
+        return new Validator($this->getTranslator(), $newData, $newRules, $newCustomMessages, $newCustomAttributes);
     }
 
     /**
