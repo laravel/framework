@@ -96,6 +96,7 @@ trait MocksApplicationServices
         });
 
         $this->app->instance('events', $mock);
+
         Model::setEventDispatcher($mock);
 
         return $this;
