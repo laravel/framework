@@ -443,12 +443,12 @@ class BelongsToMany extends Relation
     protected function getPivotModelColumns()
     {
         $columns = [];
- 
+
         if ($this->using) {
             $custom_pivot_class = $this->using;
             $columns = $custom_pivot_class::getPivotColumns();
         }
- 
+
         return $columns;
     }
 
