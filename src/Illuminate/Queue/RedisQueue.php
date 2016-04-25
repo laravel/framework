@@ -130,7 +130,10 @@ if(job ~= false) then
 end
 return {job, reserved}
 LUA;
-        list($job, $reserved) = $this->getConnection()->eval($script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire);
+
+        list($job, $reserved) = $this->getConnection()->eval(
+            $script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire
+        );
 
         if ($reserved) {
             return new RedisJob($this->container, $this, $job, $reserved, $original);
@@ -150,11 +153,12 @@ LUA;
     }
 
     /**
-     * Delete a reserved job from the reserved queue and release it back onto the main queue.
+     * Delete a reserved job from the reserved queue and release it.
      *
-     * @param string $queue
-     * @param string $job
-     * @param int $delay
+     * @param  string  $queue
+     * @param  string  $job
+     * @param  int  $delay
+     * @return void
      */
     public function deleteAndRelease($queue, $job, $delay)
     {
@@ -165,7 +169,10 @@ redis.call('zrem', KEYS[2], KEYS[3])
 redis.call('zadd', KEYS[1], KEYS[4], KEYS[3])
 return true
 LUA;
-        $this->getConnection()->eval($script, 4, $queue.':delayed', $queue.':reserved', $job, $this->getTime() + $delay);
+        $this->getConnection()->eval(
+            $script, 4, $queue.':delayed', $queue.':reserved',
+            $job, $this->getTime() + $delay
+        );
     }
 
     /**
@@ -178,6 +185,7 @@ LUA;
     public function migrateExpiredJobs($from, $to)
     {
         $redis = $this->getConnection();
+
         $script = <<<'LUA'
 local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
 if(next(val) ~= nil) then
@@ -188,6 +196,7 @@ if(next(val) ~= nil) then
 end
 return true
 LUA;
+
         $redis->eval($script, 3, $from, $to, $this->getTime());
     }
 
