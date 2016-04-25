@@ -444,7 +444,7 @@ class BelongsToMany extends Relation
     {
         $columns = [];
  
-        if($this->using){
+        if ($this->using) {
             $custom_pivot_class = $this->using;
             $columns = $custom_pivot_class::getPivotColumns();
         }

@@ -1900,7 +1900,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
     {
-        if($using){
+        if ($using) {
             return new $using($parent, $attributes, $table, $exists);
         }
 

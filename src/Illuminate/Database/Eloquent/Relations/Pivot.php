@@ -109,7 +109,8 @@ class Pivot extends Model
      *
      * @return array
      */
-    public static function getPivotColumns(){
+    public static function getPivotColumns()
+    {
         return (new ReflectionClass(static::class))->getDefaultProperties()['include'];
     }
 
