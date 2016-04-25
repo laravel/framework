@@ -76,6 +76,22 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
 
         $request->response(['errors']);
     }
+
+    public function testValidatedOnlyMethod()
+    {
+        $request = FoundationTestFormRequestStub::create('/', 'GET', ['name' => 'abigail', 'foo' => 'bar']);
+        $request->setContainer($container = new Container);
+        $factory = m::mock('Illuminate\Validation\Factory');
+        $factory->shouldReceive('make')->once()->with(['name' => 'abigail', 'foo' => 'bar'], ['name' => 'required'], [], [])->andReturn(
+            $validator = m::mock('Illuminate\Validation\Validator')
+        );
+        $container->instance('Illuminate\Contracts\Validation\Factory', $factory);
+        $validator->shouldReceive('passes')->once()->andReturn(true);
+
+        $request->validate($factory);
+
+        $this->assertEquals(['name' => 'abigail'], $request->validatedOnly());
+    }
 }
 
 class FoundationTestFormRequestStub extends Illuminate\Foundation\Http\FormRequest
