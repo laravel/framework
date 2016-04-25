@@ -3,6 +3,7 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
+use ParagonIE\ConstantTime\Encoding;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
@@ -76,10 +77,10 @@ class Encrypter implements EncrypterContract
             throw new EncryptException('Could not encrypt the data.');
         }
 
-        // Once we have the encrypted value we will go ahead base64_encode the input
+        // Once we have the encrypted value we will go ahead base64 encode the input
         // vector and create the MAC for the encrypted value so we can verify its
         // authenticity. Then, we'll JSON encode the data in a "payload" array.
-        $mac = $this->hash($iv = base64_encode($iv), $value);
+        $mac = $this->hash($iv = Encoding::base64Encode($iv), $value);
 
         $json = json_encode(compact('iv', 'value', 'mac'));
 
@@ -87,7 +88,7 @@ class Encrypter implements EncrypterContract
             throw new EncryptException('Could not encrypt the data.');
         }
 
-        return base64_encode($json);
+        return Encoding::base64Encode($json);
     }
 
     /**
@@ -102,7 +103,7 @@ class Encrypter implements EncrypterContract
     {
         $payload = $this->getJsonPayload($payload);
 
-        $iv = base64_decode($payload['iv']);
+        $iv = Encoding::base64Decode($payload['iv']);
 
         $decrypted = \openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
@@ -135,7 +136,7 @@ class Encrypter implements EncrypterContract
      */
     protected function getJsonPayload($payload)
     {
-        $payload = json_decode(base64_decode($payload), true);
+        $payload = json_decode(Encoding::base64Decode($payload), true);
 
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able
