@@ -19,6 +19,7 @@
         "ext-openssl": "*",
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*",
+        "paragonie/constant_time_encoding": "~1.0",
         "paragonie/random_compat": "~1.4"
     },
     "autoload": {
