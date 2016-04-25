@@ -279,7 +279,11 @@ class Validator implements ValidatorContract
 
         if (call_user_func($callback, $payload)) {
             foreach ((array) $attribute as $key) {
-                $this->mergeRules($key, $rules);
+                if (Str::contains($key, '*')) {
+                    $this->explodeRules([$key => $rules]);
+                } else {
+                    $this->mergeRules($key, $rules);
+                }
             }
         }
     }
