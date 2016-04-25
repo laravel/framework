@@ -226,12 +226,12 @@ class BelongsToMany extends Relation
     /**
      * Set a custom pivot model to use.
      *
-     * @param  string  $pivot_model_name
+     * @param  string  $pivotModelName
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function using($pivot_model_name)
+    public function using($pivotModelName)
     {
-        $this->using = $pivot_model_name;
+        $this->using = $pivotModelName;
 
         return $this;
     }
