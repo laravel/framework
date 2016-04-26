@@ -111,9 +111,11 @@ abstract class ServiceProvider {
 
 		static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-		if ($group)
-		{
-			static::$publishGroups[$group] = $paths;
+		if ($group) {
+			if (! array_key_exists($group, static::$publishGroups)) {
+				static::$publishGroups[$group] = [];
+			}
+			static::$publishGroups[$group] = array_merge(static::$publishGroups[$group], $paths);
 		}
 	}
 
@@ -126,6 +128,13 @@ abstract class ServiceProvider {
 	 */
 	public static function pathsToPublish($provider = null, $group = null)
 	{
+		if ($provider && $group) {
+			if (empty(static::$publishes[$provider]) || empty(static::$publishGroups[$group])) {
+				return [];
+			}
+			return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
+		}
+
 		if ($group && array_key_exists($group, static::$publishGroups))
 		{
 			return static::$publishGroups[$group];
