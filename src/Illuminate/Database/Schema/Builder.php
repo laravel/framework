@@ -93,7 +93,7 @@ class Builder
      * @return array
      */
     public function getColumnListing($table)
-    { 
+    {
         $results = $this->connection->select(
             $this->grammar->compileColumnExists(),
             $this->grammar->getTableBindings($this->connection, $table)
