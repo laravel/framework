@@ -18,6 +18,33 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 abstract class Grammar extends BaseGrammar
 {
     /**
+     * Compile the query to determine the list of columns.
+     *
+     * @return string
+     */
+    abstract public function compileTableExists();
+
+    /**
+     * Compile the query to determine the list of columns.
+     *
+     * @return string
+     */
+    abstract public function compileColumnExists();
+
+    /**
+     * Get the bindings for determining table informations
+     *
+     * @param Connection $connection
+     * @param            $table
+     * @return array
+     */
+    public function getTableBindings(Connection $connection, $table)
+    {
+        $prefix = $connection->getTablePrefix();
+        return [$prefix.$table];
+    }
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -456,4 +483,5 @@ abstract class Grammar extends BaseGrammar
     {
         return $option == 'notnull' ? ! $value : $value;
     }
+
 }
