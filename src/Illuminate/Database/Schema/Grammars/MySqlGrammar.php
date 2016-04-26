@@ -287,6 +287,21 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Enable or disable foreign key checks.
+     *
+     * @param $enable
+     * @return string
+     */
+    public function compileForeignKeyChecks($enable)
+    {
+        if ($enable) {
+            return 'SET FOREIGN_KEY_CHECKS=1;';
+        }
+
+        return 'SET FOREIGN_KEY_CHECKS=0;';
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column

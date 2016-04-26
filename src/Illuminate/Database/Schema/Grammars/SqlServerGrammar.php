@@ -247,6 +247,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Enable or disable foreign key checks.
+     *
+     * @param $enable
+     * @return string
+     */
+    public function compileForeignKeyChecks($enable)
+    {
+        if ($enable) {
+            return 'EXEC sp_msforeachtable @command1="print \'?\'", @command2="ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all";';
+        }
+
+        return 'EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all";';
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column
