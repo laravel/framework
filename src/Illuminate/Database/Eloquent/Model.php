@@ -2965,18 +2965,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         $reflectionClass = new \ReflectionClass($cast);
+
         return $reflectionClass->newInstanceArgs([$value] + $this->castParameters($key));
     }
 
     /**
      * Has a custom cast type been defined for a model attribute and does it exist.
      *
-     * @param  string  $key
-     * @return boolean
+     * @param  string $key
+     * @return bool
      */
     protected function castExists($key)
     {
-        if (!$this->castClass($key)) {
+        if (! $this->castClass($key)) {
             return false;
         }
 
@@ -2984,8 +2985,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Return the fully qualified custom class
-     * 
+     * Return the fully qualified custom class.
+     *
      * @param  string $key
      * @return string
      */
@@ -3003,9 +3004,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Return an array of custom cast parameters
-     * 
-     * @param  string $key 
+     * Return an array of custom cast parameters.
+     *
+     * @param  string $key
      * @return array
      */
     protected function castParameters($key)
