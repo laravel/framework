@@ -3020,7 +3020,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return [];
     }
 
-
     /**
      * Prepare a date for array / JSON serialization.
      *
