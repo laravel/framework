@@ -2771,10 +2771,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getCastType($key)
     {
-        if ($this->castExists($key)) {
-            return 'custom';
-        }
-
         return trim(strtolower($this->getCasts()[$key]));
     }
 
@@ -2816,11 +2812,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimeStamp($value);
-            case 'custom':
-                return $this->asCustom($key, $value);
-            default:
-                return $value;
         }
+
+        if ($this->castExists($key)) {
+            return $this->asCustom($key, $value);
+        }
+        
+        return $value;
     }
 
     /**
