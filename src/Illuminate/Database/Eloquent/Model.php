@@ -2817,7 +2817,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($this->castExists($key)) {
             return $this->asCustom($key, $value);
         }
-        
+
         return $value;
     }
 
