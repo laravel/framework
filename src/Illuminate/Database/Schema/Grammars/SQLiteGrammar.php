@@ -295,6 +295,21 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Enable or disable foreign key checks.
+     *
+     * @param $enable
+     * @return string
+     */
+    public function compileForeignKeyChecks($enable)
+    {
+        if ($enable) {
+            return 'PRAGMA foreign_keys = ON;';
+        }
+
+        return 'PRAGMA foreign_keys = OFF;';
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column

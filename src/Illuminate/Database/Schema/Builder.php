@@ -179,6 +179,24 @@ class Builder
     }
 
     /**
+     * Enable or disable foreign key checks.
+     *
+     * @param $enable
+     * @return bool
+     * @throws \Exception
+     */
+    public function foreignKeyChecks($enable)
+    {
+        if (! is_bool($enable)) {
+            throw new \Exception("The parameter should either be 'true' or 'false'");
+        }
+
+        return $this->connection->statement(
+            $this->grammar->compileForeignKeyChecks($enable)
+        );
+    }
+
+    /**
      * Rename a table on the schema.
      *
      * @param  string  $from
