@@ -143,8 +143,6 @@ class Builder
 
         $blueprint->create();
 
-        $callback($blueprint);
-
         $this->build($blueprint);
     }
 
