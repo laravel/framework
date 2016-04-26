@@ -507,6 +507,12 @@ if (! function_exists('dd')) {
      */
     function dd()
     {
+        if (app()->environment('production')) {
+            logger('dd() found', debug_backtrace()[1]);
+
+            return;
+        }
+
         array_map(function ($x) {
             (new Dumper)->dump($x);
         }, func_get_args());
