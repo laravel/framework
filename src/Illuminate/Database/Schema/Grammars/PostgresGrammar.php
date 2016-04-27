@@ -37,7 +37,7 @@ class PostgresGrammar extends Grammar
 
         return [$schema, $prefix.$table];
     }
-    
+
     /**
      * Compile the query to determine if a table exists.
      *

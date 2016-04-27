@@ -25,6 +25,7 @@ class SQLiteGrammar extends Grammar
     public function getTableBindings(Connection $connection, $table)
     {
         $prefix = $connection->getTablePrefix();
+
         return [$prefix.str_replace_array('.', '_', $table)];
     }
 

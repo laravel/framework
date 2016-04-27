@@ -32,7 +32,7 @@ class MySqlGrammar extends Grammar
     public function getTableBindings(Connection $connection, $table)
     {
         $prefix = $connection->getTablePrefix();
-        
+
         $database = $connection->getDatabaseName();
 
         return [$database, $prefix.$table];

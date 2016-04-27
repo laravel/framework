@@ -41,7 +41,7 @@ abstract class Grammar extends BaseGrammar
     public function getTableBindings(Connection $connection, $table)
     {
         $prefix = $connection->getTablePrefix();
-        
+
         return [$prefix.$table];
     }
 
