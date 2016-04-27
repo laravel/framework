@@ -841,8 +841,11 @@ class Validator implements ValidatorContract
 
         if (is_bool($data)) {
             array_walk($values, function (&$value) {
-                $value = $value == 'true' ?
-                    true : ($value == 'false' ? false : $value);
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
             });
         }
 
