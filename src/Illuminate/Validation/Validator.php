@@ -853,6 +853,16 @@ class Validator implements ValidatorContract
 
         $values = array_slice($parameters, 1);
 
+        if (is_bool($data)) {
+            array_walk($values, function (&$value) {
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
+            });
+        }
+
         if (in_array($data, $values)) {
             return $this->validateRequired($attribute, $value);
         }

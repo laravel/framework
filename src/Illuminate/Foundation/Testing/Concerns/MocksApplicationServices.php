@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Mockery;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 
 trait MocksApplicationServices
 {
@@ -89,15 +88,7 @@ trait MocksApplicationServices
             $this->firedEvents[] = $called;
         });
 
-        $mock->shouldReceive('until')->andReturnUsing(function ($called) {
-            $this->firedEvents[] = $called;
-
-            return true;
-        });
-
         $this->app->instance('events', $mock);
-
-        Model::setEventDispatcher($mock);
 
         return $this;
     }

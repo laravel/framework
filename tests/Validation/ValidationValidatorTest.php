@@ -632,6 +632,14 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['first' => 'dayle', 'last' => 'rees'], ['last' => 'required_if:first,taylor,dayle']);
         $this->assertTrue($v->passes());
 
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'required_if:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'required_if:foo,true']);
+        $this->assertTrue($v->fails());
+
         // error message when passed multiple values (required_if:foo,bar,baz)
         $trans = $this->getRealTranslator();
         $trans->addResource('array', ['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en', 'messages');
