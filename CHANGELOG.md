@@ -1,5 +1,36 @@
 # Release Notes
 
+## v5.2.31 (2016-04-27)
+
+### Added
+- Added missing suggested dependency `SuperClosure` ([09a793f](https://git.io/vwZx4))
+- Added ODBC connection support for SQL Server ([#13298](https://github.com/laravel/framework/pull/13298))
+- Added `Request::hasHeader()` method ([#13271](https://github.com/laravel/framework/pull/13271))
+- Added `@elsecan` and `@elsecannot` Blade directives ([#13256](https://github.com/laravel/framework/pull/13256))
+- Support booleans in `required_if` Validator rule ([#13327](https://github.com/laravel/framework/pull/13327))
+
+### Changed
+- Simplified `Translator::parseLocale()` method ([#13244](https://github.com/laravel/framework/pull/13244))
+- Simplified `Builder::shouldRunExistsQuery()` method ([#13321](https://github.com/laravel/framework/pull/13321))
+- Use `Gate` contract instead of Facade ([#13260](https://github.com/laravel/framework/pull/13260))
+- Return result in `SoftDeletes::forceDelete()` ([#13272](https://github.com/laravel/framework/pull/13272))
+
+### Fixed
+- Fixed BCC for SparkPost ([#13237](https://github.com/laravel/framework/pull/13237))
+- Use Carbon for everything time related in `DatabaseTokenRepository` ([#13234](https://github.com/laravel/framework/pull/13234))
+- Fixed an issue with `data_set()` affecting the Validator ([#13224](https://github.com/laravel/framework/pull/13224))
+- Fixed setting nested namespaces with `app:name` command ([#13208](https://github.com/laravel/framework/pull/13208))
+- Decode base64 encoded keys before using it in `PasswordBrokerManager` ([#13270](https://github.com/laravel/framework/pull/13270))
+- Prevented race condition in `RateLimiter` ([#13283](https://github.com/laravel/framework/pull/13283))
+- Use `DIRECTORY_SEPARATOR` to create path for migrations ([#13254](https://github.com/laravel/framework/pull/13254))
+- Fixed adding implicit rules via `sometimes()` method ([#12976](https://github.com/laravel/framework/pull/12976))
+- Fixed `Schema::hasTable()` when using PostgreSQL ([#13008](https://github.com/laravel/framework/pull/13008))
+- Allow `seeAuthenticatedAs()` to be called with any user object ([#13308](https://github.com/laravel/framework/pull/13308))
+
+### Removed
+- Removed unused base64 decoding from `Encrypter` ([#13291](https://github.com/laravel/framework/pull/13291))
+
+
 ## v5.2.30 (2016-04-19)
 
 ### Added
