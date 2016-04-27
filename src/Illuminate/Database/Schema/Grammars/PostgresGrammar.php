@@ -227,6 +227,26 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a enable foreign key constraints command.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints()
+    {
+        return 'SET CONSTRAINTS ALL IMMEDIATE;';
+    }
+
+    /**
+     * Compile a disable foreign key constraints command.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints()
+    {
+        return 'SET CONSTRAINTS ALL DEFERRED;';
+    }
+
+    /**
      * Compile a rename table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
