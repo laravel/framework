@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Mockery;
 use PHPUnit_Framework_TestCase;
-use Illuminate\Database\Eloquent\Model;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
