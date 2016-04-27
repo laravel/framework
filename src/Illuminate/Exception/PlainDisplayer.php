@@ -12,7 +12,7 @@ class PlainDisplayer implements ExceptionDisplayerInterface {
 	 * @param  \Exception  $exception
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function display(Exception $exception)
+	public function display(\Throwable $exception)
 	{
 		$status = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
 

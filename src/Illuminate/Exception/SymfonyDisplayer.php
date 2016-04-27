@@ -39,7 +39,7 @@ class SymfonyDisplayer implements ExceptionDisplayerInterface {
 	 * @param  \Exception  $exception
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function display(Exception $exception)
+	public function display(\Throwable $exception)
 	{
 		if ($this->returnJson)
 		{
