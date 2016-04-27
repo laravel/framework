@@ -22,17 +22,17 @@ abstract class Grammar extends BaseGrammar
      *
      * @return string
      */
-    abstract function compileTableExists();
+    abstract public function compileTableExists();
 
     /**
      * Compile the query to determine the list of columns.
      *
      * @return string
      */
-    abstract function compileColumnExists();
+    abstract public function compileColumnExists();
 
     /**
-     * Get the bindings for determining table informations
+     * Get the bindings for determining table information.
      *
      * @param Connection $connection
      * @param            $table
@@ -40,7 +40,8 @@ abstract class Grammar extends BaseGrammar
      */
     public function getTableBindings(Connection $connection, $table)
     {
-        $prefix = $connection>getTablePrefix();
+        $prefix = $connection->getTablePrefix();
+        
         return [$prefix.$table];
     }
 

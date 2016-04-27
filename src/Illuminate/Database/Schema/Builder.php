@@ -49,6 +49,7 @@ class Builder
     public function hasTable($table)
     {
         $sql = $this->grammar->compileTableExists();
+
         return count($this->connection->select($sql, $this->grammar->getTableBindings($this->connection, $table))) > 0;
     }
 
