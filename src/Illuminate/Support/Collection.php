@@ -1173,4 +1173,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return (array) $items;
     }
+
+    /**
+     * Search a key by keyword.
+     *
+     * @param  string  $keyword
+     * @return bool|static
+     */
+    public function like($keyword) {
+        
+        if(is_null($keyword) || empty($keyword)) {
+            return false;
+        }
+        
+        $newItems = [];
+        
+        $this->filter(function($value, $key) use ($keyword, &$newItems) {
+            if (strpos($key, $keyword)) {
+                $newItems[$key] = $value;
+            }
+        });
+
+        return $this->make($newItems);
+
+    }
 }
