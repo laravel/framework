@@ -54,12 +54,12 @@ trait InteractsWithAuthentication
 
         $this->assertInstanceOf(
             get_class($expected), $user,
-            'The logged in user is not the same'
+            'The currently authenticated user is not who was expected'
         );
 
         $this->assertSame(
             $expected->getAuthIdentifier(), $user->getAuthIdentifier(),
-            'The logged in user is not the same'
+            'The currently authenticated user is not who was expected'
         );
 
         return $this;
