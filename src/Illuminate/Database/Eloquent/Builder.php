@@ -910,7 +910,7 @@ class Builder
      */
     protected function shouldRunExistsQuery($operator, $count)
     {
-        return ($operator === '>=' && $count === 1) || ($operator === '<' && $count === 1);
+        return ($operator === '>=' || $operator === '<') && $count === 1;
     }
 
     /**
