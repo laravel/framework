@@ -1311,6 +1311,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentModelWithRelationship;
         $this->assertTrue(isset($model->childModels));
+        $this->assertFalse(isset($model->nonExistingChildModels));
     }
 
     protected function addMockConnection($model)
