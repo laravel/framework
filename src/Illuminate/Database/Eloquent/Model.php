@@ -141,13 +141,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $dates = [];
 
     /**
-     * The timezone to use when mutating dates.
-     *
-     * @var string|null
-     */
-    protected $timezone = null;
-
-    /**
      * The storage format of the model's date columns.
      *
      * @var string
@@ -258,6 +251,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     public static $manyMethods = ['belongsToMany', 'morphToMany', 'morphedByMany'];
+
+    /**
+     * The timezone to use when mutating dates.
+     *
+     * @var string|null
+     */
+    protected static $timezone = null;
 
     /**
      * The name of the "created at" column.
@@ -2917,8 +2917,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $format = $this->getDateFormat();
 
         $value = $this->asDateTime($value);
-        if ($this->timezone) {
-            $value->setTimezone($this->timezone);
+        if (static::$timezone) {
+            $value->setTimezone(static::$timezone);
         }
 
         return $value->format($format);
@@ -2965,8 +2965,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        if ($this->timezone) {
-            return Carbon::createFromFormat($this->getDateFormat(), $value, $this->timezone)
+        if (static::$timezone) {
+            return Carbon::createFromFormat($this->getDateFormat(), $value, static::$timezone)
                 ->setTimezone(date_default_timezone_get());
         } else {
             return Carbon::createFromFormat($this->getDateFormat(), $value);
