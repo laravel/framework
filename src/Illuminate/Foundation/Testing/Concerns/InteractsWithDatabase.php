@@ -81,7 +81,7 @@ trait InteractsWithDatabase
      *
      * @param  string $table
      * @param  array $data
-     * @param  string $connection
+     * @param  string|null $connection
      * @return $this
      */
     protected function seeInDatabaseSoftDeleted($table, array $data, $connection = null)
