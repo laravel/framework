@@ -46,6 +46,24 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Register the routes for handling broadcast authentication and sockets.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function route(array $attributes = [])
+    {
+        if ($this->app->routesAreCached()) {
+            return;
+        }
+
+        $this->app['router']->group($attributes, function () {
+            $this->app['router']->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
+            $this->app['router']->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
+        });
+    }
+
+    /**
      * Get the socket ID for the given request.
      *
      * @param  \Illuminate\Http\Request|null  $request
