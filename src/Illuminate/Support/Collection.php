@@ -1180,21 +1180,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  string  $keyword
      * @return bool|static
      */
-    public function like($keyword) {
-        
+    public function like($keyword) 
+    {
         if(is_null($keyword) || empty($keyword)) {
             return false;
         }
         
         $newItems = [];
         
-        $this->filter(function($value, $key) use ($keyword, &$newItems) {
+        $this->filter(function ($value, $key) use ($keyword, &$newItems) {
             if (strpos($value, $keyword) !== false || strpos($key, $keyword) !== false) {
                 $newItems[$key] = $value;
             }
         });
 
         return $this->make($newItems);
-
     }
 }
