@@ -95,7 +95,6 @@ trait InteractsWithDatabase
         return $this;
     }
 
-
     /**
      * Seed a given database connection.
      *
