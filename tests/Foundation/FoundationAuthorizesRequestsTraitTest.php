@@ -4,7 +4,6 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesResources;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
@@ -124,7 +123,7 @@ class FoundationAuthorizesRequestTestPolicy
 
 class FoundationTestAuthorizeTraitClass
 {
-    use AuthorizesRequests, AuthorizesResources;
+    use AuthorizesRequests;
 
     public function store($object)
     {
