@@ -46,16 +46,36 @@ class PusherBroadcaster implements Broadcaster
         $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
 
         foreach ($this->channels as $pattern => $callback) {
-            if (Str::is($pattern, $channel)) {
-                $parameters = $this->extractAuthParameters($pattern, $channel);
+            if (! Str::is($pattern, $channel)) {
+                continue;
+            }
 
-                if ($callback($request->user(), ...$parameters)) {
-                    return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
-                }
+            $parameters = $this->extractAuthParameters($pattern, $channel);
+
+            if ($result = $callback($request->user(), ...$parameters)) {
+                return $this->validAuthenticationResponse($request, $result);
             }
         }
 
         throw new HttpException(403);
+    }
+
+    /**
+     * Return the valid Pusher authentication response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
+     * @return mixed
+     */
+    protected function validAuthenticationResponse($request, $result)
+    {
+        if (Str::startsWith($request->channel_name, 'private')) {
+            return $this->pusher->socket_auth($request->channel_name, $request->socket_id);
+        } else {
+            return $this->pusher->presence_auth(
+                $request->channel_name, $request->socket_id, $request->user()->id, $result
+            );
+        }
     }
 
     /**
