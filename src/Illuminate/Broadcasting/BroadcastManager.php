@@ -46,6 +46,44 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Get the socket ID for the given request.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return string|null
+     */
+    public function socket($request = null)
+    {
+        if (! $request && ! $this->app->bound('request')) {
+            return;
+        }
+
+        $request = $request ?: $this->app['request'];
+
+        return $this->app['cache']->get(
+            'pusher:socket:'.$request->session()->getId()
+        );
+    }
+
+    /**
+     * Remember the socket for the given request.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return void
+     */
+    public function rememberSocket($request = null)
+    {
+        if (! $request && ! $this->app->bound('request')) {
+            return;
+        }
+
+        $request = $request ?: $this->app['request'];
+
+        $this->app['cache']->forever(
+            'pusher:socket:'.$request->session()->getId(), $request->socket
+        );
+    }
+
+    /**
      * Get a driver instance.
      *
      * @param  string  $driver
