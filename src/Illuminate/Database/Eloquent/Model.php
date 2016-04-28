@@ -143,7 +143,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * The timezone to use when mutating dates.
      *
-     * @var string
+     * @var string|null
      */
     protected $timezone = null;
 
