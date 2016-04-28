@@ -227,7 +227,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a enable foreign key constraints command.
+     * Compile the command to enable foreign key constraints.
      *
      * @return string
      */
@@ -237,7 +237,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a disable foreign key constraints command.
+     * Compile the command to disable foreign key constraints.
      *
      * @return string
      */
