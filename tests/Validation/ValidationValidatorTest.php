@@ -54,6 +54,25 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    /**
+     * @expectedException \Illuminate\Validation\ValidationException
+     */
+    public function testValidateThrowsOnFail()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
+
+        $v->validate();
+    }
+
+    public function testValidateDoesntThrowOnPass()
+    {
+        $trans = $this->getRealTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
+
+        $v->validate();
+    }
+
     public function testHasFailedValidationRules()
     {
         $trans = $this->getRealTranslator();

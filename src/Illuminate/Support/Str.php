@@ -236,19 +236,6 @@ class Str
     }
 
     /**
-     * Generate a more truly "random" bytes.
-     *
-     * @param  int  $length
-     * @return string
-     *
-     * @deprecated since version 5.2. Use random_bytes instead.
-     */
-    public static function randomBytes($length = 16)
-    {
-        return random_bytes($length);
-    }
-
-    /**
      * Generate a "random" alpha-numeric string.
      *
      * Should not be considered sufficient for cryptography, etc.
@@ -264,21 +251,20 @@ class Str
     }
 
     /**
-     * Compares two strings using a constant-time algorithm.
+     * Replace a given value in the string sequentially with an array.
      *
-     * Note: This method will leak length information.
-     *
-     * Note: Adapted from Symfony\Component\Security\Core\Util\StringUtils.
-     *
-     * @param  string  $knownString
-     * @param  string  $userInput
-     * @return bool
-     *
-     * @deprecated since version 5.2. Use hash_equals instead.
+     * @param  string  $search
+     * @param  array   $replace
+     * @param  string  $subject
+     * @return string
      */
-    public static function equals($knownString, $userInput)
+    public static function replaceArray($search, array $replace, $subject)
     {
-        return hash_equals($knownString, $userInput);
+        foreach ($replace as $value) {
+            $subject = static::replaceFirst($search, $value, $subject);
+        }
+
+        return $subject;
     }
 
     /**

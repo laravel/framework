@@ -1,8 +1,6 @@
 language: php
 
 php:
-  - 5.5.9
-  - 5.5
   - 5.6
   - 7.0
   - hhvm
@@ -13,12 +11,15 @@ env:
 
 matrix:
   include:
-    - php: 5.5.9
+    - php: 5.6
       env: setup=lowest
-    - php: 5.5.9
+    - php: 5.6
       env: setup=stable
 
 sudo: false
+
+services:
+  - redis-server
 
 before_install:
   - travis_retry composer self-update
