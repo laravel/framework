@@ -3,6 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Pusher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -100,7 +101,9 @@ class PusherBroadcaster implements Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        $this->pusher->trigger($channels, $event, $payload);
+        $socket = Arr::pull($payload, 'socket');
+
+        $this->pusher->trigger($channels, $event, $payload, $socket);
     }
 
     /**
