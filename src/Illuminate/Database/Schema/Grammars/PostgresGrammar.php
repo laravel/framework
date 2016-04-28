@@ -121,7 +121,9 @@ class PostgresGrammar extends Grammar
 
         $index = $this->wrap($command->index);
 
-        return "create index {$index} on ".$this->wrapTable($blueprint)." ({$columns})";
+        $algorithm = $command->algorithm ? ' using '.$command->algorithm : '';
+
+        return "create index {$index} on ".$this->wrapTable($blueprint).$algorithm." ({$columns})";
     }
 
     /**

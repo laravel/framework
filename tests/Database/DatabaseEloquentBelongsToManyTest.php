@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
@@ -426,7 +427,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo('x'), $this->equalTo([]), $this->equalTo(false));
         $relation->expects($this->once())->method('detach')->with($this->equalTo([1]));
         $relation->getRelated()->shouldReceive('touches')->andReturn(false);
@@ -451,7 +452,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(['foo' => 'bar']), $this->equalTo(false));
         $relation->expects($this->once())->method('updateExistingPivot')->with($this->equalTo(3), $this->equalTo(['baz' => 'qux']), $this->equalTo(false))->will($this->returnValue(true));
         $relation->expects($this->once())->method('detach')->with($this->equalTo([1]));
@@ -468,7 +469,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('attach')->with($this->equalTo(4), $this->equalTo(['foo' => 'bar']), $this->equalTo(false));
         $relation->expects($this->once())->method('updateExistingPivot')->with($this->equalTo(3), $this->equalTo(['baz' => 'qux']), $this->equalTo(false))->will($this->returnValue(false));
         $relation->expects($this->once())->method('detach')->with($this->equalTo([1]));
@@ -511,7 +512,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('user_id', 1)->andReturn($query);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('StdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
 
         $collection = new Collection([
             m::mock(['getKey' => 1]),
@@ -545,7 +546,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $query->shouldReceive('where')->once()->with('foo', '=', 'bar')->andReturn($query);
 
         // This is so $relation->sync() works
-        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn([1, 2, 3]);
+        $query->shouldReceive('pluck')->once()->with('role_id')->andReturn(new BaseCollection([1, 2, 3]));
         $relation->expects($this->once())->method('formatSyncList')->with([1, 2, 3])->will($this->returnValue([1 => [], 2 => [], 3 => []]));
 
         $relation = $relation->wherePivot('foo', '=', 'bar'); // these params are to be stored

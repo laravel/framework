@@ -102,8 +102,8 @@ class Handler implements ExceptionHandlerContract
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
-        } elseif ($e instanceof ValidationException && $e->getResponse()) {
-            return $e->getResponse();
+        } elseif ($e instanceof ValidationException) {
+            return $this->convertValidationExceptionToResponse($e, $request);
         }
 
         if ($this->isHttpException($e)) {
@@ -156,6 +156,28 @@ class Handler implements ExceptionHandlerContract
         } else {
             return $this->convertExceptionToResponse($e);
         }
+    }
+
+    /**
+     * Create a response object from the given validation exception.
+     *
+     * @param  \Illuminate\Validation\ValidationException  $e
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
+    {
+        if ($e->response) {
+            return $e->response;
+        }
+
+        $errors = $e->validator->errors()->getMessages();
+
+        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+            return response()->json($errors, 422);
+        }
+
+        return redirect()->back()->withInput($request->input())->withErrors($errors);
     }
 
     /**
