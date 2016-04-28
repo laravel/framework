@@ -214,17 +214,17 @@ class Event
     {
         $output = ProcessUtils::escapeArgument($this->output);
 
-        $redirect = $this->shouldAppendOutput ? ' >> ' : ' > ';
+        $command = $this->command.($this->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1';
 
         if ($this->withoutOverlapping) {
             if (windows_os()) {
-                $command = '(echo \'\' > "'.$this->mutexPath().'" & '.$this->command.' & del "'.$this->mutexPath().'")'.$redirect.$output.' 2>&1 &';
+                $command = 'echo \'\' > "'.$this->mutexPath().'" & '.$command.' & del "'.$this->mutexPath().'"';
             } else {
-                $command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().')'.$redirect.$output.' 2>&1 &';
+                $command = 'touch '.$this->mutexPath().'; '.$command.'; rm '.$this->mutexPath();
             }
-        } else {
-            $command = $this->command.$redirect.$output.' 2>&1 &';
         }
+
+        $command .= ' &';
 
         return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
     }
