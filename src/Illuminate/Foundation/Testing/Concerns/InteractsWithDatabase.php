@@ -75,9 +75,9 @@ trait InteractsWithDatabase
 
         return $this;
     }
-    
+
     /**
-     * Assert that a given where condition matches a soft deleted record
+     * Assert that a given where condition matches a soft deleted record.
      *
      * @param  string $table
      * @param  array $data
