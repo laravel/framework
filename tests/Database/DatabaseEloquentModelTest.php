@@ -1307,6 +1307,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testIssetModelRelationship()
+    {
+        $model = new EloquentModelWithRelationship;
+        $this->assertTrue(isset($model->childModels));
+        $this->assertFalse(isset($model->nonExistingChildModels));
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1593,4 +1600,12 @@ class EloquentModelNonIncrementingStub extends Illuminate\Database\Eloquent\Mode
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+class EloquentModelWithRelationship extends Illuminate\Database\Eloquent\Model
+{
+    public function childModels()
+    {
+        $this->hasMany(EloquentModelStub::class);
+    }
 }
