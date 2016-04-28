@@ -52,6 +52,25 @@ trait AuthorizesRequests
             return [$ability, $arguments];
         }
 
-        return [debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'], $ability];
+        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
+
+        return [$this->normalizeGuessedAbilityName($method), $ability];
+    }
+
+    /**
+     * Normalize the ability name that has been guessed from the method name.
+     *
+     * @param  string  $ability
+     * @return string
+     */
+    protected function normalizeGuessedAbilityName($ability)
+    {
+        if (method_exists($this, 'resourceAbilityMap')) {
+            $map = $this->resourceAbilityMap();
+
+            $ability = isset($map[$ability]) ? $map[$ability] : $ability;
+        }
+
+        return $ability;
     }
 }
