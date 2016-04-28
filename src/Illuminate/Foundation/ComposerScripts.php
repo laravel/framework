@@ -17,6 +17,7 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         static::clearCompiled();
+        static::createSqliteDatabaseFile();
     }
 
     /**
@@ -47,6 +48,18 @@ class ComposerScripts
 
         if (file_exists($servicesPath = $laravel->getCachedServicesPath())) {
             @unlink($servicesPath);
+        }
+    }
+
+    /**
+     * Create an empty sqlite database file.
+     *
+     * @return void
+     */
+    protected static function createSqliteDatabaseFile() {
+        $filePath = base_path('database/database.sqlite');
+        if ( ! file_exists($filePath) && is_writeable(base_path('database'))) {
+            touch($filePath);
         }
     }
 }
