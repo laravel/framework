@@ -525,4 +525,28 @@ class Arr
 
         return $filtered;
     }
+
+    /**
+     * Get the array key for the given value.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @return mixed
+     */
+    public static function key($array, $value)
+    {
+        $lookFor = $value;
+
+        $filtered = static::where($array, function ($key, $value) use ($lookFor) {
+            return ($value === $lookFor);
+        });
+
+        if (empty($filtered)) {
+            return;
+        }
+
+        $keys = array_keys($filtered);
+
+        return $keys[0];
+    }
 }
