@@ -1189,7 +1189,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $newItems = [];
         
         $this->filter(function($value, $key) use ($keyword, &$newItems) {
-            if (strpos($key, $keyword)) {
+            if (strpos($value, $keyword) !== false || strpos($key, $keyword) !== false) {
                 $newItems[$key] = $value;
             }
         });
