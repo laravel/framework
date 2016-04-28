@@ -35,7 +35,7 @@ class DetectEnvironment
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($env = $app->detectEnvironment(function(){})) {
+        if ($env = $app->detectEnvironment(function () {})) {
             putenv('APP_ENV='.$env);
         }
 
