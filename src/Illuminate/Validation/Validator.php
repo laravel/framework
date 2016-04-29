@@ -1536,11 +1536,7 @@ class Validator implements ValidatorContract
      */
     protected function validateFile($attribute, $value)
     {
-        if (! $this->isAValidFileInstance($value)) {
-            return false;
-        }
-
-        return true;
+        return $this->isAValidFileInstance($value);
     }
 
     /**
