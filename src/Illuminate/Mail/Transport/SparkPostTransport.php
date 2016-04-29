@@ -74,7 +74,7 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        $to = $bcc = [];
+        $to = [];
 
         if ($message->getTo()) {
             $to = array_merge($to, array_keys($message->getTo()));
@@ -85,7 +85,7 @@ class SparkPostTransport extends Transport
         }
 
         if ($message->getBcc()) {
-            $to = array_merge($bcc, array_keys($message->getBcc()));
+            $to = array_merge($to, array_keys($message->getBcc()));
         }
 
         $recipients = array_map(function ($address) {
