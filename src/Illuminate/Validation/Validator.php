@@ -1550,6 +1550,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the given value is a valid file.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    protected function validateFile($attribute, $value)
+    {
+        return $this->isAValidFileInstance($value);
+    }
+
+    /**
      * Validate the MIME type of a file is an image MIME type.
      *
      * @param  string  $attribute
