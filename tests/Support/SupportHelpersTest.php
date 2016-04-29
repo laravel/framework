@@ -210,11 +210,11 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, array_key([100, 200, 300], 300));
 
         // Testing for a non-existant value
-        $this->assertNull(array_key([100, 200, 300], 900));
+        $this->assertFalse(array_key([100, 200, 300], 900));
 
         // Does not work for nested arrays
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
-        $this->assertNull(array_key($array, 'Jane'));
+        $this->assertFalse(array_key($array, 'Jane'));
     }
 
     public function testStrIs()

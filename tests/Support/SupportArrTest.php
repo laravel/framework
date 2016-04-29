@@ -476,11 +476,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
 
         // Testing for a non-existant value
         $key = Arr::key($array, 900);
-        $this->assertNull($key);
+        $this->assertFalse($key);
 
         // Does not work for nested arrays
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
         $key = Arr::key($array, 'Jane');
-        $this->assertNull($key);
+        $this->assertFalse($key);
     }
 }

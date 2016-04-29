@@ -535,18 +535,10 @@ class Arr
      */
     public static function key($array, $value)
     {
-        $lookFor = $value;
-
-        $filtered = static::where($array, function ($key, $value) use ($lookFor) {
-            return ($value === $lookFor);
-        });
-
-        if (empty($filtered)) {
-            return;
+        if ($key = array_search($value, $array)) {
+            return $key;
         }
 
-        $keys = array_keys($filtered);
-
-        return $keys[0];
+        return false;
     }
 }
