@@ -1273,11 +1273,23 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
-    public function testProvidingNullOrFalseAsSecondParameterBuildsCorrectly()
+    public function testProvidingNullWithOperatorsBuildsCorrectly()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('foo', null);
         $this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '=', null);
+        $this->assertEquals('select * from "users" where "foo" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '!=', null);
+        $this->assertEquals('select * from "users" where "foo" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '<>', null);
+        $this->assertEquals('select * from "users" where "foo" is not null', $builder->toSql());
     }
 
     public function testDynamicWhere()
