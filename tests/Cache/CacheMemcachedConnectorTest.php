@@ -61,7 +61,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $validOptions = ['OPT_NO_BLOCK' => true, 'OPT_AUTO_EJECT_HOSTS' => true];
+        $validOptions = ['OPT_NO_BLOCK' => true, 'OPT_CONNECT_TIMEOUT' => 2000];
 
         $memcached = $this->memcachedMockWithAddServer();
         $memcached->shouldReceive('setOptions')->once()->andReturn(true);
@@ -85,7 +85,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $invalidOptions = ['OPT_NO_BLOC' => true, 'OPT_AUTO_EJECT_HOST' => true];
+        $invalidOptions = ['OPT_NO_BLOC' => true, 'OPT_CONNECT_TIMEOUT' => 2000];
 
         $memcached = m::mock('stdClass');
 
