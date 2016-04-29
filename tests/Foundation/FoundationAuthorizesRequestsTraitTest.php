@@ -3,6 +3,7 @@
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
@@ -67,12 +68,25 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
+    public function test_policy_method_may_be_guessed_and_normalized()
+    {
+        unset($_SERVER['_test.authorizes.trait.policy']);
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
+
+        (new FoundationTestAuthorizeTraitClass)->store(new FoundationAuthorizesRequestTestClass);
+
+        $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
+    }
+
     public function getBasicGate()
     {
-        $container = new Container;
-        Container::setInstance($container);
+        $container = Container::setInstance(new Container);
 
         $gate = new Gate($container, function () { return (object) ['id' => 1]; });
+
         $container->instance(GateContract::class, $gate);
 
         return $gate;
@@ -85,6 +99,13 @@ class FoundationAuthorizesRequestTestClass
 
 class FoundationAuthorizesRequestTestPolicy
 {
+    public function create()
+    {
+        $_SERVER['_test.authorizes.trait.policy'] = true;
+
+        return true;
+    }
+
     public function update()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
@@ -102,5 +123,10 @@ class FoundationAuthorizesRequestTestPolicy
 
 class FoundationTestAuthorizeTraitClass
 {
-    use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+    use AuthorizesRequests;
+
+    public function store($object)
+    {
+        $this->authorize($object);
+    }
 }
