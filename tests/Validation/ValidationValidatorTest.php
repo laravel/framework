@@ -1756,6 +1756,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @requires extension fileinfo
+     */
+    public function testValidateFile()
+    {
+        $trans = $this->getRealTranslator();
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', [], $uploadedFile);
+
+        $v = new Validator($trans, ['x' => '1'], ['x' => 'file']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'file']);
+        $v->setFiles(['x' => $file]);
+        $this->assertTrue($v->passes());
+    }
+
     public function testEmptyRulesSkipped()
     {
         $trans = $this->getRealTranslator();
