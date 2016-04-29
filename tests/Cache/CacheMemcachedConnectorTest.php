@@ -76,27 +76,6 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
         $this->assertSame($result, $memcached);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testExceptionThrownWithInvalidOptions()
-    {
-        if (! class_exists('Memcached')) {
-            $this->markTestSkipped('Memcached module not installed');
-        }
-
-        $invalidOptions = ['OPT_NO_BLOC' => true, 'OPT_CONNECT_TIMEOUT' => 2000];
-
-        $memcached = m::mock('stdClass');
-
-        $connector = $this->connectorMock();
-        $connector->expects($this->once())
-            ->method('getMemcached')
-            ->will($this->returnValue($memcached));
-
-        $this->connect($connector, false, $invalidOptions);
-    }
-
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
         if (! class_exists('Memcached')) {
