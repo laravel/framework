@@ -76,7 +76,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('fire')->once()->with(m::type(Attempting::class));
-        $user = $this->getMock('Illuminate\Contracts\Auth\Authenticatable');
+        $user = $this->createMock('Illuminate\Contracts\Auth\Authenticatable');
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->expects($this->once())->method('login')->with($this->equalTo($user));
