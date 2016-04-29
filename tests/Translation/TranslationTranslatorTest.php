@@ -40,7 +40,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
 
     public function testGetMethodProperlyLoadsAndRetrievesItem()
     {
-        $t = $this->getMock('Illuminate\Translation\Translator', null, [$this->getLoader(), 'en']);
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
         $this->assertEquals('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertEquals('foo', $t->get('foo::bar.foo'));
@@ -48,7 +48,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
 
     public function testGetMethodProperlyLoadsAndRetrievesItemWithLongestReplacementsFirst()
     {
-        $t = $this->getMock('Illuminate\Translation\Translator', null, [$this->getLoader(), 'en']);
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo :foobar']);
         $this->assertEquals('breeze bar taylor', $t->get('foo::bar.baz', ['foo' => 'bar', 'foobar' => 'taylor'], 'en'));
         $this->assertEquals('breeze foo bar baz taylor', $t->get('foo::bar.baz', ['foo' => 'foo bar baz', 'foobar' => 'taylor'], 'en'));
@@ -57,7 +57,7 @@ class TranslationTranslatorTest extends PHPUnit_Framework_TestCase
 
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
-        $t = $this->getMock('Illuminate\Translation\Translator', null, [$this->getLoader(), 'en']);
+        $t = new Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'breeze :foo']);
         $this->assertEquals('breeze bar', $t->get('foo.bar', ['foo' => 'bar']));
     }
