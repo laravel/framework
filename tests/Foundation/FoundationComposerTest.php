@@ -13,7 +13,7 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $composer = $this->getMock('Illuminate\Support\Composer', ['getProcess'], [$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__]);
+        $composer = $this->getMockBuilder('Illuminate\Support\Composer')->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
         $process = m::mock('stdClass');
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
@@ -25,7 +25,7 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
 
     public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent()
     {
-        $composer = $this->getMock('Illuminate\Support\Composer', ['getProcess'], [$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__]);
+        $composer = $this->getMockBuilder('Illuminate\Support\Composer')->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);
         $process = m::mock('stdClass');
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
