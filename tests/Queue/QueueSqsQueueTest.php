@@ -47,7 +47,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPopProperlyPopsJobOffOfSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
@@ -57,7 +57,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPopProperlyPopsJobOffOfSqsWithCustomJobCreator()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->createJobsUsing(function () { return 'job!'; });
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -69,7 +69,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
     {
         $now = Carbon\Carbon::now();
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getSeconds', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getSeconds')->with($now)->will($this->returnValue(5));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -80,7 +80,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getSeconds', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getSeconds', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getSeconds')->with($this->mockedDelay)->will($this->returnValue($this->mockedDelay));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -91,7 +91,7 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushProperlyPushesJobOntoSqs()
     {
-        $queue = $this->getMock('Illuminate\Queue\SqsQueue', ['createPayload', 'getQueue'], [$this->sqs, $this->queueName, $this->account]);
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);

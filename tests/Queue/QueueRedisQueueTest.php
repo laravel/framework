@@ -11,7 +11,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getRandomId'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['job' => 'foo', 'data' => ['data'], 'id' => 'foo', 'attempts' => 1]));
@@ -22,7 +22,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
-        $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getSeconds', 'getTime', 'getRandomId'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $queue->expects($this->once())->method('getSeconds')->with(1)->will($this->returnValue(1));
         $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
@@ -41,7 +41,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
         $date = Carbon\Carbon::now();
-        $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getSeconds', 'getTime', 'getRandomId'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getSeconds', 'getTime', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Redis\Database'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $queue->expects($this->once())->method('getSeconds')->with($date)->will($this->returnValue(1));
         $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));

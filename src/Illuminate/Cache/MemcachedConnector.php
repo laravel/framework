@@ -51,7 +51,7 @@ class MemcachedConnector
      */
     protected function getMemcached($connectionId, array $credentials, array $options)
     {
-        $memcached = empty($connectionId) ? new Memcached : new Memcached($connectionId);
+        $memcached = $this->createMemcachedInstance($connectionId);
 
         if (count($credentials) == 2) {
             $this->setCredentials($memcached, $credentials);
@@ -62,6 +62,17 @@ class MemcachedConnector
         }
 
         return $memcached;
+    }
+
+    /**
+     * Create the Memcached instance.
+     *
+     * @param  string|null  $connectionId
+     * @return \Memcached
+     */
+    protected function createMemcachedInstance($connectionId)
+    {
+        return empty($connectionId) ? new Memcached : new Memcached($connectionId);
     }
 
     /**
