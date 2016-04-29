@@ -474,6 +474,11 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $key = Arr::key($array, 300);
         $this->assertEquals(2, $key);
 
+        // Testing with multiple identical values must return the first key
+        $array = [100, 200, 300, 100];
+        $key = Arr::key($array, 100);
+        $this->assertEquals(0, $key);
+
         // Testing for a non-existant value
         $key = Arr::key($array, 900);
         $this->assertFalse($key);

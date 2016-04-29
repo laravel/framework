@@ -209,6 +209,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         // Testing with indexed key
         $this->assertEquals(2, array_key([100, 200, 300], 300));
 
+        // Testing with multiple identical values must return first key
+        $this->assertEquals(0, array_key([100, 200, 300, 100], 100));
+
         // Testing for a non-existant value
         $this->assertFalse(array_key([100, 200, 300], 900));
 
