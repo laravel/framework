@@ -303,4 +303,14 @@ trait ResetsPasswords
     {
         return property_exists($this, 'guard') ? $this->guard : null;
     }
+
+    /**
+     * Get the guest middleware for the application.
+     */
+    public function guestMiddleware()
+    {
+        $guard = $this->getGuard();
+
+        return $guard ? 'guest:'.$guard : 'guest';
+    }
 }
