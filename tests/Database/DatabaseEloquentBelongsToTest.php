@@ -89,6 +89,24 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $relation->associate(1);
     }
 
+    public function testDefaultEagerConstraintsWhenIncrementing()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', [0]);
+        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $relation->addEagerConstraints($models);
+    }
+
+    public function testDefaultEagerConstraintsWhenNotIncrementing()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent->incrementing = false;
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', [null]);
+        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $relation->addEagerConstraints($models);
+    }
+
     protected function getRelation($parent = null)
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -111,4 +129,9 @@ class EloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
 class AnotherEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value.two';
+}
+
+class MissingEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
+{
+    public $foreign_key = null;
 }
