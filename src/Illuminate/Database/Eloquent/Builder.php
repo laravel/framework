@@ -947,9 +947,46 @@ class Builder
         // the has query, and then copy the bindings from the "has" query to the main.
         $relationQuery = $relation->toBase();
 
+        $relationWheres = $relationQuery->wheres;
+
+        if (in_array(SoftDeletes::class, class_uses($hasQuery->model))) {
+            $relationWheres = $this->removeSoftDeletionWhereConditionIfNotNeeded($relationWheres, $hasQuery);
+        }
+
         $hasQuery->withoutGlobalScopes()->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
+            $relationWheres, $relationQuery->getBindings()
         );
+    }
+
+    /**
+     * Remove soft deletion "whereNull" condition if not needed.
+     *
+     * @param  array  $relationWheres
+     * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
+     * @return array
+     */
+    protected function removeSoftDeletionWhereConditionIfNotNeeded($relationWheres, Builder $hasQuery)
+    {
+        $deletedAtColumn = $hasQuery->model->getQualifiedDeletedAtColumn();
+
+        $deletedAtColumnWheres = array_filter($hasQuery->toBase()->wheres, function ($where) use ($deletedAtColumn) {
+            return isset($where['column']) && $where['column'] == $deletedAtColumn;
+        });
+
+        $deletedAtColumnWhereNotNull = array_filter($deletedAtColumnWheres, function ($where) use ($deletedAtColumn) {
+            return $where['type'] == 'NotNull';
+        });
+
+        // If no where conditions on the deleted_at column then we need to return all the
+        // records, so we remove the default condition added by the SoftDeletingScope.
+        // We also remove the condition if another was added checking for NOT NULL.
+        if (! $deletedAtColumnWheres || $deletedAtColumnWhereNotNull) {
+            $relationWheres = array_filter($relationWheres, function ($where) use ($deletedAtColumn) {
+                return $where['column'] != $deletedAtColumn;
+            });
+        }
+
+        return $relationWheres;
     }
 
     /**
