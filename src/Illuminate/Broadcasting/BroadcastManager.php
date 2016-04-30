@@ -77,8 +77,8 @@ class BroadcastManager implements FactoryContract
 
         $request = $request ?: $this->app['request'];
 
-        if ($request->has('socket')) {
-            return $request->input('socket');
+        if ($request->hasHeader('X-Socket-Id')) {
+            return $request->header('X-Socket-Id');
         }
 
         return $this->app['cache']->get(
@@ -101,7 +101,7 @@ class BroadcastManager implements FactoryContract
         $request = $request ?: $this->app['request'];
 
         $this->app['cache']->forever(
-            'pusher:socket:'.$request->session()->getId(), $request->socket
+            'pusher:socket:'.$request->session()->getId(), $request->socket_id
         );
     }
 
