@@ -306,6 +306,8 @@ trait ResetsPasswords
 
     /**
      * Get the guest middleware for the application.
+     *
+     * @return string
      */
     public function guestMiddleware()
     {
