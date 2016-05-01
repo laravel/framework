@@ -405,6 +405,31 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     /**
      * @group test
      */
+    public function testWhereHasWithNestedDeletedRelationshipAndOnlyTrashedCondition()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+        $post->delete();
+
+        $users = SoftDeletesTestUser::has('posts')->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+            $q->onlyTrashed();
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+            $q->withTrashed();
+        })->get();
+        $this->assertEquals(1, count($users));
+    }
+
+    /**
+     * @group test
+     */
     public function testWhereHasWithNestedDeletedRelationship()
     {
         $this->createUsers();

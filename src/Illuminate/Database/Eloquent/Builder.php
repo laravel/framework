@@ -66,6 +66,13 @@ class Builder
     protected $scopes = [];
 
     /**
+     * Removed global scopes.
+     *
+     * @var array
+     */
+    protected $removedScopes = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -102,17 +109,13 @@ class Builder
      */
     public function withoutGlobalScope($scope)
     {
-        if (is_string($scope)) {
-            unset($this->scopes[$scope]);
-
-            return $this;
+        if (! is_string($scope)) {
+            $scope = get_class($scope);
         }
 
-        foreach ($this->scopes as $key => $value) {
-            if ($scope instanceof $value) {
-                unset($this->scopes[$key]);
-            }
-        }
+        unset($this->scopes[$scope]);
+
+        $this->removedScopes[] = $scope;
 
         return $this;
     }
@@ -134,6 +137,16 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Get an array of global scopes that were removed from the query.
+     *
+     * @return array
+     */
+    public function removedScopes()
+    {
+        return $this->removedScopes;
     }
 
     /**
@@ -942,11 +955,13 @@ class Builder
      */
     protected function mergeModelDefinedRelationWheresToHasQuery(Builder $hasQuery, Relation $relation)
     {
+        $removedScopes = $hasQuery->removedScopes();
+
+        $relationQuery = $relation->withoutGlobalScopes($removedScopes)->toBase();
+
         // Here we have the "has" query and the original relation. We need to copy over any
         // where clauses the developer may have put in the relationship function over to
         // the has query, and then copy the bindings from the "has" query to the main.
-        $relationQuery = $relation->toBase();
-
         $hasQuery->withoutGlobalScopes()->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
