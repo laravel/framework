@@ -89,11 +89,28 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $relation->associate(1);
     }
 
-    protected function getRelation($parent = null)
+    public function testDefaultEagerConstraintsWhenIncrementing()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([0]));
+        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $relation->addEagerConstraints($models);
+    }
+
+    public function testDefaultEagerConstraintsWhenNotIncrementing()
+    {
+        $relation = $this->getRelation(null, false);
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $relation->addEagerConstraints($models);
+    }
+
+    protected function getRelation($parent = null, $incrementing = true)
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related->incrementing = $incrementing;
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
@@ -111,4 +128,9 @@ class EloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
 class AnotherEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value.two';
+}
+
+class MissingEloquentBelongsToModelStub extends Illuminate\Database\Eloquent\Model
+{
+    public $foreign_key = null;
 }
