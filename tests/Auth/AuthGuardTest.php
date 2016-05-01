@@ -250,8 +250,12 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
 
     public function testOnceUsingIdFailure()
     {
-        $guard = $this->getGuard();
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\Guard', [$provider, $session, $request])->makePartial();
+
         $guard->getProvider()->shouldReceive('retrieveById')->once()->with(11)->andReturn(null);
+        $guard->shouldNotReceive('setUser');
+
         $this->assertFalse($guard->onceUsingId(11));
     }
 
