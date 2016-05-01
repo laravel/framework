@@ -240,7 +240,9 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\Guard', [$provider, $session, $request])->makePartial();
-        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user = m::mock('Illuminate\Contracts\Auth\Authenticatable'));
+
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
         $guard->shouldReceive('login')->once()->with($user, false);
 
         $this->assertEquals($user, $guard->loginUsingId(10));
