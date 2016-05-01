@@ -16,6 +16,10 @@ class DetectEnvironment
      */
     public function bootstrap(Application $app)
     {
+        $app->detectEnvironment(function () use ($config) {
+            return env('APP_ENV', 'production');
+        });
+
         $this->checkForSpecificEnvironmentFile($app);
 
         try {
@@ -33,11 +37,7 @@ class DetectEnvironment
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if (! env('APP_ENV')) {
-            return;
-        }
-
-        $file = $app->environmentFile().'.'.env('APP_ENV');
+        $file = $app->environmentFile().'.'.$app->environment();
 
         if (file_exists($app->environmentPath().'/'.$file)) {
             $app->loadEnvironmentFrom($file);
