@@ -98,8 +98,8 @@ class ViewServiceProvider extends ServiceProvider
         $matches = call_user_func_array('array_intersect_assoc', $paths);
 
         $root = '/';
-        for ($i = 0; isset($matches[ $i ]); $i += 1) {
-            $root .= $matches[ $i ].'/';
+        for ($i = 0; isset($matches[$i]); $i += 1) {
+            $root .= $matches[$i].'/';
         }
 
         return $root;
