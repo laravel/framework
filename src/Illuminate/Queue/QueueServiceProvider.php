@@ -11,10 +11,12 @@ use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
-use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Illuminate\Queue\Failed\DatabaseFailedJobAttemptProvider;
+use Illuminate\Queue\Failed\NullFailedJobAttemptProvider;
 
 class QueueServiceProvider extends ServiceProvider
 {
@@ -78,7 +80,7 @@ class QueueServiceProvider extends ServiceProvider
         $this->registerRestartCommand();
 
         $this->app->singleton('queue.worker', function ($app) {
-            return new Worker($app['queue'], $app['queue.failer'], $app['events']);
+            return new Worker($app['queue'], $app['queue.failer'], $app['queue.attempts.failer'], $app['events']);
         });
     }
 
@@ -247,6 +249,15 @@ class QueueServiceProvider extends ServiceProvider
                 return new NullFailedJobProvider;
             }
         });
+        $this->app->singleton('queue.attempts.failer', function ($app) {
+            $config = $app['config']['queue.failed'];
+
+            if (isset($config['attempts_table'])) {
+                return new DatabaseFailedJobAttemptProvider($app['db'], $config['database'], $config['attempts_table']);
+            } else {
+                return new NullFailedJobAttemptProvider;
+            }
+        });
     }
 
     /**
@@ -270,8 +281,8 @@ class QueueServiceProvider extends ServiceProvider
     {
         return [
             'queue', 'queue.worker', 'queue.listener', 'queue.failer',
-            'command.queue.work', 'command.queue.listen',
-            'command.queue.restart', 'queue.connection',
+            'queue.attempts.failer', 'command.queue.work',
+            'command.queue.listen', 'command.queue.restart', 'queue.connection',
         ];
     }
 }

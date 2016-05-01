@@ -62,6 +62,24 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException RuntimeException
      */
+    public function testWorkerLogsExceptionWhenJobExceptionIsThrown()
+    {
+        $worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'), null, $attempts = m::mock('Illuminate\Queue\Failed\FailedJobAttemptProviderInterface'));
+        $job = m::mock('Illuminate\Contracts\Queue\Job');
+        $e = new RuntimeException;
+        $job->shouldReceive('fire')->once()->andReturnUsing(function () use ($e) { throw $e; });
+        $job->shouldReceive('getQueue')->once()->andReturn('queue');
+        $job->shouldReceive('getRawBody')->once()->andReturn('body');
+        $job->shouldReceive('isDeleted')->once()->andReturn(false);
+        $job->shouldReceive('release')->once()->with(5);
+        $attempts->shouldReceive('log')->once()->with('connection', 'queue', 'body', $e);
+
+        $worker->process('connection', $job, 0, 5);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
     public function testJobIsReleasedWhenExceptionIsThrown()
     {
         $worker = new Illuminate\Queue\Worker(m::mock('Illuminate\Queue\QueueManager'));

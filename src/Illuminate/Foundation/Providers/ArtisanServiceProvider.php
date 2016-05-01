@@ -11,6 +11,7 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
+use Illuminate\Queue\Console\FailedAttemptsTableCommand;
 use Illuminate\Foundation\Console\TinkerCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
@@ -90,6 +91,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
+        'QueueFailedAttemptsTable' => 'command.queue.failed-attempts-table',
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
         'SeederMake' => 'command.seeder.make',
@@ -377,6 +379,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.queue.failed-table', function ($app) {
             return new FailedTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueFailedAttemptsTableCommand()
+    {
+        $this->app->singleton('command.queue.failed-attempts-table', function ($app) {
+            return new FailedAttemptsTableCommand($app['files'], $app['composer']);
         });
     }
 

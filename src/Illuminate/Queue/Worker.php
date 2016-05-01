@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
+use Illuminate\Queue\Failed\FailedJobAttemptProviderInterface;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -26,6 +27,13 @@ class Worker
      * @var \Illuminate\Queue\Failed\FailedJobProviderInterface
      */
     protected $failer;
+
+    /**
+     * The failed job attempt provider implementation.
+     *
+     * @var \Illuminate\Queue\Failed\FailedJobAttemptProviderInterface
+     */
+    protected $attemptFailer;
 
     /**
      * The event dispatcher instance.
@@ -58,9 +66,11 @@ class Worker
      */
     public function __construct(QueueManager $manager,
                                 FailedJobProviderInterface $failer = null,
+                                FailedJobAttemptProviderInterface $attemptFailer = null,
                                 Dispatcher $events = null)
     {
         $this->failer = $failer;
+        $this->attemptFailer = $attemptFailer;
         $this->events = $events;
         $this->manager = $manager;
     }
@@ -227,6 +237,8 @@ class Worker
      */
     protected function handleJobException($connection, Job $job, $delay, $e)
     {
+        $this->logFailedJobAttempt($connection, $job, $e);
+
         // If we catch an exception, we will attempt to release the job back onto
         // the queue so it is not lost. This will let is be retried at a later
         // time by another listener (or the same one). We will do that here.
@@ -312,6 +324,21 @@ class Worker
         }
 
         return ['job' => $job, 'failed' => true];
+    }
+
+    /**
+     * Log a failed job attempt into storage.
+     *
+     * @param  string  $connection
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function logFailedJobAttempt($connection, Job $job, $e)
+    {
+        if ($this->attemptFailer) {
+            $this->attemptFailer->log($connection, $job->getQueue(), $job->getRawBody(), $e);
+        }
     }
 
     /**
