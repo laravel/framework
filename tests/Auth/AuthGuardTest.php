@@ -248,6 +248,17 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($user, $guard->loginUsingId(10));
     }
 
+    public function testLoginUsingIdFailure()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\Guard', [$provider, $session, $request])->makePartial();
+
+        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(11)->andReturn(null);
+        $guard->shouldNotReceive('login');
+
+        $this->assertFalse($guard->loginUsingId(11));
+    }
+
     public function testOnceUsingIdFailure()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
