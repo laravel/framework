@@ -16,14 +16,12 @@ class DetectEnvironment
      */
     public function bootstrap(Application $app)
     {
-        if (! $app->configurationIsCached()) {
-            $this->checkForSpecificEnvironmentFile($app);
+        $this->checkForSpecificEnvironmentFile($app);
 
-            try {
-                (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-            } catch (InvalidPathException $e) {
-                //
-            }
+        try {
+            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+        } catch (InvalidPathException $e) {
+            //
         }
     }
 
