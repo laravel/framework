@@ -24,6 +24,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The count of self joins.
+     *
+     * @var integer
+     */
+    static protected $selfJoinCount = 0;
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -99,7 +106,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'self_'.md5(static::$selfJoinCount++);
     }
 
     /**
