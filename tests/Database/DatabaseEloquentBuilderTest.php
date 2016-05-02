@@ -553,7 +553,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
 
         $nestedSql = preg_replace($aliasRegex, $alias, $nestedSql);
         $dotSql = preg_replace($aliasRegex, $alias, $dotSql);
@@ -569,7 +569,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(self_[a-f0-9]{32})(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 

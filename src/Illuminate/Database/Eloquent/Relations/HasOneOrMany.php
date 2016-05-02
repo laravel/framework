@@ -106,7 +106,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(static::$selfJoinCount++);
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
