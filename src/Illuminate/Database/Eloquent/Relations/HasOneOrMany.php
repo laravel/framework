@@ -26,9 +26,9 @@ abstract class HasOneOrMany extends Relation
     /**
      * The count of self joins.
      *
-     * @var integer
+     * @var int
      */
-    static protected $selfJoinCount = 0;
+    protected static $selfJoinCount = 0;
 
     /**
      * Create a new has one or many relationship instance.

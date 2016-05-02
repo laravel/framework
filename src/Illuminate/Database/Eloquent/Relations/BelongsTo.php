@@ -33,9 +33,9 @@ class BelongsTo extends Relation
     /**
      * The count of self joins.
      *
-     * @var integer
+     * @var int
      */
-    static protected $selfJoinCount = 0;
+    protected static $selfJoinCount = 0;
 
     /**
      * Create a new belongs to relationship instance.

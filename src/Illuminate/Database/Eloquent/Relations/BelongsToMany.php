@@ -70,9 +70,9 @@ class BelongsToMany extends Relation
     /**
      * The count of self joins.
      *
-     * @var integer
+     * @var int
      */
-    static protected $selfJoinCount = 0;
+    protected static $selfJoinCount = 0;
 
     /**
      * Create a new belongs to many relationship instance.
