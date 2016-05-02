@@ -619,7 +619,7 @@ class Router implements RegistrarContract
             return false;
         }
 
-        return is_string($action) || is_string(isset($action['uses']) ? $action['uses'] : null);
+        return is_string($action) || isset($action['uses']) && is_string($action['uses']);
     }
 
     /**
