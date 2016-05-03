@@ -61,7 +61,10 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $validOptions = ['OPT_NO_BLOCK' => true, 'OPT_CONNECT_TIMEOUT' => 2000];
+        $validOptions = [
+            Memcached::OPT_NO_BLOCK => true,
+            Memcached::OPT_CONNECT_TIMEOUT => 2000,
+        ];
 
         $memcached = $this->memcachedMockWithAddServer();
         $memcached->shouldReceive('setOptions')->once()->andReturn(true);
