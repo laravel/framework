@@ -761,7 +761,7 @@ class Builder
     {
         return $this->where($column, $operator, $value, 'or');
     }
-    
+
     /**
      * Add a relationship count select to the query.
      *
