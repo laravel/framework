@@ -69,6 +69,10 @@ class DatabaseEloquentGlobalScopesTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentClosureGlobalScopesWithOrTestModel();
 
+        $query = $model->newQuery();
+        $this->assertEquals('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+
         $query = $model->newQuery()->where('col1', 'val1')->orWhere('col2', 'val2');
         $this->assertEquals('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
