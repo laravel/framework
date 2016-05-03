@@ -761,6 +761,27 @@ class Builder
     {
         return $this->where($column, $operator, $value, 'or');
     }
+    
+    /**
+     * Add a relationship count select to the query.
+     *
+     * @param  string  $relation
+     * @param  string  $as
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function selectCount($relation, $as, Closure $callback = null)
+    {
+        $relation = $this->getHasRelationQuery($relation);
+
+        $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
+
+        if ($callback) {
+            call_user_func($callback, $query);
+        }
+
+        return $this->selectSub($query->getQuery(), $as);
+    }
 
     /**
      * Add a relationship count / exists condition to the query.
