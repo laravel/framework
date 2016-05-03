@@ -54,7 +54,7 @@ class SparkPostTransport extends Transport
                 'content' => [
                     'html' => $message->getBody(),
                     'from' => $this->getFrom($message),
-                    'reply_to' => $this->getReplyTo($message), 
+                    'reply_to' => $this->getReplyTo($message),
                     'subject' => $message->getSubject(),
                 ],
             ],
@@ -108,7 +108,7 @@ class SparkPostTransport extends Transport
     }
 
     /**
-     * Get the 'reply_to' headers and format as required by sparkpost
+     * Get the 'reply_to' headers and format as required by SparkPost.
      *
      * @param  Swift_Mime_Message  $message
      * @return string
