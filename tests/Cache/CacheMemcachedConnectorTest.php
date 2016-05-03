@@ -63,7 +63,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
         $validOptions = [
             Memcached::OPT_NO_BLOCK => true,
-            Memcached::OPT_CONNECT_TIMEOUT => 2000
+            Memcached::OPT_CONNECT_TIMEOUT => 2000,
         ];
 
         $memcached = $this->memcachedMockWithAddServer();
