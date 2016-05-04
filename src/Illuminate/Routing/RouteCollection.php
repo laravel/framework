@@ -111,6 +111,36 @@ class RouteCollection implements Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Prepare the route collection instance for serialization.
+	 *
+	 * @return void
+	 */
+	public function prepareForSerialization()
+	{
+		foreach ($this->routes as $routes)
+		{
+			$this->prepareRoutesForSerialization($routes);
+		}
+
+		$this->prepareRoutesForSerialization($this->allRoutes);
+		$this->prepareRoutesForSerialization($this->nameList);
+		$this->prepareRoutesForSerialization($this->actionList);
+	}
+
+	/**
+	 * @param array $routes Array of routes
+	 *
+	 * @return void
+	 */
+	protected function prepareRoutesForSerialization($routes)
+	{
+		foreach ($routes as $route)
+		{
+			$route->prepareForSerialization();
+		}
+	}
+
+	/**
 	 * Find the first route matching a given request.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
