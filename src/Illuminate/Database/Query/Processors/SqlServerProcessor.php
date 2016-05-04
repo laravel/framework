@@ -20,13 +20,12 @@ class SqlServerProcessor extends Processor
         $connection = $query->getConnection();
         $connection->insert($sql, $values);
         if ($connection->getConfig('odbc') === true) {
-            $result = $connection->select("SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid");
-            if (!$result) {
+            $result = $connection->select('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
+            if (! $result) {
                 throw new Exception('Error retrieving lastInsertId');
             }
             $id = $result[0]->insertid;
-        }
-        else {
+        } else {
             $id = $connection->getPdo()->lastInsertId();
         }
 
