@@ -95,7 +95,7 @@ class WorkCommand extends Command
 
         if ($timeout > 0) {
 
-            declare(ticks = 1);
+            declare(ticks=1);
 
             pcntl_signal(SIGALRM, function () {
                 throw new TimeoutException();

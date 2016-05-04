@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Console;
 
-use Exception;
+use RuntimeException;
 
-class TimeoutException extends Exception
+class TimeoutException extends RuntimeException
 {
 }

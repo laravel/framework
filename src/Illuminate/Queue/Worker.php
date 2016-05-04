@@ -154,7 +154,6 @@ class Worker
         // then immediately return back out. If there is no job on the queue
         // we will "sleep" the worker for the specified number of seconds.
         if (! is_null($job)) {
-
             if ($timeout > 0) {
                 pcntl_alarm($timeout);
             }
