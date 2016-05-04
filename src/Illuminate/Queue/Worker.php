@@ -72,18 +72,19 @@ class Worker
      * @param  string  $queue
      * @param  int     $delay
      * @param  int     $memory
+     * @param  int     $timeout
      * @param  int     $sleep
      * @param  int     $maxTries
      * @return array
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 0, $sleep = 3, $maxTries = 0)
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
             if ($this->daemonShouldRun()) {
                 $this->runNextJobForDaemon(
-                    $connectionName, $queue, $delay, $sleep, $maxTries
+                    $connectionName, $queue, $delay, $timeout, $sleep, $maxTries
                 );
             } else {
                 $this->sleep($sleep);
@@ -101,14 +102,15 @@ class Worker
      * @param  string  $connectionName
      * @param  string  $queue
      * @param  int  $delay
+     * @param  int  $timeout
      * @param  int  $sleep
      * @param  int  $maxTries
      * @return void
      */
-    protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
+    protected function runNextJobForDaemon($connectionName, $queue, $delay, $timeout, $sleep, $maxTries)
     {
         try {
-            $this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+            $this->pop($connectionName, $queue, $delay, $timeout, $sleep, $maxTries);
         } catch (Exception $e) {
             if ($this->exceptions) {
                 $this->exceptions->report($e);
@@ -137,11 +139,12 @@ class Worker
      * @param  string  $connectionName
      * @param  string  $queue
      * @param  int     $delay
+     * @param  int     $timeout
      * @param  int     $sleep
      * @param  int     $maxTries
      * @return array
      */
-    public function pop($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
+    public function pop($connectionName, $queue = null, $delay = 0, $timeout = 0, $sleep = 3, $maxTries = 0)
     {
         $connection = $this->manager->connection($connectionName);
 
@@ -151,9 +154,21 @@ class Worker
         // then immediately return back out. If there is no job on the queue
         // we will "sleep" the worker for the specified number of seconds.
         if (! is_null($job)) {
-            return $this->process(
-                $this->manager->getName($connectionName), $job, $maxTries, $delay
-            );
+
+            if ($timeout > 0) {
+                pcntl_alarm($timeout);
+            }
+            try {
+                $response = $this->process(
+                    $this->manager->getName($connectionName), $job, $maxTries, $delay
+                );
+            } finally {
+                if ($timeout > 0) {
+                    pcntl_alarm(0);
+                }
+            }
+
+            return $response;
         }
 
         $this->sleep($sleep);
