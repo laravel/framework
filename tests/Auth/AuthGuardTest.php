@@ -249,21 +249,50 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard->login($user, true);
     }
 
-    public function testLoginUsingIdStoresInSessionAndLogsInWithUser()
+    public function testLoginUsingIdLogsInWithUser()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $guard = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['login', 'user'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $guard->getSession()->shouldReceive('set')->once()->with($guard->getName(), 10);
-        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user = m::mock('Illuminate\Contracts\Auth\Authenticatable'));
-        $guard->expects($this->once())->method('login')->with($this->equalTo($user), $this->equalTo(false))->will($this->returnValue($user));
+
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
+        $guard->shouldReceive('login')->once()->with($user, false);
 
         $this->assertEquals($user, $guard->loginUsingId(10));
     }
 
+    public function testLoginUsingIdFailure()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+
+        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(11)->andReturn(null);
+        $guard->shouldNotReceive('login');
+
+        $this->assertFalse($guard->loginUsingId(11));
+    }
+
+    public function testOnceUsingIdSetsUser()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
+        $guard->shouldReceive('setUser')->once()->with($user);
+
+        $this->assertTrue($guard->onceUsingId(10));
+    }
+
     public function testOnceUsingIdFailure()
     {
-        $guard = $this->getGuard();
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
+
         $guard->getProvider()->shouldReceive('retrieveById')->once()->with(11)->andReturn(null);
+        $guard->shouldNotReceive('setUser');
+
         $this->assertFalse($guard->onceUsingId(11));
     }
 

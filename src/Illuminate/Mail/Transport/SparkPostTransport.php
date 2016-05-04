@@ -54,6 +54,7 @@ class SparkPostTransport extends Transport
                 'content' => [
                     'html' => $message->getBody(),
                     'from' => $this->getFrom($message),
+                    'reply_to' => $this->getReplyTo($message),
                     'subject' => $message->getSubject(),
                 ],
             ],
@@ -106,6 +107,19 @@ class SparkPostTransport extends Transport
         return array_map(function ($email, $name) {
             return compact('name', 'email');
         }, array_keys($message->getFrom()), $message->getFrom())[0];
+    }
+
+    /**
+     * Get the 'reply_to' headers and format as required by SparkPost.
+     *
+     * @param  Swift_Mime_Message  $message
+     * @return string
+     */
+    protected function getReplyTo(Swift_Mime_Message $message)
+    {
+        if (is_array($message->getReplyTo())) {
+            return current($message->getReplyTo()).' <'.key($message->getReplyTo()).'>';
+        }
     }
 
     /**
