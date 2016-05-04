@@ -97,7 +97,7 @@ class WorkCommand extends Command
 
         if ($timeout > 0) {
 
-            if (!extension_loaded('pcntl')) {
+            if (! extension_loaded('pcntl')) {
                 throw new MissingExtensionException('The pcntl extension is required to use the timeout option.');
             }
 
