@@ -3,6 +3,8 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
+use Illuminate\Queue\MissingExtensionException;
+use Illuminate\Queue\TimeoutException;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
@@ -94,6 +96,10 @@ class WorkCommand extends Command
         $timeout = $this->option('timeout');
 
         if ($timeout > 0) {
+
+            if (!extension_loaded('pcntl')) {
+                throw new MissingExtensionException('The pcntl extension is required to use the timeout option.');
+            }
 
             declare(ticks=1);
 
