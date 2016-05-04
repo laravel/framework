@@ -226,7 +226,7 @@ class Event
             $command = $this->command.$redirect.$output.' 2>&1 &';
         }
 
-        return $this->user ? 'sudo -u '.$this->user.' '.$command : $command;
+        return $this->user && ! windows_os() ? 'sudo -u '.$this->user.' -- sh -c \''.$command.'\'' : $command;
     }
 
     /**
