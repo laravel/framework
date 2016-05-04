@@ -1656,6 +1656,61 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateImageDimensions()
+    {
+        // Knowing that demo image.gif has width = 3 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '');
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:min_width=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:min_width=5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:max_width=10']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:max_width=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:min_height=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:min_height=5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:max_height=10']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:max_height=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:width=3']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:height=2']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:min_height=2,ratio=3/2']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'image_dimensions:ratio=1/1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+    }
+
     /**
      * @requires extension fileinfo
      */
