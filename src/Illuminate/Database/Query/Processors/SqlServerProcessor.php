@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Processors;
 
-use Illuminate\Database\Query\Builder;
 use Exception;
+use Illuminate\Database\Query\Builder;
 
 class SqlServerProcessor extends Processor
 {
