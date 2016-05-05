@@ -14,12 +14,12 @@ class CacheManagerTest extends PHPUnit_Framework_TestCase
     {
         $cacheManager = new CacheManager([
             'config' => [
-                'cache.stores.' . __CLASS__ => [
-                    'driver' => __CLASS__
-                ]
-            ]
+                'cache.stores.'.__CLASS__ => [
+                    'driver' => __CLASS__,
+                ],
+            ],
         ]);
-        $driver       = function () {
+        $driver = function () {
             return $this;
         };
         $cacheManager->extend(__CLASS__, $driver);
