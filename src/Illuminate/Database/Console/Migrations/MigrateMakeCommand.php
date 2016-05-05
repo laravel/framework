@@ -71,6 +71,7 @@ class MigrateMakeCommand extends BaseCommand
 
         if (! $table && is_string($create)) {
             $table = $create;
+
             $create = true;
         }
 
