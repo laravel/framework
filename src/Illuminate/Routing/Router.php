@@ -466,8 +466,10 @@ class Router implements RegistrarContract
     {
         if (isset($new['namespace'])) {
             return isset($old['namespace'])
-                    ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
-                    : trim($new['namespace'], '\\');
+                ? strpos($new['namespace'], '\\') === 0
+                    ? trim($new['namespace'], '\\')
+                    : trim($old['namespace'], '\\') . '\\' . trim($new['namespace'], '\\')
+                : rtrim($new['namespace'], '\\');
         }
 
         return isset($old['namespace']) ? $old['namespace'] : null;
