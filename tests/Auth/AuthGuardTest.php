@@ -282,7 +282,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
         $guard->shouldReceive('setUser')->once()->with($user);
 
-        $this->assertTrue($guard->onceUsingId(10));
+        $this->assertEquals($user, $guard->onceUsingId(10));
     }
 
     public function testOnceUsingIdFailure()
