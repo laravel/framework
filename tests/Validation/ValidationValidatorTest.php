@@ -2694,22 +2694,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $trans = $this->getRealTranslator();
 
         $v = new Validator($trans, ['foo' => [
-            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+            ['start' => '2016-04-19', 'end' => '2017-04-19'],
         ]], ['foo.*.start' => ['before:foo.*.end']]);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [
-            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+            ['start' => '2016-04-19', 'end' => '2017-04-19'],
         ]], ['foo.*.end' => ['before:foo.*.start']]);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['foo' => [
-            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+            ['start' => '2016-04-19', 'end' => '2017-04-19'],
         ]], ['foo.*.end' => ['after:foo.*.start']]);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [
-            ['start' => '2016-04-19', 'end' => '2046-04-19'],
+            ['start' => '2016-04-19', 'end' => '2017-04-19'],
         ]], ['foo.*.start' => ['after:foo.*.end']]);
         $this->assertTrue($v->fails());
     }
