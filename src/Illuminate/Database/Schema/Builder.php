@@ -244,7 +244,7 @@ class Builder
         if ($container && $container->bound('Illuminate\Database\Schema\Blueprint')) {
             return $container->make('Illuminate\Database\Schema\Blueprint', [$table, $callback]);
         }
-        
+
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback);
         }
