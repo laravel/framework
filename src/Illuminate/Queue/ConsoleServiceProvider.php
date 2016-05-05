@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\RetryCommand;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Console\FlushFailedCommand;
+use Illuminate\Queue\Console\FlushFailedAttemptsCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand;
 
 class ConsoleServiceProvider extends ServiceProvider
@@ -40,9 +41,14 @@ class ConsoleServiceProvider extends ServiceProvider
             return new FlushFailedCommand;
         });
 
+        $this->app->singleton('command.queue.attempts.flush', function () {
+            return new FlushFailedAttemptsCommand;
+        });
+
         $this->commands(
             'command.queue.failed', 'command.queue.retry',
-            'command.queue.forget', 'command.queue.flush'
+            'command.queue.forget', 'command.queue.flush',
+            'command.queue.attempts.flush'
         );
     }
 
