@@ -158,7 +158,7 @@ class Worker
                 pcntl_alarm($timeout);
             }
             try {
-                $response = $this->process(
+                return $this->process(
                     $this->manager->getName($connectionName), $job, $maxTries, $delay
                 );
             } finally {
@@ -166,8 +166,6 @@ class Worker
                     pcntl_alarm(0);
                 }
             }
-
-            return $response;
         }
 
         $this->sleep($sleep);

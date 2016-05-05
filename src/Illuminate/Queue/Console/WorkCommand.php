@@ -96,16 +96,15 @@ class WorkCommand extends Command
         $timeout = $this->option('timeout');
 
         if ($timeout > 0) {
+            if (extension_loaded('pcntl') && function_exists('pcntl_alarm') && function_exists('pcntl_signal')) {
+                declare(ticks=1);
 
-            if (! extension_loaded('pcntl')) {
+                pcntl_signal(SIGALRM, function () {
+                    throw new TimeoutException();
+                }, true);
+            } else {
                 throw new MissingExtensionException('The pcntl extension is required to use the timeout option.');
             }
-
-            declare(ticks=1);
-
-            pcntl_signal(SIGALRM, function () {
-                throw new TimeoutException();
-            }, true);
         }
 
         if ($daemon) {
