@@ -3114,7 +3114,11 @@ class Validator implements ValidatorContract
      */
     protected function callClassBasedExtension($callback, $parameters)
     {
-        list($class, $method) = explode('@', $callback);
+        if (Str::contains($callback, '@')) {
+            list($class, $method) = explode('@', $callback);
+        } else {
+            list($class, $method) = [$callback, '__invoke'];
+        }
 
         return call_user_func_array([$this->container->make($class), $method], $parameters);
     }
