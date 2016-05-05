@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\App;
 
 class Builder
 {
@@ -238,6 +239,12 @@ class Builder
      */
     protected function createBlueprint($table, Closure $callback = null)
     {
+        $container = App::make('Illuminate\Container\Container');
+
+        if ($container && $container->bound('Illuminate\Database\Schema\Blueprint')) {
+            return $container->make('Illuminate\Database\Schema\Blueprint', [$table, $callback]);
+        }
+
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback);
         }
