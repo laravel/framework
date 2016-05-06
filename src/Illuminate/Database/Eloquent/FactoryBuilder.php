@@ -99,9 +99,11 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         $results = [];
+        
         for ($i = 0; $i < $this->amount; $i++) {
             $results[] = $this->makeInstance($attributes);
         }
+        
         return new Collection($results);
     }
 
