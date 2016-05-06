@@ -270,12 +270,12 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         return [
             'queue' => $queue,
-            'payload' => $payload,
             'attempts' => $attempts,
             'reserved' => 0,
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->getTime(),
+            'payload' => $payload,
         ];
     }
 
