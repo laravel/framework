@@ -77,18 +77,14 @@ class FactoryBuilder
      * Create a collection of models and persist them to the database.
      *
      * @param  array  $attributes
-     * @return mixed
+     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model[]
      */
     public function create(array $attributes = [])
     {
         $results = $this->make($attributes);
 
-        if ($this->amount === 1) {
-            $results->save();
-        } else {
-            foreach ($results as $result) {
-                $result->save();
-            }
+        foreach ($results as $result) {
+            $result->save();
         }
 
         return $results;
@@ -98,21 +94,17 @@ class FactoryBuilder
      * Create a collection of models.
      *
      * @param  array  $attributes
-     * @return mixed
+     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model[]
      */
     public function make(array $attributes = [])
     {
-        if ($this->amount === 1) {
-            return $this->makeInstance($attributes);
-        } else {
-            $results = [];
+        $results = [];
 
-            for ($i = 0; $i < $this->amount; $i++) {
-                $results[] = $this->makeInstance($attributes);
-            }
-
-            return new Collection($results);
+        for ($i = 0; $i < $this->amount; $i++) {
+            $results[] = $this->makeInstance($attributes);
         }
+
+        return new Collection($results);
     }
 
     /**
