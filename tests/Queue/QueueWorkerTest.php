@@ -11,7 +11,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function testJobIsPoppedOffQueueAndProcessed()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
+        $worker = $this->getMockBuilder('Illuminate\Queue\Worker')->setMethods(['process'])->setConstructorArgs([$manager = m::mock('Illuminate\Queue\QueueManager')])->getMock();
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
@@ -23,7 +23,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function testJobIsPoppedOffFirstQueueInListAndProcessed()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', ['process'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
+        $worker = $this->getMockBuilder('Illuminate\Queue\Worker')->setMethods(['process'])->setConstructorArgs([$manager = m::mock('Illuminate\Queue\QueueManager')])->getMock();
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $manager->shouldReceive('getName')->andReturn('connection');
         $job = m::mock('Illuminate\Contracts\Queue\Job');
@@ -36,7 +36,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
 
     public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
     {
-        $worker = $this->getMock('Illuminate\Queue\Worker', ['process', 'sleep'], [$manager = m::mock('Illuminate\Queue\QueueManager')]);
+        $worker = $this->getMockBuilder('Illuminate\Queue\Worker')->setMethods(['process', 'sleep'])->setConstructorArgs([$manager = m::mock('Illuminate\Queue\QueueManager')])->getMock();
         $manager->shouldReceive('connection')->once()->with('connection')->andReturn($connection = m::mock('StdClass'));
         $connection->shouldReceive('pop')->once()->with('queue')->andReturn(null);
         $worker->expects($this->never())->method('process');
