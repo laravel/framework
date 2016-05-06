@@ -19,18 +19,33 @@ class SqlServerProcessor extends Processor
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {
         $connection = $query->getConnection();
+
         $connection->insert($sql, $values);
+
         if ($connection->getConfig('odbc') === true) {
-            $result = $connection->select('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
-            if (! $result) {
-                throw new Exception('Error retrieving lastInsertId');
-            }
-            $id = $result[0]->insertid;
+            $id = $this->processInsertGetIdForOdbc($connection);
         } else {
             $id = $connection->getPdo()->lastInsertId();
         }
 
         return is_numeric($id) ? (int) $id : $id;
+    }
+
+    /**
+     * Process an "insert get ID" query for ODBC.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return int
+     */
+    protected function processInsertGetIdForOdbc($connection)
+    {
+        $result = $connection->select('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
+
+        if (! $result) {
+            throw new Exception('Unable to retrieve lastInsertID for ODBC.');
+        }
+
+        return $result[0]->insertid;
     }
 
     /**
