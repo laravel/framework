@@ -82,7 +82,7 @@ class FactoryBuilder
     public function create(array $attributes = [])
     {
         $results = $this->make($attributes);
-        
+
         foreach ($results as $result) {
             $result->save();
         }
@@ -99,11 +99,11 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         $results = [];
-        
+
         for ($i = 0; $i < $this->amount; $i++) {
             $results[] = $this->makeInstance($attributes);
         }
-        
+
         return new Collection($results);
     }
 
