@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Processors;
 
+use Exception;
 use Illuminate\Database\Query\Builder;
 
 class SqlServerProcessor extends Processor
@@ -17,9 +18,17 @@ class SqlServerProcessor extends Processor
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {
-        $query->getConnection()->insert($sql, $values);
-
-        $id = $query->getConnection()->getPdo()->lastInsertId();
+        $connection = $query->getConnection();
+        $connection->insert($sql, $values);
+        if ($connection->getConfig('odbc') === true) {
+            $result = $connection->select('SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid');
+            if (! $result) {
+                throw new Exception('Error retrieving lastInsertId');
+            }
+            $id = $result[0]->insertid;
+        } else {
+            $id = $connection->getPdo()->lastInsertId();
+        }
 
         return is_numeric($id) ? (int) $id : $id;
     }
