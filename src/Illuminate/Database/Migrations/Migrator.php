@@ -176,7 +176,7 @@ class Migrator
      * @param  bool  $pretend
      * @return int
      */
-    public function rollback(array $paths, $pretend = false)
+    public function rollback($paths, $pretend = false)
     {
         $this->notes = [];
 
