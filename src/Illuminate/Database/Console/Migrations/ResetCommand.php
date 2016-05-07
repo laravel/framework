@@ -7,7 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class ResetCommand extends Command
+class ResetCommand extends BaseCommand
 {
     use ConfirmableTrait;
 
@@ -66,7 +66,11 @@ class ResetCommand extends Command
 
         $pretend = $this->input->getOption('pretend');
 
-        $this->migrator->reset($pretend);
+        $paths[] = $this->getMigrationPath();
+
+        $paths = array_merge($paths, $this->migrator->paths());
+
+        $this->migrator->reset($paths, $pretend);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having

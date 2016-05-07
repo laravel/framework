@@ -45,6 +45,13 @@ class Migrator
     protected $notes = [];
 
     /**
+     * The paths for all migration files.
+     *
+     * @var array
+     */
+    protected $paths = [];
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -64,24 +71,30 @@ class Migrator
     /**
      * Run the outstanding migrations at a given path.
      *
-     * @param  string  $path
+     * @param  string|array  $paths
      * @param  array  $options
      * @return void
      */
-    public function run($path, array $options = [])
+    public function run($paths, array $options = [])
     {
         $this->notes = [];
 
-        $files = $this->getMigrationFiles($path);
+        $files = $this->getMigrationFiles($paths);
 
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
         $ran = $this->repository->getRan();
 
-        $migrations = array_diff($files, $ran);
+        $migrations = [];
 
-        $this->requireFiles($path, $migrations);
+        foreach ($files as $file) {
+            if (! in_array($this->getMigrationName($file), $ran)) {
+                $migrations[] = $file;
+            }
+        }
+
+        $this->requireFiles($migrations);
 
         $this->runMigrationList($migrations, $options);
     }
@@ -135,6 +148,8 @@ class Migrator
      */
     protected function runUp($file, $batch, $pretend)
     {
+        $file = $this->getMigrationName($file);
+
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
@@ -157,10 +172,11 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
+     * @param  string|array $paths
      * @param  bool  $pretend
      * @return int
      */
-    public function rollback($pretend = false)
+    public function rollback(array $paths, $pretend = false)
     {
         $this->notes = [];
 
@@ -171,14 +187,21 @@ class Migrator
 
         $count = count($migrations);
 
+        $files = $this->getMigrationFiles($paths);
+
         if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
         } else {
             // We need to reverse these migrations so that they are "downed" in reverse
             // to what they run on "up". It lets us backtrack through the migrations
             // and properly reverse the entire database schema operation that ran.
+            $this->requireFiles($files);
             foreach ($migrations as $migration) {
-                $this->runDown((object) $migration, $pretend);
+                foreach ($files as $file) {
+                    if ($this->getMigrationName($file) == $migration->migration) {
+                        $this->runDown($file, (object) $migration, $pretend);
+                    }
+                }
             }
         }
 
@@ -188,12 +211,15 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
+     * @param  string|array $paths
      * @param  bool  $pretend
      * @return int
      */
-    public function reset($pretend = false)
+    public function reset($paths, $pretend = false)
     {
         $this->notes = [];
+
+        $files = $this->getMigrationFiles($paths);
 
         $migrations = array_reverse($this->repository->getRan());
 
@@ -202,8 +228,13 @@ class Migrator
         if ($count === 0) {
             $this->note('<info>Nothing to rollback.</info>');
         } else {
+            $this->requireFiles($files);
             foreach ($migrations as $migration) {
-                $this->runDown((object) ['migration' => $migration], $pretend);
+                foreach ($files as $file) {
+                    if ($this->getMigrationName($file) == $migration) {
+                        $this->runDown($file, (object) ['migration' => $migration], $pretend);
+                    }
+                }
             }
         }
 
@@ -213,13 +244,14 @@ class Migrator
     /**
      * Run "down" a migration instance.
      *
+     * @param  string  $file
      * @param  object  $migration
      * @param  bool    $pretend
      * @return void
      */
-    protected function runDown($migration, $pretend)
+    protected function runDown($file, $migration, $pretend)
     {
-        $file = $migration->migration;
+        $file = $this->getMigrationName($file);
 
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
@@ -243,29 +275,43 @@ class Migrator
     /**
      * Get all of the migration files in a given path.
      *
-     * @param  string  $path
+     * @param  string|array  $paths
      * @return array
      */
-    public function getMigrationFiles($path)
+    public function getMigrationFiles($paths)
     {
-        $files = $this->files->glob($path.'/*_*.php');
+        $files = [];
+
+        $paths = is_array($paths) ? $paths : [$paths];
+
+        foreach ($paths as $path) {
+            $files[] = $this->files->glob($path.'/*_*.php');
+        }
+
+        $files = array_flatten($files);
+
+        $files = array_filter($files);
 
         // Once we have the array of files in the directory we will just remove the
         // extension and take the basename of the file which is all we need when
         // finding the migrations that haven't been run against the databases.
-        if ($files === false) {
+        if (empty($files)) {
             return [];
         }
 
-        $files = array_map(function ($file) {
-            return str_replace('.php', '', basename($file));
+        // Now we have a full list of file names we will sort them and because they
+        // all start with a timestamp this should give us the migrations in the
+        // order they were actually created in by the application developers.
+        usort($files, function ($a, $b) {
+            $a = $this->getMigrationName($a);
+            $b = $this->getMigrationName($b);
 
-        }, $files);
+            if ($a == $b) {
+                return 0;
+            }
 
-        // Once we have all of the formatted file names we will sort them and since
-        // they all start with a timestamp this should give us the migrations in
-        // the order they were actually created by the application developers.
-        sort($files);
+            return ($a < $b) ? -1 : 1;
+        });
 
         return $files;
     }
@@ -273,14 +319,13 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  string  $path
      * @param  array   $files
      * @return void
      */
-    public function requireFiles($path, array $files)
+    public function requireFiles(array $files)
     {
         foreach ($files as $file) {
-            $this->files->requireOnce($path.'/'.$file.'.php');
+            $this->files->requireOnce($file);
         }
     }
 
@@ -413,5 +458,30 @@ class Migrator
     public function getFilesystem()
     {
         return $this->files;
+    }
+
+    /**
+     * Set a path which contains migration files.
+     *
+     * @param string $path
+     */
+    public function path($path)
+    {
+        $this->paths[] = $path;
+    }
+
+    /**
+     * Get all custom migration paths.
+     *
+     * @return array
+     */
+    public function paths()
+    {
+        return $this->paths;
+    }
+
+    public function getMigrationName($path)
+    {
+        return str_replace('.php', '', basename($path));
     }
 }
