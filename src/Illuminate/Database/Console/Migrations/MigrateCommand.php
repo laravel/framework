@@ -66,12 +66,14 @@ class MigrateCommand extends BaseCommand
         // we will use the path relative to the root of this installation folder
         // so that migrations may be run for any path within the applications.
         if (! is_null($path = $this->input->getOption('path'))) {
-            $path = $this->laravel->basePath().'/'.$path;
+            $paths[] = $this->laravel->basePath().'/'.$path;
         } else {
-            $path = $this->getMigrationPath();
+            $paths[] = $this->getMigrationPath();
+
+            $paths = array_merge($paths, $this->migrator->paths());
         }
 
-        $this->migrator->run($path, [
+        $this->migrator->run($paths, [
             'pretend' => $pretend,
             'step' => $this->input->getOption('step'),
         ]);
