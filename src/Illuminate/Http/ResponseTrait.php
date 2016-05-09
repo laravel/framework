@@ -85,7 +85,7 @@ trait ResponseTrait
     }
 
     /**
-     * Throws the response in a HttpResponseException.
+     * Throws the response in a HttpResponseException instance.
      *
      * @throws Illuminate\Http\Exception\HttpResponseException;
      */
