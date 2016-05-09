@@ -63,11 +63,11 @@ class MigrateMakeCommand extends BaseCommand
         // It's possible for the developer to specify the tables to modify in this
         // schema operation. The developer may also specify if this table needs
         // to be freshly created so we can create the appropriate migrations.
-        $name = trim($this->input->getArgument('name'));
+        $name = trim($this->argument('name'));
 
-        $table = $this->input->getOption('table');
+        $table = $this->option('table');
 
-        $create = $this->input->getOption('create') ?: false;
+        $create = $this->option('create') ?: false;
 
         if (! $table && is_string($create)) {
             $table = $create;
@@ -107,7 +107,7 @@ class MigrateMakeCommand extends BaseCommand
      */
     protected function getMigrationPath()
     {
-        if (! is_null($targetPath = $this->input->getOption('path'))) {
+        if (! is_null($targetPath = $this->option('path'))) {
             return $this->laravel->basePath().'/'.$targetPath;
         }
 
