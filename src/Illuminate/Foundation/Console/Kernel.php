@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -75,6 +76,8 @@ class Kernel implements KernelContract
 
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
+
+            $this->commands();
         });
     }
 
@@ -143,6 +146,30 @@ class Kernel implements KernelContract
     protected function schedule(Schedule $schedule)
     {
         //
+    }
+
+    /**
+     * Register the Closure based commands for the application.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        //
+    }
+
+    /**
+     * Register a Closure based command with the application.
+     *
+     * @param  string  $signature
+     * @param  Closure  $callback
+     * @return ClosureCommand
+     */
+    public function command($signature, Closure $callback)
+    {
+        $this->registerCommand($command = new ClosureCommand($signature, $callback));
+
+        return $command;
     }
 
     /**
