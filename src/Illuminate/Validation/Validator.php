@@ -7,6 +7,7 @@ use DateTime;
 use Countable;
 use Exception;
 use DateTimeZone;
+use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1425,7 +1426,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'before');
 
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof Carbon) {
             return false;
         }
 
@@ -1467,7 +1468,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof Carbon) {
             return false;
         }
 
