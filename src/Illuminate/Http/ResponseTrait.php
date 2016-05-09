@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Http\Exception\HttpResponseException;
+
 trait ResponseTrait
 {
     /**
@@ -80,5 +82,15 @@ trait ResponseTrait
         $this->headers->setCookie($cookie);
 
         return $this;
+    }
+
+    /**
+     * Throws the response in a HttpResponseException instance.
+     *
+     * @throws Illuminate\Http\Exception\HttpResponseException;
+     */
+    public function throwResponse()
+    {
+        throw new HttpResponseException($this);
     }
 }
