@@ -1559,13 +1559,13 @@ class Validator implements ValidatorContract
      * @param  array $parameters
      * @return bool
      */
-    protected function validateImageDimensions($attribute, $value, $parameters)
+    protected function validateDimensions($attribute, $value, $parameters)
     {
         if (! $sizeDetails = getimagesize($value->getRealPath())) {
             return false;
         }
 
-        $this->requireParameterCount(1, $parameters, 'image_dimensions');
+        $this->requireParameterCount(1, $parameters, 'dimensions');
 
         list($width, $height) = $sizeDetails;
 
