@@ -3405,7 +3405,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __isset($key)
     {
         return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key)));
+                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))) ||
+                (method_exists($this, $key) && $this->$key instanceof Relation);
     }
 
     /**
