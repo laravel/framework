@@ -455,25 +455,34 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => $builder], $builder->delete());
     }
 
-    public function testSelectCount()
+    public function testWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->selectCount('foo', 'fooCount');
+        $builder = $model->withCount('foo');
 
-        $this->assertEquals('select (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "fooCount" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals('select *, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
-    public function testSelectCountWithSelectAndContraintsAndHaving()
+    public function testWithCountAndSelect()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->where('bar', 'baz')->select('*');
-        $builder->selectCount('foo', 'fooCount', function ($q) {
-            $q->where('bam', '>', 'qux');
-        })->having('fooCount', '>=', 1);
+        $builder = $model->select('id')->withCount('foo');
 
-        $this->assertEquals('select *, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "fooCount" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "fooCount" >= ?', $builder->toSql());
+        $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAndContraintsAndHaving()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz');
+        $builder->withCount(['foo' => function ($q) {
+            $q->where('bam', '>', 'qux');
+        }])->having('fooCount', '>=', 1);
+
+        $this->assertEquals('select *, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "fooCount" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 

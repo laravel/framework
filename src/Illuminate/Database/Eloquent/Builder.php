@@ -763,27 +763,6 @@ class Builder
     }
 
     /**
-     * Add a relationship count select to the query.
-     *
-     * @param  string  $relation
-     * @param  string  $as
-     * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function selectCount($relation, $as, Closure $callback = null)
-    {
-        $relation = $this->getHasRelationQuery($relation);
-
-        $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
-
-        if ($callback) {
-            call_user_func($callback, $query);
-        }
-
-        return $this->selectSub($query->getQuery(), $as);
-    }
-
-    /**
      * Add a relationship count / exists condition to the query.
      *
      * @param  string  $relation
@@ -1016,6 +995,41 @@ class Builder
         $eagers = $this->parseWithRelations($relations);
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
+
+        return $this;
+    }
+
+    /**
+     * Add subselect queries to count the relations.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withCount($relations)
+    {
+        // If no columns are set, add the default * columns.
+        if (is_null($this->query->columns)) {
+            $this->query->select(['*']);
+        }
+
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        $relations = $this->parseWithRelations($relations);
+
+        foreach ($relations as $name => $constraints) {
+            // First determine the count query for the given relationship,
+            // then run the constraints callback to get the final query.
+            // This query will be added as subSelect query.
+            $relation = $this->getHasRelationQuery($name);
+            $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
+
+            call_user_func($constraints, $query);
+
+            $asColumn = snake_case($name).'_count';
+            $this->selectSub($query->getQuery(), $asColumn);
+        }
 
         return $this;
     }
