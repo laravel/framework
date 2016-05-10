@@ -224,6 +224,8 @@ class Worker
      * @param  int  $delay
      * @param  \Throwable  $e
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function handleJobException($connection, Job $job, $delay, $e)
     {
