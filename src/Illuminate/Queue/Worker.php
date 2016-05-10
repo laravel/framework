@@ -217,7 +217,7 @@ class Worker
     }
 
     /**
-     * Handle an exception that occured while the job was running.
+     * Handle an exception that occurred while the job was running.
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
