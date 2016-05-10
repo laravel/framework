@@ -3397,15 +3397,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Determine if an attribute exists on the model.
+     * Determine if an attribute or relation exists on the model.
      *
      * @param  string  $key
      * @return bool
      */
     public function __isset($key)
     {
-        return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key)));
+        if (isset($this->attributes[$key]) || isset($this->relations[$key])) {
+            return true;
+        }
+
+        if (method_exists($this, $key)) {
+            // For unloaded relations we attempt to load it in if the method exists
+            $this->$key;
+            if (isset($this->relations[$key])) {
+                return true;
+            }
+        }
+
+        return $this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key));
     }
 
     /**
