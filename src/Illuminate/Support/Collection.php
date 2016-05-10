@@ -506,6 +506,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run a string function map over each of the items.
+     *
+     * @param  string  $callback
+     * @return static
+     */
+    public function mapProc($callback)
+    {
+      return $this->map(function($element) use ($callback){
+        return $callback($element);
+      });
+    }
+
+    /**
      * Map a collection and flatten the result by a single level.
      *
      * @param  callable  $callback
@@ -935,6 +948,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $this->items = $this->map($callback)->all();
 
+        return $this;
+    }
+
+    /**
+     * Transform each item in the collection using a callback string.
+     *
+     * @param  string  $callback
+     * @return $this
+     */
+    public function transformProc($callback)
+    {
+        $this->items = $this->mapProc($callback)->all();
         return $this;
     }
 
