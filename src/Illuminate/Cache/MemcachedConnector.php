@@ -11,9 +11,9 @@ class MemcachedConnector
      * Create a new Memcached connection.
      *
      * @param  array  $servers
-     * @param  string|null $connectionId
-     * @param  array $options
-     * @param  array $credentials
+     * @param  string|null  $connectionId
+     * @param  array  $options
+     * @param  array  $credentials
      * @return \Memcached
      *
      * @throws \RuntimeException
