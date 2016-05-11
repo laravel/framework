@@ -1001,6 +1001,41 @@ class Builder
     }
 
     /**
+     * Add subselect queries to count the relations.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withCount($relations)
+    {
+        // If no columns are set, add the default * columns.
+        if (is_null($this->query->columns)) {
+            $this->query->select(['*']);
+        }
+
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        $relations = $this->parseWithRelations($relations);
+
+        foreach ($relations as $name => $constraints) {
+            // First determine the count query for the given relationship,
+            // then run the constraints callback to get the final query.
+            // This query will be added as subSelect query.
+            $relation = $this->getHasRelationQuery($name);
+            $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
+
+            call_user_func($constraints, $query);
+
+            $asColumn = snake_case($name).'_count';
+            $this->selectSub($query->getQuery(), $asColumn);
+        }
+
+        return $this;
+    }
+
+    /**
      * Parse a list of relations into individuals.
      *
      * @param  array  $relations
