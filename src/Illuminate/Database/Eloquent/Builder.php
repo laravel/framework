@@ -552,7 +552,7 @@ class Builder
         }
 
         return array_merge($values, [
-            $column => $this->model->freshTimestampString()
+            $column => $this->model->freshTimestampString(),
         ]);
     }
 
