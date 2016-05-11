@@ -871,3 +871,33 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('array_values_recursive')) {
+    /**
+     * Recursively get all values from array.
+     *
+     * @param  array  $array
+     * @param  bool   $merge  maintain array dimension
+     * @return array
+     */
+    function array_values_recursive(array $array, $merge = true)
+    {
+        $values = [];
+
+        foreach ($array as $key => $value) {
+            $values[] = is_array($value) ? array_values_recursive($value, $merge) : $value;
+        }
+
+        if (! $merge) {
+            return $values;
+        }
+
+        $valuesForMerge = function () use ($values) {
+            return array_map(function ($value) {
+                return is_array($value) ? $value : [$value];
+            }, $values);
+        };
+
+        return call_user_func_array('array_merge', $valuesForMerge());
+    }
+}

@@ -661,6 +661,43 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
         $this->assertEquals(['firstname' => 'Ferid'], $developer);
     }
+
+    public function testArrayValuesRecursive()
+    {
+        $validations = [
+            'required',
+            'text' => 'integer',
+            'textbox' => [
+                'string' => 'limit|500',
+            ],
+            'select' => [
+                'multiselect',
+                [
+                    'apple',
+                    'banana',
+                    'selected'  => 'orange',
+                ],
+            ],
+        ];
+
+        $this->assertEquals([
+            'required',
+            'integer',
+            [
+                'limit|500',
+            ],
+            [
+                'multiselect',
+                [
+                    'apple', 'banana', 'orange',
+                ],
+            ],
+        ], array_values_recursive($validations, false));
+
+        $this->assertEquals([
+            'required', 'integer', 'limit|500', 'multiselect', 'apple', 'banana', 'orange',
+        ], array_values_recursive($validations));
+    }
 }
 
 trait SupportTestTraitOne
