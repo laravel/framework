@@ -383,6 +383,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function intersect($keys)
     {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
         return array_filter($this->only($keys));
     }
 
