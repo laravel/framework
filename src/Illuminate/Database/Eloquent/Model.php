@@ -3408,12 +3408,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return true;
         }
 
-        if (method_exists($this, $key)) {
-            // For unloaded relations we attempt to load it in if the method exists
-            $this->$key;
-            if (isset($this->relations[$key])) {
-                return true;
-            }
+        if (method_exists($this, $key) && $this->$key && isset($this->relations[$key])) {
+            return true;
         }
 
         return $this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key));
