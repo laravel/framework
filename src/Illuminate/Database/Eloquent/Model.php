@@ -2764,6 +2764,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine whether a value should be PHP-serialized.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isSerializeCastable($key)
+    {
+        return $this->hasCast($key) && ! $this->isDateCastable($key) && class_exists($this->getCasts()[$key]);
+    }
+
+    /**
      * Get the type of cast for a model attribute.
      *
      * @param  string  $key
@@ -2771,7 +2782,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getCastType($key)
     {
-        return trim(strtolower($this->getCasts()[$key]));
+        $casts = $this->getCasts();
+        if (class_exists($casts[$key]) && strtolower($casts[$key]) != 'datetime') {
+            return $casts[$key];
+        }
+        return trim(strtolower($casts[$key]));
     }
 
     /**
@@ -2787,7 +2802,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        $castType = $this->getCastType($key);
+
+        switch ($castType) {
             case 'int':
             case 'integer':
                 return (int) $value;
@@ -2813,6 +2830,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'timestamp':
                 return $this->asTimeStamp($value);
             default:
+                if (class_exists($castType)) {
+                    $casted = @unserialize($value);
+                    if ($casted instanceof $castType) {
+                        return $casted;
+                    } else {
+                        return null;
+                    }
+                }
                 return $value;
         }
     }
@@ -2844,6 +2869,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->asJson($value);
+        } elseif ($this->isSerializeCastable($key)) {
+            $castType = $this->getCastType($key);
+            if ($value instanceof $castType) {
+                $value = serialize($value);
+            } else {
+                $value = null;
+            }
         }
 
         $this->attributes[$key] = $value;
