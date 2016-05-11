@@ -1008,28 +1008,25 @@ class Builder
      */
     public function withCount($relations)
     {
-        // If no columns are set, add the default * columns.
         if (is_null($this->query->columns)) {
             $this->query->select(['*']);
         }
 
-        if (is_string($relations)) {
-            $relations = func_get_args();
-        }
+        $relations = is_array($relations) ? $relations : func_get_args();
 
-        $relations = $this->parseWithRelations($relations);
-
-        foreach ($relations as $name => $constraints) {
-            // First determine the count query for the given relationship,
-            // then run the constraints callback to get the final query.
-            // This query will be added as subSelect query.
+        foreach ($this->parseWithRelations($relations) as $name => $constraints) {
+            // Here we will get the relationship count query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the relation
+            // count query. We will normalize the relation name then append _count as the name.
             $relation = $this->getHasRelationQuery($name);
-            $query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
+
+            $query = $relation->getRelationCountQuery(
+                $relation->getRelated()->newQuery(), $this
+            );
 
             call_user_func($constraints, $query);
 
-            $asColumn = snake_case($name).'_count';
-            $this->selectSub($query->getQuery(), $asColumn);
+            $this->selectSub($query->getQuery(), snake_case($name).'_count');
         }
 
         return $this;
