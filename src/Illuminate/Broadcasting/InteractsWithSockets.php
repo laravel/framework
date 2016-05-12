@@ -18,9 +18,21 @@ trait InteractsWithSockets
      *
      * @return $this
      */
-    public function exceptCurrentUser()
+    public function dontBroadcastToCurrentUser()
     {
         $this->socket = Broadcast::socket();
+
+        return $this;
+    }
+
+    /**
+     * Broadcast the event to everyone.
+     *
+     * @return $this
+     */
+    public function broadcastToEveryone()
+    {
+        $this->socket = null;
 
         return $this;
     }
