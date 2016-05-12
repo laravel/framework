@@ -345,6 +345,8 @@ if (! function_exists('elixir')) {
             $manifestPath = $buildDirectory;
         }
 
+        $file = ltrim($file,'/');
+
         if (isset($manifest[$file])) {
             return '/'.$buildDirectory.'/'.$manifest[$file];
         }
