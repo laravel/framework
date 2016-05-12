@@ -277,6 +277,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->get('foo/{bar?}', ['uses' => 'RouteTestControllerWithParameterStub@returnParameter'])->defaults('bar', 'foo');
         $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
 
+        $router->get('foo/{bar?}', ['uses' => 'RouteTestControllerWithParameterStub@returnParameter'])->defaults('bar', 'foo');
+        $this->assertEquals('bar', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
         $router->get('foo/{bar?}', function ($bar = '') { return $bar; })->defaults('bar', 'foo');
         $this->assertEquals('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
