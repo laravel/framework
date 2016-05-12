@@ -569,6 +569,10 @@ class Validator implements ValidatorContract
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
     {
+        if (is_string($value) && trim($value) === '') {
+            return $this->isImplicit($rule);
+        }
+
         return $this->validatePresent($attribute, $value) || $this->isImplicit($rule);
     }
 
@@ -1035,7 +1039,7 @@ class Validator implements ValidatorContract
      */
     protected function validateArray($attribute, $value)
     {
-        return $value === '' || is_array($value);
+        return is_array($value);
     }
 
     /**
@@ -1049,7 +1053,7 @@ class Validator implements ValidatorContract
     {
         $acceptable = [true, false, 0, 1, '0', '1'];
 
-        return $value === '' || in_array($value, $acceptable, true);
+        return in_array($value, $acceptable, true);
     }
 
     /**
@@ -1061,7 +1065,7 @@ class Validator implements ValidatorContract
      */
     protected function validateInteger($attribute, $value)
     {
-        return $value === '' || filter_var($value, FILTER_VALIDATE_INT) !== false;
+        return filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
@@ -1073,7 +1077,7 @@ class Validator implements ValidatorContract
      */
     protected function validateNumeric($attribute, $value)
     {
-        return $value === '' || is_numeric($value);
+        return is_numeric($value);
     }
 
     /**
