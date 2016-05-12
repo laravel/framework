@@ -605,6 +605,7 @@ class Validator implements ValidatorContract
         if (! $this->hasRule($attribute, ['Nullable'])) {
             return true;
         }
+
         return ! is_null($value);
     }
 
