@@ -29,7 +29,7 @@ class ValidationException extends Exception
      */
     public function __construct($validator, $response = null)
     {
-        parent::__construct('The given data failed to pass validation.');
+        parent::__construct(trans('validation.exception'));
 
         $this->response = $response;
         $this->validator = $validator;
