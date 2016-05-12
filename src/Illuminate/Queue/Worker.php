@@ -217,13 +217,15 @@ class Worker
     }
 
     /**
-     * Handle an exception that occured while the job was running.
+     * Handle an exception that occurred while the job was running.
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $delay
      * @param  \Throwable  $e
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function handleJobException($connection, Job $job, $delay, $e)
     {

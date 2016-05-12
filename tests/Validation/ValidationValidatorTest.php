@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Carbon\Carbon;
 use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -1722,6 +1723,61 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateImageDimensions()
+    {
+        // Knowing that demo image.gif has width = 3 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '');
+        $trans = $this->getRealTranslator();
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_width=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_width=5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:max_width=10']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:max_width=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_height=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_height=5']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:max_height=10']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:max_height=1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:width=3']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:height=2']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:min_height=2,ratio=3/2']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'dimensions:ratio=1/1']);
+        $v->setFiles(['x' => $uploadedFile]);
+        $this->assertTrue($v->fails());
+    }
+
     /**
      * @requires extension fileinfo
      */
@@ -1950,10 +2006,22 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => ['2000-01-01']], ['x' => 'Before:2012-01-01']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['x' => new Carbon('2000-01-01')], ['x' => 'Before:2012-01-01']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => [new Carbon('2000-01-01')]], ['x' => 'Before:2012-01-01']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['x' => '2012-01-01'], ['x' => 'After:2000-01-01']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => ['2012-01-01']], ['x' => 'After:2000-01-01']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => new Carbon('2012-01-01')], ['x' => 'After:2000-01-01']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => [new Carbon('2012-01-01')]], ['x' => 'After:2000-01-01']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['start' => '2012-01-01', 'ends' => '2013-01-01'], ['start' => 'After:2000-01-01', 'ends' => 'After:start']);

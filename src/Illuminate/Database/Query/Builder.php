@@ -1546,11 +1546,12 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
+    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 

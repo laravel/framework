@@ -474,11 +474,12 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
@@ -980,6 +981,38 @@ class Builder
         $eagers = $this->parseWithRelations($relations);
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
+
+        return $this;
+    }
+
+    /**
+     * Add subselect queries to count the relations.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withCount($relations)
+    {
+        if (is_null($this->query->columns)) {
+            $this->query->select(['*']);
+        }
+
+        $relations = is_array($relations) ? $relations : func_get_args();
+
+        foreach ($this->parseWithRelations($relations) as $name => $constraints) {
+            // Here we will get the relationship count query and prepare to add it to the main query
+            // as a sub-select. First, we'll get the "has" query and use that to get the relation
+            // count query. We will normalize the relation name then append _count as the name.
+            $relation = $this->getHasRelationQuery($name);
+
+            $query = $relation->getRelationCountQuery(
+                $relation->getRelated()->newQuery(), $this
+            );
+
+            call_user_func($constraints, $query);
+
+            $this->selectSub($query->getQuery(), snake_case($name).'_count');
+        }
 
         return $this;
     }
