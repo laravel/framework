@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Database\DetectsLostConnections;
 
-class Connector
+abstract class Connector
 {
     use DetectsLostConnections;
 
