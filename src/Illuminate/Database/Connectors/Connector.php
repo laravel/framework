@@ -25,6 +25,14 @@ abstract class Connector
     ];
 
     /**
+     * Establish a database connection.
+     *
+     * @param  array  $config
+     * @return \PDO
+     */
+    abstract public function connect(array $config);
+
+    /**
      * Get the PDO options based on the configuration.
      *
      * @param  array  $config
