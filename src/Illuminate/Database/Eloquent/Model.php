@@ -2947,10 +2947,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Prepare a date for array / JSON serialization.
      *
-     * @param  \DateTime  $date
+     * @param  \DateTimeInterface  $date
      * @return string
      */
-    protected function serializeDate(DateTime $date)
+    protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format($this->getDateFormat());
     }
