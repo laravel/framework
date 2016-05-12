@@ -138,6 +138,38 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('first', $relation->first());
     }
 
+    public function testFindOrFailThrowsException()
+    {
+        $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\HasManyThrough', ['find'], $this->getRelationArguments());
+        $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
+
+        $this->setExpectedException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        try {
+            $relation->findOrFail('foo');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->assertNotEmpty($e->getModel());
+
+            throw $e;
+        }
+    }
+
+    public function testFirstOrFailThrowsException()
+    {
+        $relation = $this->getMock('Illuminate\Database\Eloquent\Relations\HasManyThrough', ['first'], $this->getRelationArguments());
+        $relation->expects($this->once())->method('first')->with(['id' => 'foo'])->will($this->returnValue(null));
+
+        $this->setExpectedException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        try {
+            $relation->firstOrFail(['id' => 'foo']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->assertNotEmpty($e->getModel());
+
+            throw $e;
+        }
+    }
+
     public function testFindMethod()
     {
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[first]', $this->getRelationArguments());
