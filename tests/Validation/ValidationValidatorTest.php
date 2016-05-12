@@ -120,11 +120,11 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     {
         $trans = $this->getRealTranslator();
 
-        $v = new Validator($trans, ['x' => ''], ['x' => 'size:10']);
+        $v = new Validator($trans, ['x' => ''], ['x' => 'size:10|array|integer|min:5']);
         $this->assertTrue($v->passes());
     }
 
-    public function testEmptyNonStringExistingAttributesAreValidated()
+    public function testEmptyExistingAttributesAreValidated()
     {
         $trans = $this->getRealTranslator();
 
