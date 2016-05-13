@@ -403,6 +403,12 @@ class FormBuilder {
 
 		$options['name'] = $name;
 
+		// Split the _prepend option out of the options array, if it exists.
+		if (isset($options['_prepend'])) 
+		{
+			$list = array_pull($options, '_prepend') + $list;
+		}
+
 		// We will simply loop through the options and build an HTML value for each of
 		// them until we have an array of HTML declarations. Then we will join them
 		// all together into one single HTML element that can be put on the form.
