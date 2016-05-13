@@ -358,7 +358,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $conditions = [
             ['first_name', 'last_name'],
-            ['updated_at', '>', 'created_at']
+            ['updated_at', '>', 'created_at'],
         ];
 
         $builder = $this->getBuilder();
