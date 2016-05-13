@@ -147,7 +147,7 @@ class Handler {
 		// If one of the custom error handlers returned a response, we will send that
 		// response back to the client after preparing it. This allows a specific
 		// type of exceptions to handled by a Closure giving great flexibility.
-		if ( ! is_null($response))
+		if ( ! is_null($response) && ! $response instanceof \Exception)
 		{
 			$response = $this->prepareResponse($response);
 
@@ -159,7 +159,7 @@ class Handler {
 		// it show the exception to the user / developer based on the situation.
 		else
 		{
-			$this->displayException($exception);
+			$this->displayException($response);
 		}
 
 		$this->bail();
@@ -247,9 +247,9 @@ class Handler {
 			{
 				$response = $handler($exception, $code, $fromConsole);
 			}
-			catch (\Exception $e)
+			catch (\Exception $exception)
 			{
-				$response = $this->formatException($e);
+				$response = $this->callCustomHandlers($exception, $fromConsole);
 			}
 
 			// If this handler returns a "non-null" response, we will return it so it will
@@ -260,6 +260,8 @@ class Handler {
 				return $response;
 			}
 		}
+
+		return $exception;
 	}
 
 	/**
