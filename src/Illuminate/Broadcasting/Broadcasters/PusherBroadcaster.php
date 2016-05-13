@@ -36,12 +36,26 @@ class PusherBroadcaster implements Broadcaster
     }
 
     /**
+     * Register a channel authenticator.
+     *
+     * @param  string  $channel
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function auth($channel, callable $callback)
+    {
+        $this->channels[$channel] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function auth($request)
+    public function check($request)
     {
         $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
 
@@ -100,20 +114,6 @@ class PusherBroadcaster implements Broadcaster
         }
 
         return [];
-    }
-
-    /**
-     * Register a channel authenticator.
-     *
-     * @param  string  $channel
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function channel($channel, callable $callback)
-    {
-        $this->channels[$channel] = $callback;
-
-        return $this;
     }
 
     /**
