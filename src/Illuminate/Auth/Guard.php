@@ -635,7 +635,7 @@ class Guard {
 	 */
 	public function getName()
 	{
-		return 'login_'.md5(get_class($this));
+		return 'login_'.md5(get_class($this->provider));
 	}
 
 	/**
@@ -645,7 +645,7 @@ class Guard {
 	 */
 	public function getRecallerName()
 	{
-		return 'remember_'.md5(get_class($this));
+		return 'remember_'.md5(get_class($this->provider));
 	}
 
 }
