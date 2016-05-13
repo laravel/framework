@@ -507,7 +507,7 @@ class Connection implements ConnectionInterface
         if ($this->transactions == 1) {
             try {
                 $this->pdo->beginTransaction();
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 --$this->transactions;
 
                 throw $e;
