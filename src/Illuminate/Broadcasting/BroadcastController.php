@@ -21,7 +21,7 @@ class BroadcastController extends Controller
             abort(403);
         }
 
-        return Broadcast::auth($request);
+        return Broadcast::check($request);
     }
 
     /**
