@@ -3,6 +3,8 @@
 namespace Illuminate\Queue\Console;
 
 use Carbon\Carbon;
+use Illuminate\Queue\MissingExtensionException;
+use Illuminate\Queue\TimeoutException;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
@@ -91,6 +93,20 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
+        $timeout = $this->option('timeout');
+
+        if ($timeout > 0) {
+            if (extension_loaded('pcntl') && function_exists('pcntl_alarm') && function_exists('pcntl_signal')) {
+                declare(ticks=1);
+
+                pcntl_signal(SIGALRM, function () {
+                    throw new TimeoutException();
+                }, true);
+            } else {
+                throw new MissingExtensionException('The pcntl extension is required to use the timeout option.');
+            }
+        }
+
         if ($daemon) {
             $this->worker->setCache($this->laravel['cache']->driver());
 
@@ -99,13 +115,13 @@ class WorkCommand extends Command
             );
 
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
+                $connection, $queue, $delay, $memory, $timeout,
                 $this->option('sleep'), $this->option('tries')
             );
         }
 
         return $this->worker->pop(
-            $connection, $queue, $delay,
+            $connection, $queue, $delay, $timeout,
             $this->option('sleep'), $this->option('tries')
         );
     }
@@ -171,6 +187,8 @@ class WorkCommand extends Command
             ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'Seconds a job may run before timing out', 0],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];
