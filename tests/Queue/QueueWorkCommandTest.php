@@ -81,8 +81,8 @@ class QueueWorkCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testTimeoutWhenWorkingOnAnInfinitLoopJob()
     {
-        $this->queue->push(function() {
-            while(true) {
+        $this->queue->push(function () {
+            while (true) {
                 sleep(10);
             }
         });
@@ -96,7 +96,7 @@ class QueueWorkCommandTest extends PHPUnit_Framework_TestCase
 
     public function testNoTimeoutWhenWorkingTheJobIsFastEnough()
     {
-        $this->queue->push(function() {
+        $this->queue->push(function () {
             //do nothing!
         });
 
