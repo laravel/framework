@@ -345,11 +345,12 @@ class Filesystem
      * Get all of the files from the given directory (recursive).
      *
      * @param  string  $directory
+     * @param  bool  $hidden
      * @return array
      */
-    public function allFiles($directory)
+    public function allFiles($directory, $hidden = false)
     {
-        return iterator_to_array(Finder::create()->files()->in($directory), false);
+        return iterator_to_array(Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory), false);
     }
 
     /**
