@@ -257,7 +257,7 @@ trait MakesHttpRequests
             $this->seeJsonEquals($data);
 
             return $this;
-        } catch(PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
             return $this->seeJsonContains($data, $negate);
         }
     }
