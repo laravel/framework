@@ -161,7 +161,12 @@ class CacheManager implements FactoryContract
     {
         $prefix = $this->getPrefix($config);
 
-        $memcached = $this->app['memcached.connector']->connect($config['servers']);
+        $memcached = $this->app['memcached.connector']->connect(
+            $config['servers'],
+            array_get($config, 'persistent_id'),
+            array_get($config, 'options', []),
+            array_filter(array_get($config, 'sasl', []))
+        );
 
         return $this->repository(new MemcachedStore($memcached, $prefix));
     }
@@ -279,7 +284,7 @@ class CacheManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
+        $this->customCreators[$driver] = $callback->bindTo($this, $this);
 
         return $this;
     }
