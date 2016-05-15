@@ -341,6 +341,32 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn('first_name', 'last_name')->orWhereColumn('first_name', 'middle_name');
+        $this->assertEquals('select * from "users" where "first_name" = "last_name" or "first_name" = "middle_name"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn('updated_at', '>', 'created_at');
+        $this->assertEquals('select * from "users" where "updated_at" > "created_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testArrayWhereColumn()
+    {
+        $conditions = [
+            ['first_name', 'last_name'],
+            ['updated_at', '>', 'created_at'],
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn($conditions);
+        $this->assertEquals('select * from "users" where ("first_name" = "last_name" and "updated_at" > "created_at")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();
