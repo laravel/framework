@@ -567,6 +567,20 @@ class Builder
     }
 
     /**
+     * Determine if the given operator and value combination is legal.
+     *
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function invalidOperatorAndValue($operator, $value)
+    {
+        $isOperator = in_array($operator, $this->operators);
+
+        return is_null($value) && $isOperator && ! in_array($operator, ['=', '<>', '!=']);
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  string  $column
@@ -623,20 +637,6 @@ class Builder
     public function orWhereColumn($first, $operator = null, $second = null)
     {
         return $this->whereColumn($first, $operator, $second, 'or');
-    }
-
-    /**
-     * Determine if the given operator and value combination is legal.
-     *
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return bool
-     */
-    protected function invalidOperatorAndValue($operator, $value)
-    {
-        $isOperator = in_array($operator, $this->operators);
-
-        return is_null($value) && $isOperator && ! in_array($operator, ['=', '<>', '!=']);
     }
 
     /**
