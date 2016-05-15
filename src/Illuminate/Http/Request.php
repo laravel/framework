@@ -338,6 +338,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Retrieve an input item from the request.
+     * Overridden to support all of Illuminate's input sources.
+     *
+     * @param  string  $key
+     * @param  string|array|null  $default
+     * @return string|array
+     */
+    public function get($key, $default = null)
+    {
+        return $this->input($key, $default);
+    }
+
+    /**
      * Get a subset of the items from the input data.
      *
      * @param  array|mixed  $keys
