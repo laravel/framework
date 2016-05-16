@@ -72,18 +72,19 @@ class Worker
      * @param  string  $queue
      * @param  int     $delay
      * @param  int     $memory
+     * @param  int     $timeout
      * @param  int     $sleep
      * @param  int     $maxTries
      * @return array
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0)
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
             if ($this->daemonShouldRun()) {
                 $this->runNextJobForDaemon(
-                    $connectionName, $queue, $delay, $sleep, $maxTries
+                    $connectionName, $queue, $delay, $timeout, $sleep, $maxTries
                 );
             } else {
                 $this->sleep($sleep);
@@ -101,21 +102,28 @@ class Worker
      * @param  string  $connectionName
      * @param  string  $queue
      * @param  int  $delay
+     * @param  int  $timeout
      * @param  int  $sleep
      * @param  int  $maxTries
      * @return void
      */
-    protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
+    protected function runNextJobForDaemon($connectionName, $queue, $delay, $timeout, $sleep, $maxTries)
     {
-        try {
-            $this->runNextJob($connectionName, $queue, $delay, $sleep, $maxTries);
-        } catch (Exception $e) {
-            if ($this->exceptions) {
-                $this->exceptions->report($e);
-            }
-        } catch (Throwable $e) {
-            if ($this->exceptions) {
-                $this->exceptions->report(new FatalThrowableError($e));
+        if ($processId = pcntl_fork()) {
+            $this->waitForChildProcess($processId, $timeout);
+        } else {
+            try {
+                $this->runNextJob($connectionName, $queue, $delay, $sleep, $maxTries);
+            } catch (Exception $e) {
+                if ($this->exceptions) {
+                    $this->exceptions->report($e);
+                }
+            } catch (Throwable $e) {
+                if ($this->exceptions) {
+                    $this->exceptions->report(new FatalThrowableError($e));
+                }
+            } finally {
+                exit;
             }
         }
     }
@@ -129,6 +137,32 @@ class Worker
     {
         return $this->manager->isDownForMaintenance()
                     ? false : $this->events->until('illuminate.queue.looping') !== false;
+    }
+
+    /**
+     * Wait for the given child process to finish.
+     *
+     * @param  int  $processId
+     * @param  int  $timeout
+     * @return void
+     */
+    protected function waitForChildProcess($processId, $timeout)
+    {
+        declare(ticks=1) {
+            pcntl_signal(SIGALRM, function () use ($processId) {
+                posix_kill($processId, SIGKILL);
+
+                if ($this->exceptions) {
+                    $this->exceptions->report(new Exception("Daemon queue child process timed out."));
+                }
+            }, true);
+
+            pcntl_alarm($timeout);
+
+            pcntl_waitpid($processId, $status);
+
+            pcntl_alarm(0);
+        }
     }
 
     /**
