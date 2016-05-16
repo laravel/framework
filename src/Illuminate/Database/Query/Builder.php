@@ -354,9 +354,7 @@ class Builder
         else {
             $method = $where ? 'where' : 'on';
 
-            $this->joins[] = $join->$method(
-                $one, $operator, $two, 'and', $where
-            );
+            $this->joins[] = $join->$method($one, $operator, $two);
 
             $this->addBinding($join->getBindings(), 'join');
         }
