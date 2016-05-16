@@ -596,6 +596,18 @@ class Event
     }
 
     /**
+     * State that the command should run in background.
+     *
+     * @return $this
+     */
+    public function runInBackground()
+    {
+        $this->runInBackground = true;
+
+        return $this;
+    }
+
+    /**
      * Set the timezone the date should be evaluated on.
      *
      * @param  \DateTimeZone|string  $timezone
@@ -658,18 +670,6 @@ class Event
         return $this->skip(function () {
             return file_exists($this->mutexPath());
         });
-    }
-
-    /**
-     * State that the command should run in background.
-     *
-     * @return $this
-     */
-    public function runInBackground()
-    {
-        $this->runInBackground = true;
-
-        return $this;
     }
 
     /**
