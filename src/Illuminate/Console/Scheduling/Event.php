@@ -64,6 +64,13 @@ class Event
     public $withoutOverlapping = false;
 
     /**
+     * Indicates if the command should run in background.
+     *
+     * @var bool
+     */
+    public $runInBackground = false;
+
+    /**
      * The array of filter callbacks.
      *
      * @var array
@@ -142,7 +149,11 @@ class Event
      */
     public function run(Container $container)
     {
-        $this->runCommandInForeground($container);
+        if (! $this->runInBackground) {
+            $this->runCommandInForeground($container);
+        } else {
+            $this->runCommandInBackground();
+        }
     }
 
     /**
@@ -160,6 +171,18 @@ class Event
         ))->run();
 
         $this->callAfterCallbacks($container);
+    }
+
+    /**
+     * Run the command in the background.
+     *
+     * @return void
+     */
+    protected function runCommandInBackground()
+    {
+        (new Process(
+            $this->buildCommand(), base_path(), null, null, null
+        ))->run();
     }
 
     /**
@@ -635,6 +658,18 @@ class Event
         return $this->skip(function () {
             return file_exists($this->mutexPath());
         });
+    }
+
+    /**
+     * State that the command should run in background.
+     *
+     * @return $this
+     */
+    public function runInBackground()
+    {
+        $this->runInBackground = true;
+
+        return $this;
     }
 
     /**
