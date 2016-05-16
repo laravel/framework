@@ -62,7 +62,7 @@ class SparkPostTransport extends Transport
         ];
 
         if ($attachments = $message->getChildren()) {
-            $options['json']['content']['attachments'] = array_map(function($attachment) {
+            $options['json']['content']['attachments'] = array_map(function ($attachment) {
                 return [
                     'type' => $attachment->getContentType(),
                     'name' => $attachment->getFileName(),
