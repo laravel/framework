@@ -382,7 +382,7 @@ if (! function_exists('clear_routes')) {
             }
         }
         $data = implode("\n", array_values($lines));
-        
+
         return file_put_contents($path, $data);
     }
 }
