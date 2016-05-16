@@ -365,16 +365,16 @@ if (! function_exists('class_uses_recursive')) {
     }
 }
 
-if (!function_exists("clear_routes")) {
+if (! function_exists("clear_routes")) {
     /**
-     * Clear routes file
+     * Clear routes file.
      *
-     * @param String $remove
+     * @param string $remove
      * @return mixed
      */
     function clear_routes($remove)
     {
-        $path = app_path() . '/Http/routes.php';
+        $path = app_path().'/Http/routes.php';
         $lines = file($path, FILE_IGNORE_NEW_LINES);
         foreach ($lines as $key => $line) {
             if (strstr($line, $remove)) {
