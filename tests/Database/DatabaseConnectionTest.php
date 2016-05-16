@@ -116,7 +116,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testTransactionsDecrementedOnTransactionException()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $pdo->expects($this->once())->method('beginTransaction')->will($this->throwException(new ErrorException('MySQL server has gone away')));
         $connection = $this->getMockConnection([], $pdo);
         $this->setExpectedException('ErrorException', 'MySQL server has gone away');
@@ -127,7 +127,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testCantSwapPDOWithOpenTransaction()
     {
-        $pdo = $this->getMock('DatabaseConnectionTestMockPDO');
+        $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $pdo->expects($this->once())->method('beginTransaction')->will($this->returnValue(true));
         $connection = $this->getMockConnection([], $pdo);
         $connection->beginTransaction();

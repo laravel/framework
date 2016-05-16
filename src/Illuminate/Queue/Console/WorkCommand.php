@@ -104,7 +104,7 @@ class WorkCommand extends Command
             );
         }
 
-        return $this->worker->pop(
+        return $this->worker->runNextJob(
             $connection, $queue, $delay,
             $this->option('sleep'), $this->option('tries')
         );

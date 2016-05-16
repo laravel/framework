@@ -18,7 +18,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $connection->shouldReceive('pop')->once()->with('queue')->andReturn($job);
         $worker->expects($this->once())->method('process')->with($this->equalTo('connection'), $this->equalTo($job), $this->equalTo(0), $this->equalTo(0));
 
-        $worker->pop('connection', 'queue');
+        $worker->runNextJob('connection', 'queue');
     }
 
     public function testJobIsPoppedOffFirstQueueInListAndProcessed()
@@ -31,7 +31,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $connection->shouldReceive('pop')->once()->with('queue2')->andReturn($job);
         $worker->expects($this->once())->method('process')->with($this->equalTo('connection'), $this->equalTo($job), $this->equalTo(0), $this->equalTo(0));
 
-        $worker->pop('connection', 'queue1,queue2');
+        $worker->runNextJob('connection', 'queue1,queue2');
     }
 
     public function testWorkerSleepsIfNoJobIsPresentAndSleepIsEnabled()
@@ -42,7 +42,7 @@ class QueueWorkerTest extends PHPUnit_Framework_TestCase
         $worker->expects($this->never())->method('process');
         $worker->expects($this->once())->method('sleep')->with($this->equalTo(3));
 
-        $worker->pop('connection', 'queue', 0, 3);
+        $worker->runNextJob('connection', 'queue', 0, 3);
     }
 
     public function testWorkerLogsJobToFailedQueueIfMaxTriesHasBeenExceeded()
