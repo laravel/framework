@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
-use InvalidArgumentException;
 
 class JoinClause extends Builder
 {
