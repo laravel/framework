@@ -365,7 +365,7 @@ if (! function_exists('class_uses_recursive')) {
     }
 }
 
-if (! function_exists("clear_routes")) {
+if (! function_exists('clear_routes')) {
     /**
      * Clear routes file.
      *
