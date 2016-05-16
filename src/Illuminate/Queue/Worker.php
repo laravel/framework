@@ -108,7 +108,7 @@ class Worker
     protected function runNextJobForDaemon($connectionName, $queue, $delay, $sleep, $maxTries)
     {
         try {
-            $this->pop($connectionName, $queue, $delay, $sleep, $maxTries);
+            $this->runNextJob($connectionName, $queue, $delay, $sleep, $maxTries);
         } catch (Exception $e) {
             if ($this->exceptions) {
                 $this->exceptions->report($e);
@@ -132,7 +132,7 @@ class Worker
     }
 
     /**
-     * Listen to the given queue.
+     * Process the next job on the queue.
      *
      * @param  string  $connectionName
      * @param  string  $queue
@@ -141,7 +141,7 @@ class Worker
      * @param  int     $maxTries
      * @return array
      */
-    public function pop($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
+    public function runNextJob($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
     {
         $connection = $this->manager->connection($connectionName);
 
