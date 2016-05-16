@@ -506,7 +506,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->whereHas('foo', function ($q) {
             $q->join('quuuux', function ($j) {
-               $j->on('quuuuux', '=', 'quuuuuux', 'and', true);
+               $j->where('quuuuux', '=', 'quuuuuux');
             });
             $q->having('bam', '>', 'qux');
         })->where('quux', 'quuux');
