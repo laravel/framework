@@ -99,7 +99,7 @@ class WorkCommand extends Command
             );
 
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
+                $connection, $queue, $delay, $memory, $this->option('timeout', 60),
                 $this->option('sleep'), $this->option('tries')
             );
         }
@@ -171,6 +171,8 @@ class WorkCommand extends Command
             ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 60],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];
