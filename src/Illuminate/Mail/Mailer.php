@@ -152,12 +152,10 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return void
+     * @return int
      */
     public function send($view, array $data, $callback)
     {
-        $this->forceReconnection();
-
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -304,18 +302,6 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Force the transport to re-connect.
-     *
-     * This will prevent errors in daemon queue situations.
-     *
-     * @return void
-     */
-    protected function forceReconnection()
-    {
-        $this->getSwiftMailer()->getTransport()->stop();
-    }
-
-    /**
      * Add the content to a given message.
      *
      * @param  \Illuminate\Mail\Message  $message
@@ -383,7 +369,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int
      */
     protected function sendSwiftMessage($message)
     {
@@ -391,24 +377,33 @@ class Mailer implements MailerContract, MailQueueContract
             $this->events->fire('mailer.sending', [$message]);
         }
 
+        $result = 0;
+
         if (! $this->pretending) {
-            return $this->swift->send($message, $this->failedRecipients);
+            $result = $this->getSwiftMailer()->send($message, $this->failedRecipients);
+            $this->getSwiftMailer()->getTransport()->stop();
         } elseif (isset($this->logger)) {
-            $this->logMessage($message);
+            $result = $this->logMessage($message);
         }
+
+        return $result;
     }
 
     /**
      * Log that a message was sent.
+     * Return the number of recipients, pretending everything worked just fine.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int
      */
     protected function logMessage($message)
     {
-        $emails = implode(', ', array_keys((array) $message->getTo()));
+        $recipients = (array) $message->getTo();
+        $emails = implode(', ', array_keys($recipients));
 
         $this->logger->info("Pretending to mail message to: {$emails}");
+
+        return count($recipients);
     }
 
     /**
