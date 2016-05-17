@@ -380,7 +380,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (! $this->pretending) {
             $result = $this->getSwiftMailer()->send($message, $this->failedRecipients);
             $this->getSwiftMailer()->getTransport()->stop();
-            
+
             return $result;
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
