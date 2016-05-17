@@ -23,7 +23,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        if (isset($config['unix_socket'])) {
+	// If we are connecting via unix_socket or if we have a config attribute of use_statement
+	// we will need to execute the "use $database" statement
+        if (isset($config['unix_socket']) || $config['use_statement']) {
             $connection->exec("use `{$config['database']}`;");
         }
 
