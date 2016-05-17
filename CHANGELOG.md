@@ -1,5 +1,52 @@
 # Release Notes
 
+## v5.2.32 (2016-05-17)
+
+### Added
+- Allow user to enable/disable foreign key checks dynamically ([#13333](https://github.com/laravel/framework/pull/13333))
+- Added `file` validation rule ([#13371](https://github.com/laravel/framework/pull/13371))
+- Added `guestMiddleware()` method to get guest middleware with guard parameter ([#13384](https://github.com/laravel/framework/pull/13384))
+- Added `Pivot::fromRawAttributes()` to create a new pivot model from raw values returned from a query ([f356419](https://github.com/laravel/framework/commit/f356419fa6f6b6fbc3322ca587b0bc1e075ba8d2))
+- Added `Builder::withCount()` to add a relationship subquery count ([#13414](https://github.com/laravel/framework/pull/13414))
+- Support `reply_to` field when using SparkPost ([#13410](https://github.com/laravel/framework/pull/13410))
+- Added validation rule for image dimensions ([#13428](https://github.com/laravel/framework/pull/13428))
+- Added "Generated Columns" support to MySQL grammar ([#13430](https://github.com/laravel/framework/pull/13430))
+- Added `Response::throwResponse()` ([#13473](https://github.com/laravel/framework/pull/13473))
+- Added `page` parameter to the `simplePaginate()` method ([#13502](https://github.com/laravel/framework/pull/13502))
+- Added `whereColumn()` method to Query Builder ([#13549](https://github.com/laravel/framework/pull/13549))
+- Allow `File::allFiles()` to show hidden dot files ([#13555](https://github.com/laravel/framework/pull/13555))
+
+### Changed
+- Return `null` instead of `0` for a default `BelongsTo` key ([#13378](https://github.com/laravel/framework/pull/13378))
+- Avoid useless logical operation ([#13397](https://github.com/laravel/framework/pull/13397))
+- Stop using `{!! !!}` for `csrf_field()` ([#13398](https://github.com/laravel/framework/pull/13398))
+- Improvements for `SessionGuard` methods `loginUsingId()` and `onceUsingId()` ([#13393](https://github.com/laravel/framework/pull/13393))
+- Added Work-around due to lack of `lastInsertId()` for ODBC for MSSQL ([#13423](https://github.com/laravel/framework/pull/13423))
+- Ensure `MigrationCreator::create()` receives `$create` as boolean ([#13439](https://github.com/laravel/framework/pull/13439))
+- Allow custom validators to be called with out function name ([#13444](https://github.com/laravel/framework/pull/13444))
+- Moved the `payload` column of jobs table to the end ([#13469](https://github.com/laravel/framework/pull/13469))
+- Stabilized table aliases for self joins by adding count ([#13401](https://github.com/laravel/framework/pull/13401))
+- Account for `__isset` changes in PHP 7 ([#13509](https://github.com/laravel/framework/pull/13509))
+- Bring back support for `Carbon` instances to `before` and `after` validators ([#13494](https://github.com/laravel/framework/pull/13494))
+- Allow method chaining for `MakesHttpRequest` trait ([#13529](https://github.com/laravel/framework/pull/13529))
+- Allow `Request::intersect()` to accept argument list ([#13515](https://github.com/laravel/framework/pull/13515))
+
+### Fixed
+- Accept != and <> as operators while value is null ([#13370](https://github.com/laravel/framework/pull/13370))
+- Fixed SparkPost BCC issue ([#13361](https://github.com/laravel/framework/pull/13361))
+- Fixed fatal error with optional `morphTo` relationship ([#13360](https://github.com/laravel/framework/pull/13360))
+- Fixed using `onlyTrashed()` and `withTrashed()` with `whereHas()` ([#13396](https://github.com/laravel/framework/pull/13396))
+- Fixed automatic scope nesting ([#13413](https://github.com/laravel/framework/pull/13413))
+- Fixed scheduler issue when using `user()` and `withoutOverlapping()` combined ([#13412](https://github.com/laravel/framework/pull/13412))
+- Fixed SqlServer grammar issue when table name is equal to a reserved keyword ([#13458](https://github.com/laravel/framework/pull/13458))
+- Fixed replacing route default parameters ([#13514](https://github.com/laravel/framework/pull/13514))
+- Fixed missing model attribute on `ModelNotFoundException` ([#13537](https://github.com/laravel/framework/pull/13537))
+- Decrement transaction count when `beginTransaction()` errors ([#13551](https://github.com/laravel/framework/pull/13551))
+- Fixed `seeJson()` issue when comparing two equal arrays ([#13531](https://github.com/laravel/framework/pull/13531))
+- Fixed a Scheduler issue where would no longer run in background ([#12628](https://github.com/laravel/framework/issues/12628))
+- Fixed sending attachments with SparkPost ([#13577](https://github.com/laravel/framework/pull/13577))
+
+
 ## v5.2.31 (2016-04-27)
 
 ### Added
