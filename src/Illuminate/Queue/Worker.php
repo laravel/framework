@@ -153,7 +153,7 @@ class Worker
                 posix_kill($processId, SIGKILL);
 
                 if ($this->exceptions) {
-                    $this->exceptions->report(new Exception("Daemon queue child process timed out."));
+                    $this->exceptions->report(new Exception('Daemon queue child process timed out.'));
                 }
             }, true);
 
