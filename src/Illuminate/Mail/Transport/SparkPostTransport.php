@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Swift_Encoding;
 use Swift_Mime_Message;
 use GuzzleHttp\ClientInterface;
 
@@ -59,6 +60,16 @@ class SparkPostTransport extends Transport
                 ],
             ],
         ];
+
+        if ($attachments = $message->getChildren()) {
+            $options['json']['content']['attachments'] = array_map(function ($attachment) {
+                return [
+                    'type' => $attachment->getContentType(),
+                    'name' => $attachment->getFileName(),
+                    'data' => Swift_Encoding::getBase64Encoding()->encodeString($attachment->getBody()),
+                ];
+            }, $attachments);
+        }
 
         $this->client->post('https://api.sparkpost.com/api/v1/transmissions', $options);
 
