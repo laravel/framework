@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use DateTime;
-use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Connection;
