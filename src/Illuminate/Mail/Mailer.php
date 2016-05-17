@@ -302,6 +302,18 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Force the transport to re-connect.
+     *
+     * This will prevent errors in daemon queue situations.
+     *
+     * @return void
+     */
+    protected function forceReconnection()
+    {
+        $this->getSwiftMailer()->getTransport()->stop();
+    }
+
+    /**
      * Add the content to a given message.
      *
      * @param  \Illuminate\Mail\Message  $message
@@ -378,8 +390,11 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         if (! $this->pretending) {
-            $result = $this->getSwiftMailer()->send($message, $this->failedRecipients);
-            $this->getSwiftMailer()->getTransport()->stop();
+            try {
+                $result = $this->swift->send($message, $this->failedRecipients);
+            } finally {
+                $this->getSwiftMailer()->getTransport()->stop();
+            }
 
             return $result;
         } elseif (isset($this->logger)) {
