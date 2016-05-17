@@ -146,7 +146,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['jsonSerialize']);
+        $c = $this->getMock('Illuminate\Support\Collection', ['jsonSerialize']);
         $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
