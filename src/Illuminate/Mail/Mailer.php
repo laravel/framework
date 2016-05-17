@@ -152,7 +152,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
-     * @return int
+     * @return void
      */
     public function send($view, array $data, $callback)
     {
@@ -369,7 +369,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return int
+     * @return void
      */
     protected function sendSwiftMessage($message)
     {
@@ -377,33 +377,26 @@ class Mailer implements MailerContract, MailQueueContract
             $this->events->fire('mailer.sending', [$message]);
         }
 
-        $result = 0;
-
         if (! $this->pretending) {
             $result = $this->getSwiftMailer()->send($message, $this->failedRecipients);
             $this->getSwiftMailer()->getTransport()->stop();
+            return $result;
         } elseif (isset($this->logger)) {
-            $result = $this->logMessage($message);
+            $this->logMessage($message);
         }
-
-        return $result;
     }
 
     /**
      * Log that a message was sent.
-     * Return the number of recipients, pretending everything worked just fine.
      *
      * @param  \Swift_Message  $message
-     * @return int
+     * @return void
      */
     protected function logMessage($message)
     {
-        $recipients = (array) $message->getTo();
-        $emails = implode(', ', array_keys($recipients));
+        $emails = implode(', ', array_keys((array) $message->getTo()));
 
         $this->logger->info("Pretending to mail message to: {$emails}");
-
-        return count($recipients);
     }
 
     /**
