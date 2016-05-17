@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use DateTime;
+use Exception;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
@@ -187,15 +188,19 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
 
-        $this->database->table($this->table)
-                    ->where('queue', $this->getQueue($queue))
-                    ->where('reserved', 1)
-                    ->where('reserved_at', '<=', $expired)
-                    ->update([
-                        'reserved' => 0,
-                        'reserved_at' => null,
-                        'attempts' => new Expression('attempts + 1'),
-                    ]);
+        try {
+            $this->database->table($this->table)
+                        ->where('queue', $this->getQueue($queue))
+                        ->where('reserved', 1)
+                        ->where('reserved_at', '<=', $expired)
+                        ->update([
+                            'reserved' => 0,
+                            'reserved_at' => null,
+                            'attempts' => new Expression('attempts + 1'),
+                        ]);
+        } catch (Exception $e) {
+            //
+        }
     }
 
     /**
