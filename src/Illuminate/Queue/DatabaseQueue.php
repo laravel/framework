@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use DateTime;
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Database\Query\Expression;
@@ -186,21 +187,28 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function releaseJobsThatHaveBeenReservedTooLong($queue)
     {
-        $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
-
-        try {
-            $this->database->table($this->table)
-                        ->where('queue', $this->getQueue($queue))
-                        ->where('reserved', 1)
-                        ->where('reserved_at', '<=', $expired)
-                        ->update([
-                            'reserved' => 0,
-                            'reserved_at' => null,
-                            'attempts' => new Expression('attempts + 1'),
-                        ]);
-        } catch (Exception $e) {
-            //
+        if (random_int(1, 10) < 10) {
+            return;
         }
+
+        $this->database->beginTransaction();
+
+        $stale = $this->database->table($this->table)
+                    ->lockForUpdate()
+                    ->where('queue', $this->getQueue($queue))
+                    ->where('reserved', 1)
+                    ->where('reserved_at', '<=', Carbon::now()->subSeconds($this->expire)->getTimestamp())
+                    ->get();
+
+        $this->database->table($this->table)
+            ->whereIn('id', Collection::make($stale)->pluck('id')->all())
+            ->update([
+                'reserved' => 0,
+                'reserved_at' => null,
+                'attempts' => new Expression('attempts + 1'),
+            ]);
+
+        $this->database->commit();
     }
 
     /**
