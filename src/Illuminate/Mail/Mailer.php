@@ -391,14 +391,14 @@ class Mailer implements MailerContract, MailQueueContract
 
     /**
      * Log that a message was sent.
-     * Return the number of recipients, pretending everything worked just fine
+     * Return the number of recipients, pretending everything worked just fine.
      *
      * @param  \Swift_Message  $message
      * @return int
      */
     protected function logMessage($message)
     {
-        $recipients = (array)$message->getTo();
+        $recipients = (array) $message->getTo();
         $emails = implode(', ', array_keys($recipients));
 
         $this->logger->info("Pretending to mail message to: {$emails}");
