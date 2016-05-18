@@ -336,6 +336,46 @@ trait MakesHttpRequests
     }
 
     /**
+     * Assert that the response contains the given JSON at the given path.
+     *
+     * @param  array  $data
+     * @param  string  $path
+     * @param  bool  $negate
+     * @return $this
+     */
+    protected function seeJsonAtPath(array $data, $path, $negate = false)
+    {
+        $method = $negate ? 'assertFalse' : 'assertTrue';
+
+        $actual = json_encode(Arr::sortRecursive(
+            Arr::get($this->decodeResponseJson(), $path)
+        ));
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = $this->formatToExpectedJson($key, $value);
+
+            $this->{$method}(
+                Str::contains($actual, $expected),
+                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response doesn't contain the given JSON at the given path.
+     *
+     * @param  array|null  $data
+     * @param  string  $null
+     * @return $this
+     */
+    public function dontSeeJsonAtPath(array $data = null, $path)
+    {
+        return $this->seeJsonAtPath($data, $path, true);
+    }
+
+    /**
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
