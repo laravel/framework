@@ -335,7 +335,7 @@ class Builder
      */
     public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
     {
-        $join = new JoinClause($type, $table, $this);
+        $join = new JoinClause($this, $type, $table);
 
         // If the first "column" of the join is really a Closure instance the developer
         // is trying to build a join with a complex "on" clause containing more than
@@ -448,7 +448,7 @@ class Builder
             return $this->join($table, $first, $operator, $second, 'cross');
         }
 
-        $this->joins[] = new JoinClause('cross', $table, $this);
+        $this->joins[] = new JoinClause($this, 'cross', $table);
 
         return $this;
     }
