@@ -141,7 +141,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $mock = $this->getGuard();
         $mock->setUser($user);
-        $this->assertEquals($user, $mock->user());
+        $this->assertSame($user, $mock->user());
     }
 
     public function testNullIsReturnedForUserIfNoUserFound()
@@ -157,8 +157,8 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock->getSession()->shouldReceive('get')->once()->andReturn(1);
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
-        $this->assertEquals($user, $mock->user());
-        $this->assertEquals($user, $mock->getUser());
+        $this->assertSame($user, $mock->user());
+        $this->assertSame($user, $mock->getUser());
     }
 
     public function testLogoutRemovesSessionTokenAndRememberMeCookie()
@@ -259,7 +259,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
         $guard->shouldReceive('login')->once()->with($user, false);
 
-        $this->assertEquals($user, $guard->loginUsingId(10));
+        $this->assertSame($user, $guard->loginUsingId(10));
     }
 
     public function testLoginUsingIdFailure()
@@ -282,7 +282,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard->getProvider()->shouldReceive('retrieveById')->once()->with(10)->andReturn($user);
         $guard->shouldReceive('setUser')->once()->with($user);
 
-        $this->assertEquals($user, $guard->onceUsingId(10));
+        $this->assertSame($user, $guard->onceUsingId(10));
     }
 
     public function testOnceUsingIdFailure()
@@ -308,7 +308,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $guard->getSession()->shouldReceive('set')->with($guard->getName(), 'bar')->once();
         $session->shouldReceive('migrate')->once();
-        $this->assertEquals($user, $guard->user());
+        $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
     }
 
