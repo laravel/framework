@@ -1418,7 +1418,6 @@ class Builder
                 }
             }
         }
-        
         return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
