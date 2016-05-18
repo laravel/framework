@@ -1410,7 +1410,6 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
-                
         // avoid duplicate orders
         if ($this->orders !== null) {
             foreach ($this->orders as $key => $order) {
