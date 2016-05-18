@@ -30,12 +30,12 @@ class JoinClause extends Builder
     /**
      * Create a new join clause instance.
      *
+     * @param  \Illuminate\Database\Query\Builder $parentQuery
      * @param  string  $type
      * @param  string  $table
-     * @param  \Illuminate\Database\Query\Builder $parentQuery
      * @return void
      */
-    public function __construct($type, $table, Builder $parentQuery)
+    public function __construct(Builder $parentQuery, $type, $table)
     {
         $this->type = $type;
         $this->table = $table;
@@ -95,6 +95,6 @@ class JoinClause extends Builder
      */
     public function newQuery()
     {
-        return new static($this->type, $this->table, $this->parentQuery);
+        return new static($this->parentQuery, $this->type, $this->table);
     }
 }
