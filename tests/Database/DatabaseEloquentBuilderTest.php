@@ -477,7 +477,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->select('id')->withCount(['activeFoo' => function($q){
+        $builder = $model->select('id')->withCount(['activeFoo' => function ($q) {
             $q->where('bam', '>', 'qux');
         }]);
 
