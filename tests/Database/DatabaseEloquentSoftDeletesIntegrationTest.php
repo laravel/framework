@@ -461,6 +461,43 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, count($users));
     }
 
+    /**
+     * @group test
+     */
+    public function testWithCountWithNestedDeletedRelationshipAndOnlyTrashedCondition()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+        $post1->delete();
+        $post2 = $abigail->posts()->create(['title' => 'Second Title']);
+        $post3 = $abigail->posts()->create(['title' => 'Third Title']);
+
+        $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(2, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->onlyTrashed();
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(1, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->withTrashed();
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(3, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->withTrashed()->where('title', 'First Title');
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(1, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->where('title', 'First Title');
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(0, $user->posts_count);
+    }
+
     public function testOrWhereWithSoftDeleteConstraint()
     {
         $this->createUsers();
