@@ -137,7 +137,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testToJsonEncodesTheJsonSerializeResult()
     {
-        $c = $this->getMock('Illuminate\Support\Collection', ['jsonSerialize']);
+        $c = $this->getMock(Collection::class, ['jsonSerialize']);
         $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
         $results = $c->toJson();
 
@@ -146,7 +146,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['jsonSerialize']);
+        $c = $this->getMock(Collection::class, ['jsonSerialize']);
         $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
@@ -551,8 +551,8 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         $data = $data->chunk(3);
 
-        $this->assertInstanceOf('Illuminate\Support\Collection', $data);
-        $this->assertInstanceOf('Illuminate\Support\Collection', $data[0]);
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertInstanceOf(Collection::class, $data[0]);
         $this->assertCount(4, $data);
         $this->assertEquals([1, 2, 3], $data[0]->toArray());
         $this->assertEquals([9 => 10], $data[3]->toArray());
@@ -631,7 +631,7 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertContains($random, $data->all());
 
         $random = $data->random(3);
-        $this->assertInstanceOf('Illuminate\Support\Collection', $random);
+        $this->assertInstanceOf(Collection::class, $random);
         $this->assertCount(3, $random);
     }
 
@@ -1091,10 +1091,10 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     {
         $c = new Collection([1, 2, 3]);
         $c = $c->zip(new Collection([4, 5, 6]));
-        $this->assertInstanceOf('Illuminate\Support\Collection', $c);
-        $this->assertInstanceOf('Illuminate\Support\Collection', $c[0]);
-        $this->assertInstanceOf('Illuminate\Support\Collection', $c[1]);
-        $this->assertInstanceOf('Illuminate\Support\Collection', $c[2]);
+        $this->assertInstanceOf(Collection::class, $c);
+        $this->assertInstanceOf(Collection::class, $c[0]);
+        $this->assertInstanceOf(Collection::class, $c[1]);
+        $this->assertInstanceOf(Collection::class, $c[2]);
         $this->assertCount(3, $c);
         $this->assertEquals([1, 4], $c[0]->all());
         $this->assertEquals([2, 5], $c[1]->all());
