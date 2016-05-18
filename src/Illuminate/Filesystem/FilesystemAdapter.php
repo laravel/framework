@@ -244,14 +244,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
-    * Get the local path for the given filename.
-    * @param string $path
-    * @return string
-    */
+     * Get the local path for the given filename.
+     *
+     * @param string $path
+     * @return string
+     */
     public function localPath($path)
     {
         $adapter = $this->driver->getAdapter();
         if ($adapter instanceof LocalAdapter) {
+
             return ($adapter->getPathPrefix().$path);
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
