@@ -317,22 +317,11 @@ trait MakesHttpRequests
      */
     protected function seeJsonContains(array $data, $negate = false)
     {
-        $method = $negate ? 'assertFalse' : 'assertTrue';
-
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
         ));
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $expected = $this->formatToExpectedJson($key, $value);
-
-            $this->{$method}(
-                Str::contains($actual, $expected),
-                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
-            );
-        }
-
-        return $this;
+        return $this->assertJsonContains($data, $actual, $negate);
     }
 
     /**
@@ -345,22 +334,11 @@ trait MakesHttpRequests
      */
     protected function seeJsonAtPath(array $data, $path, $negate = false)
     {
-        $method = $negate ? 'assertFalse' : 'assertTrue';
-
         $actual = json_encode(Arr::sortRecursive(
             Arr::get($this->decodeResponseJson(), $path)
         ));
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $expected = $this->formatToExpectedJson($key, $value);
-
-            $this->{$method}(
-                Str::contains($actual, $expected),
-                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
-            );
-        }
-
-        return $this;
+        return $this->assertJsonContains($data, $actual, $negate);
     }
 
     /**
@@ -424,6 +402,30 @@ trait MakesHttpRequests
         }
 
         return $expected;
+    }
+
+    /**
+     * Asserts that the given data was found in the actual JSON.
+     *
+     * @param  array  $data
+     * @param  string  $actual
+     * @param  bool  $negate
+     * @return $this
+     */
+    protected function assertJsonContains($data, $actual, $negate = false)
+    {
+        $method = $negate ? 'assertFalse' : 'assertTrue';
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = $this->formatToExpectedJson($key, $value);
+
+            $this->{$method}(
+                Str::contains($actual, $expected),
+                ($negate ? 'Found unexpected' : 'Unable to find')." JSON fragment [{$expected}] within [{$actual}]."
+            );
+        }
+
+        return $this;
     }
 
     /**
