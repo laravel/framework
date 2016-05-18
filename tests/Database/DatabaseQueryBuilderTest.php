@@ -728,6 +728,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testBasicJoins()
     {
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', 'users.id', 'contacts.id');
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id');
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
 
@@ -859,6 +863,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         });
         $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and "contacts"."is_active" = ? or (("contacts"."country" = ? or "contacts"."type" = "users"."type") and ("contacts"."country" = ? or "contacts"."is_partner" is null))', $builder->toSql());
         $this->assertEquals([1, 'UK', 'US'], $builder->getBindings());
+    }
+
+    public function testJoinsWithAdvancedConditions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->where(function ($j) {
+                $j->whereRole('admin')
+                    ->orWhereNull('contacts.disabled')
+                    ->orWhereRaw('year(contacts.created_at) = 2016');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and ("role" = ? or "contacts"."disabled" is null or year(contacts.created_at) = 2016)', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
     }
 
     public function testRawExpressionsInSelect()
