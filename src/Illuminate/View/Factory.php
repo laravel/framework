@@ -78,6 +78,13 @@ class Factory implements FactoryContract
     protected $composers = [];
 
     /**
+     * View composer parameters.
+     *
+     * @var array
+     */
+    protected $composerParameters = [];
+
+    /**
      * All of the finished, captured sections.
      *
      * @var array
@@ -399,6 +406,17 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Add a view composer parameter.
+     *
+     * @param  mixed  $parameter
+     * @return void
+     */
+    public function addComposerParameter($parameter)
+    {
+        $this->composerParameters[] = $parameter;
+    }
+
+    /**
      * Add an event for a given view.
      *
      * @param  string  $view
@@ -507,7 +525,9 @@ class Factory implements FactoryContract
      */
     public function callComposer(View $view)
     {
-        $this->events->fire('composing: '.$view->getName(), [$view]);
+        $parameters = $this->composerParameters;
+        array_unshift($parameters, $view);
+        $this->events->fire('composing: '.$view->getName(), $parameters);
     }
 
     /**
