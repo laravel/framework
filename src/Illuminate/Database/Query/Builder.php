@@ -1410,6 +1410,15 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
+        // avoid duplicate orders
+        if ($this->orders !== null) {
+            foreach ($this->orders as $key => $order) {
+                if ($order['column'] == $column) {
+                    unset($this->orders[$key]);
+                }
+            }
+        }
+
         return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
