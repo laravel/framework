@@ -47,7 +47,6 @@ class SparkPostTransport extends Transport
         $message->setBcc([]);
 
         $options = [
-            'connect_timeout' => 60,
             'headers' => [
                 'Authorization' => $this->key,
             ],
