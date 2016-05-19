@@ -75,14 +75,15 @@ class Worker
      * @param  int     $timeout
      * @param  int     $sleep
      * @param  int     $maxTries
+     * @param  bool    $force
      * @return array
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false)
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         while (true) {
-            if ($this->daemonShouldRun()) {
+            if ($this->daemonShouldRun($force)) {
                 $this->runNextJobForDaemon(
                     $connectionName, $queue, $delay, $timeout, $sleep, $maxTries
                 );
@@ -131,11 +132,12 @@ class Worker
     /**
      * Determine if the daemon should process on this iteration.
      *
+     * @param  bool  $force
      * @return bool
      */
-    protected function daemonShouldRun()
+    protected function daemonShouldRun($force)
     {
-        return $this->manager->isDownForMaintenance()
+        return (! $force && $this->manager->isDownForMaintenance())
                     ? false : $this->events->until('illuminate.queue.looping') !== false;
     }
 

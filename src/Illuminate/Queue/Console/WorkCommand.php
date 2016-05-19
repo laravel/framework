@@ -100,7 +100,7 @@ class WorkCommand extends Command
 
             return $this->worker->daemon(
                 $connection, $queue, $delay, $memory, $this->option('timeout', 60),
-                $this->option('sleep'), $this->option('tries')
+                $this->option('sleep'), $this->option('tries'), $this->option('force')
             );
         }
 
