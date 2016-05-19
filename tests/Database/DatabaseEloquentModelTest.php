@@ -1284,6 +1284,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testIssetBehavesCorrectlyWithAttributesAndRelationships()
+    {
+        $model = new EloquentModelStub;
+        $this->assertFalse(isset($model->nonexistent));
+
+        $model->some_attribute = 'some_value';
+        $this->assertTrue(isset($model->some_attribute));
+
+        $model->setRelation('some_relation', 'some_value');
+        $this->assertTrue(isset($model->some_relation));
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
