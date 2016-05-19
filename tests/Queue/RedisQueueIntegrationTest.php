@@ -88,8 +88,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
-        $this->assertGreaterThanOrEqual($score, $before + 60);
-        $this->assertLessThanOrEqual($score, $after + 60);
+        $this->assertLessThanOrEqual($score, $before + 60);
+        $this->assertGreaterThanOrEqual($score, $after + 60);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -109,8 +109,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
-        $this->assertGreaterThanOrEqual($score, $before + 60);
-        $this->assertLessThanOrEqual($score, $after + 60);
+        $this->assertLessThanOrEqual($score, $before + 60);
+        $this->assertGreaterThanOrEqual($score, $after + 60);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -132,8 +132,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
-        $this->assertGreaterThanOrEqual($score, $before);
-        $this->assertLessThanOrEqual($score, $after);
+        $this->assertLessThanOrEqual($score, $before);
+        $this->assertGreaterThanOrEqual($score, $after);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -166,11 +166,11 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $command);
             $this->assertContains($command->i, [10, -20]);
             if ($command->i == 10) {
-                $this->assertGreaterThanOrEqual($score, $before);
-                $this->assertLessThanOrEqual($score, $after);
+                $this->assertLessThanOrEqual($score, $before);
+                $this->assertGreaterThanOrEqual($score, $after);
             } else {
-                $this->assertGreaterThanOrEqual($score, $beforeFailPop);
-                $this->assertLessThanOrEqual($score, $afterFailPop);
+                $this->assertLessThanOrEqual($score, $beforeFailPop);
+                $this->assertGreaterThanOrEqual($score, $afterFailPop);
             }
         }
     }
@@ -193,8 +193,8 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $result = $this->redis->connection()->zrangebyscore('queues:default:reserved', -INF, INF, ['WITHSCORES' => true]);
         $reservedJob = array_keys($result)[0];
         $score = $result[$reservedJob];
-        $this->assertGreaterThanOrEqual($score, $before + 30);
-        $this->assertLessThanOrEqual($score, $after + 30);
+        $this->assertLessThanOrEqual($score, $before + 30);
+        $this->assertGreaterThanOrEqual($score, $after + 30);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
