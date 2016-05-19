@@ -1032,7 +1032,9 @@ class Builder
 
             call_user_func($constraints, $query);
 
-            $this->selectSub($query->getQuery(), snake_case($name).'_count');
+            $this->mergeModelDefinedRelationWheresToHasQuery($query, $relation);
+
+            $this->selectSub($query->toBase(), snake_case($name).'_count');
         }
 
         return $this;
