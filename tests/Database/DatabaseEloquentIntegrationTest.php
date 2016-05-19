@@ -768,6 +768,18 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $result->getRelations());
     }
 
+    public function testForPageAfterIdCorrectlyPaginates()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::forPageAfterId(15, 1);
+        $this->assertEquals(1, count($results));
+
+        $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
+        $this->assertEquals(1, count($results));
+    }
+
     /**
      * Helpers...
      */
