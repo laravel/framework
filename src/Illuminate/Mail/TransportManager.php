@@ -166,17 +166,17 @@ class TransportManager extends Manager
     }
 
     /**
-     * get configured http client
+     * get configured http client.
      * @param $config
      * @return HttpClient
      */
     protected function getHttpClient($config)
     {
         $guzzleConfig = Arr::get($config, 'guzzle', []);
-        
+
         // add default config for timeout
         $guzzleConfig = Arr::add($guzzleConfig, 'connect_timeout', 60);
-        
+
         return new HttpClient($guzzleConfig);
     }
 }
