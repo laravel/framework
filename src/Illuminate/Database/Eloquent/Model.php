@@ -3470,11 +3470,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __isset($key)
     {
-        if (isset($this->attributes[$key]) || isset($this->relations[$key])) {
-            return true;
-        }
-
-        if (method_exists($this, $key) && $this->$key && isset($this->relations[$key])) {
+        if (isset($this->attributes[$key]) || isset($this->relations[$key]) ||
+            method_exists($this, $key)) {
             return true;
         }
 
