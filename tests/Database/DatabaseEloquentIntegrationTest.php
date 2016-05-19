@@ -91,6 +91,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
+        $this->assertTrue(isset($model->email));
+        $this->assertTrue(isset($model->friends));
 
         $model = EloquentTestUser::find(1);
         $this->assertInstanceOf('EloquentTestUser', $model);
@@ -216,10 +218,19 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $post = $user->post;
         $user = $post->user;
 
+        $this->assertTrue(isset($user->post->name));
         $this->assertInstanceOf('EloquentTestUser', $user);
         $this->assertInstanceOf('EloquentTestPost', $post);
         $this->assertEquals('taylorotwell@gmail.com', $user->email);
         $this->assertEquals('First Post', $post->name);
+    }
+
+    public function testIssetLoadsInRelationshipIfItIsntLoadedAlready()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->post()->create(['name' => 'First Post']);
+
+        $this->assertTrue(isset($user->post->name));
     }
 
     public function testOneToManyRelationship()
