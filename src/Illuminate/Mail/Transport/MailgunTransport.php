@@ -75,6 +75,7 @@ class MailgunTransport extends Transport
                 'message' => new PostFile('message', $message->toString()),
             ];
         }
+        $options['connect_timeout'] = 60;
 
         return $this->client->post($this->url, $options);
     }
