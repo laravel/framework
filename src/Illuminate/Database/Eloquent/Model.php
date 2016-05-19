@@ -2136,6 +2136,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->hidden = array_diff($this->hidden, (array) $attributes);
 
+        if (! empty($this->visible)) {
+            $this->addVisible($attributes);
+        }
+
         return $this;
     }
 
