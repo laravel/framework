@@ -53,6 +53,7 @@ class MandrillTransport extends Transport
         } else {
             $options = ['body' => $data];
         }
+        $options['connect_timeout'] = 60;
 
         return $this->client->post('https://mandrillapp.com/api/1.0/messages/send-raw.json', $options);
     }
