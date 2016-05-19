@@ -24,6 +24,45 @@ class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
         $this->seeJson($resource->jsonSerialize());
     }
 
+    public function testSeeJsonContains()
+    {
+        $this->response = new Illuminate\Http\Response([
+            'name' => 'laravel',
+            'projects' => [['name' => 'valet']],
+        ]);
+
+        $this->seeJsonContains(['name' => 'valet']);
+        $this->seeJsonContains(['name' => 'laravel']);
+
+        try {
+            $this->seeJsonContains(['name' => 'rails']);
+
+            $this->fail('Test did not fail while the given data does not exist.');
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    public function testSeeAndDontSeeJsonAtPath()
+    {
+        $this->response = new Illuminate\Http\Response([
+            'name' => 'laravel',
+            'projects' => [['name' => 'valet']],
+        ]);
+
+        $this->seeJsonAtPath(['name' => 'valet'], 'projects');
+
+        $this->dontSeeJsonAtPath(['name' => 'laravel    '], 'projects');
+
+        try {
+            $this->seeJsonAtPath(['name' => 'laravel'], 'projects');
+
+            $this->fail('Lookup fails to look only inside the given path.');
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
     public function testSeeJsonStructure()
     {
         $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
