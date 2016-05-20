@@ -250,9 +250,19 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(get_class($a->zip(['a', 'b'], ['c', 'd'])), BaseCollection::class);
         $this->assertEquals(get_class($b->flip()), BaseCollection::class);
     }
+
+    public function testMakeVisibleRemovesHiddenAndIncludesVisible()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeVisible('hidden');
+
+        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
+    protected $visible = ['visible'];
     protected $hidden = ['hidden'];
 }
