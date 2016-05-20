@@ -165,6 +165,8 @@ class DatabaseQueue extends Queue implements QueueContract
             $this->releaseJobsThatHaveBeenReservedTooLong($queue);
         }
 
+        $this->database->beginTransaction();
+
         if ($job = $this->getNextAvailableJob($queue)) {
             $this->markJobAsReserved($job->id);
 
@@ -218,8 +220,6 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function getNextAvailableJob($queue)
     {
-        $this->database->beginTransaction();
-
         $job = $this->database->table($this->table)
                     ->lockForUpdate()
                     ->where('queue', $this->getQueue($queue))
