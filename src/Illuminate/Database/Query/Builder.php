@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1410,6 +1411,11 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
+        $this->orders = Collection::make($this->orders)
+                ->reject(function ($order) use ($column) {
+                    return $order['column'] === $column;
+                })->values()->all();
+
         return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
