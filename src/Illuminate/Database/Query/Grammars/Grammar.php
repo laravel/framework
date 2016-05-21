@@ -842,7 +842,7 @@ class Grammar extends BaseGrammar
      */
     public function compileRandom()
     {
-        return "RANDOM()";
+        return 'RANDOM()';
     }
 
     /**

@@ -355,6 +355,6 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRandom()
     {
-        return "NEWID()";
+        return 'NEWID()';
     }
 }

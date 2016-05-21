@@ -166,6 +166,6 @@ class MySqlGrammar extends Grammar
      */
     public function compileRandom()
     {
-        return "RAND()";
+        return 'RAND()';
     }
 }
