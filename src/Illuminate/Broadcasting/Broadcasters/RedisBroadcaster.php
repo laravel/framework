@@ -82,7 +82,7 @@ class RedisBroadcaster implements Broadcaster
         $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
 
         foreach ($this->channels as $pattern => $callback) {
-            if (!Str::is($pattern, $channel)) {
+            if (! Str::is($pattern, $channel)) {
                 continue;
             }
 
@@ -117,7 +117,7 @@ class RedisBroadcaster implements Broadcaster
      */
     protected function extractAuthParameters($pattern, $channel)
     {
-        if (!Str::contains($pattern, '*')) {
+        if (! Str::contains($pattern, '*')) {
             return [];
         }
 
