@@ -1397,7 +1397,7 @@ class Builder
      */
     public function random($value = 1)
     {
-        return $this->orderByRaw('RAND()')->limit($value);
+        return $this->orderByRaw($this->grammar->compileRandom())->limit($value);
     }
 
     /**

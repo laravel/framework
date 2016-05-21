@@ -347,4 +347,13 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
+
+    /**
+     * Compile random function for SqlServer.
+     *
+     * @return string
+     */
+    public function compileRandom(){
+        return "NEWID()";
+    }
 }

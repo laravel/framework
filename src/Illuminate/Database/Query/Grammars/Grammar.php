@@ -836,6 +836,15 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile random into SQL.
+     *
+     * @return string
+     */
+    public function compileRandom(){
+        return "RANDOM()";
+    }
+
+    /**
      * Concatenate an array of segments, removing empties.
      *
      * @param  array   $segments
