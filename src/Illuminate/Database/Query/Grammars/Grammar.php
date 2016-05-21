@@ -840,7 +840,8 @@ class Grammar extends BaseGrammar
      *
      * @return string
      */
-    public function compileRandom(){
+    public function compileRandom()
+    {
         return "RANDOM()";
     }
 

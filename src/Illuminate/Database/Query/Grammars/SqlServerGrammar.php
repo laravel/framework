@@ -353,7 +353,8 @@ class SqlServerGrammar extends Grammar
      *
      * @return string
      */
-    public function compileRandom(){
+    public function compileRandom()
+    {
         return "NEWID()";
     }
 }
