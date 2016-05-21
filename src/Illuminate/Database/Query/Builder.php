@@ -1390,6 +1390,17 @@ class Builder
     }
 
     /**
+     * Add statements to query to get one or many random records.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function random($value = 1)
+    {
+        return $this->orderByRaw('RAND()')->limit($value);
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param  int  $page
