@@ -70,7 +70,7 @@ class TokenGuard implements Guard
             );
         }
         
-        $this->request->setUserResolver(function() use ($user) {
+        $this->request->setUserResolver(function () use ($user) {
             return $user;
         });
 
