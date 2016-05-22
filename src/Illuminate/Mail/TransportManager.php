@@ -101,7 +101,7 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.mailgun', []);
 
         return new MailgunTransport(
-            new HttpClient(Arr::get($config, 'guzzle', [])),
+            $this->getHttpClient($config),
             $config['secret'], $config['domain']
         );
     }
@@ -116,7 +116,7 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.mandrill', []);
 
         return new MandrillTransport(
-            new HttpClient(Arr::get($config, 'guzzle', [])), $config['secret']
+            $this->getHttpClient($config), $config['secret']
         );
     }
 
@@ -130,7 +130,7 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.sparkpost', []);
 
         return new SparkPostTransport(
-            new HttpClient(Arr::get($config, 'guzzle', [])), $config['secret']
+            $this->getHttpClient($config), $config['secret']
         );
     }
 
@@ -163,5 +163,20 @@ class TransportManager extends Manager
     public function setDefaultDriver($name)
     {
         $this->app['config']['mail.driver'] = $name;
+    }
+
+    /**
+     * get configured http client.
+     * @param $config
+     * @return HttpClient
+     */
+    protected function getHttpClient($config)
+    {
+        $guzzleConfig = Arr::get($config, 'guzzle', []);
+
+        // add default config for timeout
+        $guzzleConfig = Arr::add($guzzleConfig, 'connect_timeout', 60);
+
+        return new HttpClient($guzzleConfig);
     }
 }
