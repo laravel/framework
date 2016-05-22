@@ -6,7 +6,6 @@ use Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PusherBroadcaster extends AbstractBroadcaster implements Broadcaster
 {

@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 abstract class AbstractBroadcaster
 {
-
     /**
      * The registered channel authenticators.
      *
