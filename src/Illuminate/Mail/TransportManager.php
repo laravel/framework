@@ -145,6 +145,19 @@ class TransportManager extends Manager
     }
 
     /**
+     * Get a fresh Guzzle HTTP client instance.
+     *
+     * @param  array  $config
+     * @return HttpClient
+     */
+    protected function getHttpClient($config)
+    {
+        $guzzleConfig = Arr::get($config, 'guzzle', []);
+
+        return new HttpClient(Arr::add($guzzleConfig, 'connect_timeout', 60));
+    }
+
+    /**
      * Get the default cache driver name.
      *
      * @return string
@@ -163,20 +176,5 @@ class TransportManager extends Manager
     public function setDefaultDriver($name)
     {
         $this->app['config']['mail.driver'] = $name;
-    }
-
-    /**
-     * get configured http client.
-     * @param $config
-     * @return HttpClient
-     */
-    protected function getHttpClient($config)
-    {
-        $guzzleConfig = Arr::get($config, 'guzzle', []);
-
-        // add default config for timeout
-        $guzzleConfig = Arr::add($guzzleConfig, 'connect_timeout', 60);
-
-        return new HttpClient($guzzleConfig);
     }
 }
