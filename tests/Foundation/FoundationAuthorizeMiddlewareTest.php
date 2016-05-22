@@ -1,10 +1,12 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Middleware\Authorize;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -14,13 +16,25 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     protected $container;
     protected $user;
 
+    public function tearDown()
+    {
+        m::close();
+    }
+
     public function setUp()
     {
         parent::setUp();
 
         $this->user = new stdClass;
 
-        $this->container = new Container;
+        Container::setInstance($this->container = new Container);
+
+        $this->container->singleton(Auth::class, function () {
+            $auth = m::mock(Auth::class);
+            $auth->shouldReceive('authenticate')->once()->andReturn(null);
+
+            return $auth;
+        });
 
         $this->container->singleton(GateContract::class, function () {
             return new Gate($this->container, function () {
