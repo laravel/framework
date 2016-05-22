@@ -26,6 +26,22 @@ trait GuardHelpers
     /**
      * Determine if the current user is authenticated.
      *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    public function authenticate()
+    {
+        if (! is_null($user = $this->user())) {
+            return $user;
+        }
+
+        throw new AuthenticationException($this);
+    }
+
+    /**
+     * Determine if the current user is authenticated.
+     *
      * @return bool
      */
     public function check()
