@@ -5,7 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
 
-class RedisBroadcaster implements Broadcaster
+class RedisBroadcaster extends AbstractBroadcaster implements Broadcaster
 {
     /**
      * The Redis instance.

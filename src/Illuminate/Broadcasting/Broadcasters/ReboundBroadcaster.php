@@ -5,7 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
 
-class ReboundBroadcaster implements Broadcaster
+class ReboundBroadcaster extends AbstractBroadcaster implements Broadcaster
 {
     /**
      * The Redis instance.
@@ -35,45 +35,6 @@ class ReboundBroadcaster implements Broadcaster
     }
 
     /**
-     * Register a channel authenticator.
-     *
-     * @param  string  $channel
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function auth($channel, callable $callback)
-    {
-        $this->channels[$channel] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Authenticate the incoming request for a given channel.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    public function check($request)
-    {
-        $channel = str_replace(['private-', 'presence-'], '', $request->channel_name);
-
-        foreach ($this->channels as $pattern => $callback) {
-            if (! Str::is($pattern, $channel)) {
-                continue;
-            }
-
-            $parameters = $this->extractAuthParameters($pattern, $channel);
-
-            if ($result = $callback($request->user(), ...$parameters)) {
-                return $this->validAuthenticationResponse($request, $result);
-            }
-        }
-
-        throw new HttpException(403);
-    }
-
-    /**
      * Return the valid Rebound authentication response.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -83,30 +44,6 @@ class ReboundBroadcaster implements Broadcaster
     protected function validAuthenticationResponse($request, $result)
     {
         return ['status' => 'success', 'user' => $request->user()];
-    }
-
-    /**
-     * Extract the parameters from the given pattern and channel.
-     *
-     * @param  string  $pattern
-     * @param  string  $channel
-     * @return array
-     */
-    protected function extractAuthParameters($pattern, $channel)
-    {
-        if (! Str::contains($pattern, '*')) {
-            return [];
-        }
-
-        $pattern = str_replace('\*', '([^\.]+)', preg_quote($pattern));
-
-        if (preg_match('/^'.$pattern.'/', $channel, $keys)) {
-            array_shift($keys);
-
-            return $keys;
-        }
-
-        return [];
     }
 
     /**
