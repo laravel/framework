@@ -41,7 +41,7 @@ class ReboundBroadcaster extends AbstractBroadcaster implements Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    protected function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result)
     {
         return ['status' => 'success', 'user' => $request->user()];
     }

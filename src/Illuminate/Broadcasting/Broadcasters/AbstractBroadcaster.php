@@ -54,6 +54,18 @@ abstract class AbstractBroadcaster
     }
 
     /**
+     * Return the valid authentication response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
+     * @return mixed
+     */
+    public function validAuthenticationResponse($request, $result)
+    {
+        return false;
+    }
+
+    /**
      * Extract the parameters from the given pattern and channel.
      *
      * @param  string  $pattern
