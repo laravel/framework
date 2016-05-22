@@ -91,7 +91,7 @@ class BroadcastManager implements FactoryContract
         }
 
         return $this->app['cache']->get(
-            'realtime:socket:'.$request->session()->getId()
+            'broadcast:socket:'.$request->session()->getId()
         );
     }
 
@@ -110,7 +110,7 @@ class BroadcastManager implements FactoryContract
         $request = $request ?: $this->app['request'];
 
         $this->app['cache']->forever(
-            'realtime:socket:'.$request->session()->getId(), $request->socket_id
+            'broadcast:socket:'.$request->session()->getId(), $request->socket_id
         );
     }
 
