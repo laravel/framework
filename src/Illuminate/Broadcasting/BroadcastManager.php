@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\ReboundBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
@@ -81,12 +82,16 @@ class BroadcastManager implements FactoryContract
             return $request->header('X-Socket-Id');
         }
 
+        if ($request->hasCookie('io')) {
+            return $request->cookie('io');
+        }
+
         if (! $request->hasSession()) {
             return;
         }
 
         return $this->app['cache']->get(
-            'pusher:socket:'.$request->session()->getId()
+            'realtime:socket:'.$request->session()->getId()
         );
     }
 
@@ -105,7 +110,7 @@ class BroadcastManager implements FactoryContract
         $request = $request ?: $this->app['request'];
 
         $this->app['cache']->forever(
-            'pusher:socket:'.$request->session()->getId(), $request->socket_id
+            'realtime:socket:'.$request->session()->getId(), $request->socket_id
         );
     }
 
@@ -206,6 +211,19 @@ class BroadcastManager implements FactoryContract
     protected function createRedisDriver(array $config)
     {
         return new RedisBroadcaster(
+            $this->app->make('redis'), Arr::get($config, 'connection')
+        );
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createReboundDriver(array $config)
+    {
+        return new ReboundBroadcaster(
             $this->app->make('redis'), Arr::get($config, 'connection')
         );
     }
