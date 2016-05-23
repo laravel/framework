@@ -86,6 +86,10 @@ class BroadcastManager implements FactoryContract
             return $request->cookie('io');
         }
 
+        if ($request->has('socket_id')) {
+            return $request->input('socket_id');
+        }
+
         if (! $request->hasSession()) {
             return;
         }
