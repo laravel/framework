@@ -17,6 +17,7 @@ trait AuthorizesRequests
      */
     public function authorize($ability, $arguments = [])
     {
+        xdebug_break();
         list($ability, $arguments) = $this->parseAbilityAndArguments($ability, $arguments);
 
         return app(Gate::class)->authorize($ability, $arguments);
@@ -48,7 +49,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability) && ! class_exists($ability)) {
+        if (is_string($ability) && ! (class_exists($ability, false) && is_subclass_of($ability, 'Illuminate\Database\Eloquent\Model'))) {
             return [$ability, $arguments];
         }
 
