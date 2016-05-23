@@ -838,9 +838,10 @@ class Grammar extends BaseGrammar
     /**
      * Compile random into SQL.
      *
+     * @param $seed
      * @return string
      */
-    public function compileRandom()
+    public function compileRandom($seed)
     {
         return 'RANDOM()';
     }
