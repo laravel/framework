@@ -97,6 +97,6 @@ abstract class AbstractBroadcaster
      */
     public function rememberSocket($request)
     {
-        return;
+        return false;
     }
 }
