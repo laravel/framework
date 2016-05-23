@@ -118,6 +118,25 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock->login($user);
     }
 
+    public function testAuthenticateReturnsUserWhenUserIsNotNull()
+    {
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard = $this->getGuard()->setUser($user);
+
+        $this->assertEquals($user, $guard->authenticate());
+    }
+
+    /**
+     * @expectedException \Illuminate\Auth\AuthenticationException
+     */
+    public function testAuthenticateThrowsWhenUserIsNull()
+    {
+        $guard = $this->getGuard();
+        $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+
+        $guard->authenticate();
+    }
+
     public function testIsAuthedReturnsTrueWhenUserIsNotNull()
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
