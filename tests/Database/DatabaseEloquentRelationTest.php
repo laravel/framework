@@ -76,6 +76,30 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $relation = new EloquentRelationStub($eloquentBuilder, $parent);
         $relation->wrap('test');
     }
+
+    public function testModelAccessorDoesNotBreakQuery()
+    {
+        $eloquentBuilder = m::mock(Builder::class);
+        $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
+
+        $model1 = new EloquentRelationResetModelStub;
+        $model1->value = ['array'];
+
+        $model2 = new EloquentRelationResetModelStub;
+        $model2->value = 'string value';
+
+        $model3 = new EloquentRelationResetModelStub;
+        $model3->value = new ValueObjectStub;
+
+        $eloquentBuilder->shouldReceive('getModel')->andReturn($model1);
+
+        $relation = new EloquentRelationStub($eloquentBuilder, $parent);
+        $keys = $relation->getAllKeys([$model1, $model2, $model3], 'value');
+
+        $this->assertSame('array', $keys[0]);
+        $this->assertSame('string value', $keys[1]);
+        $this->assertSame('object', $keys[2]);
+    }
 }
 
 class EloquentRelationResetModelStub extends Model
@@ -110,5 +134,18 @@ class EloquentRelationStub extends Relation
 
     public function getResults()
     {
+    }
+
+    public function getAllKeys(array $models, $key = null)
+    {
+        return $this->getKeys($models, $key);
+    }
+}
+
+class ValueObjectStub
+{
+    public function __toString()
+    {
+        return 'value object';
     }
 }
