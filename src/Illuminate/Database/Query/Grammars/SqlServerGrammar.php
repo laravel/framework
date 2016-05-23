@@ -351,9 +351,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile random function for SqlServer.
      *
+     * @param $seed
      * @return string
      */
-    public function compileRandom()
+    public function compileRandom($seed)
     {
         return 'NEWID()';
     }

@@ -1390,14 +1390,26 @@ class Builder
     }
 
     /**
-     * Add statements to query to get one or many random records.
+     * Add a statement to query to order records randomly.
      *
-     * @param  int  $value
+     * @param string $seed
      * @return $this
      */
-    public function random($value = 1)
+    public function orderByRand($seed = '')
     {
-        return $this->orderByRaw($this->grammar->compileRandom())->limit($value);
+        return $this->orderByRaw($this->grammar->compileRandom($seed));
+    }
+
+    /**
+     * Add statements to query to get one or many random records.
+     *
+     * @param  int $value
+     * @param string $seed
+     * @return $this
+     */
+    public function random($value = 1, $seed = '')
+    {
+        return $this->orderByRand($seed)->limit($value);
     }
 
     /**

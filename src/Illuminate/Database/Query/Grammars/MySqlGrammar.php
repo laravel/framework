@@ -162,10 +162,11 @@ class MySqlGrammar extends Grammar
     /**
      * Compile random function for MySQL.
      *
+     * @param $seed
      * @return string
      */
-    public function compileRandom()
+    public function compileRandom($seed)
     {
-        return 'RAND()';
+        return 'RAND('.$seed.')';
     }
 }
