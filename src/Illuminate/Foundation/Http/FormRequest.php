@@ -210,7 +210,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Set custom messages for validator errors.
+     * Get custom messages for validator errors.
      *
      * @return array
      */
@@ -220,7 +220,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Set custom attributes for validator errors.
+     * Get custom attributes for validator errors.
      *
      * @return array
      */
