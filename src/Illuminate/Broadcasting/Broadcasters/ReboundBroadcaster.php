@@ -43,7 +43,7 @@ class ReboundBroadcaster extends AbstractBroadcaster implements Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
-        return ['status' => 'success', 'user_id' => $request->user()->id, 'user_info' => $request->user()];
+        return ['status' => 'success', 'user_id' => $request->user()->id, 'user_info' => $result];
     }
 
     /**
