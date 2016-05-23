@@ -61,7 +61,7 @@ class UploadedFile extends SymfonyUploadedFile
      * @param  bool $test
      * @return static
      */
-    public static function createFromBase(SymfonyUploadedFile $file, $test)
+    public static function createFromBase(SymfonyUploadedFile $file, $test = false)
     {
         return $file instanceof static ? $file : new static(
             $file->getPathname(),
