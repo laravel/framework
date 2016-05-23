@@ -88,4 +88,15 @@ abstract class AbstractBroadcaster
 
         return [];
     }
+
+    /**
+     * Return a response to requests to save socket.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function remeberSocket($request)
+    {
+        return;
+    }
 }

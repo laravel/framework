@@ -112,6 +112,8 @@ class BroadcastManager implements FactoryContract
         $this->app['cache']->forever(
             'broadcast:socket:'.$request->session()->getId(), $request->socket_id
         );
+
+        return $this->connection()->rememberSocket($request);
     }
 
     /**

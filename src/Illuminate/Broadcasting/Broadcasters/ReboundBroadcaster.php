@@ -59,4 +59,19 @@ class ReboundBroadcaster extends AbstractBroadcaster implements Broadcaster
             $connection->publish($channel, $payload);
         }
     }
+
+    /**
+     * Return a response to requests to save socket.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function rememberSocket($request)
+    {
+        if ($request->user()) {
+            return ['status' => 'success', 'user_id' => $request->user()->id];
+        }
+
+        return ['status' => 'success'];
+    }
 }
