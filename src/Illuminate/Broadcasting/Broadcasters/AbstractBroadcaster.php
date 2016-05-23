@@ -95,7 +95,7 @@ abstract class AbstractBroadcaster
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function remeberSocket($request)
+    public function rememberSocket($request)
     {
         return;
     }
