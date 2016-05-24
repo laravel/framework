@@ -137,10 +137,13 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
+
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;
+
         $model2 = new EloquentHasManyModelStub;
         $model2->id = 2;
+
         $relation->addEagerConstraints([$model1, $model2]);
     }
 

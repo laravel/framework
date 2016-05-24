@@ -2606,6 +2606,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Retrieve a value (raw) for an attribute from this model.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getRawAttributeValue($key)
+    {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        }
+    }
+
+    /**
      * Get a plain attribute (not a relationship).
      *
      * @param  string  $key

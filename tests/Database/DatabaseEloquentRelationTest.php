@@ -89,7 +89,7 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
 
         $relation->getAllKeys([$model], 'key');
 
-        $model->shouldHaveReceived('getRawAttribute')->once()->with('key');
+        $model->shouldHaveReceived('getRawAttributeValue')->once()->with('key');
     }
 }
 
