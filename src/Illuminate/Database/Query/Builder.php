@@ -1693,6 +1693,18 @@ class Builder
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @return mixed
+     */
+    public function cursor()
+    {
+        $results = $this->connection->cursor($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+
+        return $results;
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param  int  $count
