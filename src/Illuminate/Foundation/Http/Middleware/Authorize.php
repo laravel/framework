@@ -38,6 +38,8 @@ class Authorize
      */
     public function handle($request, Closure $next, $ability, $model = null)
     {
+        auth()->authenticate();
+
         $this->gate->authorize($ability, $this->getGateArguments($request, $model));
 
         return $next($request);
