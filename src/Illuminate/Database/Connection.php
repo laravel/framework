@@ -354,7 +354,7 @@ class Connection implements ConnectionInterface
      */
     public function cursor($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+        $statement = $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
             if ($me->pretending()) {
                 return [];
             }
@@ -371,10 +371,12 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            while ($record = $statement->fetch()) {
-                yield $record;
-            }
+            return $statement;
         });
+
+        while ($record = $statement->fetch()) {
+            yield $record;
+        }
     }
 
     /**
