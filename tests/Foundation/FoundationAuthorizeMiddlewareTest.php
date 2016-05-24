@@ -32,6 +32,7 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
         $this->container->singleton(Auth::class, function () {
             $auth = m::mock(Auth::class);
             $auth->shouldReceive('authenticate')->once()->andReturn(null);
+
             return $auth;
         });
 
