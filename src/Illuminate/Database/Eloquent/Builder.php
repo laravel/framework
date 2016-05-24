@@ -342,6 +342,20 @@ class Builder
     }
 
     /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        $builder = $this->applyScopes();
+
+        foreach ($builder->query->cursor() as $record) {
+            yield $this->model->newFromBuilder($record);
+        }
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param  int  $count
