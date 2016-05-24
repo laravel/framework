@@ -332,7 +332,7 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $this->bindValues($statement, $me->prepareBindings($bindings));
+            $me->bindValues($statement, $me->prepareBindings($bindings));
 
             $statement->execute();
 
@@ -341,6 +341,39 @@ class Connection implements ConnectionInterface
             return isset($fetchArgument)
                     ? $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument())
                     : $statement->fetchAll($me->getFetchMode());
+        });
+    }
+
+    /*
+     * Run a select statement against the database and returns a generator.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return \Generator
+     */
+    public function cursor($query, $bindings = [], $useReadPdo = true)
+    {
+        return $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+            if ($me->pretending()) {
+                return [];
+            }
+
+            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+
+            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
+                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            } else {
+                $statement->setFetchMode($me->getFetchMode());
+            }
+
+            $me->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
+
+            while ($record = $statement->fetch()) {
+                yield $record;
+            }
         });
     }
 
