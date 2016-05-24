@@ -1693,15 +1693,19 @@ class Builder
     }
 
     /**
-     * Execute the query as a "select" statement.
+     * Get a generator for the given query.
      *
-     * @return mixed
+     * @return \Generator
      */
     public function cursor()
     {
-        $results = $this->connection->cursor($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
+        if (is_null($this->columns)) {
+            $this->columns = ['*'];
+        }
 
-        return $results;
+        return $this->connection->cursor(
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+        );
     }
 
     /**
