@@ -343,12 +343,12 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Run a select statement against the database and returns a cursor.
+     * Run a select statement against the database and returns a generator.
      *
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
+     * @return \Generator
      */
     public function cursor($query, $bindings = [], $useReadPdo = true)
     {
@@ -357,16 +357,19 @@ class Connection implements ConnectionInterface
                 return [];
             }
 
-            // For select statements, we'll simply execute the query and return an array
-            // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $statement->setFetchMode($me->getFetchMode());
+            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
+                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            } else {
+                $statement->setFetchMode($me->getFetchMode());
+            }
 
             $statement->execute($me->prepareBindings($bindings));
 
-            return $statement;
+            while ($record = $statement->fetch()) {
+                yield $record;
+            }
         });
     }
 
