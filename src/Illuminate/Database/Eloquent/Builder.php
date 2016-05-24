@@ -304,6 +304,33 @@ class Builder
     }
 
     /**
+     * Traverses through a result set using a cursor.
+     *
+     * @return void
+     */
+    public function cursor()
+    {
+        $builder = $this->applyScopes();
+
+        $statement = $builder->query->cursor();
+
+        while ($row = $statement->fetch()) {
+            // On each result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+
+            if ($row === false) {
+                return;
+            }
+
+            //Hydrate and yield an Eloquent Model
+            $model = $this->model->newFromBuilder($row);
+
+            yield $model;
+        }
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
