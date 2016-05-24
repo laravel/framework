@@ -304,20 +304,6 @@ class Builder
     }
 
     /**
-     * Get a generator for the given query.
-     *
-     * @return \Generator
-     */
-    public function cursor()
-    {
-        $builder = $this->applyScopes();
-
-        foreach ($builder->query->cursor() as $record) {
-            yield $this->model->newFromBuilder($record);
-        }
-    }
-
-    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -351,6 +337,20 @@ class Builder
 
         if ($result) {
             return $result->{$column};
+        }
+    }
+
+    /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        $builder = $this->applyScopes();
+
+        foreach ($builder->query->cursor() as $record) {
+            yield $this->model->newFromBuilder($record);
         }
     }
 
