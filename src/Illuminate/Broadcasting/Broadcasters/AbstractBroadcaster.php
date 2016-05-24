@@ -8,11 +8,29 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 abstract class AbstractBroadcaster
 {
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The registered channel authenticators.
      *
      * @var array
      */
     protected $channels = [];
+
+    /**
+     * Create a new broadcaster instance.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * Register a channel authenticator.
@@ -21,7 +39,7 @@ abstract class AbstractBroadcaster
      * @param  callable  $callback
      * @return $this
      */
-    public function auth($channel, callable $callback)
+    public function auth($channel, $callback)
     {
         $this->channels[$channel] = $callback;
 
@@ -45,12 +63,69 @@ abstract class AbstractBroadcaster
 
             $parameters = $this->extractAuthParameters($pattern, $channel);
 
-            if ($result = $callback($request->user(), ...$parameters)) {
+            $resolvedCallback = $this->makeAuthenticator($callback);
+
+            if ($result = $resolvedCallback($request->user(), ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
 
         throw new HttpException(403);
+    }
+
+    /**
+     * Register an authenticator.
+     *
+     * @param  mixed  $callback
+     * @return callable
+     */
+    public function makeAuthenticator($callback)
+    {
+        return is_string($callback) ? $this->createClassAuthenticator($callback) : $callback;
+    }
+
+    /**
+     * Create a class based authenticator using the IoC container.
+     *
+     * @param  mixed  $callback
+     * @return \Closure
+     */
+    public function createClassAuthenticator($callback)
+    {
+        $container = $this->app;
+
+        return function () use ($callback, $container) {
+            return call_user_func_array(
+                $this->createClassCallable($callback, $container), func_get_args()
+            );
+        };
+    }
+
+    /**
+     * Create the class based authenticator callable.
+     *
+     * @param  string  $callback
+     * @param  \Illuminate\Container\Container  $container
+     * @return callable
+     */
+    protected function createClassCallable($callback, $container)
+    {
+        list($class, $method) = $this->parseClassCallable($callback);
+
+        return [$container->make($class), $method];
+    }
+
+    /**
+     * Parse the class authenticator into class and method.
+     *
+     * @param  string  $callback
+     * @return array
+     */
+    protected function parseClassCallable($callback)
+    {
+        $segments = explode('@', $callback);
+
+        return [$segments[0], count($segments) == 2 ? $segments[1] : 'authenticate'];
     }
 
     /**

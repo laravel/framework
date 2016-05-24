@@ -17,11 +17,13 @@ class LogBroadcaster extends AbstractBroadcaster implements Broadcaster
     /**
      * Create a new broadcaster instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct($app, LoggerInterface $logger)
     {
+        parent::__construct($app);
         $this->logger = $logger;
     }
 

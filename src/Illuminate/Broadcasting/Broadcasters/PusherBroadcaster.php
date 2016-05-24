@@ -26,11 +26,13 @@ class PusherBroadcaster extends AbstractBroadcaster implements Broadcaster
     /**
      * Create a new broadcaster instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Pusher  $pusher
      * @return void
      */
-    public function __construct(Pusher $pusher)
+    public function __construct($app, Pusher $pusher)
     {
+        parent::__construct($app);
         $this->pusher = $pusher;
     }
 

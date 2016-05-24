@@ -204,6 +204,7 @@ class BroadcastManager implements FactoryContract
     protected function createPusherDriver(array $config)
     {
         return new PusherBroadcaster(
+            $this->app,
             new Pusher($config['key'], $config['secret'], $config['app_id'], Arr::get($config, 'options', []))
         );
     }
@@ -217,6 +218,7 @@ class BroadcastManager implements FactoryContract
     protected function createRedisDriver(array $config)
     {
         return new RedisBroadcaster(
+            $this->app,
             $this->app->make('redis'), Arr::get($config, 'connection')
         );
     }
@@ -230,6 +232,7 @@ class BroadcastManager implements FactoryContract
     protected function createReboundDriver(array $config)
     {
         return new ReboundBroadcaster(
+            $this->app,
             $this->app->make('redis'), Arr::get($config, 'connection')
         );
     }
@@ -243,6 +246,7 @@ class BroadcastManager implements FactoryContract
     protected function createLogDriver(array $config)
     {
         return new LogBroadcaster(
+            $this->app,
             $this->app->make('Psr\Log\LoggerInterface')
         );
     }
