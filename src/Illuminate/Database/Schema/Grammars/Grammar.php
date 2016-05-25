@@ -82,7 +82,7 @@ abstract class Grammar extends BaseGrammar
     {
         $table = $this->wrapTable($blueprint);
 
-        $index = $this->wrap($command->index);
+        $index = $this->wrap($command->index, true);
 
         $on = $this->wrapTable($command->on);
 

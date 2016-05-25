@@ -248,6 +248,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add primary key `bar`(`foo`)', $statements[0]);
     }
 
+    public function testAddingPrimaryKeyWithPrefix()
+    {
+        $blueprint = new Blueprint('users');
+        $grammar = $this->getGrammar()->setTablePrefix('prefix_');
+        $blueprint->primary('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $grammar);
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `prefix_users` add primary key `prefix_bar`(`foo`)', $statements[0]);
+    }
+
     public function testAddingUniqueKey()
     {
         $blueprint = new Blueprint('users');
@@ -256,6 +267,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add unique `bar`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithPrefix()
+    {
+        $blueprint = new Blueprint('users');
+        $grammar = $this->getGrammar()->setTablePrefix('prefix_');
+        $blueprint->unique('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $grammar);
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `prefix_users` add unique `prefix_bar`(`foo`)', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -268,6 +290,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingIndexWithPrefix()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], 'baz');
+        $grammar = $this->getGrammar()->setTablePrefix('prefix_');
+        $statements = $blueprint->toSql($this->getConnection(), $grammar);
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `prefix_users` add index `prefix_baz`(`foo`, `bar`)', $statements[0]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');
@@ -276,6 +309,17 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add constraint `users_foo_id_foreign` foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithPrefix()
+    {
+        $blueprint = new Blueprint('users');
+        $grammar = $this->getGrammar()->setTablePrefix('prefix_');
+        $blueprint->foreign('foo_id', 'baz')->references('id')->on('orders');
+        $statements = $blueprint->toSql($this->getConnection(), $grammar);
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `prefix_users` add constraint `prefix_baz` foreign key (`foo_id`) references `prefix_orders` (`id`)', $statements[0]);
     }
 
     public function testAddingIncrementingID()
