@@ -128,6 +128,7 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Matching/MethodValidator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Matching/SchemeValidator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Matching/UriValidator.php',
+    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php',
