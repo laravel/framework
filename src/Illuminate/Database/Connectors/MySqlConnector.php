@@ -23,7 +23,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        $connection->exec("use `{$config['database']}`;");
+        if (isset($config['database'])) {
+            $connection->exec("use `{$config['database']}`;");
+        }
 
         $collation = $config['collation'];
 
