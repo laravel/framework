@@ -142,7 +142,6 @@ return [
     $basePath.'/vendor/laravel/framework/src/Illuminate/Cookie/CookieJar.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Encryption/BaseEncrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Support/Facades/Log.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Log/Writer.php',
