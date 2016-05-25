@@ -56,8 +56,6 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
-        $queue = $this->option('queue');
-
         $delay = $this->option('delay');
 
         // The memory limit is the amount of memory we will allow the script to occupy
@@ -66,6 +64,11 @@ class WorkCommand extends Command
         $memory = $this->option('memory');
 
         $connection = $this->argument('connection');
+
+        // We need to get the right queue for the connection which is set in the queue
+        // configuration file for the application. We will pull it based on the set
+        // connection being run for the queue operation currently being executed.
+        $queue = $this->getQueue($connection);
 
         $response = $this->runWorker(
             $connection, $queue, $delay, $memory, $this->option('daemon')
@@ -77,6 +80,23 @@ class WorkCommand extends Command
         if (! is_null($response['job'])) {
             $this->writeOutput($response['job'], $response['failed']);
         }
+    }
+
+    /**
+     * Get the name of the queue connection to listen on.
+     *
+     * @param  string  $connection
+     * @return string
+     */
+    protected function getQueue($connection)
+    {
+        if (is_null($connection)) {
+            $connection = $this->laravel['config']['queue.default'];
+        }
+
+        $queue = $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
+
+        return $this->input->getOption('queue') ?: $queue;
     }
 
     /**
