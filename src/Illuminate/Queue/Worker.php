@@ -160,7 +160,6 @@ class Worker
             if ($this->exceptions) {
                 $this->exceptions->report($e);
             }
-            $this->stop();
         }
 
         $this->sleep($sleep);
