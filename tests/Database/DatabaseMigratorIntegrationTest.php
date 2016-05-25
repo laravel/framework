@@ -62,9 +62,12 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $this->migrator->rollback([__DIR__.'/migrations/one']);
+        $rolledBack = $this->migrator->rollback([__DIR__.'/migrations/one']);
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+
+        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(str_contains($rolledBack[1], 'users'));
     }
 
     public function testMigrationsCanBeReset()
@@ -72,9 +75,12 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $this->migrator->reset([__DIR__.'/migrations/one']);
+        $rolledBack = $this->migrator->reset([__DIR__.'/migrations/one']);
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+
+        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(str_contains($rolledBack[1], 'users'));
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
