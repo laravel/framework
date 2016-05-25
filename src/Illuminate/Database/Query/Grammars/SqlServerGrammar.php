@@ -175,6 +175,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the random statemnet into SQL.
+     *
+     * @param  string  $seed
+     * @return string
+     */
+    public function compileRandom($seed)
+    {
+        return 'NEWID()';
+    }
+
+    /**
      * Compile the "limit" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
