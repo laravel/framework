@@ -1650,6 +1650,12 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ['http://президент.рф/'],
             ['http://스타벅스코리아.com'],
             ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
+            ['http://laravel.com?'],
+            ['http://laravel.com?q=1'],
+            ['http://laravel.com/?q=1'],
+            ['http://laravel.com#'],
+            ['http://laravel.com#fragment'],
+            ['http://laravel.com/#fragment'],
         ];
     }
 
@@ -1665,8 +1671,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
             ['http://goog_le.com'],
             ['http://google.com::aa'],
             ['http://google.com:aa'],
-            ['http://laravel.com?'],
-            ['http://laravel.com#'],
             ['http://127.0.0.1:aa'],
             ['http://[::1'],
             ['foo://bar'],

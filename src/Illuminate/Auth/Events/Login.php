@@ -2,8 +2,12 @@
 
 namespace Illuminate\Auth\Events;
 
+use Illuminate\Queue\SerializesModels;
+
 class Login
 {
+    use SerializesModels;
+
     /**
      * The authenticated user.
      *
