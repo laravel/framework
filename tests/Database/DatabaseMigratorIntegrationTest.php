@@ -25,15 +25,15 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
         $db->setAsGlobal();
 
+        $container = new Illuminate\Container\Container;
+        $container->instance('db', $db->getDatabaseManager());
+        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
             new Filesystem
         );
-
-        $container = new Illuminate\Container\Container;
-        $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
 
         if (! $repository->repositoryExists()) {
             $repository->createRepository();

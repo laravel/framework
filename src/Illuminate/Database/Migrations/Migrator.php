@@ -72,11 +72,11 @@ class Migrator
     /**
      * Run the outstanding migrations at a given path.
      *
-     * @param  string|array  $paths
+     * @param  array|string  $paths
      * @param  array  $options
      * @return array
      */
-    public function run($paths, array $options = [])
+    public function run($paths = [], array $options = [])
     {
         $this->notes = [];
 
@@ -172,11 +172,11 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param  string|array $paths
+     * @param  array|string $paths
      * @param  bool  $pretend
      * @return array
      */
-    public function rollback($paths, $pretend = false)
+    public function rollback($paths = [], $pretend = false)
     {
         $this->notes = [];
 
@@ -212,11 +212,11 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
-     * @param  string|array $paths
+     * @param  array|string $paths
      * @param  bool  $pretend
      * @return array
      */
-    public function reset($paths, $pretend = false)
+    public function reset($paths = [], $pretend = false)
     {
         $this->notes = [];
 
@@ -404,17 +404,22 @@ class Migrator
     }
 
     /**
-     * Set a path which contains migration files.
+     * Register a custom migration path.
      *
-     * @param string $path
+     * These path will not automatically be applied.
+     *
+     * @param  string  $path
+     * @return void
      */
     public function path($path)
     {
         $this->paths[] = $path;
+
+        $this->paths = array_unique($this->paths);
     }
 
     /**
-     * Get all custom migration paths.
+     * Get all of the custom migration paths.
      *
      * @return array
      */
