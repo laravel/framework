@@ -1295,6 +1295,15 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($model->update());
     }
 
+    public function testRawAttributeRetrieval()
+    {
+        $model = new EloquentModelKeyStub;
+        $model->id = 'key';
+        
+        $this->assertEquals('key', $model->getKeyRawValue());
+        $this->assertInstanceOf(Id::class, $model->id);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1375,6 +1384,22 @@ class EloquentModelStub extends Model
     public function getAppendableAttribute()
     {
         return 'appended';
+    }
+}
+
+class Id
+{
+    public function __consturct($id)
+    {
+        $this->id = $id;
+    }
+}
+
+class EloquentModelKeyStub extends EloquentModelStub
+{
+    public function getIdAttribute($value)
+    {
+        return new Id($value);
     }
 }
 

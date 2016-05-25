@@ -1940,6 +1940,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Returns the raw value for the model's key.
+     *
+     * @return mixed
+     */
+    public function getKeyRawValue()
+    {
+        return $this->getRawAttributeValue($this->getKeyName());
+    }
+
+    /**
      * Get the queueable identity for the entity.
      *
      * @return mixed
