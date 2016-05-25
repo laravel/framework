@@ -56,15 +56,11 @@ class RollbackCommand extends BaseCommand
             return;
         }
 
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
-        $pretend = $this->input->getOption('pretend');
-
-        $paths = array_merge(
-            [$this->getMigrationPath()], $this->migrator->paths()
+        $this->migrator->rollback(
+            $this->getMigrationPaths(), $this->option('pretend')
         );
-
-        $this->migrator->rollback($paths, $pretend);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
