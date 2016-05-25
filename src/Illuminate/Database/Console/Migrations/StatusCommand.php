@@ -55,17 +55,19 @@ class StatusCommand extends BaseCommand
         $this->migrator->setConnection($this->input->getOption('database'));
 
         if (! is_null($path = $this->input->getOption('path'))) {
-            $path = $this->laravel->basePath().'/'.$path;
+            $paths[] = $this->laravel->basePath().'/'.$path;
         } else {
-            $path = $this->getMigrationPath();
+            $paths[] = $this->getMigrationPath();
+
+            $paths = array_merge($paths, $this->migrator->paths());
         }
 
         $ran = $this->migrator->getRepository()->getRan();
 
         $migrations = [];
 
-        foreach ($this->getAllMigrationFiles($path) as $migration) {
-            $migrations[] = in_array($migration, $ran) ? ['<info>Y</info>', $migration] : ['<fg=red>N</fg=red>', $migration];
+        foreach ($this->getAllMigrationFiles($paths) as $migration) {
+            $migrations[] = in_array($this->migrator->getMigrationName($migration), $ran) ? ['<info>Y</info>', $this->migrator->getMigrationName($migration)] : ['<fg=red>N</fg=red>', $this->migrator->getMigrationName($migration)];
         }
 
         if (count($migrations) > 0) {
@@ -78,12 +80,12 @@ class StatusCommand extends BaseCommand
     /**
      * Get all of the migration files.
      *
-     * @param  string  $path
+     * @param  array  $paths
      * @return array
      */
-    protected function getAllMigrationFiles($path)
+    protected function getAllMigrationFiles(array $paths)
     {
-        return $this->migrator->getMigrationFiles($path);
+        return $this->migrator->getMigrationFiles($paths);
     }
 
     /**
