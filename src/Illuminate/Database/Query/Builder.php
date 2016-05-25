@@ -1390,6 +1390,29 @@ class Builder
     }
 
     /**
+     * Add a statement to query to order records randomly.
+     *
+     * @param string $seed
+     * @return $this
+     */
+    public function orderByRand($seed = '')
+    {
+        return $this->orderByRaw($this->grammar->compileRandom($seed));
+    }
+
+    /**
+     * Add statements to query to get one or many random records.
+     *
+     * @param  int $value
+     * @param string $seed
+     * @return $this
+     */
+    public function random($value = 1, $seed = '')
+    {
+        return $this->orderByRand($seed)->limit($value);
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param  int  $page
