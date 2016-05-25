@@ -1285,10 +1285,10 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
-        $property = $this->unions ? 'unionOrders' : 'orders';
-        $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
-
-        $this->{$property}[] = compact('column', 'direction');
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => $column,
+            'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
+        ];
 
         return $this;
     }
@@ -1313,6 +1313,17 @@ class Builder
     public function oldest($column = 'created_at')
     {
         return $this->orderBy($column, 'asc');
+    }
+
+    /**
+     * Put the query's results in random order.
+     *
+     * @param  string  $seed
+     * @return $this
+     */
+    public function inRandomOrder($seed = '')
+    {
+        return $this->orderByRaw($this->grammar->compileRandom($seed));
     }
 
     /**
@@ -1387,29 +1398,6 @@ class Builder
     public function take($value)
     {
         return $this->limit($value);
-    }
-
-    /**
-     * Add a statement to query to order records randomly.
-     *
-     * @param string $seed
-     * @return $this
-     */
-    public function orderByRand($seed = '')
-    {
-        return $this->orderByRaw($this->grammar->compileRandom($seed));
-    }
-
-    /**
-     * Add statements to query to get one or many random records.
-     *
-     * @param  int $value
-     * @param string $seed
-     * @return $this
-     */
-    public function random($value = 1, $seed = '')
-    {
-        return $this->orderByRand($seed)->limit($value);
     }
 
     /**
