@@ -57,6 +57,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the random statemnet into SQL.
+     *
+     * @param  string  $seed
+     * @return string
+     */
+    public function compileRandom($seed)
+    {
+        return 'RAND('.$seed.')';
+    }
+
+    /**
      * Compile the lock into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -157,16 +168,5 @@ class MySqlGrammar extends Grammar
         $field = $this->wrapValue(array_shift($path));
 
         return $field.'->'.'"$.'.implode('.', $path).'"';
-    }
-
-    /**
-     * Compile random function for MySQL.
-     *
-     * @param $seed
-     * @return string
-     */
-    public function compileRandom($seed)
-    {
-        return 'RAND('.$seed.')';
     }
 }
