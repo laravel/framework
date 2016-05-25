@@ -48,9 +48,13 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testBasicMigrationOfSingleFolder()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $ran = $this->migrator->run([__DIR__.'/migrations/one']);
+
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+
+        $this->assertTrue(str_contains($ran[0], 'users'));
+        $this->assertTrue(str_contains($ran[1], 'password_resets'));
     }
 
     public function testMigrationsCanBeRolledBack()
