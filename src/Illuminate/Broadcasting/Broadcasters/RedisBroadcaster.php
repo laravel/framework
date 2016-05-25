@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
@@ -41,20 +42,6 @@ class RedisBroadcaster implements Broadcaster
     {
         $this->redis = $redis;
         $this->connection = $connection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function broadcast(array $channels, $event, array $payload = [])
-    {
-        $connection = $this->redis->connection($this->connection);
-
-        $payload = json_encode(['event' => $event, 'data' => $payload]);
-
-        foreach ($channels as $channel) {
-            $connection->publish($channel, $payload);
-        }
     }
 
     /**
@@ -130,5 +117,25 @@ class RedisBroadcaster implements Broadcaster
         }
 
         return [];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function broadcast(array $channels, $event, array $payload = [])
+    {
+        $connection = $this->redis->connection($this->connection);
+
+        $socket = Arr::pull($payload, 'socket');
+
+        $payload = json_encode([
+            'event' => $event,
+            'data' => $payload,
+            'socket' => $socket
+        ]);
+
+        foreach ($channels as $channel) {
+            $connection->publish($channel, $payload);
+        }
     }
 }
