@@ -174,11 +174,13 @@ class Migrator
      *
      * @param  string|array $paths
      * @param  bool  $pretend
-     * @return int
+     * @return array
      */
     public function rollback($paths, $pretend = false)
     {
         $this->notes = [];
+
+        $rolledBack = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
@@ -198,11 +200,13 @@ class Migrator
             $this->requireFiles($files);
 
             foreach ($migrations as $migration) {
+                $rolledBack[] = $files[$migration->migration];
+
                 $this->runDown($files[$migration->migration], (object) $migration, $pretend);
             }
         }
 
-        return $count;
+        return $rolledBack;
     }
 
     /**
@@ -210,11 +214,13 @@ class Migrator
      *
      * @param  string|array $paths
      * @param  bool  $pretend
-     * @return int
+     * @return array
      */
     public function reset($paths, $pretend = false)
     {
         $this->notes = [];
+
+        $rolledBack = [];
 
         $files = $this->getMigrationFiles($paths);
 
@@ -234,11 +240,13 @@ class Migrator
             // which will reverse each migration in order. This will get the database
             // back to its original "empty" state and will be ready for migrations.
             foreach ($migrations as $migration) {
+                $rolledBack[] = $files[$migration];
+
                 $this->runDown($files[$migration], (object) ['migration' => $migration], $pretend);
             }
         }
 
-        return $count;
+        return $rolledBack;
     }
 
     /**
