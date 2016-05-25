@@ -839,6 +839,11 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $model->address = null;
         $this->assertNull($model->line_one);
         $this->assertNull($model->line_two);
+
+        $model->address = new EloquentTestAddressValueObject('Fresh Line 1', 'Fresh Line 2');
+        $model->forceFill(['address' => null]);
+        $this->assertNull($model->line_one);
+        $this->assertNull($model->line_two);
     }
 
     /**
