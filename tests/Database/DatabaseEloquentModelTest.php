@@ -1306,12 +1306,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model = new EloquentModelStub;
         $this->assertFalse($model->update());
     }
-    
+
     public function testRawAttributeRetrieval()
     {
         $model = new EloquentModelKeyStub;
         $model->id = 'key';
-        
+
         $this->assertEquals('key', $model->getKeyRawValue());
         $this->assertInstanceOf(Id::class, $model->id);
     }
