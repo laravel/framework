@@ -60,9 +60,9 @@ class RollbackCommand extends BaseCommand
 
         $pretend = $this->input->getOption('pretend');
 
-        $paths[] = $this->getMigrationPath();
-
-        $paths = array_merge($paths, $this->migrator->paths());
+        $paths = array_merge(
+            [$this->getMigrationPath()], $this->migrator->paths()
+        );
 
         $this->migrator->rollback($paths, $pretend);
 
