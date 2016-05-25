@@ -57,9 +57,9 @@ class StatusCommand extends BaseCommand
         if (! is_null($path = $this->input->getOption('path'))) {
             $paths[] = $this->laravel->basePath().'/'.$path;
         } else {
-            $paths[] = $this->getMigrationPath();
-
-            $paths = array_merge($paths, $this->migrator->paths());
+            $paths = array_merge(
+                [$this->getMigrationPath()], $this->migrator->paths()
+            );
         }
 
         $ran = $this->migrator->getRepository()->getRan();
