@@ -175,7 +175,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the random statemnet into SQL.
+     * Compile the random statement into SQL.
      *
      * @param  string  $seed
      * @return string
