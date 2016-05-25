@@ -120,7 +120,6 @@ return [
     $basePath.'/vendor/symfony/routing/Route.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/Controller.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php',
-    $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/ControllerInspector.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php',
     $basePath.'/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php',
