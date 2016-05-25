@@ -74,7 +74,7 @@ class Migrator
      *
      * @param  string|array  $paths
      * @param  array  $options
-     * @return void
+     * @return array
      */
     public function run($paths, array $options = [])
     {
@@ -95,6 +95,8 @@ class Migrator
         $this->requireFiles($migrations);
 
         $this->runMigrationList($migrations, $options);
+
+        return $migrations;
     }
 
     /**
