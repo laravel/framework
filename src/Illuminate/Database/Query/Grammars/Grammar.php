@@ -530,6 +530,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the random statemnet into SQL.
+     *
+     * @param  string  $seed
+     * @return string
+     */
+    public function compileRandom($seed)
+    {
+        return 'RANDOM()';
+    }
+
+    /**
      * Compile the "limit" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
