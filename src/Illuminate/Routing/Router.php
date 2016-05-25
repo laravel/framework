@@ -734,7 +734,7 @@ class Router implements RegistrarContract
 
         $this->container->instance('Illuminate\Routing\Route', $route);
 
-        return $this->substituteBindings($route);
+        return $route;
     }
 
     /**
@@ -743,15 +743,13 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
-    protected function substituteBindings($route)
+    public function substituteBindings($route)
     {
         foreach ($route->parameters() as $key => $value) {
             if (isset($this->binders[$key])) {
                 $route->setParameter($key, $this->performBinding($key, $value, $route));
             }
         }
-
-        $this->substituteImplicitBindings($route);
 
         return $route;
     }
@@ -762,7 +760,7 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
-    protected function substituteImplicitBindings($route)
+    public function substituteImplicitBindings($route)
     {
         $parameters = $route->parameters();
 
