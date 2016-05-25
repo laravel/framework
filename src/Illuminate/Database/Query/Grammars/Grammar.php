@@ -530,7 +530,7 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile the random statemnet into SQL.
+     * Compile the random statement into SQL.
      *
      * @param  string  $seed
      * @return string
