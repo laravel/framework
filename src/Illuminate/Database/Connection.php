@@ -343,6 +343,39 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Run a select statement against the database and returns a generator.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return \Generator
+     */
+    public function cursor($query, $bindings = [], $useReadPdo = true)
+    {
+        $statement = $this->run($query, $bindings, function ($me, $query, $bindings) use ($useReadPdo) {
+            if ($me->pretending()) {
+                return [];
+            }
+
+            $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
+
+            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
+                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            } else {
+                $statement->setFetchMode($me->getFetchMode());
+            }
+
+            $statement->execute($me->prepareBindings($bindings));
+
+            return $statement;
+        });
+
+        while ($record = $statement->fetch()) {
+            yield $record;
+        }
+    }
+
+    /**
      * Get the PDO connection to use for a select query.
      *
      * @param  bool  $useReadPdo
