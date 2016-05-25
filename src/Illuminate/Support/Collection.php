@@ -557,7 +557,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Union the collection with the given items.
      *
      * @param  mixed  $items
-     * @return void
+     * @return static
      */
     public function union($items)
     {
@@ -1021,7 +1021,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
-
         }, $this->items);
     }
 

@@ -91,6 +91,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
+        $this->assertTrue(isset($model->email));
+        $this->assertTrue(isset($model->friends));
 
         $model = EloquentTestUser::find(1);
         $this->assertInstanceOf('EloquentTestUser', $model);
@@ -110,6 +112,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $collection = EloquentTestUser::find([1, 2, 3]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
         $this->assertEquals(2, $collection->count());
+
+        $models = EloquentTestUser::where('id', 1)->cursor();
+        foreach ($models as $model) {
+            $this->assertEquals(1, $model->id);
+        }
+
+        $records = DB::table('users')->where('id', 1)->cursor();
+        foreach ($records as $record) {
+            $this->assertEquals(1, $record->id);
+        }
+
+        $records = DB::cursor('select * from users where id = ?', [1]);
+        foreach ($records as $record) {
+            $this->assertEquals(1, $record->id);
+        }
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -231,10 +248,19 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $post = $user->post;
         $user = $post->user;
 
+        $this->assertTrue(isset($user->post->name));
         $this->assertInstanceOf('EloquentTestUser', $user);
         $this->assertInstanceOf('EloquentTestPost', $post);
         $this->assertEquals('taylorotwell@gmail.com', $user->email);
         $this->assertEquals('First Post', $post->name);
+    }
+
+    public function testIssetLoadsInRelationshipIfItIsntLoadedAlready()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->post()->create(['name' => 'First Post']);
+
+        $this->assertTrue(isset($user->post->name));
     }
 
     public function testOneToManyRelationship()
@@ -766,6 +792,18 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $result = EloquentTestUserWithGlobalScope::first();
 
         $this->assertCount(1, $result->getRelations());
+    }
+
+    public function testForPageAfterIdCorrectlyPaginates()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::forPageAfterId(15, 1);
+        $this->assertEquals(1, count($results));
+
+        $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
+        $this->assertEquals(1, count($results));
     }
 
     /**

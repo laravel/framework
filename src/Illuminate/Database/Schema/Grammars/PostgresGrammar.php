@@ -28,7 +28,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return 'select * from information_schema.tables where table_name = ?';
+        return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
     }
 
     /**
@@ -224,6 +224,26 @@ class PostgresGrammar extends Grammar
         $index = $this->wrap($command->index);
 
         return "alter table {$table} drop constraint {$index}";
+    }
+
+    /**
+     * Compile the command to enable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints()
+    {
+        return 'SET CONSTRAINTS ALL IMMEDIATE;';
+    }
+
+    /**
+     * Compile the command to disable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints()
+    {
+        return 'SET CONSTRAINTS ALL DEFERRED;';
     }
 
     /**

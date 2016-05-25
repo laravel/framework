@@ -20,6 +20,7 @@
         "illuminate/contracts": "5.2.*",
         "illuminate/support": "5.2.*",
         "nesbot/carbon": "~1.20",
+        "symfony/debug": "2.8.*|3.0.*",
         "symfony/process": "2.8.*|3.0.*"
     },
     "autoload": {

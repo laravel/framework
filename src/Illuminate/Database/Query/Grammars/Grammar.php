@@ -8,6 +8,13 @@ use Illuminate\Database\Grammar as BaseGrammar;
 class Grammar extends BaseGrammar
 {
     /**
+     * The grammar specific operators.
+     *
+     * @var array
+     */
+    protected $operators = [];
+
+    /**
      * The components that make up a select clause.
      *
      * @var array
@@ -299,6 +306,20 @@ class Grammar extends BaseGrammar
         $value = $this->parameter($where['value']);
 
         return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Compile a where clause comparing two columns..
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereColumn(Builder $query, $where)
+    {
+        $second = $this->wrap($where['second']);
+
+        return $this->wrap($where['first']).' '.$where['operator'].' '.$second;
     }
 
     /**
@@ -836,5 +857,15 @@ class Grammar extends BaseGrammar
     protected function removeLeadingBoolean($value)
     {
         return preg_replace('/and |or /i', '', $value, 1);
+    }
+
+    /**
+     * Get the gramar specific operators.
+     *
+     * @return array
+     */
+    public function getOperators()
+    {
+        return $this->operators;
     }
 }

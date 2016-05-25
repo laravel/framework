@@ -73,12 +73,20 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 
     public function testSeeIsAuthenticatedAs()
     {
+        $expected = m::mock(Authenticatable::class);
+        $expected->shouldReceive('getAuthIdentifier')
+            ->andReturn('1');
+
         $this->mockGuard()
             ->shouldReceive('user')
             ->once()
-            ->andReturn('Someone');
+            ->andReturn($expected);
 
-        $this->seeIsAuthenticatedAs('Someone');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthIdentifier')
+            ->andReturn('1');
+
+        $this->seeIsAuthenticatedAs($user);
     }
 
     protected function setupProvider(array $credentials)

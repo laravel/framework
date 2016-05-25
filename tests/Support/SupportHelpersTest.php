@@ -502,6 +502,16 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
             ['foo' => ['bar' => 'boom'], 'baz' => 'kaboom'],
             data_set($data, 'foo.bar', 'boom')
         );
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => 'boom']],
+            data_set($data, 'baz.bar', 'boom')
+        );
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => ['boom' => ['kaboom' => 'boom']]]],
+            data_set($data, 'baz.bar.boom.kaboom', 'boom')
+        );
     }
 
     public function testDataSetWithStar()

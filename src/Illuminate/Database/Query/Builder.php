@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -512,7 +513,8 @@ class Builder
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
-        if (! in_array(strtolower($operator), $this->operators, true)) {
+        if (! in_array(strtolower($operator), $this->operators, true) &&
+            ! in_array(strtolower($operator), $this->grammar->getOperators(), true)) {
             list($value, $operator) = [$operator, '='];
         }
 
@@ -549,19 +551,34 @@ class Builder
      *
      * @param  array  $column
      * @param  string  $boolean
+     * @param  string  $method
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean)
+    protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column) {
+        return $this->whereNested(function ($query) use ($column, $method) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
-                    call_user_func_array([$query, 'where'], $value);
+                    call_user_func_array([$query, $method], $value);
                 } else {
-                    $query->where($key, '=', $value);
+                    $query->$method($key, '=', $value);
                 }
             }
         }, $boolean);
+    }
+
+    /**
+     * Determine if the given operator and value combination is legal.
+     *
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function invalidOperatorAndValue($operator, $value)
+    {
+        $isOperator = in_array($operator, $this->operators);
+
+        return is_null($value) && $isOperator && ! in_array($operator, ['=', '<>', '!=']);
     }
 
     /**
@@ -578,17 +595,49 @@ class Builder
     }
 
     /**
-     * Determine if the given operator and value combination is legal.
+     * Add a "where" clause comparing two columns to the query.
      *
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return bool
+     * @param  string|array  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string|null  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
      */
-    protected function invalidOperatorAndValue($operator, $value)
+    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
-        $isOperator = in_array($operator, $this->operators);
+        // If the column is an array, we will assume it is an array of key-value pairs
+        // and can add them each as a where clause. We will maintain the boolean we
+        // received when the method was called and pass it into the nested where.
+        if (is_array($first)) {
+            return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
+        }
 
-        return $isOperator && $operator != '=' && is_null($value);
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if (! in_array(strtolower($operator), $this->operators, true) &&
+            ! in_array(strtolower($operator), $this->grammar->getOperators(), true)) {
+            list($second, $operator) = [$operator, '='];
+        }
+
+        $type = 'Column';
+
+        $this->wheres[] = compact('type', 'first', 'operator', 'second', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where" clause comparing two columns to the query.
+     *
+     * @param  string|array  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereColumn($first, $operator = null, $second = null)
+    {
+        return $this->whereColumn($first, $operator, $second, 'or');
     }
 
     /**
@@ -1362,6 +1411,11 @@ class Builder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
+        $this->orders = Collection::make($this->orders)
+                ->reject(function ($order) use ($column) {
+                    return $order['column'] === $column;
+                })->values()->all();
+
         return $this->where($column, '>', $lastId)
                     ->orderBy($column, 'asc')
                     ->take($perPage);
@@ -1545,11 +1599,12 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
+    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
@@ -1635,6 +1690,22 @@ class Builder
 
         $this->backups = [];
         $this->bindingBackups = [];
+    }
+
+    /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        if (is_null($this->columns)) {
+            $this->columns = ['*'];
+        }
+
+        return $this->connection->cursor(
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+        );
     }
 
     /**

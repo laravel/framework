@@ -2,13 +2,31 @@
 
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 
-class FoundationCrawlerTraitJsonTest extends PHPUnit_Framework_TestCase
+class FoundationMakesHttpRequestsJsonTest extends PHPUnit_Framework_TestCase
 {
     use MakesHttpRequests;
 
+    public function testSeeJsonWithArray()
+    {
+        $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
+
+        $resource = new JsonSerializableSingleResourceStub;
+
+        $this->seeJson($resource->jsonSerialize());
+    }
+
+    public function testSeeJsonWithMixed()
+    {
+        $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
+
+        $resource = new JsonSerializableMixedResourcesStub;
+
+        $this->seeJson($resource->jsonSerialize());
+    }
+
     public function testSeeJsonStructure()
     {
-        $this->response = new \Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
+        $this->response = new Illuminate\Http\Response(new JsonSerializableMixedResourcesStub);
 
         // At root
         $this->seeJsonStructure(['foo']);
@@ -23,7 +41,7 @@ class FoundationCrawlerTraitJsonTest extends PHPUnit_Framework_TestCase
         $this->seeJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
         // Wildcard (repeating structure) at root
-        $this->response = new \Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
+        $this->response = new Illuminate\Http\Response(new JsonSerializableSingleResourceStub);
         $this->seeJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 }
