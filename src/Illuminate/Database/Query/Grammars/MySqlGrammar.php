@@ -158,4 +158,15 @@ class MySqlGrammar extends Grammar
 
         return $field.'->'.'"$.'.implode('.', $path).'"';
     }
+
+    /**
+     * Compile random function for MySQL.
+     *
+     * @param $seed
+     * @return string
+     */
+    public function compileRandom($seed)
+    {
+        return 'RAND('.$seed.')';
+    }
 }
