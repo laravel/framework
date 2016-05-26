@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Grammar as BaseGrammar;
 
 class Grammar extends BaseGrammar
@@ -145,90 +146,14 @@ class Grammar extends BaseGrammar
         $sql = [];
 
         foreach ($joins as $join) {
+            $conditions = $this->compileWheres($join);
+
             $table = $this->wrapTable($join->table);
 
-            $type = $join->type;
-
-            // Cross joins generate a cartesian product between this first table and a joined
-            // table. In case the user didn't specify any "on" clauses on the join we will
-            // append this SQL and jump right back into the next iteration of this loop.
-            if ($type === 'cross' &&  ! $join->clauses) {
-                $sql[] = "cross join $table";
-
-                continue;
-            }
-
-            // First we need to build all of the "on" clauses for the join. There may be many
-            // of these clauses so we will need to iterate through each one and build them
-            // separately, then we'll join them up into a single string when we're done.
-            $clauses = [];
-
-            foreach ($join->clauses as $clause) {
-                $clauses[] = $this->compileJoinConstraint($clause);
-            }
-
-            // Once we have constructed the clauses, we'll need to take the boolean connector
-            // off of the first clause as it obviously will not be required on that clause
-            // because it leads the rest of the clauses, thus not requiring any boolean.
-            $clauses[0] = $this->removeLeadingBoolean($clauses[0]);
-
-            $clauses = implode(' ', $clauses);
-
-            // Once we have everything ready to go, we will just concatenate all the parts to
-            // build the final join statement SQL for the query and we can then return the
-            // final clause back to the callers as a single, stringified join statement.
-            $sql[] = "$type join $table on $clauses";
+            $sql[] = trim("{$join->type} join {$table} {$conditions}");
         }
 
         return implode(' ', $sql);
-    }
-
-    /**
-     * Create a join clause constraint segment.
-     *
-     * @param  array  $clause
-     * @return string
-     */
-    protected function compileJoinConstraint(array $clause)
-    {
-        if ($clause['nested']) {
-            return $this->compileNestedJoinConstraint($clause);
-        }
-
-        $first = $this->wrap($clause['first']);
-
-        if ($clause['where']) {
-            if ($clause['operator'] === 'in' || $clause['operator'] === 'not in') {
-                $second = '('.implode(', ', array_fill(0, $clause['second'], '?')).')';
-            } else {
-                $second = '?';
-            }
-        } else {
-            $second = $this->wrap($clause['second']);
-        }
-
-        return "{$clause['boolean']} $first {$clause['operator']} $second";
-    }
-
-    /**
-     * Create a nested join clause constraint segment.
-     *
-     * @param  array  $clause
-     * @return string
-     */
-    protected function compileNestedJoinConstraint(array $clause)
-    {
-        $clauses = [];
-
-        foreach ($clause['join']->clauses as $nestedClause) {
-            $clauses[] = $this->compileJoinConstraint($nestedClause);
-        }
-
-        $clauses[0] = $this->removeLeadingBoolean($clauses[0]);
-
-        $clauses = implode(' ', $clauses);
-
-        return "{$clause['boolean']} ({$clauses})";
     }
 
     /**
@@ -260,7 +185,9 @@ class Grammar extends BaseGrammar
         if (count($sql) > 0) {
             $sql = implode(' ', $sql);
 
-            return 'where '.$this->removeLeadingBoolean($sql);
+            $conjunction = $query instanceof JoinClause ? 'on' : 'where';
+
+            return $conjunction.' '.$this->removeLeadingBoolean($sql);
         }
 
         return '';
@@ -277,7 +204,9 @@ class Grammar extends BaseGrammar
     {
         $nested = $where['query'];
 
-        return '('.substr($this->compileWheres($nested), 6).')';
+        $offset = $query instanceof JoinClause ? 3 : 6;
+
+        return '('.substr($this->compileWheres($nested), $offset).')';
     }
 
     /**

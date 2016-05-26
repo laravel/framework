@@ -514,12 +514,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testGroupBys()
     {
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email');
+        $this->assertEquals('select * from "users" group by "email"', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->groupBy('id', 'email');
         $this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->groupBy(['id', 'email']);
         $this->assertEquals('select * from "users" group by "id", "email"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy(new Raw('DATE(created_at)'));
+        $this->assertEquals('select * from "users" group by DATE(created_at)', $builder->toSql());
     }
 
     public function testOrderBys()
@@ -571,7 +579,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('item');
         $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3)->get();
-        $this->assertEquals([['category' => 'rock', 'total' => 5]], $result);
+        $this->assertEquals([['category' => 'rock', 'total' => 5]], $result->all());
 
         // Using \Raw value
         $builder = $this->getBuilder();
@@ -580,7 +588,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) { return $results; });
         $builder->from('item');
         $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'))->get();
-        $this->assertEquals([['category' => 'rock', 'total' => 5]], $result);
+        $this->assertEquals([['category' => 'rock', 'total' => 5]], $result->all());
     }
 
     public function testRawHavings()
@@ -720,6 +728,10 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testBasicJoins()
     {
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', 'users.id', 'contacts.id');
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->leftJoin('photos', 'users.id', '=', 'photos.id');
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
 
@@ -853,6 +865,20 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([1, 'UK', 'US'], $builder->getBindings());
     }
 
+    public function testJoinsWithAdvancedConditions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->where(function ($j) {
+                $j->whereRole('admin')
+                    ->orWhereNull('contacts.disabled')
+                    ->orWhereRaw('year(contacts.created_at) = 2016');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and ("role" = ? or "contacts"."disabled" is null or year(contacts.created_at) = 2016)', $builder->toSql());
+        $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();
@@ -886,7 +912,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
-        $this->assertEquals(['bar', 'baz'], $results);
+        $this->assertEquals(['bar', 'baz'], $results->all());
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']]);
@@ -894,7 +920,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');
-        $this->assertEquals([1 => 'bar', 10 => 'baz'], $results);
+        $this->assertEquals([1 => 'bar', 10 => 'baz'], $results->all());
     }
 
     public function testImplode()
@@ -980,7 +1006,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $sum = $builder->sum('id');
         $this->assertEquals(2, $sum);
         $result = $builder->get();
-        $this->assertEquals([['column1' => 'foo', 'column2' => 'bar']], $result);
+        $this->assertEquals([['column1' => 'foo', 'column2' => 'bar']], $result->all());
     }
 
     public function testAggregateResetFollowedBySelectGet()
@@ -993,7 +1019,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $count = $builder->count('column1');
         $this->assertEquals(1, $count);
         $result = $builder->select('column2', 'column3')->get();
-        $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result);
+        $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
     }
 
     public function testAggregateResetFollowedByGetWithColumns()
@@ -1006,7 +1032,7 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $count = $builder->count('column1');
         $this->assertEquals(1, $count);
         $result = $builder->get(['column2', 'column3']);
-        $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result);
+        $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
     }
 
     public function testAggregateWithSubSelect()
@@ -1532,9 +1558,9 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'someIdField')->andReturn($builder);
 
         $builder->shouldReceive('get')->times(3)->andReturn(
-            [(object) ['someIdField' => 1], (object) ['someIdField' => 2]],
-            [(object) ['someIdField' => 10]],
-            []
+            collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]),
+            collect([(object) ['someIdField' => 10]]),
+            collect([])
         );
 
         $builder->chunkById(2, function ($results) {}, 'someIdField');

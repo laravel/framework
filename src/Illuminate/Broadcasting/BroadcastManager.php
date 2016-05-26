@@ -46,6 +46,70 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Register the routes for handling broadcast authentication and sockets.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function route(array $attributes = [])
+    {
+        if ($this->app->routesAreCached()) {
+            return;
+        }
+
+        $this->app['router']->group($attributes, function () {
+            $this->app['router']->post('/broadcasting/auth', BroadcastController::class.'@authenticate');
+            $this->app['router']->post('/broadcasting/socket', BroadcastController::class.'@rememberSocket');
+        });
+    }
+
+    /**
+     * Get the socket ID for the given request.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return string|null
+     */
+    public function socket($request = null)
+    {
+        if (! $request && ! $this->app->bound('request')) {
+            return;
+        }
+
+        $request = $request ?: $this->app['request'];
+
+        if ($request->hasHeader('X-Socket-Id')) {
+            return $request->header('X-Socket-Id');
+        }
+
+        if (! $request->hasSession()) {
+            return;
+        }
+
+        return $this->app['cache']->get(
+            'pusher:socket:'.$request->session()->getId()
+        );
+    }
+
+    /**
+     * Remember the socket for the given request.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return void
+     */
+    public function rememberSocket($request = null)
+    {
+        if (! $request && ! $this->app->bound('request')) {
+            return;
+        }
+
+        $request = $request ?: $this->app['request'];
+
+        $this->app['cache']->forever(
+            'pusher:socket:'.$request->session()->getId(), $request->socket_id
+        );
+    }
+
+    /**
      * Get a driver instance.
      *
      * @param  string  $driver

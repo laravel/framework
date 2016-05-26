@@ -38,28 +38,6 @@ class Arr
     }
 
     /**
-     * Build a new array using a callback.
-     *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
-     *
-     * @deprecated since version 5.2.
-     */
-    public static function build($array, callable $callback)
-    {
-        $results = [];
-
-        foreach ($array as $key => $value) {
-            list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
-
-            $results[$innerKey] = $innerValue;
-        }
-
-        return $results;
-    }
-
-    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
@@ -160,7 +138,7 @@ class Arr
         }
 
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
+            if (call_user_func($callback, $value, $key)) {
                 return $value;
             }
         }
@@ -182,7 +160,7 @@ class Arr
             return empty($array) ? value($default) : end($array);
         }
 
-        return static::first(array_reverse($array), $callback, $default);
+        return static::first(array_reverse($array, true), $callback, $default);
     }
 
     /**

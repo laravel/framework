@@ -7,7 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends Command
+class RollbackCommand extends BaseCommand
 {
     use ConfirmableTrait;
 
@@ -56,11 +56,11 @@ class RollbackCommand extends Command
             return;
         }
 
-        $this->migrator->setConnection($this->input->getOption('database'));
+        $this->migrator->setConnection($this->option('database'));
 
-        $pretend = $this->input->getOption('pretend');
-
-        $this->migrator->rollback($pretend);
+        $this->migrator->rollback(
+            $this->getMigrationPaths(), $this->option('pretend')
+        );
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having

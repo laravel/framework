@@ -56,8 +56,6 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
-        $queue = $this->option('queue');
-
         $delay = $this->option('delay');
 
         // The memory limit is the amount of memory we will allow the script to occupy
@@ -66,6 +64,11 @@ class WorkCommand extends Command
         $memory = $this->option('memory');
 
         $connection = $this->argument('connection');
+
+        // We need to get the right queue for the connection which is set in the queue
+        // configuration file for the application. We will pull it based on the set
+        // connection being run for the queue operation currently being executed.
+        $queue = $this->getQueue($connection);
 
         $response = $this->runWorker(
             $connection, $queue, $delay, $memory, $this->option('daemon')
@@ -77,6 +80,27 @@ class WorkCommand extends Command
         if (! is_null($response['job'])) {
             $this->writeOutput($response['job'], $response['failed']);
         }
+    }
+
+    /**
+     * Get the name of the queue connection to listen on.
+     *
+     * @param  string  $connection
+     * @return string
+     */
+    protected function getQueue($connection)
+    {
+        if ($this->option('queue')) {
+            return $this->option('queue');
+        }
+
+        if (is_null($connection)) {
+            $connection = $this->laravel['config']['queue.default'];
+        }
+
+        return $this->laravel['config']->get(
+            "queue.connections.{$connection}.queue", 'default'
+        );
     }
 
     /**
@@ -99,12 +123,12 @@ class WorkCommand extends Command
             );
 
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
+                $connection, $queue, $delay, $memory, $this->option('timeout', 60),
                 $this->option('sleep'), $this->option('tries')
             );
         }
 
-        return $this->worker->pop(
+        return $this->worker->runNextJob(
             $connection, $queue, $delay,
             $this->option('sleep'), $this->option('tries')
         );
@@ -171,6 +195,8 @@ class WorkCommand extends Command
             ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 60],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];

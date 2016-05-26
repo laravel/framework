@@ -332,17 +332,19 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $statement->execute($me->prepareBindings($bindings));
+            $me->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
 
             $fetchArgument = $me->getFetchArgument();
 
-            return isset($fetchArgument) ?
-                $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument()) :
-                $statement->fetchAll($me->getFetchMode());
+            return isset($fetchArgument)
+                    ? $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument())
+                    : $statement->fetchAll($me->getFetchMode());
         });
     }
 
-    /**
+    /*
      * Run a select statement against the database and returns a generator.
      *
      * @param  string  $query
@@ -365,13 +367,32 @@ class Connection implements ConnectionInterface
                 $statement->setFetchMode($me->getFetchMode());
             }
 
-            $statement->execute($me->prepareBindings($bindings));
+            $me->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
 
             return $statement;
         });
 
         while ($record = $statement->fetch()) {
             yield $record;
+        }
+    }
+
+    /**
+     * Bind values to their parameters in the given statement.
+     *
+     * @param  \PDOStatement $statement
+     * @param  array  $bindings
+     * @return void
+     */
+    public function bindValues($statement, $bindings)
+    {
+        foreach ($bindings as $key => $value) {
+            $statement->bindValue(
+                is_string($key) ? $key : $key + 1, $value,
+                filter_var($value, FILTER_VALIDATE_FLOAT) !== false ? PDO::PARAM_INT : PDO::PARAM_STR
+            );
         }
     }
 
@@ -436,9 +457,11 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            $bindings = $me->prepareBindings($bindings);
+            $statement = $this->getPdo()->prepare($query);
 
-            return $me->getPdo()->prepare($query)->execute($bindings);
+            $this->bindValues($statement, $me->prepareBindings($bindings));
+
+            return $statement->execute();
         });
     }
 
@@ -461,7 +484,9 @@ class Connection implements ConnectionInterface
             // to execute the statement and then we'll use PDO to fetch the affected.
             $statement = $me->getPdo()->prepare($query);
 
-            $statement->execute($me->prepareBindings($bindings));
+            $this->bindValues($statement, $me->prepareBindings($bindings));
+
+            $statement->execute();
 
             return $statement->rowCount();
         });
