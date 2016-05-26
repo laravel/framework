@@ -36,7 +36,7 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
             ],
         ], $dictionary);
     }
-g
+
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
