@@ -493,9 +493,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->withCount(['foo' => function ($q) {
             $q->where('bam', '>', 'qux');
-        }])->having('fooCount', '>=', 1);
+        }])->having('foo_count', '>=', 1);
 
-        $this->assertEquals('select *, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "fooCount" >= ?', $builder->toSql());
+        $this->assertEquals('select *, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "foo_count" >= ?', $builder->toSql());
         $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
     }
 

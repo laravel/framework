@@ -535,6 +535,10 @@ class Builder
         // will be bound to each SQL statements when it is finally executed.
         $type = 'Basic';
 
+        if (Str::contains($column, '->') && is_bool($value)) {
+            $value = new Expression($value ? 'true' : 'false');
+        }
+
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
