@@ -182,22 +182,6 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Convert an authentication exception into an unauthenticated response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function unauthenticated($request, AuthenticationException $e)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            return response('Unauthorized.', 401);
-        } else {
-            return redirect()->guest('login');
-        }
-    }
-
-    /**
      * Create a Symfony response for the given exception.
      *
      * @param  \Exception  $e
