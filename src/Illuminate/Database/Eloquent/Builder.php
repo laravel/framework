@@ -573,15 +573,9 @@ class Builder
             return $values;
         }
 
-        if (count($this->getQuery()->joins) > 0) {
-            $column = $this->model->getQualifiedUpdatedAtColumn();
-        } else {
-            $column = $this->model->getUpdatedAtColumn();
-        }
+        $column = $this->model->getUpdatedAtColumn();
 
-        return array_merge($values, [
-            $column => $this->model->freshTimestampString(),
-        ]);
+        return Arr::add($values, $column, $this->model->freshTimestampString());
     }
 
     /**
