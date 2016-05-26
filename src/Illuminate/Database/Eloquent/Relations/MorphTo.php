@@ -178,8 +178,6 @@ class MorphTo extends BelongsTo
         $query = clone $this->query;
         $query->setModel($instance);
 
-        $query = $query->withoutGlobalScopes($this->query->removedScopes());
-
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
     }
 
