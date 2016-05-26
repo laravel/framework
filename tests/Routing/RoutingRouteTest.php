@@ -701,21 +701,21 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
 
         $router = $this->getRouter();
-        $router->resource('foo-bars.foo-bazs', 'FooController', ['only' => ['show']]);
+        $router->resource('foo-bar.foo-baz', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}/foo-bazs/{foo_bazs}', $routes[0]->getUri());
+        $this->assertEquals('foo-bar/{foo_bar}/foo-baz/{foo_baz}', $routes[0]->getUri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show'], 'as' => 'prefix']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertEquals('foo-bars/{foo_bars}', $routes[0]->getUri());
+        $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->getUri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
     }
 
