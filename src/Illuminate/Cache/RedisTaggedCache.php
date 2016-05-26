@@ -9,13 +9,13 @@ class RedisTaggedCache extends TaggedCache
      *
      * @var string
      */
-    const REFERENCE_KEY_FOREVER = 'forever';
+    const REFERENCE_KEY_FOREVER = 'forever_ref';
     /**
      * Standard reference key.
      *
      * @var string
      */
-    const REFERENCE_KEY_STANDARD = 'standard';
+    const REFERENCE_KEY_STANDARD = 'standard_ref';
 
     /**
      * Store an item in the cache.
@@ -96,7 +96,7 @@ class RedisTaggedCache extends TaggedCache
         $fullKey = $this->getPrefix().sha1($namespace).':'.$key;
 
         foreach (explode('|', $namespace) as $segment) {
-            $this->store->connection()->lpush($this->referenceKey($segment, $reference), $fullKey);
+            $this->store->connection()->sadd($this->referenceKey($segment, $reference), $fullKey);
         }
     }
 
@@ -143,7 +143,7 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function deleteValues($referenceKey)
     {
-        $values = array_unique($this->store->connection()->lrange($referenceKey, 0, -1));
+        $values = array_unique($this->store->connection()->smembers($referenceKey));
 
         if (count($values) > 0) {
             call_user_func_array([$this->store->connection(), 'del'], $values);
