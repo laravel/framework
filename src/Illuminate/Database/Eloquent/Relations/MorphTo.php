@@ -175,12 +175,10 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = $instance->newQuery();
+        $query = clone $this->query;
+        $query->setModel($instance);
 
         $query = $query->withoutGlobalScopes($this->query->removedScopes());
-        foreach ($this->query->getQuery()->getRawBindings() as $bindingType => $bindings) {
-            $query->setBindings($bindings, $bindingType);
-        }
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
     }
