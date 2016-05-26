@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Query;
 
+use InvalidArgumentException;
+
 class JsonExpression extends Expression
 {
     /**
@@ -19,16 +21,16 @@ class JsonExpression extends Expression
      */
     public function __construct($value)
     {
-        $this->value = $this->getJsonValue($value);
+        $this->value = $this->getJsonBindingParameter($value);
     }
 
     /**
-     * Get the value of a JSON using the correct type.
+     * Translate the given value into the appropriate JSON binding parameter.
      *
      * @param  mixed  $value
      * @return string
      */
-    protected function getJsonValue($value)
+    protected function getJsonBindingParameter($value)
     {
         switch ($type = gettype($value)) {
             case 'boolean':
@@ -43,7 +45,7 @@ class JsonExpression extends Expression
                 return '?';
         }
 
-        throw new \InvalidArgumentException('JSON value is of illegal type: '.$type);
+        throw new InvalidArgumentException('JSON value is of illegal type: '.$type);
     }
 
     /**

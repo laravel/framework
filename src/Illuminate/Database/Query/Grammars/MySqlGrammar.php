@@ -95,14 +95,16 @@ class MySqlGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
+        $columns = [];
+
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = [];
-
         foreach ($values as $key => $value) {
             if ($this->isJsonSelector($key)) {
-                $columns[] = $this->prepareJsonUpdateColumn($key, new JsonExpression($value));
+                $columns[] = $this->compileJsonUpdateColumn(
+                    $key, new JsonExpression($value)
+                );
             } else {
                 $columns[] = $this->wrap($key).' = '.$this->parameter($value);
             }
@@ -138,13 +140,13 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Prepares the update column for JSON selectors using the JSON_SET MySQL function.
+     * Prepares a JSON column being updated using the JSON_SET function.
      *
-     * @param  string         $key
-     * @param  JsonExpression $value
+     * @param  string  $key
+     * @param  \Illuminate\Database\JsonExpression  $value
      * @return string
      */
-    protected function prepareJsonUpdateColumn($key, JsonExpression $value)
+    protected function compileJsonUpdateColumn($key, JsonExpression $value)
     {
         $path = explode('->', $key);
 
@@ -152,9 +154,7 @@ class MySqlGrammar extends Grammar
 
         $accessor = '"$.'.implode('.', $path).'"';
 
-        $sanitizedValue = $value->getValue();
-
-        return "{$field} = json_set({$field}, {$accessor}, {$sanitizedValue})";
+        return "{$field} = json_set({$field}, {$accessor}, {$value->getValue()})";
     }
 
     /**
@@ -189,61 +189,6 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Check for a JSON selector.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected function isJsonSelector($value)
-    {
-        return Str::contains($value, '->');
-    }
-
-    /**
-     * Compile a basic where clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBasic(Builder $query, $where)
-    {
-        // If we have a JSON selector here we'll simply
-        // convert it to a JsonExpression which then
-        // sets the value correctly on the query
-        if ($this->isJsonSelector($where['column']) && is_bool($where['value'])) {
-            $this->removeWhereBindingFromQuery($query, $where);
-
-            $where['value'] = new JsonExpression($where['value']);
-        }
-
-        $value = $this->parameter($where['value']);
-
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
-    }
-
-    /**
-     * Removes one where binding from the query.
-     *
-     * @param  Builder $query
-     * @param  array   $where
-     * @return void
-     */
-    protected function removeWhereBindingFromQuery(Builder $query, $where)
-    {
-        $wheres = $query->wheres;
-        $offset = array_search($where, $wheres);
-
-        if ($offset !== false) {
-            $whereBindings = $query->getRawBindings()['where'];
-
-            unset($whereBindings[$offset]);
-
-            $query->setBindings($whereBindings, 'where');
-        }
-    }
-
-    /**
      * Wrap a single string in keyword identifiers.
      *
      * @param  string  $value
@@ -275,5 +220,16 @@ class MySqlGrammar extends Grammar
         $field = $this->wrapValue(array_shift($path));
 
         return $field.'->'.'"$.'.implode('.', $path).'"';
+    }
+
+    /**
+     * Determine if the given string is a JSON selector.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isJsonSelector($value)
+    {
+        return Str::contains($value, '->');
     }
 }
