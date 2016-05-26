@@ -46,8 +46,8 @@ class TransportManager extends Manager
             $transport->setPassword($config['password']);
         }
 
-        if (isset($config['stream_options'])) {
-            $transport->setStreamOptions($config['stream_options']);
+        if (isset($config['stream'])) {
+            $transport->setStreamOptions($config['stream']);
         }
 
         return $transport;
