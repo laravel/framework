@@ -177,8 +177,6 @@ class MorphTo extends BelongsTo
 
         $query = $instance->newQuery();
 
-        $query = $this->useWithTrashed($query);
-
         $query = $query->withoutGlobalScopes($this->query->removedScopes());
         foreach ($this->query->getQuery()->getRawBindings() as $bindingType => $bindings) {
             $query->setBindings($bindings, $bindingType);

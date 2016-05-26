@@ -85,18 +85,6 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $relation->getEager();
     }
 
-    public function testModelsWithSoftDeleteAreProperlyPulled()
-    {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-
-        $relation = $this->getRelation(null, $builder);
-
-        $builder->shouldReceive('getMacro')->once()->with('withTrashed')->andReturn(function () { return true; });
-        $builder->shouldReceive('withTrashed')->once();
-
-        $relation->withTrashed();
-    }
-
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
