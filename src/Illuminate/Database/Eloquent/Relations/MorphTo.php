@@ -229,5 +229,4 @@ class MorphTo extends BelongsTo
     {
         return $this->dictionary;
     }
-
 }
