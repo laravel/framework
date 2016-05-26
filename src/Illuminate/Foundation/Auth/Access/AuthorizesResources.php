@@ -40,13 +40,13 @@ trait AuthorizesResources
     protected function resourceAbilityMap()
     {
         return [
-            'index'  => 'view',
-            'create' => 'create',
-            'store'  => 'create',
-            'show'   => 'view',
-            'edit'   => 'update',
-            'update' => 'update',
-            'delete' => 'delete',
+            'index'   => 'view',
+            'create'  => 'create',
+            'store'   => 'create',
+            'show'    => 'view',
+            'edit'    => 'update',
+            'update'  => 'update',
+            'destroy' => 'delete',
         ];
     }
 }
