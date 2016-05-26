@@ -62,6 +62,11 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $secondQuery->shouldReceive('getTable')->andReturn('foreign_table_2');
         $secondQuery->shouldReceive('getKeyName')->andReturn('id');
 
+        $firstQuery->shouldReceive('withoutGlobalScopes')->with([])->andReturn($firstQuery);
+        $firstQuery->shouldReceive('setBindings')->andReturnNull();
+        $secondQuery->shouldReceive('withoutGlobalScopes')->with([])->andReturn($secondQuery);
+        $secondQuery->shouldReceive('setBindings')->andReturnNull();
+
         $firstQuery->shouldReceive('newQuery')->once()->andReturn($firstQuery);
         $secondQuery->shouldReceive('newQuery')->once()->andReturn($secondQuery);
 
@@ -139,6 +144,17 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
     public function getRelation($parent = null, $builder = null)
     {
         $builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder->shouldReceive('getQuery')->andReturn($builder);
+        $builder->shouldReceive('removedScopes')->andReturn([]);
+        $builder->shouldReceive('withoutGlobalScopes')->with([])->andReturn($builder);
+        $builder->shouldReceive('getRawBindings')->andReturn([
+            'select' => [],
+            'join'   => [],
+            'where'  => [],
+            'having' => [],
+            'order'  => [],
+            'union'  => [],
+        ]);
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
         $related->shouldReceive('getKeyName')->andReturn('id');
