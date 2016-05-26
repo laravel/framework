@@ -521,23 +521,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
             'owner_id' => $abigail->id,
         ]);
 
-        $post1->comments()->create([
-            'body' => 'Comment Body 2',
-            'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
-        ]);
-
         $abigail->delete();
 
         $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
             $q->withoutGlobalScope(SoftDeletingScope::class);
         }])->first();
-        $comment2 = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
-            $q->withTrashed();
-        }])->where('body', 'Comment Body 2')->first();
 
         $this->assertEquals($abigail->email, $comment->owner->email);
-        $this->assertEquals($abigail->email, $comment2->owner->email);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+            $q->withTrashed();
+        }])->first();
+
+        $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
     public function testMorphToWithConstraints()
@@ -546,7 +542,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
-        $comment1 = $post1->comments()->create([
+        $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
             'owner_id' => $abigail->id,
@@ -574,6 +570,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
         $this->assertEquals($abigail->email, $comment->owner->email);
+
+        $abigail->delete();
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals(null, $comment->owner);
     }
 
     /**
