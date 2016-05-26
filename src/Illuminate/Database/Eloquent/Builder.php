@@ -747,6 +747,24 @@ class Builder
     }
 
     /**
+     * Apply the callback's query changes if the given "value" is true.
+     *
+     * @param  bool  $value
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function when($value, $callback)
+    {
+        $builder = $this;
+
+        if ($value) {
+            $builder = call_user_func($callback, $builder);
+        }
+
+        return $builder;
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  string  $column
