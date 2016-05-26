@@ -105,12 +105,12 @@ trait AuthorizesRequests
     protected function resourceAbilityMap()
     {
         return [
-            'index'   => 'view',
-            'show'    => 'view',
-            'create'  => 'create',
-            'store'   => 'create',
-            'edit'    => 'update',
-            'update'  => 'update',
+            'index' => 'view',
+            'show' => 'view',
+            'create' => 'create',
+            'store' => 'create',
+            'edit' => 'update',
+            'update' => 'update',
             'destroy' => 'delete',
         ];
     }
