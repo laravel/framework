@@ -49,9 +49,9 @@ class AuthorizesResourcesTest extends PHPUnit_Framework_TestCase
         $this->assertHasMiddleware($controller, 'can:update,user');
     }
 
-    public function testDeleteMethod()
+    public function testDestroyMethod()
     {
-        $controller = new AuthorizesResourcesController($this->request('delete'));
+        $controller = new AuthorizesResourcesController($this->request('destroy'));
 
         $this->assertHasMiddleware($controller, 'can:delete,user');
     }
