@@ -3,7 +3,7 @@
 ## v5.2.33 (2016-05-25)
 
 ### Added
-- Allow query results to be traverse their via cursor ([#13030](https://github.com/laravel/framework/pull/13030))
+- Allow query results to be traversed using a cursor ([#13030](https://github.com/laravel/framework/pull/13030))
 - Added support for log levels ([#13513](https://github.com/laravel/framework/pull/13513))
 - Added `inRandomOrder()` method to query builder ([#13642](https://github.com/laravel/framework/pull/13642))
 - Added support for custom connection in `PasswordBrokerManager` ([#13646](https://github.com/laravel/framework/pull/13646))
