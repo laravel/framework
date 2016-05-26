@@ -15,6 +15,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
         $verifier->setConnection('connection');
         $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
+        $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $extra = ['foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true, 'not' => '!admin'];
         $builder->shouldReceive('whereNull')->with('foo');
