@@ -83,17 +83,6 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
     public function getRelation($parent = null, $builder = null)
     {
         $builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldReceive('toBase')->andReturn($builder);
-        $builder->shouldReceive('removedScopes')->andReturn([]);
-        $builder->shouldReceive('withoutGlobalScopes')->with([])->andReturn($builder);
-        $builder->shouldReceive('getRawBindings')->andReturn([
-            'select' => [],
-            'join'   => [],
-            'where'  => [],
-            'having' => [],
-            'order'  => [],
-            'union'  => [],
-        ]);
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
         $related->shouldReceive('getKeyName')->andReturn('id');
