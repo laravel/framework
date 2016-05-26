@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JsonExpression;
 
 class MySqlGrammar extends Grammar
 {
@@ -92,7 +93,40 @@ class MySqlGrammar extends Grammar
      */
     public function compileUpdate(Builder $query, $values)
     {
-        $sql = parent::compileUpdate($query, $values);
+        $table = $this->wrapTable($query->from);
+
+        $columns = [];
+
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+        foreach ($values as $key => $value) {
+            if ($this->isJsonSelector($key)) {
+                $columns[] = $this->compileJsonUpdateColumn(
+                    $key, new JsonExpression($value)
+                );
+            } else {
+                $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+            }
+        }
+
+        $columns = implode(', ', $columns);
+
+        // If the query has any "join" clauses, we will setup the joins on the builder
+        // and compile them so we can attach them to this update, as update queries
+        // can get join statements to attach to other tables when they're needed.
+        if (isset($query->joins)) {
+            $joins = ' '.$this->compileJoins($query, $query->joins);
+        } else {
+            $joins = '';
+        }
+
+        // Of course, update queries may also be constrained by where clauses so we'll
+        // need to compile the where clauses and attach it to the query so only the
+        // intended records are updated by the SQL statements we generate to run.
+        $where = $this->compileWheres($query);
+
+        $sql = rtrim("update {$table}{$joins} set $columns $where");
 
         if (isset($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
@@ -103,6 +137,24 @@ class MySqlGrammar extends Grammar
         }
 
         return rtrim($sql);
+    }
+
+    /**
+     * Prepares a JSON column being updated using the JSON_SET function.
+     *
+     * @param  string  $key
+     * @param  \Illuminate\Database\JsonExpression  $value
+     * @return string
+     */
+    protected function compileJsonUpdateColumn($key, JsonExpression $value)
+    {
+        $path = explode('->', $key);
+
+        $field = $this->wrapValue(array_shift($path));
+
+        $accessor = '"$.'.implode('.', $path).'"';
+
+        return "{$field} = json_set({$field}, {$accessor}, {$value->getValue()})";
     }
 
     /**
@@ -148,7 +200,7 @@ class MySqlGrammar extends Grammar
             return $value;
         }
 
-        if (Str::contains($value, '->')) {
+        if ($this->isJsonSelector($value)) {
             return $this->wrapJsonSelector($value);
         }
 
@@ -168,5 +220,16 @@ class MySqlGrammar extends Grammar
         $field = $this->wrapValue(array_shift($path));
 
         return $field.'->'.'"$.'.implode('.', $path).'"';
+    }
+
+    /**
+     * Determine if the given string is a JSON selector.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isJsonSelector($value)
+    {
+        return Str::contains($value, '->');
     }
 }
