@@ -1,5 +1,36 @@
 # Release Notes
 
+## v5.2.33 (2016-05-25)
+
+### Added
+- Allow query results to be traverse their via cursor ([#13030](https://github.com/laravel/framework/pull/13030))
+- Added support for log levels ([#13513](https://github.com/laravel/framework/pull/13513))
+- Added `inRandomOrder()` method to query builder ([#13642](https://github.com/laravel/framework/pull/13642))
+- Added support for custom connection in `PasswordBrokerManager` ([#13646](https://github.com/laravel/framework/pull/13646))
+- Allow connection timeouts in `TransportManager` ([#13621](https://github.com/laravel/framework/pull/13621))
+- Added missing `$test` argument to `UploadedFile` ([#13656](https://github.com/laravel/framework/pull/13656))
+- Added `authenticate()` method to guards ([#13651](https://github.com/laravel/framework/pull/13651))
+
+### Changed
+- Use locking to migrate stale jobs ([26a24d6](https://github.com/laravel/framework/commit/26a24d61ced4c5833eba6572d585af90b22fcdb7))
+- Avoid `chunkById` duplicating `orders` clause with the same column ([#13604](https://github.com/laravel/framework/pull/13604))
+- Fire `RouteMatched` event on `route:list` command ([#13474](https://github.com/laravel/framework/pull/13474))
+- Set user resolver for request in `AuthManager::shouldUse()` ([bf5303f](https://github.com/laravel/framework/commit/bf5303fdc919d9d560df128b92a1891dc64ea488))
+- Always execute `use` call, unless database is empty ([#13701](https://github.com/laravel/framework/pull/13701), [ef770ed](https://github.com/laravel/framework/commit/ef770edb08f3540aefffd916ae6ef5c8db58f0af))
+- Allow `elixir()` `$buildDirectory` to be `null`. ([#13661](https://github.com/laravel/framework/pull/13661))
+- Simplified calling `Model::replicate()` with `$except` argument ([#13676](https://github.com/laravel/framework/pull/13676))
+- Allow auth events to be serialized ([#13704](https://github.com/laravel/framework/pull/13704))
+- Added `for` and `id` attributes to auth scaffold ([#13689](https://github.com/laravel/framework/pull/13689))
+- Aquire lock before deleting reserved job ([4b502dc](https://github.com/laravel/framework/commit/4b502dc6eecd80efad01e845469b9a2bac26dae0#diff-b05083dc38b4e45d38d28c676abbad83))
+
+### Fixed
+- Prefix timestamps when updating many-to-many relationships ([#13519](https://github.com/laravel/framework/pull/13519))
+- Fixed missing wheres defined on the relation when creating the subquery for a relation count ([#13612](https://github.com/laravel/framework/pull/13612))
+- Fixed `Model::makeVisible()` when `$visible` property is not empty ([#13625](https://github.com/laravel/framework/pull/13625))
+- Fixed PostgreSQL's `Schema::hasTable()` ([#13008](https://github.com/laravel/framework/pull/13008))
+- Fixed `url` validation rule when missing trailing slash ([#13700](https://github.com/laravel/framework/pull/13700))
+
+
 ## v5.2.32 (2016-05-17)
 
 ### Added
@@ -32,7 +63,7 @@
 - Allow `Request::intersect()` to accept argument list ([#13515](https://github.com/laravel/framework/pull/13515))
 
 ### Fixed
-- Accept != and <> as operators while value is null ([#13370](https://github.com/laravel/framework/pull/13370))
+- Accept `!=` and `<>` as operators while value is `null` ([#13370](https://github.com/laravel/framework/pull/13370))
 - Fixed SparkPost BCC issue ([#13361](https://github.com/laravel/framework/pull/13361))
 - Fixed fatal error with optional `morphTo` relationship ([#13360](https://github.com/laravel/framework/pull/13360))
 - Fixed using `onlyTrashed()` and `withTrashed()` with `whereHas()` ([#13396](https://github.com/laravel/framework/pull/13396))
