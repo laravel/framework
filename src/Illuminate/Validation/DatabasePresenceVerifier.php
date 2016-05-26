@@ -107,7 +107,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      */
     protected function table($table)
     {
-        return $this->db->connection($this->connection)->table($table);
+        return $this->db->connection($this->connection)->table($table)->useWritePdo();
     }
 
     /**
