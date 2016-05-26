@@ -29,13 +29,6 @@ class MorphTo extends BelongsTo
      */
     protected $dictionary = [];
 
-    /*
-     * Indicates if soft-deleted model instances should be fetched.
-     *
-     * @var bool
-     */
-    protected $withTrashed = false;
-
     /**
      * Create a new morph to relationship instance.
      *
@@ -243,32 +236,4 @@ class MorphTo extends BelongsTo
         return $this->dictionary;
     }
 
-    /**
-     * Fetch soft-deleted model instances with query.
-     *
-     * @return $this
-     */
-    public function withTrashed()
-    {
-        $this->withTrashed = true;
-
-        $this->query = $this->useWithTrashed($this->query);
-
-        return $this;
-    }
-
-    /**
-     * Return trashed models with query if told so.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function useWithTrashed(Builder $query)
-    {
-        if ($this->withTrashed && $query->getMacro('withTrashed') !== null) {
-            return $query->withTrashed();
-        }
-
-        return $query;
-    }
 }
