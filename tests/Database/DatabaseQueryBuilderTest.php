@@ -1230,6 +1230,62 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from `users`', $builder->toSql());
     }
 
+    public function testMySqlUpdateWrappingJson()
+    {
+        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+        // Couldn't get mockery to work
+        $connection = $this->getMock('Illuminate\Database\ConnectionInterface');
+        $connection->expects($this->once())
+                    ->method('update')
+                    ->with(
+                        $this->equalTo('update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?'),
+                        $this->equalTo(['John', 'Doe', 1])
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
+    }
+
+    public function testMySqlWrappingJsonWithString()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->sku', '=', 'foo-bar');
+        $this->assertEquals('select * from `users` where `items`->"$.sku" = ?', $builder->toSql());
+        $this->assertCount(1, $builder->getRawBindings()['where']);
+        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
+    }
+
+    public function testMySqlWrappingJsonWithInteger()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price', '=', 1);
+        $this->assertEquals('select * from `users` where `items`->"$.price" = ?', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithDouble()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->price', '=', 1.5);
+        $this->assertEquals('select * from `users` where `items`->"$.price" = ?', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithBoolean()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', true);
+        $this->assertEquals('select * from `users` where `items`->"$.available" = true', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithBooleanAndIntegerThatLooksLikeOne()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
+        $this->assertEquals('select * from `users` where `items`->"$.available" = true and `items`->"$.active" = false and `items`->"$.number_available" = ?', $builder->toSql());
+    }
+
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
