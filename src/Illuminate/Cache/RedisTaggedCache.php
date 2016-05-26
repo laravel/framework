@@ -9,13 +9,13 @@ class RedisTaggedCache extends TaggedCache
      *
      * @var string
      */
-    const REFERENCE_KEY_FOREVER = 'forever';
+    const REFERENCE_KEY_FOREVER = 'forever_ref';
     /**
      * Standard reference key.
      *
      * @var string
      */
-    const REFERENCE_KEY_STANDARD = 'standard';
+    const REFERENCE_KEY_STANDARD = 'standard_ref';
 
     /**
      * Store an item in the cache.
