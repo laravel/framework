@@ -45,6 +45,7 @@ class Authorize
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Auth\Access\AuthenticationException
      */
     public function handle($request, Closure $next, $ability, $model = null)
     {
