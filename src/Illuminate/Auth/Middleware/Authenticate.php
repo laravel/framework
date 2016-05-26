@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Http;
+namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
