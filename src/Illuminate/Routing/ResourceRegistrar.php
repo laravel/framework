@@ -39,7 +39,7 @@ class ResourceRegistrar
      *
      * @var bool
      */
-    protected static $singularParameters = false;
+    protected static $singularParameters = true;
 
     /**
      * Create a new resource registrar instance.
