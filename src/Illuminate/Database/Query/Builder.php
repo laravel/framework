@@ -2067,6 +2067,8 @@ class Builder
 
         $sql = $this->grammar->compileUpdate($this, $values);
 
+        $bindings = $this->grammar->prepareBindingsForUpdate($bindings, $values);
+
         return $this->connection->update($sql, $this->cleanBindings($bindings));
     }
 
