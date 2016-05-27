@@ -1,5 +1,24 @@
 # Release Notes
 
+## v5.2.34 (2016-05-26)
+
+### Added
+- Added correct MySQL JSON bool handling and updating grammar ([#13242](https://github.com/laravel/framework/pull/13242))
+- Added `stream` option to mail `TransportManager` ([#13715](https://github.com/laravel/framework/pull/13715))
+- Added `when()` method to eloquent query builder ([#13726](https://github.com/laravel/framework/pull/13726))
+
+### Changed
+- Catch exceptions in `Worker::pop()` to prevent log spam ([#13688](https://github.com/laravel/framework/pull/13688))
+- Use write connection when validating uniqueness ([#13718](https://github.com/laravel/framework/pull/13718))
+- Use `withException()` method in `Handler::toIlluminateResponse()` ([#13712](https://github.com/laravel/framework/pull/13712))
+- Apply constraints to `morphTo` relationships when using eager loading ([#13724](https://github.com/laravel/framework/pull/13724))
+- Use SETs rather than LISTs for storing Redis cache key references ([#13731](https://github.com/laravel/framework/pull/13731))
+
+### Fixed
+- Map `destroy` instead of `delete` in `AuthorizesResources` ([#13716](https://github.com/laravel/framework/pull/13716))
+- Reverted [#13519](https://github.com/laravel/framework/pull/13519) ([#13733](https://github.com/laravel/framework/pull/13733))
+
+
 ## v5.2.33 (2016-05-25)
 
 ### Added
