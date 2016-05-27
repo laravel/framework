@@ -196,13 +196,11 @@ class MorphTo extends BelongsTo
     {
         $eagers = BaseCollection::make($this->query->getEagerLoads());
 
-        $eagers = $eagers->filter(function ($constraint, $relation) {
+        return $eagers->filter(function ($constraint, $relation) {
             return Str::startsWith($relation, $this->relation.'.');
-        });
-
-        return $eagers->keys()->map(function ($key) {
-            return Str::replaceFirst($this->relation.'.', '', $key);
-        })->combine($eagers)->merge($instance->getEagerLoads())->all();
+        })->flatMap(function ($constraint, $relation) {
+            return [Str::replaceFirst($this->relation.'.', '', $relation) => $constraint];
+        })->merge($instance->getEagerLoads())->all();
     }
 
     /**
