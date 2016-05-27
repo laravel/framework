@@ -133,11 +133,11 @@ abstract class AbstractBroadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $result
-     * @return mixed
+     * @return array
      */
     public function validAuthenticationResponse($request, $result)
     {
-        return false;
+        return ['status' => 'success', 'user_id' => $request->user()->getKey(), 'user_info' => $result];
     }
 
     /**
@@ -168,10 +168,14 @@ abstract class AbstractBroadcaster
      * Return a response to requests to save socket.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return array
      */
     public function rememberSocket($request)
     {
-        return false;
+        if ($request->user()) {
+            return ['status' => 'success', 'user_id' => $request->user()->getKey()];
+        }
+
+        return ['status' => 'success'];
     }
 }
