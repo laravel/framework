@@ -194,15 +194,12 @@ class MorphTo extends BelongsTo
      */
     protected function getEagerLoadsForInstance(Model $instance)
     {
-        $eagers = BaseCollection::make($this->query->getEagerLoads());
-
-        $eagers = $eagers->filter(function ($constraint, $relation) {
-            return Str::startsWith($relation, $this->relation.'.');
-        });
-
-        return $eagers->keys()->map(function ($key) {
-            return Str::replaceFirst($this->relation.'.', '', $key);
-        })->combine($eagers)->merge($instance->getEagerLoads())->all();
+        return BaseCollection::make($this->query->getEagerLoads())
+            ->filter(function ($constraint, $relation) {
+                return Str::startsWith($relation, $this->relation.'.');
+            })->mapKeys(function ($key) {
+                return Str::replaceFirst($this->relation.'.', '', $key);
+            })->merge($instance->getEagerLoads())->all();
     }
 
     /**
