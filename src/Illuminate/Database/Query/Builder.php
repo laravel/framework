@@ -1810,7 +1810,7 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        if(is_array($column)) {
+        if (is_array($column)) {
             $column = array_values($column)[0];
             $key = array_keys($column)[0];
         }
