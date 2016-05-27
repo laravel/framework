@@ -1,12 +1,8 @@
 <?php
 
-use Carbon\Carbon;
 use Illuminate\Database\Connection;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestCase
