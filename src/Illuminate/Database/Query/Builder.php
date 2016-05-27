@@ -465,6 +465,8 @@ class Builder
      */
     public function when($value, $callback)
     {
+        // The callback will be passed this Query Builder instance
+        // as a parameter, and has to return it.
         $builder = $this;
 
         if ($value) {
