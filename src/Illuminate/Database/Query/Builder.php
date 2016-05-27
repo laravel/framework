@@ -1811,7 +1811,7 @@ class Builder
     public function pluck($column, $key = null)
     {
         if(is_array($column)) {
-            $column = $column[0];
+            $column = array_values($column)[0];
             $key = array_keys($column)[0];
         }
 
