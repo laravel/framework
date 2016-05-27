@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Str;
 
 class MorphTo extends BelongsTo
 {
@@ -180,9 +180,29 @@ class MorphTo extends BelongsTo
         $query = clone $this->query;
 
         $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
+
         $query->setModel($instance);
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
+    }
+
+    /**
+     * Get the relationships that should be eager loaded for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $instance
+     * @return array
+     */
+    protected function getEagerLoadsForInstance(Model $instance)
+    {
+        $eagers = BaseCollection::make($this->query->getEagerLoads());
+
+        $eagers = $eagers->filter(function ($constraint, $relation) {
+            return Str::startsWith($relation, $this->relation.'.');
+        });
+
+        return $eagers->keys()->map(function ($key) {
+            return Str::replaceFirst($this->relation.'.', '', $key);
+        })->combine($eagers)->merge($instance->getEagerLoads())->all();
     }
 
     /**
@@ -212,19 +232,6 @@ class MorphTo extends BelongsTo
         $class = $this->parent->getActualClassNameForMorph($type);
 
         return new $class;
-    }
-
-    protected function getEagerLoadsForInstance(Model $instance)
-    {
-        $eagers = BaseCollection::make($this->query->getEagerLoads());
-
-        $eagers = $eagers->filter(function ($constraint, $relation) {
-            return Str::startsWith($relation, $this->relation.'.');
-        });
-
-        return $eagers->keys()->map(function ($key) {
-            return Str::replaceFirst($this->relation.'.', '', $key);
-        })->combine($eagers)->merge($instance->getEagerLoads())->all();
     }
 
     /**
