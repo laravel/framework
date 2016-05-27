@@ -5,6 +5,8 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Str;
 
 class MorphTo extends BelongsTo
 {
@@ -176,6 +178,8 @@ class MorphTo extends BelongsTo
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
         $query = clone $this->query;
+
+        $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
         $query->setModel($instance);
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
@@ -208,6 +212,19 @@ class MorphTo extends BelongsTo
         $class = $this->parent->getActualClassNameForMorph($type);
 
         return new $class;
+    }
+
+    protected function getEagerLoadsForInstance(Model $instance)
+    {
+        $eagers = BaseCollection::make($this->query->getEagerLoads());
+
+        $eagers = $eagers->filter(function ($constraint, $relation) {
+            return Str::startsWith($relation, $this->relation.'.');
+        });
+
+        return $eagers->keys()->map(function ($key) {
+            return Str::replaceFirst($this->relation.'.', '', $key);
+        })->combine($eagers)->merge($instance->getEagerLoads())->all();
     }
 
     /**
