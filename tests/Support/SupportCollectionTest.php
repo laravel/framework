@@ -774,6 +774,13 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testMapKeys()
+    {
+        $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+        $data = $data->mapKeys(function ($key, $item) { return $key.'-'.strrev($item); });
+        $this->assertEquals(['first-rolyat' => 'taylor', 'last-llewto' => 'otwell'], $data->all());
+    }
+
     public function testFlatMap()
     {
         $data = new Collection([
