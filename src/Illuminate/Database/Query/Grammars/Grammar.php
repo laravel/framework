@@ -777,6 +777,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Prepare the bindings for an update statement.
+     *
+     * @param  array  $bindings
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareBindingsForUpdate(array $bindings, array $values)
+    {
+        return $bindings;
+    }
+
+    /**
      * Compile a delete statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
