@@ -168,7 +168,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('commit');
-        $result = $mock->transaction(function ($db) { return $db; });
+        $result = $mock->transaction(function ($db) {
+            return $db;
+        });
         $this->assertEquals($mock, $result);
     }
 
@@ -180,7 +182,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $pdo->expects($this->once())->method('rollBack');
         $pdo->expects($this->never())->method('commit');
         try {
-            $mock->transaction(function () { throw new Exception('foo'); });
+            $mock->transaction(function () {
+                throw new Exception('foo');
+            });
         } catch (Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
@@ -202,7 +206,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
             $connection->setPDO(null);
         });
 
-        $mock->transaction(function ($connection) { $connection->reconnect(); });
+        $mock->transaction(function ($connection) {
+            $connection->reconnect();
+        });
     }
 
     public function testRunMethodRetriesOnFailure()
@@ -214,7 +220,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
-        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
+        $method->invokeArgs($mock, ['', [], function () {
+            throw new \Illuminate\Database\QueryException('', [], new \Exception);
+        }]);
     }
 
     /**
@@ -231,7 +239,9 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())->method('tryAgainIfCausedByLostConnection');
         $mock->beginTransaction();
 
-        $method->invokeArgs($mock, ['', [], function () {throw new \Illuminate\Database\QueryException('', [], new \Exception); }]);
+        $method->invokeArgs($mock, ['', [], function () {
+            throw new \Illuminate\Database\QueryException('', [], new \Exception);
+        }]);
     }
 
     public function testFromCreatesNewQueryBuilder()

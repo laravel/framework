@@ -18,7 +18,9 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $handler->shouldReceive('handle')->once()->andReturn('foo');
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () {
+            return 'Handler@handle';
+        });
 
         $result = $dispatcher->dispatch(new BusDispatcherTestBasicCommand);
         $this->assertEquals('foo', $result);
@@ -72,7 +74,9 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
 
             return $mock;
         });
-        $dispatcher->mapUsing(function () { return 'BusDispatcherTestQueuedHandler@handle'; });
+        $dispatcher->mapUsing(function () {
+            return 'BusDispatcherTestQueuedHandler@handle';
+        });
 
         $dispatcher->dispatch(new BusDispatcherTestBasicCommand);
     }
@@ -84,7 +88,9 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $handler->shouldReceive('handle')->once()->andReturn('foo');
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () {
+            return 'Handler@handle';
+        });
 
         $result = $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
         $this->assertEquals('foo', $result);
@@ -97,9 +103,13 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
         $handler->shouldReceive('after')->once();
         $container->instance('Handler', $handler);
         $dispatcher = new Dispatcher($container);
-        $dispatcher->mapUsing(function () { return 'Handler@handle'; });
+        $dispatcher->mapUsing(function () {
+            return 'Handler@handle';
+        });
 
-        $dispatcher->dispatch(new BusDispatcherTestBasicCommand, function ($handler) { $handler->after(); });
+        $dispatcher->dispatch(new BusDispatcherTestBasicCommand, function ($handler) {
+            $handler->after();
+        });
     }
 
     public function testDispatchingFromArray()
