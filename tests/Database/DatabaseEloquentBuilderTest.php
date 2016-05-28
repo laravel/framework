@@ -253,8 +253,10 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[loadRelation]', [$this->getMockQueryBuilder()]);
-        $nop1 = function () {};
-        $nop2 = function () {};
+        $nop1 = function () {
+        };
+        $nop2 = function () {
+        };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
         $builder->shouldAllowMockingProtectedMethods()->shouldReceive('loadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
 
@@ -265,7 +267,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[getRelation]', [$this->getMockQueryBuilder()]);
-        $builder->setEagerLoads(['orders' => function ($query) { $_SERVER['__eloquent.constrain'] = $query; }]);
+        $builder->setEagerLoads(['orders' => function ($query) {
+            $_SERVER['__eloquent.constrain'] = $query;
+        }]);
         $relation = m::mock('stdClass');
         $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
@@ -339,13 +343,17 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Closure', $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
-        $builder->with(['orders' => function () { return 'foo'; }]);
+        $builder->with(['orders' => function () {
+            return 'foo';
+        }]);
         $eagers = $builder->getEagerLoads();
 
         $this->assertEquals('foo', $eagers['orders']());
 
         $builder = $this->getBuilder();
-        $builder->with(['orders.lines' => function () { return 'foo'; }]);
+        $builder->with(['orders.lines' => function () {
+            return 'foo';
+        }]);
         $eagers = $builder->getEagerLoads();
 
         $this->assertInstanceOf('Closure', $eagers['orders']);
@@ -390,7 +398,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and');
         $nestedQuery->shouldReceive('foo')->once();
 
-        $result = $builder->where(function ($query) { $query->foo(); });
+        $result = $builder->where(function ($query) {
+            $query->foo();
+        });
         $this->assertEquals($builder, $result);
     }
 
@@ -398,7 +408,9 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
     {
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) { $query->where('baz', '>', 9000); });
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
+            $query->where('baz', '>', 9000);
+        });
         $this->assertEquals('select * from "table" where "table"."deleted_at" is null and "foo" = ? and ("baz" > ?)', $query->toSql());
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
@@ -439,7 +451,7 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $builder = $model->where('bar', 'baz');
         $builder->whereHas('foo', function ($q) {
             $q->join('quuuux', function ($j) {
-               $j->on('quuuuux', '=', 'quuuuuux', 'and', true);
+                $j->on('quuuuux', '=', 'quuuuuux', 'and', true);
             });
             $q->having('bam', '>', 'qux');
         })->where('quux', 'quuux');

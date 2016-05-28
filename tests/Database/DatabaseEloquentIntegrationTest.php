@@ -135,7 +135,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
         EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
 
-        Paginator::currentPageResolver(function () { return 1; });
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
         $this->assertEquals(2, $models->count());
@@ -145,7 +147,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
         $this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
 
-        Paginator::currentPageResolver(function () { return 2; });
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
         $this->assertEquals(1, $models->count());

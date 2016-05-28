@@ -329,7 +329,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         switch ($visibility) {
             case FilesystemContract::VISIBILITY_PUBLIC:
                 return AdapterInterface::VISIBILITY_PUBLIC;
-
             case FilesystemContract::VISIBILITY_PRIVATE:
                 return AdapterInterface::VISIBILITY_PRIVATE;
         }
