@@ -76,6 +76,21 @@ class DatabaseEloquentRelationTest extends PHPUnit_Framework_TestCase
         $relation = new EloquentRelationStub($eloquentBuilder, $parent);
         $relation->wrap('test');
     }
+
+    public function testModelReturnsRawAttributeValueForQuerying()
+    {
+        $model = m::spy('somemodel');
+
+        $eloquentBuilder = m::mock(Builder::class);
+        $eloquentBuilder->shouldReceive('getModel')->andReturn($related = m::mock(StdClass::class));
+        $parent = m::mock(EloquentRelationResetModelStub::class)->makePartial();
+
+        $relation = new EloquentRelationStub($eloquentBuilder, $parent);
+
+        $relation->getAllKeys([$model], 'key');
+
+        $model->shouldHaveReceived('getRawAttributeValue')->once()->with('key');
+    }
 }
 
 class EloquentRelationResetModelStub extends Model
@@ -110,5 +125,10 @@ class EloquentRelationStub extends Relation
 
     public function getResults()
     {
+    }
+
+    public function getAllKeys(array $models, $key = null)
+    {
+        return $this->getKeys($models, $key);
     }
 }

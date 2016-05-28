@@ -1940,6 +1940,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Returns the raw value for the model's key.
+     *
+     * @return mixed
+     */
+    public function getKeyRawValue()
+    {
+        return $this->getRawAttributeValue($this->getKeyName());
+    }
+
+    /**
      * Get the queueable identity for the entity.
      *
      * @return mixed
@@ -2607,6 +2617,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return $this->getRelationValue($key);
+    }
+
+    /**
+     * Retrieve a value (raw) for an attribute from this model.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getRawAttributeValue($key)
+    {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        }
     }
 
     /**

@@ -199,8 +199,7 @@ abstract class Relation
     protected function getKeys(array $models, $key = null)
     {
         return array_unique(array_values(array_map(function ($value) use ($key) {
-            return $key ? $value->getAttribute($key) : $value->getKey();
-
+            return $key ? $value->getRawAttributeValue($key) : $value->getKeyRawValue();
         }, $models)));
     }
 
