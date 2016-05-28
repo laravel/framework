@@ -58,7 +58,9 @@ class QueueSqsQueueTest extends PHPUnit_Framework_TestCase
     public function testPopProperlyPopsJobOffOfSqsWithCustomJobCreator()
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $queue->createJobsUsing(function () { return 'job!'; });
+        $queue->createJobsUsing(function () {
+            return 'job!';
+        });
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);

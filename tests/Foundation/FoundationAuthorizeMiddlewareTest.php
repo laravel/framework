@@ -46,7 +46,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router = new Router(new Dispatcher, $this->container);
 
-        $this->container->singleton(Registrar::class, function () { return $this->router; });
+        $this->container->singleton(Registrar::class, function () {
+            return $this->router;
+        });
     }
 
     public function testSimpleAbilityUnauthorized()
@@ -61,7 +63,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $this->router->dispatch(Request::create('dashboard', 'GET'));
@@ -75,7 +79,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
@@ -95,7 +101,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('users/create', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':create,App\User'],
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $this->router->dispatch(Request::create('users/create', 'GET'));
@@ -111,7 +119,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('users/create', [
             'middleware' => Authorize::class.':create,App\User',
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $response = $this->router->dispatch(Request::create('users/create', 'GET'));
@@ -125,7 +135,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $post = new stdClass;
 
-        $this->router->bind('post', function () use ($post) { return $post; });
+        $this->router->bind('post', function () use ($post) {
+            return $post;
+        });
 
         $this->gate()->define('edit', function ($user, $model) use ($post) {
             $this->assertSame($model, $post);
@@ -135,7 +147,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
@@ -145,7 +159,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
     {
         $post = new stdClass;
 
-        $this->router->bind('post', function () use ($post) { return $post; });
+        $this->router->bind('post', function () use ($post) {
+            return $post;
+        });
 
         $this->gate()->define('edit', function ($user, $model) use ($post) {
             $this->assertSame($model, $post);
@@ -155,7 +171,9 @@ class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () { return 'success'; },
+            'uses' => function () {
+                return 'success';
+            },
         ]);
 
         $response = $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
