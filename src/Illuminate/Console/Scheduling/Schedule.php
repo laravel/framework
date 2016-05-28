@@ -80,7 +80,7 @@ class Schedule
     {
         $compiled = [];
         foreach ($parameters as $key => $value) {
-            if (! is_bool($value)){
+            if (! is_bool($value)) {
                 $compiled[] = is_numeric($key) ? $value : $key.'='.(is_numeric($value) ? $value : ProcessUtils::escapeArgument($value));
                 continue;
             }
