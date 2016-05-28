@@ -27,7 +27,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->getQuery()->shouldReceive('applyScopes')->once()->andReturnSelf();
         $relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
         $relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+            return new Collection($array);
+        });
         $relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
         $results = $relation->get();
 
@@ -71,7 +73,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $relation->getQuery()->shouldReceive('applyScopes')->once()->andReturnSelf();
         $relation->getQuery()->shouldReceive('getModels')->once()->andReturn($models);
         $relation->getQuery()->shouldReceive('eagerLoadRelations')->once()->with($models)->andReturn($models);
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+            return new Collection($array);
+        });
         $relation->getQuery()->shouldReceive('getQuery')->once()->andReturn($baseBuilder);
         $results = $relation->get();
     }
@@ -94,7 +98,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
         $model3 = new EloquentBelongsToManyModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+            return new Collection($array);
+        });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->pivot->user_id);
@@ -108,7 +114,9 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
+            return new Collection($array);
+        });
         $model = m::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
         $models = $relation->initRelation([$model], 'foo');

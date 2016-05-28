@@ -28,7 +28,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $array = ['names' => ['developer' => 'taylor']];
         $this->assertEquals('taylor', array_get($array, 'names.developer'));
         $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function () { return 'dayle'; }));
+        $this->assertEquals('dayle', array_get($array, 'names.otherDeveloper', function () {
+            return 'dayle';
+        }));
     }
 
     public function testArrayHas()
@@ -141,13 +143,17 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testArrayFirst()
     {
         $array = ['name' => 'taylor', 'otherDeveloper' => 'dayle'];
-        $this->assertEquals('dayle', array_first($array, function ($key, $value) { return $value == 'dayle'; }));
+        $this->assertEquals('dayle', array_first($array, function ($key, $value) {
+            return $value == 'dayle';
+        }));
     }
 
     public function testArrayLast()
     {
         $array = [100, 250, 290, 320, 500, 560, 670];
-        $this->assertEquals(670, array_last($array, function ($key, $value) { return $value > 320; }));
+        $this->assertEquals(670, array_last($array, function ($key, $value) {
+            return $value > 320;
+        }));
     }
 
     public function testArrayPluck()
@@ -309,7 +315,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testValue()
     {
         $this->assertEquals('foo', value('foo'));
-        $this->assertEquals('foo', value(function () { return 'foo'; }));
+        $this->assertEquals('foo', value(function () {
+            return 'foo';
+        }));
     }
 
     public function testObjectGet()
@@ -332,7 +340,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
         $this->assertNull(data_get($array, '0.users.3'));
         $this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', function () { return 'Not found'; }));
+        $this->assertEquals('Not found', data_get($array, '0.users.3', function () {
+            return 'Not found';
+        }));
         $this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
         $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
         $this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
@@ -590,7 +600,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
             ['name' => 'bar'],
             ['name' => 'baz'],
             ['name' => 'foo'], ],
-        array_values(array_sort($array, function ($v) { return $v['name']; })));
+        array_values(array_sort($array, function ($v) {
+            return $v['name'];
+        })));
     }
 
     public function testArraySortRecursive()
