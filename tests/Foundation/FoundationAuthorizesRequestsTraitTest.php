@@ -85,7 +85,9 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
     {
         $container = Container::setInstance(new Container);
 
-        $gate = new Gate($container, function () { return (object) ['id' => 1]; });
+        $gate = new Gate($container, function () {
+            return (object) ['id' => 1];
+        });
 
         $container->instance(GateContract::class, $gate);
 

@@ -82,8 +82,12 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function ($model) { return $model->getKey() < 2; }));
-        $this->assertFalse($c->contains(function ($model) { return $model->getKey() > 2; }));
+        $this->assertTrue($c->contains(function ($model) {
+            return $model->getKey() < 2;
+        }));
+        $this->assertFalse($c->contains(function ($model) {
+            return $model->getKey() > 2;
+        }));
     }
 
     public function testFindMethodFindsModelById()

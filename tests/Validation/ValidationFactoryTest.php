@@ -23,9 +23,12 @@ class ValidationFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
         $presence = m::mock(PresenceVerifierInterface::class);
-        $noop1 = function () {};
-        $noop2 = function () {};
-        $noop3 = function () {};
+        $noop1 = function () {
+        };
+        $noop2 = function () {
+        };
+        $noop3 = function () {
+        };
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);
         $factory->replacer('replacer', $noop3);
