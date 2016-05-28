@@ -44,7 +44,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
-        $callback = function () {};
+        $callback = function () {
+        };
         $broker->expects($this->once())->method('emailResetLink')->with($this->equalTo($user), $this->equalTo('token'), $this->equalTo($callback));
 
         $this->assertEquals(PasswordBroker::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
@@ -54,7 +55,9 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__password.reset.test']);
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $callback = function ($message, $user) { $_SERVER['__password.reset.test'] = true; };
+        $callback = function ($message, $user) {
+            $_SERVER['__password.reset.test'] = true;
+        };
         $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
         $mocks['mailer']->shouldReceive('send')->once()->with('resetLinkView', ['token' => 'token', 'user' => $user], m::type('Closure'))->andReturnUsing(function ($view, $data, $callback) {
             return $callback;
@@ -73,7 +76,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
 
-        $this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(['creds'], function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_USER, $broker->reset(['creds'], function () {
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
@@ -82,7 +86,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordNotSet()
@@ -91,7 +96,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
@@ -100,17 +106,21 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
     {
         $creds = ['password' => 'abcdef', 'password_confirmation' => 'abcdef'];
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $broker->validator(function ($credentials) { return strlen($credentials['password']) >= 7; });
+        $broker->validator(function ($credentials) {
+            return strlen($credentials['password']) >= 7;
+        });
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
 
-        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
@@ -121,7 +131,8 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
-        $this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function () {}));
+        $this->assertEquals(PasswordBroker::INVALID_TOKEN, $broker->reset($creds, function () {
+        }));
     }
 
     public function testResetRemovesRecordOnReminderTableAndCallsCallback()

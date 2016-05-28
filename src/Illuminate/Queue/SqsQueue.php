@@ -95,7 +95,6 @@ class SqsQueue extends Queue implements QueueContract
         $delay = $this->getSeconds($delay);
 
         return $this->sqs->sendMessage([
-
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, 'DelaySeconds' => $delay,
 
         ])->get('MessageId');
