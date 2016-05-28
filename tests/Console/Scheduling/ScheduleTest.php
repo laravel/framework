@@ -26,7 +26,7 @@ class ScheduleTest extends PHPUnit_Framework_TestCase
         $command = $this->schedule->command('command', $options)->command;
 
         $command = preg_split('/\s+/', $command);
-        $command = array_slice($command,-3, 3);
+        $command = array_slice($command, -3, 3);
 
         $commandExpected = [
             '--empty-option',
