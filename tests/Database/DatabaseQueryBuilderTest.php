@@ -1235,13 +1235,12 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
-        // Couldn't get mockery to work
-        $connection = $this->getMock('Illuminate\Database\ConnectionInterface');
-        $connection->expects($this->once())
-                    ->method('update')
+        $connection = m::mock('Illuminate\Database\ConnectionInterface');
+        $connection->shouldReceive('update')
+                    ->once()
                     ->with(
-                        $this->equalTo('update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?'),
-                        $this->equalTo(['John', 'Doe', 1])
+                        'update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?',
+                        ['John', 'Doe', 1]
                     );
 
         $builder = new Builder($connection, $grammar, $processor);
