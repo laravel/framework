@@ -80,7 +80,9 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'Hello World');
         $files = new Filesystem();
         $tempDir = $this->tempDir;
-        $files->macro('getFoo', function () use ($files, $tempDir) { return $files->get($tempDir.'/foo.txt'); });
+        $files->macro('getFoo', function () use ($files, $tempDir) {
+            return $files->get($tempDir.'/foo.txt');
+        });
         $this->assertEquals('Hello World', $files->getFoo());
     }
 

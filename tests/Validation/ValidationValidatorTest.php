@@ -1590,7 +1590,6 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
     public function invalidUrls()
     {
         return [
-
             ['aslsdlks'],
             ['google.com'],
             ['://google.com'],
@@ -2074,7 +2073,9 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $trans = $this->getRealTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
-        $v->sometimes('foo.*.name', 'Required|String', function ($i) { return $i['foo'][0]['title'] === null; });
+        $v->sometimes('foo.*.name', 'Required|String', function ($i) {
+            return $i['foo'][0]['title'] === null;
+        });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
     }
 

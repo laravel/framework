@@ -881,7 +881,7 @@ class EloquentTestUserWithGlobalScope extends EloquentTestUser
         parent::boot();
 
         static::addGlobalScope(function ($builder) {
-           $builder->with('posts');
+            $builder->with('posts');
         });
     }
 }

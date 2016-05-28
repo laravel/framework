@@ -1631,7 +1631,8 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
             []
         );
 
-        $builder->chunkById(2, function ($results) {}, 'someIdField');
+        $builder->chunkById(2, function ($results) {
+        }, 'someIdField');
     }
 
     protected function getBuilder()
