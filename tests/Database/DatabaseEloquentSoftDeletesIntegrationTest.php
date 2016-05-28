@@ -125,7 +125,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->pluck('email')->all());
 
-        Paginator::currentPageResolver(function () { return 1; });
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->paginate(2)->all());

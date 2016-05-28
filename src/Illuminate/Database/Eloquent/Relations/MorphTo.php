@@ -215,7 +215,6 @@ class MorphTo extends BelongsTo
 
         return collect($this->dictionary[$type])->map(function ($models) use ($foreign) {
             return head($models)->{$foreign};
-
         })->values()->unique();
     }
 

@@ -180,7 +180,6 @@ class ResourceRegistrar
         // entire string for the resource URI that contains all nested resources.
         return implode('/', array_map(function ($s) {
             return $s.'/{'.$this->getResourceWildcard($s).'}';
-
         }, $segments));
     }
 

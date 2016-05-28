@@ -187,7 +187,9 @@ dad
     {
         $engine = new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
         $engine->getCompiler()->shouldReceive('getCompiledPath')
-            ->andReturnUsing(function ($path) { return $path; });
+            ->andReturnUsing(function ($path) {
+                return $path;
+            });
         $engine->getCompiler()->shouldReceive('isExpired')->andReturn(false);
 
         $factory = $this->getFactory();
