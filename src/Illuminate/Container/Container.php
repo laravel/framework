@@ -515,11 +515,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function isCallableWithAtSign($callback)
     {
-        if (! is_string($callback)) {
-            return false;
-        }
-
-        return strpos($callback, '@') !== false;
+        return is_string($callback) && strpos($callback, '@') !== false;
     }
 
     /**
