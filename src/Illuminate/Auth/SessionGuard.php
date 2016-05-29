@@ -363,6 +363,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return true;
         }
 
+        if ($login) {
+            $this->fireFailedEvent($credentials, $remember, $user);
+        }
+
         return false;
     }
 
@@ -391,6 +395,24 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         if (isset($this->events)) {
             $this->events->fire(new Events\Attempting(
                 $credentials, $remember, $login
+            ));
+        }
+    }
+
+    /**
+     * Fire the failed login attempt event with the arguments.
+     *
+     * @param  array  $credentials
+     * @param  bool  $remember
+     * @param  bool  $login
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent(array $credentials, $remember, $user = null)
+    {
+        if (isset($this->events)) {
+            $this->events->fire(new Events\Failed(
+                $credentials, $remember, $user
             ));
         }
     }
