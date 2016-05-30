@@ -961,12 +961,12 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
             ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ]);
-        $result = $data->keyBy(function ($item) {
-            return strtolower($item['firstname'].$item['lastname']);
+        $result = $data->keyBy(function ($item, $key) {
+            return strtolower($key.'-'.$item['firstname'].$item['lastname']);
         });
         $this->assertEquals([
-            'taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
-            'lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+            '0-taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+            '1-lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
     }
 
