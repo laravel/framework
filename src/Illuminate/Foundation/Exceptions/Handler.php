@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exception\HttpResponseException;
@@ -100,6 +101,8 @@ class Handler implements ExceptionHandlerContract
             return $e->getResponse();
         } elseif ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof AuthenticationException) {
+            return $this->unauthenticated($request, $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
         } elseif ($e instanceof ValidationException) {
@@ -124,9 +127,7 @@ class Handler implements ExceptionHandlerContract
     {
         $response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
 
-        $response->exception = $e;
-
-        return $response;
+        return $response->withException($e);
     }
 
     /**

@@ -39,7 +39,7 @@ class ResourceRegistrar
      *
      * @var bool
      */
-    protected static $singularParameters = false;
+    protected static $singularParameters = true;
 
     /**
      * Create a new resource registrar instance.
@@ -180,7 +180,6 @@ class ResourceRegistrar
         // entire string for the resource URI that contains all nested resources.
         return implode('/', array_map(function ($s) {
             return $s.'/{'.$this->getResourceWildcard($s).'}';
-
         }, $segments));
     }
 

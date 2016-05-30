@@ -113,6 +113,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $collection = EloquentTestUser::find([1, 2, 3]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
         $this->assertEquals(2, $collection->count());
+
+        $models = EloquentTestUser::where('id', 1)->cursor();
+        foreach ($models as $model) {
+            $this->assertEquals(1, $model->id);
+        }
+
+        $records = DB::table('users')->where('id', 1)->cursor();
+        foreach ($records as $record) {
+            $this->assertEquals(1, $record->id);
+        }
+
+        $records = DB::cursor('select * from users where id = ?', [1]);
+        foreach ($records as $record) {
+            $this->assertEquals(1, $record->id);
+        }
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -136,7 +151,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
         EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
 
-        Paginator::currentPageResolver(function () { return 1; });
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
         $this->assertEquals(2, $models->count());
@@ -146,7 +163,9 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('taylorotwell@gmail.com', $models[0]->email);
         $this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
 
-        Paginator::currentPageResolver(function () { return 2; });
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
         $this->assertEquals(1, $models->count());
@@ -889,7 +908,7 @@ class EloquentTestUserWithGlobalScope extends EloquentTestUser
         parent::boot();
 
         static::addGlobalScope(function ($builder) {
-           $builder->with('posts');
+            $builder->with('posts');
         });
     }
 }

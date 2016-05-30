@@ -1334,7 +1334,6 @@ class Validator implements ValidatorContract
         $extra = $this->getUniqueExtra($parameters);
 
         return $verifier->getCount(
-
             $table, $column, $value, $id, $idColumn, $extra
 
         ) == 0;
@@ -1528,7 +1527,7 @@ class Validator implements ValidatorContract
                 \]  # a IPv6 address
             )
             (:[0-9]+)?                              # a port (optional)
-            (/?|/\S+)                               # a /, nothing or a / with something
+            (/?|/\S+|\?\S*|\#\S*)                   # a /, nothing, a / with something, a query or a fragment
         $~ixu';
 
         return preg_match($pattern, $value) === 1;

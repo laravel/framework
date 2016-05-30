@@ -1,12 +1,20 @@
 <?php
 
-namespace Illuminate\Foundation\Http\Middleware;
+namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Factory as Auth;
 
 class Authorize
 {
+    /**
+     * The authentication factory instance.
+     *
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    protected $auth;
+
     /**
      * The gate instance.
      *
@@ -17,11 +25,13 @@ class Authorize
     /**
      * Create a new middleware instance.
      *
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function __construct(Gate $gate)
+    public function __construct(Auth $auth, Gate $gate)
     {
+        $this->auth = $auth;
         $this->gate = $gate;
     }
 
@@ -34,10 +44,13 @@ class Authorize
      * @param  string|null  $model
      * @return mixed
      *
+     * @throws \Illuminate\Auth\Access\AuthenticationException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function handle($request, Closure $next, $ability, $model = null)
     {
+        $this->auth->authenticate();
+
         $this->gate->authorize($ability, $this->getGateArguments($request, $model));
 
         return $next($request);

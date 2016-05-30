@@ -13,7 +13,9 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
     {
         $env = new Illuminate\Foundation\EnvironmentDetector;
 
-        $result = $env->detect(function () { return 'foobar'; });
+        $result = $env->detect(function () {
+            return 'foobar';
+        });
         $this->assertEquals('foobar', $result);
     }
 
@@ -21,7 +23,9 @@ class FoundationEnvironmentDetectorTest extends PHPUnit_Framework_TestCase
     {
         $env = new Illuminate\Foundation\EnvironmentDetector;
 
-        $result = $env->detect(function () { return 'foobar'; }, ['--env=local']);
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env=local']);
         $this->assertEquals('local', $result);
     }
 }

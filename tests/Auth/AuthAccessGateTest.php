@@ -19,8 +19,12 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->define('bar', function ($user) { return false; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->define('bar', function ($user) {
+            return false;
+        });
 
         $this->assertTrue($gate->check('foo'));
         $this->assertFalse($gate->check('bar'));
@@ -30,7 +34,9 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
         $gate->before(function ($user, $ability) {
             $this->assertEquals('foo', $ability);
 
@@ -44,8 +50,11 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->before(function () {});
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->before(function () {
+        });
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -54,8 +63,12 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) { return true; });
-        $gate->define('bar', function ($user) { return false; });
+        $gate->define('foo', function ($user) {
+            return true;
+        });
+        $gate->define('bar', function ($user) {
+            return false;
+        });
 
         $gate->after(function ($user, $ability, $result) {
             if ($ability == 'foo') {
@@ -173,7 +186,9 @@ class GateTest extends PHPUnit_Framework_TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('update', function () { $this->fail(); });
+        $gate->define('update', function () {
+            $this->fail();
+        });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
