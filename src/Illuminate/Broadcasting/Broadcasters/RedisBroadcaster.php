@@ -3,9 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
@@ -51,7 +49,7 @@ class RedisBroadcaster extends Broadcaster
         $payload = json_encode([
             'event' => $event,
             'data' => $payload,
-            'socket' => $socket
+            'socket' => $socket,
         ]);
 
         foreach ($channels as $channel) {
