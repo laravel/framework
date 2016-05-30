@@ -119,7 +119,7 @@ class ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if ($retryAfter) {
+        if (! is_null($retryAfter)) {
             return 0;
         }
 
