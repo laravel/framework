@@ -363,8 +363,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return true;
         }
 
+        // If the authentication attempt fails we will fire an event so that the user
+        // may be notified of any suspicious attempts to access their account from
+        // an unrecognized user. A developer may listen to this event as needed.
         if ($login) {
-            $this->fireFailedEvent($credentials, $remember, $user);
+            $this->fireFailedEvent($user, $credentials);
         }
 
         return false;
@@ -400,20 +403,16 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Fire the failed login attempt event with the arguments.
+     * Fire the failed authentication attempt event with the given arguments.
      *
-     * @param  array  $credentials
-     * @param  bool  $remember
-     * @param  bool  $login
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  array  $credentials
      * @return void
      */
-    protected function fireFailedEvent(array $credentials, $remember, $user = null)
+    protected function fireFailedEvent($user, array $credentials)
     {
         if (isset($this->events)) {
-            $this->events->fire(new Events\Failed(
-                $credentials, $remember, $user
-            ));
+            $this->events->fire(new Events\Failed($user, $credentials));
         }
     }
 
