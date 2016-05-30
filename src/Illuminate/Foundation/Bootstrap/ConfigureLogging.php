@@ -88,8 +88,7 @@ class ConfigureLogging
         $maxFiles = $config->get('app.log_max_files');
 
         $log->useDailyFiles(
-            $app->storagePath().'/logs/laravel.log',
-            is_null($maxFiles) ? 5 : $maxFiles,
+            $app->storagePath().'/logs/laravel.log', is_null($maxFiles) ? 5 : $maxFiles,
             $config->get('app.log_level', 'debug')
         );
     }
