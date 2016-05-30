@@ -822,7 +822,9 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            call_user_func($callback, $query);
+            $query->where(function ($query) use ($callback) {
+                call_user_func($callback, $query);
+            });
         }
 
         return $this->addHasWhere(
