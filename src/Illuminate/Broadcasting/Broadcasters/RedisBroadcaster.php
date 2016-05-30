@@ -92,7 +92,7 @@ class RedisBroadcaster implements Broadcaster
      */
     protected function validAuthenticationResponse($request, $result)
     {
-        return is_array($result) ? $result : json_encode($result);
+        return is_bool($result) ? $result : ['channel_data' => $result];
     }
 
     /**
@@ -118,7 +118,7 @@ class RedisBroadcaster implements Broadcaster
 
         return [];
     }
-    
+
     /**
      * {@inheritdoc}
      */
