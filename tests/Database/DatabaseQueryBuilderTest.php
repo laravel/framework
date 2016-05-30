@@ -1293,18 +1293,35 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
-        // Couldn't get mockery to work
         $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        $this->equalTo('update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?'),
-                        $this->equalTo(['John', 'Doe', 1])
+                        'update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?',
+                        ['John', 'Doe', 1]
                     );
 
         $builder = new Builder($connection, $grammar, $processor);
 
         $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
+    }
+
+    public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
+    {
+        $grammar = new Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+        $connection = m::mock('Illuminate\Database\ConnectionInterface');
+        $connection->shouldReceive('update')
+                    ->once()
+                    ->with(
+                        'update `users` set `options` = json_set(`options`, "$.enable", false), `updated_at` = ? where `id` = ?',
+                        ['2015-05-26 22:02:06', 0]
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $result = $builder->from('users')->where('id', '=', 0)->update(['options->enable' => false, 'updated_at' => '2015-05-26 22:02:06']);
     }
 
     public function testMySqlWrappingJsonWithString()

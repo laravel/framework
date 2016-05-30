@@ -1,8 +1,9 @@
 <?php
 
 use Mockery as m;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
+use Symfony\Component\HttpFoundation\Request;
 
 class AuthGuardTest extends PHPUnit_Framework_TestCase
 {
@@ -66,6 +67,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $guard = $this->getGuard();
         $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('fire')->once()->with(m::type(Attempting::class));
+        $events->shouldReceive('fire')->once()->with(m::type(Failed::class));
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo']);
         $guard->attempt(['foo']);
     }
@@ -88,6 +90,7 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock = $this->getGuard();
         $mock->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('fire')->once()->with(m::type(Attempting::class));
+        $events->shouldReceive('fire')->once()->with(m::type(Failed::class));
         $mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn(null);
         $this->assertFalse($mock->attempt(['foo']));
     }
@@ -116,6 +119,16 @@ class AuthGuardTest extends PHPUnit_Framework_TestCase
         $mock->getSession()->shouldReceive('set')->with('foo', 'bar')->once();
         $session->shouldReceive('migrate')->once();
         $mock->login($user);
+    }
+
+    public function testFailedAttemptFiresFailedEvent()
+    {
+        $guard = $this->getGuard();
+        $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('fire')->once()->with(m::type(Attempting::class));
+        $events->shouldReceive('fire')->once()->with(m::type(Failed::class));
+        $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn(null);
+        $guard->attempt(['foo']);
     }
 
     public function testAuthenticateReturnsUserWhenUserIsNotNull()
