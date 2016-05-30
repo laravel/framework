@@ -76,7 +76,7 @@ class RedisJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int   $delay
-     * @return void
+     * @return int
      */
     public function release($delay = 0)
     {
@@ -84,7 +84,7 @@ class RedisJob extends Job implements JobContract
 
         $this->delete();
 
-        $this->redis->release($this->queue, $this->job, $delay, $this->attempts() + 1);
+        return $this->redis->release($this->queue, $this->job, $delay, $this->attempts() + 1);
     }
 
     /**
