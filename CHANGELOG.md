@@ -1,9 +1,28 @@
 # Release Notes
 
+## v5.2.35 (2016-05-30)
+
+### Added
+- Added failed login event ([#13761](https://github.com/laravel/framework/pull/13761))
+
+### Changed
+- Always cast `FileStore::expiration()` return value to integer ([#13708](https://github.com/laravel/framework/pull/13708))
+- Simplified `Container::isCallableWithAtSign()` ([#13757](https://github.com/laravel/framework/pull/13757))
+- Pass key to the `Collection::keyBy()` callback ([#13766](https://github.com/laravel/framework/pull/13766))
+- Support unlimited log files by setting `app.log_max_files` to `0` ([#13776](https://github.com/laravel/framework/pull/13776))
+- Wathan-ize `MorphTo::getEagerLoadsForInstance()` ([#13741](https://github.com/laravel/framework/pull/13741), [#13777](https://github.com/laravel/framework/pull/13777))
+
+### Fixed
+- Fixed MySQL JSON boolean binding update grammar ([38acdd8](https://github.com/laravel/framework/commit/38acdd807faec4b85fd47051341ccaf666499551))
+- Fixed loading of nested polymorphic relationships ([#13737](https://github.com/laravel/framework/pull/13737))
+- Fixed early return in `AuthManager::shouldUse()` ([5b88244](https://github.com/laravel/framework/commit/5b88244c0afd5febe9f54e8544b0870b55ef6cfd))
+- Fixed the remaining attempts calculation in `ThrottleRequests` ([#13756](https://github.com/laravel/framework/pull/13756), [#13759](https://github.com/laravel/framework/pull/13759))
+- Fixed strict `TypeError` in `AbstractPaginator::url()` ([#13758](https://github.com/laravel/framework/pull/13758))
+
 ## v5.2.34 (2016-05-26)
 
 ### Added
-- Added correct MySQL JSON bool handling and updating grammar ([#13242](https://github.com/laravel/framework/pull/13242))
+- Added correct MySQL JSON boolean handling and updating grammar ([#13242](https://github.com/laravel/framework/pull/13242))
 - Added `stream` option to mail `TransportManager` ([#13715](https://github.com/laravel/framework/pull/13715))
 - Added `when()` method to eloquent query builder ([#13726](https://github.com/laravel/framework/pull/13726))
 
