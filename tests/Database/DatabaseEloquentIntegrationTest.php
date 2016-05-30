@@ -828,7 +828,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
         EloquentTestItem::create(['id' => 1]);
         EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
-        try{
+        try {
             $item = EloquentTestOrder::first()->item;
         } catch (Exception $e) {
             // ignore the exception
