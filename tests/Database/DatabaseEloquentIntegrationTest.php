@@ -35,17 +35,17 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     protected function createSchema()
     {
-            $this->schema('default')->create('test_orders', function ($table) {
-                $table->increments('id');
-                $table->string('item_type');
-                $table->integer('item_id');
-                $table->timestamps();
-            });
+        $this->schema('default')->create('test_orders', function ($table) {
+            $table->increments('id');
+            $table->string('item_type');
+            $table->integer('item_id');
+            $table->timestamps();
+        });
 
-            $this->schema('second_connection')->create('test_items', function ($table) {
-                $table->increments('id');
-                $table->timestamps();
-            });
+        $this->schema('second_connection')->create('test_items', function ($table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
 
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
