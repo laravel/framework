@@ -63,7 +63,7 @@ abstract class Broadcaster implements Broadcaster
      */
     protected function validAuthenticationResponse($request, $result)
     {
-         if (is_bool($result)) {
+        if (is_bool($result)) {
             return json_encode($result);
         }
 
