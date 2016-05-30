@@ -1312,6 +1312,12 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $model = new EloquentModelStub;
         $this->assertFalse(isset($model->nonexistent));
 
+        // Existing method names
+        $this->assertFalse(isset($model->saved));
+
+        $model->saved = 'some_value';
+        $this->assertTrue(isset($model->saved));
+
         $model->some_attribute = 'some_value';
         $this->assertTrue(isset($model->some_attribute));
 
