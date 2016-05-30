@@ -6,14 +6,14 @@ use Illuminate\Routing\Router;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Http\Middleware\Authorize;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class FoundationAuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
+class AuthorizeMiddlewareTest extends PHPUnit_Framework_TestCase
 {
     protected $container;
     protected $user;

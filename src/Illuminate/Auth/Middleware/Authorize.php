@@ -1,10 +1,10 @@
 <?php
 
-namespace Illuminate\Foundation\Http\Middleware;
+namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Auth\Factory as Auth;
 
 class Authorize
 {
@@ -29,7 +29,7 @@ class Authorize
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function __construct(AuthFactory $auth, Gate $gate)
+    public function __construct(Auth $auth, Gate $gate)
     {
         $this->auth = $auth;
         $this->gate = $gate;
