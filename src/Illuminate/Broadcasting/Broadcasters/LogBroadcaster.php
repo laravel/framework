@@ -3,9 +3,8 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Psr\Log\LoggerInterface;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
 
-class LogBroadcaster implements Broadcaster
+class LogBroadcaster extends Broadcaster
 {
     /**
      * The logger implementation.
@@ -17,10 +16,11 @@ class LogBroadcaster implements Broadcaster
     /**
      * Create a new broadcaster instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct($app, LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
