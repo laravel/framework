@@ -822,15 +822,12 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($results));
     }
 
-    /**
-    *
-    */
     public function testMorphToRelationsAcrossDatabaseConnections()
     {
         $item = null;
 
-        EloquentTestItem::create(['id'=>1]);
-        EloquentTestOrder::create(['id'=>1, 'item_type'=>EloquentTestItem::class, 'item_id'=>1]);
+        EloquentTestItem::create(['id' => 1]);
+        EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
         try{
             $item = EloquentTestOrder::first()->item;
         } catch (Exception $e) {
