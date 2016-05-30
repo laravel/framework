@@ -79,7 +79,7 @@ class BeanstalkdJob extends Job implements JobContract
      * Release the job back into the queue.
      *
      * @param  int   $delay
-     * @return void
+     * @return int
      */
     public function release($delay = 0)
     {
@@ -87,7 +87,7 @@ class BeanstalkdJob extends Job implements JobContract
 
         $priority = Pheanstalk::DEFAULT_PRIORITY;
 
-        $this->pheanstalk->release($this->job, $priority, $delay);
+        return $this->pheanstalk->release($this->job, $priority, $delay);
     }
 
     /**
