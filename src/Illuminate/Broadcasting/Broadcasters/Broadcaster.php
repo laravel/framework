@@ -22,16 +22,6 @@ abstract class Broadcaster implements Broadcaster
      */
     protected $channels = [];
 
-    /**
-     * Create a new broadcaster instance.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
 
     /**
      * Register a channel authenticator.

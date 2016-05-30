@@ -31,8 +31,6 @@ class RedisBroadcaster extends Broadcaster
      */
     public function __construct(RedisDatabase $redis, $connection = null)
     {
-        parent::__construct();
-
         $this->redis = $redis;
         $this->connection = $connection;
     }

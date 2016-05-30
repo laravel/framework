@@ -23,8 +23,6 @@ class PusherBroadcaster extends Broadcaster
      */
     public function __construct(Pusher $pusher)
     {
-        parent::__construct();
-
         $this->pusher = $pusher;
     }
 
