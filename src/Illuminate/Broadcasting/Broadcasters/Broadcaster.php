@@ -22,7 +22,6 @@ abstract class Broadcaster implements Broadcaster
      */
     protected $channels = [];
 
-
     /**
      * Register a channel authenticator.
      *
