@@ -16,7 +16,6 @@ class LogBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */

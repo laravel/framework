@@ -24,7 +24,6 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Redis\Database  $redis
      * @param  string  $connection
      * @return void

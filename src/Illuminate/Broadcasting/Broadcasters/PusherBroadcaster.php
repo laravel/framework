@@ -17,7 +17,6 @@ class PusherBroadcaster extends Broadcaster
 
     /**
      * Create a new broadcaster instance.
-     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Pusher  $pusher
      * @return void
      */

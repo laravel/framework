@@ -9,13 +9,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 abstract class Broadcaster implements Broadcaster
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The registered channel authenticators.
      *
      * @var array
