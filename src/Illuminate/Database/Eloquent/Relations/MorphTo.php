@@ -183,6 +183,8 @@ class MorphTo extends BelongsTo
 
         $query->setModel($instance);
 
+        $query->useConnection($instance->getConnection());
+
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
     }
 
