@@ -20,7 +20,7 @@ class LogBroadcaster extends Broadcaster
      * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */
-    public function __construct($app, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }

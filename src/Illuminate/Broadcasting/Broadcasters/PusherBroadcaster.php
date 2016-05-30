@@ -21,9 +21,9 @@ class PusherBroadcaster extends Broadcaster
      * @param  \Pusher  $pusher
      * @return void
      */
-    public function __construct($app, Pusher $pusher)
+    public function __construct(Pusher $pusher)
     {
-        parent::__construct($app);
+        parent::__construct();
 
         $this->pusher = $pusher;
     }
