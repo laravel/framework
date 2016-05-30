@@ -3,8 +3,11 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Encoding;
+use Swift_MimePart;
+use Swift_Attachment;
 use Swift_Mime_Message;
 use GuzzleHttp\ClientInterface;
+use Illuminate\Support\Collection;
 
 class SparkPostTransport extends Transport
 {
@@ -54,6 +57,7 @@ class SparkPostTransport extends Transport
                 'recipients' => $recipients,
                 'content' => [
                     'html' => $message->getBody(),
+                    'text' => $this->getPlainBody($message),
                     'from' => $this->getFrom($message),
                     'reply_to' => $this->getReplyTo($message),
                     'subject' => $message->getSubject(),
@@ -61,14 +65,8 @@ class SparkPostTransport extends Transport
             ],
         ];
 
-        if ($attachments = $message->getChildren()) {
-            $options['json']['content']['attachments'] = array_map(function ($attachment) {
-                return [
-                    'type' => $attachment->getContentType(),
-                    'name' => $attachment->getFileName(),
-                    'data' => Swift_Encoding::getBase64Encoding()->encodeString($attachment->getBody()),
-                ];
-            }, $attachments);
+        if ($attachments = $this->getAttachments($message) and ! $attachments->isEmpty()) {
+            $options['json']['content']['attachments'] = $attachments->values();
         }
 
         return $this->client->post('https://api.sparkpost.com/api/v1/transmissions', $options);
@@ -84,23 +82,20 @@ class SparkPostTransport extends Transport
      */
     protected function getRecipients(Swift_Mime_Message $message)
     {
-        $to = [];
+        $fields = [
+            'to' => $message->getTo() ? array_keys($message->getTo()) : [],
+            'cc' => $message->getCc() ? array_keys($message->getCc()) : [],
+            'bcc' => $message->getBcc() ? array_keys($message->getBcc()) : [],
+        ];
 
-        if ($message->getTo()) {
-            $to = array_merge($to, array_keys($message->getTo()));
-        }
+        $all = array_collapse($fields);
+        $visible = array_merge($fields['to'], $fields['cc']);
 
-        if ($message->getCc()) {
-            $to = array_merge($to, array_keys($message->getCc()));
-        }
+        $recipients = array_map(function ($address) use ($visible) {
+            $header = count($visible) ? implode(',', $visible) : $address;
 
-        if ($message->getBcc()) {
-            $to = array_merge($to, array_keys($message->getBcc()));
-        }
-
-        $recipients = array_map(function ($address) {
-            return ['address' => ['email' => $address, 'header_to' => $address]];
-        }, $to);
+            return ['address' => ['email' => $address, 'header_to' => $header]];
+        }, $all);
 
         return $recipients;
     }
@@ -108,7 +103,7 @@ class SparkPostTransport extends Transport
     /**
      * Get the "from" contacts in the format required by SparkPost.
      *
-     * @param  Swift_Mime_Message  $message
+     * @param  \Swift_Mime_Message  $message
      * @return array
      */
     protected function getFrom(Swift_Mime_Message $message)
@@ -121,7 +116,7 @@ class SparkPostTransport extends Transport
     /**
      * Get the 'reply_to' headers and format as required by SparkPost.
      *
-     * @param  Swift_Mime_Message  $message
+     * @param  \Swift_Mime_Message  $message
      * @return string
      */
     protected function getReplyTo(Swift_Mime_Message $message)
@@ -129,6 +124,44 @@ class SparkPostTransport extends Transport
         if (is_array($message->getReplyTo())) {
             return current($message->getReplyTo()).' <'.key($message->getReplyTo()).'>';
         }
+    }
+
+    /**
+     * Get plain body content of this entity as a string.
+     *
+     * @param  \Swift_Mime_Message  $message
+     * @return string
+     */
+    protected function getPlainBody(Swift_Mime_Message $message)
+    {
+        $parts = Collection::make($message->getChildren())
+                    ->filter(function ($item, $key) {
+                        return $item instanceof Swift_MimePart;
+                    })
+                    ->first();
+
+        return $parts ? $parts->getBody() : $message->getBody();
+    }
+
+    /**
+     * Get message attachments.
+     *
+     * @param  \Swift_Mime_Message $message
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getAttachments(Swift_Mime_Message $message)
+    {
+        return Collection::make($message->getChildren())
+                ->filter(function ($value, $key) {
+                    return $value instanceof Swift_Attachment;
+                })
+                ->map(function ($item, $key) {
+                    return [
+                        'type' => $item->getContentType(),
+                        'name' => $item->getFileName(),
+                        'data' => Swift_Encoding::getBase64Encoding()->encodeString($item->getBody()),
+                    ];
+                });
     }
 
     /**
