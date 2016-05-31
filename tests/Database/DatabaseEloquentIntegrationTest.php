@@ -35,6 +35,18 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
 
     protected function createSchema()
     {
+        $this->schema('default')->create('test_orders', function ($table) {
+            $table->increments('id');
+            $table->string('item_type');
+            $table->integer('item_id');
+            $table->timestamps();
+        });
+
+        $this->schema('second_connection')->create('test_items', function ($table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
                 $table->increments('id');
@@ -837,6 +849,21 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($results));
     }
 
+    public function testMorphToRelationsAcrossDatabaseConnections()
+    {
+        $item = null;
+
+        EloquentTestItem::create(['id' => 1]);
+        EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
+        try {
+            $item = EloquentTestOrder::first()->item;
+        } catch (Exception $e) {
+            // ignore the exception
+        }
+
+        $this->assertInstanceOf('EloquentTestItem', $item);
+    }
+
     /**
      * Helpers...
      */
@@ -955,4 +982,23 @@ class EloquentTestUserWithStringCastId extends EloquentTestUser
     protected $casts = [
         'id' => 'string',
     ];
+}
+
+class EloquentTestOrder extends Eloquent
+{
+    protected $guarded = [];
+    protected $table = 'test_orders';
+    protected $with = ['item'];
+
+    public function item()
+    {
+        return $this->morphTo();
+    }
+}
+
+class EloquentTestItem extends Eloquent
+{
+    protected $guarded = [];
+    protected $table = 'test_items';
+    protected $connection = 'second_connection';
 }

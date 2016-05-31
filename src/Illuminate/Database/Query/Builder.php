@@ -2305,6 +2305,23 @@ class Builder
     }
 
     /**
+     * Use a different connection for the query.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
+     * @param  \Illuminate\Database\Query\Processors\Processor  $processor
+     * @return void
+     */
+    public function useConnection(ConnectionInterface $connection,
+                                  Grammar $grammar = null,
+                                  Processor $processor = null)
+    {
+        $this->connection = $connection;
+        $this->grammar = $grammar ?: $connection->getQueryGrammar();
+        $this->processor = $processor ?: $connection->getPostProcessor();
+    }
+
+    /**
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method
