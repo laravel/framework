@@ -65,17 +65,29 @@ class Authorize
      */
     protected function getGateArguments($request, $model)
     {
-        // If there's no model, we'll pass an empty array to the gate. If it
-        // looks like a FQCN of a model, we'll send it to the gate as is.
-        // Otherwise, we'll resolve the Eloquent model from the route.
-        if (is_null($model)) {
-            return [];
-        }
+        return is_null($model) ? [] : $this->getModel($request, $model);
+    }
 
-        if (strpos($model, '\\') !== false) {
-            return $model;
-        }
+    /**
+     * Get the model to authorize.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $model
+     * @return string|\Illuminate\Database\Eloquent\Model
+     */
+    protected function getModel($request, $model)
+    {
+        return $this->isClassName($model) ? $model : $request->route($model);
+    }
 
-        return $request->route($model);
+    /**
+     * Checks if the given string looks like a fully qualified class name.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isClassName($value)
+    {
+        return strpos($value, '\\') !== false;
     }
 }
