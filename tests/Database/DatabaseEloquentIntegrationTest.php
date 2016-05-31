@@ -321,7 +321,8 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
-        $this->assertTrue(isset($user->friends));
+
+        $this->assertTrue(isset($user->friends[0]->id));
 
         $results = EloquentTestUser::has('friends')->get();
 
