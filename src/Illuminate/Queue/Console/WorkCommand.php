@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -56,6 +58,13 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
+        // We'll listen to the processed and failed events so we can write information
+        // to the console as jobs are processed, which will let the developer watch
+        // which jobs are coming through a queue and be informed on its progress.
+        $this->listenForEvents();
+
+        $queue = $this->option('queue');
+
         $delay = $this->option('delay');
 
         // The memory limit is the amount of memory we will allow the script to occupy
@@ -73,13 +82,22 @@ class WorkCommand extends Command
         $response = $this->runWorker(
             $connection, $queue, $delay, $memory, $this->option('daemon')
         );
+    }
 
-        // If a job was fired by the worker, we'll write the output out to the console
-        // so that the developer can watch live while the queue runs in the console
-        // window, which will also of get logged if stdout is logged out to disk.
-        if (! is_null($response['job'])) {
-            $this->writeOutput($response['job'], $response['failed']);
-        }
+    /**
+     * Listen for the queue events in order to update the console output.
+     *
+     * @return void
+     */
+    protected function listenForEvents()
+    {
+        $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+            $this->writeOutput($event->job, false);
+        });
+
+        $this->laravel['events']->listen(JobFailed::class, function ($event) {
+            $this->writeOutput($event->job, true);
+        });
     }
 
     /**
