@@ -53,6 +53,10 @@ trait SerializesModels
      */
     protected function getSerializedPropertyValue($value)
     {
+        if ($value instanceof QueueableCollection) {
+            return new ModelIdentifier($value->getQueueableClass(), $value->getQueueableIds());
+        }
+
         if ($value instanceof QueueableEntity) {
             return new ModelIdentifier(get_class($value), $value->getQueueableId());
         }
