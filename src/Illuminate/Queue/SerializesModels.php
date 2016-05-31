@@ -6,7 +6,6 @@ use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Database\ModelIdentifier;
-use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait SerializesModels
