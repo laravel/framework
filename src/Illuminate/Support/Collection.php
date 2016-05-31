@@ -36,7 +36,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection instance if the value isn't one already.
+     * Create a new collection.
      *
      * @param  mixed  $items
      * @return static
