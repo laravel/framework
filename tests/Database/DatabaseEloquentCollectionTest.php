@@ -263,6 +263,21 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $c[0]->getHidden());
         $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
     }
+
+    public function testQueueableCollectionImplementation()
+    {
+        $c = new Collection([new TestEloquentCollectionModel, new TestEloquentCollectionModel]);
+        $this->assertEquals(TestEloquentCollectionModel::class, $c->getQueueableClass());
+    }
+
+    /**
+     * @expectedException LogicException
+     */
+    public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
+    {
+        $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
+        $c->getQueueableClass();
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
