@@ -187,8 +187,10 @@ class FilesystemManager implements FactoryContract
 
         $root = isset($s3Config['root']) ? $s3Config['root'] : null;
 
+        $options = isset($config['options']) ? $config['options'] : [];
+
         return $this->adapt($this->createFlysystem(
-            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, isset($config['options']) ? $config['options'] : []), $config
+            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options), $config
         ));
     }
 
