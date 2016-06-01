@@ -81,12 +81,20 @@ class BroadcastManager implements FactoryContract
             return $request->header('X-Socket-Id');
         }
 
+        if ($request->hasCookie('io')) {
+            return $request->cookie('io');
+        }
+
+        if ($request->has('socket_id')) {
+            return $request->input('socket_id');
+        }
+
         if (! $request->hasSession()) {
             return;
         }
 
         return $this->app['cache']->get(
-            'pusher:socket:'.$request->session()->getId()
+            'broadcast:socket:'.$request->session()->getId()
         );
     }
 
@@ -105,8 +113,10 @@ class BroadcastManager implements FactoryContract
         $request = $request ?: $this->app['request'];
 
         $this->app['cache']->forever(
-            'pusher:socket:'.$request->session()->getId(), $request->socket_id
+            'broadcast:socket:'.$request->session()->getId(), $request->socket_id
         );
+
+        return $this->connection()->rememberSocket($request);
     }
 
     /**
@@ -193,6 +203,7 @@ class BroadcastManager implements FactoryContract
     protected function createPusherDriver(array $config)
     {
         return new PusherBroadcaster(
+            $this->app,
             new Pusher($config['key'], $config['secret'], $config['app_id'], Arr::get($config, 'options', []))
         );
     }
@@ -206,6 +217,7 @@ class BroadcastManager implements FactoryContract
     protected function createRedisDriver(array $config)
     {
         return new RedisBroadcaster(
+            $this->app,
             $this->app->make('redis'), Arr::get($config, 'connection')
         );
     }
@@ -219,6 +231,7 @@ class BroadcastManager implements FactoryContract
     protected function createLogDriver(array $config)
     {
         return new LogBroadcaster(
+            $this->app,
             $this->app->make('Psr\Log\LoggerInterface')
         );
     }

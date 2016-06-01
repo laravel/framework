@@ -5,7 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Redis\Database as RedisDatabase;
 
-class RedisBroadcaster implements Broadcaster
+class RedisBroadcaster extends AbstractBroadcaster implements Broadcaster
 {
     /**
      * The Redis instance.
@@ -24,12 +24,14 @@ class RedisBroadcaster implements Broadcaster
     /**
      * Create a new broadcaster instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Redis\Database  $redis
      * @param  string  $connection
      * @return void
      */
-    public function __construct(RedisDatabase $redis, $connection = null)
+    public function __construct($app, RedisDatabase $redis, $connection = null)
     {
+        parent::__construct($app);
         $this->redis = $redis;
         $this->connection = $connection;
     }
