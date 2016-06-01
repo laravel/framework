@@ -28,15 +28,15 @@
         "paragonie/random_compat": "~1.4",
         "psy/psysh": "0.7.*",
         "swiftmailer/swiftmailer": "~5.1",
-        "symfony/console": "3.1.*",
-        "symfony/debug": "3.1.*",
-        "symfony/finder": "3.1.*",
-        "symfony/http-foundation": "3.1.*",
-        "symfony/http-kernel": "3.1.*",
-        "symfony/process": "3.1.*",
-        "symfony/routing": "3.1.*",
-        "symfony/translation": "3.1.*",
-        "symfony/var-dumper": "3.1.*",
+        "symfony/console": "3.2.*",
+        "symfony/debug": "3.2.*",
+        "symfony/finder": "3.2.*",
+        "symfony/http-foundation": "3.2.*",
+        "symfony/http-kernel": "3.2.*",
+        "symfony/process": "3.2.*",
+        "symfony/routing": "3.2.*",
+        "symfony/translation": "3.2.*",
+        "symfony/var-dumper": "3.2.*",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {
@@ -75,8 +75,8 @@
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~5.4",
         "predis/predis": "~1.0",
-        "symfony/css-selector": "3.1.*",
-        "symfony/dom-crawler": "3.1.*"
+        "symfony/css-selector": "3.2.*",
+        "symfony/dom-crawler": "3.2.*"
     },
     "autoload": {
         "classmap": [
@@ -92,7 +92,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.3-dev"
+            "dev-master": "5.4-dev"
         }
     },
     "suggest": {
@@ -105,8 +105,8 @@
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
-        "symfony/css-selector": "Required to use some of the crawler integration testing tools (3.1.*).",
-        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (3.1.*).",
+        "symfony/css-selector": "Required to use some of the crawler integration testing tools (3.2.*).",
+        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (3.2.*).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (0.2.*)."
     },
     "minimum-stability": "dev"
