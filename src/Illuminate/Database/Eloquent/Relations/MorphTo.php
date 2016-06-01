@@ -204,7 +204,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Merge the "wheres" from a relation query to a has query.
+     * Merge the "wheres" from a relation query to a morph query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $relationQuery
      * @param  \Illuminate\Database\Eloquent\Builder  $morphQuery
