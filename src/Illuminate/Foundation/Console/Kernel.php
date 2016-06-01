@@ -107,14 +107,14 @@ class Kernel implements KernelContract
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
+            $this->reportException($e);
+
+            $this->renderException($output, $e);
             if (! $input->hasParameterOption(['--help', '-h'], true) && $input->hasArgument('command')) {
                 $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
 
                 return $this->handle($input, $output);
             }
-            $this->reportException($e);
-
-            $this->renderException($output, $e);
 
             return 1;
         } catch (Throwable $e) {
