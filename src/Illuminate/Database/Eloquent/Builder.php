@@ -822,7 +822,7 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            $query->applyCallbackToQuery($callback);
+            $query->callScope($callback);
         }
 
         return $this->addHasWhere(
@@ -1055,7 +1055,7 @@ class Builder
                 $relation->getRelated()->newQuery(), $this
             );
 
-            $query->applyCallbackToQuery($constraints);
+            $query->callScope($constraints);
 
             $query->mergeModelDefinedRelationConstraints($relation->getQuery());
 
@@ -1126,25 +1126,13 @@ class Builder
     }
 
     /**
-     * Call the given model scope on the underlying model.
+     * Apply the given scope on the current builder instance.
      *
-     * @param  string  $scope
-     * @param  array   $parameters
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function callScope($scope, $parameters)
-    {
-        return $this->applyCallbackToQuery([$this->model, $scope], $parameters);
-    }
-
-    /**
-     * Apply the given callback to the current builder instance.
-     *
-     * @param  callable $callback
+     * @param  callable $scope
      * @param  array $parameters
      * @return mixed
      */
-    protected function applyCallbackToQuery(callable $callback, $parameters = [])
+    protected function callScope(callable $scope, $parameters = [])
     {
         array_unshift($parameters, $this);
 
@@ -1155,7 +1143,7 @@ class Builder
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = call_user_func_array($callback, $parameters) ?: $this;
+        $result = call_user_func_array($scope, $parameters) ?: $this;
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
@@ -1177,45 +1165,17 @@ class Builder
 
         $builder = clone $this;
 
-        $query = $builder->getQuery();
-
-        // We will keep track of how many wheres are on the query before running the
-        // scope so that we can properly group the added scope constraints in the
-        // query as their own isolated nested where statement and avoid issues.
-        $originalWhereCount = count($query->wheres);
-
-        $whereCounts = [$originalWhereCount];
-
         foreach ($this->scopes as $scope) {
-            $this->applyScope($scope, $builder);
-
-            // Again, we will keep track of the count each time we add where clauses so that
-            // we will properly isolate each set of scope constraints inside of their own
-            // nested where clause to avoid any conflicts or issues with logical order.
-            $whereCounts[] = count($query->wheres);
-        }
-
-        if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
-            $this->nestWheresForScope($query, $whereCounts);
+            $builder->callScope(function(Builder $builder) use ($scope) {
+                if ($scope instanceof Closure) {
+                    $scope($builder);
+                } elseif ($scope instanceof Scope) {
+                    $scope->apply($builder, $this->getModel());
+                }
+            });
         }
 
         return $builder;
-    }
-
-    /**
-     * Apply a single scope on the given builder instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return void
-     */
-    protected function applyScope($scope, $builder)
-    {
-        if ($scope instanceof Closure) {
-            $scope($builder);
-        } elseif ($scope instanceof Scope) {
-            $scope->apply($builder, $this->getModel());
-        }
     }
 
     /**
@@ -1422,7 +1382,7 @@ class Builder
         }
 
         if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope($scope, $parameters);
+            return $this->callScope([$this->model, $scope], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
