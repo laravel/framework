@@ -182,9 +182,9 @@ class Worker
 
             $job = $this->getNextJob($connection, $queue);
 
-            // If we're able to pull a job off of the stack, we will process it and
-            // then immediately return back out. If there is no job on the queue
-            // we will "sleep" the worker for the specified number of seconds.
+            // If we're able to pull a job off of the stack, we will process it and then return
+            // from this method. If there is no job on the queue, we will "sleep" the worker
+            // for the specified number of seconds, then keep processing jobs after sleep.
             if (! is_null($job)) {
                 return $this->process(
                     $this->manager->getName($connectionName), $job, $maxTries, $delay
@@ -239,9 +239,9 @@ class Worker
         try {
             $this->raiseBeforeJobEvent($connection, $job);
 
-            // First we will fire off the job. Once it is done we will see if it will be
-            // automatically deleted after processing and if so we'll fire the delete
-            // method on the job. Otherwise, we will just keep on running our jobs.
+            // Here we will fire off the job and let it process. We will catch any exceptions so
+            // they can be reported to the developers logs, etc. Once the job is finished the
+            // proper events will be fired to let any listeners know this job has finished.
             $job->fire();
 
             $this->raiseAfterJobEvent($connection, $job);
@@ -265,9 +265,9 @@ class Worker
      */
     protected function handleJobException($connection, Job $job, $delay, $e)
     {
-        // If we catch an exception, we will attempt to release the job back onto
-        // the queue so it is not lost. This will let is be retried at a later
-        // time by another listener (or the same one). We will do that here.
+        // If we catch an exception, we will attempt to release the job back onto the queue
+        // so it is not lost entirely. This'll let the job be retried at a later time by
+        // another listener (or this same one). We will re-throw this exception after.
         try {
             $this->raiseExceptionOccurredJobEvent(
                 $connection, $job, $e
