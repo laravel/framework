@@ -2,11 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo
 {
@@ -177,46 +175,12 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = $instance->newQuery();
+        $eagerLoads = $this->getQuery()->nestedRelations($this->relation);
 
-        $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
-
-        $this->mergeRelationWheresToMorphQuery($this->query, $query);
+        $query = $instance->newQuery()->setEagerLoads($eagerLoads)
+            ->mergeModelDefinedRelationConstraints($this->getQuery());
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
-    }
-
-    /**
-     * Get the relationships that should be eager loaded for the given model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $instance
-     * @return array
-     */
-    protected function getEagerLoadsForInstance(Model $instance)
-    {
-        $relations = BaseCollection::make($this->query->getEagerLoads());
-
-        return $relations->filter(function ($constraint, $relation) {
-            return Str::startsWith($relation, $this->relation.'.');
-        })->keyBy(function ($constraint, $relation) {
-            return Str::replaceFirst($this->relation.'.', '', $relation);
-        })->merge($instance->getEagerLoads())->all();
-    }
-
-    /**
-     * Merge the "wheres" from a relation query to a morph query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $relationQuery
-     * @param  \Illuminate\Database\Eloquent\Builder  $morphQuery
-     * @return void
-     */
-    protected function mergeRelationWheresToMorphQuery(Builder $relationQuery, Builder $morphQuery)
-    {
-        $removedScopes = $relationQuery->removedScopes();
-
-        $morphQuery->withoutGlobalScopes($removedScopes)->mergeWheres(
-            $relationQuery->getQuery()->wheres, $relationQuery->getBindings()
-        );
     }
 
     /**
