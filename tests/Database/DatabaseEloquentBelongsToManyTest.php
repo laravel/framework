@@ -521,7 +521,7 @@ class DatabaseEloquentBelongsToManyTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $relation->getRelated()->shouldReceive('freshTimestamp')->andReturn(100);
+        $relation->getRelated()->shouldReceive('freshTimestampString')->andReturn(100);
         $relation->getRelated()->shouldReceive('getQualifiedKeyName')->andReturn('table.id');
         $relation->getQuery()->shouldReceive('select')->once()->with('table.id')->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('pluck')->once()->with('id')->andReturn([1, 2, 3]);
