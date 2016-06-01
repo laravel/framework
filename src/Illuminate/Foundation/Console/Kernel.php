@@ -114,11 +114,7 @@ class Kernel implements KernelContract
 
             $this->renderException($output, $e);
 
-            if (! $input->hasParameterOption('--help', true) && $input->hasArgument('command')) {
-                $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
-
-                return $this->handle($input, $output);
-            }
+            $this->displayHelpOutputForCommand($input, $output);
 
             return 1;
         } catch (Throwable $e) {
@@ -282,6 +278,22 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
+    }
+
+    /**
+     * Display the help output for the intended command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function displayHelpOutputForCommand($input, $output)
+    {
+        if (! $input->hasParameterOption('--help', true) && $input->hasArgument('command')) {
+            $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
+
+            $this->handle($input, $output);
+        }
     }
 
     /**
