@@ -381,15 +381,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function getGlobalScope($scope)
     {
-        $modelScopes = Arr::get(static::$globalScopes, static::class, []);
-
-        if (is_string($scope)) {
-            return isset($modelScopes[$scope]) ? $modelScopes[$scope] : null;
+        if (! is_string($scope)) {
+            $scope = get_class($scope);
         }
 
-        return Arr::first($modelScopes, function ($key, $value) use ($scope) {
-            return $scope instanceof $value;
-        });
+        return Arr::get(static::$globalScopes, static::class.'.'.$scope);
     }
 
     /**
