@@ -75,7 +75,7 @@ class Worker
      * @param  int     $timeout
      * @param  int     $sleep
      * @param  int     $maxTries
-     * @return array
+     * @return void
      */
     public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0)
     {
@@ -173,7 +173,7 @@ class Worker
      * @param  int     $delay
      * @param  int     $sleep
      * @param  int     $maxTries
-     * @return array
+     * @return void
      */
     public function runNextJob($connectionName, $queue = null, $delay = 0, $sleep = 3, $maxTries = 0)
     {
@@ -226,7 +226,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @param  int  $delay
-     * @return array|null
+     * @return void
      *
      * @throws \Throwable
      */
@@ -335,7 +335,7 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @return array
+     * @return void
      */
     protected function logFailedJob($connection, Job $job)
     {
