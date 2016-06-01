@@ -133,7 +133,7 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
-        $this->worker->setDaemonExceptionHandler(
+        $this->worker->setExceptionHandler(
             $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
         );
 
