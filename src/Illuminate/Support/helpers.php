@@ -583,7 +583,7 @@ if (! function_exists('object_get')) {
     }
 }
 
-if (! function_exists('preg_replace_sub')) {
+if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
      *
@@ -592,7 +592,7 @@ if (! function_exists('preg_replace_sub')) {
      * @param  string  $subject
      * @return string
      */
-    function preg_replace_sub($pattern, &$replacements, $subject)
+    function preg_replace_array($pattern, array $replacements, $subject)
     {
         return preg_replace_callback($pattern, function ($match) use (&$replacements) {
             foreach ($replacements as $key => $value) {
