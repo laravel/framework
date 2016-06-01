@@ -127,7 +127,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function render($view = null)
     {
-        $view = $view ?: 'pagination::bootstrap-3';
+        $view = $view ?: static::$defaultView;
 
         $window = UrlWindow::make($this);
 
