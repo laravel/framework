@@ -430,12 +430,12 @@ class Worker
     }
 
     /**
-     * Set the exception handler to use in Daemon mode.
+     * Set the exception handler instance.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @return void
      */
-    public function setDaemonExceptionHandler(ExceptionHandler $handler)
+    public function setExceptionHandler(ExceptionHandler $handler)
     {
         $this->exceptions = $handler;
     }
