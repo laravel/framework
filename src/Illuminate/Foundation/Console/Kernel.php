@@ -8,6 +8,7 @@ use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
+use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -112,6 +113,12 @@ class Kernel implements KernelContract
             $this->reportException($e);
 
             $this->renderException($output, $e);
+
+            if (! $input->hasParameterOption(['--help', '-h'], true) && $input->hasArgument('command')) {
+                $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
+
+                return $this->handle($input, $output);
+            }
 
             return 1;
         } catch (Throwable $e) {
