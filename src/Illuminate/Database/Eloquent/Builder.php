@@ -695,7 +695,7 @@ class Builder
      * @param  string  $relation
      * @return array
      */
-    protected function nestedRelations($relation)
+    public function nestedRelations($relation)
     {
         $nested = [];
 
@@ -807,7 +807,7 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            $this->applyCallbackToQuery($callback, [$query], $query->getQuery());
+            $query->callScope($callback);
         }
 
         return $this->addHasWhere(
@@ -921,7 +921,7 @@ class Builder
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        $this->mergeModelDefinedRelationWheresToHasQuery($hasQuery, $relation);
+        $hasQuery->mergeModelDefinedRelationConstraints($relation->getQuery());
 
         if ($this->shouldRunExistsQuery($operator, $count)) {
             $not = ($operator === '<' && $count === 1);
@@ -965,22 +965,21 @@ class Builder
     }
 
     /**
-     * Merge the "wheres" from a relation query to a has query.
+     * Merge the constraints from a relation query to the current query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Illuminate\Database\Eloquent\Builder  $relation
      * @return void
      */
-    protected function mergeModelDefinedRelationWheresToHasQuery(Builder $hasQuery, Relation $relation)
+    public function mergeModelDefinedRelationConstraints(Builder $relation)
     {
-        $removedScopes = $hasQuery->removedScopes();
+        $removedScopes = $relation->removedScopes();
 
-        $relationQuery = $relation->withoutGlobalScopes($removedScopes)->toBase();
+        $relationQuery = $relation->getQuery();
 
-        // Here we have the "has" query and the original relation. We need to copy over any
-        // where clauses the developer may have put in the relationship function over to
-        // the has query, and then copy the bindings from the "has" query to the main.
-        $hasQuery->withoutGlobalScopes()->mergeWheres(
+        // Here we have some relation query and the original relation. We need to copy over any
+        // where clauses that the developer may have put in the relation definition function.
+        // We need to remove any global scopes that the developer already removed as well.
+        return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
     }
@@ -1041,9 +1040,9 @@ class Builder
                 $relation->getRelated()->newQuery(), $this
             );
 
-            call_user_func($constraints, $query);
+            $query->callScope($constraints);
 
-            $this->mergeModelDefinedRelationWheresToHasQuery($query, $relation);
+            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
 
             $this->selectSub($query->toBase(), snake_case($name).'_count');
         }
@@ -1112,37 +1111,24 @@ class Builder
     }
 
     /**
-     * Call the given model scope on the underlying model.
+     * Apply the given scope on the current builder instance.
      *
-     * @param  string  $scope
-     * @param  array   $parameters
-     * @return \Illuminate\Database\Query\Builder
+     * @param  callable $scope
+     * @param  array $parameters
+     * @return mixed
      */
-    protected function callScope($scope, $parameters)
+    protected function callScope(callable $scope, $parameters = [])
     {
         array_unshift($parameters, $this);
 
-        return $this->applyCallbackToQuery([$this->model, $scope], $parameters);
-    }
-
-    /**
-     * Apply the given callback to a supplied (or the current) builder instance.
-     *
-     * @param  callable $callback
-     * @param  array $parameters
-     * @param  \Illuminate\Database\Query\Builder $query
-     * @return mixed
-     */
-    protected function applyCallbackToQuery(callable $callback, $parameters = [], $query = null)
-    {
-        $query = $query ?: $this->getQuery();
+        $query = $this->getQuery();
 
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = call_user_func_array($callback, $parameters) ?: $this;
+        $result = call_user_func_array($scope, $parameters) ?: $this;
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
@@ -1164,45 +1150,17 @@ class Builder
 
         $builder = clone $this;
 
-        $query = $builder->getQuery();
-
-        // We will keep track of how many wheres are on the query before running the
-        // scope so that we can properly group the added scope constraints in the
-        // query as their own isolated nested where statement and avoid issues.
-        $originalWhereCount = count($query->wheres);
-
-        $whereCounts = [$originalWhereCount];
-
         foreach ($this->scopes as $scope) {
-            $this->applyScope($scope, $builder);
-
-            // Again, we will keep track of the count each time we add where clauses so that
-            // we will properly isolate each set of scope constraints inside of their own
-            // nested where clause to avoid any conflicts or issues with logical order.
-            $whereCounts[] = count($query->wheres);
-        }
-
-        if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
-            $this->nestWheresForScope($query, $whereCounts);
+            $builder->callScope(function (Builder $builder) use ($scope) {
+                if ($scope instanceof Closure) {
+                    $scope($builder);
+                } elseif ($scope instanceof Scope) {
+                    $scope->apply($builder, $this->getModel());
+                }
+            });
         }
 
         return $builder;
-    }
-
-    /**
-     * Apply a single scope on the given builder instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return void
-     */
-    protected function applyScope($scope, $builder)
-    {
-        if ($scope instanceof Closure) {
-            $scope($builder);
-        } elseif ($scope instanceof Scope) {
-            $scope->apply($builder, $this->getModel());
-        }
     }
 
     /**
@@ -1410,7 +1368,7 @@ class Builder
         }
 
         if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope($scope, $parameters);
+            return $this->callScope([$this->model, $scope], $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
