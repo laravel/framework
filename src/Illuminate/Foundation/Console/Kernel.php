@@ -114,7 +114,7 @@ class Kernel implements KernelContract
 
             $this->renderException($output, $e);
 
-            if (! $input->hasParameterOption(['--help', '-h'], true) && $input->hasArgument('command')) {
+            if (! $input->hasParameterOption('--help', true) && $input->hasArgument('command')) {
                 $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
 
                 return $this->handle($input, $output);
