@@ -822,7 +822,7 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            $this->applyCallback($callback, [$query], $query->getQuery());
+            $this->applyCallbackToQuery($callback, [$query], $query->getQuery());
         }
 
         return $this->addHasWhere(
@@ -1137,7 +1137,7 @@ class Builder
     {
         array_unshift($parameters, $this);
 
-        return $this->applyCallback([$this->model, $scope], $parameters);
+        return $this->applyCallbackToQuery([$this->model, $scope], $parameters);
     }
 
     /**
@@ -1148,7 +1148,7 @@ class Builder
      * @param  \Illuminate\Database\Query\Builder $query
      * @return mixed
      */
-    protected function applyCallback(callable $callback, $parameters = [], $query = null)
+    protected function applyCallbackToQuery(callable $callback, $parameters = [], $query = null)
     {
         $query = $query ?: $this->getQuery();
 
