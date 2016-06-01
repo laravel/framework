@@ -822,7 +822,7 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            call_user_func($callback, $query);
+            $this->applyCallback($callback, [$query], $query->getQuery());
         }
 
         return $this->addHasWhere(
@@ -1137,14 +1137,27 @@ class Builder
     {
         array_unshift($parameters, $this);
 
-        $query = $this->getQuery();
+        return $this->applyCallback([$this->model, $scope], $parameters);
+    }
+
+    /**
+     * Apply the given callback to a supplied (or the current) builder instance.
+     *
+     * @param  callable $callback
+     * @param  array $parameters
+     * @param  \Illuminate\Database\Query\Builder $query
+     * @return mixed
+     */
+    protected function applyCallback(callable $callback, $parameters = [], $query = null)
+    {
+        $query = $query ?: $this->getQuery();
 
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = count($query->wheres);
 
-        $result = call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+        $result = call_user_func_array($callback, $parameters) ?: $this;
 
         if ($this->shouldNestWheresForScope($query, $originalWhereCount)) {
             $this->nestWheresForScope($query, $originalWhereCount);
@@ -1238,8 +1251,7 @@ class Builder
         // We will construct where offsets by adding the outer most offsets to the
         // collection (0 and total where count) while also flattening the array
         // and extracting unique values, ensuring that all wheres are sliced.
-        $whereOffsets = collect([0, $whereCounts, count($allWheres)])
-                    ->flatten()->unique();
+        $whereOffsets = collect([0, $whereCounts, count($allWheres)])->flatten()->unique();
 
         $sliceFrom = $whereOffsets->shift();
 
