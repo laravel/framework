@@ -81,6 +81,20 @@ abstract class AbstractPaginator implements Htmlable
     protected static $viewFactoryResolver;
 
     /**
+     * The default pagination view.
+     *
+     * @var string
+     */
+    public static $defaultView = 'pagination::bootstrap-3';
+
+    /**
+     * The default "simple" pagination view.
+     *
+     * @var string
+     */
+    public static $defaultSimpleView = 'pagination::simple-bootstrap-3';
+
+    /**
      * Determine if the given value is a valid page number.
      *
      * @param  int  $page
@@ -372,6 +386,28 @@ abstract class AbstractPaginator implements Htmlable
     public static function viewFactoryResolver(Closure $resolver)
     {
         static::$viewFactoryResolver = $resolver;
+    }
+
+    /**
+     * Set the default pagination view.
+     *
+     * @param  string  $view
+     * @return void
+     */
+    public static function defaultView($view)
+    {
+        static::$defaultView = $view;
+    }
+
+    /**
+     * Set the default "simple" pagination view.
+     *
+     * @param  string  $view
+     * @return void
+     */
+    public static function defaultSimpleView($view)
+    {
+        static::$defaultSimpleView = $view;
     }
 
     /**
