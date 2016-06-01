@@ -127,8 +127,6 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function render($view = null)
     {
-        $view = $view ?: static::$defaultView;
-
         $window = UrlWindow::make($this);
 
         $elements = [
@@ -139,7 +137,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             $window['last'],
         ];
 
-        return new HtmlString(static::viewFactory()->make($view, [
+        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, [
             'paginator' => $this,
             'elements' => array_filter($elements),
         ])->render());
