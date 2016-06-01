@@ -74,11 +74,11 @@ abstract class AbstractPaginator implements Htmlable
     protected static $currentPageResolver;
 
     /**
-     * The default presenter resolver.
+     * The view factory resolver callback.
      *
      * @var \Closure
      */
-    protected static $presenterResolver;
+    protected static $viewFactoryResolver;
 
     /**
      * Determine if the given value is a valid page number.
@@ -271,6 +271,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Determine if the paginator is on the first page.
+     *
+     * @return bool
+     */
+    public function onFirstPage()
+    {
+        return $this->currentPage() <= 1;
+    }
+
+    /**
      * Get the current page.
      *
      * @return int
@@ -344,14 +354,24 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Set the default Presenter resolver.
+     * Get an instance of the view factory from the resolver.
+     *
+     * @return \Illuminate\Contracts\View\Factory
+     */
+    public static function viewFactory()
+    {
+        return call_user_func(static::$viewFactoryResolver);
+    }
+
+    /**
+     * Set the view factory resolver callback.
      *
      * @param  \Closure  $resolver
      * @return void
      */
-    public static function presenter(Closure $resolver)
+    public static function viewFactoryResolver(Closure $resolver)
     {
-        static::$presenterResolver = $resolver;
+        static::$viewFactoryResolver = $resolver;
     }
 
     /**
