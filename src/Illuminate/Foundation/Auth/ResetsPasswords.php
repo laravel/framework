@@ -223,9 +223,7 @@ trait ResetsPasswords
             $this->getResetValidationCustomAttributes()
         );
 
-        $credentials = $request->only(
-            'email', 'password', 'password_confirmation', 'token'
-        );
+        $credentials = $this->getResetCredentials($request);
 
         $broker = $this->getBroker();
 
@@ -273,6 +271,19 @@ trait ResetsPasswords
     protected function getResetValidationCustomAttributes()
     {
         return [];
+    }
+
+    /**
+     * Get the password reset credentials from request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function getResetCredentials(Request $request)
+    {
+        return $request->only(
+            'email', 'password', 'password_confirmation', 'token'
+        );
     }
 
     /**
