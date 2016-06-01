@@ -385,7 +385,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $scope = get_class($scope);
         }
 
-        return Arr::get(static::$globalScopes, static::class . '.' . $scope);
+        return Arr::get(static::$globalScopes, static::class.'.'.$scope);
     }
 
     /**

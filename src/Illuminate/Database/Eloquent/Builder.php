@@ -1166,7 +1166,7 @@ class Builder
         $builder = clone $this;
 
         foreach ($this->scopes as $scope) {
-            $builder->callScope(function(Builder $builder) use ($scope) {
+            $builder->callScope(function (Builder $builder) use ($scope) {
                 if ($scope instanceof Closure) {
                     $scope($builder);
                 } elseif ($scope instanceof Scope) {
