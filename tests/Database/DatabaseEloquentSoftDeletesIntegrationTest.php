@@ -579,6 +579,26 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(null, $comment->owner);
     }
 
+    public function testMorphToNonSoftDeletingModel()
+    {
+        $taylor = TestUserWithoutSoftDelete::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post1 = $taylor->posts()->create(['title' => 'First Title']);
+        $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => TestUserWithoutSoftDelete::class,
+            'owner_id' => $taylor->id,
+        ]);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals($taylor->email, $comment->owner->email);
+
+        $taylor->delete();
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals(null, $comment->owner);
+    }
+
     /**
      * Helpers...
      */
@@ -608,6 +628,20 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
+    }
+}
+
+/**
+ * Eloquent Models...
+ */
+class TestUserWithoutSoftDelete extends Eloquent
+{
+    protected $table = 'users';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
     }
 }
 
