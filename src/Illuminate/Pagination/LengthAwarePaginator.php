@@ -6,7 +6,6 @@ use Countable;
 use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
