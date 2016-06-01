@@ -177,13 +177,11 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = clone $this->query;
+        $query = $instance->newQuery();
 
         $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
 
-        $query->setModel($instance);
-
-        $query->useConnection($instance->getConnection());
+        $this->mergeRelationWheresToMorphQuery($this->query, $query);
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
     }
@@ -203,6 +201,22 @@ class MorphTo extends BelongsTo
         })->keyBy(function ($constraint, $relation) {
             return Str::replaceFirst($this->relation.'.', '', $relation);
         })->merge($instance->getEagerLoads())->all();
+    }
+
+    /**
+     * Merge the "wheres" from a relation query to a morph query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $relationQuery
+     * @param  \Illuminate\Database\Eloquent\Builder  $morphQuery
+     * @return void
+     */
+    protected function mergeRelationWheresToMorphQuery(Builder $relationQuery, Builder $morphQuery)
+    {
+        $removedScopes = $relationQuery->removedScopes();
+
+        $morphQuery->withoutGlobalScopes($removedScopes)->mergeWheres(
+            $relationQuery->getQuery()->wheres, $relationQuery->getBindings()
+        );
     }
 
     /**
