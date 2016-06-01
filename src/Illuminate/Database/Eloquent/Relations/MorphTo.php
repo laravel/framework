@@ -177,11 +177,9 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = clone $this->query;
+        $query = $instance->newQuery();
 
         $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
-
-        $query->setModel($instance);
 
         $query->useConnection($instance->getConnection());
 
