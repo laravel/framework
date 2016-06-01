@@ -197,8 +197,6 @@ class Worker
         }
 
         $this->sleep($sleep);
-
-        return ['job' => null, 'failed' => false];
     }
 
     /**
@@ -247,8 +245,6 @@ class Worker
             $job->fire();
 
             $this->raiseAfterJobEvent($connection, $job);
-
-            return ['job' => $job, 'failed' => false];
         } catch (Exception $e) {
             $this->handleJobException($connection, $job, $delay, $e);
         } catch (Throwable $e) {
@@ -343,17 +339,17 @@ class Worker
      */
     protected function logFailedJob($connection, Job $job)
     {
-        if ($this->failer) {
-            $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
-
-            $job->delete();
-
-            $job->failed();
-
-            $this->raiseFailedJobEvent($connection, $job);
+        if (! $this->failer) {
+            return;
         }
 
-        return ['job' => $job, 'failed' => true];
+        $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+
+        $job->delete();
+
+        $job->failed();
+
+        $this->raiseFailedJobEvent($connection, $job);
     }
 
     /**
