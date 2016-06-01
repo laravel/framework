@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Exception;
+use Symfony\Component\Console\Input\ArrayInput;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
@@ -106,6 +107,10 @@ class Kernel implements KernelContract
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
+            if( !$input->hasParameterOption(['--help', '-h'], true) && $input->hasArgument('command') ) {
+                $input = new ArrayInput(array('command' => $input->getArgument('command'), '--help'));
+                return $this->handle($input, $output);
+            }
             $this->reportException($e);
 
             $this->renderException($output, $e);
