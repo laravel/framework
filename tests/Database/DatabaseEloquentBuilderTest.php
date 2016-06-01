@@ -527,6 +527,21 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
+    public function testHasWithContraintsWithOrWhereAndHavingInSubquery()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('name', 'larry');
+        $builder->whereHas('address', function ($q) {
+            $q->where('zipcode', '90210');
+            $q->orWhere('zipcode', '90220');
+            $q->having('street', '=', 'fooside dr');
+        })->where('age', 29);
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "zipcode" = ?) having "street" = ?) and "age" = ?', $builder->toSql());
+        $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
+    }
+
     public function testHasWithContraintsAndJoinAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -710,6 +725,11 @@ class EloquentBuilderTestModelParentStub extends Illuminate\Database\Eloquent\Mo
     public function foo()
     {
         return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub');
+    }
+
+    public function address()
+    {
+        return $this->belongsTo('EloquentBuilderTestModelCloseRelatedStub', 'foo_id');
     }
 
     public function activeFoo()
