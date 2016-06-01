@@ -104,30 +104,6 @@ trait SoftDeletes
     }
 
     /**
-     * Get a new query builder that includes soft deletes.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function withTrashed()
-    {
-        return (new static)->newQueryWithoutScope(new SoftDeletingScope);
-    }
-
-    /**
-     * Get a new query builder that only includes soft deletes.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function onlyTrashed()
-    {
-        $instance = new static;
-
-        $column = $instance->getQualifiedDeletedAtColumn();
-
-        return $instance->newQueryWithoutScope(new SoftDeletingScope)->whereNotNull($column);
-    }
-
-    /**
      * Register a restoring model event with the dispatcher.
      *
      * @param  \Closure|string  $callback

@@ -710,7 +710,7 @@ class Builder
      * @param  string  $relation
      * @return array
      */
-    protected function nestedRelations($relation)
+    public function nestedRelations($relation)
     {
         $nested = [];
 
@@ -822,7 +822,7 @@ class Builder
         $query = $relation->{$queryType}($relation->getRelated()->newQuery(), $this);
 
         if ($callback) {
-            $this->applyCallbackToQuery($callback, [$query], $query->getQuery());
+            $query->applyCallbackToQuery($callback);
         }
 
         return $this->addHasWhere(
@@ -936,7 +936,7 @@ class Builder
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
-        $this->mergeModelDefinedRelationWheresToHasQuery($hasQuery, $relation);
+        $hasQuery->mergeModelDefinedRelationConstraints($relation->getQuery());
 
         if ($this->shouldRunExistsQuery($operator, $count)) {
             $not = ($operator === '<' && $count === 1);
@@ -980,22 +980,21 @@ class Builder
     }
 
     /**
-     * Merge the "wheres" from a relation query to a has query.
+     * Merge the constraints from a relation query to the current query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Illuminate\Database\Eloquent\Builder  $relation
      * @return void
      */
-    protected function mergeModelDefinedRelationWheresToHasQuery(Builder $hasQuery, Relation $relation)
+    public function mergeModelDefinedRelationConstraints(Builder $relation)
     {
-        $removedScopes = $hasQuery->removedScopes();
+        $removedScopes = $relation->removedScopes();
 
-        $relationQuery = $relation->withoutGlobalScopes($removedScopes)->toBase();
+        $relationQuery = $relation->getQuery();
 
-        // Here we have the "has" query and the original relation. We need to copy over any
-        // where clauses the developer may have put in the relationship function over to
-        // the has query, and then copy the bindings from the "has" query to the main.
-        $hasQuery->withoutGlobalScopes()->mergeWheres(
+        // Here we have some relation query and the original relation. We need to copy over any
+        // where clauses that the developer may have put in the relation definition function.
+        // We need to remove any global scopes that the developer already removed as well.
+        return $this->withoutGlobalScopes($removedScopes)->mergeWheres(
             $relationQuery->wheres, $relationQuery->getBindings()
         );
     }
@@ -1056,9 +1055,9 @@ class Builder
                 $relation->getRelated()->newQuery(), $this
             );
 
-            call_user_func($constraints, $query);
+            $query->applyCallbackToQuery($constraints);
 
-            $this->mergeModelDefinedRelationWheresToHasQuery($query, $relation);
+            $query->mergeModelDefinedRelationConstraints($relation->getQuery());
 
             $this->selectSub($query->toBase(), snake_case($name).'_count');
         }
@@ -1135,22 +1134,21 @@ class Builder
      */
     protected function callScope($scope, $parameters)
     {
-        array_unshift($parameters, $this);
-
         return $this->applyCallbackToQuery([$this->model, $scope], $parameters);
     }
 
     /**
-     * Apply the given callback to a supplied (or the current) builder instance.
+     * Apply the given callback to the current builder instance.
      *
      * @param  callable $callback
      * @param  array $parameters
-     * @param  \Illuminate\Database\Query\Builder $query
      * @return mixed
      */
-    protected function applyCallbackToQuery(callable $callback, $parameters = [], $query = null)
+    protected function applyCallbackToQuery(callable $callback, $parameters = [])
     {
-        $query = $query ?: $this->getQuery();
+        array_unshift($parameters, $this);
+
+        $query = $this->getQuery();
 
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
