@@ -25,9 +25,9 @@ class FoundationFormRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Http\Exception\HttpResponseException
+     * @expectedException \Illuminate\Validation\ValidationException
      */
-    public function testValidateFunctionThrowsHttpResponseExceptionIfValidationFails()
+    public function testValidateFunctionThrowsValidationExceptionIfValidationFails()
     {
         $request = m::mock('FoundationTestFormRequestStub[response]');
         $request->initialize(['name' => null]);
