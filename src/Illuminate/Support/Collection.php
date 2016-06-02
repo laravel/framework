@@ -263,12 +263,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  array  $values
+     * @param  mixed  $values
      * @param  bool  $strict
      * @return static
      */
-    public function whereIn($key, array $values, $strict = false)
+    public function whereIn($key, $values, $strict = false)
     {
+        $values = $this->getArrayableItems($values);
+
         return $this->filter(function ($item) use ($key, $values, $strict) {
             return in_array(data_get($item, $key), $values, $strict);
         });
@@ -278,10 +280,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  array  $values
+     * @param  mixed  $values
      * @return static
      */
-    public function whereInStrict($key, array $values)
+    public function whereInStrict($key, $values)
     {
         return $this->whereIn($key, $values, true);
     }
@@ -394,8 +396,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $results = [];
 
-        foreach ($this->items as $item) {
-            $results[$keyBy($item)] = $item;
+        foreach ($this->items as $key => $item) {
+            $results[$keyBy($item, $key)] = $item;
         }
 
         return new static($results);
@@ -557,6 +559,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function combine($values)
     {
         return new static(array_combine($this->all(), $this->getArrayableItems($values)));
+    }
+
+    /**
+     * Union the collection with the given items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function union($items)
+    {
+        return new static($this->items + $this->getArrayableItems($items));
     }
 
     /**
@@ -812,7 +825,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = $this->items;
 
         $callback ? uasort($items, $callback) : uasort($items, function ($a, $b) {
-
             if ($a == $b) {
                 return 0;
             }
@@ -1016,7 +1028,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
-
         }, $this->items);
     }
 

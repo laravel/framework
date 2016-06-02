@@ -219,11 +219,12 @@ class Router implements RegistrarContract
     /**
      * Set the unmapped global resource parameters to singular.
      *
+     * @param  bool  $singular
      * @return void
      */
-    public function singularResourceParameters()
+    public function singularResourceParameters($singular = true)
     {
-        ResourceRegistrar::singularParameters();
+        ResourceRegistrar::singularParameters($singular);
     }
 
     /**
@@ -529,7 +530,7 @@ class Router implements RegistrarContract
             return false;
         }
 
-        return is_string($action) || is_string(isset($action['uses']) ? $action['uses'] : null);
+        return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
     }
 
     /**
@@ -665,13 +666,11 @@ class Router implements RegistrarContract
         // set of middleware under single keys that can be conveniently referenced.
         if (isset($this->middlewareGroups[$name])) {
             return $this->parseMiddlewareGroup($name);
-
         // When the middleware is simply a Closure, we will return this Closure instance
         // directly so that Closures can be registered as middleware inline, which is
         // convenient on occasions when the developers are experimenting with them.
         } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
-
         // Finally, when the middleware is simply a string mapped to a class name the
         // middleware name will get parsed into the full class name and parameters
         // which may be run using the Pipeline which accepts this string format.
@@ -734,7 +733,7 @@ class Router implements RegistrarContract
 
         $this->container->instance('Illuminate\Routing\Route', $route);
 
-        return $this->substituteBindings($route);
+        return $route;
     }
 
     /**
@@ -743,15 +742,13 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
-    protected function substituteBindings($route)
+    public function substituteBindings($route)
     {
         foreach ($route->parameters() as $key => $value) {
             if (isset($this->binders[$key])) {
                 $route->setParameter($key, $this->performBinding($key, $value, $route));
             }
         }
-
-        $this->substituteImplicitBindings($route);
 
         return $route;
     }
@@ -762,7 +759,7 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
-    protected function substituteImplicitBindings($route)
+    public function substituteImplicitBindings($route)
     {
         $parameters = $route->parameters();
 
@@ -1074,7 +1071,7 @@ class Router implements RegistrarContract
     }
 
     /**
-     * Alias for the "currentRouteNamed" method.
+     * Alias for the "currentRouteName" method.
      *
      * @param  mixed  string
      * @return bool

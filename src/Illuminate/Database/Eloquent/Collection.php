@@ -2,10 +2,12 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use LogicException;
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Support\Collection as BaseCollection;
 
-class Collection extends BaseCollection
+class Collection extends BaseCollection implements QueueableCollection
 {
     /**
      * Find a model in the collection by key.
@@ -22,7 +24,6 @@ class Collection extends BaseCollection
 
         return Arr::first($this->items, function ($model) use ($key) {
             return $model->getKey() == $key;
-
         }, $default);
     }
 
@@ -197,6 +198,19 @@ class Collection extends BaseCollection
     }
 
     /**
+     * Make the given, typically visible, attributes hidden across the entire collection.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function makeHidden($attributes)
+    {
+        return $this->each(function ($model) use ($attributes) {
+            $model->addHidden($attributes);
+        });
+    }
+
+    /**
      * Make the given, typically hidden, attributes visible across the entire collection.
      *
      * @param  array|string  $attributes
@@ -204,11 +218,9 @@ class Collection extends BaseCollection
      */
     public function makeVisible($attributes)
     {
-        $this->each(function ($model) use ($attributes) {
+        return $this->each(function ($model) use ($attributes) {
             $model->makeVisible($attributes);
         });
-
-        return $this;
     }
 
     /**
@@ -296,6 +308,38 @@ class Collection extends BaseCollection
     public function flip()
     {
         return $this->toBase()->flip();
+    }
+
+    /**
+     * Get the type of the entities being queued.
+     *
+     * @return string|null
+     */
+    public function getQueueableClass()
+    {
+        if ($this->count() === 0) {
+            return;
+        }
+
+        $class = get_class($this->first());
+
+        $this->each(function ($model) use ($class) {
+            if (get_class($model) !== $class) {
+                throw new LogicException('Queueing collections with multiple model types is not supported.');
+            }
+        });
+
+        return $class;
+    }
+
+    /**
+     * Get the identifiers for all of the entities.
+     *
+     * @return array
+     */
+    public function getQueueableIds()
+    {
+        return $this->modelKeys();
     }
 
     /**

@@ -6,6 +6,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Database\ModelIdentifier;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait SerializesModels
 {
@@ -51,8 +52,15 @@ trait SerializesModels
      */
     protected function getSerializedPropertyValue($value)
     {
-        return $value instanceof QueueableEntity
-                        ? new ModelIdentifier(get_class($value), $value->getQueueableId()) : $value;
+        if ($value instanceof QueueableCollection) {
+            return new ModelIdentifier($value->getQueueableClass(), $value->getQueueableIds());
+        }
+
+        if ($value instanceof QueueableEntity) {
+            return new ModelIdentifier(get_class($value), $value->getQueueableId());
+        }
+
+        return $value;
     }
 
     /**
@@ -63,9 +71,31 @@ trait SerializesModels
      */
     protected function getRestoredPropertyValue($value)
     {
-        return $value instanceof ModelIdentifier
-                        ? (new $value->class)->newQuery()->useWritePdo()->findOrFail($value->id)
-                        : $value;
+        if (! $value instanceof ModelIdentifier) {
+            return $value;
+        }
+
+        return is_array($value->id)
+                ? $this->restoreCollection($value)
+                : (new $value->class)->newQuery()->useWritePdo()->findOrFail($value->id);
+    }
+
+    /**
+     * Restore a queueable collection instance.
+     *
+     * @param  \Illuminate\Contracts\Database\ModelIdentifier  $value
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function restoreCollection($value)
+    {
+        if (! $value->class || count($value->id) === 0) {
+            return new EloquentCollection;
+        }
+
+        $model = new $value->class;
+
+        return $model->newQuery()->useWritePdo()
+                    ->whereIn($model->getKeyName(), $value->id)->get();
     }
 
     /**

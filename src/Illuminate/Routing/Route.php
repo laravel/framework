@@ -250,8 +250,24 @@ class Route
     }
 
     /**
+     * Get the controller middleware for the route.
+     *
+     * @return array
+     */
+    protected function controllerMiddleware()
+    {
+        list($class, $method) = explode('@', $this->action['uses']);
+
+        $controller = $this->container->make($class);
+
+        return (new ControllerDispatcher($this->router, $this->container))
+            ->getMiddleware($controller, $method);
+    }
+
+    /**
      * Get the parameters that are listed in the route / controller signature.
      *
+     * @param string|null  $subClass
      * @return array
      */
     public function signatureParameters($subClass = null)
@@ -359,7 +375,6 @@ class Route
         if (isset($this->parameters)) {
             return array_map(function ($value) {
                 return is_string($value) ? rawurldecode($value) : $value;
-
             }, $this->parameters);
         }
 
@@ -433,9 +448,7 @@ class Route
         // compile that and get the parameter matches for this domain. We will then
         // merge them into this parameters array so that this array is completed.
         $params = $this->matchToKeys(
-
             array_slice($this->bindPathParameters($request), 1)
-
         );
 
         // If the route has a regular expression for the host part of the URI, we will
@@ -504,8 +517,8 @@ class Route
      */
     protected function replaceDefaults(array $parameters)
     {
-        foreach ($parameters as $key => &$value) {
-            $value = isset($value) ? $value : Arr::get($this->defaults, $key);
+        foreach ($parameters as $key => $value) {
+            $parameters[$key] = isset($value) ? $value : Arr::get($this->defaults, $key);
         }
 
         foreach ($this->defaults as $key => $value) {
@@ -808,7 +821,29 @@ class Route
      */
     public function uses($action)
     {
-        return $this->setAction(array_merge($this->action, $this->parseAction($action)));
+        $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
+
+        return $this->setAction(array_merge($this->action, $this->parseAction([
+            'uses' => $action,
+            'controller' => $action,
+        ])));
+    }
+
+    /**
+     * Parse a string based action for the "uses" fluent method.
+     *
+     * @param  string  $action
+     * @return string
+     */
+    protected function addGroupNamespaceToStringUses($action)
+    {
+        $groupStack = last($this->router->getGroupStack());
+
+        if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
+            return $groupStack['namespace'].'\\'.$action;
+        }
+
+        return $action;
     }
 
     /**

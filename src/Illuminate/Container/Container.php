@@ -515,11 +515,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function isCallableWithAtSign($callback)
     {
-        if (! is_string($callback)) {
-            return false;
-        }
-
-        return strpos($callback, '@') !== false;
+        return is_string($callback) && strpos($callback, '@') !== false;
     }
 
     /**
@@ -1142,18 +1138,22 @@ class Container implements ArrayAccess, ContainerContract
      */
     public static function getInstance()
     {
+        if (is_null(static::$instance)) {
+            static::$instance = new static;
+        }
+
         return static::$instance;
     }
 
     /**
      * Set the shared instance of the container.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @return static
      */
-    public static function setInstance(ContainerContract $container)
+    public static function setInstance(ContainerContract $container = null)
     {
-        static::$instance = $container;
+        return static::$instance = $container;
     }
 
     /**

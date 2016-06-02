@@ -44,7 +44,7 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Set the environmeny key in the environment file.
+     * Set the application key in the environment file.
      *
      * @param  string  $key
      * @return void

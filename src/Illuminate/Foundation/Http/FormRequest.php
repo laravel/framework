@@ -187,7 +187,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * Set the Redirector instance.
      *
      * @param  \Illuminate\Routing\Redirector  $redirector
-     * @return \Illuminate\Foundation\Http\FormRequest
+     * @return $this
      */
     public function setRedirector(Redirector $redirector)
     {
@@ -210,7 +210,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Set custom messages for validator errors.
+     * Get custom messages for validator errors.
      *
      * @return array
      */
@@ -220,7 +220,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Set custom attributes for validator errors.
+     * Get custom attributes for validator errors.
      *
      * @return array
      */

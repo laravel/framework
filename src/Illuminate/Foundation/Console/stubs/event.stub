@@ -4,11 +4,12 @@ namespace DummyNamespace;
 
 use DummyRootNamespaceEvents\Event;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class DummyClass extends Event
 {
-    use SerializesModels;
+    use InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.

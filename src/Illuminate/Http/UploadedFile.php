@@ -30,6 +30,16 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
+     * Get the file's extension supplied by the client.
+     *
+     * @return string
+     */
+    public function clientExtension()
+    {
+        return $this->guessClientExtension();
+    }
+
+    /**
      * Get a filename for the file that is the MD5 hash of the contents.
      *
      * @param  string  $path
@@ -48,16 +58,18 @@ class UploadedFile extends SymfonyUploadedFile
      * Create a new file instance from a base instance.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
+     * @param  bool $test
      * @return static
      */
-    public static function createFromBase(SymfonyUploadedFile $file)
+    public static function createFromBase(SymfonyUploadedFile $file, $test = false)
     {
         return $file instanceof static ? $file : new static(
             $file->getPathname(),
             $file->getClientOriginalName(),
             $file->getClientMimeType(),
             $file->getClientSize(),
-            $file->getError()
+            $file->getError(),
+            $test
         );
     }
 }

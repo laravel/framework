@@ -468,6 +468,14 @@ if (! function_exists('data_set')) {
             } elseif ($overwrite || ! isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
+        } else {
+            $target = [];
+
+            if ($segments) {
+                data_set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
         }
 
         return $target;
@@ -575,7 +583,7 @@ if (! function_exists('object_get')) {
     }
 }
 
-if (! function_exists('preg_replace_sub')) {
+if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
      *
@@ -584,13 +592,12 @@ if (! function_exists('preg_replace_sub')) {
      * @param  string  $subject
      * @return string
      */
-    function preg_replace_sub($pattern, &$replacements, $subject)
+    function preg_replace_array($pattern, array $replacements, $subject)
     {
         return preg_replace_callback($pattern, function ($match) use (&$replacements) {
             foreach ($replacements as $key => $value) {
                 return array_shift($replacements);
             }
-
         }, $subject);
     }
 }
@@ -841,7 +848,7 @@ if (! function_exists('value')) {
 
 if (! function_exists('windows_os')) {
     /**
-     * Determine whether the current envrionment is Windows based.
+     * Determine whether the current environment is Windows based.
      *
      * @return bool
      */

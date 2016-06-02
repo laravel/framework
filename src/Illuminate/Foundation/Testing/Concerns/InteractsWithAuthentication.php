@@ -50,9 +50,16 @@ trait InteractsWithAuthentication
      */
     public function seeIsAuthenticatedAs($user, $guard = null)
     {
+        $expected = $this->app->make('auth')->guard($guard)->user();
+
+        $this->assertInstanceOf(
+            get_class($expected), $user,
+            'The currently authenticated user is not who was expected'
+        );
+
         $this->assertSame(
-            $this->app->make('auth')->guard($guard)->user(), $user,
-            'The logged in user is not the same'
+            $expected->getAuthIdentifier(), $user->getAuthIdentifier(),
+            'The currently authenticated user is not who was expected'
         );
 
         return $this;

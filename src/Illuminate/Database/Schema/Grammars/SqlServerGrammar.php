@@ -59,7 +59,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a create table command.
+     * Compile a column addition table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
@@ -149,7 +149,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table '.$blueprint->getTable();
+        return 'if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \''.$blueprint->getTable().'\') drop table ['.$blueprint->getTable().']';
     }
 
     /**
@@ -244,6 +244,26 @@ class SqlServerGrammar extends Grammar
         $from = $this->wrapTable($blueprint);
 
         return "sp_rename {$from}, ".$this->wrapTable($command->to);
+    }
+
+    /**
+     * Compile the command to enable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints()
+    {
+        return 'EXEC sp_msforeachtable @command1="print \'?\'", @command2="ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all";';
+    }
+
+    /**
+     * Compile the command to disable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints()
+    {
+        return 'EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all";';
     }
 
     /**
@@ -540,6 +560,28 @@ class SqlServerGrammar extends Grammar
     protected function typeUuid(Fluent $column)
     {
         return 'uniqueidentifier';
+    }
+
+    /**
+     * Create the column definition for an IP address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIpAddress(Fluent $column)
+    {
+        return 'nvarchar(45)';
+    }
+
+    /**
+     * Create the column definition for a MAC address type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMacAddress(Fluent $column)
+    {
+        return 'nvarchar(17)';
     }
 
     /**

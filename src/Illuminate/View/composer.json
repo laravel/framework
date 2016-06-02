@@ -19,7 +19,8 @@
         "illuminate/contracts": "5.3.*",
         "illuminate/events": "5.3.*",
         "illuminate/filesystem": "5.3.*",
-        "illuminate/support": "5.3.*"
+        "illuminate/support": "5.3.*",
+        "symfony/debug": "3.1.*"
     },
     "autoload": {
         "psr-4": {

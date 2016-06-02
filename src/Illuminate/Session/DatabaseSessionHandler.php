@@ -105,7 +105,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     }
 
     /**
-     * Get the default paylaod for the session.
+     * Get the default payload for the session.
      *
      * @param  string  $data
      * @return array

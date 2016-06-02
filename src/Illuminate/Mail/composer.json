@@ -33,7 +33,8 @@
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (~3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0)."
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~5.3|~6.0).",
+        "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0)."
     },
     "minimum-stability": "dev"
 }
