@@ -22,7 +22,7 @@ class RedisTaggedCache extends TaggedCache
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|int  $minutes
+     * @param  \DateTime|float  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
