@@ -536,6 +536,12 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         }])->first();
 
         $this->assertEquals($abigail->email, $comment->owner->email);
+
+        $comment = TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
+            $q->withTrashed();
+        }])->first();
+
+        $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
     public function testMorphToWithConstraints()
@@ -700,6 +706,20 @@ class SoftDeletesTestPost extends Eloquent
     public function comments()
     {
         return $this->hasMany(SoftDeletesTestComment::class, 'post_id');
+    }
+}
+
+/**
+ * Eloquent Models...
+ */
+class TestCommentWithoutSoftDelete extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+
+    public function owner()
+    {
+        return $this->morphTo();
     }
 }
 
