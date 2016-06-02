@@ -27,7 +27,7 @@ trait RetrievesMultipleKeys
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  int  $minutes
+     * @param  float  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)

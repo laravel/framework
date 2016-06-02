@@ -33,7 +33,7 @@ class ArrayStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  float   $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -45,7 +45,7 @@ class ArrayStore extends TaggableStore implements Store
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  int  $minutes
+     * @param  float  $minutes
      * @return void
      */
     public function putMultiple(array $values, $minutes)

@@ -92,7 +92,7 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  float   $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -104,7 +104,7 @@ class DatabaseStore implements Store
         // time and place that on the table so we will check it on our retrieval.
         $value = $this->encrypter->encrypt($value);
 
-        $expiration = $this->getTime() + ($minutes * 60);
+        $expiration = $this->getTime() + (int) ($minutes * 60);
 
         try {
             $this->table()->insert(compact('key', 'value', 'expiration'));

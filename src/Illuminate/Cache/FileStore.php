@@ -94,7 +94,7 @@ class FileStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  float   $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -208,7 +208,7 @@ class FileStore implements Store
     /**
      * Get the expiration time based on the given minutes.
      *
-     * @param  int  $minutes
+     * @param  float  $minutes
      * @return int
      */
     protected function expiration($minutes)
