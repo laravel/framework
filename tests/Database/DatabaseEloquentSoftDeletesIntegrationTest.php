@@ -544,6 +544,27 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testMorphToWithBadMethodCall()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+
+        $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => SoftDeletesTestUser::class,
+            'owner_id' => $abigail->id,
+        ]);
+
+        TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
+            $q->thisMethodDoesNotExist();
+        }])->first();
+    }
+
     public function testMorphToWithConstraints()
     {
         $this->createUsers();
