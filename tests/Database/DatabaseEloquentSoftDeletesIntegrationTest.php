@@ -553,7 +553,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
-        
+
         $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
