@@ -24,6 +24,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -99,7 +106,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -221,8 +228,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a collection of models to the parent instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection|array  $models
-     * @return \Illuminate\Database\Eloquent\Collection|array
+     * @param  \Traversable|array  $models
+     * @return \Traversable|array
      */
     public function saveMany($models)
     {

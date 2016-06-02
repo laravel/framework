@@ -271,22 +271,34 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
     public function testSingleStackPush()
     {
         $factory = $this->getFactory();
-        $factory->startSection('foo');
+        $factory->startPush('foo');
         echo 'hi';
-        $factory->appendSection();
-        $this->assertEquals('hi', $factory->yieldContent('foo'));
+        $factory->stopPush();
+        $this->assertEquals('hi', $factory->yieldPushContent('foo'));
     }
 
     public function testMultipleStackPush()
     {
         $factory = $this->getFactory();
-        $factory->startSection('foo');
+        $factory->startPush('foo');
         echo 'hi';
-        $factory->appendSection();
-        $factory->startSection('foo');
+        $factory->stopPush();
+        $factory->startPush('foo');
         echo ', Hello!';
-        $factory->appendSection();
-        $this->assertEquals('hi, Hello!', $factory->yieldContent('foo'));
+        $factory->stopPush();
+        $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
+
+        // mimic a parent view is rendering
+        $factory->incrementRender();
+        $factory->startPush('foo');
+        echo 'Dear ';
+        $factory->stopPush();
+        $factory->startPush('foo');
+        echo 'friend';
+        $factory->stopPush();
+        $factory->decrementRender();
+
+        $this->assertEquals('Dear friendhi, Hello!', $factory->yieldPushContent('foo'));
     }
 
     public function testSessionAppending()

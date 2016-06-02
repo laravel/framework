@@ -2,11 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Application as Artisan;
+use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -75,6 +77,8 @@ class Kernel implements KernelContract
 
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
+
+            $this->commands();
         });
     }
 
@@ -110,6 +114,8 @@ class Kernel implements KernelContract
 
             $this->renderException($output, $e);
 
+            $this->displayHelpOutputForCommand($input, $output);
+
             return 1;
         } catch (Throwable $e) {
             $e = new FatalThrowableError($e);
@@ -143,6 +149,41 @@ class Kernel implements KernelContract
     protected function schedule(Schedule $schedule)
     {
         //
+    }
+
+    /**
+     * Register the Closure based commands for the application.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        //
+    }
+
+    /**
+     * Register a Closure based command with the application.
+     *
+     * @param  string  $signature
+     * @param  Closure  $callback
+     * @return ClosureCommand
+     */
+    public function command($signature, Closure $callback)
+    {
+        $this->registerCommand($command = new ClosureCommand($signature, $callback));
+
+        return $command;
+    }
+
+    /**
+     * Register the given command with the console application.
+     *
+     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @return void
+     */
+    public function registerCommand($command)
+    {
+        $this->getArtisan()->add($command);
     }
 
     /**
@@ -237,6 +278,22 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
+    }
+
+    /**
+     * Display the help output for the intended command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function displayHelpOutputForCommand($input, $output)
+    {
+        if (! $input->hasParameterOption('--help', true) && $input->hasArgument('command')) {
+            $input = new ArrayInput(['command' => $input->getArgument('command'), '--help']);
+
+            $this->handle($input, $output);
+        }
     }
 
     /**

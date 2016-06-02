@@ -7,9 +7,9 @@ use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Pagination\Presenter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
 class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, LengthAwarePaginatorContract
@@ -109,31 +109,38 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
-     * Render the paginator using the given presenter.
+     * Render the paginator using the given view.
      *
-     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @param  string  $view
      * @return string
      */
-    public function links(Presenter $presenter = null)
+    public function links($view = null)
     {
-        return $this->render($presenter);
+        return $this->render($view);
     }
 
     /**
-     * Render the paginator using the given presenter.
+     * Render the paginator using the given view.
      *
-     * @param  \Illuminate\Contracts\Pagination\Presenter|null  $presenter
+     * @param  string  $view
      * @return string
      */
-    public function render(Presenter $presenter = null)
+    public function render($view = null)
     {
-        if (is_null($presenter) && static::$presenterResolver) {
-            $presenter = call_user_func(static::$presenterResolver, $this);
-        }
+        $window = UrlWindow::make($this);
 
-        $presenter = $presenter ?: new BootstrapThreePresenter($this);
+        $elements = [
+            $window['first'],
+            is_array($window['slider']) ? '...' : null,
+            $window['slider'],
+            is_array($window['last']) ? '...' : null,
+            $window['last'],
+        ];
 
-        return $presenter->render();
+        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, [
+            'paginator' => $this,
+            'elements' => array_filter($elements),
+        ])->render());
     }
 
     /**
@@ -144,15 +151,15 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function toArray()
     {
         return [
-            'total'         => $this->total(),
-            'per_page'      => $this->perPage(),
-            'current_page'  => $this->currentPage(),
-            'last_page'     => $this->lastPage(),
+            'total' => $this->total(),
+            'per_page' => $this->perPage(),
+            'current_page' => $this->currentPage(),
+            'last_page' => $this->lastPage(),
             'next_page_url' => $this->nextPageUrl(),
             'prev_page_url' => $this->previousPageUrl(),
-            'from'          => $this->firstItem(),
-            'to'            => $this->lastItem(),
-            'data'          => $this->items->toArray(),
+            'from' => $this->firstItem(),
+            'to' => $this->lastItem(),
+            'data' => $this->items->toArray(),
         ];
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestCase
@@ -50,6 +51,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
 
         $this->schema()->create('comments', function ($table) {
             $table->increments('id');
+            $table->integer('owner_id')->nullable();
+            $table->string('owner_type')->nullable();
             $table->integer('post_id');
             $table->string('body');
             $table->timestamps();
@@ -122,7 +125,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->pluck('email')->all());
 
-        Paginator::currentPageResolver(function () { return 1; });
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->paginate(2)->all());
@@ -405,6 +410,31 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     /**
      * @group test
      */
+    public function testWhereHasWithNestedDeletedRelationshipAndOnlyTrashedCondition()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post = $abigail->posts()->create(['title' => 'First Title']);
+        $post->delete();
+
+        $users = SoftDeletesTestUser::has('posts')->get();
+        $this->assertEquals(0, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+            $q->onlyTrashed();
+        })->get();
+        $this->assertEquals(1, count($users));
+
+        $users = SoftDeletesTestUser::whereHas('posts', function ($q) {
+            $q->withTrashed();
+        })->get();
+        $this->assertEquals(1, count($users));
+    }
+
+    /**
+     * @group test
+     */
     public function testWhereHasWithNestedDeletedRelationship()
     {
         $this->createUsers();
@@ -436,12 +466,137 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
         $this->assertEquals(1, count($users));
     }
 
+    /**
+     * @group test
+     */
+    public function testWithCountWithNestedDeletedRelationshipAndOnlyTrashedCondition()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+        $post1->delete();
+        $post2 = $abigail->posts()->create(['title' => 'Second Title']);
+        $post3 = $abigail->posts()->create(['title' => 'Third Title']);
+
+        $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(2, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->onlyTrashed();
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(1, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->withTrashed();
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(3, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->withTrashed()->where('title', 'First Title');
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(1, $user->posts_count);
+
+        $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
+            $q->where('title', 'First Title');
+        }])->orderBy('postsCount', 'desc')->first();
+        $this->assertEquals(0, $user->posts_count);
+    }
+
     public function testOrWhereWithSoftDeleteConstraint()
     {
         $this->createUsers();
 
         $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->orWhere('email', 'abigailotwell@gmail.com');
         $this->assertEquals(['abigailotwell@gmail.com'], $users->pluck('email')->all());
+    }
+
+    public function testMorphToWithTrashed()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+        $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => SoftDeletesTestUser::class,
+            'owner_id' => $abigail->id,
+        ]);
+
+        $abigail->delete();
+
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+            $q->withoutGlobalScope(SoftDeletingScope::class);
+        }])->first();
+
+        $this->assertEquals($abigail->email, $comment->owner->email);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+            $q->withTrashed();
+        }])->first();
+
+        $this->assertEquals($abigail->email, $comment->owner->email);
+    }
+
+    public function testMorphToWithConstraints()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+        $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => SoftDeletesTestUser::class,
+            'owner_id' => $abigail->id,
+        ]);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
+            $q->where('email', 'taylorotwell@gmail.com');
+        }])->first();
+
+        $this->assertEquals(null, $comment->owner);
+    }
+
+    public function testMorphToWithoutConstraints()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $post1 = $abigail->posts()->create(['title' => 'First Title']);
+        $comment1 = $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => SoftDeletesTestUser::class,
+            'owner_id' => $abigail->id,
+        ]);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals($abigail->email, $comment->owner->email);
+
+        $abigail->delete();
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals(null, $comment->owner);
+    }
+
+    public function testMorphToNonSoftDeletingModel()
+    {
+        $taylor = TestUserWithoutSoftDelete::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post1 = $taylor->posts()->create(['title' => 'First Title']);
+        $post1->comments()->create([
+            'body' => 'Comment Body',
+            'owner_type' => TestUserWithoutSoftDelete::class,
+            'owner_id' => $taylor->id,
+        ]);
+
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals($taylor->email, $comment->owner->email);
+
+        $taylor->delete();
+        $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
+
+        $this->assertEquals(null, $comment->owner);
     }
 
     /**
@@ -473,6 +628,20 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends PHPUnit_Framework_TestC
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
+    }
+}
+
+/**
+ * Eloquent Models...
+ */
+class TestUserWithoutSoftDelete extends Eloquent
+{
+    protected $table = 'users';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
     }
 }
 
@@ -544,6 +713,25 @@ class SoftDeletesTestComment extends Eloquent
     protected $dates = ['deleted_at'];
     protected $table = 'comments';
     protected $guarded = [];
+
+    public function owner()
+    {
+        return $this->morphTo();
+    }
+}
+
+class SoftDeletesTestCommentWithTrashed extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+    protected $table = 'comments';
+    protected $guarded = [];
+
+    public function owner()
+    {
+        return $this->morphTo();
+    }
 }
 
 /**

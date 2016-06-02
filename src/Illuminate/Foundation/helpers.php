@@ -257,7 +257,7 @@ if (! function_exists('csrf_field')) {
     /**
      * Generate a CSRF token form field.
      *
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     function csrf_field()
     {
@@ -336,14 +336,17 @@ if (! function_exists('elixir')) {
      */
     function elixir($file, $buildDirectory = 'build')
     {
-        static $manifest = null;
+        static $manifest;
+        static $manifestPath;
 
-        if (is_null($manifest)) {
+        if (is_null($manifest) || $manifestPath !== $buildDirectory) {
             $manifest = json_decode(file_get_contents(public_path($buildDirectory.'/rev-manifest.json')), true);
+
+            $manifestPath = $buildDirectory;
         }
 
         if (isset($manifest[$file])) {
-            return '/'.$buildDirectory.'/'.$manifest[$file];
+            return '/'.trim($buildDirectory.'/'.$manifest[$file], '/');
         }
 
         throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
@@ -383,15 +386,12 @@ if (! function_exists('env')) {
             case 'true':
             case '(true)':
                 return true;
-
             case 'false':
             case '(false)':
                 return false;
-
             case 'empty':
             case '(empty)':
                 return '';
-
             case 'null':
             case '(null)':
                 return;
@@ -480,7 +480,7 @@ if (! function_exists('method_field')) {
      * Generate a form field to spoof the HTTP verb used by forms.
      *
      * @param  string  $method
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     function method_field($method)
     {
@@ -609,12 +609,11 @@ if (! function_exists('route')) {
      * @param  string  $name
      * @param  array   $parameters
      * @param  bool    $absolute
-     * @param  \Illuminate\Routing\Route  $route
      * @return string
      */
-    function route($name, $parameters = [], $absolute = true, $route = null)
+    function route($name, $parameters = [], $absolute = true)
     {
-        return app('url')->route($name, $parameters, $absolute, $route);
+        return app('url')->route($name, $parameters, $absolute);
     }
 }
 

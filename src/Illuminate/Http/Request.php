@@ -376,6 +376,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Intersect an array of items with the input data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function intersect($keys)
+    {
+        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key
@@ -485,6 +496,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected function isValidFile($file)
     {
         return $file instanceof SplFileInfo && $file->getPath() != '';
+    }
+
+    /**
+     * Determine if a header is set on the request.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasHeader($key)
+    {
+        return ! is_null($this->header($key));
     }
 
     /**
@@ -661,11 +683,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $split = explode('/', $actual);
 
-        if (isset($split[1]) && preg_match('/'.$split[0].'\/.+\+'.$split[1].'/', $type)) {
-            return true;
-        }
-
-        return false;
+        return isset($split[1]) && preg_match('#'.preg_quote($split[0], '#').'/.+\+'.preg_quote($split[1], '#').'#', $type);
     }
 
     /**

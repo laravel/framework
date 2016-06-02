@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -56,6 +58,11 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
+        // We'll listen to the processed and failed events so we can write information
+        // to the console as jobs are processed, which will let the developer watch
+        // which jobs are coming through a queue and be informed on its progress.
+        $this->listenForEvents();
+
         $queue = $this->option('queue');
 
         $delay = $this->option('delay');
@@ -67,16 +74,51 @@ class WorkCommand extends Command
 
         $connection = $this->argument('connection');
 
+        // We need to get the right queue for the connection which is set in the queue
+        // configuration file for the application. We will pull it based on the set
+        // connection being run for the queue operation currently being executed.
+        $queue = $this->getQueue($connection);
+
         $response = $this->runWorker(
             $connection, $queue, $delay, $memory, $this->option('daemon')
         );
+    }
 
-        // If a job was fired by the worker, we'll write the output out to the console
-        // so that the developer can watch live while the queue runs in the console
-        // window, which will also of get logged if stdout is logged out to disk.
-        if (! is_null($response['job'])) {
-            $this->writeOutput($response['job'], $response['failed']);
+    /**
+     * Listen for the queue events in order to update the console output.
+     *
+     * @return void
+     */
+    protected function listenForEvents()
+    {
+        $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+            $this->writeOutput($event->job, false);
+        });
+
+        $this->laravel['events']->listen(JobFailed::class, function ($event) {
+            $this->writeOutput($event->job, true);
+        });
+    }
+
+    /**
+     * Get the name of the queue connection to listen on.
+     *
+     * @param  string  $connection
+     * @return string
+     */
+    protected function getQueue($connection)
+    {
+        if ($this->option('queue')) {
+            return $this->option('queue');
         }
+
+        if (is_null($connection)) {
+            $connection = $this->laravel['config']['queue.default'];
+        }
+
+        return $this->laravel['config']->get(
+            "queue.connections.{$connection}.queue", 'default'
+        );
     }
 
     /**
@@ -91,20 +133,20 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
+        $this->worker->setExceptionHandler(
+            $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+        );
+
         if ($daemon) {
             $this->worker->setCache($this->laravel['cache']->driver());
 
-            $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
-            );
-
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory,
+                $connection, $queue, $delay, $memory, $this->option('timeout', 60),
                 $this->option('sleep'), $this->option('tries')
             );
         }
 
-        return $this->worker->pop(
+        return $this->worker->runNextJob(
             $connection, $queue, $delay,
             $this->option('sleep'), $this->option('tries')
         );
@@ -120,9 +162,9 @@ class WorkCommand extends Command
     protected function writeOutput(Job $job, $failed)
     {
         if ($failed) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->getName());
+            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
         } else {
-            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->getName());
+            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
         }
     }
 
@@ -171,6 +213,8 @@ class WorkCommand extends Command
             ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 60],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];

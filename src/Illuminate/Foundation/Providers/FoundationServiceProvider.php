@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Providers;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Routing\Events\RouteMatched;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
@@ -22,10 +21,8 @@ class FoundationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Initialize the form request with data from the given request.
+     * Bootstrap the application services.
      *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $form
-     * @param  \Symfony\Component\HttpFoundation\Request  $current
      * @return void
      */
     public function boot()
@@ -44,12 +41,10 @@ class FoundationServiceProvider extends ServiceProvider
             $resolved->validate();
         });
 
-        $this->app['events']->listen(RouteMatched::class, function () {
-            $this->app->resolving(function (FormRequest $request, $app) {
-                $this->initializeRequest($request, $app['request']);
+        $this->app->resolving(function (FormRequest $request, $app) {
+            $this->initializeRequest($request, $app['request']);
 
-                $request->setContainer($app)->setRedirector($app->make(Redirector::class));
-            });
+            $request->setContainer($app)->setRedirector($app->make(Redirector::class));
         });
     }
 

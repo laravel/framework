@@ -96,6 +96,19 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register a database migration path.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function loadMigrationsFrom($paths)
+    {
+        foreach ((array) $paths as $path) {
+            $this->app['migrator']->path($path);
+        }
+    }
+
+    /**
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths

@@ -41,6 +41,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
         $this->assertEquals(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::dot([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::dot(['foo' => []]);
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]]);
+        $this->assertEquals(['foo.bar' => []], $array);
     }
 
     public function testExcept()
@@ -80,10 +89,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, 200, 300];
 
-        $last = Arr::last($array, function ($value) { return $value < 250; });
+        $last = Arr::last($array, function ($value) {
+            return $value < 250;
+        });
         $this->assertEquals(200, $last);
 
-        $last = Arr::last($array, function ($value, $key) { return $key < 2; });
+        $last = Arr::last($array, function ($value, $key) {
+            return $key < 2;
+        });
         $this->assertEquals(200, $last);
 
         $this->assertEquals(300, Arr::last($array));
@@ -186,9 +199,20 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertNull(Arr::get($array, 'foo', 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
 
+        // Test null key returns the whole array
+        $array = ['foo', 'bar'];
+        $this->assertEquals($array, Arr::get($array, null));
+
         // Test $array not an array
-        $this->assertEquals('default', Arr::get(null, 'foo', 'default'));
-        $this->assertEquals('default', Arr::get(false, 'foo', 'default'));
+        $this->assertSame('default', Arr::get(null, 'foo', 'default'));
+        $this->assertSame('default', Arr::get(false, 'foo', 'default'));
+
+        // Test $array not an array and key is null
+        $this->assertSame('default', Arr::get(null, null, 'default'));
+
+        // Test $array is empty and key is null
+        $this->assertSame([], Arr::get([], null));
+        $this->assertSame([], Arr::get([], null, 'default'));
     }
 
     public function testHas()
@@ -216,8 +240,14 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
 
+        $array = ['foo', 'bar'];
+        $this->assertFalse(Arr::has($array, null));
+
         $this->assertFalse(Arr::has(null, 'foo'));
         $this->assertFalse(Arr::has(false, 'foo'));
+
+        $this->assertFalse(Arr::has(null, null));
+        $this->assertFalse(Arr::has([], null));
     }
 
     public function testIsAssoc()
@@ -284,6 +314,18 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $name = Arr::pull($array, 'name');
         $this->assertEquals('Desk', $name);
         $this->assertEquals(['price' => 100], $array);
+
+        // Only works on first level keys
+        $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
+        $name = Arr::pull($array, 'joe@example.com');
+        $this->assertEquals('Joe', $name);
+        $this->assertEquals(['jane@localhost' => 'Jane'], $array);
+
+        // Does not work for nested keys
+        $array = ['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']];
+        $name = Arr::pull($array, 'emails.joe@example.com');
+        $this->assertEquals(null, $name);
+        $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
     }
 
     public function testSet()
@@ -417,5 +459,15 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
         $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+
+        // Only works on first level keys
+        $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];
+        Arr::forget($array, 'joe@example.com');
+        $this->assertEquals(['jane@example.com' => 'Jane'], $array);
+
+        // Does not work for nested keys
+        $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
+        Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
+        $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
 }

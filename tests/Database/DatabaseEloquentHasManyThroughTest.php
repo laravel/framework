@@ -16,7 +16,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
+            return new Collection($array);
+        });
         $model->shouldReceive('setRelation')->once()->with('foo', m::type('Illuminate\Database\Eloquent\Collection'));
         $models = $relation->initRelation([$model], 'foo');
 
@@ -52,7 +54,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $model3 = new EloquentHasManyThroughModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+            return new Collection($array);
+        });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
@@ -81,7 +85,9 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $model3 = new EloquentHasManyThroughModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) { return new Collection($array); });
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+            return new Collection($array);
+        });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
         $this->assertEquals(1, $models[0]->foo[0]->country_id);
@@ -136,6 +142,38 @@ class DatabaseEloquentHasManyThroughTest extends PHPUnit_Framework_TestCase
         $relation->shouldReceive('take')->with(1)->once()->andReturn($relation);
 
         $this->assertEquals('first', $relation->first());
+    }
+
+    public function testFindOrFailThrowsException()
+    {
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\HasManyThrough')->setMethods(['find'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation->expects($this->once())->method('find')->with('foo')->will($this->returnValue(null));
+
+        $this->setExpectedException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        try {
+            $relation->findOrFail('foo');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->assertNotEmpty($e->getModel());
+
+            throw $e;
+        }
+    }
+
+    public function testFirstOrFailThrowsException()
+    {
+        $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\HasManyThrough')->setMethods(['first'])->setConstructorArgs($this->getRelationArguments())->getMock();
+        $relation->expects($this->once())->method('first')->with(['id' => 'foo'])->will($this->returnValue(null));
+
+        $this->setExpectedException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        try {
+            $relation->firstOrFail(['id' => 'foo']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->assertNotEmpty($e->getModel());
+
+            throw $e;
+        }
     }
 
     public function testFindMethod()

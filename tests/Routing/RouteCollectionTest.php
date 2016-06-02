@@ -90,7 +90,7 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
     }
 
-    public function testRouteCollectionCanGetIteratorWhenEMpty()
+    public function testRouteCollectionCanGetIteratorWhenEmpty()
     {
         $this->assertCount(0, $this->routeCollection);
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());

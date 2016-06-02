@@ -31,6 +31,13 @@ class BelongsTo extends Relation
     protected $relation;
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new belongs to relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -125,7 +132,7 @@ class BelongsTo extends Relation
      */
     public function getRelationCountHash()
     {
-        return 'self_'.md5(microtime(true));
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
@@ -163,11 +170,11 @@ class BelongsTo extends Relation
             }
         }
 
-        // If there are no keys that were not null we will just return an array with 0 in
-        // it so the query doesn't fail, but will not return any results, which should
-        // be what this developer is expecting in a case where this happens to them.
-        if (count($keys) == 0) {
-            return [0];
+        // If there are no keys that were not null we will just return an array with either
+        // null or 0 in (depending on if incrementing keys are in use) so the query wont
+        // fail plus returns zero results, which should be what the developer expects.
+        if (count($keys) === 0) {
+            return [$this->related->incrementing ? 0 : null];
         }
 
         return array_values(array_unique($keys));

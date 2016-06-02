@@ -82,8 +82,12 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $mockModel2->shouldReceive('getKey')->andReturn(2);
         $c = new Collection([$mockModel1, $mockModel2]);
 
-        $this->assertTrue($c->contains(function ($model) { return $model->getKey() < 2; }));
-        $this->assertFalse($c->contains(function ($model) { return $model->getKey() > 2; }));
+        $this->assertTrue($c->contains(function ($model) {
+            return $model->getKey() < 2;
+        }));
+        $this->assertFalse($c->contains(function ($model) {
+            return $model->getKey() > 2;
+        }));
     }
 
     public function testFindMethodFindsModelById()
@@ -98,7 +102,7 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
 
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $c = $this->getMock('Illuminate\Database\Eloquent\Collection', ['first'], [['foo']]);
+        $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
         $mockItem = m::mock('StdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
         $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
@@ -223,7 +227,15 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
 
-    public function testWithHiddenSetsHiddenOnEntireCollection()
+    public function testMakeHiddenAddsHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeHidden(['visible']);
+
+        $this->assertEquals(['hidden', 'visible'], $c[0]->getHidden());
+    }
+
+    public function testMakeVisibleRemovesHiddenFromEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible(['hidden']);
@@ -242,9 +254,34 @@ class DatabaseEloquentCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(get_class($a->zip(['a', 'b'], ['c', 'd'])), BaseCollection::class);
         $this->assertEquals(get_class($b->flip()), BaseCollection::class);
     }
+
+    public function testMakeVisibleRemovesHiddenAndIncludesVisible()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->makeVisible('hidden');
+
+        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
+    }
+
+    public function testQueueableCollectionImplementation()
+    {
+        $c = new Collection([new TestEloquentCollectionModel, new TestEloquentCollectionModel]);
+        $this->assertEquals(TestEloquentCollectionModel::class, $c->getQueueableClass());
+    }
+
+    /**
+     * @expectedException LogicException
+     */
+    public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
+    {
+        $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
+        $c->getQueueableClass();
+    }
 }
 
 class TestEloquentCollectionModel extends Illuminate\Database\Eloquent\Model
 {
+    protected $visible = ['visible'];
     protected $hidden = ['hidden'];
 }

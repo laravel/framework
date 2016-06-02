@@ -61,7 +61,7 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
 
-        return $this->getMock('Illuminate\Auth\EloquentUserProvider', ['createModel'], [$hasher, 'foo']);
+        return $this->getMockBuilder('Illuminate\Auth\EloquentUserProvider')->setMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
     }
 }
 

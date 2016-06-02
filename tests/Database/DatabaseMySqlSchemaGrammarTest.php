@@ -348,6 +348,18 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
     }
 
+    public function testAddingGeneratedColumn()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs('price - 5');
+        $blueprint->integer('discounted_stored')->storedAs('price - 5');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5) not null, add `discounted_stored` int as (price - 5) stored not null', $statements[0]);
+    }
+
     public function testAddingString()
     {
         $blueprint = new Blueprint('users');
@@ -692,6 +704,26 @@ class DatabaseMySqlSchemaGrammarTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
+    public function testAddingIpAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` varchar(45) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddress()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
     }
 
     protected function getConnection()

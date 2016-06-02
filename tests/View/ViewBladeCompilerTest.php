@@ -193,9 +193,9 @@ test';
         $string = '@push(\'foo\')
 test
 @endpush';
-        $expected = '<?php $__env->startSection(\'foo\'); ?>
+        $expected = '<?php $__env->startPush(\'foo\'); ?>
 test
-<?php $__env->appendSection(); ?>';
+<?php $__env->stopPush(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -203,7 +203,7 @@ test
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@stack(\'foo\')';
-        $expected = '<?php echo $__env->yieldContent(\'foo\'); ?>';
+        $expected = '<?php echo $__env->yieldPushContent(\'foo\'); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
@@ -240,14 +240,30 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testHasSectionStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@hasSection("section")
+breeze
+@endif';
+        $expected = '<?php if (! empty(trim($__env->yieldContent("section")))): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     public function testCanStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@can (\'update\', [$post])
 breeze
+@elsecan(\'delete\', [$post])
+sneeze
 @endcan';
-        $expected = '<?php if (Gate::check(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'update\', [$post])): ?>
 breeze
+<?php elseif (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->check(\'delete\', [$post])): ?>
+sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
@@ -257,9 +273,13 @@ breeze
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@cannot (\'update\', [$post])
 breeze
+@elsecannot(\'delete\', [$post])
+sneeze
 @endcannot';
-        $expected = '<?php if (Gate::denies(\'update\', [$post])): ?>
+        $expected = '<?php if (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'update\', [$post])): ?>
 breeze
+<?php elseif (app(\'Illuminate\\Contracts\\Auth\\Access\\Gate\')->denies(\'delete\', [$post])): ?>
+sneeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
@@ -675,7 +695,9 @@ empty
     public function testCustomExtensionsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $compiler->extend(function ($value) { return str_replace('foo', 'bar', $value); });
+        $compiler->extend(function ($value) {
+            return str_replace('foo', 'bar', $value);
+        });
         $this->assertEquals('bar', $compiler->compileString('foo'));
     }
 
