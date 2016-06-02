@@ -77,7 +77,7 @@ class MemcachedStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float   $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -89,7 +89,7 @@ class MemcachedStore extends TaggableStore implements Store
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  float  $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
@@ -108,7 +108,7 @@ class MemcachedStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float   $minutes
+     * @param  float|int  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes)

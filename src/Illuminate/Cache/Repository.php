@@ -35,7 +35,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * The default number of minutes to store items.
      *
-     * @var float
+     * @var float|int
      */
     protected $default = 60;
 
@@ -191,7 +191,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
@@ -213,7 +213,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  float  $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
@@ -234,7 +234,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes)
@@ -300,7 +300,7 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or store the default value.
      *
      * @param  string  $key
-     * @param  \DateTime|float  $minutes
+     * @param  \DateTime|float|int  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -354,7 +354,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Remove an item from the cache.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function forget($key)
@@ -405,7 +405,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get the default cache time.
      *
-     * @return float
+     * @return float|int
      */
     public function getDefaultCacheTime()
     {
@@ -415,7 +415,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Set the default cache time in minutes.
      *
-     * @param  float   $minutes
+     * @param  float|int  $minutes
      * @return void
      */
     public function setDefaultCacheTime($minutes)
@@ -481,8 +481,8 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTime|float  $duration
-     * @return float|null
+     * @param  \DateTime|float|int  $duration
+     * @return float|int|null
      */
     protected function getMinutes($duration)
     {
