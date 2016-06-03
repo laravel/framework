@@ -8,6 +8,7 @@ use Countable;
 use Exception;
 use DateTimeZone;
 use RuntimeException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use BadMethodCallException;
@@ -1757,7 +1758,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'before');
 
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTime) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -1799,7 +1800,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTime) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -1902,12 +1903,12 @@ class Validator implements ValidatorContract
     /**
      * Get the date timestamp.
      *
-     * @param $value
-     * @return mixed
+     * @param  mixed  $value
+     * @return int
      */
     protected function getDateTimestamp($value)
     {
-        return $value instanceof DateTime ? $value->getTimestamp() : strtotime($value);
+        return $value instanceof DateTimeInterface ? $value->getTimestamp() : strtotime($value);
     }
 
     /**
