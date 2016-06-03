@@ -17,7 +17,13 @@ trait AuthorizesResources
      */
     public function authorizeResource($model, $name = null, array $options = [], $request = null)
     {
-        $method = array_last(explode('@', with($request ?: request())->route()->getActionName()));
+        $route = with($request ?: request())->route();
+
+        if ($route == null) {
+            return new ControllerMiddlewareOptions($options);
+        }
+
+        $method = array_last(explode('@', $route->getActionName()));
 
         $map = $this->resourceAbilityMap();
 
