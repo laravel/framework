@@ -41,7 +41,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(Container $log)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
