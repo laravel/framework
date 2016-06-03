@@ -157,17 +157,22 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
+     * @param  int   $count
      * @param  bool  $pretend
      * @return int
      */
-    public function rollback($pretend = false)
+    public function rollback($count = 0, $pretend = false)
     {
         $this->notes = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->repository->getLast();
+        if (is_int($count) && ($count > 0)) {
+            $migrations = $this->repository->getMigrations($count);
+        } else {
+            $migrations = $this->repository->getLast();
+        }
 
         $count = count($migrations);
 
