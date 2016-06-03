@@ -72,6 +72,13 @@ class Router implements RegistrarContract
     protected $middlewareGroups = [];
 
     /**
+     * The priority-sorted list of middleware.
+     *
+     * @var array
+     */
+    public $middlewarePriority = [];
+
+    /**
      * The registered route value binders.
      *
      * @var array
@@ -645,10 +652,11 @@ class Router implements RegistrarContract
      */
     public function gatherRouteMiddlewares(Route $route)
     {
-        return Collection::make($route->middleware())->map(function ($name) {
+        $middleware = Collection::make($route->middleware())->map(function ($name) {
             return Collection::make($this->resolveMiddlewareClassName($name));
-        })
-        ->flatten()->all();
+        })->flatten();
+
+        return $this->sortMiddleware($middleware)->all();
     }
 
     /**
@@ -719,6 +727,51 @@ class Router implements RegistrarContract
         }
 
         return $results;
+    }
+
+    /**
+     * Sort the given middleware by priority.
+     *
+     * @param  \Illuminate\Support\Collection  $middlewares
+     * @return \Illuminate\Support\Collection
+     */
+    protected function sortMiddleware(Collection $middlewares)
+    {
+        $priority = collect($this->middlewarePriority);
+
+        $sorted = collect();
+
+        foreach ($middlewares as $middleware) {
+            if (! $sorted->contains($middleware)) {
+                $sorted = $this->addPrerequisiteMiddleware($middleware, $sorted, $middlewares, $priority);
+
+                $sorted[] = $middleware;
+            }
+        }
+
+        return $sorted;
+    }
+
+    /**
+     * Add any prerequisite middleware that have beeen declared after the current one.
+     *
+     * @param  string  $middleware
+     * @param  \Illuminate\Support\Collection $sorted
+     * @param  \Illuminate\Support\Collection $all
+     * @param  \Illuminate\Support\Collection $priority
+     * @return \Illuminate\Support\Collection
+     */
+    protected function addPrerequisiteMiddleware($middleware, $sorted, $all, $priority)
+    {
+        if (($index = $priority->search($middleware)) === false) {
+            return $sorted;
+        }
+
+        return $sorted->merge(
+            $priority->take($index)->filter(function ($middleware) use ($sorted, $all) {
+                return $all->contains($middleware) && ! $sorted->contains($middleware);
+            })
+        );
     }
 
     /**

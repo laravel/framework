@@ -6,8 +6,10 @@ use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
@@ -560,6 +562,33 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         }]);
         $router->bind('bar', 'RouteBindingStub@find');
         $this->assertEquals('dragon', $router->dispatch(Request::create('foo/Dragon', 'GET'))->getContent());
+    }
+
+    public function testMiddlewarePrioritySorting()
+    {
+        $middleware = [
+            Placeholder1::class,
+            SubstituteBindings::class,
+            Placeholder2::class,
+            Authenticate::class,
+            Placeholder3::class,
+        ];
+
+        $router = $this->getRouter();
+
+        $router->middlewarePriority = [Authenticate::class, SubstituteBindings::class, Authorize::class];
+
+        $route = $router->get('foo', ['middleware' => $middleware, 'uses' => function ($name) {
+            return $name;
+        }]);
+
+        $this->assertEquals([
+            Placeholder1::class,
+            Authenticate::class,
+            SubstituteBindings::class,
+            Placeholder2::class,
+            Placeholder3::class,
+        ], $router->gatherRouteMiddlewares($route));
     }
 
     public function testModelBinding()

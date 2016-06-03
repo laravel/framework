@@ -44,6 +44,20 @@ class Kernel implements KernelContract
     ];
 
     /**
+     * The priority-sorted list of middleware.
+     *
+     * @var array
+     */
+    protected $middlewarePriority = [
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Auth\Middleware\Authenticate::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \Illuminate\Auth\Middleware\Authorize::class,
+    ];
+
+    /**
      * The application's middleware stack.
      *
      * @var array
@@ -83,6 +97,8 @@ class Kernel implements KernelContract
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->middleware($key, $middleware);
         }
+
+        $router->middlewarePriority = $this->middlewarePriority;
     }
 
     /**
