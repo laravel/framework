@@ -17,19 +17,29 @@ trait AuthorizesResources
      */
     public function authorizeResource($model, $name = null, array $options = [], $request = null)
     {
+        $map = $this->resourceAbilityMap();
+
         $route = with($request ?: request())->route();
 
         if ($route == null) {
+            foreach ($map as $method => $ability) {
+                $this->assignMiddleware($model, $method, $name, $options);
+            }
+
             return new ControllerMiddlewareOptions($options);
         }
 
         $method = array_last(explode('@', $route->getActionName()));
 
-        $map = $this->resourceAbilityMap();
-
         if (! in_array($method, array_keys($map))) {
             return new ControllerMiddlewareOptions($options);
         }
+
+    }
+
+    public function assignMiddleware($model, $method, $name = null, array $options = [])
+    {
+        $map = $this->resourceAbilityMap();
 
         if (! in_array($method, ['index', 'create', 'store'])) {
             $model = $name ?: strtolower(class_basename($model));
