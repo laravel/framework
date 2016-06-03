@@ -551,7 +551,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider = $this->resolveProviderClass($provider);
         }
 
-        $this->registerProvider($provider);
+        if (method_exists($provider, 'register')) {
+            $provider->register();
+        }
 
         // Once we have registered the service we will iterate through the options
         // and set each of them on the application so they will be available on
@@ -596,19 +598,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function resolveProviderClass($provider)
     {
         return new $provider($this);
-    }
-
-    /**
-     * Register the given service provider.
-     *
-     * @param  \Illuminate\Support\ServiceProvider  $provider
-     * @return mixed
-     */
-    protected function registerProvider(ServiceProvider $provider)
-    {
-        if (method_exists($provider, 'register')) {
-            return $this->call([$provider, 'register']);
-        }
     }
 
     /**
