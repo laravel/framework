@@ -60,7 +60,14 @@ class RollbackCommand extends Command
 
         $pretend = $this->input->getOption('pretend');
 
-        $this->migrator->rollback($pretend);
+        $count = (int) $this->input->getOption('count');
+
+        if (is_int($count) && ($count > 0)) {
+            $this->migrator->setRollBackCount($count);
+            $this->migrator->rollback($pretend);
+        } else {
+            $this->migrator->rollback($pretend);
+        }
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -83,6 +90,8 @@ class RollbackCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+
+            ['count', null, InputOption::VALUE_OPTIONAL, 'Number of migrations to be reverted.'],
         ];
     }
 }

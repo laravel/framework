@@ -45,6 +45,13 @@ class Migrator
     protected $notes = [];
 
     /**
+     * Number of migrations to rollback.
+     *
+     * @var int
+     */
+    protected $rollBackCount = 0;
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -167,7 +174,11 @@ class Migrator
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->repository->getLast();
+        if ($this->rollBackCount) {
+            $migrations = $this->repository->getMigrations($this->rollBackCount);
+        } else {
+            $migrations = $this->repository->getLast();
+        }
 
         $count = count($migrations);
 
@@ -238,6 +249,19 @@ class Migrator
         $this->repository->delete($migration);
 
         $this->note("<info>Rolled back:</info> $file");
+    }
+
+    /**
+     * Set value to rollback specific number of migrations.
+     *
+     * @param  int  $count
+     * @return int
+     */
+    public function setRollBackCount($count)
+    {
+        $this->rollBackCount = $count;
+
+        return $this->rollBackCount;
     }
 
     /**
