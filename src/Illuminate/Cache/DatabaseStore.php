@@ -97,6 +97,17 @@ class DatabaseStore implements Store
      */
     public function put($key, $value, $minutes)
     {
+        if ($minutes >= 5256000) {
+            // 10 Years.
+            $minutes = 5256000;
+        }
+
+        $seconds = (int) ($minutes * 60);
+
+        if ($seconds <= 0) {
+            return;
+        }
+
         $key = $this->prefix.$key;
 
         // All of the cached values in the database are encrypted in case this is used
@@ -104,7 +115,7 @@ class DatabaseStore implements Store
         // time and place that on the table so we will check it on our retrieval.
         $value = $this->encrypter->encrypt($value);
 
-        $expiration = $this->getTime() + (int) ($minutes * 60);
+        $expiration = $this->getTime() + $seconds;
 
         try {
             $this->table()->insert(compact('key', 'value', 'expiration'));
@@ -187,18 +198,6 @@ class DatabaseStore implements Store
     protected function getTime()
     {
         return time();
-    }
-
-    /**
-     * Store an item in the cache indefinitely.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
-     */
-    public function forever($key, $value)
-    {
-        $this->put($key, $value, 5256000);
     }
 
     /**
