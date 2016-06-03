@@ -47,13 +47,6 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    abstract public function register();
-
-    /**
      * Merge the given configuration with the existing configuration.
      *
      * @param  string  $path
