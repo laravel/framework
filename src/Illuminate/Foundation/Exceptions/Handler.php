@@ -55,7 +55,7 @@ class Handler implements ExceptionHandlerContract
     public function report(Exception $e)
     {
         if ($this->shouldntReport($e)) {
-            return
+            return;
         }
 
         try {
