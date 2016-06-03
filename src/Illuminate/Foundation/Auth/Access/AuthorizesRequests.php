@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Routing\ControllerMiddlewareOptions;
 
 trait AuthorizesRequests
 {
@@ -75,26 +74,19 @@ trait AuthorizesRequests
      * Authorize a resource action based on the incoming request.
      *
      * @param  string  $model
-     * @param  string|null  $name
+     * @param  string|null  $parameter
      * @param  array  $options
-     * @param  \Illuminate\Http\Request|null  $request
-     * @return \Illuminate\Routing\ControllerMiddlewareOptions
+     * @return void
      */
-    public function authorizeResource($model, $name = null, array $options = [], $request = null)
+    public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $method = array_last(explode('@', with($request ?: request())->route()->getActionName()));
+        $parameter = $parameter ?: strtolower(class_basename($model));
 
-        $map = $this->resourceAbilityMap();
+        foreach ($this->resourceAbilityMap() as $method => $ability) {
+            $modelName = in_array($method, ['index', 'create', 'store']) ? $model : $parameter;
 
-        if (! in_array($method, array_keys($map))) {
-            return new ControllerMiddlewareOptions($options);
+            $this->middleware("can:{$ability},{$modelName}", $options)->only($method);
         }
-
-        if (! in_array($method, ['index', 'create', 'store'])) {
-            $model = $name ?: strtolower(class_basename($model));
-        }
-
-        return $this->middleware("can:{$map[$method]},{$model}", $options);
     }
 
     /**
