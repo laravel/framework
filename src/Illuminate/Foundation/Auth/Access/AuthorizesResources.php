@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Auth\Access;
 
-use Illuminate\Routing\ControllerMiddlewareOptions;
-
 trait AuthorizesResources
 {
     /**
