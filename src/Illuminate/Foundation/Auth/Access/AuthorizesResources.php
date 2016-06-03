@@ -22,9 +22,7 @@ trait AuthorizesResources
         $route = with($request ?: request())->route();
 
         if ($route == null) {
-            foreach ($map as $method => $ability) {
-                $this->assignMiddleware($model, $method, $name, $options);
-            }
+            $this->assignMiddlewareToAllMethods($model, $name, $options);
 
             return new ControllerMiddlewareOptions($options);
         }
@@ -38,7 +36,7 @@ trait AuthorizesResources
         return $this->assignMiddleware($model, $method, $name, $options);
     }
 
-    public function assignMiddleware($model, $method, $name = null, array $options = [])
+    protected function assignMiddleware($model, $method, $name = null, array $options = [])
     {
         $map = $this->resourceAbilityMap();
 
@@ -47,6 +45,17 @@ trait AuthorizesResources
         }
 
         return $this->middleware("can:{$map[$method]},{$model}", $options);
+    }
+
+    protected function assignMiddlewareToAllMethods($model, $name = null, array $options = [])
+    {
+        $map = $this->resourceAbilityMap();
+
+        foreach ($map as $method => $ability) {
+            if (method_exists($this, $method)) {
+                $this->assignMiddleware($model, $method, $name, $options)->only($method);
+            }
+        }
     }
 
     /**
