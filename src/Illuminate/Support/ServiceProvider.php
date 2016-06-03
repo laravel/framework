@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use BadMethodCallException;
 use Illuminate\Console\Events\ArtisanStarting;
 
 abstract class ServiceProvider
