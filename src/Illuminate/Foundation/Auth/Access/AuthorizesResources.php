@@ -17,19 +17,45 @@ trait AuthorizesResources
      */
     public function authorizeResource($model, $name = null, array $options = [], $request = null)
     {
-        $method = array_last(explode('@', with($request ?: request())->route()->getActionName()));
-
         $map = $this->resourceAbilityMap();
+
+        $route = with($request ?: request())->route();
+
+        if ($route == null) {
+            $this->assignMiddlewareToAllMethods($model, $name, $options);
+
+            return new ControllerMiddlewareOptions($options);
+        }
+
+        $method = array_last(explode('@', $route->getActionName()));
 
         if (! in_array($method, array_keys($map))) {
             return new ControllerMiddlewareOptions($options);
         }
+
+        return $this->assignMiddleware($model, $method, $name, $options);
+    }
+
+    protected function assignMiddleware($model, $method, $name = null, array $options = [])
+    {
+        $map = $this->resourceAbilityMap();
 
         if (! in_array($method, ['index', 'create', 'store'])) {
             $model = $name ?: strtolower(class_basename($model));
         }
 
         return $this->middleware("can:{$map[$method]},{$model}", $options);
+    }
+
+    protected function assignMiddlewareToAllMethods($model, $name = null, array $options = [])
+    {
+        $map = $this->resourceAbilityMap();
+
+        foreach ($map as $method => $ability) {
+            if (method_exists($this, $method)) {
+                $this->assignMiddleware($model, $method, $name, $options)->only($method);
+            }
+        }
     }
 
     /**
