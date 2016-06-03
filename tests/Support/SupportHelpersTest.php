@@ -677,7 +677,9 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
     public function testTap()
     {
         $object = (object) ['id' => 1];
-        $this->assertEquals(2, tap($object, function ($object) { $object->id = 2; })->id);
+        $this->assertEquals(2, tap($object, function ($object) {
+            $object->id = 2;
+        })->id);
     }
 }
 
