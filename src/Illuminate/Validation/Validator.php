@@ -7,7 +7,6 @@ use DateTime;
 use Countable;
 use Exception;
 use DateTimeZone;
-use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1766,7 +1765,7 @@ class Validator implements ValidatorContract
             return $this->validateBeforeWithFormat($format, $value, $parameters);
         }
 
-        if(! $date = $this->getDateTimestamp($parameters[0])) {
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
@@ -1808,7 +1807,7 @@ class Validator implements ValidatorContract
             return $this->validateAfterWithFormat($format, $value, $parameters);
         }
 
-        if(! $date = $this->getDateTimestamp($parameters[0])) {
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
@@ -1901,7 +1900,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Get the date timestamp
+     * Get the date timestamp.
      *
      * @param $value
      * @return mixed
