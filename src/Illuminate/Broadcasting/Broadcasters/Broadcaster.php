@@ -67,7 +67,12 @@ abstract class Broadcaster implements Broadcaster
             return json_encode($result);
         }
 
-        return json_encode(['channel_data' => $result]);
+        $channel_data = [
+            'user_id' => $request->user()->getKey(),
+            'user_info' => $result,
+        ];
+
+        return json_encode(compact('channel_data'));
     }
 
     /**
