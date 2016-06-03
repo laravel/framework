@@ -801,6 +801,21 @@ if (! function_exists('studly_case')) {
     }
 }
 
+if (! function_exists('tap')) {
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function tap($value, $callback)
+    {
+        $callback($value);
+
+        return $value;
+    }
+}
+
 if (! function_exists('title_case')) {
     /**
      * Convert a value to title case.
