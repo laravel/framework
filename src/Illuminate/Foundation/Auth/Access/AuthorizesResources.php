@@ -35,6 +35,7 @@ trait AuthorizesResources
             return new ControllerMiddlewareOptions($options);
         }
 
+        return $this->assignMiddleware($model, $method, $name, $options);
     }
 
     public function assignMiddleware($model, $method, $name = null, array $options = [])
