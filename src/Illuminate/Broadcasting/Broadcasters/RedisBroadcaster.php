@@ -44,9 +44,7 @@ class RedisBroadcaster extends Broadcaster
         $socket = Arr::pull($payload, 'socket');
 
         $payload = json_encode([
-            'event' => $event,
-            'data' => $payload,
-            'socket' => $socket,
+            'event' => $event, 'data' => $payload, 'socket' => $socket,
         ]);
 
         foreach ($channels as $channel) {
