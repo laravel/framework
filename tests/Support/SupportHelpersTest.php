@@ -673,6 +673,12 @@ class SupportHelpersTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Mövsümov', array_pull($developer, 'surname'));
         $this->assertEquals(['firstname' => 'Ferid'], $developer);
     }
+
+    public function testTap()
+    {
+        $object = (object) ['id' => 1];
+        $this->assertEquals(2, tap($object, function ($object) { $object->id = 2; })->id);
+    }
 }
 
 trait SupportTestTraitOne
