@@ -803,7 +803,7 @@ if (! function_exists('studly_case')) {
 
 if (! function_exists('tap')) {
     /**
-     * Call the given Closure with a given value then return the value.
+     * Call the given Closure with the given value then return the value.
      *
      * @param  mixed  $value
      * @return mixed
