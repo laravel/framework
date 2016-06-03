@@ -16,6 +16,11 @@ abstract class Broadcaster implements Broadcaster
     protected $channels = [];
 
     /**
+     * {@inheritdoc}
+     */
+    abstract public function broadcast(array $channels, $event, array $payload = []);
+
+    /**
      * Register a channel authenticator.
      *
      * @param  string  $channel
@@ -55,27 +60,6 @@ abstract class Broadcaster implements Broadcaster
     }
 
     /**
-     * Return the valid Pusher authentication response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
-     */
-    protected function validAuthenticationResponse($request, $result)
-    {
-        if (is_bool($result)) {
-            return json_encode($result);
-        }
-
-        $channel_data = [
-            'user_id' => $request->user()->getKey(),
-            'user_info' => $result,
-        ];
-
-        return json_encode(compact('channel_data'));
-    }
-
-    /**
      * Extract the parameters from the given pattern and channel.
      *
      * @param  string  $pattern
@@ -100,7 +84,21 @@ abstract class Broadcaster implements Broadcaster
     }
 
     /**
-     * {@inheritdoc}
+     * Return the valid Pusher authentication response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
+     * @return mixed
      */
-    abstract public function broadcast(array $channels, $event, array $payload = []);
+    protected function validAuthenticationResponse($request, $result)
+    {
+        if (is_bool($result)) {
+            return json_encode($result);
+        }
+
+        return json_encode(['channel_data' => [
+            'user_id' => $request->user()->getKey(),
+            'user_info' => $result,
+        ]]);
+    }
 }
