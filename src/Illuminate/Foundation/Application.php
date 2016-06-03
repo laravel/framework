@@ -551,7 +551,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider = $this->resolveProviderClass($provider);
         }
 
-        $provider->register();
+        if (method_exists($provider, 'register')) {
+            $provider->register();
+        }
 
         // Once we have registered the service we will iterate through the options
         // and set each of them on the application so they will be available on

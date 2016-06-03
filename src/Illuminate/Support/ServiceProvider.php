@@ -47,13 +47,6 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    abstract public function register();
-
-    /**
      * Merge the given configuration with the existing configuration.
      *
      * @param  string  $path
@@ -243,10 +236,6 @@ abstract class ServiceProvider
      */
     public function __call($method, $parameters)
     {
-        if ($method == 'boot') {
-            return;
-        }
-
         throw new BadMethodCallException("Call to undefined method [{$method}]");
     }
 }

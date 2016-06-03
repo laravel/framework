@@ -6,6 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exception\HttpResponseException;
@@ -21,11 +22,11 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 class Handler implements ExceptionHandlerContract
 {
     /**
-     * The log implementation.
+     * The container implementation.
      *
-     * @var \Psr\Log\LoggerInterface
+     * @var \Illuminate\Contracts\Container\Container
      */
-    protected $log;
+    protected $container;
 
     /**
      * A list of the exception types that should not be reported.
@@ -37,12 +38,12 @@ class Handler implements ExceptionHandlerContract
     /**
      * Create a new exception handler instance.
      *
-     * @param  \Psr\Log\LoggerInterface  $log
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(LoggerInterface $log)
+    public function __construct(Container $container)
     {
-        $this->log = $log;
+        $this->container = $container;
     }
 
     /**
@@ -53,8 +54,14 @@ class Handler implements ExceptionHandlerContract
      */
     public function report(Exception $e)
     {
-        if ($this->shouldReport($e)) {
-            $this->log->error($e);
+        if ($this->shouldntReport($e)) {
+            return;
+        }
+
+        try {
+            $this->container->make(LoggerInterface::class)->error($e);
+        } catch (Exception $ex) {
+            throw $e; // throw the original exception
         }
     }
 
