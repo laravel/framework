@@ -99,6 +99,10 @@ class FileStore implements Store
      */
     public function put($key, $value, $minutes)
     {
+        if ((int) ($minutes * 60) <= 0) {
+            return;
+        }
+
         $value = $this->expiration($minutes).serialize($value);
 
         $this->createCacheDirectory($path = $this->path($key));
@@ -147,18 +151,6 @@ class FileStore implements Store
     public function decrement($key, $value = 1)
     {
         return $this->increment($key, $value * -1);
-    }
-
-    /**
-     * Store an item in the cache indefinitely.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
-     */
-    public function forever($key, $value)
-    {
-        $this->put($key, $value, 0);
     }
 
     /**
@@ -215,7 +207,7 @@ class FileStore implements Store
     {
         $time = time() + ($minutes * 60);
 
-        if ($minutes === 0 || $time > 9999999999) {
+        if ($time > 9999999999) {
             return 9999999999;
         }
 

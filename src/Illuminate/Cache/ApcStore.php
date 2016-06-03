@@ -60,7 +60,17 @@ class ApcStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        $this->apc->put($this->prefix.$key, $value, (int) ($minutes * 60));
+        $seconds = (int) ($minutes * 60);
+
+        if ($seconds <= 0) {
+            return;
+        }
+
+        if ($minutes === INF) {
+            $seconds = 0;
+        }
+
+        $this->apc->put($this->prefix.$key, $value, $seconds);
     }
 
     /**
@@ -85,18 +95,6 @@ class ApcStore extends TaggableStore implements Store
     public function decrement($key, $value = 1)
     {
         return $this->apc->decrement($this->prefix.$key, $value);
-    }
-
-    /**
-     * Store an item in the cache indefinitely.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return array|bool
-     */
-    public function forever($key, $value)
-    {
-        return $this->put($key, $value, 0);
     }
 
     /**

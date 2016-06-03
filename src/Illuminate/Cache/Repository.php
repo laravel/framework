@@ -196,7 +196,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function put($key, $value, $minutes = null)
     {
-        if (is_array($key) && filter_var($value, FILTER_VALIDATE_INT) !== false) {
+        if (is_array($key)) {
             return $this->putMany($key, $value);
         }
 
@@ -291,7 +291,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forever($key, $value)
     {
-        $this->store->forever($this->itemKey($key), $value);
+        $this->store->put($this->itemKey($key), $value, INF);
 
         $this->fireCacheEvent('write', [$key, $value, 0]);
     }
@@ -490,7 +490,7 @@ class Repository implements CacheContract, ArrayAccess
             $duration = Carbon::now()->diffInSeconds(Carbon::instance($duration), false) / 60;
         }
 
-        return $duration > 0 ? $duration : null;
+        return (int) ($duration * 60) > 0 ? $duration : null;
     }
 
     /**

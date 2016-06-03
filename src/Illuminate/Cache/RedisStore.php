@@ -91,9 +91,19 @@ class RedisStore extends TaggableStore implements Store
      */
     public function put($key, $value, $minutes)
     {
+        $seconds = (int) ($minutes * 60);
+
+        if ($seconds <= 0) {
+            return;
+        }
+
         $value = is_numeric($value) ? $value : serialize($value);
 
-        $this->connection()->setex($this->prefix.$key, (int) max(1, $minutes * 60), $value);
+        if ($minutes === INF) {
+            $this->connection()->set($this->prefix.$key, $value);
+        } else {
+            $this->connection()->setex($this->prefix.$key, $seconds, $value);
+        }
     }
 
     /**
@@ -136,20 +146,6 @@ class RedisStore extends TaggableStore implements Store
     public function decrement($key, $value = 1)
     {
         return $this->connection()->decrby($this->prefix.$key, $value);
-    }
-
-    /**
-     * Store an item in the cache indefinitely.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @return void
-     */
-    public function forever($key, $value)
-    {
-        $value = is_numeric($value) ? $value : serialize($value);
-
-        $this->connection()->set($this->prefix.$key, $value);
     }
 
     /**
