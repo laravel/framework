@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Routing\ControllerMiddlewareOptions;
 
 trait AuthorizesRequests
 {
