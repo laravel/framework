@@ -490,7 +490,7 @@ class Repository implements CacheContract, ArrayAccess
             $duration = Carbon::now()->diffInSeconds(Carbon::instance($duration), false) / 60;
         }
 
-        return $duration > 0 ? $duration : null;
+        return (int) ($duration * 60) > 0 ? $duration : null;
     }
 
     /**
