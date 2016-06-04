@@ -21,7 +21,7 @@ class AuthRegistrar
     /**
      * Create a new auth registrar instance.
      *
-     * @param  \Illuminate\Routing\Router $router
+     * @param \Illuminate\Routing\Router $router
      *
      * @return void
      */
@@ -31,26 +31,24 @@ class AuthRegistrar
     }
 
     /**
-     * Route a resource to a controller.
+     * Register the typical authentication routes for an application.
      *
      * @param  array $options
-     *
      */
     public function register(array $options = [])
     {
-
         $defaults = $this->authDefaults;
 
         foreach ($this->getAuthMethods($defaults, $options) as $m) {
-            $this->{'addAuth' . ucfirst($m)}($options);
+            $this->{'addAuth'.ucfirst($m)}($options);
         }
     }
 
     /**
      * Get the applicable auth methods.
      *
-     * @param  array $defaults
-     * @param  array $options
+     * @param array $defaults
+     * @param array $options
      *
      * @return array
      */
