@@ -273,23 +273,18 @@ class Router implements RegistrarContract
     /**
      * Register the typical authentication routes for an application.
      *
+     * @param array $options
      * @return void
      */
-    public function auth()
+    public function auth(array $options = [])
     {
-        // Authentication Routes...
-        $this->get('login', 'Auth\AuthController@showLoginForm');
-        $this->post('login', 'Auth\AuthController@login');
-        $this->get('logout', 'Auth\AuthController@logout');
-
-        // Registration Routes...
-        $this->get('register', 'Auth\AuthController@showRegistrationForm');
-        $this->post('register', 'Auth\AuthController@register');
-
-        // Password Reset Routes...
-        $this->get('password/reset/{token?}', 'Auth\PasswordController@showResetForm');
-        $this->post('password/email', 'Auth\PasswordController@sendResetLinkEmail');
-        $this->post('password/reset', 'Auth\PasswordController@reset');
+        if ($this->container && $this->container->bound('Illuminate\Routing\AuthRegistrar')) {
+            $registrar = $this->container->make('Illuminate\Routing\AuthRegistrar');
+        } else {
+            $registrar = new AuthRegistrar($this);
+        }
+        
+        $registrar->register($options);
     }
 
     /**
