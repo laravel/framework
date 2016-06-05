@@ -59,10 +59,12 @@ class Handler implements ExceptionHandlerContract
         }
 
         try {
-            $this->container->make(LoggerInterface::class)->error($e);
+            $logger = $this->container->make(LoggerInterface::class);
         } catch (Exception $ex) {
             throw $e; // throw the original exception
         }
+
+        $logger->error($e);
     }
 
     /**
