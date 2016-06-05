@@ -932,7 +932,7 @@ class Builder
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder|static
      */
     protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
@@ -983,7 +983,7 @@ class Builder
      * Merge the constraints from a relation query to the current query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $relation
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function mergeModelDefinedRelationConstraints(Builder $relation)
     {
@@ -1194,10 +1194,10 @@ class Builder
      * Nest where conditions by slicing them at the given where count.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  int|array  $whereCounts
+     * @param  int  $originalWhereCount
      * @return void
      */
-    protected function nestWheresForScope(QueryBuilder $query, $whereCounts)
+    protected function nestWheresForScope(QueryBuilder $query, $originalWhereCount)
     {
         // Here, we totally remove all of the where clauses since we are going to
         // rebuild them as nested queries by slicing the groups of wheres into
@@ -1206,20 +1206,8 @@ class Builder
 
         $query->wheres = [];
 
-        // We will construct where offsets by adding the outer most offsets to the
-        // collection (0 and total where count) while also flattening the array
-        // and extracting unique values, ensuring that all wheres are sliced.
-        $whereOffsets = collect([0, $whereCounts, count($allWheres)])->flatten()->unique();
-
-        $sliceFrom = $whereOffsets->shift();
-
-        foreach ($whereOffsets as $sliceTo) {
-            $this->sliceWhereConditions(
-                $query, $allWheres, $sliceFrom, $sliceTo
-            );
-
-            $sliceFrom = $sliceTo;
-        }
+        $this->sliceWhereConditions($query, $allWheres, 0, $originalWhereCount);
+        $this->sliceWhereConditions($query, $allWheres, $originalWhereCount);
     }
 
     /**
@@ -1227,13 +1215,13 @@ class Builder
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $wheres
-     * @param  int  $sliceFrom
-     * @param  int  $sliceTo
+     * @param  int  $offset
+     * @param  int  $length
      * @return void
      */
-    protected function sliceWhereConditions(QueryBuilder $query, array $wheres, $sliceFrom, $sliceTo)
+    protected function sliceWhereConditions(QueryBuilder $query, $wheres, $offset, $length = null)
     {
-        $whereSlice = array_slice($wheres, $sliceFrom, $sliceTo - $sliceFrom);
+        $whereSlice = array_slice($wheres, $offset, $length);
 
         $whereBooleans = collect($whereSlice)->pluck('boolean');
 
