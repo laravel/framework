@@ -18,7 +18,7 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "~1.0",
         "illuminate/contracts": "5.4.*",
-        "paragonie/random_compat": "~1.4"
+        "paragonie/random_compat": "~1.4|~2.0"
     },
     "autoload": {
         "psr-4": {

@@ -19,7 +19,7 @@
         "ext-openssl": "*",
         "illuminate/contracts": "5.4.*",
         "illuminate/support": "5.4.*",
-        "paragonie/random_compat": "~1.4"
+        "paragonie/random_compat": "~1.4|~2.0"
     },
     "autoload": {
         "psr-4": {
