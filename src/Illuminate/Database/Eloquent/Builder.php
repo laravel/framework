@@ -1206,12 +1206,12 @@ class Builder
 
         $query->wheres = [];
 
-        $this->sliceWhereConditions($query, $allWheres, 0, $originalWhereCount);
-        $this->sliceWhereConditions($query, $allWheres, $originalWhereCount);
+        $this->addNestedWhereSlice($query, $allWheres, 0, $originalWhereCount);
+        $this->addNestedWhereSlice($query, $allWheres, $originalWhereCount);
     }
 
     /**
-     * Create a slice of where conditions at the given offsets and nest them if needed.
+     * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $wheres
@@ -1219,7 +1219,7 @@ class Builder
      * @param  int  $length
      * @return void
      */
-    protected function sliceWhereConditions(QueryBuilder $query, $wheres, $offset, $length = null)
+    protected function addNestedWhereSlice(QueryBuilder $query, $wheres, $offset, $length = null)
     {
         $whereSlice = array_slice($wheres, $offset, $length);
 
