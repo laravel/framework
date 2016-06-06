@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 trait RoutesNotifications
 {
@@ -20,11 +21,26 @@ trait RoutesNotifications
             $this, $instance
         );
 
+        if ($instance instanceof ShouldQueue) {
+            return $this->queueNotifications($notifications);
+        }
+
         foreach ($notifications as $notification) {
             $manager->send($notification->application(
                 config('app.name'), config('app.logo')
             ));
         }
+    }
+
+    /**
+     * Queue the given notification instances.
+     *
+     * @param  array[\Illuminate\Notifcations\Transports\Notification]
+     * @return void
+     */
+    protected function queueNotifications(array $notifications)
+    {
+        dispatch(new SendQueuedNotifications($notifications));
     }
 
     /**
