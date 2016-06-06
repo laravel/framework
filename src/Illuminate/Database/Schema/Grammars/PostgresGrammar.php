@@ -28,7 +28,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
+        return 'select * from information_schema.tables where table_name = ?';
     }
 
     /**
