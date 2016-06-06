@@ -1,5 +1,37 @@
 # Release Notes
 
+## v5.2.36 (2016-06-06)
+
+### Added
+- Allow passing along options to the S3 client ([#13791](https://github.com/laravel/framework/pull/13791))
+- Allow nested `WHERE` clauses in `whereHas()` queries ([#13794](https://github.com/laravel/framework/pull/13794))
+- Support `DateTime` instances in `Before`/`After` date validation ([#13844](https://github.com/laravel/framework/pull/13844))
+- Support queueing collections ([d159f02](https://github.com/laravel/framework/commit/d159f02fe8cb5310b90c73d416a684e4bf51785a))
+
+### Changed
+- Reverted SparkPost driver back to `email_rfc822` parameter for simplicity ([#13780](https://github.com/laravel/framework/pull/13780))
+- Simplified `Model::__isset()` ([8fb89c6](https://github.com/laravel/framework/commit/8fb89c61c24af905b0b9db4d645d68a2c4a133b9))
+- Set exception handler even on non-daemon `queue:work` calls ([d5bbda9](https://github.com/laravel/framework/commit/d5bbda95a6435fa8cb38b8b640440b38de6b7f83))
+- Show handler class names in `queue:work` console output ([4d7eb59](https://github.com/laravel/framework/commit/4d7eb59f9813723bab00b4e42ce9885b54e65778))
+- Use queue events to update the console output of `queue:work` ([ace7f04](https://github.com/laravel/framework/commit/ace7f04ae579146ca3adf1c5992256c50ddc05a8))
+- Made `ResetsPasswords` trait easier to customize ([#13818](https://github.com/laravel/framework/pull/13818))
+- Refactored Eloquent relations and scopes ([#13824](https://github.com/laravel/framework/pull/13824), [#13884](https://github.com/laravel/framework/pull/13884), [#13894](https://github.com/laravel/framework/pull/13894))
+- Respected `session.http_only` option in `StartSession` middleware ([#13825](https://github.com/laravel/framework/pull/13825))
+- Don't return in `ApcStore::forever()` ([#13871](https://github.com/laravel/framework/pull/13871))
+- Allow Redis key expiration to be lower than one minute ([#13810](https://github.com/laravel/framework/pull/13810))
+
+### Fixed
+- Fixed `morphTo` relations across database connections ([#13784](https://github.com/laravel/framework/pull/13784))
+- Fixed `morphTo` relations without soft deletes ([13806](https://github.com/laravel/framework/pull/13806))
+- Fixed edge case on `morphTo` relations macro call that only exists on the related model ([#13828](https://github.com/laravel/framework/pull/13828))
+- Fixed formatting of `updatedAt` timestamp when calling `touch()` on `BelongsToMany` relation ([#13799](https://github.com/laravel/framework/pull/13799))
+- Don't get `$id` from Recaller in `Auth::id()` ([#13769](https://github.com/laravel/framework/pull/13769))
+- Fixed `AuthorizesResources` trait ([25443e3](https://github.com/laravel/framework/commit/25443e3e218cce1121f546b596dd70b5fd2fb619))
+
+### Removed
+- Removed unused `ArrayStore::putMultiple()` method ([#13840](https://github.com/laravel/framework/pull/13840))
+
+
 ## v5.2.35 (2016-05-30)
 
 ### Added
