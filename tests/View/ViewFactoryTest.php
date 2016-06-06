@@ -448,6 +448,104 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->appendSection();
     }
 
+    public function testAddingLoops()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2, 3]);
+
+        $expectedLoop = [
+            'index' => 0,
+            'reverseIndex' => 4,
+            'size' => 3,
+            'isFirst' => true,
+            'isLast' => false,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopsStack());
+
+        $factory->addLoop([1, 2, 3, 4]);
+
+        $secondExpectedLoop = [
+            'index' => 0,
+            'reverseIndex' => 5,
+            'size' => 4,
+            'isFirst' => true,
+            'isLast' => false,
+            'depth' => 2,
+            'parent' => (object) $expectedLoop,
+        ];
+        $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopsStack());
+
+        $factory->popLoop();
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopsStack());
+    }
+
+    public function testAddingUncountableLoop()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop('');
+
+        $expectedLoop = [
+            'index' => 0,
+            'reverseIndex' => null,
+            'size' => null,
+            'isFirst' => true,
+            'isLast' => null,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopsStack());
+    }
+
+    public function testIncrementingLoopIndices()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2, 3, 4]);
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopsStack()[0]['index']);
+        $this->assertEquals(3, $factory->getLoopsStack()[0]['reverseIndex']);
+    }
+
+    public function testReachingEndOfLoop()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop([1, 2]);
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertTrue($factory->getLoopsStack()[0]['isLast']);
+    }
+
+    public function testIncrementingLoopIndicesOfUncountable()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop('');
+
+        $factory->incrementLoopIndices();
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopsStack()[0]['index']);
+        $this->assertFalse($factory->getLoopsStack()[0]['isFirst']);
+        $this->assertNull($factory->getLoopsStack()[0]['reverseIndex']);
+        $this->assertNull($factory->getLoopsStack()[0]['isLast']);
+    }
+
     protected function getFactory()
     {
         return new Factory(
