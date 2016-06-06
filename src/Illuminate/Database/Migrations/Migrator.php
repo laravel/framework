@@ -53,13 +53,6 @@ class Migrator
     protected $paths = [];
 
     /**
-     * Number of migrations to rollback.
-     *
-     * @var int
-     */
-    protected $rollBackSteps = 0;
-
-    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -180,10 +173,10 @@ class Migrator
      * Rollback the last migration operation.
      *
      * @param  array|string $paths
-     * @param  bool  $pretend
+     * @param  array  $options
      * @return array
      */
-    public function rollback($paths = [], $pretend = false)
+    public function rollback($paths = [], array $options = [])
     {
         $this->notes = [];
 
@@ -192,8 +185,8 @@ class Migrator
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        if ($this->rollBackSteps) {
-            $migrations = $this->repository->getMigrations($this->rollBackSteps);
+        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+            $migrations = $this->repository->getMigrations($steps);
         } else {
             $migrations = $this->repository->getLast();
         }
@@ -213,7 +206,10 @@ class Migrator
             foreach ($migrations as $migration) {
                 $rolledBack[] = $files[$migration->migration];
 
-                $this->runDown($files[$migration->migration], (object) $migration, $pretend);
+                $this->runDown(
+                    $files[$migration->migration],
+                    (object) $migration, Arr::get($options, 'pretend', false)
+                );
             }
         }
 
@@ -289,19 +285,6 @@ class Migrator
         $this->repository->delete($migration);
 
         $this->note("<info>Rolled back:</info> $file");
-    }
-
-    /**
-     * Set value to rollback specific number of migrations.
-     *
-     * @param  int  $step
-     * @return int
-     */
-    public function setRollBackSteps($step)
-    {
-        $this->rollBackSteps = $step;
-
-        return $this->rollBackSteps;
     }
 
     /**
