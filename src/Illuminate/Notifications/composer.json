@@ -1,0 +1,37 @@
+{
+    "name": "illuminate/notifications",
+    "description": "The Illuminate Notifications package.",
+    "license": "MIT",
+    "homepage": "http://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.4",
+        "illuminate/contracts": "5.3.*",
+        "illuminate/support": "5.3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Notifications\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.3-dev"
+        }
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Required to use the Slack transport.",
+        "illuminate/database": "Required to use the database transport (5.3.*).",
+        "nexmo/client": "Required to use the Nexmo transport."
+    },
+    "minimum-stability": "dev"
+}
