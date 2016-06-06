@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -795,29 +796,19 @@ class Factory implements FactoryContract
      */
     public function addLoop($data)
     {
-        $length = is_array($data) || $data instanceof \Countable ? count($data) : null;
+        $length = is_array($data) || $data instanceof Countable ? count($data) : null;
 
         $parent = Arr::last($this->loopsStack);
 
-        $this->loopsStack[] = $added = [
+        $this->loopsStack[] = [
             'index' => 0,
-            'reverseIndex' => isset($length) ? $length + 1 : null,
-            'size' => $length,
-            'isFirst' => true,
-            'isLast' => isset($length) ? $length == 1 : null,
+            'remaining' => isset($length) ? $length + 1 : null,
+            'count' => $length,
+            'first' => true,
+            'last' => isset($length) ? $length == 1 : null,
             'depth' => count($this->loopsStack) + 1,
             'parent' => $parent ? (object) $parent : null,
         ];
-    }
-
-    /**
-     * Pop the a loop from the top of the stack.
-     *
-     * @return void
-     */
-    public function popLoop()
-    {
-        array_pop($this->loopsStack);
     }
 
     /**
@@ -827,27 +818,27 @@ class Factory implements FactoryContract
      */
     public function incrementLoopIndices()
     {
-        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
+        $loop =& $this->loopsStack[count($this->loopsStack) - 1];
 
-        $loop['index'] += 1;
+        $loop['index']++;
 
-        $loop['isFirst'] = $loop['index'] == 1;
+        $loop['first'] = $loop['index'] == 1;
 
-        if (isset($loop['size'])) {
-            $loop['reverseIndex'] -= 1;
+        if (isset($loop['count'])) {
+            $loop['remaining']--;
 
-            $loop['isLast'] = $loop['index'] == $loop['size'];
+            $loop['last'] = $loop['index'] == $loop['count'];
         }
     }
 
     /**
-     * Get the entire loops stack.
+     * Pop a loop from the top of the loop stack.
      *
-     * @return array
+     * @return void
      */
-    public function getLoopsStack()
+    public function popLoop()
     {
-        return $this->loopsStack;
+        array_pop($this->loopsStack);
     }
 
     /**
@@ -857,9 +848,17 @@ class Factory implements FactoryContract
      */
     public function getFirstLoop()
     {
-        $last = Arr::last($this->loopsStack);
+        return ($last = Arr::last($this->loopsStack)) ? (object) $last : null;
+    }
 
-        return $last ? (object) $last : null;
+    /**
+     * Get the entire loop stack.
+     *
+     * @return array
+     */
+    public function getLoopStack()
+    {
+        return $this->loopsStack;
     }
 
     /**
