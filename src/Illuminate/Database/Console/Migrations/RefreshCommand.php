@@ -41,17 +41,9 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
-        $step = (int) $this->input->getOption('step');
-
-        if (is_int($step) && ($step > 0)) {
-            $this->call('migrate:rollback', [
-                '--database' => $database, '--force' => $force, '--step' => $step,
-            ]);
-        } else {
-            $this->call('migrate:reset', [
-                '--database' => $database, '--force' => $force,
-            ]);
-        }
+        $this->call('migrate:reset', [
+            '--database' => $database, '--force' => $force,
+        ]);
 
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
@@ -107,8 +99,6 @@ class RefreshCommand extends Command
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
-
-            ['step', null, InputOption::VALUE_OPTIONAL, 'Number of migrations to be reverted & re-run.'],
 
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
