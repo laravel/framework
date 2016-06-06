@@ -308,12 +308,12 @@ class Store implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function has($name)
+    public function exists($key)
     {
-        $keys = is_array($name) ? $name : func_get_args();
+        $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if (is_null($this->get($value))) {
+            if (! Arr::exists($this->attributes, $value)) {
                 return false;
             }
         }
@@ -324,12 +324,12 @@ class Store implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function exists($key)
+    public function has($name)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($name) ? $name : func_get_args();
 
         foreach ($keys as $value) {
-            if (! Arr::exists($this->attributes, $value)) {
+            if (is_null($this->get($value))) {
                 return false;
             }
         }
