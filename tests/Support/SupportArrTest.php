@@ -52,6 +52,21 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo.bar' => []], $array);
     }
 
+    public function testUnDot()
+    {
+        $array = Arr::unDot(['foo.bar' => 'baz']);
+        $this->assertEquals(['foo' => ['bar' => 'baz']], $array);
+
+        $array = Arr::unDot([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::unDot(['foo.bar' => 'baz', 'foo1' => 'bar1']);
+        $this->assertEquals(['foo' => ['bar' => 'baz'], 'foo1' => 'bar1'], $array);
+
+        $array = Arr::unDot(['foo.bar' => 'baz', 'foo.bar1' => 'baz1', 'foo2' => 'bar2']);
+        $this->assertEquals(['foo' => ['bar' => 'baz', 'bar1' => 'baz1'], 'foo2' => 'bar2'], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'Desk', 'price' => 100];

@@ -116,6 +116,36 @@ class Arr
     }
 
     /**
+     * Expand a dotted array. Acts the opposite way of Arr::dot()
+     *
+     * @param  array  $array
+     * @param  bool  $recursively
+     * @return array
+     */
+    public static function unDot($array, $recursively = true)
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (count($dottedKeys = explode('.', $key, 2)) > 1) {
+                $results[$dottedKeys[0]][$dottedKeys[1]] = $value;
+            } else {
+                $results[$key] = $value;
+            }
+        }
+
+        if ($recursively) {
+            foreach ($results as $key => $value) {
+                if (is_array($value) && ! empty($value)) {
+                    $results[$key] = self::unDot($value, $recursively);
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all of the given array except for a specified array of items.
      *
      * @param  array  $array
