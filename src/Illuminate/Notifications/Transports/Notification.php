@@ -6,11 +6,14 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Notifications\Action;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Notifications\TransportManager;
 
 class Notification implements Arrayable
 {
+    use SerializesModels;
+
     /**
      * The entities that should receive the notification.
      *
@@ -87,7 +90,7 @@ class Notification implements Arrayable
      */
     public function __construct($notifiables)
     {
-        $this->notifiables = Collection::make($notifiables);
+        $this->notifiables = \Illuminate\Database\Eloquent\Collection::make($notifiables);
     }
 
     /**
