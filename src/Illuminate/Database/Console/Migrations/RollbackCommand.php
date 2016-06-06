@@ -58,6 +58,12 @@ class RollbackCommand extends BaseCommand
 
         $this->migrator->setConnection($this->option('database'));
 
+        $step = (int) $this->input->getOption('step');
+
+        if (is_int($step) && ($step > 0)) {
+            $this->migrator->setRollBackSteps($step);
+        }
+
         $this->migrator->rollback(
             $this->getMigrationPaths(), $this->option('pretend')
         );
@@ -83,6 +89,8 @@ class RollbackCommand extends BaseCommand
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+
+            ['step', null, InputOption::VALUE_OPTIONAL, 'Number of migrations to be reverted.'],
         ];
     }
 }
