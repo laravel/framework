@@ -1206,8 +1206,13 @@ class Builder
 
         $query->wheres = [];
 
-        $this->addNestedWhereSlice($query, $allWheres, 0, $originalWhereCount);
-        $this->addNestedWhereSlice($query, $allWheres, $originalWhereCount);
+        $this->addNestedWhereSlice(
+            $query, $allWheres, 0, $originalWhereCount
+        );
+
+        $this->addNestedWhereSlice(
+            $query, $allWheres, $originalWhereCount
+        );
     }
 
     /**
