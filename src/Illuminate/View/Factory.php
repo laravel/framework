@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -90,6 +91,13 @@ class Factory implements FactoryContract
      * @var array
      */
     protected $sectionStack = [];
+
+    /**
+     * The stack of in-progress loops.
+     *
+     * @var array
+     */
+    protected $loopsStack = [];
 
     /**
      * All of the finished, captured push sections.
@@ -778,6 +786,79 @@ class Factory implements FactoryContract
     public function doneRendering()
     {
         return $this->renderCount == 0;
+    }
+
+    /**
+     * Add new loop to the stack.
+     *
+     * @param  array|\Countable  $data
+     * @return void
+     */
+    public function addLoop($data)
+    {
+        $length = is_array($data) || $data instanceof Countable ? count($data) : null;
+
+        $parent = Arr::last($this->loopsStack);
+
+        $this->loopsStack[] = [
+            'index' => 0,
+            'remaining' => isset($length) ? $length + 1 : null,
+            'count' => $length,
+            'first' => true,
+            'last' => isset($length) ? $length == 1 : null,
+            'depth' => count($this->loopsStack) + 1,
+            'parent' => $parent ? (object) $parent : null,
+        ];
+    }
+
+    /**
+     * Increment the top loop's indices.
+     *
+     * @return void
+     */
+    public function incrementLoopIndices()
+    {
+        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
+
+        $loop['index']++;
+
+        $loop['first'] = $loop['index'] == 1;
+
+        if (isset($loop['count'])) {
+            $loop['remaining']--;
+
+            $loop['last'] = $loop['index'] == $loop['count'];
+        }
+    }
+
+    /**
+     * Pop a loop from the top of the loop stack.
+     *
+     * @return void
+     */
+    public function popLoop()
+    {
+        array_pop($this->loopsStack);
+    }
+
+    /**
+     * Get an instance of the first loop in the stack.
+     *
+     * @return array
+     */
+    public function getFirstLoop()
+    {
+        return ($last = Arr::last($this->loopsStack)) ? (object) $last : null;
+    }
+
+    /**
+     * Get the entire loop stack.
+     *
+     * @return array
+     */
+    public function getLoopStack()
+    {
+        return $this->loopsStack;
     }
 
     /**
