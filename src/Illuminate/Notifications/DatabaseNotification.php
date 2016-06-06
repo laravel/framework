@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications;
 
-use Parsedown;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
