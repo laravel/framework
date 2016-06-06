@@ -196,7 +196,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function put($key, $value, $minutes = null)
     {
-        if (is_array($key) && filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+        if (is_array($key)) {
             return $this->putMany($key, $value);
         }
 
