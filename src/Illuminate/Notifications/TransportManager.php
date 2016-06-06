@@ -17,7 +17,8 @@ class TransportManager extends Manager
     public function to($notifiables)
     {
         return (new Transports\Notification($this, $notifiables))->application(
-            $this->app['config']['app.name']
+            $this->app['config']['app.name'],
+            $this->app['config']['app.logo']
         );
     }
 
