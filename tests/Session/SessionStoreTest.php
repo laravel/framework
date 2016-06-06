@@ -296,6 +296,17 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($session->getName(), 'foo');
     }
 
+    public function testKeyExists()
+    {
+        $session = $this->getSession();
+        $session->set('foo', 'bar');
+        $this->assertTrue($session->exists('foo'));
+        $session->set('baz', null);
+        $this->assertFalse($session->has('baz'));
+        $this->assertTrue($session->exists('baz'));
+        $this->assertFalse($session->exists('bogus'));
+    }
+
     public function getSession()
     {
         $reflection = new ReflectionClass('Illuminate\Session\Store');
