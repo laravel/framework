@@ -28,4 +28,13 @@ interface SessionInterface extends BaseSessionInterface
      * @return void
      */
     public function setRequestOnHandler(Request $request);
+
+    /**
+     * Checks if an attribute exists.
+     *
+     * @param  string|array  $key
+     *
+     * @return bool
+     */
+    public function exists($key);
 }
