@@ -19,7 +19,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], false);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 0]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command);
@@ -33,8 +33,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('setRollBackSteps')->once()->with(2);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], false);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 2]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--step' => 2]);
@@ -62,8 +61,7 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('setRollBackSteps')->once()->with(2);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], true);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => true, 'step' => 2]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
