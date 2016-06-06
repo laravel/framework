@@ -31,6 +31,13 @@ class Notification implements Arrayable
     public $application;
 
     /**
+     * The URL to the application's logo.
+     *
+     * @var string
+     */
+    public $logoUrl;
+
+    /**
      * The "level" of the notification (info, success, error).
      *
      * @var string
@@ -87,11 +94,13 @@ class Notification implements Arrayable
      * Specify the name of the application sending the notification.
      *
      * @param  string  $application
+     * @param  string  $logoUrl
      * @return $this
      */
-    public function application($application)
+    public function application($application, $logoUrl = null)
     {
         $this->application = $application;
+        $this->logoUrl = $logoUrl;
 
         return $this;
     }
@@ -269,6 +278,7 @@ class Notification implements Arrayable
         return [
             'notifiables' => $this->notifiables,
             'application' => $this->application,
+            'logoUrl' => $this->logoUrl,
             'level' => $this->level,
             'subject' => $this->subject,
             'introLines' => $this->introLines,

@@ -218,8 +218,11 @@
                     <tr>
                         <td class="email-masthead">
                             <a class="email-masthead_name" href="{{ url('/') }}" target="_blank">
-                                <!-- <img src="logo" class="email-logo" /> -->
-                                {{ $application }}
+                                @if (isset($logoUrl))
+                                    <img src="{{ $logoUrl }}" class="email-logo" />
+                                @else
+                                    {{ $application }}
+                                @endif
                             </a>
                         </td>
                     </tr>

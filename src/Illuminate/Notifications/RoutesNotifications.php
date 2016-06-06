@@ -21,7 +21,9 @@ trait RoutesNotifications
         );
 
         foreach ($notifications as $notification) {
-            $manager->send($notification->application(config('app.name')));
+            $manager->send($notification->application(
+                config('app.name'), config('app.logo')
+            ));
         }
     }
 
