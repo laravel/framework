@@ -49,7 +49,6 @@ class AuthEloquentUserProviderTest extends PHPUnit_Framework_TestCase
 
     public function testModelsCanBeCreated()
     {
-        $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $provider = new Illuminate\Auth\EloquentUserProvider($hasher, 'EloquentProviderUserStub');
         $model = $provider->createModel();
