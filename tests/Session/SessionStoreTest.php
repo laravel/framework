@@ -305,6 +305,8 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($session->has('baz'));
         $this->assertTrue($session->exists('baz'));
         $this->assertFalse($session->exists('bogus'));
+        $this->assertTrue($session->exists(['foo', 'baz']));
+        $this->assertFalse($session->exists(['foo', 'baz', 'bogus']));
     }
 
     public function getSession()
