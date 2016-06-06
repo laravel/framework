@@ -101,7 +101,7 @@ trait ResetsPasswords
     }
 
     /**
-     * Get the needed credentials for sending reset link.
+     * Get the needed credentials for sending the reset link.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
@@ -274,7 +274,7 @@ trait ResetsPasswords
     }
 
     /**
-     * Get the password reset credentials from request.
+     * Get the password reset credentials from the request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
