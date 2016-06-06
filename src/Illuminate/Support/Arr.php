@@ -116,7 +116,7 @@ class Arr
     }
 
     /**
-     * Expand a dotted array. Acts the opposite way of Arr::dot()
+     * Expand a dotted array. Acts the opposite way of Arr::dot().
      *
      * @param  array  $array
      * @param  bool  $recursively
