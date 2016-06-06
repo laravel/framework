@@ -137,7 +137,7 @@ class Arr
         if ($recursively) {
             foreach ($results as $key => $value) {
                 if (is_array($value) && ! empty($value)) {
-                    $results[$key] = self::unDot($value, $recursively);
+                    $results[$key] = static::unDot($value, $recursively);
                 }
             }
         }
