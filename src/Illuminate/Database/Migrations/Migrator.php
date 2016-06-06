@@ -173,10 +173,10 @@ class Migrator
      * Rollback the last migration operation.
      *
      * @param  array|string $paths
-     * @param  bool  $pretend
+     * @param  array  $options
      * @return array
      */
-    public function rollback($paths = [], $pretend = false)
+    public function rollback($paths = [], array $options = [])
     {
         $this->notes = [];
 
@@ -185,7 +185,11 @@ class Migrator
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->repository->getLast();
+        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+            $migrations = $this->repository->getMigrations($steps);
+        } else {
+            $migrations = $this->repository->getLast();
+        }
 
         $count = count($migrations);
 
@@ -202,7 +206,10 @@ class Migrator
             foreach ($migrations as $migration) {
                 $rolledBack[] = $files[$migration->migration];
 
-                $this->runDown($files[$migration->migration], (object) $migration, $pretend);
+                $this->runDown(
+                    $files[$migration->migration],
+                    (object) $migration, Arr::get($options, 'pretend', false)
+                );
             }
         }
 

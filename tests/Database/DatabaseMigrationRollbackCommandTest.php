@@ -19,10 +19,24 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], false);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 0]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command);
+    }
+
+    public function testRollbackCommandCallsMigratorWithStepOption()
+    {
+        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 2]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command, ['--step' => 2]);
     }
 
     public function testRollbackCommandCanBePretended()
@@ -37,6 +51,20 @@ class DatabaseMigrationRollbackCommandTest extends PHPUnit_Framework_TestCase
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
+    }
+
+    public function testRollbackCommandCanBePretendedWithStepOption()
+    {
+        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => true, 'step' => 2]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
     }
 
     protected function runCommand($command, $input = [])
