@@ -818,7 +818,7 @@ class Factory implements FactoryContract
      */
     public function incrementLoopIndices()
     {
-        $loop =& $this->loopsStack[count($this->loopsStack) - 1];
+        $loop = &$this->loopsStack[count($this->loopsStack) - 1];
 
         $loop['index']++;
 
