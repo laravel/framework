@@ -20,7 +20,9 @@ class SoftDeletingScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        if (in_array(SoftDeletes::class, class_uses($model))) {
+            $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        }
     }
 
     /**
