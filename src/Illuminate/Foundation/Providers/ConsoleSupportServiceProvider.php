@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Console\Jobs\JobsServiceProvider;
 use Illuminate\Support\AggregateServiceProvider;
 
 class ConsoleSupportServiceProvider extends AggregateServiceProvider
@@ -25,5 +26,6 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider
         'Illuminate\Database\SeedServiceProvider',
         'Illuminate\Foundation\Providers\ComposerServiceProvider',
         'Illuminate\Queue\ConsoleServiceProvider',
+        JobsServiceProvider::class,
     ];
 }
