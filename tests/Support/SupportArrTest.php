@@ -67,6 +67,28 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => ['bar' => 'baz', 'bar1' => 'baz1'], 'foo2' => 'bar2'], $array);
     }
 
+    public function testUnDotWithDepth()
+    {
+        // Without specifying depth it expands recursively.
+        $array = Arr::unDot(['foo.bar.baz' => 'baz-value']);
+        $this->assertEquals(['foo' => ['bar' => ['baz' => 'baz-value']]], $array);
+
+        $array = Arr::unDot(['foo.bar.baz.bizz' => 'baz-value'], 1);
+        $this->assertEquals(['foo' => ['bar.baz.bizz' => 'baz-value']], $array);
+
+        $array = Arr::unDot(['foo.bar.baz.bizz' => 'baz-value'], 2);
+        $this->assertEquals(['foo' => ['bar' => ['baz.bizz' => 'baz-value']]], $array);
+
+        $array = Arr::unDot(['foo.bar.baz.bizz' => 'baz-value'], 3);
+        $this->assertEquals(['foo' => ['bar' => ['baz' => ['bizz' => 'baz-value']]]], $array);
+
+        $array = Arr::unDot(['foo.bar' => 'baz', 'foo.bar1.bizz' => 'baz1', 'foo2' => 'bar2'], 2);
+        $this->assertEquals(['foo' => ['bar' => 'baz', 'bar1' => ['bizz' => 'baz1']], 'foo2' => 'bar2'], $array);
+
+        $array = Arr::unDot(['foo.bar' => 'baz', 'foo.bar1.bizz' => 'baz1', 'foo2' => 'bar2'], 1);
+        $this->assertEquals(['foo' => ['bar' => 'baz', 'bar1.bizz' => 'baz1'], 'foo2' => 'bar2'], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'Desk', 'price' => 100];

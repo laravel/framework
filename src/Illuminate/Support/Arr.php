@@ -119,10 +119,10 @@ class Arr
      * Expand a dotted array. Acts the opposite way of Arr::dot().
      *
      * @param  array  $array
-     * @param  bool  $recursively
+     * @param  int  $depth
      * @return array
      */
-    public static function unDot($array, $recursively = true)
+    public static function unDot($array, $depth = INF)
     {
         $results = [];
 
@@ -134,11 +134,9 @@ class Arr
             }
         }
 
-        if ($recursively) {
-            foreach ($results as $key => $value) {
-                if (is_array($value) && ! empty($value)) {
-                    $results[$key] = static::unDot($value, $recursively);
-                }
+        foreach ($results as $key => $value) {
+            if (is_array($value) && ! empty($value) && $depth > 1) {
+                $results[$key] = static::unDot($value, $depth - 1);
             }
         }
 
