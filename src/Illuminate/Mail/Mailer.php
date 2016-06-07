@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Closure;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use Illuminate\Support\Arr;
@@ -156,8 +157,6 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function send($view, array $data, $callback)
     {
-        $this->forceReconnection();
-
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -312,7 +311,29 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function forceReconnection()
     {
-        $this->getSwiftMailer()->getTransport()->stop();
+        $transport = $this->getSwiftMailer()->getTransport();
+
+        if (! $transport->isStarted()) {
+            $transport->start();
+
+            return;
+        }
+
+        if (method_exists($transport, 'reset')) {
+            try {
+                $transport->reset();
+
+                return;
+            } catch (Exception $e) {
+            }
+        }
+
+        try {
+            $transport->stop();
+        } catch (Exception $e) {
+        }
+
+        $transport->start();
     }
 
     /**
@@ -392,6 +413,8 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         if (! $this->pretending) {
+            $this->forceReconnection();
+
             return $this->swift->send($message, $this->failedRecipients);
         } elseif (isset($this->logger)) {
             $this->logMessage($message);
