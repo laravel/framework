@@ -220,10 +220,10 @@ class Migrator
      * Rolls all of the currently applied migrations back.
      *
      * @param  array|string $paths
-     * @param  bool  $pretend
+     * @param  array  $options
      * @return array
      */
-    public function reset($paths = [], $pretend = false)
+    public function reset($paths = [], array $options = [])
     {
         $this->notes = [];
 
@@ -249,7 +249,7 @@ class Migrator
             foreach ($migrations as $migration) {
                 $rolledBack[] = $files[$migration];
 
-                $this->runDown($files[$migration], (object) ['migration' => $migration], $pretend);
+                $this->runDown($files[$migration], (object) ['migration' => $migration], Arr::get($options, 'pretend', false));
             }
         }
 
