@@ -15,9 +15,9 @@ trait RoutesNotifications
      */
     public function notify($instance)
     {
-        $manager = app(TransportManager::class);
+        $manager = app(ChannelManager::class);
 
-        $notifications = Transports\Notification::notificationsFromInstance(
+        $notifications = Channels\Notification::notificationsFromInstance(
             $this, $instance
         );
 
@@ -36,7 +36,7 @@ trait RoutesNotifications
      * Queue the given notification instances.
      *
      * @param  mixed  $instance
-     * @param  array[\Illuminate\Notifcations\Transports\Notification]
+     * @param  array[\Illuminate\Notifcations\Channels\Notification]
      * @return void
      */
     protected function queueNotifications($instance, array $notifications)

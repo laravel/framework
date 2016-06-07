@@ -1,13 +1,13 @@
 <?php
 
-namespace Illuminate\Notifications\Transports;
+namespace Illuminate\Notifications\Channels;
 
-class DatabaseTransport
+class DatabaseChannel
 {
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     public function send(Notification $notification)

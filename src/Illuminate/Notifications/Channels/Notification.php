@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Notifications\Transports;
+namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -8,7 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Notifications\Action;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Notifications\TransportManager;
+use Illuminate\Notifications\ChannelManager;
 
 class Notification implements Arrayable
 {
@@ -22,7 +22,7 @@ class Notification implements Arrayable
     public $notifiables;
 
     /**
-     * The transports that the notification should be sent through.
+     * The channels that the notification should be sent through.
      */
     public $via = [];
 
@@ -204,14 +204,14 @@ class Notification implements Arrayable
     }
 
     /**
-     * Set the transports that should be used to deliver the notification.
+     * Set the channels that should be used to deliver the notification.
      *
-     * @param  array|string  $transports
+     * @param  array|string  $channels
      * @return $this
      */
-    public function via($transports)
+    public function via($channels)
     {
-        $this->via = (array) $transports;
+        $this->via = (array) $channels;
 
         return $this;
     }
@@ -223,33 +223,33 @@ class Notification implements Arrayable
      */
     public function send()
     {
-        return Container::getInstance(TransportManager::class)->send($this);
+        return Container::getInstance(ChannelManager::class)->send($this);
     }
 
     /**
-     * Build a new transport notification from the given object.
+     * Build a new channel notification from the given object.
      *
      * @param  mixed  $notifiable
      * @param  mixed  $instance
-     * @param  array|null  $transports
+     * @param  array|null  $channels
      * @return array[static]
      */
-    public static function notificationsFromInstance($notifiable, $instance, $transports = null)
+    public static function notificationsFromInstance($notifiable, $instance, $channels = null)
     {
         $notifications = [];
 
-        $transports = $transports ?: $instance->via($notifiable);
+        $channels = $channels ?: $instance->via($notifiable);
 
-        $transports = $transports ?: ['mail', 'database'];
+        $channels = $channels ?: app(ChannelManager::class)->deliversVia();
 
-        foreach ($transports as $transport) {
+        foreach ($channels as $channel) {
             $notifications[] = $notification = new static([$notifiable]);
 
-            $notification->via($transport)
+            $notification->via($channel)
                          ->subject($instance->subject())
                          ->level($instance->level());
 
-            $method = static::messageMethod($instance, $transport);
+            $method = static::messageMethod($instance, $channel);
 
             foreach ($instance->{$method}()->elements as $element) {
                 $notification->with($element);
@@ -260,17 +260,17 @@ class Notification implements Arrayable
     }
 
     /**
-     * Get the proper message method for the given instance and transport.
+     * Get the proper message method for the given instance and channel.
      *
      * @param  mixed  $instance
-     * @param  string  $transport
+     * @param  string  $channel
      * @return string
      */
-    protected static function messageMethod($instance, $transport)
+    protected static function messageMethod($instance, $channel)
     {
         return method_exists(
-            $instance, $transportMethod = Str::camel($transport).'Message'
-        ) ? $transportMethod : 'message';
+            $instance, $channelMethod = Str::camel($channel).'Message'
+        ) ? $channelMethod : 'message';
     }
 
     /**

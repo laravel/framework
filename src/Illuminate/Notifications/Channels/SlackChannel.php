@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Notifications\Transports;
+namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
 
@@ -9,7 +9,7 @@ class SlackTransport
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     public function send(Notification $notification)
@@ -33,7 +33,7 @@ class SlackTransport
     /**
      * Format the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return string
      */
     protected function format(Notification $notification)
@@ -52,7 +52,7 @@ class SlackTransport
     /**
      * Get the color that should be applied to the notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return string|null
      */
     protected function color(Notification $notification)
