@@ -23,10 +23,7 @@ class ChannelManager extends Manager
      */
     public function to($notifiables)
     {
-        return (new Channels\Notification($this, $notifiables))->application(
-            $this->app['config']['app.name'],
-            $this->app['config']['app.logo']
-        );
+        return new Channels\Notification($this, $notifiables);
     }
 
     /**
@@ -37,9 +34,14 @@ class ChannelManager extends Manager
      */
     public function send(Channels\Notification $notification)
     {
-        $channels = $notification->via ?: $this->deliversVia();
+        if (! $notification->application) {
+            $notification->application(
+                $this->app['config']['app.name'],
+                $this->app['config']['app.logo']
+            );
+        }
 
-        foreach ($channels as $channel) {
+        foreach ($notification->via ?: $this->deliversVia() as $channel) {
             $this->driver($channel)->send($notification);
         }
 

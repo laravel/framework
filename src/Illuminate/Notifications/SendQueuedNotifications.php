@@ -36,9 +36,7 @@ class SendQueuedNotifications implements ShouldQueue
     public function handle(ChannelManager $manager)
     {
         foreach ($this->notifications as $notification) {
-            $manager->send($notification->application(
-                config('app.name'), config('app.logo')
-            ));
+            $manager->send($notification);
         }
     }
 }
