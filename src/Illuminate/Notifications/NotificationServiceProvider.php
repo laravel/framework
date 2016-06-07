@@ -7,6 +7,13 @@ use Illuminate\Support\ServiceProvider;
 class NotificationServiceProvider extends ServiceProvider
 {
     /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = true;
+
+    /**
      * Boot the application services.
      *
      * @return void
@@ -32,5 +39,17 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app->singleton(ChannelManager::class, function ($app) {
             return new ChannelManager($app);
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            ChannelManager::class,
+        ];
     }
 }
