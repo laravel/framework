@@ -1353,7 +1353,7 @@ class EloquentModelStub extends Model
 
     public function setListItemsAttribute($value)
     {
-        $this->attributes['list_items'] = json_encode($value);
+        $this->attributes['list_items'] = json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     public function getPasswordAttribute()
