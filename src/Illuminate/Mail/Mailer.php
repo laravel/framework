@@ -319,15 +319,21 @@ class Mailer implements MailerContract, MailQueueContract
             return;
         }
 
-        try {
-            $transport->reset();
-        } catch (Exception $e) {
+        if (method_exists($transport, 'reset')) {
             try {
-                $transport->stop();
-            } finally {
-                $transport->start();
+                $transport->reset();
+
+                return;
+            } catch (Exception $e) {
             }
         }
+
+        try {
+            $transport->stop();
+        } catch (Exception $e) {
+        }
+
+        $transport->start();
     }
 
     /**
