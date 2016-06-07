@@ -2,10 +2,13 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendQueuedNotifications implements ShouldQueue
 {
+    use Queueable;
+
     /**
      * The notifications to be sent.
      *
@@ -27,14 +30,13 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Send the notifications.
      *
+     * @param  \Illuminate\Notifications\TransportManager  $transports
      * @return void
      */
-    public function handle()
+    public function handle(TransportManager $transports)
     {
-        $manager = app(TransportManager::class);
-
         foreach ($this->notifications as $notification) {
-            $manager->send($notification->application(
+            $transports->send($notification->application(
                 config('app.name'), config('app.logo')
             ));
         }

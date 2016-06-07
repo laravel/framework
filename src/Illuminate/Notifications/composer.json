@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": ">=5.6.4",
+        "illuminate/bus": "5.3.*",
         "illuminate/contracts": "5.3.*",
         "illuminate/support": "5.3.*"
     },

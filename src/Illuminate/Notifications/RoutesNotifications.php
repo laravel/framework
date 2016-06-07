@@ -22,7 +22,7 @@ trait RoutesNotifications
         );
 
         if ($instance instanceof ShouldQueue) {
-            return $this->queueNotifications($notifications);
+            return $this->queueNotifications($instance, $notifications);
         }
 
         foreach ($notifications as $notification) {
@@ -35,12 +35,18 @@ trait RoutesNotifications
     /**
      * Queue the given notification instances.
      *
+     * @param  mixed  $instance
      * @param  array[\Illuminate\Notifcations\Transports\Notification]
      * @return void
      */
-    protected function queueNotifications(array $notifications)
+    protected function queueNotifications($instance, array $notifications)
     {
-        dispatch(new SendQueuedNotifications($notifications));
+        dispatch(
+            (new SendQueuedNotifications($notifications))
+                    ->onConnection($instance->connection)
+                    ->onQueue($instance->queue)
+                    ->delay($instance->delay)
+        );
     }
 
     /**
