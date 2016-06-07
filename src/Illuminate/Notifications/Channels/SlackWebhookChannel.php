@@ -4,7 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use GuzzleHttp\Client as HttpClient;
 
-class SlackTransport
+class SlackWebhookChannel
 {
     /**
      * Send the given notification.
@@ -15,7 +15,11 @@ class SlackTransport
     public function send(Notification $notification)
     {
         foreach ($notification->notifiables as $notifiable) {
-            $response = (new HttpClient)->post($notifiable->routeNotificationFor('slack'), [
+            if (! $url = $notifiable->routeNotificationFor('slack')) {
+                continue;
+            }
+
+            $response = (new HttpClient)->post($url, [
                 'json' => [
                     'attachments' => [
                         array_filter([

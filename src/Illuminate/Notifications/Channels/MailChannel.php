@@ -45,8 +45,17 @@ class MailChannel
     {
         $data = $this->prepareNotificationData($notification);
 
-        $this->mailer->send('notifications::email', $data, function ($m) use ($notification) {
-            $this->setRecipients($m, $notification);
+        $emails = $notification->notifiables->map(function ($n) {
+            return $n->routeNotificationFor('mail');
+        })->filter()->all();
+
+        if (empty($emails)) {
+            return;
+        }
+
+        $this->mailer->send('notifications::email', $data, function ($m) use ($notification, $emails) {
+            count($notification->notifiables) === 1
+                        ? $m->to($emails) : $m->bcc($emails);
 
             $m->subject($notification->subject);
         });
@@ -81,21 +90,5 @@ class MailChannel
             default:
                 return 'blue';
         }
-    }
-
-    /**
-     * Set the recipients on the mail message.
-     *
-     * @param  \Illuminate\Mail\Message  $message
-     * @param  \Illuminate\Notifications\Channels\Notification  $notification
-     * @return void
-     */
-    protected function setRecipients($message, Notification $notification)
-    {
-        $emails = $notification->notifiables->map(function ($n) {
-            return $n->routeNotificationFor('mail');
-        })->all();
-
-        count($notification->notifiables) === 1 ? $message->to($emails) : $message->bcc($emails);
     }
 }

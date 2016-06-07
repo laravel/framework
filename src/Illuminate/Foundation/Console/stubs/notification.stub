@@ -29,6 +29,6 @@ class DummyClass extends Notification
     {
         return $this->line('The introduction to the notification.')
                     ->action('Notification Action', 'https://laravel.com')
-                    ->line('Thanks for using our application.');
+                    ->line('Thank you for using our application!');
     }
 }

@@ -42,9 +42,13 @@ class NexmoSmsChannel
     public function send(Notification $notification)
     {
         foreach ($notification->notifiables as $notifiable) {
+            if (! $to = $notifiable->routeNotificationFor('nexmo')) {
+                continue;
+            }
+
             $this->nexmo->message()->send([
                 'from' => $this->from,
-                'to' => $notifiable->routeNotificationFor('nexmo'),
+                'to' => $to,
                 'text' => $this->formatNotification($notification),
             ]);
         }

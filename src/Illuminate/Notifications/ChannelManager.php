@@ -91,7 +91,7 @@ class ChannelManager extends Manager
      */
     protected function createSlackDriver()
     {
-        return $this->app->make(Channels\SlackChannel::class);
+        return $this->app->make(Channels\SlackWebhookChannel::class);
     }
 
     /**
