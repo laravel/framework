@@ -6,8 +6,15 @@ use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 
-class TransportManager extends Manager
+class ChannelManager extends Manager
 {
+    /**
+     * The default channels used to deliver messages.
+     *
+     * @var array
+     */
+    protected $defaultChannels = ['mail', 'database'];
+
     /**
      * Create a new notification for the given notifiable entities.
      *
@@ -16,7 +23,7 @@ class TransportManager extends Manager
      */
     public function to($notifiables)
     {
-        return (new Transports\Notification($this, $notifiables))->application(
+        return (new Channels\Notification($this, $notifiables))->application(
             $this->app['config']['app.name'],
             $this->app['config']['app.logo']
         );
@@ -25,15 +32,15 @@ class TransportManager extends Manager
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
-    public function send(Transports\Notification $notification)
+    public function send(Channels\Notification $notification)
     {
-        $transports = $notification->via ?: ['mail', 'database'];
+        $channels = $notification->via ?: $this->deliversVia();
 
-        foreach ($transports as $transport) {
-            $this->driver($transport)->send($notification);
+        foreach ($channels as $channel) {
+            $this->driver($channel)->send($notification);
         }
 
         $this->app->make('events')->fire(
@@ -44,31 +51,31 @@ class TransportManager extends Manager
     /**
      * Create an instance of the database driver.
      *
-     * @return \Illuminate\Notifications\Transports\DatabaseTransport
+     * @return \Illuminate\Notifications\Channels\DatabaseChannel
      */
     protected function createDatabaseDriver()
     {
-        return $this->app->make(Transports\DatabaseTransport::class);
+        return $this->app->make(Channels\DatabaseChannel::class);
     }
 
     /**
      * Create an instance of the mail driver.
      *
-     * @return \Illuminate\Notifications\Transports\MailTransport
+     * @return \Illuminate\Notifications\Channels\MailChannel
      */
     protected function createMailDriver()
     {
-        return $this->app->make(Transports\MailTransport::class);
+        return $this->app->make(Channels\MailChannel::class);
     }
 
     /**
      * Create an instance of the Nexmo driver.
      *
-     * @return \Illuminate\Notifications\Transports\NexmoSmsTransport
+     * @return \Illuminate\Notifications\Channels\NexmoSmsChannel
      */
     protected function createNexmoDriver()
     {
-        return new Transports\NexmoSmsTransport(
+        return new Channels\NexmoSmsChannel(
             new NexmoClient(new NexmoCredentials(
                 $this->app['config']['services.nexmo.key'],
                 $this->app['config']['services.nexmo.secret']
@@ -80,31 +87,41 @@ class TransportManager extends Manager
     /**
      * Create an instance of the Slack driver.
      *
-     * @return \Illuminate\Notifications\Transports\SlackTransport
+     * @return \Illuminate\Notifications\Channels\SlackChannel
      */
     protected function createSlackDriver()
     {
-        return $this->app->make(Transports\SlackTransport::class);
+        return $this->app->make(Channels\SlackChannel::class);
     }
 
     /**
-     * Get the default transport driver name.
+     * Get the default channel driver names.
      *
-     * @return string
+     * @return array
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['notifications.driver'];
+        return $this->defaultChannels;
     }
 
     /**
-     * Set the default transport driver name.
+     * Get the default channel driver names.
      *
-     * @param  string  $name
+     * @return array
+     */
+    public function deliversVia()
+    {
+        return $this->getDefaultDriver();
+    }
+
+    /**
+     * Set the default channel driver names.
+     *
+     * @param  array|string  $channels
      * @return void
      */
-    public function setDefaultDriver($name)
+    public function deliverVia($channels)
     {
-        $this->app['config']['notifications.driver'] = $name;
+        $this->defaultChannels = (array) $channels;
     }
 }

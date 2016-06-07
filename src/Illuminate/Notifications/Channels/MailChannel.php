@@ -1,12 +1,12 @@
 <?php
 
-namespace Illuminate\Notifications\Transports;
+namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
-class MailTransport
+class MailChannel
 {
     /**
      * The mailer implementation.
@@ -23,7 +23,7 @@ class MailTransport
     protected $views;
 
     /**
-     * Create a new mail transport instance.
+     * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  \Illuminate\Contracts\View\Factory  $views
@@ -38,7 +38,7 @@ class MailTransport
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     public function send(Notification $notification)
@@ -55,7 +55,7 @@ class MailTransport
     /**
      * Prepare the data from the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     protected function prepareNotificationData($notification)
@@ -87,7 +87,7 @@ class MailTransport
      * Set the recipients on the mail message.
      *
      * @param  \Illuminate\Mail\Message  $message
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     protected function setRecipients($message, Notification $notification)

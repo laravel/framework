@@ -11,7 +11,7 @@ class DummyClass extends Notification
     use Queueable;
 
     /**
-     * Get the notification's channels.
+     * Get the notification channels.
      *
      * @return array|string
      */
@@ -23,12 +23,12 @@ class DummyClass extends Notification
     /**
      * Get the notification message.
      *
-     * @return array
+     * @return \Illuminate\Notifications\MessageBuilder
      */
     public function message()
     {
-        return $this->line("The notification's introduction.")
-                    ->action('More Details', 'https://laravel.com')
-                    ->line("Thanks for using our application.");
+        return $this->line('The introduction to the notification.')
+                    ->action('Notification Action', 'https://laravel.com')
+                    ->line('Thanks for using our application.');
     }
 }

@@ -19,7 +19,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  array[\Illuminate\Notifications\Transports\Notification]  $notifications
+     * @param  array[\Illuminate\Notifications\Channels\Notification]  $notifications
      * @return void
      */
     public function __construct(array $notifications)
@@ -30,13 +30,13 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Send the notifications.
      *
-     * @param  \Illuminate\Notifications\TransportManager  $transports
+     * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @return void
      */
-    public function handle(TransportManager $transports)
+    public function handle(ChannelManager $manager)
     {
         foreach ($this->notifications as $notification) {
-            $transports->send($notification->application(
+            $manager->send($notification->application(
                 config('app.name'), config('app.logo')
             ));
         }

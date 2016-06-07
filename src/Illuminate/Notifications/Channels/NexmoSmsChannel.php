@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Notifications\Transports;
+namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Nexmo\Client as NexmoClient;
 
-class NexmoSmsTransport
+class NexmoSmsChannel
 {
     /**
      * The Nexmo client instance.
@@ -22,7 +22,7 @@ class NexmoSmsTransport
     protected $from;
 
     /**
-     * Create a new transport instance.
+     * Create a new Nexmo channel instance.
      *
      * @param  \Nexmo\Client  $nexmo
      * @return void
@@ -36,7 +36,7 @@ class NexmoSmsTransport
     /**
      * Send the given notification.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return void
      */
     public function send(Notification $notification)
@@ -53,7 +53,7 @@ class NexmoSmsTransport
     /**
      * Format the given notification to a single string.
      *
-     * @param  \Illuminate\Notifications\Transports\Notification  $notification
+     * @param  \Illuminate\Notifications\Channels\Notification  $notification
      * @return string
      */
     protected function formatNotification(Notification $notification)
