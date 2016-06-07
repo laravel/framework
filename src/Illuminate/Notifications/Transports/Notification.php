@@ -240,6 +240,8 @@ class Notification implements Arrayable
 
         $transports = $transports ?: $instance->via($notifiable);
 
+        $transports = $transports ?: ['mail', 'database'];
+
         foreach ($transports as $transport) {
             $notifications[] = $notification = new static([$notifiable]);
 
