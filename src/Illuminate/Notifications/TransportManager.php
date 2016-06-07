@@ -30,7 +30,9 @@ class TransportManager extends Manager
      */
     public function send(Transports\Notification $notification)
     {
-        foreach ($notification->via as $transport) {
+        $transports = $notification->via ?: ['mail', 'database'];
+
+        foreach ($transports as $transport) {
             $this->driver($transport)->send($notification);
         }
 
