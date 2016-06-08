@@ -327,7 +327,7 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  int
+     * @param  int|null  $failedId
      * @return void
      */
     protected function raiseFailedJobEvent($connection, Job $job, $failedId)
