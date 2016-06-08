@@ -381,6 +381,13 @@ class Gate implements GateContract
                 $ability = Str::camel($ability);
             }
 
+            // If the first argument is a string, that means they are passing a class name
+            // to the policy. We'll append "Any" to this ability name so that users may
+            // call the policy method with either a class or model name consistently.
+            if (isset($arguments[0]) && is_string($arguments[0])) {
+                $ability = $ability.'Any';
+            }
+
             if (! is_callable([$instance, $ability])) {
                 return false;
             }
