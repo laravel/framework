@@ -33,6 +33,6 @@ class StorageLinkCommand extends Command
 
         symlink(storage_path('app/public'), public_path('storage'));
 
-        $this->info('The [public/storage] directory has been successfully linked.');
+        $this->info('The [public/storage] directory has been linked.');
     }
 }
