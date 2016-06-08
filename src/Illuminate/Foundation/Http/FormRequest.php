@@ -80,8 +80,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
         }
 
         return $factory->make(
-            $this->all(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
+            $this->getValidationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
         );
+    }
+
+    /**
+     * Get validation data from request.
+     *
+     * @return array
+     */
+    protected function getValidationData()
+    {
+        return $this->all();
     }
 
     /**
