@@ -35,15 +35,24 @@ class RefreshCommand extends Command
             return;
         }
 
-        $database = $this->input->getOption('database');
+        $database = $this->option('database');
 
-        $force = $this->input->getOption('force');
+        $force = $this->option('force');
 
-        $path = $this->input->getOption('path');
+        $path = $this->option('path');
 
-        $this->call('migrate:reset', [
-            '--database' => $database, '--force' => $force,
-        ]);
+        if (($step = Arr::get($this->getOptions(), $this->option('step'), 0)) > 0) {
+            $this->call('migrate:rollback', [
+                '--database' => $database,
+                '--force' => $force,
+                '--step' => $step,
+            ]);
+        } else {
+            $this->call('migrate:reset', [
+                '--database' => $database,
+                '--force' => $force,
+            ]);
+        }
 
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
