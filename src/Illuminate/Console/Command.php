@@ -217,6 +217,28 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Returns true if an InputArgument object exists by name or position.
+     *
+     * @param string|int $name
+     * @return bool
+     */
+    public function hasArgument($name)
+    {
+        return $this->input->hasArgument($name);
+    }
+
+    /**
+     * Returns true if an InputOption object exists by name.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasOption($name)
+    {
+        return $this->input->hasOption($name);
+    }
+
+    /**
      * Get the value of a command option.
      *
      * @param  string  $key
