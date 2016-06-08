@@ -28,7 +28,7 @@ class JobFailed
     /**
      * The failed job ID.
      *
-     * @var int
+     * @var int|null
      */
     public $failedId;
 
@@ -38,7 +38,7 @@ class JobFailed
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  array  $data
-     * @param  int  $failedId
+     * @param  int|null  $failedId
      * @return void
      */
     public function __construct($connectionName, $job, $data, $failedId = null)

@@ -14,7 +14,7 @@ class NullFailedJobProvider implements FailedJobProviderInterface
      */
     public function log($connection, $queue, $payload)
     {
-        return false;
+        return -1;
     }
 
     /**
