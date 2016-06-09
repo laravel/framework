@@ -296,11 +296,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @return static
      */
     public function onFlatFlat($depth = INF)
-    {   
+    {
         $onWhatsThat = new static(Arr::flatten($this->items, $depth));
+
         return $onWhatsThat;
     }
-    
+
     /**
      * Flip the items in the collection.
      *
