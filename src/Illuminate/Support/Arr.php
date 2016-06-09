@@ -189,7 +189,7 @@ class Arr
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  array  $array
-     * @param  int  $depth
+     * @param  int|INF  $depth
      * @return array
      */
     public static function flatten($array, $depth = INF)
