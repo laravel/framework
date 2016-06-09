@@ -26,7 +26,7 @@ class JobFailed
     public $data;
 
     /**
-     * The failed job ID.
+     * The ID of the entry in the failed jobs table.
      *
      * @var int|null
      */
