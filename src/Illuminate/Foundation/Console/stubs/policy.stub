@@ -2,6 +2,8 @@
 
 namespace DummyNamespace;
 
+use DummyRootNamespaceUser;
+use DummyRootNamespaceDummyModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DummyClass
@@ -9,11 +11,70 @@ class DummyClass
     use HandlesAuthorization;
 
     /**
-     * Create a new policy instance.
+     * Determine whether the given user can view dummyPluralModelName.
      *
-     * @return void
+     * @param  DummyRootNamespaceUser  $user
+     * @return mixed
      */
-    public function __construct()
+    public function viewAny(User $user)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the given user can view the specified dummyModelName.
+     *
+     * @param  DummyRootNamespaceUser  $user
+     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @return mixed
+     */
+    public function view(User $user, DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the given user can create dummyPluralModelName.
+     *
+     * @param  DummyRootNamespaceUser  $user
+     * @return mixed
+     */
+    public function createAny(User $user)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the given user can update dummyPluralModelName.
+     *
+     * @param  DummyRootNamespaceUser  $user
+     * @return mixed
+     */
+    public function updateAny(User $user)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the given user can update the specified dummyModelName.
+     *
+     * @param  DummyRootNamespaceUser  $user
+     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @return mixed
+     */
+    public function update(User $user, DummyModel $dummyModelName)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the given user can delete the specified dummyModelName.
+     *
+     * @param  DummyRootNamespaceUser  $user
+     * @param  DummyRootNamespaceDummyModel  $dummyModelName
+     * @return mixed
+     */
+    public function delete(User $user, DummyModel $dummyModelName)
     {
         //
     }
