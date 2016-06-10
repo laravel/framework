@@ -59,7 +59,9 @@ class SessionManager extends Manager
     {
         $path = $this->app['config']['session.files'];
 
-        return $this->buildSession(new FileSessionHandler($this->app['files'], $path));
+        $lifetime = $this->app['config']['session.lifetime'];
+
+        return $this->buildSession(new FileSessionHandler($this->app['files'], $path, $lifetime));
     }
 
     /**
