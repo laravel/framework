@@ -456,7 +456,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $expectedLoop = [
             'index' => 0,
-            'remaining' => 4,
+            'remaining' => 3,
             'count' => 3,
             'first' => true,
             'last' => false,
@@ -470,7 +470,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
 
         $secondExpectedLoop = [
             'index' => 0,
-            'remaining' => 5,
+            'remaining' => 4,
             'count' => 4,
             'first' => true,
             'last' => false,
@@ -514,7 +514,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase
         $factory->incrementLoopIndices();
 
         $this->assertEquals(2, $factory->getLoopStack()[0]['index']);
-        $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
     }
 
     public function testReachingEndOfLoop()
