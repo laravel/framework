@@ -65,7 +65,7 @@ class CookieSessionHandler implements SessionHandlerInterface
             }
         }
 
-        return $value;
+        return '';
     }
 
     /**

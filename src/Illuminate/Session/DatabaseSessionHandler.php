@@ -24,6 +24,13 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     protected $table;
 
+    /*
+     * The number of minutes the session should be valid.
+     *
+     * @var int
+     */
+    protected $minutes;
+
     /**
      * The number of minutes the session should be valid.
      *
