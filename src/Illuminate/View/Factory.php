@@ -802,7 +802,7 @@ class Factory implements FactoryContract
 
         $this->loopsStack[] = [
             'index' => 0,
-            'remaining' => isset($length) ? $length + 1 : null,
+            'remaining' => isset($length) ? $length : null,
             'count' => $length,
             'first' => true,
             'last' => isset($length) ? $length == 1 : null,

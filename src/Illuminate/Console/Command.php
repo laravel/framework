@@ -202,6 +202,17 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Determine if the given argument is present.
+     *
+     * @param  string|int  $name
+     * @return bool
+     */
+    public function hasArgument($name)
+    {
+        return $this->input->hasArgument($name);
+    }
+
+    /**
      * Get the value of a command argument.
      *
      * @param  string  $key
@@ -214,6 +225,17 @@ class Command extends SymfonyCommand
         }
 
         return $this->input->getArgument($key);
+    }
+
+    /**
+     * Determine if the given option is present.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasOption($name)
+    {
+        return $this->input->hasOption($name);
     }
 
     /**
