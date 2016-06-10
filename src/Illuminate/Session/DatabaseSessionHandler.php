@@ -32,13 +32,6 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected $minutes;
 
     /**
-     * The number of minutes the session should be valid.
-     *
-     * @var int
-     */
-    protected $minutes;
-
-    /**
      * The container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
