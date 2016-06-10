@@ -17,6 +17,14 @@ class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
+    public function testItDoesNotCacheTemplatesIfTheApplicationIsConfiguredNotTo()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, false);
+        $files->shouldReceive('getCompiledPath')->never();
+        $files->shouldReceive('exists')->never();
+        $this->assertTrue($compiler->isExpired('foo'));
+    }
+
     public function testIsExpiredReturnsTrueIfCachePathIsNull()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), null);

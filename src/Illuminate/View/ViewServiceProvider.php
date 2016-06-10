@@ -73,8 +73,9 @@ class ViewServiceProvider extends ServiceProvider
         // instance to pass into the engine so it can compile the views properly.
         $app->singleton('blade.compiler', function ($app) {
             $cache = $app['config']['view.compiled'];
+            $shouldCache = $app['config']['view.should_cache'];
 
-            return new BladeCompiler($app['files'], $cache);
+            return new BladeCompiler($app['files'], $cache, $shouldCache);
         });
 
         $resolver->register('blade', function () use ($app) {
