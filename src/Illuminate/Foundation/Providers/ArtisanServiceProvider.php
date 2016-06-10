@@ -24,6 +24,7 @@ use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
@@ -66,6 +67,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
+        'StorageLink' => 'command.storage.link',
         'Tinker' => 'command.tinker',
         'Up' => 'command.up',
         'ViewClear' => 'command.view.clear',
@@ -439,6 +441,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.session.table', function ($app) {
             return new SessionTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerStorageLinkCommand()
+    {
+        $this->app->singleton('command.storage.link', function () {
+            return new StorageLinkCommand;
         });
     }
 
