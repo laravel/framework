@@ -499,9 +499,9 @@ breeze
 @empty
 empty
 @endforelse';
-        $expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
+        $expected = '<?php $__empty_1 = true; $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); $__empty_1 = false; ?>
 breeze
-<?php endforeach; if ($__empty_1): ?>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
@@ -519,13 +519,13 @@ tag empty
 @empty
 empty
 @endforelse';
-        $expected = '<?php $__empty_1 = true; foreach($this->getUsers() as $user): $__empty_1 = false; ?>
-<?php $__empty_2 = true; foreach($user->tags as $tag): $__empty_2 = false; ?>
+        $expected = '<?php $__empty_1 = true; $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); $__empty_1 = false; ?>
+<?php $__empty_2 = true; $__currentLoopData = $user->tags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); $__empty_2 = false; ?>
 breeze
-<?php endforeach; if ($__empty_2): ?>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); if ($__empty_2): ?>
 tag empty
 <?php endif; ?>
-<?php endforeach; if ($__empty_1): ?>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); if ($__empty_1): ?>
 empty
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
