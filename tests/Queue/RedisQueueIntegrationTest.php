@@ -77,7 +77,7 @@ class RedisQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $redisJob = $this->queue->pop();
         $after = time();
 
-        $this->assertEquals($job, unserialize(json_decode($redisJob->getRedisJob())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertEquals(1, $redisJob->attempts());
         $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
         $this->assertEquals(2, json_decode($redisJob->getReservedJob())->attempts);
