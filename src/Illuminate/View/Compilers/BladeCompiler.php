@@ -624,7 +624,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
+        preg_match('/\( *(.*) *as *([^\)]*)/', $expression, $matches);
+
+        $iteratee = trim($matches[1]);
+
+        $iteration = trim($matches[2]);
+
+        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getFirstLoop();';
+
+        return "<?php {$empty} = true; {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} {$empty} = false; ?>";
     }
 
     /**
@@ -703,7 +713,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.$this->forelseCounter--;
 
-        return "<?php endforeach; if ({$empty}): ?>";
+        return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getFirstLoop(); if ({$empty}): ?>";
     }
 
     /**
