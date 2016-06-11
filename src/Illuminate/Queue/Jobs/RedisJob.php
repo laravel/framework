@@ -24,11 +24,11 @@ class RedisJob extends Job implements JobContract
     protected $job;
 
     /**
-     * The Redis decoded job payload.
+     * The JSON decoded version of "$job".
      *
      * @var array
      */
-    protected $decodedJob;
+    protected $decoded;
 
     /**
      * The Redis job payload inside the reserved queue.
@@ -49,11 +49,11 @@ class RedisJob extends Job implements JobContract
     public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $queue)
     {
         $this->job = $job;
-        $this->decodedJob = json_decode($job, true);
         $this->redis = $redis;
         $this->queue = $queue;
         $this->reserved = $reserved;
         $this->container = $container;
+        $this->decoded = json_decode($job, true);
     }
 
     /**
@@ -63,7 +63,7 @@ class RedisJob extends Job implements JobContract
      */
     public function fire()
     {
-        $this->resolveAndFire($this->decodedJob);
+        $this->resolveAndFire($this->decoded);
     }
 
     /**
@@ -108,7 +108,7 @@ class RedisJob extends Job implements JobContract
      */
     public function attempts()
     {
-        return Arr::get($this->decodedJob, 'attempts');
+        return Arr::get($this->decoded, 'attempts');
     }
 
     /**
@@ -118,7 +118,7 @@ class RedisJob extends Job implements JobContract
      */
     public function getJobId()
     {
-        return Arr::get($this->decodedJob, 'id');
+        return Arr::get($this->decoded, 'id');
     }
 
     /**
