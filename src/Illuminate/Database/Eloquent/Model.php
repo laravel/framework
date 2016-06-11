@@ -654,6 +654,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return;
         }
 
+        if (is_string($with)) {
+            $with = func_get_args();
+        }
+
         $key = $this->getKeyName();
 
         return static::with($with)->where($key, $this->getKey())->first();
