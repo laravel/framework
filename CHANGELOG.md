@@ -1,5 +1,15 @@
 # Release Notes
 
+## v5.2.37 (2016-06-10)
+
+### Added
+- Added `hasArgument()` and `hasOption()` methods to `Command` class ([#13919](https://github.com/laravel/framework/pull/13919))
+- Added `$failedId` property to `JobFailed` event ([#13920](https://github.com/laravel/framework/pull/13920))
+
+### Fixed
+- Fixed session expiration on several drivers ([0831312](https://github.com/laravel/framework/commit/0831312aec47d904a65039e07574f41ab7492418))
+
+
 ## v5.2.36 (2016-06-06)
 
 ### Added
