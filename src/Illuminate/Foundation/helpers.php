@@ -686,7 +686,7 @@ if (! function_exists('cache')) {
         }
 
         if (is_string($arguments[0])) {
-            return app('cache')->get($arguments[0], isset($arguments[1]) ? $arguments[1]: null);
+            return app('cache')->get($arguments[0], isset($arguments[1]) ? $arguments[1] : null);
         }
 
         if (is_array($arguments[0])) {
