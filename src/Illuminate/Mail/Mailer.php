@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Mail;
 
 use Closure;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use SuperClosure\Serializer;
@@ -362,10 +363,12 @@ class Mailer implements MailerContract, MailQueueContract {
 		if ( ! $this->pretending)
 		{
 			try {
-				return $this->swift->send($message, $this->failedRecipients);
-			} finally {
-				$this->swift->getTransport()->stop();
+				$result = $this->swift->send($message, $this->failedRecipients);
+			} catch(Exception $e) {
 			}
+
+			$this->swift->getTransport()->stop();
+			return $result;
 		}
 		elseif (isset($this->logger))
 		{
