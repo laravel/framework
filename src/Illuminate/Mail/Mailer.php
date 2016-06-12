@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Mail;
 
 use Closure;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use SuperClosure\Serializer;
@@ -147,8 +148,6 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	public function send($view, array $data, $callback)
 	{
-		$this->forceReconnection();
-
 		// First we need to parse the view, which could either be a string or an array
 		// containing both an HTML and plain text versions of the view which should
 		// be used when sending an e-mail. We will extract both of them out here.
@@ -363,7 +362,13 @@ class Mailer implements MailerContract, MailQueueContract {
 
 		if ( ! $this->pretending)
 		{
-			return $this->swift->send($message, $this->failedRecipients);
+			try {
+				$result = $this->swift->send($message, $this->failedRecipients);
+			} catch(Exception $e) {
+			}
+
+			$this->swift->getTransport()->stop();
+			return $result;
 		}
 		elseif (isset($this->logger))
 		{
