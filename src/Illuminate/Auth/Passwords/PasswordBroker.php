@@ -82,7 +82,7 @@ class PasswordBroker implements PasswordBrokerContract
         $user = $this->getUser($credentials);
 
         if (is_null($user)) {
-            return PasswordBrokerContract::INVALID_USER;
+            return static::INVALID_USER;
         }
 
         // Once we have the reset token, we are ready to send the message out to this
@@ -92,7 +92,7 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->emailResetLink($user, $token, $callback);
 
-        return PasswordBrokerContract::RESET_LINK_SENT;
+        return static::RESET_LINK_SENT;
     }
 
     /**
@@ -146,7 +146,7 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->tokens->delete($credentials['token']);
 
-        return PasswordBrokerContract::PASSWORD_RESET;
+        return static::PASSWORD_RESET;
     }
 
     /**
@@ -158,15 +158,15 @@ class PasswordBroker implements PasswordBrokerContract
     protected function validateReset(array $credentials)
     {
         if (is_null($user = $this->getUser($credentials))) {
-            return PasswordBrokerContract::INVALID_USER;
+            return static::INVALID_USER;
         }
 
         if (! $this->validateNewPassword($credentials)) {
-            return PasswordBrokerContract::INVALID_PASSWORD;
+            return static::INVALID_PASSWORD;
         }
 
         if (! $this->tokens->exists($user, $credentials['token'])) {
-            return PasswordBrokerContract::INVALID_TOKEN;
+            return static::INVALID_TOKEN;
         }
 
         return $user;
