@@ -74,43 +74,46 @@ class DatabaseEloquentPolymorphicIntegrationTest extends PHPUnit_Framework_TestC
 
     public function testItLoadsRelationshipsAutomatically()
     {
-        $this->createUsers();
-
-        $taylor = TestUser::first();
-        $taylor->posts()->create(['title' => 'A title', 'body' => 'A body'])
-            ->comments()->create(['body' => 'A comment body', 'user_id' => 1])
-            ->likes()->create([]);
+        $this->seedData();
 
         $like = TestLikeWithSingleWith::first();
 
         $this->assertTrue($like->relationLoaded('likeable'));
-
         $this->assertEquals(TestComment::first(), $like->likeable);
+    }
+
+    public function testItLoadsChainedRelationshipsAutomatically()
+    {
+        $this->seedData();
+
+        $like = TestLikeWithSingleWith::first();
+
+        $this->assertTrue($like->likeable->relationLoaded('commentable'));
+        $this->assertEquals(TestPost::first(), $like->likeable->commentable);
     }
 
     public function testItLoadsNestedRelationshipsAutomatically()
     {
-        $this->createUsers();
-
-        $taylor = TestUser::first();
-        $taylor->posts()->create(['title' => 'A title', 'body' => 'A body'])
-               ->comments()->create(['body' => 'A comment body', 'user_id' => 1])
-               ->likes()->create([]);
+        $this->seedData();
 
         $like = TestLikeWithNestedWith::first();
 
         $this->assertTrue($like->relationLoaded('likeable'));
         $this->assertTrue($like->likeable->relationLoaded('owner'));
 
-        $this->assertEquals($taylor, $like->likeable->owner);
+        $this->assertEquals(TestUser::first(), $like->likeable->owner);
     }
 
     /**
      * Helpers...
      */
-    protected function createUsers()
+    protected function seedData()
     {
-        TestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $taylor = TestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $taylor->posts()->create(['title' => 'A title', 'body' => 'A body'])
+            ->comments()->create(['body' => 'A comment body', 'user_id' => 1])
+            ->likes()->create([]);
     }
 
     /**
@@ -174,6 +177,7 @@ class TestComment extends Eloquent
 {
     protected $table = 'comments';
     protected $guarded = [];
+    protected $with = ['commentable'];
 
     public function owner()
     {
