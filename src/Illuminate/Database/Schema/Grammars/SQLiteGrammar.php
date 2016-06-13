@@ -634,6 +634,17 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Create a custom typed column.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function customType(Fluent $column)
+    {
+        return $column->type;
+    }
+
+    /**
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
