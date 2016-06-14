@@ -1334,11 +1334,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
     {
         $model = $this->getMock('EloquentIdTypeModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
-        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn("string id");
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
 
         $this->assertTrue($model->save());
-        $this->assertEquals("string id", $model->id);
+        $this->assertEquals('string id', $model->id);
     }
 
     protected function addMockConnection($model)
@@ -1455,7 +1455,7 @@ class EloquentModelSaveStub extends Model
 
 class EloquentIdTypeModelStub extends EloquentModelStub
 {
-    public $idType = "string";
+    public $idType = 'string';
 }
 
 class EloquentModelFindWithWritePdoStub extends Model
