@@ -1062,7 +1062,12 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getAlias($abstract)
     {
-        return isset($this->aliases[$abstract]) ? $this->aliases[$abstract] : $abstract;
+        if (! isset($this->aliases[$abstract])) {
+            return $abstract;
+        }
+        $abstract = $this->aliases[$abstract];
+
+        return $this->getAlias($abstract);
     }
 
     /**
