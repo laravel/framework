@@ -1065,9 +1065,8 @@ class Container implements ArrayAccess, ContainerContract
         if (! isset($this->aliases[$abstract])) {
             return $abstract;
         }
-        $abstract = $this->aliases[$abstract];
 
-        return $this->getAlias($abstract);
+        return $this->getAlias($this->aliases[$abstract]);
     }
 
     /**
