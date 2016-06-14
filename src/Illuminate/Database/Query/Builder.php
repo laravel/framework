@@ -1066,7 +1066,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDate($column, $operator, $value)
