@@ -71,8 +71,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $incrementing = true;
 
     /**
-     * Sets the type used by the ID. Note that this property is ignored unless
-     * $incrementing is set to true.
+     * The type used by the incrementing ID.
      *
      * @var string
      */
