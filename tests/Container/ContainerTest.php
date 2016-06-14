@@ -128,8 +128,10 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
         $container = new Container;
         $container['foo'] = 'bar';
         $container->alias('foo', 'baz');
+        $container->alias('baz', 'bat');
         $this->assertEquals('bar', $container->make('foo'));
         $this->assertEquals('bar', $container->make('baz'));
+        $this->assertEquals('bar', $container->make('bat'));
         $container->bind(['bam' => 'boom'], function () {
             return 'pow';
         });
