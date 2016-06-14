@@ -65,7 +65,7 @@ class CookieSessionHandler implements SessionHandlerInterface
             }
         }
 
-        return $value;
+        return '';
     }
 
     /**
@@ -75,7 +75,7 @@ class CookieSessionHandler implements SessionHandlerInterface
     {
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
-            'expires' => Carbon::now()->addMinutes($this->minutes)->getTimestamp()
+            'expires' => Carbon::now()->addMinutes($this->minutes)->getTimestamp(),
         ]), $this->minutes);
     }
 

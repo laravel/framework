@@ -95,6 +95,7 @@ class AppNameCommand extends Command
     {
         $files = Finder::create()
                             ->in($this->laravel['path'])
+                            ->contains($this->currentRoot)
                             ->name('*.php');
 
         foreach ($files as $file) {
