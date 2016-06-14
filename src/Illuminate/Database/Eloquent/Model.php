@@ -71,7 +71,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $incrementing = true;
 
     /**
-     * Sets the type used by the ID
+     * Sets the type used by the ID.
      *
      * @var string
      */
@@ -2409,7 +2409,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get the type of the ID
+     * Get the type of the ID.
      *
      * @return string
      */
@@ -2419,7 +2419,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Set ID type
+     * Set ID type.
      *
      * @param  string  $value
      * @return $this
