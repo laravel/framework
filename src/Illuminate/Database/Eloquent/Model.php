@@ -71,7 +71,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $incrementing = true;
 
     /**
-     * Sets the type used by the ID.
+     * Sets the type used by the ID. Note that this property is ignored unless
+     * $incrementing is set to true.
      *
      * @var string
      */
@@ -2404,29 +2405,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function setIncrementing($value)
     {
         $this->incrementing = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get the type of the ID.
-     *
-     * @return string
-     */
-    public function getIdType()
-    {
-        return $this->idType;
-    }
-
-    /**
-     * Set ID type.
-     *
-     * @param  string  $value
-     * @return $this
-     */
-    public function setIdType($value)
-    {
-        $this->idType = $value;
 
         return $this;
     }
