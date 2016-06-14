@@ -2770,7 +2770,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->getIncrementing()) {
             return array_merge([
-                $this->getKeyName() => $this->getIdType(),
+                $this->getKeyName() => $this->idType,
             ], $this->casts);
         }
 
