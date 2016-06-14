@@ -148,7 +148,7 @@ class Worker
      */
     protected function waitForChildProcess($processId, $timeout)
     {
-        declare (ticks = 1) {
+        declare(ticks=1) {
             pcntl_signal(SIGALRM, function () use ($processId) {
                 posix_kill($processId, SIGKILL);
 
