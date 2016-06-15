@@ -493,7 +493,9 @@ class Builder
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
 
         // If the columns is actually a Closure instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
@@ -1056,7 +1058,9 @@ class Builder
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
 
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
@@ -1085,7 +1089,9 @@ class Builder
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
@@ -1101,7 +1107,9 @@ class Builder
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
@@ -1117,7 +1125,9 @@ class Builder
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
