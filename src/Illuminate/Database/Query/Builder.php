@@ -480,8 +480,6 @@ class Builder
      * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -495,11 +493,7 @@ class Builder
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        if (func_num_args() == 2) {
-            list($value, $operator) = [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
-            throw new InvalidArgumentException('Illegal operator and value combination.');
-        }
+        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
 
         // If the columns is actually a Closure instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
@@ -1055,13 +1049,15 @@ class Builder
      * Add a "where date" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
-     * @param  int   $value
-     * @param  string   $boolean
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereDate($column, $operator, $value, $boolean = 'and')
+    public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
 
@@ -1069,8 +1065,8 @@ class Builder
      * Add an "or where date" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
-     * @param  int   $value
+     * @param  string  $operator
+     * @param  string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDate($column, $operator, $value)
@@ -1082,13 +1078,15 @@ class Builder
      * Add a "where day" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
-     * @param  int   $value
-     * @param  string   $boolean
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereDay($column, $operator, $value, $boolean = 'and')
+    public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
 
@@ -1096,13 +1094,15 @@ class Builder
      * Add a "where month" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
-     * @param  int   $value
-     * @param  string   $boolean
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereMonth($column, $operator, $value, $boolean = 'and')
+    public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
 
@@ -1110,13 +1110,15 @@ class Builder
      * Add a "where year" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
-     * @param  int   $value
-     * @param  string   $boolean
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereYear($column, $operator, $value, $boolean = 'and')
+    public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator($value, $operator, func_num_args() == 2);
+
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
 
@@ -1137,6 +1139,27 @@ class Builder
         $this->addBinding($value, 'where');
 
         return $this;
+    }
+
+    /**
+     * Prepare the value and operator for a where clause.
+     *
+     * @param  string  $value
+     * @param  string  $operator
+     * @param  bool  $useDefault
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
+    {
+        if ($useDefault) {
+            return [$operator, '='];
+        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+            throw new InvalidArgumentException('Illegal operator and value combination.');
+        }
+
+        return [$value, $operator];
     }
 
     /**
