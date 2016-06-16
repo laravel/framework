@@ -111,6 +111,7 @@ class DatabaseEloquentBelongsToTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock('Illuminate\Database\Eloquent\Model');
         $related->incrementing = $incrementing;
+        $related->shouldReceive('getIncrementing')->andReturn($incrementing);
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
