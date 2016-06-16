@@ -1205,6 +1205,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testGettingMaxItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(20, $c->max(function ($item) {
+            return $item->foo;
+        }));
         $this->assertEquals(20, $c->max('foo'));
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
@@ -1220,6 +1223,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testGettingMinItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(10, $c->min(function ($item) {
+            return $item->foo;
+        }));
         $this->assertEquals(10, $c->min('foo'));
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
@@ -1246,6 +1252,9 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
     public function testGettingAvgItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(15, $c->avg(function ($item) {
+            return $item->foo;
+        }));
         $this->assertEquals(15, $c->avg('foo'));
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
