@@ -122,7 +122,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://foo.com', $request->fullUrl());
 
         $request = Request::create('https://foo.com', 'GET');
-        $this->assertEquals('https://foo.com?coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
+        $this->assertEquals('https://foo.com/?coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
 
         $request = Request::create('https://foo.com?a=b', 'GET');
         $this->assertEquals('https://foo.com/?a=b', $request->fullUrl());
@@ -132,6 +132,12 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase
 
         $request = Request::create('https://foo.com?a=b', 'GET');
         $this->assertEquals('https://foo.com/?a=c', $request->fullUrlWithQuery(['a' => 'c']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor', 'GET');
+        $this->assertEquals('http://foo.com/foo/bar?name=taylor', $request->fullUrlWithQuery(['name' => 'taylor']));
+
+        $request = Request::create('http://foo.com/foo/bar/?name=taylor', 'GET');
+        $this->assertEquals('http://foo.com/foo/bar?name=graham', $request->fullUrlWithQuery(['name' => 'graham']));
     }
 
     public function testIsMethod()
