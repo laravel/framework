@@ -148,6 +148,25 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select * from `some``table`', $builder->toSql());
     }
 
+    public function testDateBasedWheresAcceptsTwoArguments()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', 1);
+        $this->assertEquals('select * from `users` where date(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDay('created_at', 1);
+        $this->assertEquals('select * from `users` where day(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereMonth('created_at', 1);
+        $this->assertEquals('select * from `users` where month(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereyear('created_at', 1);
+        $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
+    }
+
     public function testWhereDayMySql()
     {
         $builder = $this->getMySqlBuilder();

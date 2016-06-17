@@ -1,5 +1,18 @@
 # Release Notes
 
+## v5.2.38 (2016-06-13)
+
+### Changed
+- Convert multiple `Model::fresh()` arguments to array before passing to `with()` ([#13950](https://github.com/laravel/framework/pull/13950))
+- Iterate only through files that contain a namespace in `app:name` command. ([#13961](https://github.com/laravel/framework/pull/13961))
+
+### Fixed
+- Close swift mailer connection after sending mail ([#13583](https://github.com/laravel/framework/pull/13583))
+- Prevent possible key overlap in `Str::snake` cache ([#13943](https://github.com/laravel/framework/pull/13943))
+- Fixed issue when eager loading chained `MorphTo` relationships ([#13967](https://github.com/laravel/framework/pull/13967))
+- Delete database session record if it's expired ([09b09eb](https://github.com/laravel/framework/commit/09b09ebad480940f2b49f96bbfbea0647783025e))
+
+
 ## v5.2.37 (2016-06-10)
 
 ### Added
