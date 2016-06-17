@@ -1032,7 +1032,7 @@ class Builder
     }
 
     /**
-     * Remove any relationships that have been set to be eager loaded.
+     * Prevent the specified relations from being eager loaded.
      *
      * @param  mixed  $relations
      * @return $this
