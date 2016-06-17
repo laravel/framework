@@ -71,6 +71,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $incrementing = true;
 
     /**
+     * The type used by the incrementing ID.
+     *
+     * @var string
+     */
+    public $idType = 'int';
+
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
@@ -2763,7 +2770,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->getIncrementing()) {
             return array_merge([
-                $this->getKeyName() => 'int',
+                $this->getKeyName() => $this->idType,
             ], $this->casts);
         }
 
