@@ -211,21 +211,15 @@ test
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '{{--this is a comment--}}';
-        $expected = '<?php /*this is a comment*/ ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
 
         $string = '{{--
 this is a comment
 --}}';
-        $expected = '<?php /*
-this is a comment
-*/ ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
 
         $string = sprintf('{{-- this is an %s long comment --}}', str_repeat('extremely ', 1000));
-        $expected = sprintf('<?php /* this is an %s long comment */ ?>', str_repeat('extremely ', 1000));
-
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEmpty($compiler->compileString($string));
     }
 
     public function testIfStatementsAreCompiled()

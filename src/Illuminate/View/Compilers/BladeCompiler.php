@@ -252,7 +252,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $pattern = sprintf('/%s--(.*?)--%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-        return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
+        return preg_replace($pattern, '', $value);
     }
 
     /**
