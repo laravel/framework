@@ -124,6 +124,13 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $result);
     }
 
+    public function testWithoutMethodRemovesEagerLoadedRelationshipCorrectly()
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()->without('foo');
+        $this->assertEmpty($instance->getEagerLoads());
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);
@@ -1464,6 +1471,18 @@ class EloquentModelWithStub extends Model
         $mock->shouldReceive('with')->once()->with(['foo', 'bar'])->andReturn('foo');
 
         return $mock;
+    }
+}
+
+class EloquentModelWithoutRelationStub extends Model
+{
+    public $with = ['foo'];
+
+    protected $guarded = [];
+
+    public function getEagerLoads()
+    {
+        return $this->eagerLoads;
     }
 }
 
