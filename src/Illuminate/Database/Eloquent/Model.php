@@ -57,6 +57,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -69,13 +76,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var bool
      */
     public $incrementing = true;
-
-    /**
-     * The type used by the incrementing ID.
-     *
-     * @var string
-     */
-    public $idType = 'int';
 
     /**
      * Indicates if the model should be timestamped.
@@ -2770,7 +2770,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->getIncrementing()) {
             return array_merge([
-                $this->getKeyName() => $this->idType,
+                $this->getKeyName() => $this->keyType,
             ], $this->casts);
         }
 

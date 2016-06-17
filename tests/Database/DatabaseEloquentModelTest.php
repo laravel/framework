@@ -1462,7 +1462,7 @@ class EloquentModelSaveStub extends Model
 
 class EloquentIdTypeModelStub extends EloquentModelStub
 {
-    public $idType = 'string';
+    protected $keyType = 'string';
 }
 
 class EloquentModelFindWithWritePdoStub extends Model
