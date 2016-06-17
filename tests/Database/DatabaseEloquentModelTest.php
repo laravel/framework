@@ -1310,6 +1310,28 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
+    public function testIntIdTypePreserved()
+    {
+        $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn(1);
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+
+        $this->assertTrue($model->save());
+        $this->assertEquals(1, $model->id);
+    }
+
+    public function testStringIdTypePreserved()
+    {
+        $model = $this->getMock('EloquentIdTypeModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
+        $query = m::mock('Illuminate\Database\Eloquent\Builder');
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
+        $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+
+        $this->assertTrue($model->save());
+        $this->assertEquals('string id', $model->id);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
@@ -1420,6 +1442,11 @@ class EloquentModelSaveStub extends Model
     {
         $this->incrementing = $value;
     }
+}
+
+class EloquentIdTypeModelStub extends EloquentModelStub
+{
+    protected $keyType = 'string';
 }
 
 class EloquentModelFindWithWritePdoStub extends Model
