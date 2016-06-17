@@ -87,7 +87,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
         if (isset($session->last_activity)) {
             if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
-                $this->destroy($sessionId);
+                $this->exists = true;
 
                 return;
             }

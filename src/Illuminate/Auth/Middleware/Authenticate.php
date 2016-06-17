@@ -54,7 +54,9 @@ class Authenticate
     protected function authenticate(array $guards)
     {
         if (count($guards) <= 1) {
-            $this->auth->guard($guard = array_first($guards))->authenticate();
+            $guard = array_first($guards) ?: $this->auth->getDefaultDriver();
+
+            $this->auth->guard($guard)->authenticate();
 
             return $this->auth->shouldUse($guard);
         }
