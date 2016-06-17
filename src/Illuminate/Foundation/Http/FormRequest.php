@@ -85,7 +85,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Get validation data from request.
+     * Get data to be validated from the request.
      *
      * @return array
      */
