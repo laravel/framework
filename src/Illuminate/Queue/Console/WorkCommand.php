@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Queue\Worker;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -56,6 +58,11 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
+        // We'll listen to the processed and failed events so we can write information
+        // to the console as jobs are processed, which will let the developer watch
+        // which jobs are coming through a queue and be informed on its progress.
+        $this->listenForEvents();
+
         $queue = $this->option('queue');
 
         $delay = $this->option('delay');
@@ -67,16 +74,25 @@ class WorkCommand extends Command
 
         $connection = $this->argument('connection');
 
-        $response = $this->runWorker(
+        $this->runWorker(
             $connection, $queue, $delay, $memory, $this->option('daemon')
         );
+    }
 
-        // If a job was fired by the worker, we'll write the output out to the console
-        // so that the developer can watch live while the queue runs in the console
-        // window, which will also of get logged if stdout is logged out to disk.
-        if (! is_null($response['job'])) {
-            $this->writeOutput($response['job'], $response['failed']);
-        }
+    /**
+     * Listen for the queue events in order to update the console output.
+     *
+     * @return void
+     */
+    protected function listenForEvents()
+    {
+        $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+            $this->writeOutput($event->job, false);
+        });
+
+        $this->laravel['events']->listen(JobFailed::class, function ($event) {
+            $this->writeOutput($event->job, true);
+        });
     }
 
     /**
@@ -91,12 +107,12 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue, $delay, $memory, $daemon = false)
     {
+        $this->worker->setDaemonExceptionHandler(
+            $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+        );
+
         if ($daemon) {
             $this->worker->setCache($this->laravel['cache']->driver());
-
-            $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
-            );
 
             return $this->worker->daemon(
                 $connection, $queue, $delay, $memory,
@@ -120,9 +136,9 @@ class WorkCommand extends Command
     protected function writeOutput(Job $job, $failed)
     {
         if ($failed) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->getName());
+            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
         } else {
-            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->getName());
+            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
         }
     }
 

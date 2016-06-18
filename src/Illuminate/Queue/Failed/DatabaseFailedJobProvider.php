@@ -49,13 +49,13 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @return void
+     * @return int|null
      */
     public function log($connection, $queue, $payload)
     {
         $failed_at = Carbon::now();
 
-        $this->getTable()->insert(compact('connection', 'queue', 'payload', 'failed_at'));
+        return $this->getTable()->insertGetId(compact('connection', 'queue', 'payload', 'failed_at'));
     }
 
     /**

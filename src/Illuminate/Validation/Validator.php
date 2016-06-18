@@ -7,8 +7,8 @@ use DateTime;
 use Countable;
 use Exception;
 use DateTimeZone;
-use Carbon\Carbon;
 use RuntimeException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use BadMethodCallException;
@@ -1758,7 +1758,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'before');
 
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof Carbon) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -1766,11 +1766,11 @@ class Validator implements ValidatorContract
             return $this->validateBeforeWithFormat($format, $value, $parameters);
         }
 
-        if (! ($date = strtotime($parameters[0]))) {
-            return strtotime($value) < strtotime($this->getValue($parameters[0]));
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
+            $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return strtotime($value) < $date;
+        return $this->getDateTimestamp($value) < $date;
     }
 
     /**
@@ -1800,7 +1800,7 @@ class Validator implements ValidatorContract
     {
         $this->requireParameterCount(1, $parameters, 'after');
 
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof Carbon) {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -1808,11 +1808,11 @@ class Validator implements ValidatorContract
             return $this->validateAfterWithFormat($format, $value, $parameters);
         }
 
-        if (! ($date = strtotime($parameters[0]))) {
-            return strtotime($value) > strtotime($this->getValue($parameters[0]));
+        if (! $date = $this->getDateTimestamp($parameters[0])) {
+            $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return strtotime($value) > $date;
+        return $this->getDateTimestamp($value) > $date;
     }
 
     /**
@@ -1898,6 +1898,17 @@ class Validator implements ValidatorContract
         if ($result = $this->getRule($attribute, 'DateFormat')) {
             return $result[1][0];
         }
+    }
+
+    /**
+     * Get the date timestamp.
+     *
+     * @param  mixed  $value
+     * @return int
+     */
+    protected function getDateTimestamp($value)
+    {
+        return $value instanceof DateTimeInterface ? $value->getTimestamp() : strtotime($value);
     }
 
     /**

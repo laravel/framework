@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 abstract class Job
@@ -256,6 +257,28 @@ abstract class Job
     public function getName()
     {
         return json_decode($this->getRawBody(), true)['job'];
+    }
+
+    /**
+     * Get the resolved name of the queued job class.
+     *
+     * @return string
+     */
+    public function resolveName()
+    {
+        $name = $this->getName();
+
+        $payload = json_decode($this->getRawBody(), true);
+
+        if ($name === 'Illuminate\Queue\CallQueuedHandler@call') {
+            return Arr::get($payload, 'data.commandName', $name);
+        }
+
+        if ($name === 'Illuminate\Events\CallQueuedHandler@call') {
+            return $payload['data']['class'].'@'.$payload['data']['method'];
+        }
+
+        return $name;
     }
 
     /**

@@ -2,11 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Support\Str;
+use BadMethodCallException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as BaseCollection;
 
 class MorphTo extends BelongsTo
 {
@@ -30,6 +29,13 @@ class MorphTo extends BelongsTo
      * @var array
      */
     protected $dictionary = [];
+
+    /**
+     * A buffer of dynamic calls to query macros.
+     *
+     * @var array
+     */
+    protected $macroBuffer = [];
 
     /**
      * Create a new morph to relationship instance.
@@ -177,30 +183,13 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = clone $this->query;
+        $eagerLoads = $this->getQuery()->nestedRelations($this->relation);
 
-        $query->setEagerLoads($this->getEagerLoadsForInstance($instance));
-
-        $query->setModel($instance);
+        $query = $this->replayMacros($instance->newQuery())
+            ->mergeModelDefinedRelationConstraints($this->getQuery())
+            ->with($eagerLoads);
 
         return $query->whereIn($key, $this->gatherKeysByType($type)->all())->get();
-    }
-
-    /**
-     * Get the relationships that should be eager loaded for the given model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $instance
-     * @return array
-     */
-    protected function getEagerLoadsForInstance(Model $instance)
-    {
-        $relations = BaseCollection::make($this->query->getEagerLoads());
-
-        return $relations->filter(function ($constraint, $relation) {
-            return Str::startsWith($relation, $this->relation.'.');
-        })->keyBy(function ($constraint, $relation) {
-            return Str::replaceFirst($this->relation.'.', '', $relation);
-        })->merge($instance->getEagerLoads())->all();
     }
 
     /**
@@ -249,5 +238,43 @@ class MorphTo extends BelongsTo
     public function getDictionary()
     {
         return $this->dictionary;
+    }
+
+    /**
+     * Replay stored macro calls on the actual related instance.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function replayMacros(Builder $query)
+    {
+        foreach ($this->macroBuffer as $macro) {
+            call_user_func_array([$query, $macro['method']], $macro['parameters']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Handle dynamic method calls to the relationship.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        try {
+            return parent::__call($method, $parameters);
+        }
+
+        // If we tried to call a method that does not exist on the parent Builder instance,
+        // we'll assume that we want to call a query macro (e.g. withTrashed) that only
+        // exists on related models. We will just store the call and replay it later.
+        catch (BadMethodCallException $e) {
+            $this->macroBuffer[] = compact('method', 'parameters');
+
+            return $this;
+        }
     }
 }

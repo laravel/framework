@@ -1916,11 +1916,17 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => '01/01/2000'], ['x' => 'date']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['x' => '1325376000'], ['x' => 'date']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['x' => 'Not a date'], ['x' => 'date']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => new DateTime()], ['x' => 'date']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->passes());
@@ -1977,6 +1983,21 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
 
         $v = new Validator($trans, ['start' => '2012-01-01', 'ends' => '2000-01-01'], ['start' => 'Before:ends', 'ends' => 'After:start']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => new DateTime('2000-01-01')], ['x' => 'Before:2012-01-01']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['start' => new DateTime('2012-01-01'), 'ends' => new Carbon('2013-01-01')], ['start' => 'Before:ends', 'ends' => 'After:start']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['start' => '2012-01-01', 'ends' => new DateTime('2013-01-01')], ['start' => 'Before:ends', 'ends' => 'After:start']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['start' => new DateTime('2012-01-01'), 'ends' => new DateTime('2000-01-01')], ['start' => 'After:2000-01-01', 'ends' => 'After:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => 'today', 'ends' => 'tomorrow'], ['start' => 'Before:ends', 'ends' => 'After:start']);
+        $this->assertTrue($v->passes());
     }
 
     public function testBeforeAndAfterWithFormat()

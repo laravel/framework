@@ -10,7 +10,7 @@ class NullFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @return void
+     * @return int|null
      */
     public function log($connection, $queue, $payload)
     {

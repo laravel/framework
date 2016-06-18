@@ -1,9 +1,104 @@
 # Release Notes
 
+## v5.2.39 (2016-06-17)
+
+### Added
+- Added `without()` method to Eloquent query builder ([#14031](https://github.com/laravel/framework/pull/14031))
+- Added `keyType` property Eloquent models to set key type cast ([#13985](https://github.com/laravel/framework/pull/13985))
+- Added support for mail transport `StreamOptions` ([#13925](https://github.com/laravel/framework/pull/13925))
+- Added `validationData()` method to `FormRequest` ([#13914](https://github.com/laravel/framework/pull/13914))
+
+### Changed
+- Only `set names` for MySQL connections if `charset` is set in config ([#13930](https://github.com/laravel/framework/pull/13930))
+- Support recursive container alias resolution ([#13976](https://github.com/laravel/framework/pull/13976))
+- Use late static binding in `PasswordBroker` ([#13975](https://github.com/laravel/framework/pull/13975))
+- Make sure Ajax requests are not Pjax requests in `FormRequest` ([#14024](https://github.com/laravel/framework/pull/14024))
+- Set existence state of expired database sessions, instead of deleting them ([53c0440](https://github.com/laravel/framework/commit/53c04406baa5f63bbb41127f40afee0a0facadd1))
+- Release Beanstalkd jobs before burying them ([#13963](https://github.com/laravel/framework/pull/13963))
+
+### Fixed
+- Use `getIncrementing()` method instead of the `$incrementing` attribute ([#14005](https://github.com/laravel/framework/pull/14005))
+- Fixed fatal error when `services.json` is empty ([#14030](https://github.com/laravel/framework/pull/14030))
+
+
+## v5.2.38 (2016-06-13)
+
+### Changed
+- Convert multiple `Model::fresh()` arguments to array before passing to `with()` ([#13950](https://github.com/laravel/framework/pull/13950))
+- Iterate only through files that contain a namespace in `app:name` command. ([#13961](https://github.com/laravel/framework/pull/13961))
+
+### Fixed
+- Close swift mailer connection after sending mail ([#13583](https://github.com/laravel/framework/pull/13583))
+- Prevent possible key overlap in `Str::snake` cache ([#13943](https://github.com/laravel/framework/pull/13943))
+- Fixed issue when eager loading chained `MorphTo` relationships ([#13967](https://github.com/laravel/framework/pull/13967))
+- Delete database session record if it's expired ([09b09eb](https://github.com/laravel/framework/commit/09b09ebad480940f2b49f96bbfbea0647783025e))
+
+
+## v5.2.37 (2016-06-10)
+
+### Added
+- Added `hasArgument()` and `hasOption()` methods to `Command` class ([#13919](https://github.com/laravel/framework/pull/13919))
+- Added `$failedId` property to `JobFailed` event ([#13920](https://github.com/laravel/framework/pull/13920))
+
+### Fixed
+- Fixed session expiration on several drivers ([0831312](https://github.com/laravel/framework/commit/0831312aec47d904a65039e07574f41ab7492418))
+
+
+## v5.2.36 (2016-06-06)
+
+### Added
+- Allow passing along options to the S3 client ([#13791](https://github.com/laravel/framework/pull/13791))
+- Allow nested `WHERE` clauses in `whereHas()` queries ([#13794](https://github.com/laravel/framework/pull/13794))
+- Support `DateTime` instances in `Before`/`After` date validation ([#13844](https://github.com/laravel/framework/pull/13844))
+- Support queueing collections ([d159f02](https://github.com/laravel/framework/commit/d159f02fe8cb5310b90c73d416a684e4bf51785a))
+
+### Changed
+- Reverted SparkPost driver back to `email_rfc822` parameter for simplicity ([#13780](https://github.com/laravel/framework/pull/13780))
+- Simplified `Model::__isset()` ([8fb89c6](https://github.com/laravel/framework/commit/8fb89c61c24af905b0b9db4d645d68a2c4a133b9))
+- Set exception handler even on non-daemon `queue:work` calls ([d5bbda9](https://github.com/laravel/framework/commit/d5bbda95a6435fa8cb38b8b640440b38de6b7f83))
+- Show handler class names in `queue:work` console output ([4d7eb59](https://github.com/laravel/framework/commit/4d7eb59f9813723bab00b4e42ce9885b54e65778))
+- Use queue events to update the console output of `queue:work` ([ace7f04](https://github.com/laravel/framework/commit/ace7f04ae579146ca3adf1c5992256c50ddc05a8))
+- Made `ResetsPasswords` trait easier to customize ([#13818](https://github.com/laravel/framework/pull/13818))
+- Refactored Eloquent relations and scopes ([#13824](https://github.com/laravel/framework/pull/13824), [#13884](https://github.com/laravel/framework/pull/13884), [#13894](https://github.com/laravel/framework/pull/13894))
+- Respected `session.http_only` option in `StartSession` middleware ([#13825](https://github.com/laravel/framework/pull/13825))
+- Don't return in `ApcStore::forever()` ([#13871](https://github.com/laravel/framework/pull/13871))
+- Allow Redis key expiration to be lower than one minute ([#13810](https://github.com/laravel/framework/pull/13810))
+
+### Fixed
+- Fixed `morphTo` relations across database connections ([#13784](https://github.com/laravel/framework/pull/13784))
+- Fixed `morphTo` relations without soft deletes ([13806](https://github.com/laravel/framework/pull/13806))
+- Fixed edge case on `morphTo` relations macro call that only exists on the related model ([#13828](https://github.com/laravel/framework/pull/13828))
+- Fixed formatting of `updatedAt` timestamp when calling `touch()` on `BelongsToMany` relation ([#13799](https://github.com/laravel/framework/pull/13799))
+- Don't get `$id` from Recaller in `Auth::id()` ([#13769](https://github.com/laravel/framework/pull/13769))
+- Fixed `AuthorizesResources` trait ([25443e3](https://github.com/laravel/framework/commit/25443e3e218cce1121f546b596dd70b5fd2fb619))
+
+### Removed
+- Removed unused `ArrayStore::putMultiple()` method ([#13840](https://github.com/laravel/framework/pull/13840))
+
+
+## v5.2.35 (2016-05-30)
+
+### Added
+- Added failed login event ([#13761](https://github.com/laravel/framework/pull/13761))
+
+### Changed
+- Always cast `FileStore::expiration()` return value to integer ([#13708](https://github.com/laravel/framework/pull/13708))
+- Simplified `Container::isCallableWithAtSign()` ([#13757](https://github.com/laravel/framework/pull/13757))
+- Pass key to the `Collection::keyBy()` callback ([#13766](https://github.com/laravel/framework/pull/13766))
+- Support unlimited log files by setting `app.log_max_files` to `0` ([#13776](https://github.com/laravel/framework/pull/13776))
+- Wathan-ize `MorphTo::getEagerLoadsForInstance()` ([#13741](https://github.com/laravel/framework/pull/13741), [#13777](https://github.com/laravel/framework/pull/13777))
+
+### Fixed
+- Fixed MySQL JSON boolean binding update grammar ([38acdd8](https://github.com/laravel/framework/commit/38acdd807faec4b85fd47051341ccaf666499551))
+- Fixed loading of nested polymorphic relationships ([#13737](https://github.com/laravel/framework/pull/13737))
+- Fixed early return in `AuthManager::shouldUse()` ([5b88244](https://github.com/laravel/framework/commit/5b88244c0afd5febe9f54e8544b0870b55ef6cfd))
+- Fixed the remaining attempts calculation in `ThrottleRequests` ([#13756](https://github.com/laravel/framework/pull/13756), [#13759](https://github.com/laravel/framework/pull/13759))
+- Fixed strict `TypeError` in `AbstractPaginator::url()` ([#13758](https://github.com/laravel/framework/pull/13758))
+
 ## v5.2.34 (2016-05-26)
 
 ### Added
-- Added correct MySQL JSON bool handling and updating grammar ([#13242](https://github.com/laravel/framework/pull/13242))
+- Added correct MySQL JSON boolean handling and updating grammar ([#13242](https://github.com/laravel/framework/pull/13242))
 - Added `stream` option to mail `TransportManager` ([#13715](https://github.com/laravel/framework/pull/13715))
 - Added `when()` method to eloquent query builder ([#13726](https://github.com/laravel/framework/pull/13726))
 

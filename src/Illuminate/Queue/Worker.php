@@ -310,13 +310,13 @@ class Worker
     protected function logFailedJob($connection, Job $job)
     {
         if ($this->failer) {
-            $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
+            $failedId = $this->failer->log($connection, $job->getQueue(), $job->getRawBody());
 
             $job->delete();
 
             $job->failed();
 
-            $this->raiseFailedJobEvent($connection, $job);
+            $this->raiseFailedJobEvent($connection, $job, $failedId);
         }
 
         return ['job' => $job, 'failed' => true];
@@ -327,14 +327,15 @@ class Worker
      *
      * @param  string  $connection
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int|null  $failedId
      * @return void
      */
-    protected function raiseFailedJobEvent($connection, Job $job)
+    protected function raiseFailedJobEvent($connection, Job $job, $failedId)
     {
         if ($this->events) {
             $data = json_decode($job->getRawBody(), true);
 
-            $this->events->fire(new Events\JobFailed($connection, $job, $data));
+            $this->events->fire(new Events\JobFailed($connection, $job, $data, $failedId));
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Encoding;
 use Swift_Mime_Message;
 use GuzzleHttp\ClientInterface;
 
@@ -53,23 +52,10 @@ class SparkPostTransport extends Transport
             'json' => [
                 'recipients' => $recipients,
                 'content' => [
-                    'html' => $message->getBody(),
-                    'from' => $this->getFrom($message),
-                    'reply_to' => $this->getReplyTo($message),
-                    'subject' => $message->getSubject(),
+                    'email_rfc822' => $message->toString(),
                 ],
             ],
         ];
-
-        if ($attachments = $message->getChildren()) {
-            $options['json']['content']['attachments'] = array_map(function ($attachment) {
-                return [
-                    'type' => $attachment->getContentType(),
-                    'name' => $attachment->getFileName(),
-                    'data' => Swift_Encoding::getBase64Encoding()->encodeString($attachment->getBody()),
-                ];
-            }, $attachments);
-        }
 
         return $this->client->post('https://api.sparkpost.com/api/v1/transmissions', $options);
     }
@@ -99,36 +85,10 @@ class SparkPostTransport extends Transport
         }
 
         $recipients = array_map(function ($address) {
-            return ['address' => ['email' => $address, 'header_to' => $address]];
+            return compact('address');
         }, $to);
 
         return $recipients;
-    }
-
-    /**
-     * Get the "from" contacts in the format required by SparkPost.
-     *
-     * @param  Swift_Mime_Message  $message
-     * @return array
-     */
-    protected function getFrom(Swift_Mime_Message $message)
-    {
-        return array_map(function ($email, $name) {
-            return compact('name', 'email');
-        }, array_keys($message->getFrom()), $message->getFrom())[0];
-    }
-
-    /**
-     * Get the 'reply_to' headers and format as required by SparkPost.
-     *
-     * @param  Swift_Mime_Message  $message
-     * @return string
-     */
-    protected function getReplyTo(Swift_Mime_Message $message)
-    {
-        if (is_array($message->getReplyTo())) {
-            return current($message->getReplyTo()).' <'.key($message->getReplyTo()).'>';
-        }
     }
 
     /**

@@ -57,6 +57,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -381,15 +388,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function getGlobalScope($scope)
     {
-        $modelScopes = Arr::get(static::$globalScopes, static::class, []);
-
-        if (is_string($scope)) {
-            return isset($modelScopes[$scope]) ? $modelScopes[$scope] : null;
+        if (! is_string($scope)) {
+            $scope = get_class($scope);
         }
 
-        return Arr::first($modelScopes, function ($key, $value) use ($scope) {
-            return $scope instanceof $value;
-        });
+        return Arr::get(static::$globalScopes, static::class.'.'.$scope);
     }
 
     /**
@@ -656,6 +659,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (! $this->exists) {
             return;
+        }
+
+        if (is_string($with)) {
+            $with = func_get_args();
         }
 
         $key = $this->getKeyName();
@@ -2763,7 +2770,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->getIncrementing()) {
             return array_merge([
-                $this->getKeyName() => 'int',
+                $this->getKeyName() => $this->keyType,
             ], $this->casts);
         }
 
@@ -3466,15 +3473,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __isset($key)
     {
-        if (isset($this->attributes[$key]) || isset($this->relations[$key])) {
-            return true;
-        }
-
-        if (method_exists($this, $key) && $this->$key && isset($this->relations[$key])) {
-            return true;
-        }
-
-        return $this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key));
+        return ! is_null($this->getAttribute($key));
     }
 
     /**

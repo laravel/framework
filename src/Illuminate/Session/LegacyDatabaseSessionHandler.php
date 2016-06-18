@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Carbon\Carbon;
 use SessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 
@@ -24,6 +25,13 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
      */
     protected $table;
 
+    /*
+     * The number of minutes the session should be valid.
+     *
+     * @var int
+     */
+    protected $minutes;
+
     /**
      * The existence state of the session.
      *
@@ -36,11 +44,13 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
+     * @param  int  $minutes
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table)
+    public function __construct(ConnectionInterface $connection, $table, $minutes)
     {
         $this->table = $table;
+        $this->minutes = $minutes;
         $this->connection = $connection;
     }
 
@@ -66,6 +76,14 @@ class LegacyDatabaseSessionHandler implements SessionHandlerInterface, Existence
     public function read($sessionId)
     {
         $session = (object) $this->getQuery()->find($sessionId);
+
+        if (isset($session->last_activity)) {
+            if ($session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+                $this->exists = true;
+
+                return;
+            }
+        }
 
         if (isset($session->payload)) {
             $this->exists = true;
