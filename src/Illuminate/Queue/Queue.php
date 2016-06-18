@@ -4,12 +4,12 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTime;
-use Illuminate\Contracts\Encryption\EncryptException;
+use Exception;
 use Illuminate\Support\Arr;
 use SuperClosure\Serializer;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 abstract class Queue
 {
@@ -21,9 +21,11 @@ abstract class Queue
     protected $container;
 
     /**
+     * The encrypter implementation.
+     *
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
-    protected $crypt;
+    protected $encrypter;
 
     /**
      * Push a new job onto the queue.
@@ -209,27 +211,29 @@ abstract class Queue
     }
 
     /**
-     * Set the encrypter instance.
+     * Get the encrypter implementation.
      *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $crypt
-     * @return void
-     */
-    public function setEncrypter(EncrypterContract $crypt)
-    {
-        $this->crypt = $crypt;
-    }
-
-    /**
-     * @return EncrypterContract
+     * @return  \Illuminate\Contracts\Encryption\Encrypter
      *
-     * @throws EncryptException
+     * @throws Exception
      */
     protected function getEncrypter()
     {
-        if (null === $this->crypt) {
-            throw new EncryptException('No encrypter set for Queue');
+        if (is_null($this->encrypter)) {
+            throw new Exception('No encrypter has been set on the Queue.');
         }
 
-        return $this->crypt;
+        return $this->encrypter;
+    }
+
+    /**
+     * Set the encrypter implementation.
+     *
+     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+     * @return void
+     */
+    public function setEncrypter(Encrypter $encrypter)
+    {
+        $this->encrypter = $encrypter;
     }
 }
