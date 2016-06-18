@@ -8,7 +8,7 @@ use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class SyncQueue extends Queue implements QueueContract
+class SyncQueue extends Queue
 {
     /**
      * Push a new job onto the queue.

@@ -7,7 +7,7 @@ use Pheanstalk\Job as PheanstalkJob;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class BeanstalkdQueue extends Queue implements QueueContract
+class BeanstalkdQueue extends Queue
 {
     /**
      * The Pheanstalk instance.
