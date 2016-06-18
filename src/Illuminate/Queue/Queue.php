@@ -217,7 +217,6 @@ abstract class Queue
         $this->crypt = $crypt;
     }
 
-
     /**
      * @return EncrypterContract
      *
