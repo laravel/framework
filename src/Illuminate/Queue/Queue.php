@@ -230,5 +230,4 @@ abstract class Queue
 
         return $this->crypt;
     }
-
 }
