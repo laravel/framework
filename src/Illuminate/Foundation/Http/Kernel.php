@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Http;
 
 use Exception;
 use Throwable;
-use Illuminate\Routing\Router;
 use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
@@ -24,7 +24,7 @@ class Kernel implements KernelContract
     /**
      * The router instance.
      *
-     * @var \Illuminate\Routing\Router
+     * @var \Illuminate\Contracts\Routing\Registrar
      */
     protected $router;
 
@@ -68,10 +68,10 @@ class Kernel implements KernelContract
      * Create a new HTTP kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
+     * @param  \Illuminate\Contracts\Routing\Registrar       $router
      * @return void
      */
-    public function __construct(Application $app, Router $router)
+    public function __construct(Application $app, Registrar $router)
     {
         $this->app = $app;
         $this->router = $router;
