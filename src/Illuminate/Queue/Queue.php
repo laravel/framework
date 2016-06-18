@@ -215,7 +215,7 @@ abstract class Queue
      *
      * @return  \Illuminate\Contracts\Encryption\Encrypter
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function getEncrypter()
     {
