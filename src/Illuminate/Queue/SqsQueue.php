@@ -4,9 +4,8 @@ namespace Illuminate\Queue;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class SqsQueue extends Queue implements QueueContract
+class SqsQueue extends Queue
 {
     /**
      * The Amazon SQS instance.
