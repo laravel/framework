@@ -2,9 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Queue as QueueContract;
-
-class NullQueue extends Queue implements QueueContract
+class NullQueue extends Queue
 {
     /**
      * Push a new job onto the queue.
