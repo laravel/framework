@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Queue as QueueContract;
-
 class NullQueue extends Queue
 {
     /**

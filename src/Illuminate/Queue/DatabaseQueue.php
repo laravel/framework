@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class DatabaseQueue extends Queue
 {
