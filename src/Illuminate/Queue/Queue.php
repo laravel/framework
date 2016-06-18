@@ -73,7 +73,9 @@ abstract class Queue
     {
         if ($job instanceof Closure) {
             return json_encode($this->createClosurePayload($job, $data));
-        } elseif (is_object($job)) {
+        }
+
+        if (is_object($job)) {
             return json_encode([
                 'job' => 'Illuminate\Queue\CallQueuedHandler@call',
                 'data' => ['commandName' => get_class($job), 'command' => serialize(clone $job)],
