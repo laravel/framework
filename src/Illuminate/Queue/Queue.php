@@ -222,7 +222,7 @@ abstract class Queue
      *
      * @throws EncryptException
      */
-    public function getEncrypter()
+    protected function getEncrypter()
     {
         if (null === $this->crypt) {
             throw new EncryptException('No encrypter set for Queue');
