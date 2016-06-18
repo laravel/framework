@@ -77,7 +77,7 @@ class ProviderRepository
             $this->postContructProvider($providerInstance);
         }
 
-        foreach ($eagerProviderInstances[] as $providerInstance) {
+        foreach ($eagerProviderInstances as $providerInstance) {
             $this->app->register($providerInstance);
         }
 
