@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTime;
+use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Support\Arr;
 use SuperClosure\Serializer;
 use Illuminate\Container\Container;
@@ -18,6 +19,11 @@ abstract class Queue
      * @var \Illuminate\Container\Container
      */
     protected $container;
+
+    /**
+     * @var \Illuminate\Contracts\Encryption\Encrypter
+     */
+    protected $crypt;
 
     /**
      * Push a new job onto the queue.
@@ -144,7 +150,7 @@ abstract class Queue
      */
     protected function createClosurePayload($job, $data)
     {
-        $closure = $this->crypt->encrypt((new Serializer)->serialize($job));
+        $closure = $this->getEncrypter()->encrypt((new Serializer)->serialize($job));
 
         return ['job' => 'IlluminateQueueClosure', 'data' => compact('closure')];
     }
@@ -210,4 +216,20 @@ abstract class Queue
     {
         $this->crypt = $crypt;
     }
+
+
+    /**
+     * @return EncrypterContract
+     *
+     * @throws EncryptException
+     */
+    public function getEncrypter()
+    {
+        if (null === $this->crypt) {
+            throw new EncryptException("No encrypter set for Queue");
+        }
+
+        return $this->crypt;
+    }
+
 }
