@@ -4,6 +4,7 @@ namespace Illuminate\Foundation;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Support\ServiceProvider;
 
 class ProviderRepository
 {
