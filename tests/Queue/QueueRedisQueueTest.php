@@ -86,7 +86,7 @@ class QueueRedisQueueTest extends PHPUnit_Framework_TestCase
     {
         $queue = $this->getMock('Illuminate\Queue\RedisQueue', ['getTime'], [$redis = m::mock('Illuminate\Redis\Database'), 'default']);
         $queue->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $transaction = m::mock('StdClass');
+        $transaction = m::mock(\Predis\Transaction\MultiExec::class);
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('transaction')->with(m::any(), m::type('Closure'))->andReturnUsing(function ($options, $callback) use ($transaction) {
             $callback($transaction);
