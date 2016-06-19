@@ -359,10 +359,12 @@ class Connection implements ConnectionInterface
 
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
-                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            $fetchMode = $me->getFetchMode();
+
+            if ($fetchMode === PDO::FETCH_CLASS) {
+                $statement->setFetchMode($fetchMode, 'StdClass');
             } else {
-                $statement->setFetchMode($me->getFetchMode());
+                $statement->setFetchMode($fetchMode);
             }
 
             $statement->execute($me->prepareBindings($bindings));
