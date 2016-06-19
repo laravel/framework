@@ -587,25 +587,17 @@ class Route
      * Make an action for an invokable controller.
      *
      * @param  string $action
-     * @return Closure
+     * @return string
      */
     protected function makeInvokableAction($action)
     {
-        return function () use ($action) {
-            $callable = $this->container->make($action);
+        if (! method_exists($action, '__invoke')) {
+            throw new UnexpectedValueException(sprintf(
+                'Invalid route action: [%s]', $action
+            ));
+        }
 
-            if (! is_callable($callable)) {
-                throw new UnexpectedValueException(sprintf(
-                    'Invalid route action: [%s]', $action
-                ));
-            }
-
-            return call_user_func_array(
-                $callable, $this->resolveClassMethodDependencies(
-                    [], $action, '__invoke'
-                )
-            );
-        };
+        return $action.'@__invoke';
     }
 
     /**
