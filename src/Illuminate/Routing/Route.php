@@ -564,9 +564,7 @@ class Route
         }
 
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
-            throw new UnexpectedValueException(sprintf(
-                'Invalid route action: [%s]', $action['uses']
-            ));
+            $action['uses'] = $this->makeCallableAction($action['uses']);
         }
 
         return $action;
@@ -940,5 +938,26 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
+    }
+
+    /**
+     * @param string $action
+     * @return Closure
+     */
+    protected function makeCallableAction($action)
+    {
+        return function () use ($action) {
+            $callable = $this->container->make($action);
+
+            if (! is_callable($callable)) {
+                throw new UnexpectedValueException(sprintf(
+                    'Invalid route action: [%s]', $action
+                ));
+            }
+
+            return call_user_func_array(
+                $callable, $this->resolveClassMethodDependencies([], $action, '__invoke')
+            );
+        };
     }
 }
