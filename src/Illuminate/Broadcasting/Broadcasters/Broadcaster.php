@@ -3,10 +3,10 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
-abstract class Broadcaster implements Broadcaster
+abstract class Broadcaster implements BroadcasterContract
 {
     /**
      * The registered channel authenticators.
