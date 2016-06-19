@@ -1154,11 +1154,12 @@ class Builder
 
         foreach ($scopes as $scope => $parameters) {
             if (is_int($scope)) {
-                $scope = $parameters;
-                $parameters = [];
+                list($scope, $parameters) = [$parameters, []];
             }
 
-            $builder = $builder->callScope('scope'.ucfirst($scope), (array) $parameters);
+            $builder = $builder->callScope(
+                'scope'.ucfirst($scope), (array) $parameters
+            );
         }
 
         return $builder;
