@@ -1143,6 +1143,28 @@ class Builder
     }
 
     /**
+     * Add the given scopes to the current builder instance.
+     *
+     * @param  array  $scopes
+     * @return mixed
+     */
+    public function scopes(array $scopes)
+    {
+        $builder = $this;
+
+        foreach ($scopes as $scope => $parameters) {
+            if (is_int($scope)) {
+                $scope = $parameters;
+                $parameters = [];
+            }
+
+            $builder = $builder->callScope('scope'.ucfirst($scope), (array) $parameters);
+        }
+
+        return $builder;
+    }
+
+    /**
      * Apply the given scope on the current builder instance.
      *
      * @param  callable $scope
