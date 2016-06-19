@@ -803,7 +803,9 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
     public function testInvalidActionException()
     {
         $router = $this->getRouter();
-        $router->get('/', ['uses' => 'Controller']);
+        $router->get('/', ['uses' => 'RouteTestControllerStub']);
+
+        $router->dispatch(Request::create('/'));
     }
 
     public function testResourceRouting()
@@ -1064,6 +1066,20 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
         $router->dispatch(Request::create('bar', 'GET'))->getContent();
     }
 
+    public function testDispatchingCallableActionClasses()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', 'ActionStub');
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->get('foo/bar2', [
+            'uses' => 'ActionStub',
+        ]);
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
@@ -1263,5 +1279,13 @@ class RoutingTestUserModel extends Model
     public function firstOrFail()
     {
         return $this;
+    }
+}
+
+class ActionStub
+{
+    public function __invoke()
+    {
+        return 'hello';
     }
 }
