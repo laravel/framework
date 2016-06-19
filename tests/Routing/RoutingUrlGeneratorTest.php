@@ -97,6 +97,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
         $routes->add($route);
 
+        /*
+         * Invoke action
+         */
+        $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+
         $this->assertEquals('/', $url->route('plain', [], false));
         $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -109,6 +115,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
         $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
         $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
+        $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
         $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
@@ -153,8 +160,12 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'something/else', ['controller' => 'something\foo@bar']);
         $routes->add($route);
 
+        $route = new Route(['GET'], 'foo/invoke', ['controller' => 'namespace\InvokableActionStub']);
+        $routes->add($route);
+
         $this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
         $this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
+        $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
     }
 
     public function testControllerRoutesOutsideOfDefaultNamespace()
@@ -169,7 +180,11 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'root/namespace', ['controller' => '\root\namespace@foo']);
         $routes->add($route);
 
+        $route = new Route(['GET'], 'invokable/namespace', ['controller' => '\root\namespace\InvokableActionStub']);
+        $routes->add($route);
+
         $this->assertEquals('http://www.foo.com/root/namespace', $url->action('\root\namespace@foo'));
+        $this->assertEquals('http://www.foo.com/invokable/namespace', $url->action('\root\namespace\InvokableActionStub'));
     }
 
     public function testRoutableInterfaceRouting()
@@ -384,5 +399,13 @@ class RoutableInterfaceStub implements UrlRoutable
     public function getRouteKeyName()
     {
         return 'key';
+    }
+}
+
+class InvokableActionStub
+{
+    public function __invoke()
+    {
+        return 'hello';
     }
 }
