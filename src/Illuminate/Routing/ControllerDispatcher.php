@@ -107,6 +107,10 @@ class ControllerDispatcher
     {
         $results = new Collection;
 
+        if (! method_exists($instance, 'getMiddleware')) {
+            return [];
+        }
+
         foreach ($instance->getMiddleware() as $name => $options) {
             if (! $this->methodExcludedByOptions($method, $options)) {
                 $results[] = $this->router->resolveMiddlewareClassName($name);
@@ -143,6 +147,10 @@ class ControllerDispatcher
             $route->parametersWithoutNulls(), $instance, $method
         );
 
-        return $instance->callAction($method, $parameters);
+        if (method_exists($instance, 'callAction')) {
+            return $instance->callAction($method, $parameters);
+        }
+
+        return call_user_func_array([$instance, $method], $parameters);
     }
 }

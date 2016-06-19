@@ -564,7 +564,7 @@ class Route
         }
 
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
-            $action['uses'] = $this->makeCallableAction($action['uses']);
+            $action['uses'] = $this->makeInvokableAction($action['uses']);
         }
 
         return $action;
@@ -581,6 +581,31 @@ class Route
         return Arr::first($action, function ($value, $key) {
             return is_callable($value) && is_numeric($key);
         });
+    }
+
+    /**
+     * Make an action for an invokable controller.
+     *
+     * @param  string $action
+     * @return Closure
+     */
+    protected function makeInvokableAction($action)
+    {
+        return function () use ($action) {
+            $callable = $this->container->make($action);
+
+            if (! is_callable($callable)) {
+                throw new UnexpectedValueException(sprintf(
+                    'Invalid route action: [%s]', $action
+                ));
+            }
+
+            return call_user_func_array(
+                $callable, $this->resolveClassMethodDependencies(
+                    [], $action, '__invoke'
+                )
+            );
+        };
     }
 
     /**
@@ -938,26 +963,5 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
-    }
-
-    /**
-     * @param string $action
-     * @return Closure
-     */
-    protected function makeCallableAction($action)
-    {
-        return function () use ($action) {
-            $callable = $this->container->make($action);
-
-            if (! is_callable($callable)) {
-                throw new UnexpectedValueException(sprintf(
-                    'Invalid route action: [%s]', $action
-                ));
-            }
-
-            return call_user_func_array(
-                $callable, $this->resolveClassMethodDependencies([], $action, '__invoke')
-            );
-        };
     }
 }
