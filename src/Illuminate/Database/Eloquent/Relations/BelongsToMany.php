@@ -85,7 +85,7 @@ class BelongsToMany extends Relation
      * @param  string  $relationName
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = null)
+    public function __construct(Builder $query, Model $parent, $table, $foreignKey, $otherKey, $relationName = 'pivot')
     {
         $this->table = $table;
         $this->otherKey = $otherKey;
