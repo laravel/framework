@@ -1158,7 +1158,7 @@ class Builder
             }
 
             $builder = $builder->callScope(
-                'scope'.ucfirst($scope), (array) $parameters
+                [$this->model, 'scope'.ucfirst($scope)], (array) $parameters
             );
         }
 
