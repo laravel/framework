@@ -74,6 +74,8 @@ class Router implements RegistrarContract
     /**
      * The priority-sorted list of middleware.
      *
+     * Forces the listed middleware to always be in the given order.
+     *
      * @var array
      */
     public $middlewarePriority = [];
@@ -742,36 +744,22 @@ class Router implements RegistrarContract
         $sorted = collect();
 
         foreach ($middlewares as $middleware) {
-            if (! $sorted->contains($middleware)) {
-                $sorted = $this->addPrerequisiteMiddleware($middleware, $sorted, $middlewares, $priority);
-
-                $sorted[] = $middleware;
+            if ($sorted->contains($middleware)) {
+                continue;
             }
+
+            if (($index = $priority->search($middleware)) !== false) {
+                $sorted = $sorted->merge(
+                    $priority->take($index)->reject(function ($middleware) use ($sorted) {
+                        return $sorted->contains($middleware);
+                    })
+                );
+            }
+
+            $sorted[] = $middleware;
         }
 
         return $sorted;
-    }
-
-    /**
-     * Add any prerequisite middleware that have beeen declared after the current one.
-     *
-     * @param  string  $middleware
-     * @param  \Illuminate\Support\Collection $sorted
-     * @param  \Illuminate\Support\Collection $all
-     * @param  \Illuminate\Support\Collection $priority
-     * @return \Illuminate\Support\Collection
-     */
-    protected function addPrerequisiteMiddleware($middleware, $sorted, $all, $priority)
-    {
-        if (($index = $priority->search($middleware)) === false) {
-            return $sorted;
-        }
-
-        return $sorted->merge(
-            $priority->take($index)->filter(function ($middleware) use ($sorted, $all) {
-                return $all->contains($middleware) && ! $sorted->contains($middleware);
-            })
-        );
     }
 
     /**
