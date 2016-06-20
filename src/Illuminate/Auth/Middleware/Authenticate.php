@@ -53,7 +53,7 @@ class Authenticate
      */
     protected function authenticate(array $guards)
     {
-        if (! $guards) {
+        if (empty($guards)) {
             return $this->auth->authenticate();
         }
 
