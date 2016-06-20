@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,10 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app->singleton(ChannelManager::class, function ($app) {
             return new ChannelManager($app);
         });
+
+        $this->app->alias(
+            ChannelManager::class, FactoryContract::class
+        );
     }
 
     /**
@@ -49,7 +54,7 @@ class NotificationServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            ChannelManager::class,
+            ChannelManager::class, FactoryContract::class,
         ];
     }
 }
