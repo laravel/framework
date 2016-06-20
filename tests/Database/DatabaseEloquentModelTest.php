@@ -1312,7 +1312,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testIntIdTypePreserved()
     {
-        $model = $this->getMock('EloquentModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
+        $model = $this->getMockBuilder('EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn(1);
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
@@ -1323,7 +1323,7 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testStringIdTypePreserved()
     {
-        $model = $this->getMock('EloquentIdTypeModelStub', ['newQueryWithoutScopes', 'updateTimestamps', 'refresh']);
+        $model = $this->getMockBuilder('EloquentIdTypeModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));

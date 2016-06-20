@@ -65,6 +65,21 @@ class Kernel implements KernelContract
     protected $routeMiddleware = [];
 
     /**
+     * The priority-sorted list of middleware.
+     *
+     * Forces the listed middleware to always be in the given order.
+     *
+     * @var array
+     */
+    protected $middlewarePriority = [
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Auth\Middleware\Authenticate::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \Illuminate\Auth\Middleware\Authorize::class,
+    ];
+
+    /**
      * Create a new HTTP kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -75,6 +90,8 @@ class Kernel implements KernelContract
     {
         $this->app = $app;
         $this->router = $router;
+
+        $router->middlewarePriority = $this->middlewarePriority;
 
         foreach ($this->middlewareGroups as $key => $middleware) {
             $router->middlewareGroup($key, $middleware);

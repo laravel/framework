@@ -183,7 +183,7 @@ class Handler implements ExceptionHandlerContract
 
         $errors = $e->validator->errors()->getMessages();
 
-        if (($request->ajax() && ! $request->pjax()) || $request->wantsJson()) {
+        if ($request->probablyWantsJson()) {
             return response()->json($errors, 422);
         }
 
