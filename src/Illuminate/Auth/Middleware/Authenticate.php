@@ -53,10 +53,8 @@ class Authenticate
      */
     protected function authenticate(array $guards)
     {
-        if (count($guards) <= 1) {
-            $this->auth->guard($guard = array_first($guards))->authenticate();
-
-            return $this->auth->shouldUse($guard);
+        if (empty($guards)) {
+            return $this->auth->authenticate();
         }
 
         foreach ($guards as $guard) {
