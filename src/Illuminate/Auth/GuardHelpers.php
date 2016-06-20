@@ -36,7 +36,7 @@ trait GuardHelpers
             return $user;
         }
 
-        throw new AuthenticationException($this);
+        throw new AuthenticationException;
     }
 
     /**
