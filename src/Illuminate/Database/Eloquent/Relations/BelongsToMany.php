@@ -294,7 +294,7 @@ class BelongsToMany extends Relation
         foreach ($models as $model) {
             $pivot = $this->newExistingPivot($this->cleanPivotAttributes($model));
 
-            $model->setRelation('pivot', $pivot);
+            $model->setRelation($this->getRelationName(), $pivot);
         }
     }
 
