@@ -77,7 +77,7 @@ trait ResetsPasswords
 
         $response = Password::broker($broker)->sendResetLink(
             $this->getSendResetLinkEmailCredentials($request),
-            $this->resetEmailBuilder()
+            $this->resetNotifier()
         );
 
         switch ($response) {
@@ -112,15 +112,13 @@ trait ResetsPasswords
     }
 
     /**
-     * Get the Closure which is used to build the password reset email message.
+     * Get the Closure which is used to build the password reset notification.
      *
      * @return \Closure
      */
-    protected function resetEmailBuilder()
+    protected function resetNotifier()
     {
-        return function (Message $message) {
-            $message->subject($this->getEmailSubject());
-        };
+        //
     }
 
     /**

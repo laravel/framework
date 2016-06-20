@@ -251,7 +251,7 @@ class Notification implements Arrayable
 
             $method = static::messageMethod($instance, $channel);
 
-            foreach ($instance->{$method}()->elements as $element) {
+            foreach ($instance->{$method}($notifiable)->elements as $element) {
                 $notification->with($element);
             }
         }

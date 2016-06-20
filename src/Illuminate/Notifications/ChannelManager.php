@@ -5,8 +5,9 @@ namespace Illuminate\Notifications;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 
-class ChannelManager extends Manager
+class ChannelManager extends Manager implements FactoryContract
 {
     /**
      * The default channels used to deliver messages.
