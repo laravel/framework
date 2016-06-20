@@ -483,6 +483,10 @@ tag info
         $string = '@foreach (   $users as $user)';
         $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
+
+        $string = '@foreach ($tasks as $task)';
+        $expected = '<?php $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getFirstLoop(); ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
     }
 
     public function testForelseStatementsAreCompiled()
