@@ -751,7 +751,8 @@ class Router implements RegistrarContract
             if (($index = $priority->search($middleware)) !== false) {
                 $sorted = $sorted->merge(
                     $priority->take($index)->filter(function ($middleware) use ($middlewares, $sorted) {
-                        return $middlewares->contains($middleware) && ! $sorted->contains($middleware);
+                        return $middlewares->contains($middleware) &&
+                             ! $sorted->contains($middleware);
                     })
                 );
             }
