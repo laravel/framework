@@ -1296,6 +1296,10 @@ class Validator implements ValidatorContract
             if (strtolower($id) == 'null') {
                 $id = null;
             }
+
+            if (filter_var($id, FILTER_VALIDATE_INT) !== false) {
+                $id = intval($id);
+            }
         }
 
         // The presence verifier is responsible for counting rows within this store
