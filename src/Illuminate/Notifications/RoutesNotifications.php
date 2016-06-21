@@ -31,6 +31,34 @@ trait RoutesNotifications
     }
 
     /**
+     * Send the given notification via the given channels.
+     *
+     * @param  array|string  $channels
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notifyVia($channels, $instance)
+    {
+        $manager = app(ChannelManager::class);
+
+        $notifications = Channels\Notification::notificationsFromInstance(
+            $this, $instance, (array) $channels
+        );
+
+        foreach ($notifications as $notification) {
+            $notification->via((array) $channels);
+        }
+
+        if ($instance instanceof ShouldQueue) {
+            return $this->queueNotifications($instance, $notifications);
+        }
+
+        foreach ($notifications as $notification) {
+            $manager->send($notification);
+        }
+    }
+
+    /**
      * Queue the given notification instances.
      *
      * @param  mixed  $instance
