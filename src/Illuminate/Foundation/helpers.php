@@ -191,6 +191,20 @@ if (! function_exists('bcrypt')) {
     }
 }
 
+if (! function_exists('carbon')) {
+    /**
+     * Create a new Carbon instance.
+     *
+     * @param string|null              $time
+     * @param DateTimeZone|string|null $tz
+     * @return \Carbon\Carbon
+     */
+    function carbon($time = null, $tz = null)
+    {
+        return new \Carbon\Carbon($time, $tz);
+    }
+}
+
 if (! function_exists('config')) {
     /**
      * Get / set the specified configuration value.
