@@ -690,6 +690,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load only the specified relations on the model.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadOnly($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        $query = $this->newQuery();
+
+        $query->eagerLoadRelations([$this]);
+
+        return $this;
+    }
+
+    /**
      * Begin querying a model with eager loading.
      *
      * @param  array|string  $relations
