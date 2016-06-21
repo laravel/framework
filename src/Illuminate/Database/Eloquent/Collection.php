@@ -62,7 +62,14 @@ class Collection extends BaseCollection implements QueueableCollection
             }
 
             $model = $this->first();
-            $query = $model->newQuery()->with($relations)->without($model->with);
+
+            $without = array_diff($model->with, $relations);
+
+            if (empty($without)) {
+                $query = $model->newQuery()->with($relations);
+            } else {
+                $query = $model->newQuery()->with($relations)->without($model->with);
+            }
 
             $this->items = $query->eagerLoadRelations($this->items);
         }
