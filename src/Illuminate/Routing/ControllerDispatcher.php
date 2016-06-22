@@ -2,9 +2,29 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Container\Container;
+
 class ControllerDispatcher
 {
     use RouteDependencyResolverTrait;
+
+    /**
+     * The container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
+     * Create a new controller dispatcher instance.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return void
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Dispatch a request to a given controller and method.
@@ -16,19 +36,6 @@ class ControllerDispatcher
      */
     public function dispatch(Route $route, $controller, $method)
     {
-        return $this->call($route, $controller, $method);
-    }
-
-    /**
-     * Call the given controller instance method.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $method
-     * @return mixed
-     */
-    protected function call($route, $controller, $method)
-    {
         $parameters = $this->resolveClassMethodDependencies(
             $route->parametersWithoutNulls(), $controller, $method
         );
@@ -37,7 +44,7 @@ class ControllerDispatcher
             return $controller->callAction($method, $parameters);
         }
 
-        return call_user_func_array([$controller, $method], $parameters);
+        return $controller->$method(...$parameters);
     }
 
     /**
