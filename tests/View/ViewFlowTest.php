@@ -148,7 +148,7 @@ child
 @endsection'));
 
         $factory = $this->prepareCommonFactory();
-        $this->assertEquals("yield:\ndad\n\nchild\n", $factory->make('extends-child')->render());
+        $this->assertEquals("yield:\n@parent\nchild\n", $factory->make('extends-child')->render());
     }
 
     public function testExtendsWithVariable()
@@ -180,7 +180,7 @@ dad
 
         $factory = $this->prepareCommonFactory();
         $this->assertEquals("yield:\ntitle\n", $factory->make('extends-variable-child-a', ['title' => 'title'])->render());
-        $this->assertEquals("yield:\ndad\n\n", $factory->make('extends-variable-child-b', ['title' => '@parent'])->render());
+        $this->assertEquals("yield:\n@parent\n", $factory->make('extends-variable-child-b', ['title' => '@parent'])->render());
     }
 
     protected function prepareCommonFactory()
