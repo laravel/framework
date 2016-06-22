@@ -44,6 +44,13 @@ class Route
     protected $action;
 
     /**
+     * The controller instance.
+     *
+     * @var mixed
+     */
+    protected $controller;
+
+    /**
      * The default values for the route.
      *
      * @var array
@@ -84,13 +91,6 @@ class Route
      * @var \Illuminate\Routing\Router
      */
     protected $router;
-
-    /**
-     * The controller instance.
-     *
-     * @var mixed
-     */
-    protected $controller;
 
     /**
      * The container instance used by the route.
@@ -183,7 +183,7 @@ class Route
      */
     protected function runController()
     {
-        return (new ControllerDispatcher($this->router))->dispatch(
+        return (new ControllerDispatcher)->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
     }
@@ -310,7 +310,9 @@ class Route
             return [];
         }
 
-        return ControllerDispatcher::getMiddleware($this->getController(), $this->getControllerMethod());
+        return ControllerDispatcher::getMiddleware(
+            $this->getController(), $this->getControllerMethod()
+        );
     }
 
     /**
