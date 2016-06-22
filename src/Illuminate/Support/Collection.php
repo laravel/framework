@@ -777,7 +777,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             shuffle($items);
         } else {
             srand($seed);
-            usort($items, function ($a, $b) {
+
+            usort($items, function () {
                 return rand(-1, 1);
             });
         }
