@@ -100,7 +100,7 @@ trait ValidatesRequests
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
     {
-        if ($request->probablyWantsJson()) {
+        if ($request->expectsJson()) {
             return new JsonResponse($errors, 422);
         }
 
