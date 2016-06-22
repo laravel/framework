@@ -816,7 +816,7 @@ class BelongsToMany extends Relation
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
-        // the array of the IDs given to the method which will complete the sync.
+        // array of the new IDs given to the method which will complete the sync.
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
 
