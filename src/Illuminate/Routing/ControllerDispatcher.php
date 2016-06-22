@@ -7,24 +7,6 @@ class ControllerDispatcher
     use RouteDependencyResolverTrait;
 
     /**
-     * The router instance.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
-     * Create a new controller dispatcher instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
-     * @return void
-     */
-    public function __construct(Router $router)
-    {
-        $this->router = $router;
-    }
-
-    /**
      * Dispatch a request to a given controller and method.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -34,20 +16,18 @@ class ControllerDispatcher
      */
     public function dispatch(Route $route, $controller, $method)
     {
-        Controller::setRouter($this->router);
-
-        return $this->call($controller, $route, $method);
+        return $this->call($route, $controller, $method);
     }
 
     /**
      * Call the given controller instance method.
      *
-     * @param  \Illuminate\Routing\Controller  $controller
      * @param  \Illuminate\Routing\Route  $route
+     * @param  \Illuminate\Routing\Controller  $controller
      * @param  string  $method
      * @return mixed
      */
-    protected function call($controller, $route, $method)
+    protected function call($route, $controller, $method)
     {
         $parameters = $this->resolveClassMethodDependencies(
             $route->parametersWithoutNulls(), $controller, $method
