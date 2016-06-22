@@ -183,7 +183,7 @@ class Route
      */
     protected function runController()
     {
-        return (new ControllerDispatcher)->dispatch(
+        return (new ControllerDispatcher($this->container))->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
     }
