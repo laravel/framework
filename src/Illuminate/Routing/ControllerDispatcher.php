@@ -2,9 +2,28 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Container\Container;
+
 class ControllerDispatcher
 {
     use RouteDependencyResolverTrait;
+
+    /**
+     * The container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
+     * Create a new controller dispatcher instance.
+     *
+     * @param \Illuminate\Container\Container  $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Dispatch a request to a given controller and method.
