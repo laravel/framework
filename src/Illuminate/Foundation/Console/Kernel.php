@@ -117,7 +117,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Render and report the exception
+     * Render and report the exception.
      *
      * @param  \Exception|\Throwable  $exception
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
