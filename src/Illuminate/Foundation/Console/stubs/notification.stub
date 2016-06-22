@@ -1,0 +1,34 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class DummyClass extends Notification
+{
+    use Queueable;
+
+    /**
+     * Get the notification channels.
+     *
+     * @return array|string
+     */
+    public function via($notifiable)
+    {
+        //
+    }
+
+    /**
+     * Get the notification message.
+     *
+     * @return \Illuminate\Notifications\MessageBuilder
+     */
+    public function message()
+    {
+        return $this->line('The introduction to the notification.')
+                    ->action('Notification Action', 'https://laravel.com')
+                    ->line('Thank you for using our application!');
+    }
+}

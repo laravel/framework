@@ -44,6 +44,13 @@ class Route
     protected $action;
 
     /**
+     * The controller instance.
+     *
+     * @var mixed
+     */
+    protected $controller;
+
+    /**
      * The default values for the route.
      *
      * @var array
@@ -133,23 +140,32 @@ class Route
         $this->container = $this->container ?: new Container;
 
         try {
-            if (! is_string($this->action['uses'])) {
-                return $this->runCallable($request);
+            if ($this->isControllerAction()) {
+                return $this->runController();
             }
 
-            return $this->runController($request);
+            return $this->runCallable();
         } catch (HttpResponseException $e) {
             return $e->getResponse();
         }
     }
 
     /**
+     * Checks whether the route's action is a controller.
+     *
+     * @return bool
+     */
+    protected function isControllerAction()
+    {
+        return is_string($this->action['uses']);
+    }
+
+    /**
      * Run the route action and return the response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    protected function runCallable(Request $request)
+    protected function runCallable()
     {
         $parameters = $this->resolveMethodDependencies(
             $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
@@ -161,17 +177,41 @@ class Route
     /**
      * Run the route action and return the response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function runController(Request $request)
+    protected function runController()
     {
-        list($class, $method) = explode('@', $this->action['uses']);
+        return (new ControllerDispatcher($this->container))->dispatch(
+            $this, $this->getController(), $this->getControllerMethod()
+        );
+    }
 
-        return (new ControllerDispatcher($this->router, $this->container))
-                    ->dispatch($this, $request, $class, $method);
+    /**
+     * Get the controller instance for the route.
+     *
+     * @return mixed
+     */
+    protected function getController()
+    {
+        list($class) = explode('@', $this->action['uses']);
+
+        if (! $this->controller) {
+            $this->controller = $this->container->make($class);
+        }
+
+        return $this->controller;
+    }
+
+    /**
+     * Get the controller method used for the route.
+     *
+     * @return string
+     */
+    protected function getControllerMethod()
+    {
+        return explode('@', $this->action['uses'])[1];
     }
 
     /**
@@ -227,6 +267,16 @@ class Route
     }
 
     /**
+     * Get all middleware, including the ones from the controller.
+     *
+     * @return array
+     */
+    public function gatherMiddleware()
+    {
+        return array_merge($this->middleware(), $this->controllerMiddleware());
+    }
+
+    /**
      * Get or set the middlewares attached to the route.
      *
      * @param  array|string|null $middleware
@@ -250,18 +300,19 @@ class Route
     }
 
     /**
-     * Get the controller middleware for the route.
+     * Get the middleware for the route's controller.
      *
      * @return array
      */
-    protected function controllerMiddleware()
+    public function controllerMiddleware()
     {
-        list($class, $method) = explode('@', $this->action['uses']);
+        if (! $this->isControllerAction()) {
+            return [];
+        }
 
-        $controller = $this->container->make($class);
-
-        return (new ControllerDispatcher($this->router, $this->container))
-            ->getMiddleware($controller, $method);
+        return ControllerDispatcher::getMiddleware(
+            $this->getController(), $this->getControllerMethod()
+        );
     }
 
     /**
