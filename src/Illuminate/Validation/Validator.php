@@ -1322,6 +1322,10 @@ class Validator implements ValidatorContract
             if (strtolower($id) == 'null') {
                 $id = null;
             }
+
+            if (filter_var($id, FILTER_VALIDATE_INT) !== false) {
+                $id = intval($id);
+            }
         }
 
         // The presence verifier is responsible for counting rows within this store
@@ -1587,7 +1591,7 @@ class Validator implements ValidatorContract
      */
     protected function validateDimensions($attribute, $value, $parameters)
     {
-        if (! $sizeDetails = getimagesize($value->getRealPath())) {
+        if (! $this->isAValidFileInstance($value) || ! $sizeDetails = getimagesize($value->getRealPath())) {
             return false;
         }
 
