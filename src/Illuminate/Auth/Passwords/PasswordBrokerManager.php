@@ -69,9 +69,7 @@ class PasswordBrokerManager implements FactoryContract
         // aggregate service of sorts providing a convenient interface for resets.
         return new PasswordBroker(
             $this->createTokenRepository($config),
-            $this->app['auth']->createUserProvider($config['provider']),
-            $this->app['mailer'],
-            $config['email']
+            $this->app['auth']->createUserProvider($config['provider'])
         );
     }
 

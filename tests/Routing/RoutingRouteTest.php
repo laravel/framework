@@ -588,7 +588,7 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase
             SubstituteBindings::class,
             Placeholder2::class,
             Placeholder3::class,
-        ], $router->gatherRouteMiddlewares($route));
+        ], $router->gatherRouteMiddleware($route));
     }
 
     public function testModelBinding()

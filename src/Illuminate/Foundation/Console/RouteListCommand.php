@@ -157,8 +157,6 @@ class RouteListCommand extends Command
      */
     protected function getControllerMiddleware($actionName)
     {
-        Controller::setRouter($this->laravel['router']);
-
         $segments = explode('@', $actionName);
 
         return $this->getControllerMiddlewareFromInstance(
