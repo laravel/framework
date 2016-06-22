@@ -631,15 +631,14 @@ class Router implements RegistrarContract
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddlewares($route);
+        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
 
         return (new Pipeline($this->container))
                         ->send($request)
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                $request,
-                                $route->run($request)
+                                $request, $route->run($request)
                             );
                         });
     }
@@ -650,10 +649,10 @@ class Router implements RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
-    public function gatherRouteMiddlewares(Route $route)
+    public function gatherRouteMiddleware(Route $route)
     {
-        $middleware = Collection::make($route->middleware())->map(function ($name) {
-            return Collection::make($this->resolveMiddlewareClassName($name));
+        $middleware = collect($route->gatherMiddleware())->map(function ($name) {
+            return (array) $this->resolveMiddlewareClassName($name);
         })->flatten();
 
         return $this->sortMiddleware($middleware)->all();
