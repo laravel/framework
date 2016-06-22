@@ -703,7 +703,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return bool
      */
-    public function probablyWantsJson()
+    public function expectsJson()
     {
         return ($this->ajax() && ! $this->pjax()) || $this->wantsJson();
     }
