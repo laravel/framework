@@ -50,8 +50,9 @@ class Handler implements ExceptionHandlerContract
      * Report or log an exception.
      *
      * @param  \Exception  $e
-     * @throws \Exception  $e
      * @return void
+     *
+     * @throws \Exception
      */
     public function report(Exception $e)
     {
