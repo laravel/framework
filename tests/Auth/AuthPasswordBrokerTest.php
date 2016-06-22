@@ -46,29 +46,9 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $callback = function () {
         };
-        $broker->expects($this->once())->method('emailResetLink')->with($this->equalTo($user), $this->equalTo('token'), $this->equalTo($callback));
+        $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
         $this->assertEquals(PasswordBroker::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
-    }
-
-    public function testMailerIsCalledWithProperViewTokenAndCallback()
-    {
-        unset($_SERVER['__password.reset.test']);
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $callback = function ($message, $user) {
-            $_SERVER['__password.reset.test'] = true;
-        };
-        $user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
-        $mocks['mailer']->shouldReceive('send')->once()->with('resetLinkView', ['token' => 'token', 'user' => $user], m::type('Closure'))->andReturnUsing(function ($view, $data, $callback) {
-            return $callback;
-        });
-        $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
-        $message = m::mock('StdClass');
-        $message->shouldReceive('to')->once()->with('email');
-        $result = $broker->emailResetLink($user, 'token', $callback);
-        call_user_func($result, $message);
-
-        $this->assertTrue($_SERVER['__password.reset.test']);
     }
 
     public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
