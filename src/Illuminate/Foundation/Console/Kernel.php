@@ -106,19 +106,37 @@ class Kernel implements KernelContract
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
-            $this->reportException($e);
-
-            $this->renderException($output, $e);
+            $this->reportAndRender($e, $output);
 
             return 1;
         } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
-            $this->reportException($e);
-
-            $this->renderException($output, $e);
+            $this->reportAndRender($e, $output);
 
             return 1;
+        }
+    }
+
+    /**
+     * Render and report the exception
+     *
+     * @param  \Exception|\Throwable  $exception
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    public function reportAndRender($exception, $output = null)
+    {
+        if ($exception instanceof Throwable) {
+            $exception = new FatalThrowableError($exception);
+        }
+
+        // If the app is still booting, don't go through the exception handler
+        // to prevent an 'Uncaught ReflectionException Class log does not exist'
+        if ($this->app->isBooted()) {
+            $this->reportException($exception);
+
+            $this->renderException($output, $exception);
+        } else {
+            (new ConsoleApplication)->renderException($exception, $output);
         }
     }
 
