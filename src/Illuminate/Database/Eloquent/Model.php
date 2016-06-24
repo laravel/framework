@@ -1356,11 +1356,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $column
      * @param  int  $amount
      * @param  array  $extra
+     * @param  array  $options
      * @return int
      */
-    protected function increment($column, $amount = 1, array $extra = [])
+    protected function increment($column, $amount = 1, array $extra = [], array $options = [])
     {
-        return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
+        return $this->incrementOrDecrement($column, $amount, $extra, 'increment', $options);
     }
 
     /**
@@ -1369,11 +1370,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $column
      * @param  int  $amount
      * @param  array  $extra
+     * @param  array  $options
      * @return int
      */
-    protected function decrement($column, $amount = 1, array $extra = [])
+    protected function decrement($column, $amount = 1, array $extra = [], array $options = [])
     {
-        return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
+        return $this->incrementOrDecrement($column, $amount, $extra, 'decrement', $options);
     }
 
     /**
@@ -1383,19 +1385,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  int  $amount
      * @param  array  $extra
      * @param  string  $method
+     * @param  array  $options
      * @return int
      */
-    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    protected function incrementOrDecrement($column, $amount, $extra, $method, $options)
     {
         $query = $this->newQuery();
 
         if (! $this->exists) {
-            return $query->{$method}($column, $amount, $extra);
+            return $query->{$method}($column, $amount, $extra, $options);
         }
 
         $this->incrementOrDecrementAttributeValue($column, $amount, $method);
 
-        return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount, $extra);
+        return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount, $extra, $options);
     }
 
     /**
@@ -1559,7 +1562,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $dirty = $this->getDirty();
 
             if (count($dirty) > 0) {
-                $numRows = $this->setKeysForSaveQuery($query)->update($dirty);
+                $numRows = $this->setKeysForSaveQuery($query)->update($dirty, $options);
 
                 $this->fireModelEvent('updated', false);
             }
