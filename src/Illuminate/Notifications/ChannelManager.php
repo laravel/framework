@@ -127,4 +127,17 @@ class ChannelManager extends Manager implements FactoryContract
     {
         $this->defaultChannels = (array) $channels;
     }
+
+    /**
+     * Build a new channel notification from the given object.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @param  array|null  $channels
+     * @return array
+     */
+    public function notificationsFromInstance($notifiable, $notification, $channels = null)
+    {
+        return Channels\Notification::notificationsFromInstance($notifiable, $notification, $channels);
+    }
 }
