@@ -134,7 +134,6 @@ class ChannelManager extends Manager implements FactoryContract
      * @param  mixed  $notifiable
      * @param  mixed  $notification
      * @param  array|null  $channels
-     *
      * @return array
      */
     public function notificationsFromInstance($notifiable, $notification, $channels = null)
