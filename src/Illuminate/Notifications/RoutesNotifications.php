@@ -17,7 +17,7 @@ trait RoutesNotifications
     {
         $manager = app(ChannelManager::class);
 
-        $notifications = Channels\Notification::notificationsFromInstance(
+        $notifications = $manager->notificationsFromInstance(
             $this, $instance
         );
 
@@ -41,7 +41,7 @@ trait RoutesNotifications
     {
         $manager = app(ChannelManager::class);
 
-        $notifications = Channels\Notification::notificationsFromInstance(
+        $notifications = $manager->notificationsFromInstance(
             $this, $instance, (array) $channels
         );
 
