@@ -31,8 +31,22 @@ class StorageLinkCommand extends Command
             return $this->error('The "public/storage" directory already exists.');
         }
 
-        symlink(storage_path('app/public'), public_path('storage'));
+        if ($this->isWindows()) {
+            exec('mklink /J "'.public_path('storage').'" "'.storage_path('app/public').'"');
+        } else {
+            symlink(storage_path('app/public'), public_path('storage'));
+        }
 
         $this->info('The [public/storage] directory has been linked.');
+    }
+
+    /**
+     * Checks whether the system is running on Windows.
+     *
+     * @return bool
+     */
+    protected function isWindows()
+    {
+        return DIRECTORY_SEPARATOR == '\\';
     }
 }
