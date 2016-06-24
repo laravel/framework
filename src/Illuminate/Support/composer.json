@@ -21,7 +21,7 @@
         "paragonie/random_compat": "~1.4"
     },
     "replace": {
-	"tightenco/collect": "self.version"
+        "tightenco/collect": "self.version"
     },
     "autoload": {
         "psr-4": {
