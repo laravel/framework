@@ -108,6 +108,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
         if ($this->first($key) !== '') {
             return $true;
         }
+
         return $false;
     }
 
