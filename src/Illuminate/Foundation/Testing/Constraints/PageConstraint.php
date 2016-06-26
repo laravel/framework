@@ -78,7 +78,7 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
         );
 
         if (! empty($description)) {
-            $failureDescription .= ": $description";
+            $failureDescription .= ": {$description}";
         }
 
         if (trim($html) != '') {
