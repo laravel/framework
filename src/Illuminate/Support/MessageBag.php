@@ -116,7 +116,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function hasAll($keys = [], $true = true, $false = false)
     {
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if ($this->first($key) === '') {
                 return $false;
             }
@@ -135,7 +135,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function hasAny($keys = [], $true = true, $false = false)
     {
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if ($this->first($key) !== '') {
                 return $true;
             }
