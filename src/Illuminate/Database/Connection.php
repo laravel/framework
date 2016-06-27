@@ -334,11 +334,16 @@ class Connection implements ConnectionInterface
 
             $statement->execute($me->prepareBindings($bindings));
 
+            $fetchMode = $me->getFetchMode();
             $fetchArgument = $me->getFetchArgument();
 
-            return isset($fetchArgument) ?
-                $statement->fetchAll($me->getFetchMode(), $fetchArgument, $me->getFetchConstructorArgument()) :
-                $statement->fetchAll($me->getFetchMode());
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+            }
+
+            return isset($fetchArgument)
+                ? $statement->fetchAll($fetchMode, $fetchArgument, $me->getFetchConstructorArgument())
+                : $statement->fetchAll($fetchMode);
         });
     }
 
@@ -359,10 +364,17 @@ class Connection implements ConnectionInterface
 
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            if ($me->getFetchMode() === PDO::FETCH_CLASS) {
-                $statement->setFetchMode($me->getFetchMode(), 'StdClass');
+            $fetchMode = $me->getFetchMode();
+            $fetchArgument = $me->getFetchArgument();
+
+            if ($fetchMode === PDO::FETCH_CLASS && ! isset($fetchArgument)) {
+                $fetchArgument = 'StdClass';
+            }
+
+            if (isset($fetchArgument)) {
+                $statement->setFetchMode($fetchMode, $fetchArgument, $me->getFetchConstructorArgument());
             } else {
-                $statement->setFetchMode($me->getFetchMode());
+                $statement->setFetchMode($fetchMode);
             }
 
             $statement->execute($me->prepareBindings($bindings));
