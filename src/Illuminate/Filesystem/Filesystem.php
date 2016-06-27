@@ -195,7 +195,7 @@ class Filesystem
      */
     public function link($target, $link)
     {
-        if (! $this->isWindows()) {
+        if (! windows_os()) {
             return symlink($target, $link);
         }
 
@@ -507,15 +507,5 @@ class Filesystem
     public function cleanDirectory($directory)
     {
         return $this->deleteDirectory($directory, true);
-    }
-
-    /**
-     * Checks whether the system is running on Windows.
-     *
-     * @return bool
-     */
-    protected function isWindows()
-    {
-        return DIRECTORY_SEPARATOR == '\\';
     }
 }
