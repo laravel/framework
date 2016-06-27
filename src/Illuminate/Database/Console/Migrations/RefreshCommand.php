@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Support\Arr;
 use Symfony\Component\Console\Input\InputOption;
 
 class RefreshCommand extends Command
@@ -41,9 +42,15 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
-        $this->call('migrate:reset', [
-            '--database' => $database, '--force' => $force,
-        ]);
+        if (($step = Arr::get($this->getOptions(), $this->input->getOption('step'), 0)) > 0) {
+            $this->call('migrate:rollback', [
+                '--database' => $database, '--force' => $force, '--step' => $step,
+            ]);
+        } else {
+            $this->call('migrate:reset', [
+                '--database' => $database, '--force' => $force,
+            ]);
+        }
 
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
@@ -103,6 +110,8 @@ class RefreshCommand extends Command
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
+
+            ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted & re-run.'],
         ];
     }
 }
