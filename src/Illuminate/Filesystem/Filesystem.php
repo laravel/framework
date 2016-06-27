@@ -187,6 +187,24 @@ class Filesystem
     }
 
     /**
+     * Create a hard link to the target file or directory.
+     *
+     * @param  string  $target
+     * @param  string  $link
+     * @return void
+     */
+    public function link($target, $link)
+    {
+        if (! $this->isWindows()) {
+            return symlink($target, $link);
+        }
+
+        $mode = $this->isDirectory($target) ? 'J' : 'H';
+
+        exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+    }
+
+    /**
      * Extract the file name from a file path.
      *
      * @param  string  $path
@@ -489,5 +507,15 @@ class Filesystem
     public function cleanDirectory($directory)
     {
         return $this->deleteDirectory($directory, true);
+    }
+
+    /**
+     * Checks whether the system is running on Windows.
+     *
+     * @return bool
+     */
+    protected function isWindows()
+    {
+        return DIRECTORY_SEPARATOR == '\\';
     }
 }
