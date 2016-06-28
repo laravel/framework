@@ -82,6 +82,18 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     }
 
     /**
+     * Manually indicate that the paginator does have more pages.
+     *
+     * @return $this
+     */
+    public function doesHaveMorePages()
+    {
+        $this->hasMore = true;
+
+        return $this;
+    }
+
+    /**
      * Determine if there are more items in the data source.
      *
      * @return bool
