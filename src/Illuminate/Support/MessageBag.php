@@ -99,11 +99,17 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      * Determine if messages exist for a given key.
      *
      * @param  string  $key
-     * @return bool
+     * @param  mixed   $true     The return value if true
+     * @param  mixed   $false    The return value if false
+     * @return bool|string
      */
-    public function has($key = null)
+    public function has($key = null, $true = true, $false = false)
     {
-        return $this->first($key) !== '';
+        if ($this->first($key) !== '') {
+            return $true;
+        }
+
+        return $false;
     }
 
     /**
