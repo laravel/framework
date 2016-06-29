@@ -62,10 +62,9 @@ class Authorize
 
         $gate_args = [];
         foreach ($model_args as $model) {
-            if (strpos($model, '\\') !== FALSE) {
+            if (strpos($model, '\\') !== false) {
                 $gate_args[] = $model;
-            }
-            else {
+            } else {
                 $gate_args[] = $request->route($model);
             }
         }
