@@ -38,8 +38,8 @@ class SparkPostTransport extends Transport
      */
     public function __construct(ClientInterface $client, $key, $options = [])
     {
-        $this->client = $client;
         $this->key = $key;
+        $this->client = $client;
         $this->options = $options;
     }
 
