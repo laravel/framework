@@ -62,7 +62,6 @@ class Authorize
 
         $gate_args = [];
         foreach ($model_args as $model) {
-
             if (strpos($model, '\\') !== FALSE) {
                 $gate_args[] = $model;
             }
