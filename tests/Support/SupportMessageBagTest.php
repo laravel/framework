@@ -86,16 +86,16 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasAny(['baz']));
     }
 
-    public function testHasAllIndicatesExistence()
+    public function testHasIndicatesExistenceOfAllKeys()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('bar', 'foo');
         $container->add('boom', 'baz');
-        $this->assertTrue($container->hasAll(['foo', 'bar', 'boom']));
-        $this->assertFalse($container->hasAll(['foo', 'bar', 'boom', 'baz']));
-        $this->assertFalse($container->hasAll(['foo', 'baz']));
+        $this->assertTrue($container->has(['foo', 'bar', 'boom']));
+        $this->assertFalse($container->has(['foo', 'bar', 'boom', 'baz']));
+        $this->assertFalse($container->has(['foo', 'baz']));
     }
 
     public function testAllReturnsAllMessages()
