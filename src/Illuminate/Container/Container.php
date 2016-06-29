@@ -190,7 +190,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         // If no concrete type was given, we will simply set the concrete type to the
-        // abstract type. This will allow the concrete type to be registered as shared
+        // abstract type. After that, the concrete type to be registered as shared
         // without being forced to state their classes in both of the parameters.
         $this->dropStaleInstances($abstract);
 
