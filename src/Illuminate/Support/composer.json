@@ -20,6 +20,9 @@
         "illuminate/contracts": "5.3.*",
         "paragonie/random_compat": "~1.4|~2.0"
     },
+    "replace": {
+        "tightenco/collect": "self.version"
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Support\\": ""

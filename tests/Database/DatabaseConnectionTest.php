@@ -303,7 +303,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $stmt->expects($this->exactly(3))->method('fetchAll')->withConsecutive(
             [PDO::FETCH_ASSOC],
             [PDO::FETCH_COLUMN, 3, []],
-            [PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]]
+            [PDO::FETCH_CLASS, 'ClassName', [1, 2, 3]]
         );
         $pdo = $this->createMock('DatabaseConnectionTestMockPDO');
         $pdo->expects($this->any())->method('prepare')->will($this->returnValue($stmt));
@@ -312,7 +312,7 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $connection->select('SELECT * FROM foo');
         $connection->setFetchMode(PDO::FETCH_COLUMN, 3);
         $connection->select('SELECT * FROM foo');
-        $connection->setFetchMode(PDO::FETCH_CLASS, 'stdClass', [1, 2, 3]);
+        $connection->setFetchMode(PDO::FETCH_CLASS, 'ClassName', [1, 2, 3]);
         $connection->select('SELECT * FROM foo');
     }
 

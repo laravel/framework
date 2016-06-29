@@ -134,7 +134,9 @@ class TransportManager extends Manager
         $config = $this->app['config']->get('services.sparkpost', []);
 
         return new SparkPostTransport(
-            $this->getHttpClient($config), $config['secret']
+            $this->getHttpClient($config),
+            $config['secret'],
+            Arr::get($config, 'options', [])
         );
     }
 
