@@ -1154,6 +1154,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Passes the collection into the callback, and returns the result.
+     * @param  callable $callback
+     * @return callable
+     */
+    public function pipe(callable $callback)
+    {
+        $callback($this);
+        return $this;
+    }
+
+    /**
      * Results array of items from Collection or Arrayable.
      *
      * @param  mixed  $items

@@ -1273,6 +1273,38 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection([1, 2, 3]);
         $data->random(4);
     }
+
+    public function testPipe()
+    {
+        $data = new Collection([
+            'a' => [
+                'po_01' => 'value in pos 01',
+                'po_02' => 'value in pos 01'
+            ],
+
+            'b' => [
+                'po_01' => 'value in pos 01',
+                'po_02' => 'value in pos 01',
+                'sub' => [
+                    'c' => [
+                        'po_01' => 'value in pos 01',
+                        'po_02' => 'value in pos 01',
+                    ]
+                ]
+            ],
+        ]);
+
+        $data->filter(function ($item) {
+            return collect($item)->has('sub');
+        })->map(function ($item, $key) {
+            return $item['sub'];
+        //pipe implementation.
+        })->pipe(function ($items) {
+            //do something amazing within the chain.
+        })->pipe(function ($items) {
+           //because it is fluent, it can add as much as it is needed.
+        });
+    }
 }
 
 class TestAccessorEloquentTestStub
