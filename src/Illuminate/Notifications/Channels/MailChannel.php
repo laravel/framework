@@ -55,7 +55,7 @@ class MailChannel
 
         $view = data_get($notification, 'options.view', 'notifications::email');
 
-        $this->mailer->send('notifications::email', $data, function ($m) use ($notification, $emails) {
+        $this->mailer->send($view, $data, function ($m) use ($notification, $emails) {
             count($notification->notifiables) === 1
                         ? $m->to($emails) : $m->bcc($emails);
 
