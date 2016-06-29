@@ -57,14 +57,14 @@ class BroadcastEvent
      */
     protected function getPayloadFromEvent($event)
     {
+        if (method_exists($event, 'broadcastWith')) {
+            return $event->broadcastWith();
+        }
+
         $payload = [];
 
         foreach ((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
-        }
-
-        if (method_exists($event, 'broadcastWith')) {
-            return $payload + $event->broadcastWith();
         }
 
         return $payload;
