@@ -96,7 +96,7 @@ class MailgunTransport extends Transport
         );
 
         foreach ($contacts as $address => $display) {
-            $formatted[] = $display ? $display." <$address>" : $address;
+            $formatted[] = $display ? $display." <{$address}>" : $address;
         }
 
         return implode(',', $formatted);
