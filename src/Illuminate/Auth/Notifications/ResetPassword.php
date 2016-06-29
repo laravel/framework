@@ -39,7 +39,7 @@ class ResetPassword extends Notification
      * Get the notification message.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return \Illuminate\Notifications\MessageBuilder
      */
     public function message($notifiable)
     {

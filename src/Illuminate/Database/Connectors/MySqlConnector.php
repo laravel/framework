@@ -35,8 +35,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
         if (isset($config['charset'])) {
             $charset = $config['charset'];
 
-            $names = "set names '$charset'".
-                (! is_null($collation) ? " collate '$collation'" : '');
+            $names = "set names '{$charset}'".
+                (! is_null($collation) ? " collate '{$collation}'" : '');
 
             $connection->prepare($names)->execute();
         }
@@ -116,7 +116,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         if (isset($config['modes'])) {
             $modes = implode(',', $config['modes']);
 
-            $connection->prepare("set session sql_mode='".$modes."'")->execute();
+            $connection->prepare("set session sql_mode='{$modes}'")->execute();
         } elseif (isset($config['strict'])) {
             if ($config['strict']) {
                 $connection->prepare("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'")->execute();
