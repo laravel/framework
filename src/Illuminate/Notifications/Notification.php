@@ -28,6 +28,18 @@ class Notification
                         : Str::title(Str::snake(class_basename($this), ' '));
     }
 
+     /**
+     * Get the notification channel payload data.
+     *
+     * @return array
+     */
+    public function payload()
+    {
+        return property_exists($this, 'payload')
+                        ? $this->payload
+                        : [];
+    }
+
     /**
      * Create a new message builder instance.
      *

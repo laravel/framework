@@ -82,6 +82,13 @@ class Notification implements Arrayable
     public $actionUrl;
 
     /**
+     * The data payload of the notification.
+     *
+     * @var array
+     */
+    public $payload = [];
+
+    /**
      * Create a new notification instance.
      *
      * @param  array  $notifiables
@@ -187,6 +194,21 @@ class Notification implements Arrayable
         return $this;
     }
 
+
+
+    /**
+     * Set the data payload of the notification.
+     *
+     * @param  array  $payload
+     * @return $this
+     */
+    public function payload(array $payload)
+    {
+        $this->payload = $payload;
+
+        return $this;
+    }
+
     /**
      * Configure the "call to action" button.
      *
@@ -253,6 +275,10 @@ class Notification implements Arrayable
             foreach ($instance->{$method}($notifiable)->elements as $element) {
                 $notification->with($element);
             }
+
+            $method = static::payloadMethod($instance, $channel);
+
+            $notification->payload($instance->{$method}($notifiable));
         }
 
         return $notifications;
@@ -270,6 +296,20 @@ class Notification implements Arrayable
         return method_exists(
             $instance, $channelMethod = Str::camel($channel).'Message'
         ) ? $channelMethod : 'message';
+    }
+
+    /**
+     * Get the proper data method for the given instance and channel.
+     *
+     * @param  mixed  $instance
+     * @param  string  $channel
+     * @return string
+     */
+    protected static function payloadMethod($instance, $channel)
+    {
+        return method_exists(
+            $instance, $channelMethod = Str::camel($channel).'Payload'
+        ) ? $channelMethod : 'payload';
     }
 
     /**
