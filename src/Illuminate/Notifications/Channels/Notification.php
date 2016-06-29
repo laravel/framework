@@ -194,8 +194,6 @@ class Notification implements Arrayable
         return $this;
     }
 
-
-
     /**
      * Set the data payload of the notification.
      *
