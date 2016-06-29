@@ -68,6 +68,7 @@ class Authorize
                 $gate_args[] = $request->route($model);
             }
         }
+
         return $gate_args;
     }
 }
