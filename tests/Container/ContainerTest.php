@@ -212,7 +212,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
 
             return $obj;
         });
-        
+
         $this->assertEquals('foo', $container->make('foo')->foo);
         $this->assertEquals('baz', $container->make('foo')->bar);
         $this->assertEquals('foo', $container->make('foo')->baz);
