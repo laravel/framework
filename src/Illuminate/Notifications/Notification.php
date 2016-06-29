@@ -28,7 +28,7 @@ class Notification
                         : Str::title(Str::snake(class_basename($this), ' '));
     }
 
-     /**
+    /**
      * Get the notification channel payload data.
      *
      * @return array
