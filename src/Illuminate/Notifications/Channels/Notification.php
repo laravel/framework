@@ -86,7 +86,7 @@ class Notification implements Arrayable
      *
      * @var array
      */
-    public $payload = [];
+    public $options = [];
 
     /**
      * Create a new notification instance.
@@ -195,14 +195,14 @@ class Notification implements Arrayable
     }
 
     /**
-     * Set the data payload of the notification.
+     * Set the data options of the notification.
      *
-     * @param  array  $payload
+     * @param  array  $options
      * @return $this
      */
-    public function payload(array $payload)
+    public function options(array $options)
     {
-        $this->payload = $payload;
+        $this->options = $options;
 
         return $this;
     }
@@ -274,9 +274,9 @@ class Notification implements Arrayable
                 $notification->with($element);
             }
 
-            $method = static::payloadMethod($instance, $channel);
+            $method = static::optionsMethod($instance, $channel);
 
-            $notification->payload($instance->{$method}($notifiable));
+            $notification->options($instance->{$method}($notifiable));
         }
 
         return $notifications;
@@ -303,11 +303,11 @@ class Notification implements Arrayable
      * @param  string  $channel
      * @return string
      */
-    protected static function payloadMethod($instance, $channel)
+    protected static function optionsMethod($instance, $channel)
     {
         return method_exists(
-            $instance, $channelMethod = Str::camel($channel).'Payload'
-        ) ? $channelMethod : 'payload';
+            $instance, $channelMethod = Str::camel($channel).'Options'
+        ) ? $channelMethod : 'options';
     }
 
     /**

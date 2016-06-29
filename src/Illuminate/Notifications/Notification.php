@@ -29,14 +29,14 @@ class Notification
     }
 
     /**
-     * Get the notification channel payload data.
+     * Get the notification channel options data.
      *
      * @return array
      */
-    public function payload()
+    public function options()
     {
-        return property_exists($this, 'payload')
-                        ? $this->payload
+        return property_exists($this, 'options')
+                        ? $this->options
                         : [];
     }
 
