@@ -283,7 +283,6 @@ trait MocksApplicationServices
                 if (($dispatched['notifiable'] === $notifiable ||
                     $dispatched['notifiable']->getKey() == $notifiable->getKey()) &&
                     get_class($dispatched['instance']) === $notification) {
-
                     return $this;
                 }
             }
