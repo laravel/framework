@@ -9,7 +9,7 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
         Mockery::close();
     }
 
-    public function testSmsIsSentViaNexmo()
+    public function testCorrectPayloadIsSentToSlack()
     {
         $notification = new Notification([
             $notifiable = new NotificationSlackChannelTestNotifiable,
