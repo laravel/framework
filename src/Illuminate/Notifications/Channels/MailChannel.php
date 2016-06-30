@@ -16,22 +16,13 @@ class MailChannel
     protected $mailer;
 
     /**
-     * The view factory implementation.
-     *
-     * @var \Illuminate\Contracts\View\Factory
-     */
-    protected $views;
-
-    /**
      * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  \Illuminate\Contracts\View\Factory  $views
      * @return void
      */
-    public function __construct(Mailer $mailer, ViewFactory $views)
+    public function __construct(Mailer $mailer)
     {
-        $this->views = $views;
         $this->mailer = $mailer;
     }
 
