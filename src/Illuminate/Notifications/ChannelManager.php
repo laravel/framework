@@ -4,10 +4,14 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
+use GuzzleHttp\Client as HttpClient;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
-class ChannelManager extends Manager implements FactoryContract
+class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
     /**
      * The default channels used to deliver messages.
@@ -25,6 +29,52 @@ class ChannelManager extends Manager implements FactoryContract
     public function to($notifiables)
     {
         return new Channels\Notification($this, $notifiables);
+    }
+
+    /**
+     * Dispatch the given notification instance to the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $instance
+     * @param  array  $channels
+     * @return void
+     */
+    public function dispatch($notifiable, $instance, array $channels = [])
+    {
+        $notifications = $this->notificationsFromInstance(
+            $notifiable, $instance
+        );
+
+        if (count($channels) > 0) {
+            foreach ($notifications as $notification) {
+                $notification->via((array) $channels);
+            }
+        }
+
+        if ($instance instanceof ShouldQueue) {
+            return $this->queueNotifications($instance, $notifications);
+        }
+
+        foreach ($notifications as $notification) {
+            $this->send($notification);
+        }
+    }
+
+    /**
+     * Queue the given notification instances.
+     *
+     * @param  mixed  $instance
+     * @param  array[\Illuminate\Notifcations\Channels\Notification]
+     * @return void
+     */
+    protected function queueNotifications($instance, array $notifications)
+    {
+        $this->app->make(Bus::class)->dispatch(
+            (new SendQueuedNotifications($notifications))
+                    ->onConnection($instance->connection)
+                    ->onQueue($instance->queue)
+                    ->delay($instance->delay)
+        );
     }
 
     /**
@@ -49,6 +99,17 @@ class ChannelManager extends Manager implements FactoryContract
         $this->app->make('events')->fire(
             new Events\NotificationSent($notification)
         );
+    }
+
+    /**
+     * Get a channel instance.
+     *
+     * @param  string  $driver
+     * @return mixed
+     */
+    public function channel($name = null)
+    {
+        return $this->driver($name);
     }
 
     /**
@@ -94,7 +155,7 @@ class ChannelManager extends Manager implements FactoryContract
      */
     protected function createSlackDriver()
     {
-        return $this->app->make(Channels\SlackWebhookChannel::class);
+        return new Channels\SlackWebhookChannel(new HttpClient);
     }
 
     /**

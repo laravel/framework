@@ -8,6 +8,7 @@ use Illuminate\Notifications\Action;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Database\Eloquent\Collection;
 
 class Notification implements Arrayable
 {
@@ -82,6 +83,13 @@ class Notification implements Arrayable
     public $actionUrl;
 
     /**
+     * The notification's options.
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
      * Create a new notification instance.
      *
      * @param  array  $notifiables
@@ -89,7 +97,7 @@ class Notification implements Arrayable
      */
     public function __construct($notifiables)
     {
-        $this->notifiables = \Illuminate\Database\Eloquent\Collection::make($notifiables);
+        $this->notifiables = Collection::make($notifiables);
     }
 
     /**
@@ -188,6 +196,19 @@ class Notification implements Arrayable
     }
 
     /**
+     * Set the notification's options.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
      * Configure the "call to action" button.
      *
      * @param  string  $text
@@ -253,6 +274,10 @@ class Notification implements Arrayable
             foreach ($instance->{$method}($notifiable)->elements as $element) {
                 $notification->with($element);
             }
+
+            $method = static::optionsMethod($instance, $channel);
+
+            $notification->options($instance->{$method}($notifiable));
         }
 
         return $notifications;
@@ -270,6 +295,20 @@ class Notification implements Arrayable
         return method_exists(
             $instance, $channelMethod = Str::camel($channel).'Message'
         ) ? $channelMethod : 'message';
+    }
+
+    /**
+     * Get the proper data method for the given instance and channel.
+     *
+     * @param  mixed  $instance
+     * @param  string  $channel
+     * @return string
+     */
+    protected static function optionsMethod($instance, $channel)
+    {
+        return method_exists(
+            $instance, $channelMethod = Str::camel($channel).'Options'
+        ) ? $channelMethod : 'options';
     }
 
     /**

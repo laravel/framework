@@ -34,8 +34,18 @@ class Notification
      * @param  string  $line
      * @return \Illuminate\Notifications\MessageBuilder
      */
-    protected function line($line)
+    public function line($line)
     {
         return new MessageBuilder($line);
+    }
+
+    /**
+     * Get the notification's options.
+     *
+     * @return array
+     */
+    public function options()
+    {
+        return property_exists($this, 'options') ? $this->options : [];
     }
 }
