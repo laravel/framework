@@ -4,6 +4,8 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 
@@ -25,6 +27,52 @@ class ChannelManager extends Manager implements FactoryContract
     public function to($notifiables)
     {
         return new Channels\Notification($this, $notifiables);
+    }
+
+    /**
+     * Dispatch the given notification instance to the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $instance
+     * @param  array  $channels
+     * @return void
+     */
+    public function dispatch($notifiable, $instance, array $channels = [])
+    {
+        $notifications = $this->notificationsFromInstance(
+            $notifiable, $instance
+        );
+
+        if (count($channels) > 0) {
+            foreach ($notifications as $notification) {
+                $notification->via((array) $channels);
+            }
+        }
+
+        if ($instance instanceof ShouldQueue) {
+            return $this->queueNotifications($instance, $notifications);
+        }
+
+        foreach ($notifications as $notification) {
+            $this->send($notification);
+        }
+    }
+
+    /**
+     * Queue the given notification instances.
+     *
+     * @param  mixed  $instance
+     * @param  array[\Illuminate\Notifcations\Channels\Notification]
+     * @return void
+     */
+    protected function queueNotifications($instance, array $notifications)
+    {
+        $this->app->make(Bus::class)->dispatch(
+            (new SendQueuedNotifications($notifications))
+                    ->onConnection($instance->connection)
+                    ->onQueue($instance->queue)
+                    ->delay($instance->delay)
+        );
     }
 
     /**

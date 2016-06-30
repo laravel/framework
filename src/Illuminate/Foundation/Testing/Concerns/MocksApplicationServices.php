@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Mockery;
 use Exception;
+use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 
 trait MocksApplicationServices
 {
@@ -20,6 +21,13 @@ trait MocksApplicationServices
      * @var array
      */
     protected $dispatchedJobs = [];
+
+    /**
+     * All of the dispatched notifications.
+     *
+     * @var array
+     */
+    protected $dispatchedNotifications = [];
 
     /**
      * Specify a list of events that should be fired for the given operation.
@@ -237,5 +245,54 @@ trait MocksApplicationServices
         }
 
         return false;
+    }
+
+    /**
+     * Mock the notification dispatcher so all notifications are silenced.
+     *
+     * @return $this
+     */
+    protected function withoutNotifications()
+    {
+        $mock = Mockery::mock(NotificationFactory::class);
+
+        $mock->shouldReceive('dispatch')->andReturnUsing(function ($notifiable, $instance, $channels = []) {
+            $this->dispatchedNotifications[] = compact(
+                'notifiable', 'instance', 'channels'
+            );
+        });
+
+        $this->app->instance(NotificationFactory::class, $mock);
+
+        return $this;
+    }
+
+    /**
+     * Specify a notification that is expected to be dispatched.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @return $this
+     */
+    protected function expectsNotification($notifiable, $notification)
+    {
+        $this->withoutNotifications();
+
+        $this->beforeApplicationDestroyed(function () use ($notifiable, $notification) {
+            foreach ($this->dispatchedNotifications as $dispatched) {
+                if (($dispatched['notifiable'] === $notifiable ||
+                    $dispatched['notifiable']->getKey() == $notifiable->getKey()) &&
+                    get_class($dispatched['instance']) === $notification) {
+
+                    return $this;
+                }
+            }
+
+            throw new Exception(
+                'The following expected notification were not dispatched: ['.$notification.']'
+            );
+        });
+
+        return $this;
     }
 }
