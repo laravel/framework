@@ -4,7 +4,6 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class MailChannel
 {
