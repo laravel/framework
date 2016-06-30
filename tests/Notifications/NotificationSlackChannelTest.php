@@ -55,6 +55,7 @@ class NotificationSlackChannelTestNotifiable
 {
     use Illuminate\Notifications\Notifiable;
     public $phone_number = '5555555555';
+
     public function routeNotificationForSlack()
     {
         return 'url';
