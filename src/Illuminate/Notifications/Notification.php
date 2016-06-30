@@ -34,7 +34,7 @@ class Notification
      * @param  string  $line
      * @return \Illuminate\Notifications\MessageBuilder
      */
-    protected function line($line)
+    public function line($line)
     {
         return new MessageBuilder($line);
     }
