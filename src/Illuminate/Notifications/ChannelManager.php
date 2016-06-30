@@ -4,6 +4,7 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
+use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
@@ -154,7 +155,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createSlackDriver()
     {
-        return $this->app->make(Channels\SlackWebhookChannel::class);
+        return new Channels\SlackWebhookChannel(new HttpClient);
     }
 
     /**

@@ -7,6 +7,24 @@ use GuzzleHttp\Client as HttpClient;
 class SlackWebhookChannel
 {
     /**
+     * The HTTP client instance.
+     *
+     * @var \GuzzleHttp\Client
+     */
+    protected $http;
+
+    /**
+     * Create a new Slack channel instance.
+     *
+     * @param  \GuzzleHttp\Client  $http
+     * @return void
+     */
+    public function __construct(HttpClient $http)
+    {
+        $this->http = $http;
+    }
+
+    /**
      * Send the given notification.
      *
      * @param  \Illuminate\Notifications\Channels\Notification  $notification
@@ -19,7 +37,7 @@ class SlackWebhookChannel
                 continue;
             }
 
-            $response = (new HttpClient)->post($url, [
+            $response = $this->http->post($url, [
                 'json' => [
                     'attachments' => [
                         array_filter([
