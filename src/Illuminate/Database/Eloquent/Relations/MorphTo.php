@@ -182,7 +182,7 @@ class MorphTo extends BelongsTo
 
         $key = $instance->getTable().'.'.$instance->getKeyName();
 
-        $query = $instance->newQuery();
+        $query = $instance->newQuery()->with($this->getQuery()->getEagerLoads());
 
         $query = $this->useWithTrashed($query);
 

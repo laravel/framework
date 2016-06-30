@@ -796,11 +796,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         list($type, $id) = $this->getMorphs($name, $type, $id);
 
         // If the type value is null it is probably safe to assume we're eager loading
-        // the relationship. When that is the case we will pass in a dummy query as
-        // there are multiple types in the morph and we can't use single queries.
+        // the relationship. In this case we'll just pass in a dummy query where we
+        // need to remove any eager loads that may already be defined on a model.
         if (empty($class = $this->$type)) {
             return new MorphTo(
-                $this->newQuery(), $this, $id, null, $type, $name
+                $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
             );
         }
 
