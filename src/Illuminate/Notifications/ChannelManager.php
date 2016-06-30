@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Nexmo\Client as NexmoClient;
 use GuzzleHttp\Client as HttpClient;
@@ -156,6 +157,27 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected function createSlackDriver()
     {
         return new Channels\SlackWebhookChannel(new HttpClient);
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @param  string  $driver
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function createDriver($driver)
+    {
+        try {
+            return parent::createDriver($driver);
+        } catch (InvalidArgumentException $e) {
+            if (class_exists($driver)) {
+                return $this->app->make($driver);
+            }
+
+            throw $e;
+        }
     }
 
     /**
