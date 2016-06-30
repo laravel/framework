@@ -83,7 +83,7 @@ class Notification implements Arrayable
     public $actionUrl;
 
     /**
-     * The data payload of the notification.
+     * The notification's options.
      *
      * @var array
      */
@@ -196,7 +196,7 @@ class Notification implements Arrayable
     }
 
     /**
-     * Set the data options of the notification.
+     * Set the notification's options.
      *
      * @param  array  $options
      * @return $this

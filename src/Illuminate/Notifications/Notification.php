@@ -29,18 +29,6 @@ class Notification
     }
 
     /**
-     * Get the notification channel options data.
-     *
-     * @return array
-     */
-    public function options()
-    {
-        return property_exists($this, 'options')
-                        ? $this->options
-                        : [];
-    }
-
-    /**
      * Create a new message builder instance.
      *
      * @param  string  $line
@@ -49,5 +37,15 @@ class Notification
     public function line($line)
     {
         return new MessageBuilder($line);
+    }
+
+    /**
+     * Get the notification's options.
+     *
+     * @return array
+     */
+    public function options()
+    {
+        return property_exists($this, 'options') ? $this->options : [];
     }
 }
