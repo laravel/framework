@@ -5,10 +5,12 @@ namespace Illuminate\Contracts\Notifications;
 interface Factory
 {
     /**
-     * Create a new notification for the given notifiable entities.
+     * Dispatch the given notification instance to the given notifiable.
      *
-     * @param  array  $notifiables
-     * @return \Illuminate\Notifications\Notification
+     * @param  mixed  $notifiable
+     * @param  mixed  $instance
+     * @param  array  $channels
+     * @return void
      */
-    public function to($notifiables);
+    public function dispatch($notifiable, $instance, array $channels = []);
 }
