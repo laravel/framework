@@ -38,4 +38,14 @@ class Notification
     {
         return new MessageBuilder($line);
     }
+
+    /**
+     * Get the notification's options.
+     *
+     * @return array
+     */
+    public function options()
+    {
+        return property_exists($this, 'options') ? $this->options : [];
+    }
 }
