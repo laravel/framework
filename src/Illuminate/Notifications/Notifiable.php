@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications;
 
-trait CanReceiveNotifications
+trait Notifiable
 {
     use HasDatabaseNotifications, RoutesNotifications;
 }

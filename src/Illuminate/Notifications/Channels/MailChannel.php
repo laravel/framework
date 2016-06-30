@@ -4,7 +4,6 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class MailChannel
 {
@@ -16,22 +15,13 @@ class MailChannel
     protected $mailer;
 
     /**
-     * The view factory implementation.
-     *
-     * @var \Illuminate\Contracts\View\Factory
-     */
-    protected $views;
-
-    /**
      * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  \Illuminate\Contracts\View\Factory  $views
      * @return void
      */
-    public function __construct(Mailer $mailer, ViewFactory $views)
+    public function __construct(Mailer $mailer)
     {
-        $this->views = $views;
         $this->mailer = $mailer;
     }
 
@@ -53,7 +43,9 @@ class MailChannel
             return;
         }
 
-        $this->mailer->send('notifications::email', $data, function ($m) use ($notification, $emails) {
+        $view = data_get($notification, 'options.view', 'notifications::email');
+
+        $this->mailer->send($view, $data, function ($m) use ($notification, $emails) {
             count($notification->notifiables) === 1
                         ? $m->to($emails) : $m->bcc($emails);
 
@@ -65,7 +57,7 @@ class MailChannel
      * Prepare the data from the given notification.
      *
      * @param  \Illuminate\Notifications\Channels\Notification  $notification
-     * @return void
+     * @return array
      */
     protected function prepareNotificationData($notification)
     {

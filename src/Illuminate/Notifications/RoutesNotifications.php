@@ -3,7 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Notifications\Dispatcher;
 
 trait RoutesNotifications
 {
@@ -15,19 +15,7 @@ trait RoutesNotifications
      */
     public function notify($instance)
     {
-        $manager = app(ChannelManager::class);
-
-        $notifications = $manager->notificationsFromInstance(
-            $this, $instance
-        );
-
-        if ($instance instanceof ShouldQueue) {
-            return $this->queueNotifications($instance, $notifications);
-        }
-
-        foreach ($notifications as $notification) {
-            $manager->send($notification);
-        }
+        app(Dispatcher::class)->dispatch($this, $instance);
     }
 
     /**
@@ -39,40 +27,7 @@ trait RoutesNotifications
      */
     public function notifyVia($channels, $instance)
     {
-        $manager = app(ChannelManager::class);
-
-        $notifications = $manager->notificationsFromInstance(
-            $this, $instance, (array) $channels
-        );
-
-        foreach ($notifications as $notification) {
-            $notification->via((array) $channels);
-        }
-
-        if ($instance instanceof ShouldQueue) {
-            return $this->queueNotifications($instance, $notifications);
-        }
-
-        foreach ($notifications as $notification) {
-            $manager->send($notification);
-        }
-    }
-
-    /**
-     * Queue the given notification instances.
-     *
-     * @param  mixed  $instance
-     * @param  array[\Illuminate\Notifcations\Channels\Notification]
-     * @return void
-     */
-    protected function queueNotifications($instance, array $notifications)
-    {
-        dispatch(
-            (new SendQueuedNotifications($notifications))
-                    ->onConnection($instance->connection)
-                    ->onQueue($instance->queue)
-                    ->delay($instance->delay)
-        );
+        app(Dispatcher::class)->dispatch($this, $instance, $channels);
     }
 
     /**

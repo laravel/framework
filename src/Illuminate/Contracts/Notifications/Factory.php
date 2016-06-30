@@ -5,10 +5,10 @@ namespace Illuminate\Contracts\Notifications;
 interface Factory
 {
     /**
-     * Create a new notification for the given notifiable entities.
+     * Get a channel instance by name.
      *
-     * @param  array  $notifiables
-     * @return \Illuminate\Notifications\Notification
+     * @param  string|null  $name
+     * @return mixed
      */
-    public function to($notifiables);
+    public function channel($name = null);
 }
