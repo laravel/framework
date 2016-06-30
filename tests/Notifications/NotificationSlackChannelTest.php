@@ -26,10 +26,6 @@ class NotificationSlackChannelTest extends PHPUnit_Framework_TestCase
             $http = Mockery::mock('GuzzleHttp\Client')
         );
 
-        // $http->shouldReceive('post')->andReturnUsing(function (...$args) {
-        //     dd($args);
-        // });
-
         $http->shouldReceive('post')->with('url', [
             'json' => [
                 'attachments' => [
