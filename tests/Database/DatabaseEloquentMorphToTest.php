@@ -64,6 +64,8 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
 
         $firstQuery->shouldReceive('newQuery')->once()->andReturn($firstQuery);
         $secondQuery->shouldReceive('newQuery')->once()->andReturn($secondQuery);
+        $secondQuery->shouldReceive('with')->once()->andReturn($secondQuery);
+        $firstQuery->shouldReceive('with')->once()->andReturn($firstQuery);
 
         $firstQuery->shouldReceive('whereIn')->once()->with('foreign_table_1.id', ['foreign_key_1'])->andReturn($firstQuery);
         $firstQuery->shouldReceive('get')->once()->andReturn(Collection::make([$resultOne = m::mock('StdClass')]));
@@ -146,6 +148,7 @@ class DatabaseEloquentMorphToTest extends PHPUnit_Framework_TestCase
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->shouldReceive('getEagerLoads')->andReturn([]);
         $parent = $parent ?: new EloquentMorphToModelStub;
         $morphTo = m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
 
