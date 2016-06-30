@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery as m;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
@@ -1652,6 +1654,95 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
         }, 'someIdField');
     }
 
+    public function testPaginate()
+    {
+        $perPage = 16;
+        $columns = ['test'];
+        $pageName = 'page-name';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWithDefaultArguments()
+    {
+        $perPage = 15;
+        $columns = ['*'];
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturn($builder);
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPageResolver(function () use ($path) {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate();
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWhenNoResults()
+    {
+        $perPage = 15;
+        $columns = ['*'];
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = [];
+
+        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(0);
+        $builder->shouldNotReceive('forPage');
+        $builder->shouldNotReceive('get');
+
+        Paginator::currentPageResolver(function () use ($path) {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate();
+
+        $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
     protected function getBuilder()
     {
         $grammar = new Illuminate\Database\Query\Grammars\Grammar;
@@ -1705,11 +1796,11 @@ class DatabaseQueryBuilderTest extends PHPUnit_Framework_TestCase
      */
     protected function getMockQueryBuilder()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder[forPageAfterId,get]', [
+        $builder = m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
-        ]);
+        ])->makePartial();
 
         return $builder;
     }
