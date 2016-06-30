@@ -3,6 +3,7 @@
 use Illuminate\Container\Container;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
 class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -32,6 +33,18 @@ class NotificationChannelManagerTest extends PHPUnit_Framework_TestCase
 
         $manager->dispatch(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
+
+    public function testNotificationCanBeQueued()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = Mockery::mock());
+        $bus->shouldReceive('dispatch')->with(Mockery::type(Illuminate\Notifications\SendQueuedNotifications::class));
+        Container::setInstance($container);
+        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+
+        $manager->dispatch(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestQueuedNotification);
+    }
 }
 
 class NotificationChannelManagerTestNotifiable
@@ -41,6 +54,21 @@ class NotificationChannelManagerTestNotifiable
 
 class NotificationChannelManagerTestNotification extends Notification
 {
+    public function via()
+    {
+        return ['test'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+}
+
+class NotificationChannelManagerTestQueuedNotification extends Notification implements Illuminate\Contracts\Queue\ShouldQueue
+{
+    use Illuminate\Bus\Queueable;
+
     public function via()
     {
         return ['test'];
