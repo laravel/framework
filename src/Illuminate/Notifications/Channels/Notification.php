@@ -8,6 +8,7 @@ use Illuminate\Notifications\Action;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Database\Eloquent\Collection;
 
 class Notification implements Arrayable
 {
@@ -89,7 +90,7 @@ class Notification implements Arrayable
      */
     public function __construct($notifiables)
     {
-        $this->notifiables = \Illuminate\Database\Eloquent\Collection::make($notifiables);
+        $this->notifiables = Collection::make($notifiables);
     }
 
     /**
