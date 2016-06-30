@@ -37,7 +37,7 @@ class SlackWebhookChannel
                 continue;
             }
 
-            $response = $this->http->post($url, [
+            $this->http->post($url, [
                 'json' => [
                     'attachments' => [
                         array_filter([
