@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Mockery;
 use Exception;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
 trait MocksApplicationServices
 {
@@ -254,7 +254,7 @@ trait MocksApplicationServices
      */
     protected function withoutNotifications()
     {
-        $mock = Mockery::mock(NotificationFactory::class);
+        $mock = Mockery::mock(NotificationDispatcher::class);
 
         $mock->shouldReceive('dispatch')->andReturnUsing(function ($notifiable, $instance, $channels = []) {
             $this->dispatchedNotifications[] = compact(
@@ -262,7 +262,7 @@ trait MocksApplicationServices
             );
         });
 
-        $this->app->instance(NotificationFactory::class, $mock);
+        $this->app->instance(NotificationDispatcher::class, $mock);
 
         return $this;
     }

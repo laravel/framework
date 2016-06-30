@@ -3,7 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Notifications\Dispatcher;
 
 trait RoutesNotifications
 {
@@ -15,7 +15,7 @@ trait RoutesNotifications
      */
     public function notify($instance)
     {
-        app(NotificationFactory::class)->dispatch($this, $instance);
+        app(Dispatcher::class)->dispatch($this, $instance);
     }
 
     /**
@@ -27,7 +27,7 @@ trait RoutesNotifications
      */
     public function notifyVia($channels, $instance)
     {
-        app(NotificationFactory::class)->dispatch($this, $instance, $channels);
+        app(Dispatcher::class)->dispatch($this, $instance, $channels);
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
 {
@@ -13,8 +13,8 @@ class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = Mockery::mock(NotificationFactory::class);
-        $container->instance(NotificationFactory::class, $factory);
+        $factory = Mockery::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new StdClass;
         $factory->shouldReceive('dispatch')->with($notifiable, $instance);
@@ -26,8 +26,8 @@ class NotificationRoutesNotificationsTest extends PHPUnit_Framework_TestCase
     public function testNotificationCanBeDispatchedToGivenChannels()
     {
         $container = new Container;
-        $factory = Mockery::mock(NotificationFactory::class);
-        $container->instance(NotificationFactory::class, $factory);
+        $factory = Mockery::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new StdClass;
         $factory->shouldReceive('dispatch')->with($notifiable, $instance, ['channel']);

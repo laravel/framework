@@ -8,8 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
-class ChannelManager extends Manager implements FactoryContract
+class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
     /**
      * The default channels used to deliver messages.
@@ -97,6 +98,17 @@ class ChannelManager extends Manager implements FactoryContract
         $this->app->make('events')->fire(
             new Events\NotificationSent($notification)
         );
+    }
+
+    /**
+     * Get a channel instance.
+     *
+     * @param  string  $driver
+     * @return mixed
+     */
+    public function channel($name = null)
+    {
+        return $this->driver($name);
     }
 
     /**
