@@ -176,4 +176,14 @@ class Encrypter implements EncrypterContract
 
         return hash_equals(hash_hmac('sha256', $payload['mac'], $bytes, true), $calcMac);
     }
+
+    /**
+     * Get the encryption key.
+     *
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
 }
