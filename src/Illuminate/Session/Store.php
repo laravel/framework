@@ -417,7 +417,7 @@ class Store implements SessionInterface
      * Increment the value of an item in the session.
      *
      * @param  string  $key
-     * @param  mixed   $amount
+     * @param  int  $amount
      * @return mixed
      */
     public function increment($key, $amount = 1)
@@ -433,7 +433,7 @@ class Store implements SessionInterface
      * Decrement the value of an item in the session.
      *
      * @param  string  $key
-     * @param  mixed   $amount
+     * @param  int  $amount
      * @return int
      */
     public function decrement($key, $amount = 1)
