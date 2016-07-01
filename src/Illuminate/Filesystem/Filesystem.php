@@ -405,10 +405,11 @@ class Filesystem
 
             return true;
         }
+
         if (@rename($directory, $destination) !== true) {
             return false;
         }
-        
+
         return true;
     }
 
