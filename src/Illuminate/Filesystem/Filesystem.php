@@ -402,11 +402,13 @@ class Filesystem
             $this->deleteDirectory($destination);
             $this->copyDirectory($directory, $destination);
             $this->deleteDirectory($directory);
+
             return true;
         }
         if (@rename($directory, $destination) !== true) {
             return false;
         }
+        
         return true;
     }
 
