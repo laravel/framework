@@ -251,6 +251,40 @@ class SessionStoreTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($session->getBag('bagged')->has('qu'));
     }
 
+    public function testIncrement()
+    {
+        $session = $this->getSession();
+
+        $session->set('foo', 5);
+        $foo = $session->increment('foo');
+        $this->assertEquals(6, $foo);
+        $this->assertEquals(6, $session->get('foo'));
+
+        $foo = $session->increment('foo', 4);
+        $this->assertEquals(10, $foo);
+        $this->assertEquals(10, $session->get('foo'));
+
+        $session->increment('bar');
+        $this->assertEquals(1, $session->get('bar'));
+    }
+
+    public function testDecrement()
+    {
+        $session = $this->getSession();
+
+        $session->set('foo', 5);
+        $foo = $session->decrement('foo');
+        $this->assertEquals(4, $foo);
+        $this->assertEquals(4, $session->get('foo'));
+
+        $foo = $session->decrement('foo', 4);
+        $this->assertEquals(0, $foo);
+        $this->assertEquals(0, $session->get('foo'));
+
+        $session->decrement('bar');
+        $this->assertEquals(-1, $session->get('bar'));
+    }
+
     public function testHasOldInputWithoutKey()
     {
         $session = $this->getSession();
