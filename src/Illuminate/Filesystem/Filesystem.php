@@ -398,7 +398,7 @@ class Filesystem
      */
     public function moveDirectory($directory, $destination, $overwrite = false)
     {
-        if($overwrite && $this->isDirectory($destination)) {
+        if ($overwrite && $this->isDirectory($destination)) {
             $this->deleteDirectory($destination);
             $this->copyDirectory($directory, $destination);
             $this->deleteDirectory($directory);
