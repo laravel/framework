@@ -76,7 +76,7 @@ class RedirectResponse extends BaseRedirectResponse
             if (is_array($value)) {
                 $value = array_filter($value, $callback);
             }
-            
+
             return $value instanceof SymfonyUploadedFile ? false : $value;
         }));
 
