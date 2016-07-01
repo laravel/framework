@@ -389,6 +389,31 @@ class Filesystem
     }
 
     /**
+     * Move a directory.
+     *
+     * @param  string  $directory
+     * @param  string  $destination
+     * @param  bool    $overwrite
+     * @return bool
+     */
+    public function moveDirectory($directory, $destination, $overwrite = false)
+    {
+        if ($overwrite && $this->isDirectory($destination)) {
+            $this->deleteDirectory($destination);
+            $this->copyDirectory($directory, $destination);
+            $this->deleteDirectory($directory);
+
+            return true;
+        }
+
+        if (@rename($directory, $destination) !== true) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Copy a directory from one location to another.
      *
      * @param  string  $directory
