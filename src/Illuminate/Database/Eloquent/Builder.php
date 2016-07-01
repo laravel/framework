@@ -695,7 +695,7 @@ class Builder
      * @param  string  $relation
      * @return array
      */
-    public function nestedRelations($relation)
+    protected function nestedRelations($relation)
     {
         $nested = [];
 
