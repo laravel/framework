@@ -1329,6 +1329,15 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $data = new Collection([1, 2, 3]);
         $data->random(4);
     }
+
+    public function testPipe()
+    {
+        $collection = new Collection([1, 2, 3]);
+
+        $this->assertEquals(6, $collection->pipe(function ($collection) {
+            return $collection->sum();
+        }));
+    }
 }
 
 class TestAccessorEloquentTestStub
