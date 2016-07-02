@@ -186,21 +186,43 @@ class DatabaseQueue extends Queue implements QueueContract
                     ->lockForUpdate()
                     ->where('queue', $this->getQueue($queue))
                     ->where(function ($query) {
-                        // Where not reserved.
-                        $query->where(function ($query) {
-                            $query->where('reserved', 0);
-                            $query->where('available_at', '<=', $this->getTime());
-                        });
-                        // Or where reserved and reservation has expired.
-                        $query->orWhere(function ($query) {
-                            $query->where('reserved', 1);
-                            $query->where('reserved_at', '<=', Carbon::now()->subSeconds($this->expire)->getTimestamp());
-                        });
+                        $this->isAvailable($query);
+                        $this->isReservedButExpired($query);
                     })
                     ->orderBy('id', 'asc')
                     ->first();
 
         return $job ? (object) $job : null;
+    }
+
+    /**
+     * Modify the query to check for available jobs.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return void
+     */
+    protected function isAvailable($query)
+    {
+        $query->where(function ($query) {
+            $query->where('reserved', 0);
+            $query->where('available_at', '<=', $this->getTime());
+        });
+    }
+
+    /**
+     * Modify the query to check for jobs that are reserved but have expired.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return void
+     */
+    protected function isReservedButExpired($query)
+    {
+        $expiration = Carbon::now()->subSeconds($this->expire)->getTimestamp();
+
+        $query->orWhere(function ($query) use ($expiration) {
+            $query->where('reserved', 1);
+            $query->where('reserved_at', '<=', $expiration);
+        });
     }
 
     /**
@@ -212,8 +234,8 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function markJobAsReserved($job)
     {
         $job->reserved = 1;
+        $job->attempts = $job->attempts + 1;
         $job->reserved_at = $this->getTime();
-        $job->attempts = ++$job->attempts;
 
         $this->database->table($this->table)->where('id', $job->id)->update([
             'reserved' => $job->reserved,
