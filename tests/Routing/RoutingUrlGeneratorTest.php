@@ -369,6 +369,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
         $url->getRequest()->headers->remove('referer');
         $this->assertEquals($url->to('/'), $url->previous());
+        
+        $this->assertEquals($url->to('/foo'), $url->previous(function () use ($url) {
+            return $url->to('/foo');
+        }));
     }
 }
 
