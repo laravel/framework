@@ -224,12 +224,41 @@ class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
     }
 
+    public function testPluckReturnsTheCastedAttributesOfAModel()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
+        $builder->setModel($this->getMockModel());
+        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(true);
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
+
+        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
+    }
+
+    public function testPluckReturnsTheDateAttributesOfAModel()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('pluck')->with('created_at', '')->andReturn(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
+        $builder->setModel($this->getMockModel());
+        $builder->getModel()->shouldReceive('hasGetMutator')->with('created_at')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('created_at')->andReturn(false);
+        $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['created_at' => '2010-01-01 00:00:00'])->andReturn(new EloquentBuilderTestPluckDatesStub(['created_at' => '2010-01-01 00:00:00']));
+        $builder->getModel()->shouldReceive('newFromBuilder')->with(['created_at' => '2011-01-01 00:00:00'])->andReturn(new EloquentBuilderTestPluckDatesStub(['created_at' => '2011-01-01 00:00:00']));
+
+        $this->assertEquals(['date_2010-01-01 00:00:00', 'date_2011-01-01 00:00:00'], $builder->pluck('created_at')->all());
+    }
+
     public function testPluckWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
     {
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
 
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
@@ -717,6 +746,21 @@ class EloquentBuilderTestPluckStub
     public function __get($key)
     {
         return 'foo_'.$this->attributes[$key];
+    }
+}
+
+class EloquentBuilderTestPluckDatesStub extends Illuminate\Database\Eloquent\Model
+{
+    protected $attributes;
+
+    public function __construct($attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    protected function asDateTime($value)
+    {
+        return 'date_'.$value;
     }
 }
 
