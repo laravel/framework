@@ -41,7 +41,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->queue = new DatabaseQueue($this->connection(), $this->table);
 
-        $this->container = $this->getMock(Container::class);
+        $this->container = $this->createMock(Container::class);
 
         $this->queue->setContainer($this->container);
 
