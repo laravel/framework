@@ -352,11 +352,16 @@ class Collection extends BaseCollection implements QueueableCollection
         return new BaseCollection($this->items);
     }
 
+    /**
+     * Batch update the dirty records of models.
+     *
+     * @return int|null
+     */
     public function update()
     {
         $dirties = [];
         $dirtyColumns = [];
-        /** @var Model $model */
+
         foreach ($this->items as $model) {
             $dirty = $model->getDirty();
             if (count($dirty)) {
@@ -378,6 +383,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $keyName = $model->getKeyName();
         $params = [];
         $columnUpdates = [];
+
         foreach ($dirtyColumns as $column => $rows) {
             $columnUpdate = "`$column` =  CASE";
             foreach ($rows as $row) {
