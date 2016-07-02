@@ -605,6 +605,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Pass the collection to the given callback and return the result.
+     *
+     * @param  callable $callback
+     * @return mixed
+     */
+    public function pipe(callable $callback)
+    {
+        return $callback($this);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
