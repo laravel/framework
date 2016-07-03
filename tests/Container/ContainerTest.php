@@ -649,6 +649,16 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf( 'ContainerConcreteStub', $result[0] );
 		$this->assertEquals( 'taylor', $result[1] );
 	}
+
+	/**
+	 * @group testCallWithGlobalMethodNameAnnotationWithHint
+	 */
+	public function testCallWithGlobalMethodNameAnnotationWithHint() {
+		$container = new Container;
+		$result    = $container->call( 'containerTestInjectAnnotationWithHint' );
+		$this->assertInstanceOf( 'ContainerImplementationStub', $result[0] );
+		$this->assertEquals( 'taylor', $result[1] );
+	}
 }
 
 class ContainerConcreteStub {
@@ -770,5 +780,17 @@ function containerTestInject( ContainerConcreteStub $stub, $default = 'taylor' )
  * @inject('stub', 'ContainerConcreteStub')
  */
 function containerTestInjectAnnotation( $stub, $default = 'taylor' ) {
+	return func_get_args();
+}
+
+/**
+ * @param IContainerContractStub $stub
+ * @param string                 $default
+ *
+ * @return array
+ *
+ * @inject('stub', 'ContainerImplementationStub')
+ */
+function containerTestInjectAnnotationWithHint( IContainerContractStub $stub, $default = 'taylor' ) {
 	return func_get_args();
 }
