@@ -138,21 +138,6 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Set a "where is null" clause for a pivot table column.
-     *
-     * @param  string  $column
-     * @param  string  $boolean
-     * @param  bool    $not
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function wherePivotNull($column, $boolean = 'and', $not = false)
-    {
-        $this->pivotWheres[] = func_get_args();
-
-        return $this->whereNull($this->table.'.'.$column, $boolean, $not);
-    }
-
-    /**
      * Set an "or where" clause for a pivot table column.
      *
      * @param  string  $column
