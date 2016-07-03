@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionFunction;
+use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use ReflectionParameter;
 
@@ -575,6 +576,7 @@ class Container implements ArrayAccess, ContainerContract {
 			unset( $parameters[ $parameter->name ] );
 		} elseif ( array_key_exists( $parameter->name, $injectAnnotations ) ) {
 			$dependencies[] = $this->make( $injectAnnotations[ $parameter->name ] );
+			unset( $injectAnnotations[ $parameter->name ] );
 		} elseif ( $parameter->getClass() ) {
 			$dependencies[] = $this->make( $parameter->getClass()->name );
 		} elseif ( $parameter->isDefaultValueAvailable() ) {
@@ -1245,17 +1247,16 @@ class Container implements ArrayAccess, ContainerContract {
 	}
 
 	/**
-	 * @param $reflectionFunction
+	 * @param ReflectionFunctionAbstract $reflectionFunction
 	 *
 	 * @return array
 	 */
-	protected function fetchInjectAnnotations( $reflectionFunction ) {
+	protected function fetchInjectAnnotations( ReflectionFunctionAbstract $reflectionFunction ) {
 		$phpDoc      = $reflectionFunction->getDocComment();
 		$annotations = [ ];
 		$matches     = [ ];
-		preg_match( "/@inject\('(\w+)', '(\w+)'\)/", $phpDoc, $matches );
-		for ( $i = 0, $l = count( $matches ); $i < $l; $i += 3 ) {
-			$annotations[ $matches[ $i + 1 ] ] = $matches[ $i + 2 ];
+		if ( preg_match_all( "/@inject\(\s*'(\w+)'\s*,\s*'(\w+)'\s*\)/", $phpDoc, $matches ) ) {
+			$annotations = array_combine( $matches[1], $matches[2] );
 		}
 
 		return $annotations;

@@ -464,6 +464,23 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( [ 'foo', 'bar' ], $result );
 	}
 
+	/**
+	 * @group  testCallWithAtSignBasedClassReferencesAnnotation
+	 */
+	public function testCallWithAtSignBasedClassReferencesAnnotation() {
+		$container = new Container;
+		$result    = $container->call( 'ContainerConcreteStubAnnotation@inject' );
+		$this->assertInstanceOf( 'ContainerImplementationStub', $result[0] );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $result[1] );
+		$this->assertEquals( 'taylor', $result[2] );
+
+		$container = new Container;
+		$result    = $container->call( 'ContainerConcreteStubAnnotation@inject', [ 'default' => 'foo' ] );
+		$this->assertInstanceOf( 'ContainerImplementationStub', $result[0] );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $result[1] );
+		$this->assertEquals( 'foo', $result[2] );
+	}
+
 	public function testCallWithCallableArray() {
 		$container = new Container;
 		$stub      = new ContainerTestCallStub();
@@ -657,7 +674,8 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$result    = $container->call( 'containerTestInjectAnnotationWithHint' );
 		$this->assertInstanceOf( 'ContainerImplementationStub', $result[0] );
-		$this->assertEquals( 'taylor', $result[1] );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $result[1] );
+		$this->assertEquals( 'taylor', $result[2] );
 	}
 }
 
@@ -737,6 +755,23 @@ class ContainerTestCallStub {
 	}
 }
 
+class ContainerConcreteStubAnnotation {
+
+	/**
+	 * @param IContainerContractStub $stub
+	 * @param                        $stub2
+	 * @param string                 $default
+	 *
+	 * @return array
+	 *
+	 * @inject('stub', 'ContainerImplementationStub')
+	 * @inject('stub2', 'ContainerConcreteStub')
+	 */
+	public function inject( IContainerContractStub $stub, $stub2, $default = 'taylor' ) {
+		return func_get_args();
+	}
+}
+
 class ContainerTestContextInjectOne {
 	public $impl;
 
@@ -785,12 +820,13 @@ function containerTestInjectAnnotation( $stub, $default = 'taylor' ) {
 
 /**
  * @param IContainerContractStub $stub
+ * @param                        $stub2
  * @param string                 $default
  *
  * @return array
- *
  * @inject('stub', 'ContainerImplementationStub')
+ * @inject('stub2', 'ContainerConcreteStub')
  */
-function containerTestInjectAnnotationWithHint( IContainerContractStub $stub, $default = 'taylor' ) {
+function containerTestInjectAnnotationWithHint( IContainerContractStub $stub, $stub2, $default = 'taylor' ) {
 	return func_get_args();
 }
