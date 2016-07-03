@@ -262,10 +262,22 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 	public function testResolutionOfDefaultParametersAnnotation() {
 		$container = new Container;
 		$instance  = $container->make( 'ContainerDefaultValueStubAnnotation' );
-		var_dump($instance);
 		$this->assertInstanceOf( 'ContainerImplementationStub', $instance->stub1 );
 		$this->assertInstanceOf( 'ContainerImplementationStubTwo', $instance->stub2 );
 		$this->assertInstanceOf( 'ContainerConcreteStub', $instance->stub3 );
+		$this->assertEquals( 'taylor', $instance->default );
+	}
+
+	/**
+	 * @group testResolutionOfDefaultParametersAndSetterAnnotation
+	 */
+	public function testResolutionOfDefaultParametersAndSetterAnnotation() {
+		$container = new Container;
+		$instance  = $container->make( 'ContainerDefaultValueStubAnnotation' );
+		$this->assertInstanceOf( 'ContainerImplementationStub', $instance->stub1 );
+		$this->assertInstanceOf( 'ContainerImplementationStubTwo', $instance->stub2 );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $instance->stub3 );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $instance->stub4 );
 		$this->assertEquals( 'taylor', $instance->default );
 	}
 
@@ -734,6 +746,7 @@ class ContainerDefaultValueStubAnnotation {
 	public $stub1;
 	public $stub2;
 	public $stub3;
+	public $stub4;
 	public $default;
 
 	/**
@@ -752,6 +765,16 @@ class ContainerDefaultValueStubAnnotation {
 		$this->stub2   = $stub2;
 		$this->stub3   = $stub3;
 		$this->default = $default;
+		$this->stub4   = null;
+	}
+
+	/**
+	 * @param  $stub4
+	 *
+	 * @inject('stub4', 'ContainerConcreteStub')
+	 */
+	public function setStub4( $stub4 ) {
+		$this->stub4 = $stub4;
 	}
 }
 

@@ -14,6 +14,8 @@ use ReflectionMethod;
 use ReflectionParameter;
 
 class Container implements ArrayAccess, ContainerContract {
+
+	const INJECT_ANNOTATION_PATTERN = '@inject\(\s*\'(\w+)\'\s*,\s*\'(\w+)\'\s*\)';
 	/**
 	 * The current globally available container (if any).
 	 *
@@ -789,7 +791,10 @@ class Container implements ArrayAccess, ContainerContract {
 
 		array_pop( $this->buildStack );
 
-		return $reflector->newInstanceArgs( $instances );
+		$instance = $reflector->newInstanceArgs( $instances );
+		$this->injectSetters( $instance );
+
+		return $instance;
 	}
 
 	/**
@@ -1263,10 +1268,29 @@ class Container implements ArrayAccess, ContainerContract {
 		$phpDoc      = $reflectionFunction->getDocComment();
 		$annotations = [ ];
 		$matches     = [ ];
-		if ( preg_match_all( "/@inject\(\s*'(\w+)'\s*,\s*'(\w+)'\s*\)/", $phpDoc, $matches ) ) {
+		if ( preg_match_all( "/" . self::INJECT_ANNOTATION_PATTERN . "/", $phpDoc, $matches ) ) {
 			$annotations = array_combine( $matches[1], $matches[2] );
 		}
 
 		return $annotations;
+	}
+
+	/**
+	 * Process public setters method that have the @inject annotation
+	 *
+	 * @param object $instance
+	 */
+	protected function injectSetters( $instance ) {
+		$reflection = new \ReflectionObject( $instance );
+
+		/** @var ReflectionMethod $method */
+		foreach ( $reflection->getMethods( ReflectionMethod::IS_PUBLIC ) as $method ) {
+			if ( strpos( $method->name, 'set' ) == 0 ) {
+				$phpDoc = $method->getDocComment();
+				if ( preg_match_all( "/" . self::INJECT_ANNOTATION_PATTERN . "/", $phpDoc ) > 0 ) {
+					$this->call( [ $instance, $method->name ] );
+				}
+			}
+		}
 	}
 }
