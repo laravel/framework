@@ -188,12 +188,12 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$container = new Container;
 		$container->bind( 'foo',
 			function () {
-				$obj      = new StdClass;
+				$obj      = new stdClass;
 				$obj->foo = 'bar';
 
 				return $obj;
 			} );
-		$obj      = new StdClass;
+		$obj      = new stdClass;
 		$obj->foo = 'foo';
 		$container->instance( 'foo', $obj );
 		$container->extend( 'foo',
@@ -256,6 +256,19 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( 'taylor', $instance->default );
 	}
 
+	/**
+	 * @group testResolutionOfDefaultParametersAnnotation
+	 */
+	public function testResolutionOfDefaultParametersAnnotation() {
+		$container = new Container;
+		$instance  = $container->make( 'ContainerDefaultValueStubAnnotation' );
+		var_dump($instance);
+		$this->assertInstanceOf( 'ContainerImplementationStub', $instance->stub1 );
+		$this->assertInstanceOf( 'ContainerImplementationStubTwo', $instance->stub2 );
+		$this->assertInstanceOf( 'ContainerConcreteStub', $instance->stub3 );
+		$this->assertEquals( 'taylor', $instance->default );
+	}
+
 	public function testResolvingCallbacksAreCalledForSpecificAbstracts() {
 		$container = new Container;
 		$container->resolving( 'foo',
@@ -264,7 +277,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 			} );
 		$container->bind( 'foo',
 			function () {
-				return new StdClass;
+				return new stdClass;
 			} );
 		$instance = $container->make( 'foo' );
 
@@ -278,7 +291,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		} );
 		$container->bind( 'foo',
 			function () {
-				return new StdClass;
+				return new stdClass;
 			} );
 		$instance = $container->make( 'foo' );
 
@@ -287,13 +300,13 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 	public function testResolvingCallbacksAreCalledForType() {
 		$container = new Container;
-		$container->resolving( 'StdClass',
+		$container->resolving( 'stdClass',
 			function ( $object ) {
 				return $object->name = 'taylor';
 			} );
 		$container->bind( 'foo',
 			function () {
-				return new StdClass;
+				return new stdClass;
 			} );
 		$instance = $container->make( 'foo' );
 
@@ -302,7 +315,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 	public function testUnsetRemoveBoundInstances() {
 		$container = new Container;
-		$container->instance( 'object', new StdClass );
+		$container->instance( 'object', new stdClass );
 		unset( $container['object'] );
 
 		$this->assertFalse( $container->bound( 'object' ) );
@@ -310,7 +323,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 	public function testBoundInstanceAndAliasCheckViaArrayAccess() {
 		$container = new Container;
-		$container->instance( 'object', new StdClass );
+		$container->instance( 'object', new stdClass );
 		$container->alias( 'object', 'alias' );
 
 		$this->assertTrue( isset( $container['object'] ) );
@@ -406,14 +419,14 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 	public function testCallWithDependencies() {
 		$container = new Container;
-		$result    = $container->call( function ( StdClass $foo, $bar = [ ] ) {
+		$result    = $container->call( function ( stdClass $foo, $bar = [ ] ) {
 			return func_get_args();
 		} );
 
 		$this->assertInstanceOf( 'stdClass', $result[0] );
 		$this->assertEquals( [ ], $result[1] );
 
-		$result = $container->call( function ( StdClass $foo, $bar = [ ] ) {
+		$result = $container->call( function ( stdClass $foo, $bar = [ ] ) {
 			return func_get_args();
 		},
 			[ 'bar' => 'taylor' ] );
@@ -424,7 +437,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 		/*
 		 * Wrap a function...
 		 */
-		$result = $container->wrap( function ( StdClass $foo, $bar = [ ] ) {
+		$result = $container->wrap( function ( stdClass $foo, $bar = [ ] ) {
 			return func_get_args();
 		},
 			[ 'bar' => 'taylor' ] );
@@ -713,6 +726,31 @@ class ContainerDefaultValueStub {
 
 	public function __construct( ContainerConcreteStub $stub, $default = 'taylor' ) {
 		$this->stub    = $stub;
+		$this->default = $default;
+	}
+}
+
+class ContainerDefaultValueStubAnnotation {
+	public $stub1;
+	public $stub2;
+	public $stub3;
+	public $default;
+
+	/**
+	 * ContainerDefaultValueStubAnnotation constructor.
+	 *
+	 * @param IContainerContractStub $stub1
+	 * @param                        $stub2
+	 * @param ContainerConcreteStub  $stub3
+	 * @param string                 $default
+	 *
+	 * @inject('stub1', 'ContainerImplementationStub')
+	 * @inject('stub2', 'ContainerImplementationStubTwo')
+	 */
+	public function __construct( IContainerContractStub $stub1, $stub2, ContainerConcreteStub $stub3, $default = 'taylor' ) {
+		$this->stub1   = $stub1;
+		$this->stub2   = $stub2;
+		$this->stub3   = $stub3;
 		$this->default = $default;
 	}
 }

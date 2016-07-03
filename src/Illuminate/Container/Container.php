@@ -779,9 +779,12 @@ class Container implements ArrayAccess, ContainerContract {
 			$parameters
 		);
 
+		$annotations = $this->fetchInjectAnnotations( $constructor );
+
 		$instances = $this->getDependencies(
 			$dependencies,
-			$parameters
+			$parameters,
+			$annotations
 		);
 
 		array_pop( $this->buildStack );
@@ -795,9 +798,12 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  array $parameters
 	 * @param  array $primitives
 	 *
+	 * @param array  $injectAnnotations
+	 *
 	 * @return array
+	 * @throws BindingResolutionException
 	 */
-	protected function getDependencies( array $parameters, array $primitives = [ ] ) {
+	protected function getDependencies( array $parameters, array $primitives = [ ], array $injectAnnotations = [ ] ) {
 		$dependencies = [ ];
 
 		foreach ( $parameters as $parameter ) {
@@ -808,6 +814,8 @@ class Container implements ArrayAccess, ContainerContract {
 			// we will just bomb out with an error since we have no-where to go.
 			if ( array_key_exists( $parameter->name, $primitives ) ) {
 				$dependencies[] = $primitives[ $parameter->name ];
+			} elseif ( array_key_exists( $parameter->name, $injectAnnotations ) ) {
+				$dependencies[] = $this->make( $injectAnnotations[ $parameter->name ] );
 			} elseif ( is_null( $dependency ) ) {
 				$dependencies[] = $this->resolveNonClass( $parameter );
 			} else {
