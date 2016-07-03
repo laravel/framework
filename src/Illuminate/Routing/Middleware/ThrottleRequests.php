@@ -50,7 +50,7 @@ class ThrottleRequests
         if ($this->runningUnitTests()) {
             return $next($request);
         }
-        
+
         $key = $this->resolveRequestSignature($request);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
@@ -148,5 +148,5 @@ class ThrottleRequests
     protected function runningUnitTests()
     {
         return $this->app->runningInConsole() && $this->app->runningUnitTests();
-    }    
+    }
 }
