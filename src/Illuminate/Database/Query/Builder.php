@@ -1562,16 +1562,20 @@ class Builder
     public function last($columns = ['*'], $defaultOrderColumnName = 'id')
     {
         $orderPropertyName = $this->unions ? 'unionOrders' : 'orders';
-        $this->$orderPropertyName = collect($this->$orderPropertyName)->map(function($orderArray) {
-            $orderArray['direction'] = ($orderArray['direction'] == 'asc' ? 'desc' : 'asc');
-            return $orderArray;
-        });
+
+        if (is_array($this->$orderPropertyName)) {
+            $this->$orderPropertyName = array_map(function($orderArray) {
+                $orderArray['direction'] = ($orderArray['direction'] == 'asc' ? 'desc' : 'asc');
+                return $orderArray;
+            }, $this->$orderPropertyName);
+        }
+
         if (! count($this->$orderPropertyName)) {
             $this->orderBy($defaultOrderColumnName, 'desc');
         }
-        return $this->take(1)->get($columns)->first();
-    }
 
+        return $this->first($columns);
+    }
 
     /**
      * Execute the query as a "select" statement.
