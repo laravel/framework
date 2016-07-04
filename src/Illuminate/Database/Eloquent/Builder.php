@@ -285,7 +285,7 @@ class Builder
     {
         return $this->take(1)->get($columns)->first();
     }
-    
+
     /**
      * Execute the query and get the last result.
      *

@@ -1564,8 +1564,9 @@ class Builder
         $orderPropertyName = $this->unions ? 'unionOrders' : 'orders';
 
         if (is_array($this->$orderPropertyName)) {
-            $this->$orderPropertyName = array_map(function($orderArray) {
+            $this->$orderPropertyName = array_map(function ($orderArray) {
                 $orderArray['direction'] = ($orderArray['direction'] == 'asc' ? 'desc' : 'asc');
+
                 return $orderArray;
             }, $this->$orderPropertyName);
         }
