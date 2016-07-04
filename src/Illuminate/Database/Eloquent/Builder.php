@@ -285,6 +285,17 @@ class Builder
     {
         return $this->take(1)->get($columns)->first();
     }
+    
+    /**
+     * Execute the query and get the last result.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static|null
+     */
+    public function last($columns = ['*'])
+    {
+        return $this->query->last($columns, $this->model->getKeyName());
+    }
 
     /**
      * Execute the query and get the first result or throw an exception.
