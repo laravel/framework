@@ -195,7 +195,7 @@ class Builder
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
-        'not similar to',
+        'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
     /**
