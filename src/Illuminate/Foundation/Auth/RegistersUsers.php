@@ -62,7 +62,8 @@ trait RegistersUsers
 
         Auth::guard($this->getGuard())->login($this->create($request->all()));
 
-        return redirect($this->redirectPath());
+        return redirect($this->redirectPath())
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**

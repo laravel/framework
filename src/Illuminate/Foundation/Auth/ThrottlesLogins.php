@@ -64,7 +64,8 @@ trait ThrottlesLogins
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getLockoutErrorMessage($seconds),
-            ]);
+            ])
+            ->header('Cache-Control', 'no-cache, max-age=0');
     }
 
     /**
