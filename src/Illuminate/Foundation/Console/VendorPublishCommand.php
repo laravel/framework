@@ -58,9 +58,7 @@ class VendorPublishCommand extends Command
 
         $tags = $tags ?: [null];
 
-        $tags = is_string($tags) ? [$tags] : $tags;
-
-        foreach ($tags as $tag) {
+        foreach ((array) $tags as $tag) {
             $this->publishTag($tag);
         }
     }
