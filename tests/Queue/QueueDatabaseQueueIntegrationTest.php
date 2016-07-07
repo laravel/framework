@@ -41,7 +41,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
 
         $this->queue = new DatabaseQueue($this->connection(), $this->table);
 
-        $this->container = $this->getMock(Container::class);
+        $this->container = $this->createMock(Container::class);
 
         $this->queue->setContainer($this->container);
 
@@ -60,11 +60,10 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
             $table->string('queue');
             $table->longText('payload');
             $table->tinyInteger('attempts')->unsigned();
-            $table->tinyInteger('reserved')->unsigned();
             $table->unsignedInteger('reserved_at')->nullable();
             $table->unsignedInteger('available_at');
             $table->unsignedInteger('created_at');
-            $table->index(['queue', 'reserved', 'reserved_at']);
+            $table->index(['queue', 'reserved_at']);
         });
     }
 
@@ -110,7 +109,6 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'queue' => $mock_queue_name = 'mock_queue_name',
                 'payload' => 'mock_payload',
                 'attempts' => 0,
-                'reserved' => 0,
                 'reserved_at' => null,
                 'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
@@ -131,7 +129,6 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
             'queue' => 'mock_queue_name',
             'payload' => 'mock_payload',
             'attempts' => 0,
-            'reserved' => 0,
             'reserved_at' => null,
             'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
             'created_at' => Carbon::now()->getTimestamp(),
@@ -159,7 +156,6 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'queue' => $mock_queue_name = 'mock_queue_name',
                 'payload' => 'mock_payload',
                 'attempts' => 0,
-                'reserved' => 0,
                 'reserved_at' => null,
                 'available_at' => Carbon::now()->addSeconds(60)->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
@@ -182,7 +178,6 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'queue' => $mock_queue_name = 'mock_queue_name',
                 'payload' => 'mock_payload',
                 'attempts' => 0,
-                'reserved' => 1,
                 'reserved_at' => Carbon::now()->subDay()->getTimestamp(),
                 'available_at' => Carbon::now()->addDay()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
@@ -205,7 +200,6 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
                 'queue' => $mock_queue_name = 'mock_queue_name',
                 'payload' => 'mock_payload',
                 'attempts' => 0,
-                'reserved' => 1,
                 'reserved_at' => Carbon::now()->addDay()->getTimestamp(),
                 'available_at' => Carbon::now()->subDay()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
