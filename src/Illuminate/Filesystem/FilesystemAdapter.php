@@ -240,7 +240,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return '/storage/'.$path;
         } elseif (method_exists($adapter,'getUrl')) {
             return $adapter->getUrl($path);
-        }
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }
