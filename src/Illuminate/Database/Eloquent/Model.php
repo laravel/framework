@@ -1273,7 +1273,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $instance = new static;
 
         foreach ($instance->getObservableEvents() as $event) {
-            static::$dispatcher->forget("eloquent.{$event}: ".static::class);
+            static::$dispatcher->forget(static::getModelEventName($event));
         }
     }
 
@@ -1288,9 +1288,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static function registerModelEvent($event, $callback, $priority = 0)
     {
         if (isset(static::$dispatcher)) {
-            $name = static::class;
-
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback, $priority);
+            static::$dispatcher->listen(static::getModelEventName($event), $callback, $priority);
         }
     }
 
@@ -1676,14 +1674,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return true;
         }
 
-        // We will append the names of the class to the event to distinguish it from
-        // other model events that are fired, allowing us to listen on each model
-        // event set individually instead of catching event for all the models.
-        $event = "eloquent.{$event}: ".static::class;
-
         $method = $halt ? 'until' : 'fire';
 
-        return static::$dispatcher->$method($event, $this);
+        return static::$dispatcher->$method(static::getModelEventName($event), $this);
+    }
+
+    /**
+     * Get the model event name
+     *
+     * We will append the names of the class to the event to distinguish it from
+     * other model events that are fired, allowing us to listen on each model
+     * event set individually instead of catching event for all the models.
+     *
+     * @param string $event
+     * @return string
+     */
+    public static function getModelEventName($event)
+    {
+        return "eloquent.{$event}: ".static::class;
     }
 
     /**
