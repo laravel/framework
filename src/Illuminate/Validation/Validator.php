@@ -2077,8 +2077,8 @@ class Validator implements ValidatorContract
         $value = $this->getAttribute($attribute);
 
         $message = str_replace(
-            [':ATTRIBUTE', ':Attribute', ':attribute'],
-            [Str::upper($value), Str::ucfirst($value), $value],
+            [':attribute', ':ATTRIBUTE', ':Attribute'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
             $message
         );
 
