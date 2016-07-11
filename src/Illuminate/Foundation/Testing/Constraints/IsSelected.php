@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
+use DOMElement;
 use Symfony\Component\DomCrawler\Crawler;
 
 class IsSelected extends FormFieldConstraint
@@ -74,12 +75,12 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the selected value from an option element.
      *
-     * @param \DOMElement $option
+     * @param DOMElement $option
      * @return string
      */
-    protected function getOptionValue(\DOMElement $option)
+    protected function getOptionValue(DOMElement $option)
     {
-        if($option->hasAttribute('value')){
+        if ($option->hasAttribute('value')) {
             return $option->getAttribute('value');
         }
         return $option->textContent;
