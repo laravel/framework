@@ -27,12 +27,12 @@ abstract class Compiler
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
      * @return void
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(Filesystem $files, $cachePath)
     {
-        if (!$cachePath) {
+        if (! $cachePath) {
             throw new InvalidArgumentException('The cache path must be non-empty.');
         }
 
