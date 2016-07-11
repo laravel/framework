@@ -498,6 +498,21 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (! function_exists('vd')) {
+    /**
+     * Dump the passed variables.
+     *
+     * @param  mixed
+     * @return void
+     */
+    function vd()
+    {
+        array_map(function ($x) {
+            (new Dumper)->dump($x);
+        }, func_get_args());
+    }
+}
+
 if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
