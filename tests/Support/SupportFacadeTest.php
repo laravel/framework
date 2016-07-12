@@ -57,6 +57,12 @@ class SupportFacadeTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', FacadeStub::foo());
 	}
 
+	public function testCanMockDeclaredChildMethods()
+	{
+		FacadeStub::shouldReceive('hello')->once()->andReturn('hello Matt');
+		$this->assertEquals('hello Matt', FacadeStub::hello('Mike'));
+	}
+
 }
 
 class FacadeStub extends Illuminate\Support\Facades\Facade {
@@ -64,6 +70,15 @@ class FacadeStub extends Illuminate\Support\Facades\Facade {
 	protected static function getFacadeAccessor()
 	{
 		return 'foo';
+	}
+
+	public static function hello($name)
+	{
+		if (static::isMock()) {
+			return call_user_func_array(array(static::getFacadeRoot(), 'hello'), array($name));
+		}
+
+		return 'hello ' . $name;
 	}
 
 }
