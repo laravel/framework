@@ -509,7 +509,7 @@ trait MakesHttpRequests
 
         $request = Request::create(
             $this->currentUri, $method, $parameters,
-            $cookies, $files, array_replace($this->serverVariables, $server), $content
+            $cookies, $files, array_merge($this->serverVariables, $server), $content
         );
 
         $response = $kernel->handle($request);
