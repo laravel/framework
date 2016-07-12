@@ -7,7 +7,14 @@ abstract class Migration {
 	 *
 	 * @var string
 	 */
-	protected $connection;
+  protected $connection;
+
+  /**
+   * Activates/Deactivates the migration
+   *
+   * @var boolean
+   */
+  protected $enabled = true;
 
 	/**
 	 * Get the migration connection name.
@@ -17,6 +24,17 @@ abstract class Migration {
 	public function getConnection()
 	{
 		return $this->connection;
-	}
+  }
+
+  /**
+   * Get the migration activation state.
+   *
+   * @return boolean
+   */
+
+  public function isEnabled()
+  {
+    return $this->enabled;
+  }
 
 }
