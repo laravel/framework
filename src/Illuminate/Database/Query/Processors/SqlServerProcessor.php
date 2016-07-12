@@ -17,7 +17,7 @@ class SqlServerProcessor extends Processor {
 	{
 		$query->getConnection()->insert($sql, $values);
 
-		$id = $query->getConnection()->getPdo()->lastInsertId();
+		$id = $query->selectRaw("SCOPE_IDENTITY() AS lastId")->first()->lastId;
 
 		return is_numeric($id) ? (int) $id : $id;
 	}
