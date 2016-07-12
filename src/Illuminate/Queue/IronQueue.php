@@ -131,6 +131,7 @@ class IronQueue extends Queue implements QueueInterface {
 		// queues will be a security hazard to unsuspecting developers using it.
 		if ( ! is_null($job))
 		{
+			$job->queue = $queue;
 			$job->body = $this->crypt->decrypt($job->body);
 
 			return new IronJob($this->container, $this, $job);
