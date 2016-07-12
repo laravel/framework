@@ -34,6 +34,9 @@ class ShareErrorsFromSession implements Middleware {
 	 */
 	public function handle($request, Closure $next)
 	{
+		// Make sure old input is available in the view
+		$this->view->share('old', $request->session()->getOldInput());
+
 		// If the current session has an "errors" variable bound to it, we will share
 		// its value with all view instances so the views can easily access errors
 		// without having to bind. An empty bag is set when there aren't errors.
