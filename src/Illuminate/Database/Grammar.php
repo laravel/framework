@@ -73,7 +73,15 @@ abstract class Grammar {
 			}
 			else
 			{
-				$wrapped[] = $this->wrapValue($segment);
+				// Allow column->'name' notation for Postgres
+				if(strpos($segment, '->'))
+				{
+					$wrapped[] = $segment;
+				}
+				else
+				{
+					$wrapped[] = $this->wrapValue($segment);
+				}
 			}
 		}
 
