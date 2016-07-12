@@ -252,6 +252,9 @@ class Mailer implements MailerContract, MailQueueContract {
 	 */
 	public function handleQueuedMessage($job, $data)
 	{
+		// Stop and let swift automatically reconnect to support queue daemon mode
+		$this->getSwiftMailer()->getTransport()->stop();
+
 		$this->send($data['view'], $data['data'], $this->getQueuedCallable($data));
 
 		$job->delete();
