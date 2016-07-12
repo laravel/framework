@@ -490,13 +490,9 @@ class Environment {
 		if (isset($this->sections[$section]))
 		{
 			$content = str_replace('@parent', $content, $this->sections[$section]);
+		}
 
-			$this->sections[$section] = $content;
-		}
-		else
-		{
-			$this->sections[$section] = $content;
-		}
+		$this->sections[$section] = $content;
 	}
 
 	/**
@@ -508,7 +504,16 @@ class Environment {
 	 */
 	public function yieldContent($section, $default = '')
 	{
-		return isset($this->sections[$section]) ? $this->sections[$section] : $default;
+		$sectionContent = $default;
+
+		if (isset($this->sections[$section]))
+		{
+			$sectionContent = $this->sections[$section];
+		}
+
+		$sectionContent = str_replace('@parent', '', $sectionContent);
+
+		return $sectionContent;
 	}
 
 	/**
