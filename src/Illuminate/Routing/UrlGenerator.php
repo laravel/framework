@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Routing;
 
 use InvalidArgumentException;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request;
 
 class UrlGenerator {
 
@@ -15,7 +15,7 @@ class UrlGenerator {
 	/**
 	 * The request instance.
 	 *
-	 * @var \Symfony\Component\HttpFoundation\Request
+	 * @var \Illuminate\Http\Request
 	 */
 	protected $request;
 
