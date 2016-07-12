@@ -30,9 +30,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, ['path' => 'http://website.com', 'pageName' => 'foo']);
 
-		$this->assertEquals('http://website.com/?foo=2', $p->url($p->currentPage()));
-		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 1));
-		$this->assertEquals('http://website.com/?foo=1', $p->url($p->currentPage() - 2));
+		$this->assertEquals('http://website.com?foo=2', $p->url($p->currentPage()));
+		$this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 1));
+		$this->assertEquals('http://website.com?foo=1', $p->url($p->currentPage() - 2));
 	}
 
 
@@ -48,7 +48,7 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 	{
 		$p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
 		$window = new UrlWindow($p);
-		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
+		$this->assertEquals(['first' => [1 => '?page=1', 2 => '?page=2'], 'slider' => null, 'last' => null], $window->get());
 	}
 
 
@@ -61,9 +61,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$window = new UrlWindow($p);
 		$slider = [];
 		for ($i = 4; $i <= 10; $i++)
-			$slider[$i] = '/?page='.$i;
+			$slider[$i] = '?page='.$i;
 
-		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+		$this->assertEquals(['first' => [1 => '?page=1', 2 => '?page=2'], 'slider' => $slider, 'last' => [12 => '?page=12', 13 => '?page=13']], $window->get());
 
 		/**
 		 * Test Being Near The End Of The List
@@ -72,9 +72,9 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$window = new UrlWindow($p);
 		$last = [];
 		for ($i = 5; $i <= 13; $i++)
-			$last[$i] = '/?page='.$i;
+			$last[$i] = '?page='.$i;
 
-		$this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
+		$this->assertEquals(['first' => [1 => '?page=1', 2 => '?page=2'], 'slider' => null, 'last' => $last], $window->get());
 	}
 
 
@@ -165,8 +165,8 @@ class PaginationPaginatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['item3', 'item4'], $p->items());
 
 		$this->assertEquals([
-			'per_page' => 2, 'current_page' => 2, 'next_page_url' => '/?page=3',
-			'prev_page_url' => '/?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4']
+			'per_page' => 2, 'current_page' => 2, 'next_page_url' => '?page=3',
+			'prev_page_url' => '?page=1', 'from' => 3, 'to' => 4, 'data' => ['item3', 'item4']
 		], $p->toArray());
 	}
 
