@@ -52,6 +52,11 @@ class TinkerCommand extends Command {
 		$shell->addCommands($this->getCommands());
 		$shell->setIncludes($this->argument('include'));
 
+		\Event::listen('illuminate.query', function($query) use($shell)
+		{
+			$shell->writeReturnValue($query);
+		});
+	
 		$shell->run();
 	}
 
