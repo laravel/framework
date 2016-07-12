@@ -214,7 +214,7 @@ class Request extends SymfonyRequest {
 	 */
 	public function all()
 	{
-		return array_merge_recursive($this->input(), $this->files->all());
+		return array_replace_recursive($this->input(), $this->files->all());
 	}
 
 	/**
