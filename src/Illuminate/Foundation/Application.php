@@ -1051,7 +1051,95 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function isLocale($locale)
     {
-        return $this->getLocale() == $locale;
+        return $this->getLocale() === $locale;
+    }
+
+    /**
+     * Get default application locale
+     *
+     * @return string
+     */
+    public function getDefaultLocale()
+    {
+        return config('app.fallback_locale');
+    }
+
+    /**
+     * Get additional locales supported by application
+     *
+     * @return array
+     */
+    public function getAdditionalLocales()
+    {
+        return config('app.additional_locales');
+    }
+
+    /**
+     * Get array of all locales supported by application
+     *
+     * @return array
+     */
+    public function getSupportedLocales()
+    {
+        $app_locales = config('app.additional_locales');
+        $app_locales[] = config('app.fallback_locale');
+        return $app_locales;
+    }
+
+    /**
+     * Get application configuration for default locale presence in URL
+     *
+     * @return bool
+     */
+    public function isDefaultLocaleInUrl()
+    {
+        return config('app.default_locale_in_url') === true;
+    }
+
+    /**
+     * Get URL prefix for current locale or for specified locale
+     *
+     * @param string|null $locale_to
+     * @return string
+     */
+    public function getLocaleUrlPrefix($locale_to = null)
+    {
+        $locale = ($locale_to === null) ? self::getLocale() : $locale_to;
+        if ($locale === $this->getDefaultLocale() && !$this->isDefaultLocaleInUrl()) {
+            $lang_prefix = '';
+        } elseif (in_array($locale, $this->getSupportedLocales())) {
+            $lang_prefix = '/' . Str::slug($locale);
+        } else {
+            $lang_prefix = '/' . Str::slug($this->getDefaultLocale());
+        }
+        return $lang_prefix;
+    }
+
+    /**
+     * Determine if locale is supported by application
+     *
+     * @param string $locale
+     * @return bool
+     */
+    public function isLocaleSupported($locale)
+    {
+        return (in_array($locale, $this->getSupportedLocales()));
+    }
+
+    /**
+     * Check if locale is supported by application and return this locale
+     * or return default locale
+     *
+     * @param string $locale
+     * @return string
+     */
+    public function checkAndGetLocale($locale)
+    {
+        if ($this->isLocaleSupported($locale)) {
+            return $locale;
+        } else {
+            return $this->getDefaultLocale();
+        }
     }
 
     /**

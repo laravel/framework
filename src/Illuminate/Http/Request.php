@@ -4,6 +4,7 @@ namespace Illuminate\Http;
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Support\Facades\URL;
 use SplFileInfo;
 use RuntimeException;
 use Illuminate\Support\Arr;
@@ -180,9 +181,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  string
      * @return bool
      */
-    public function is()
+    public function is() 
     {
         foreach (func_get_args() as $pattern) {
+            $pattern = Url::setLocaleSegment(null, $pattern);
+            dd($pattern);
             if (Str::is($pattern, urldecode($this->path()))) {
                 return true;
             }

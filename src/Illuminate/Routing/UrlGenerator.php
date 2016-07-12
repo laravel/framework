@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -151,6 +152,11 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function to($path, $extra = [], $secure = null)
     {
+        // if $path is not external, add locale prefix
+        if (strpos($path, '://') === false) {
+            $path = $this->setLocaleSegment(null, $path);
+        }
+
         // First we will check if the URL is already a valid URL. If it is we will not
         // try to generate a new one but will simply return the URL as is, which is
         // convenient since developers do not always have to check if it's valid.
@@ -179,6 +185,93 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         return $this->trimUrl($root, $path, $tail).$query;
+    }
+
+    /**
+     * Get path with new locale slug in URL
+     *
+     * @param string|null $locale - if not specified, gets current app locale
+     * @param string|null $url - if not specified, gets URL form current request
+     * @return string
+     */
+    public function setLocaleSegment($locale = null, $url = null)
+    {
+        $locale = ($locale === null) ? App::getLocale() : $locale;
+        $request = $this->getRequest($url);
+        $current_locale_segment = $this->getLocaleSegment($url);
+        if ($current_locale_segment !== null) {
+            // there is already a locale slug in URL, remove it
+            $pos = strpos($request->getPathInfo(), '/', 1);
+            if ($pos === false) {
+                $path = '';
+            } else {
+                $path = substr($request->getPathInfo(), $pos);
+            }
+        } else {
+            $path = $request->getPathInfo();
+        }
+        $new_path = App::getLocaleUrlPrefix($locale) . $path;
+        return Request::create($new_path)->getPathInfo();
+    }
+
+    /**
+     * Get locale segment from current request or by URL
+     * Returns null if no locale slug found
+     *
+     * @param string|null $url - if not specified, gets URL form current request
+     * @return null|string
+     */
+    public function getLocaleSegment($url = null)
+    {
+        $request = $this->getRequest($url);
+        $segments = $request->segments();
+        $default_locale = App::getDefaultLocale();
+        if (isset($segments[0])) {
+            $locale = $this->segmentToLocale($segments[0]);
+            if (App::isDefaultLocaleInUrl() && $locale === $default_locale) {
+                return Str::slug($default_locale);
+            } elseif (in_array($locale, App::getAdditionalLocales())) {
+                return $segments[0];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Transform URL slug segment to valid locale string
+     * If segment is not specified (is null) returns null
+     *
+     * @param string|null $segment
+     * @return null|string
+     */
+    public function segmentToLocale($segment)
+    {
+        $locale = null;
+        if ($segment !== null) {
+            if (strpos($segment, '-') !== false) {
+                $parts = explode('-', $segment);
+                $locale = $parts[0] . '_' . strtoupper($parts[1]);
+            } else {
+                $locale = $segment;
+            }
+        }
+        return $locale;
+    }
+
+    /**
+     * Get lang (first part before "_") from locale string
+     *
+     * @param $locale
+     * @return mixed
+     */
+    public function localeToLang($locale)
+    {
+        if (strpos($locale, '_') !== false) {
+            $parts = explode('_', $locale);
+            return $parts[0];
+        } else {
+            return $locale;
+        }
     }
 
     /**
@@ -665,13 +758,18 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Get the request instance.
+     * Get the current request instance or new instance by URL.
      *
      * @return \Illuminate\Http\Request
      */
-    public function getRequest()
+    public function getRequest($url = null)
     {
-        return $this->request;
+        if ($url === null) {
+            $request = $this->request;
+        } else {
+            $request = Request::create($url);
+        }
+        return $request;
     }
 
     /**

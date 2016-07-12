@@ -770,6 +770,21 @@ if (! function_exists('url')) {
     }
 }
 
+if (! function_exists('trans_url')) {
+
+    /**
+     * @param $locale
+     * @param null $path
+     * @return UrlGenerator|string
+     */
+    function trans_url($locale, $path = null)
+    {
+        $url = app(UrlGenerator::class);
+        $path = $url->setLocaleSegment($locale, $path);
+        return url($path);
+    }
+}
+
 if (! function_exists('validator')) {
     /**
      * Create a new Validator instance.
