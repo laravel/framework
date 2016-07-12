@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\RawJsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Support\Contracts\RawArrayableInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -21,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
+abstract class Model implements ArrayAccess, ArrayableInterface, RawArrayableInterface, JsonableInterface, RawJsonableInterface {
 
 	/**
 	 * The connection name for the model.
@@ -2177,6 +2179,40 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function toJson($options = 0)
 	{
 		return json_encode($this->toArray(), $options);
+	}
+
+	/**
+	 * Convert the model instance to JSON without visible and hidden filter.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 */
+	public function toRawJson($options = 0)
+	{
+		return json_encode($this->toRawArray(), $options);
+	}
+
+	/**
+	 * Convert the model instance to an array without visible or hidden filter
+	 * @return array
+	 */
+	public function toRawArray()
+	{
+		$savedHidden  = $this->hidden;
+		$savedVisible = $this->visible;
+
+		// Reset
+		$this->setVisible(array());
+		$this->setHidden(array());
+		$attributes = $this->attributesToArray();
+
+		$rawArray = array_merge($attributes, $this->relationsToArray());
+
+		// Re set old values
+		$this->setVisible($savedHidden);
+		$this->setHidden($savedVisible);
+
+		return $rawArray;
 	}
 
 	/**

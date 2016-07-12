@@ -466,7 +466,6 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $model->getConnection());
 	}
 
-
 	public function testToArray()
 	{
 		$model = new EloquentModelStub;
@@ -493,6 +492,35 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 
 		$model->setAppends(array('appendable'));
 		$array = $model->toArray();
+		$this->assertEquals('appended', $array['appendable']);
+	}
+
+	public function testToRawArray()
+	{
+		$model = new EloquentBaseModelStub;
+		$model->name = 'foo';
+		$model->age = null;
+		$model->password = 'password1';
+		//$model->setHidden(array('password'));
+		$model->setRelation('names', new Illuminate\Database\Eloquent\Collection(array(
+			new EloquentModelStub(array('bar' => 'baz')), new EloquentModelStub(array('bam' => 'boom'))
+		)));
+		$model->setRelation('partner', new EloquentModelStub(array('name' => 'abby')));
+		$model->setRelation('group', null);
+		$model->setRelation('multi', new Illuminate\Database\Eloquent\Collection);
+		$array = $model->toRawArray();
+
+		$this->assertTrue(is_array($array));
+		$this->assertEquals('foo', $array['name']);
+		$this->assertEquals('baz', $array['names'][0]['bar']);
+		$this->assertEquals('boom', $array['names'][1]['bam']);
+		$this->assertEquals('abby', $array['partner']['name']);
+		$this->assertEquals(null, $array['group']);
+		$this->assertEquals(array(), $array['multi']);
+		$this->assertTrue(isset($array['password']));
+
+		$model->setAppends(array('appendable'));
+		$array = $model->toRawArray();
 		$this->assertEquals('appended', $array['appendable']);
 	}
 
@@ -837,6 +865,44 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 class EloquentTestObserverStub {
 	public function creating() {}
 	public function saved() {}
+}
+
+class EloquentBaseModelStub extends Illuminate\Database\Eloquent\Model {
+	protected $table = 'stub';
+	protected $guarded = array();
+
+	public function getListItemsAttribute($value)
+	{
+		return json_decode($value, true);
+	}
+	public function setListItemsAttribute($value)
+	{
+		$this->attributes['list_items'] = json_encode($value);
+	}
+	public function belongsToStub()
+	{
+		return $this->belongsTo('EloquentModelSaveStub');
+	}
+	public function morphToStub()
+	{
+		return $this->morphTo();
+	}
+	public function belongsToExplicitKeyStub()
+	{
+		return $this->belongsTo('EloquentModelSaveStub', 'foo');
+	}
+	public function incorrectRelationStub()
+	{
+		return 'foo';
+	}
+	public function getDates()
+	{
+		return array();
+	}
+	public function getAppendableAttribute()
+	{
+		return 'appended';
+	}
 }
 
 class EloquentModelStub extends Illuminate\Database\Eloquent\Model {
