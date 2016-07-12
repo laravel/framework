@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Mail\Message;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -41,9 +42,9 @@ trait ResetsPasswords {
 	{
 		$this->validate($request, ['email' => 'required|email']);
 
-		$response = $this->passwords->sendResetLink($request->only('email'), function($m)
+		$response = $this->passwords->sendResetLink($request->only('email'), function(Message $message)
 		{
-			$m->subject($this->getEmailSubject());
+			$message->subject($this->getEmailSubject());
 		});
 
 		switch ($response)
