@@ -100,6 +100,23 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Prepare exception for rendering.
+     *
+     * @param  \Exception  $e
+     * @return \Exception
+     */
+    protected function prepareException(Exception $e)
+    {
+        if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof AuthorizationException) {
+            $e = new HttpException(403, $e->getMessage());
+        }
+
+        return $e;
+    }
+
+    /**
      * Render an exception into a response.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -108,18 +125,28 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Exception $e)
     {
+        $e = $this->prepareException($e);
+
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
-        } elseif ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthenticationException) {
             return $this->unauthenticated($request, $e);
-        } elseif ($e instanceof AuthorizationException) {
-            $e = new HttpException(403, $e->getMessage());
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
+        return $this->prepareResponse($request, $e);
+    }
+
+    /**
+     * Prepare response containing exception render.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function prepareResponse($request, Exception $e)
+    {
         if ($this->isHttpException($e)) {
             return $this->toIlluminateResponse($this->renderHttpException($e), $e);
         } else {
