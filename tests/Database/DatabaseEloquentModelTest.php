@@ -352,6 +352,27 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFromDateTime()
+	{
+		$model = new EloquentModelStub();
+
+		$value = Carbon\Carbon::parse('2015-04-17 22:59:01');
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = new DateTime('2015-04-17 22:59:01');
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = '2015-04-17 22:59:01';
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+		$value = '2015-04-17';
+		$this->assertEquals('2015-04-17 00:00:00', $model->fromDateTime($value));
+
+		$value = '1429311541';
+		$this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+	}
+
+
 	public function testInsertProcess()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
