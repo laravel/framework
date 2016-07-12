@@ -67,6 +67,8 @@ class ProviderRepository {
 			$this->registerLoadEvents($provider, $events);
 		}
 
+		$this->app->setDeferredServices($manifest['deferred']);
+		
 		// We will go ahead and register all of the eagerly loaded providers with the
 		// application so their services can be registered with the application as
 		// a provided service. Then we will set the deferred service list on it.
@@ -75,7 +77,7 @@ class ProviderRepository {
 			$this->app->register($this->createProvider($provider));
 		}
 
-		$this->app->setDeferredServices($manifest['deferred']);
+		
 	}
 
 	/**
