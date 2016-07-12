@@ -351,4 +351,56 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         return new BaseCollection($this->items);
     }
+
+    /**
+     * Batch update the dirty records of models.
+     *
+     * @return int|null
+     */
+    public function update()
+    {
+        $dirties = [];
+        $dirtyColumns = [];
+
+        foreach ($this->items as $model) {
+            $dirty = $model->getDirty();
+            if (count($dirty)) {
+                $dirties[$model->getKey()] = $dirty;
+                foreach ($dirty as $column => $value) {
+                    if (! array_key_exists($column, $dirtyColumns)) {
+                        $dirtyColumns[$column] = [];
+                    }
+                    $dirtyColumns[$column][] = [$model->getKey(), $value];
+                }
+
+            }
+        }
+
+        if (! count($dirties)) {
+            return;
+        }
+
+        $keyName = $model->getKeyName();
+        $params = [];
+        $columnUpdates = [];
+
+        foreach ($dirtyColumns as $column => $rows) {
+            $columnUpdate = "`$column` =  CASE";
+            foreach ($rows as $row) {
+                $columnUpdate .= " WHEN `$keyName` = ? THEN ?";
+                $params[] = $row[0];
+                $params[] = $row[1];
+            }
+            $columnUpdate .= " ELSE `$column` END";
+            $columnUpdates[] = $columnUpdate;
+        }
+
+        $table = $model->newQuery()->getQuery()->getGrammar()->wrapTable($model->getTable());
+        $sql = "UPDATE $table SET ".join(',', $columnUpdates)." WHERE $keyName IN (".join(',', array_fill(0, count($dirties), '?')).')';
+
+        $statement = $model->getConnection()->getPdo()->prepare($sql);
+        if ($statement->execute(array_merge($params, array_keys($dirties)))) {
+            return $statement->rowCount();
+        }
+    }
 }
