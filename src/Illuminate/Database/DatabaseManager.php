@@ -189,6 +189,19 @@ class DatabaseManager implements ConnectionResolverInterface {
 	}
 
 	/**
+	 * Get the driver name for a connection.
+	 *
+	 * @param  string|null  $name
+	 * @return string
+	 */
+	public function getConnectionDriverName($name = null)
+	{
+		$config = $this->getConfig($name);
+
+		return $config['driver'];
+	}
+
+	/**
 	 * Get the default connection name.
 	 *
 	 * @return string
