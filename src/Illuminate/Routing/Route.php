@@ -209,8 +209,9 @@ class Route {
 	protected static function explodeFilters($filters)
 	{
 		if (is_array($filters)) return static::explodeArrayFilters($filters);
-
-		return explode('|', $filters);
+		
+		
+		return array_map('trim', explode('|', $filters));
 	}
 
 	/**
@@ -225,7 +226,7 @@ class Route {
 
 		foreach ($filters as $filter)
 		{
-			$results = array_merge($results, explode('|', $filter));
+			$results = array_merge($results, array_map('trim', explode('|', $filter)));
 		}
 
 		return $results;
