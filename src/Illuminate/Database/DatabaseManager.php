@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Database;
 
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
@@ -82,7 +81,7 @@ class DatabaseManager implements ConnectionResolverInterface {
 	{
 		$name = $name ?: $this->getDefaultConnection();
 
-		return Str::endsWith($name, ['::read', '::write'])
+		return ends_with($name, ['::read', '::write'])
                             ? explode('::', $name, 2) : [$name, null];
 	}
 
