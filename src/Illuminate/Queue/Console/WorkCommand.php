@@ -141,7 +141,7 @@ class WorkCommand extends Command
             $this->worker->setCache($this->laravel['cache']->driver());
 
             return $this->worker->daemon(
-                $connection, $queue, $delay, $memory, $this->option('timeout', 60),
+                $connection, $queue, $delay, $memory, $this->option('timeout'),
                 $this->option('sleep'), $this->option('tries')
             );
         }
@@ -214,7 +214,7 @@ class WorkCommand extends Command
 
             ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
 
-            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 60],
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a daemon child process can run', 0],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 0],
         ];

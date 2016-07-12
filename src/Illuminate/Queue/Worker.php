@@ -77,7 +77,7 @@ class Worker
      * @param  int     $maxTries
      * @return void
      */
-    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0)
+    public function daemon($connectionName, $queue = null, $delay = 0, $memory = 128, $timeout = 0, $sleep = 3, $maxTries = 0)
     {
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
