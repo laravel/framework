@@ -563,6 +563,8 @@ class Builder {
 
 		$query = $relation->getRelationCountQuery($relation->getRelated()->newQuery(), $this);
 
+		$this->mergeWheresToHas($query, $relation);
+
 		if ($callback) call_user_func($callback, $query);
 
 		return $this->addHasWhere($query, $relation, $operator, $count, $boolean);
@@ -678,8 +680,6 @@ class Builder {
 	 */
 	protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
 	{
-		$this->mergeWheresToHas($hasQuery, $relation);
-
 		if (is_numeric($count))
 		{
 			$count = new Expression($count);
