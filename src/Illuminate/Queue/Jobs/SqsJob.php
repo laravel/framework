@@ -29,9 +29,9 @@ class SqsJob extends Job {
 	 * @return void
 	 */
 	public function __construct(Container $container,
-                                SqsClient $sqs,
-                                $queue,
-                                array $job)
+								SqsClient $sqs,
+								$queue,
+								array $job)
 	{
 		$this->sqs = $sqs;
 		$this->job = $job;

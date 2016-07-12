@@ -442,8 +442,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	{
 		$results = array();
 
-		if (is_string($callback)) $callback =
-                          $this->valueRetriever($callback);
+		if (is_string($callback)) $callback = $this->valueRetriever($callback);
 
 		// First we will loop through the items and get the comparator from a callback
 		// function which we were given. Then, we will sort the returned values and
@@ -454,7 +453,7 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 
 		$descending ? arsort($results, $options)
-                    : asort($results, $options);
+					: asort($results, $options);
 
 		// Once we have sorted all of the keys in the array, we will loop through them
 		// and grab the corresponding model so we can set the underlying items list

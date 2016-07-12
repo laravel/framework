@@ -86,9 +86,9 @@ class PasswordBroker {
 	 * @return void
 	 */
 	public function __construct(ReminderRepositoryInterface $reminders,
-                                UserProviderInterface $users,
-                                Mailer $mailer,
-                                $reminderView)
+								UserProviderInterface $users,
+								Mailer $mailer,
+								$reminderView)
 	{
 		$this->users = $users;
 		$this->mailer = $mailer;
