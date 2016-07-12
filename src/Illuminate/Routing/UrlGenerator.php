@@ -80,7 +80,15 @@ class UrlGenerator {
 	{
 		return $this->to($this->request->headers->get('referer'));
 	}
-
+	/**
+	 * An alias for URL::previous()
+	 *
+	 * @return string
+	 */
+	public function back()
+	{
+		return $this->previous();
+	}
 	/**
 	 * Generate a absolute URL to the given path.
 	 *
