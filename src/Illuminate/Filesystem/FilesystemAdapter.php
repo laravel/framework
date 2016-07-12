@@ -329,4 +329,18 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract {
 		throw new InvalidArgumentException('Unknown visibility: '.$visibility);
 	}
 
+	/**
+	 * Call a Flysystem driver plugin.
+	 *
+	 * @param  string  $method
+	 * @param  array  $arguments
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, array $arguments)
+	{
+		return $this->driver->__call($method, $arguments);
+	}
+
 }
