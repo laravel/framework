@@ -16,6 +16,13 @@ class Builder {
 	protected $connection;
 
 	/**
+	 * The fetch mode to be used when fetching results
+	 *
+	 * @var int PDO fetch mode
+	 */
+	protected $fetchMode = null;
+
+	/**
 	 * The database query grammar instance.
 	 *
 	 * @var \Illuminate\Database\Query\Grammars\Grammar
@@ -188,6 +195,28 @@ class Builder {
 		$this->grammar = $grammar;
 		$this->processor = $processor;
 		$this->connection = $connection;
+	}
+
+	/**
+	 * Get the default fetch mode for the connection.
+	 *
+	 * @return int
+	 */
+	public function getFetchMode()
+	{
+		return $this->fetchMode;
+	}
+
+	/**
+	 * Set the default fetch mode for the connection.
+	 *
+	 * @param  int  $fetchMode
+	 * @return \Illuminate\Database\Query\Builder
+	 */
+	public function setFetchMode($fetchMode)
+	{
+		$this->fetchMode = $fetchMode;
+		return $this;
 	}
 
 	/**
@@ -1288,7 +1317,7 @@ class Builder {
 	 */
 	protected function runSelect()
 	{
-		return $this->connection->select($this->toSql(), $this->bindings);
+		return $this->connection->select($this->toSql(), $this->bindings, $this->fetchMode);
 	}
 
 	/**
@@ -1364,7 +1393,7 @@ class Builder {
 	{
 		$name = $this->connection->getName();
 
-		return md5($name.$this->toSql().serialize($this->bindings));
+		return md5($name.$this->toSql().serialize($this->bindings).$this->fetchMode);
 	}
 
 	/**

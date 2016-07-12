@@ -252,9 +252,9 @@ class Connection implements ConnectionInterface {
 	 * @param  array   $bindings
 	 * @return mixed
 	 */
-	public function selectOne($query, $bindings = array())
+	public function selectOne($query, $bindings = array(), $fetchMode = null)
 	{
-		$records = $this->select($query, $bindings);
+		$records = $this->select($query, $bindings, $fetchMode);
 
 		return count($records) > 0 ? reset($records) : null;
 	}
@@ -264,11 +264,12 @@ class Connection implements ConnectionInterface {
 	 *
 	 * @param  string  $query
 	 * @param  array   $bindings
+	 * @param  int     $fetchMode
 	 * @return array
 	 */
-	public function select($query, $bindings = array())
+	public function select($query, $bindings = array(), $fetchMode = null)
 	{
-		return $this->run($query, $bindings, function($me, $query, $bindings)
+		return $this->run($query, $bindings, function($me, $query, $bindings) use ($fetchMode)
 		{
 			if ($me->pretending()) return array();
 
@@ -279,7 +280,7 @@ class Connection implements ConnectionInterface {
 
 			$statement->execute($me->prepareBindings($bindings));
 
-			return $statement->fetchAll($me->getFetchMode());
+			return $statement->fetchAll(!is_null($fetchMode) ? $fetchMode : $me->getFetchMode());
 		});
 	}
 
@@ -905,7 +906,7 @@ class Connection implements ConnectionInterface {
 	 */
 	public function setFetchMode($fetchMode)
 	{
-		$this->fetchMode = $fetchMode;
+		return $this->fetchMode = $fetchMode;
 	}
 
 	/**
