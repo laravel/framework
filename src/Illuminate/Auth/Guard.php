@@ -375,11 +375,12 @@ class Guard implements GuardContract {
 		// fact valid we'll log the users into the application and return true.
 		if ($this->hasValidCredentials($user, $credentials))
 		{
-			if ($login) $this->login($user, $remember);
+			if ($login)
 			{
-				return true;
-
+				$this->login($user, $remember);
 			}
+
+			return true;
 		}
 
 		return false;
