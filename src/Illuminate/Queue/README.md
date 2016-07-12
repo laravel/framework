@@ -17,6 +17,13 @@ $queue->addConnection([
     'queue' => 'default',
 ]);
 
+$queue->getContainer()->bind('encrypter', function() {
+	return new Illuminate\Encryption\Encrypter('foobar');
+});
+$queue->getContainer()->bind('request', function() {
+	return new Illuminate\Http\Request();
+});
+
 // Make this Capsule instance available globally via static methods... (optional)
 $queue->setAsGlobal();
 ```
