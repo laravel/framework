@@ -156,6 +156,11 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 
 		if (isset($source[$parameter->name]))
 		{
+			if (is_object($source->files) && is_null($source[$parameter->name]) && $source->file($parameter->name))
+			{
+				return $source->file($parameter->name);
+			}
+
 			return $source[$parameter->name];
 		}
 
