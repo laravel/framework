@@ -4,7 +4,7 @@ use {{rootNamespace}}Http\Requests;
 use {{rootNamespace}}Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-
+{{modelUse}}
 class {{class}} extends Controller {
 
 	/**
@@ -40,10 +40,10 @@ class {{class}} extends Controller {
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  {{modelHint}}
 	 * @return Response
 	 */
-	public function show($id)
+	public function show({{model}})
 	{
 		//
 	}
@@ -51,10 +51,10 @@ class {{class}} extends Controller {
 	/**
 	 * Show the form for editing the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  {{modelHint}}
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit({{model}})
 	{
 		//
 	}
@@ -62,10 +62,10 @@ class {{class}} extends Controller {
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  int  $id
+	 * @param  {{modelHint}}
 	 * @return Response
 	 */
-	public function update($id)
+	public function update({{model}})
 	{
 		//
 	}
@@ -73,10 +73,10 @@ class {{class}} extends Controller {
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $id
+	 * @param  {{modelHint}}
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy({{model}})
 	{
 		//
 	}
