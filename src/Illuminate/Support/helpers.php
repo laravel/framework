@@ -747,12 +747,19 @@ if ( ! function_exists('object_get'))
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_object($object) || ! isset($object->{$segment}))
+			if ($object instanceof Illuminate\Support\Collection)
 			{
-				return value($default);
+				$object = $object[$segment];
 			}
+			else
+			{
+				if ( ! is_object($object) || ! isset($object->{$segment}))
+				{
+					return value($default);
+				}
 
-			$object = $object->{$segment};
+				$object = $object->{$segment};
+			}
 		}
 
 		return $object;
