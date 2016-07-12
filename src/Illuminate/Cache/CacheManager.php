@@ -251,7 +251,7 @@ class CacheManager implements FactoryContract {
 	 */
 	protected function getPrefix(array $config)
 	{
-		return array_get($config, 'prefix') ?: $this->app['config']['cache.prefix'];
+		return array_get($config, 'prefix', $this->app['config']['cache.prefix']);
 	}
 
 	/**
