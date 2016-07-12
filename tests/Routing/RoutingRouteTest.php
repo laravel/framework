@@ -582,6 +582,31 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $routes[0]->getPrefix());
 	}
 
+	public function testRouteGroupWhere()
+	{
+		$router = $this->getRouter();
+		$router->group(array('prefix' => '{foo}'), function() use ($router)
+		{
+			$router->get('bar', function() { return 'hello'; });
+			$router->group(array('prefix' => '{bar}'), function() use ($router)
+			{
+				$router->get('{baz}', function() { return 'hello'; });
+			})->where('bar', '[0-9]+');
+		})->where('foo', '(bar|baz)')->where('baz', '[a-z]+');
+
+		$request1 = Request::create('bar/bar', 'GET');
+		$router->getRoutes()->match($request1);
+
+		$request2 = Request::create('baz/3/bar', 'GET');
+		$router->getRoutes()->match($request2);
+
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('#^/(?P<foo>(bar|baz))/bar$#s', $routes[0]->getCompiled()->getRegex());
+		$this->assertEquals('#^/(?P<foo>(bar|baz))/(?P<bar>[0-9]+)/(?P<baz>[a-z]+)$#s', $routes[1]->getCompiled()->getRegex());
+	}
+
 
 	public function testMergingControllerUses()
 	{

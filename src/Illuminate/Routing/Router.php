@@ -97,7 +97,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	protected $patterns = array();
 
 	/**
-	 * The route group attribute stack.
+	 * The route group stack.
 	 *
 	 * @var array
 	 */
@@ -485,7 +485,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 		// the resource action. Otherwise we'll just use an empty string for here.
 		$prefix = isset($options['as']) ? $options['as'].'.' : '';
 
-		if (count($this->groupStack) == 0)
+		if (count($this->groupStack) === 0)
 		{
 			return $prefix.$resource.'.'.$method;
 		}
@@ -671,30 +671,29 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function group(array $attributes, Closure $callback)
 	{
-		$this->updateGroupStack($attributes);
+		$this->groupStack[] = new RouteGroupStack($this->mergeGroupAttributes($attributes), $callback);
 
 		// Once we have updated the group stack, we will execute the user Closure and
 		// merge in the groups attributes when the route is created. After we have
 		// run the callback, we will pop the attributes off of this group stack.
 		call_user_func($callback, $this);
 
-		array_pop($this->groupStack);
+		return array_pop($this->groupStack);
 	}
 
 	/**
-	 * Update the group stack with the given attributes.
+	 * Merge the group stack attributes.
 	 *
-	 * @param  array  $attributes
-	 * @return void
+	 * @param array $attributes
+	 * @return array
 	 */
-	protected function updateGroupStack(array $attributes)
+	protected function mergeGroupAttributes(array $attributes)
 	{
 		if (count($this->groupStack) > 0)
 		{
-			$attributes = $this->mergeGroup($attributes, last($this->groupStack));
+			return $this->mergeGroup($attributes, last($this->groupStack)->getAttributes());
 		}
-
-		$this->groupStack[] = $attributes;
+		return $attributes;
 	}
 
 	/**
@@ -705,7 +704,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	public function mergeWithLastGroup($new)
 	{
-		return $this->mergeGroup($new, last($this->groupStack));
+		return $this->mergeGroup($new, last($this->groupStack)->getAttributes());
 	}
 
 	/**
@@ -773,7 +772,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	{
 		if (count($this->groupStack) > 0)
 		{
-			return array_get(last($this->groupStack), 'prefix', '');
+			return array_get(last($this->groupStack)->getAttributes(), 'prefix', '');
 		}
 
 		return '';
@@ -789,7 +788,12 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function addRoute($methods, $uri, $action)
 	{
-		return $this->routes->add($this->createRoute($methods, $uri, $action));
+		$newRoute = $this->createRoute($methods, $uri, $action);
+		foreach ($this->groupStack as $groupStack)
+		{
+			$groupStack->add($newRoute);
+		}
+		return $this->routes->add($newRoute);
 	}
 
 	/**
@@ -943,7 +947,7 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 */
 	protected function prependGroupUses($uses)
 	{
-		$group = last($this->groupStack);
+		$group = last($this->groupStack)->getAttributes();
 
 		return isset($group['namespace']) ? $group['namespace'].'\\'.$uses : $uses;
 	}
@@ -1639,6 +1643,8 @@ class Router implements HttpKernelInterface, RouteFiltererInterface {
 	 * Get the response for a given request.
 	 *
 	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @param int $type
+	 * @param bool $catch
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
