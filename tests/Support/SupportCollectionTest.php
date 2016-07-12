@@ -132,6 +132,14 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([['v' => 3], ['v' => '3']], $c->whereLoose('v', 3)->values()->all());
 	}
 
+	public function testWhereNot()
+	{
+		$c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+		$this->assertEquals([['v' => 1], ['v' => 2], ['v' => '3'], ['v' => 4]], $c->whereNot('v', 3)->values()->all());
+		$this->assertEquals([['v' => 1], ['v' => 2], ['v' => 4]], $c->whereNotLoose('v', 3)->values()->all());
+	}
+
 
 	public function testValues()
 	{
