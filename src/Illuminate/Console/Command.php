@@ -282,22 +282,38 @@ class Command extends \Symfony\Component\Console\Command\Command {
 	 * Write a string as information output.
 	 *
 	 * @param  string  $string
+	 * @param  bool  $newline
 	 * @return void
 	 */
-	public function info($string)
+	public function info($string, $newline = true)
 	{
-		$this->output->writeln("<info>$string</info>");
+		if ($newline)
+		{
+	    		$this->output->writeln("<info>$string</info>");
+		}
+		else
+		{
+	    		$this->output->write("<info>$string</info>");
+		}
 	}
 
 	/**
 	 * Write a string as standard output.
 	 *
 	 * @param  string  $string
+	 * @param  bool  $newline
 	 * @return void
 	 */
-	public function line($string)
+	public function line($string, $newline = true)
 	{
-		$this->output->writeln($string);
+		if ($newline)
+		{
+	    		$this->output->writeln($string);
+		}
+		else
+		{
+	    		$this->output->write($string);
+		}
 	}
 
 	/**
