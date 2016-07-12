@@ -127,6 +127,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $appends = [];
 
     /**
+     * Attribute to column mapping.
+     *
+     * @var array
+     */
+    protected $maps = [];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -2082,7 +2089,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getHidden()
     {
-        return $this->hidden;
+        return array_merge($this->hidden, array_values($this->maps));
     }
 
     /**
@@ -2175,6 +2182,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->appends = $appends;
 
         return $this;
+    }
+
+    /**
+     * Set the attribute column mapping array.
+     *
+     * @param  array  $maps
+     * @return $this
+     */
+    public function setMaps(array $maps)
+    {
+        $this->maps = $maps;
+
+        return $this;
+    }
+
+    /**
+     * Get the attribute column mappings array.
+     *
+     * @return array
+     */
+    public function getMaps()
+    {
+        return $this->maps;
     }
 
     /**
@@ -2498,12 +2528,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getArrayableAppends()
     {
-        if (! count($this->appends)) {
+        $appends = array_merge($this->appends, array_keys($this->maps));
+
+        if (! count($appends)) {
             return [];
         }
 
         return $this->getArrayableItems(
-            array_combine($this->appends, $this->appends)
+            array_combine($appends, $appends)
         );
     }
 
@@ -2691,7 +2723,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        if (method_exists($this, 'get'.Str::studly($key).'Attribute')) {
+            return true;
+        }
+
+        return isset($this->maps[$key]);
     }
 
     /**
@@ -2703,7 +2739,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        $method = 'get'.Str::studly($key).'Attribute';
+
+        if (method_exists($this, $method)) {
+            return $this->{$method}($value);
+        }
+
+        return $this->attributes[$this->maps[$key]];
     }
 
     /**
@@ -2843,7 +2885,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($this->hasSetMutator($key)) {
             $method = 'set'.Str::studly($key).'Attribute';
 
-            return $this->{$method}($value);
+            if (method_exists($this, $method)) {
+                return $this->{$method}($value);
+            }
+
+            $this->attributes[$this->maps[$key]] = $value;
+
+            return $this;
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
@@ -2870,7 +2918,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+        if (method_exists($this, 'set'.Str::studly($key).'Attribute')) {
+            return true;
+        }
+
+        return isset($this->maps[$key]);
     }
 
     /**
@@ -3343,7 +3395,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             static::cacheMutatedAttributes($class);
         }
 
-        return static::$mutatorCache[$class];
+        return array_merge(static::$mutatorCache[$class], array_keys($this->maps));
     }
 
     /**

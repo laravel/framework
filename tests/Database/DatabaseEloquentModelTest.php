@@ -1115,6 +1115,21 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['firstName', 'middleName', 'lastName'], $model->getMutatedAttributes());
     }
 
+    public function testMappedAttributes()
+    {
+        $model = new EloquentModelStub;
+
+        $model->setRawAttributes(['badly_named_column__name' => 'Foo']);
+        $model->setMaps(['name' => 'badly_named_column__name']);
+
+        $this->assertEquals(['name' => 'Foo'], $model->toArray());
+        $this->assertEquals('Foo', $model->name);
+        $model->name = 'Bar';
+
+        $this->assertEquals(['name' => 'Bar'], $model->toArray());
+        $this->assertEquals(['badly_named_column__name' => 'Bar'], $model->getAttributes());
+    }
+
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
         $model = new EloquentModelStub;
