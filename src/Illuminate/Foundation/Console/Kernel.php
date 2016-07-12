@@ -6,10 +6,14 @@ use Exception;
 use Throwable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
+use Symfony\Component\Console\ConsoleEvents;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 class Kernel implements KernelContract
 {
@@ -90,6 +94,7 @@ class Kernel implements KernelContract
         );
 
         $this->schedule($schedule);
+        $this->events->fire('artisan.schedule', $schedule);
     }
 
     /**
@@ -103,6 +108,7 @@ class Kernel implements KernelContract
     {
         try {
             $this->bootstrap();
+            $this->listenToArtisan();
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
@@ -166,6 +172,7 @@ class Kernel implements KernelContract
     public function call($command, array $parameters = [])
     {
         $this->bootstrap();
+        $this->listenToArtisan();
 
         return $this->getArtisan()->call($command, $parameters);
     }
@@ -271,5 +278,23 @@ class Kernel implements KernelContract
     protected function renderException($output, Exception $e)
     {
         $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+    }
+
+    /**
+     * Listen to Artisan for events and re-issue them as artisan events.
+     *
+     * @return void
+     */
+    protected function listenToArtisan()
+    {
+        $dispatcher = new SymfonyEventDispatcher();
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+            $this->events->fire('artisan.begin ' . $event->getCommand()->getName(), $event);
+        });
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+            $this->events->fire('artisan.finish ' . $event->getCommand()->getName(), $event);
+        });
+
+        $this->getArtisan()->setDispatcher($dispatcher);
     }
 }
