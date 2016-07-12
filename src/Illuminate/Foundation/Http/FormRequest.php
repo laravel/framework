@@ -64,6 +64,13 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected $dontFlash = ['password', 'password_confirmation'];
 
 	/**
+	 * The database connection used in validation.
+	 *
+	 * @var string
+	 */
+	protected $connection;
+
+	/**
 	 * Get the validator instance for the request.
 	 *
 	 * @return \Illuminate\Validation\Validator
@@ -71,6 +78,15 @@ class FormRequest extends Request implements ValidatesWhenResolved {
 	protected function getValidatorInstance()
 	{
 		$factory = $this->container->make('Illuminate\Validation\Factory');
+
+		if ($this->connection)
+		{
+			$verifier = $this->container->make('validation.presence');
+
+			$verifier->setConnection($this->connection);
+
+			$factory->setPresenceVerifier($verifier);
+		}
 
 		if (method_exists($this, 'validator'))
 		{
