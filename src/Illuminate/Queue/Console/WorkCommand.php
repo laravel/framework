@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 
 class WorkCommand extends Command
 {
@@ -94,7 +95,7 @@ class WorkCommand extends Command
             $this->worker->setCache($this->laravel['cache']->driver());
 
             $this->worker->setDaemonExceptionHandler(
-                $this->laravel['Illuminate\Contracts\Debug\ExceptionHandler']
+                $this->laravel[ExceptionHandlerContract::class]
             );
 
             return $this->worker->daemon(
