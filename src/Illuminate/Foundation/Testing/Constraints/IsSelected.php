@@ -75,7 +75,7 @@ class IsSelected extends FormFieldConstraint
     /**
      * Get the selected value from an option element.
      *
-     * @param \DOMElement $option
+     * @param  \DOMElement  $option
      * @return string
      */
     protected function getOptionValue(DOMElement $option)
