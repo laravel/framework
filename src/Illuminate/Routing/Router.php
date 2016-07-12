@@ -394,11 +394,13 @@ class Router implements RegistrarContract {
 
 		$new['prefix'] = static::formatGroupPrefix($new, $old);
 
+		$new['as'] = static::formatNamePrefix($new, $old);
+
 		if (isset($new['domain'])) unset($old['domain']);
 
 		$new['where'] = array_merge(array_get($old, 'where', []), array_get($new, 'where', []));
 
-		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'where')), $new);
+		return array_merge_recursive(array_except($old, array('namespace', 'prefix', 'as', 'where')), $new);
 	}
 
 	/**
@@ -437,6 +439,23 @@ class Router implements RegistrarContract {
 		}
 
 		return array_get($old, 'prefix');
+	}
+
+	/**
+	 * Format the name for the new group attributes.
+	 *
+	 * @param  array  $new
+	 * @param  array  $old
+	 * @return string
+	 */
+	protected static function formatNamePrefix($new, $old)
+	{
+		if (isset($new['as']))
+		{
+			return trim(array_get($old, 'as'), '.').'.'.trim($new['as'], '.');
+		}
+
+		return array_get($old, 'as');
 	}
 
 	/**
