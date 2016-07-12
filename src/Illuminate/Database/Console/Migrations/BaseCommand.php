@@ -9,9 +9,13 @@ class BaseCommand extends Command {
 	 *
 	 * @return string
 	 */
-	protected function getMigrationPath()
+	protected function getMigrationPath($path = NULL)
 	{
-		return $this->laravel->databasePath().'/migrations';
+		if (! is_null($path)) {
+          return $this->laravel->basePath(). '/'. $path;
+        } else {
+          return $this->laravel->databasePath().'/migrations';
+        }
 	}
 
 }
