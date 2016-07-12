@@ -1,13 +1,14 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\MigrateTrait;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class RollbackCommand extends Command {
 
-	use ConfirmableTrait;
+	use ConfirmableTrait, MigrateTrait;
 
 	/**
 	 * The console command name.
@@ -22,13 +23,6 @@ class RollbackCommand extends Command {
 	 * @var string
 	 */
 	protected $description = 'Rollback the last database migration';
-
-	/**
-	 * The migrator instance.
-	 *
-	 * @var \Illuminate\Database\Migrations\Migrator
-	 */
-	protected $migrator;
 
 	/**
 	 * Create a new migration rollback command instance.
@@ -52,7 +46,7 @@ class RollbackCommand extends Command {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
-		$this->migrator->setConnection($this->input->getOption('database'));
+		$this->selectDatabase();
 
 		$pretend = $this->input->getOption('pretend');
 

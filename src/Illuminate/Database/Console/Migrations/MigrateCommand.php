@@ -1,12 +1,13 @@
 <?php namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\MigrateTrait;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends BaseCommand {
 
-	use ConfirmableTrait;
+	use ConfirmableTrait, MigrateTrait;
 
 	/**
 	 * The console command name.
@@ -21,13 +22,6 @@ class MigrateCommand extends BaseCommand {
 	 * @var string
 	 */
 	protected $description = 'Run the database migrations';
-
-	/**
-	 * The migrator instance.
-	 *
-	 * @var \Illuminate\Database\Migrations\Migrator
-	 */
-	protected $migrator;
 
 	/**
 	 * Create a new migration command instance.
@@ -51,6 +45,7 @@ class MigrateCommand extends BaseCommand {
 	{
 		if ( ! $this->confirmToProceed()) return;
 
+		$this->selectDatabase();
 		$this->prepareDatabase();
 
 		// The pretend option can be used for "simulating" the migration and grabbing
@@ -96,8 +91,6 @@ class MigrateCommand extends BaseCommand {
 	 */
 	protected function prepareDatabase()
 	{
-		$this->migrator->setConnection($this->input->getOption('database'));
-
 		if ( ! $this->migrator->repositoryExists())
 		{
 			$options = array('--database' => $this->input->getOption('database'));
