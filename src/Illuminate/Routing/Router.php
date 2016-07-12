@@ -289,7 +289,7 @@ class Router implements RegistrarContract
         // Authentication Routes...
         $this->get('login', 'Auth\LoginController@showLoginForm');
         $this->post('login', 'Auth\LoginController@login');
-        $this->get('logout', 'Auth\LoginController@logout');
+        $this->post('logout', 'Auth\LoginController@logout');
 
         // Registration Routes...
         $this->get('register', 'Auth\RegisterController@showRegistrationForm');

@@ -52,7 +52,14 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url('/logout') }}">Logout</a></li>
+                                <li>
+                                    <form action="{{ url('/logout') }}" method="POST">
+                                        {!! csrf_field() !!}
+                                        <button type="submit" class="btn btn-link">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     @endif
