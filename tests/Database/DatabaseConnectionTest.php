@@ -177,6 +177,23 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($mock, $result);
     }
 
+    public function testTransactionMethodSuccessCallback()
+    {
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit']);
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('commit');
+        $result = $mock->transaction(
+            function () {
+                return 'foo';
+            },
+            function ($result) {
+                return $result.'bar';
+            }
+        );
+        $this->assertEquals('foobar', $result);
+    }
+
     public function testTransactionMethodRollsbackAndThrows()
     {
         $pdo = $this->getMockBuilder('DatabaseConnectionTestMockPDO')->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
@@ -191,6 +208,48 @@ class DatabaseConnectionTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
+    }
+
+    public function testTransactionMethodErrorCallback()
+    {
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('rollBack');
+        $pdo->expects($this->never())->method('commit');
+
+        $result = $mock->transaction(
+            function () {
+                throw new Exception('foo');
+            },
+            null,
+            function (Exception $e) {
+                return $e;
+            }
+        );
+
+        $this->assertInstanceOf('Exception', $result);
+        $this->assertEquals('foo', $result->getMessage());
+    }
+
+    public function testTransactionMethodErrorExternalCallback()
+    {
+        $pdo = $this->getMock('DatabaseConnectionTestMockPDO', ['beginTransaction', 'commit', 'rollBack']);
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->once())->method('beginTransaction');
+        $pdo->expects($this->once())->method('rollBack');
+        $pdo->expects($this->never())->method('commit');
+
+        $result = $mock->transaction(
+            function () {
+                throw new Exception('foo');
+            },
+            null,
+            DatabaseConnectionExceptionHandler::class.'::handle'
+        );
+
+        $this->assertInstanceOf('Exception', $result);
+        $this->assertEquals('foo', $result->getMessage());
     }
 
     /**
@@ -331,5 +390,13 @@ class DatabaseConnectionTestMockPDO extends PDO
 {
     public function __construct()
     {
+    }
+}
+
+class DatabaseConnectionExceptionHandler
+{
+    public static function handle($e)
+    {
+        return $e;
     }
 }
