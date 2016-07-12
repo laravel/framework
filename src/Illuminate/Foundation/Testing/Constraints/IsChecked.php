@@ -47,4 +47,14 @@ class IsChecked extends FormFieldConstraint
     {
         return "the checkbox [{$this->selector}] is checked";
     }
+
+    /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return "the checkbox [{$this->selector}] is not checked";
+    }
 }
