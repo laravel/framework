@@ -9,11 +9,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$array  = array('name' => 'Taylor', 'age' => 25);
 		$fluent = new Fluent($array);
 
-		$refl = new \ReflectionObject($fluent);
-		$attributes = $refl->getProperty('attributes');
-		$attributes->setAccessible(true);
-
-		$this->assertEquals($array, $attributes->getValue($fluent));
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
@@ -23,11 +18,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$array  = array('name' => 'Taylor', 'age' => 25);
 		$fluent = new Fluent((object) $array);
 
-		$refl = new \ReflectionObject($fluent);
-		$attributes = $refl->getProperty('attributes');
-		$attributes->setAccessible(true);
-
-		$this->assertEquals($array, $attributes->getValue($fluent));
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
@@ -37,11 +27,6 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 		$array  = array('name' => 'Taylor', 'age' => 25);
 		$fluent = new Fluent(new FluentArrayIteratorStub($array));
 
-		$refl = new \ReflectionObject($fluent);
-		$attributes = $refl->getProperty('attributes');
-		$attributes->setAccessible(true);
-
-		$this->assertEquals($array, $attributes->getValue($fluent));
 		$this->assertEquals($array, $fluent->getAttributes());
 	}
 
@@ -106,7 +91,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase {
 }
 
 
-class FluentArrayIteratorStub implements \IteratorAggregate {
+class FluentArrayIteratorStub implements IteratorAggregate {
 	protected $items = array();
 
 	public function __construct(array $items = array())
@@ -116,6 +101,6 @@ class FluentArrayIteratorStub implements \IteratorAggregate {
 
 	public function getIterator()
 	{
-		return new \ArrayIterator($this->items);
+		return new ArrayIterator($this->items);
 	}
 }
