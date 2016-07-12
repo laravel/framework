@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Connection;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -22,6 +23,22 @@ class PostgresGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Get the bindings for determining table information including schema name.
+     *
+     * @param Connection $connection
+     * @param            $table
+     * @return array
+     */
+    public function getTableBindings(Connection $connection, $table)
+    {
+        $prefix = $connection->getTablePrefix();
+
+        $schema = $connection->getConfig('schema', 'public');
+
+        return [$schema, $prefix.$table];
+    }
+
+    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -33,13 +50,11 @@ class PostgresGrammar extends Grammar
 
     /**
      * Compile the query to determine the list of columns.
-     *
-     * @param  string  $table
      * @return string
      */
-    public function compileColumnExists($table)
+    public function compileColumnExists()
     {
-        return "select column_name from information_schema.columns where table_name = '$table'";
+        return 'select column_name from information_schema.columns where table_name = ?';
     }
 
     /**

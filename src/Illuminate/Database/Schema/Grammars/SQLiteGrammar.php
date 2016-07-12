@@ -22,6 +22,13 @@ class SQLiteGrammar extends Grammar
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
+    public function getTableBindings(Connection $connection, $table)
+    {
+        $prefix = $connection->getTablePrefix();
+
+        return [$prefix.str_replace_array('.', '_', $table)];
+    }
+
     /**
      * Compile the query to determine if a table exists.
      *
@@ -38,9 +45,9 @@ class SQLiteGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnExists($table)
+    public function compileColumnExists()
     {
-        return 'pragma table_info('.str_replace('.', '__', $table).')';
+        return 'pragma table_info(?)';
     }
 
     /**

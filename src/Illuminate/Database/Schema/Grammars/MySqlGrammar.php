@@ -26,6 +26,22 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Get the bindings for determining table information including database name.
+     *
+     * @param Connection $connection
+     * @param            $table
+     * @return array
+     */
+    public function getTableBindings(Connection $connection, $table)
+    {
+        $prefix = $connection->getTablePrefix();
+
+        $database = $connection->getDatabaseName();
+
+        return [$database, $prefix.$table];
+    }
+
+    /**
      * Compile the query to determine the list of tables.
      *
      * @return string
