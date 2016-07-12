@@ -500,7 +500,24 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEmpty($container->tagged('this_tag_does_not_exist'));
 	}
+    
+    /**
+     * Methods should using contextual binding
+     */
+	public function testContextualBindingOnMethods()
+	{
+		$container = new Container;
+        $container->when("ContainerTestInterfaceStub")->needs("IContainerContractStub")->give("ContainerImplementationStub");
 
+        // Works if using constructor
+		$constructor = $container->make('ContainerTestInterfaceStub');
+		$result = $constructor->getStub();
+        $this->assertInstanceOf("ContainerImplementationStub", $result);
+
+        // Doesn't work if using methods
+		$result = $container->call('ContainerTestInterfaceStub@go');
+        $this->assertInstanceOf("ContainerImplementationStub", $result);
+	}
 }
 
 class ContainerConcreteStub {}
@@ -597,4 +614,21 @@ class ContainerStaticMethodStub
 function containerTestInject(ContainerConcreteStub $stub, $default = 'taylor')
 {
 	return func_get_args();
+}
+
+class ContainerTestInterfaceStub {
+    public function __construct(IContainerContractStub $stub)
+    {
+        $this->stub = $stub;
+    }
+
+	public function go(IContainerContractStub $stub)
+	{
+		return $stub; 
+	}
+
+    public function getStub()
+    {
+        return $this->stub;
+    }
 }
