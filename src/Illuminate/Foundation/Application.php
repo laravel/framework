@@ -757,10 +757,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		{
 			return $this->basePath().'/vendor/config.php';
 		}
-		else
-		{
-			return $this['path.storage'].'/framework/config.php';
-		}
+
+		return $this['path.storage'].'/framework/config.php';
 	}
 
 	/**
@@ -784,10 +782,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		{
 			return $this->basePath().'/vendor/routes.php';
 		}
-		else
-		{
-			return $this['path.storage'].'/framework/routes.php';
-		}
+
+		return $this['path.storage'].'/framework/routes.php';
 	}
 
 	/**
@@ -801,10 +797,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		{
 			return $this->basePath().'/vendor/compiled.php';
 		}
-		else
-		{
-			return $this->storagePath().'/framework/compiled.php';
-		}
+
+		return $this->storagePath().'/framework/compiled.php';
 	}
 
 	/**
@@ -818,10 +812,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 		{
 			return $this->basePath().'/vendor/services.json';
 		}
-		else
-		{
-			return $this->storagePath().'/framework/services.json';
-		}
+
+		return $this->storagePath().'/framework/services.json';
 	}
 
 	/**

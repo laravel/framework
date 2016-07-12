@@ -673,10 +673,8 @@ class Request extends SymfonyRequest implements ArrayAccess {
 		{
 			return $this->route()->parameter(func_get_arg(0));
 		}
-		else
-		{
-			return call_user_func($this->getRouteResolver());
-		}
+
+		return call_user_func($this->getRouteResolver());
 	}
 
 	/**

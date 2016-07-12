@@ -77,10 +77,7 @@ class SoftDeletingScope implements ScopeInterface {
 		{
 			return $builder->getModel()->getQualifiedDeletedAtColumn();
 		}
-		else
-		{
-			return $builder->getModel()->getDeletedAtColumn();
-		}
+		return $builder->getModel()->getDeletedAtColumn();
 	}
 
 	/**
