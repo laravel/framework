@@ -2784,7 +2784,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// the connection grammar's date format. We will auto set the values.
 		elseif (in_array($key, $this->getDates()) && $value)
 		{
-			$value = $this->fromDateTime($value);
+			$value = $this->fromDateTime($value, $this->getInputDateFormat($key));
 		}
 
 		if ($this->isJsonCastable($key))
@@ -2822,9 +2822,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * Convert a DateTime to a storable string.
 	 *
 	 * @param  \DateTime|int  $value
+	 * @param  string         $inputDateFormat
 	 * @return string
 	 */
-	public function fromDateTime($value)
+	public function fromDateTime($value, $inputDateFormat = null)
 	{
 		$format = $this->getDateFormat();
 
@@ -2857,7 +2858,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		// can return back the finally formatted DateTime instances to the devs.
 		else
 		{
-			$value = Carbon::createFromFormat($format, $value);
+			$value = Carbon::createFromFormat($inputDateFormat ?: $format, $value);
 		}
 
 		return $value->format($format);
@@ -2908,6 +2909,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected function getDateFormat()
 	{
 		return $this->getConnection()->getQueryGrammar()->getDateFormat();
+	}
+
+	/**
+	 * Get the format for input dates.
+	 *
+	 * @param  string  $attribute
+	 * @return string
+	 */
+	protected function getInputDateFormat($attribute)
+	{
+		return $this->getDateFormat();
 	}
 
 	/**
