@@ -25,7 +25,14 @@ class BcryptHasher implements HasherContract {
 	{
 		$cost = isset($options['rounds']) ? $options['rounds'] : $this->rounds;
 
-		$hash = password_hash($value, PASSWORD_BCRYPT, array('cost' => $cost));
+		$parameters = array('cost' => $cost);
+
+		if (isset($options['salt']))
+		{
+			$parameters['salt'] = $options['salt'];
+		}
+
+		$hash = password_hash($value, PASSWORD_BCRYPT, $parameters);
 
 		if ($hash === false)
 		{
