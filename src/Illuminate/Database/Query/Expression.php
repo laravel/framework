@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Database\Query;
 
-class Expression {
+use Illuminate\Contracts\Database\Expression as ExpressionContract;
+
+class Expression implements ExpressionContract {
 
 	/**
 	 * The value of the expression.
