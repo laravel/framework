@@ -104,7 +104,7 @@ class Repository implements ArrayAccess {
 	 * @param  Closure  $callback
 	 * @return mixed
 	 */
-	public function remember($key, $minutes, Closure $callback)
+	public function remember($key, $minutes, Closure $callback, array $arguments = array())
 	{
 		// If the item exists in the cache we will just return this immediately
 		// otherwise we will execute the given Closure and cache the result
@@ -114,7 +114,9 @@ class Repository implements ArrayAccess {
 			return $value;
 		}
 
-		$this->put($key, $value = $callback(), $minutes);
+        $value = call_user_func_array($callback, $arguments);
+
+		$this->put($key, $value, $minutes);
 
 		return $value;
 	}
