@@ -151,7 +151,7 @@ trait ValidatesRequests
     {
         $this->validatesRequestErrorBag = $errorBag;
 
-        call_user_func($callback);
+        $callback();
 
         $this->validatesRequestErrorBag = null;
     }
