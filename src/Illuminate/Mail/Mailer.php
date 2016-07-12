@@ -322,7 +322,11 @@ class Mailer {
 	 */
 	protected function logMessage($message)
 	{
-		$emails = implode(', ', array_keys((array) $message->getTo()));
+		$emails = implode(', ', array_merge(
+			array_keys((array) $message->getTo()),
+			array_keys((array) $message->getCc()),
+			array_keys((array) $message->getBcc())
+		));
 
 		$this->logger->info("Pretending to mail message to: {$emails}");
 	}
