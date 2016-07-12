@@ -159,6 +159,11 @@ class Builder {
 	 */
 	public function get($columns = array('*'))
 	{
+		if(is_string($columns))
+		{
+			$columns = func_get_args();
+		}
+
 		$models = $this->getModels($columns);
 
 		// If we actually found models we will also eager load any relationships that
