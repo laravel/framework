@@ -546,7 +546,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  array  $parameters
 	 * @return array
 	 */
-	protected function getMethodDependencies($callback, $parameters = [])
+	protected function getMethodDependencies($callback, array $parameters = [])
 	{
 		$dependencies = [];
 
@@ -637,7 +637,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  array   $parameters
 	 * @return mixed
 	 */
-	public function make($abstract, $parameters = [])
+	public function make($abstract, array $parameters = [])
 	{
 		$abstract = $this->getAlias($abstract);
 
@@ -766,7 +766,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 *
 	 * @throws BindingResolutionException
 	 */
-	public function build($concrete, $parameters = [])
+	public function build($concrete, array $parameters = [])
 	{
 		// If the concrete type is actually a Closure, we will just execute it and
 		// hand back the results of the functions, which allows functions to be
@@ -827,7 +827,7 @@ class Container implements ArrayAccess, ContainerContract {
 	 * @param  array  $primitives
 	 * @return array
 	 */
-	protected function getDependencies($parameters, array $primitives = [])
+	protected function getDependencies(array $parameters, array $primitives = [])
 	{
 		$dependencies = [];
 
