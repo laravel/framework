@@ -42,33 +42,59 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 	public function testStartsWith()
 	{
 		$this->assertTrue(Str::startsWith('jason', 'jas'));
+		$this->assertFalse(Str::startsWith('jason', 'Jas'));
+		$this->assertTrue(Str::startsWith('jason', 'Jas', false));
 		$this->assertTrue(Str::startsWith('jason', 'jason'));
+		$this->assertFalse(Str::startsWith('jason', 'Jason'));
+		$this->assertTrue(Str::startsWith('jason', 'Jason', false));
 		$this->assertTrue(Str::startsWith('jason', array('jas')));
+		$this->assertFalse(Str::startsWith('jason', array('Jas')));
+		$this->assertTrue(Str::startsWith('jason', array('Jas'), false));
 		$this->assertFalse(Str::startsWith('jason', 'day'));
+		$this->assertFalse(Str::startsWith('jason', 'day', false));
 		$this->assertFalse(Str::startsWith('jason', array('day')));
+		$this->assertFalse(Str::startsWith('jason', array('day'), false));
 		$this->assertFalse(Str::startsWith('jason', ''));
+		$this->assertFalse(Str::startsWith('jason', ''), false);
 	}
 
 
 	public function testEndsWith()
 	{
 		$this->assertTrue(Str::endsWith('jason', 'on'));
+		$this->assertFalse(Str::endsWith('jason', 'On'));
+		$this->assertTrue(Str::endsWith('jason', 'On', false));
 		$this->assertTrue(Str::endsWith('jason', 'jason'));
+		$this->assertFalse(Str::endsWith('jason', 'Jason'));
+		$this->assertTrue(Str::endsWith('jason', 'Jason', false));
 		$this->assertTrue(Str::endsWith('jason', array('on')));
+		$this->assertFalse(Str::endsWith('jason', array('On')));
+		$this->assertTrue(Str::endsWith('jason', array('On'), false));
 		$this->assertFalse(Str::endsWith('jason', 'no'));
+		$this->assertFalse(Str::endsWith('jason', 'No', false));
 		$this->assertFalse(Str::endsWith('jason', array('no')));
+		$this->assertFalse(Str::endsWith('jason', array('no'), false));
 		$this->assertFalse(Str::endsWith('jason', ''));
+		$this->assertFalse(Str::endsWith('jason', '', false));
 		$this->assertFalse(Str::endsWith('7', ' 7'));
+		$this->assertFalse(Str::endsWith('7', ' 7', false));
 	}
 
 
 	public function testStrContains()
 	{
 		$this->assertTrue(Str::contains('taylor', 'ylo'));
+		$this->assertFalse(Str::contains('taylor', 'Ylo'));
+		$this->assertTrue(Str::contains('taylor', 'Ylo', false));
 		$this->assertTrue(Str::contains('taylor', array('ylo')));
+		$this->assertFalse(Str::contains('taylor', array('Ylo')));
+		$this->assertTrue(Str::contains('taylor', array('Ylo'), false));
 		$this->assertFalse(Str::contains('taylor', 'xxx'));
+		$this->assertFalse(Str::contains('taylor', 'xxx', false));
 		$this->assertFalse(Str::contains('taylor', array('xxx')));
+		$this->assertFalse(Str::contains('taylor', array('xxx'), false));
 		$this->assertFalse(Str::contains('taylor', ''));
+		$this->assertFalse(Str::contains('taylor', '', false));
 	}
 
 
@@ -102,7 +128,11 @@ class SupportStrTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Str::is('/', ' /'));
 		$this->assertFalse(Str::is('/', '/a'));
 		$this->assertTrue(Str::is('foo/*', 'foo/bar/baz'));
+		$this->assertFalse(Str::is('foo/*', 'Foo/bar/baz'));
+		$this->assertTrue(Str::is('foo/*', 'Foo/bar/baz', false));
 		$this->assertTrue(Str::is('*/foo', 'blah/baz/foo'));
+		$this->assertFalse(Str::is('*/foo', 'blah/baz/Foo'));
+		$this->assertTrue(Str::is('*/foo', 'blah/baz/Foo', false));
 	}
 
 
