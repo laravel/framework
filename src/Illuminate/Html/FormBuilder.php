@@ -566,9 +566,31 @@ class FormBuilder {
 	 * @param  array   $options
 	 * @return string
 	 */
-	public function checkbox($name, $value = 1, $checked = null, $options = array())
+	public function checkbox($name, $value = 1, $checked = null, $options = array(), $uncheckedValue = 0)
 	{
-		return $this->checkable('checkbox', $name, $value, $checked, $options);
+		$hidden = $this->hiddenFieldForCheckbox($name, $uncheckedValue, $options);
+		$checkbox = $this->checkable('checkbox', $name, $value, $checked, $options);;
+		return $hidden . $checkbox;
+	}
+
+	/**
+	 * Create a hidden field for a checkbox input field.
+	 *
+	 * @param  string  $name
+	 * @param  mixed   $uncheckedValue
+	 * @param  array   $options
+	 * @return string
+	 */
+	protected function hiddenFieldForCheckbox($name, $uncheckedValue, $options)
+	{
+		$hidden = '';
+		if (!is_null($uncheckedValue) && $uncheckedValue !== false) {
+			$this->skipValueTypes[] = 'hidden';
+			$hidden = $this->hidden($name, $uncheckedValue, array_only($options, array('disabled', 'form')));
+			$this->skipValueTypes = array_diff($this->skipValueTypes, array('hidden'));
+		}
+
+		return $hidden;
 	}
 
 	/**

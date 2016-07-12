@@ -298,11 +298,15 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 		$form2 = $this->formBuilder->checkbox('foo');
 		$form3 = $this->formBuilder->checkbox('foo', 'foobar', true);
 		$form4 = $this->formBuilder->checkbox('foo', 'foobar', false, array('class' => 'span2'));
+		$form5 = $this->formBuilder->checkbox('foo', 'foobar', false, array(), 'no');
+		$form6 = $this->formBuilder->checkbox('foo', 'foobar', false, array(), false);
 
 		$this->assertEquals('<input name="foo" type="checkbox">', $form1);
-		$this->assertEquals('<input name="foo" type="checkbox" value="1">', $form2);
-		$this->assertEquals('<input checked="checked" name="foo" type="checkbox" value="foobar">', $form3);
-		$this->assertEquals('<input class="span2" name="foo" type="checkbox" value="foobar">', $form4);
+		$this->assertEquals('<input name="foo" type="hidden" value="0"><input name="foo" type="checkbox" value="1">', $form2);
+		$this->assertEquals('<input name="foo" type="hidden" value="0"><input checked="checked" name="foo" type="checkbox" value="foobar">', $form3);
+		$this->assertEquals('<input name="foo" type="hidden" value="0"><input class="span2" name="foo" type="checkbox" value="foobar">', $form4);
+		$this->assertEquals('<input name="foo" type="hidden" value="no"><input name="foo" type="checkbox" value="foobar">', $form5);
+		$this->assertEquals('<input name="foo" type="checkbox" value="foobar">', $form6);
 	}
 
 
@@ -313,20 +317,20 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 
 		$session->shouldReceive('getOldInput')->once()->with('check')->andReturn(null);
 		$check = $this->formBuilder->checkbox('check', 1, true);
-		$this->assertEquals('<input name="check" type="checkbox" value="1">', $check);
+		$this->assertEquals('<input name="check" type="hidden" value="0"><input name="check" type="checkbox" value="1">', $check);
 
 		$session->shouldReceive('getOldInput')->with('check.key')->andReturn('yes');
 		$check = $this->formBuilder->checkbox('check[key]', 'yes');
-		$this->assertEquals('<input checked="checked" name="check[key]" type="checkbox" value="yes">', $check);
+		$this->assertEquals('<input name="check[key]" type="hidden" value="0"><input checked="checked" name="check[key]" type="checkbox" value="yes">', $check);
 
 		$session->shouldReceive('getOldInput')->with('multicheck')->andReturn(array(1, 3));
 		$check1 = $this->formBuilder->checkbox('multicheck[]', 1);
 		$check2 = $this->formBuilder->checkbox('multicheck[]', 2, true);
 		$check3 = $this->formBuilder->checkbox('multicheck[]', 3);
 
-		$this->assertEquals('<input checked="checked" name="multicheck[]" type="checkbox" value="1">', $check1);
-		$this->assertEquals('<input name="multicheck[]" type="checkbox" value="2">', $check2);
-		$this->assertEquals('<input checked="checked" name="multicheck[]" type="checkbox" value="3">', $check3);
+		$this->assertEquals('<input name="multicheck[]" type="hidden" value="0"><input checked="checked" name="multicheck[]" type="checkbox" value="1">', $check1);
+		$this->assertEquals('<input name="multicheck[]" type="hidden" value="0"><input name="multicheck[]" type="checkbox" value="2">', $check2);
+		$this->assertEquals('<input name="multicheck[]" type="hidden" value="0"><input checked="checked" name="multicheck[]" type="checkbox" value="3">', $check3);
 	}
 
 
