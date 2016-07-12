@@ -1,9 +1,17 @@
 <?php namespace Illuminate\Database\Migrations;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Container\Container;
 
 class Migrator {
+
+	/**
+	 * The application container.
+	 *
+	 * @var \Illuminate\Container\Container
+	 */
+	protected $app;
 
 	/**
 	 * The migration repository implementation.
@@ -43,15 +51,18 @@ class Migrator {
 	/**
 	 * Create a new migrator instance.
 	 *
+	 * @param  \Illuminate\Container\Container  $app
 	 * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
 	 * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
 	 * @param  \Illuminate\Filesystem\Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(MigrationRepositoryInterface $repository,
+	public function __construct(Container $app,
+								MigrationRepositoryInterface $repository,
 								Resolver $resolver,
-                                Filesystem $files)
+								Filesystem $files)
 	{
+		$this->app = $app;
 		$this->files = $files;
 		$this->resolver = $resolver;
 		$this->repository = $repository;
@@ -294,7 +305,7 @@ class Migrator {
 
 		$class = studly_case($file);
 
-		return new $class;
+		return $this->app->make($class);
 	}
 
 	/**
