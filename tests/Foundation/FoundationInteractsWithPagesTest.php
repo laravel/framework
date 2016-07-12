@@ -215,6 +215,28 @@ class FoundationInteractsWithPagesTest extends PHPUnit_Framework_TestCase
         $this->dontSeeIsSelected('availability', 'partial_time');
     }
 
+    protected function getSelectHtmlWithoutValueAttribute()
+    {
+        return
+            '<select name="size">
+              <option>S</option>
+              <option selected>M</option>
+              <option>L</option>
+          </select>';
+    }
+
+    public function testSeeOptionWithoutValueIsSelected()
+    {
+        $this->setCrawler($this->getSelectHtmlWithoutValueAttribute());
+        $this->seeIsSelected('size', 'M');
+    }
+
+    public function testDontSeeOptionWithoutValueIsSelected()
+    {
+        $this->setCrawler($this->getSelectHtmlWithoutValueAttribute());
+        $this->dontSeeIsSelected('size', 'S');
+    }
+
     protected function getEmptySelectHtml()
     {
         return
