@@ -1,0 +1,22 @@
+<?php namespace {{namespace}};
+
+class {{class}}TableSeeder extends Seeder {
+
+	/**
+	 * Create a seed for {{class}}.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		{{class}}::truncate();
+
+		foreach (range(1, 10) as $index)
+		{
+			{{class}}::create([
+
+			]);
+		}
+	}
+
+}
