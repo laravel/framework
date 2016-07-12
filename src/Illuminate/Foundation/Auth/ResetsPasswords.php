@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -10,21 +9,21 @@ trait ResetsPasswords {
 	/**
 	 * The Guard implementation.
 	 *
-	 * @var Guard
+	 * @var \Illuminate\Contracts\Auth\Guard
 	 */
 	protected $auth;
 
 	/**
 	 * The password broker implementation.
 	 *
-	 * @var PasswordBroker
+	 * @var \Illuminate\Contracts\Auth\PasswordBroker
 	 */
 	protected $passwords;
 
 	/**
 	 * Display the form to request a password reset link.
 	 *
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function getEmail()
 	{
@@ -34,8 +33,8 @@ trait ResetsPasswords {
 	/**
 	 * Send a reset link to the given user.
 	 *
-	 * @param  Request  $request
-	 * @return Response
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
 	 */
 	public function postEmail(Request $request)
 	{
@@ -70,7 +69,7 @@ trait ResetsPasswords {
 	 * Display the password reset view for the given token.
 	 *
 	 * @param  string  $token
-	 * @return Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public function getReset($token = null)
 	{
@@ -85,8 +84,8 @@ trait ResetsPasswords {
 	/**
 	 * Reset the given user's password.
 	 *
-	 * @param  Request  $request
-	 * @return Response
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
 	 */
 	public function postReset(Request $request)
 	{
