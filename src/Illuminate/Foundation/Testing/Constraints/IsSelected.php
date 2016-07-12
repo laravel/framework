@@ -83,7 +83,7 @@ class IsSelected extends FormFieldConstraint
         if ($option->hasAttribute('value')) {
             return $option->getAttribute('value');
         }
-        
+
         return $option->textContent;
     }
 
