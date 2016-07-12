@@ -809,4 +809,25 @@ class BladeCompiler extends Compiler implements CompilerInterface {
 		$this->echoFormat = $format;
 	}
 
+	/**
+	 * Add footer.
+	 * 
+	 * @param  string $footer
+	 * @return void
+	 */
+	public function addFooter($footer)
+	{
+		$this->footer[] = $footer;
+	}
+
+	/**
+	 * Get footer used for the compiler.
+	 * 
+	 * @return array
+	 */
+	public function getFooter()
+	{
+		return $this->footer;
+	}
+
 }
