@@ -34,6 +34,12 @@ class FreshCommand extends Command {
 
 		$files = new Filesystem;
 
+		if ($files->exists($this->laravel->storagePath().'/framework/fresh'))
+		{
+			$this->error('You shouldn\'t run this twice, it\'s dangerous... Remove [/storage/framework/fresh] and try again if you\'re sure.');
+			return;
+		}
+
 		$files->deleteDirectory(app_path('Services'));
 		$files->delete(base_path('resources/views/app.blade.php'));
 		$files->delete(base_path('resources/views/home.blade.php'));
@@ -52,6 +58,8 @@ class FreshCommand extends Command {
 
 		$files->put(app_path('Http/routes.php'), $files->get(__DIR__.'/stubs/fresh-routes.stub'));
 		$files->put(app_path('Providers/AppServiceProvider.php'), $files->get(__DIR__.'/stubs/fresh-app-provider.stub'));
+
+		touch($this->laravel->storagePath().'/framework/fresh');
 
 		$this->info('Scaffolding removed! Enjoy your fresh start.');
 	}
