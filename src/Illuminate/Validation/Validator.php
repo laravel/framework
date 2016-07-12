@@ -1027,7 +1027,12 @@ class Validator implements ValidatorContract {
 	{
 		$this->requireParameterCount(1, $parameters, 'unique');
 
-		$table = $parameters[0];
+		list($connection, $table) = explode('.', $parameters[0]);
+		if (empty($table))
+		{
+			$table = $connection;
+			$connection = null;
+		}
 
 		// The second parameter position holds the name of the column that needs to
 		// be verified as unique. If this parameter isn't specified we will just
@@ -1047,7 +1052,11 @@ class Validator implements ValidatorContract {
 		// mechanism which might be a relational database or any other permanent
 		// data store like Redis, etc. We will use it to determine uniqueness.
 		$verifier = $this->getPresenceVerifier();
-
+		if (!empty($connection))
+		{
+			$verifier->setConnection($connection);
+		}
+		
 		$extra = $this->getUniqueExtra($parameters);
 
 		return $verifier->getCount(
