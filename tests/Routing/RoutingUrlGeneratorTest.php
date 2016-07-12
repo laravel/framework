@@ -115,6 +115,64 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicRouteGenerationOptionalParameterMatch()
+	{
+		$url = new UrlGenerator(
+				$routes = new Illuminate\Routing\RouteCollection,
+				$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz?}', array('as' => 'foobaz'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobaz', ['baz' => 'taylor']));
+	}
+
+
+	public function testBasicRouteGenerationOptionalParameterNoMatch()
+	{
+		$url = new UrlGenerator(
+			$routes = new Illuminate\Routing\RouteCollection,
+			$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz?}', array('as' => 'foobaz'));
+		$routes->add($route);
+
+		$this->assertEquals('http://www.foo.com/foo/bar?taylor=otwell', $url->route('foobaz', ['taylor' => 'otwell']));
+	}
+
+
+	public function testBasicRouteGenerationOptionalParameterNoMatchIntegerKeyValue()
+	{
+		$url = new UrlGenerator(
+				$routes = new Illuminate\Routing\RouteCollection,
+				$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz?}', array('as' => 'foobaz'));
+		$routes->add($route);
+
+		// or /foo/bar?1&2 ???
+		$this->assertEquals('http://www.foo.com/foo/bar//1/2', $url->route('foobaz', [1,2]));
+	}
+
+
+	public function testBasicRouteGenerationOptionalParameterNoMatchIntegerKeyStringValue()
+	{
+		$url = new UrlGenerator(
+				$routes = new Illuminate\Routing\RouteCollection,
+				$request = Illuminate\Http\Request::create('http://www.foo.com/')
+		);
+
+		$route = new Illuminate\Routing\Route(array('GET'), 'foo/bar/{baz?}', array('as' => 'foobaz'));
+		$routes->add($route);
+
+		// or /foo/bar?taylor ???
+		$this->assertEquals('http://www.foo.com/foo/bar//taylor', $url->route('foobaz', 'taylor'));
+	}
+
+
 	public function testControllerRoutesWithADefaultNamespace()
 	{
 		$url = new UrlGenerator(
@@ -135,6 +193,9 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
 		$this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
+
+		$this->assertEquals('http://www.foo.com/foo/bar/1', $url->action('foo@bar', 1));
+		$this->assertEquals('http://www.foo.com/foo/bar/1/2', $url->action('foo@bar', [1,2]));
 	}
 
 
@@ -276,7 +337,10 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase {
 		$route = new Illuminate\Routing\Route(array('GET'), 'foo/{one}/{two?}/{three?}', array('as' => 'foo', function() {}));
 		$routes->add($route);
 
-		$this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
+		$this->assertEquals('http://www.foo.com:8080/foo/taylor', $url->route('foo', array('one' => 'taylor')));
+
+		$this->setExpectedException('InvalidArgumentException');
+		$url->route('foo'); // required parameter "one" is missing
 	}
 
 
