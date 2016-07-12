@@ -217,7 +217,7 @@ class StartSession implements TerminableMiddleware {
 	 */
 	protected function sessionConfigured()
 	{
-		return ! is_null(array_get($this->manager->getSessionConfig(), 'driver'));
+		return ! array_has($this->manager->getSessionConfig(), 'driver');
 	}
 
 	/**
