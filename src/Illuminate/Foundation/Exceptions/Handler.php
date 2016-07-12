@@ -115,14 +115,12 @@ class Handler implements ExceptionHandlerContract {
 	{
 		$status = $e->getStatusCode();
 
-		if (view()->exists("errors.{$status}"))
+		if(($debug = config('app.debug')) or !view()->exists("errors.{$status}"))
 		{
-			return response()->view("errors.{$status}", [], $status);
+			return (new SymfonyDisplayer($debug))->createResponse($e);
 		}
-		else
-		{
-			return (new SymfonyDisplayer(config('app.debug')))->createResponse($e);
-		}
+
+		return response()->view("errors.{$status}", [], $status);
 	}
 
 	/**
