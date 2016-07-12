@@ -178,6 +178,30 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUpdateWithAliases()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+		$model->setAliases(['foo' => 'bar']);
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('where')->once()->with('id', '=', 1);
+		$query->shouldReceive('update')->once()->with(array('name' => 'taylor', 'foo' => 'baz'));
+		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+		$model->id = 1;
+		$model->syncOriginal();
+		$model->name = 'taylor';
+		$model->bar = 'baz';
+		$model->exists = true;
+		$this->assertTrue($model->save());
+	}
+
+
 	public function testUpdateProcessDoesntOverrideTimestamps()
 	{
 		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes'));
@@ -349,6 +373,51 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase {
 		$model = new EloquentDateModelStub;
 		$model->created_at = '2012-01-01';
 		$this->assertInstanceOf('Carbon\Carbon', $model->created_at);
+	}
+
+
+	public function testInsertWithAliases()
+	{
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+		$model->setAliases(['foo' => 'bar']);
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insertGetId')->once()->with(array('name' => 'taylor', 'foo' => 'baz'), 'id')->andReturn(1);
+		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+		$model->name = 'taylor';
+		$model->bar = 'baz';
+		$model->exists = false;
+		$this->assertTrue($model->save());
+		$this->assertEquals(1, $model->id);
+		$this->assertTrue($model->exists);
+
+		$model = $this->getMock('EloquentModelStub', array('newQueryWithoutScopes', 'updateTimestamps'));
+		$model->setAliases(['foo' => 'bar']);
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('insert')->once()->with(array('name' => 'taylor', 'foo' => 'baz'));
+		$model->expects($this->once())->method('newQueryWithoutScopes')->will($this->returnValue($query));
+		$model->expects($this->once())->method('updateTimestamps');
+		$model->setIncrementing(false);
+
+		$model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+		$events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+		$events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
+		$events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+		$model->name = 'taylor';
+		$model->bar = 'baz';
+		$model->exists = false;
+		$this->assertTrue($model->save());
+		$this->assertNull($model->id);
+		$this->assertTrue($model->exists);
 	}
 
 

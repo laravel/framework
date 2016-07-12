@@ -523,7 +523,9 @@ class Builder {
 		}
 		else
 		{
-			call_user_func_array(array($this->query, 'where'), func_get_args());
+			$args = func_get_args();
+			$args[0] = $this->model->unaliasColumn($column);
+			call_user_func_array(array($this->query, 'where'), $args);
 		}
 
 		return $this;
