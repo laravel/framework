@@ -69,7 +69,17 @@ class StartSession
 
             $this->collectGarbage($session);
 
-            $this->addCookieToResponse($response, $session);
+            $config = $this->manager->getSessionConfig();
+            if ($config['expire_on_close']) {
+                $sessionCookieName = $session->getName();
+                $sessionId = $session->getId();
+                $oldSessionId = $request->cookie($sessionCookieName);
+                if ($oldSessionId == null || $oldSessionId !== $sessionId) {
+                    $this->addCookieToResponse($response, $session);
+                }
+            } else {
+                $this->addCookieToResponse($response, $session);
+            }
         }
 
         return $response;
