@@ -666,6 +666,42 @@ if ( ! function_exists('link_to'))
 	}
 }
 
+if ( ! function_exists('link_to_if'))
+{
+    /**
+     * Generate a HTML link if the condition returns true.
+     *
+     * @param  bool    $condition
+     * @param  string  $url
+     * @param  string  $title
+     * @param  array   $attributes
+     * @param  bool    $secure
+     * @return string
+     */
+    function link_to_if($condition, $url, $title = null, $attributes = array(), $secure = null)
+    {
+        return ($condition) ? app('html')->link($url, $title, $attributes, $secure) : '';
+    }
+}
+
+if ( ! function_exists('link_to_unless'))
+{
+    /**
+     * Generate a HTML link unless the condition returns true.
+     *
+     * @param  bool    $condition
+     * @param  string  $url
+     * @param  string  $title
+     * @param  array   $attributes
+     * @param  bool    $secure
+     * @return string
+     */
+    function link_to_unless($condition, $url, $title = null, $attributes = array(), $secure = null)
+    {
+        return ( ! $condition) ? app('html')->link($url, $title, $attributes, $secure) : '';
+    }
+}
+
 if ( ! function_exists('last'))
 {
 	/**
