@@ -658,9 +658,10 @@ if ( ! function_exists('elixir'))
 	* Get the path to a versioned Elixir file.
 	*
 	* @param  string  $file
+	* @param  string  $default
 	* @return string
 	*/
-	function elixir($file)
+	function elixir($file, $default = null)
 	{
 		static $manifest = null;
 
@@ -672,6 +673,10 @@ if ( ! function_exists('elixir'))
 		if (isset($manifest[$file]))
 		{
 			return '/build/'.$manifest[$file];
+		}
+		elseif ( ! is_null($default) && isset($manifest[$default]))
+		{
+			return '/build/'.$manifest[$default];
 		}
 
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
