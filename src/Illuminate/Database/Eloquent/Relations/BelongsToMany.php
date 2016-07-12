@@ -267,9 +267,10 @@ class BelongsToMany extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  array  $columns
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $columns = ['*'])
     {
         $this->query->addSelect($this->getSelectColumns());
 
@@ -277,7 +278,7 @@ class BelongsToMany extends Relation
             $this->hydratePivotRelation($results->all());
 
             return $callback($results);
-        });
+        }, $columns);
     }
 
     /**

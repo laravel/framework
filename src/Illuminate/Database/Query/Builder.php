@@ -1728,11 +1728,12 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  array  $columns
      * @return  bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $columns = ['*'])
     {
-        $results = $this->forPage($page = 1, $count)->get();
+        $results = $this->forPage($page = 1, $count)->get($columns);
 
         while (count($results) > 0) {
             // On each chunk result set, we will pass them to the callback and then let the
@@ -1744,7 +1745,7 @@ class Builder
 
             $page++;
 
-            $results = $this->forPage($page, $count)->get();
+            $results = $this->forPage($page, $count)->get($columns);
         }
 
         return true;
@@ -1756,13 +1757,14 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
+     * @param  array  $columns
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = 'id')
+    public function chunkById($count, callable $callback, $column = 'id', $columns = ['*'])
     {
         $lastId = null;
 
-        $results = $this->forPageAfterId($count, 0, $column)->get();
+        $results = $this->forPageAfterId($count, 0, $column)->get($columns);
 
         while (! empty($results)) {
             if (call_user_func($callback, $results) === false) {
@@ -1771,7 +1773,7 @@ class Builder
 
             $lastId = last($results)->{$column};
 
-            $results = $this->forPageAfterId($count, $lastId, $column)->get();
+            $results = $this->forPageAfterId($count, $lastId, $column)->get($columns);
         }
 
         return true;
@@ -1782,11 +1784,12 @@ class Builder
      *
      * @param  callable  $callback
      * @param  int  $count
+     * @param  array  $columns
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function each(callable $callback, $count = 1000)
+    public function each(callable $callback, $count = 1000, $columns = ['*'])
     {
         if (is_null($this->orders) && is_null($this->unionOrders)) {
             throw new RuntimeException('You must specify an orderBy clause when using the "each" function.');
@@ -1798,7 +1801,7 @@ class Builder
                     return false;
                 }
             }
-        });
+        }, $columns);
     }
 
     /**
