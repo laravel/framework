@@ -331,7 +331,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             return isset($match[3]) ? $match[0] : $match[0].$match[2];
         };
 
-        return preg_replace_callback('/\B@(@?\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', $callback, $value);
+        return preg_replace_callback('/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', $callback, $value);
     }
 
     /**
