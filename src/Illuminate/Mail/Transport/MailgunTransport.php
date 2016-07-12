@@ -160,7 +160,7 @@ class MailgunTransport implements Swift_Transport {
 	 */
 	public function setDomain($domain)
 	{
-		$this->url = 'https://api.mailgun.net/v2/'.$domain.'/messages.mime';
+		$this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
 
 		return $this->domain = $domain;
 	}
