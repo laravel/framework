@@ -425,7 +425,11 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 	 */
 	public function sort(Closure $callback)
 	{
-		uasort($this->items, $callback);
+		if( $this->isAssociative() ) {
+			uasort($this->items, $callback);
+		} else {
+			usort($this->items, $callback);
+		}
 
 		return $this;
 	}
@@ -459,12 +463,19 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		// Once we have sorted all of the keys in the array, we will loop through them
 		// and grab the corresponding model so we can set the underlying items list
 		// to the sorted version. Then we'll just return the collection instance.
+		$itemResults = array();
 		foreach (array_keys($results) as $key)
 		{
-			$results[$key] = $this->items[$key];
+			if( $this->isAssociative() ) {
+				// preserve both order and keys
+				$itemResults[$key] = $this->items[$key];
+			} else {
+				// preserve order, reset keys
+				$itemResults[] = $this->items[$key];
+			}
 		}
 
-		$this->items = $results;
+		$this->items = $itemResults;
 
 		return $this;
 	}
@@ -712,6 +723,17 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Returns whether the items array has associative keys. If not,
+	 * it's numeric.
+	 *
+	 * @return bool
+	 */
+	private function isAssociative()
+	{
+		return array_keys($this->items) !== range(0, count($this->items) - 1);	
 	}
 
 }
