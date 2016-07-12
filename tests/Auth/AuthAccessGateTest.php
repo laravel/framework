@@ -272,9 +272,19 @@ class AccessGateTestPolicy
 {
     use HandlesAuthorization;
 
+    public function createAny($user)
+    {
+        return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
+    }
+
     public function create($user)
     {
         return $user->isAdmin ? $this->allow() : $this->deny('You are not an admin.');
+    }
+
+    public function updateAny($user, AccessGateTestDummy $dummy)
+    {
+        return ! $user->isAdmin;
     }
 
     public function update($user, AccessGateTestDummy $dummy)

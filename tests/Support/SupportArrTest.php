@@ -77,7 +77,7 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     {
         $array = [100, 200, 300];
 
-        $value = Arr::first($array, function ($key, $value) {
+        $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
 
@@ -88,10 +88,17 @@ class SupportArrTest extends PHPUnit_Framework_TestCase
     public function testLast()
     {
         $array = [100, 200, 300];
-        $last = Arr::last($array, function () {
-            return true;
+
+        $last = Arr::last($array, function ($value) {
+            return $value < 250;
         });
-        $this->assertEquals(300, $last);
+        $this->assertEquals(200, $last);
+
+        $last = Arr::last($array, function ($value, $key) {
+            return $key < 2;
+        });
+        $this->assertEquals(200, $last);
+
         $this->assertEquals(300, Arr::last($array));
     }
 

@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Support\Arr;
 use UnexpectedValueException;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
@@ -27,20 +26,6 @@ class PasswordBroker implements PasswordBrokerContract
     protected $users;
 
     /**
-     * The mailer instance.
-     *
-     * @var \Illuminate\Contracts\Mail\Mailer
-     */
-    protected $mailer;
-
-    /**
-     * The view of the password reset link e-mail.
-     *
-     * @var string
-     */
-    protected $emailView;
-
-    /**
      * The custom password validator callback.
      *
      * @var \Closure
@@ -52,29 +37,22 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  string  $emailView
      * @return void
      */
     public function __construct(TokenRepositoryInterface $tokens,
-                                UserProvider $users,
-                                MailerContract $mailer,
-                                $emailView)
+                                UserProvider $users)
     {
         $this->users = $users;
-        $this->mailer = $mailer;
         $this->tokens = $tokens;
-        $this->emailView = $emailView;
     }
 
     /**
      * Send a password reset link to a user.
      *
      * @param  array  $credentials
-     * @param  \Closure|null  $callback
      * @return string
      */
-    public function sendResetLink(array $credentials, Closure $callback = null)
+    public function sendResetLink(array $credentials)
     {
         // First we will check to see if we found a user at the given credentials and
         // if we did not we will redirect back to this current URI with a piece of
@@ -88,35 +66,11 @@ class PasswordBroker implements PasswordBrokerContract
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
-        $token = $this->tokens->create($user);
-
-        $this->emailResetLink($user, $token, $callback);
+        $user->sendPasswordResetNotification(
+            $this->tokens->create($user)
+        );
 
         return static::RESET_LINK_SENT;
-    }
-
-    /**
-     * Send the password reset link via e-mail.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @param  string  $token
-     * @param  \Closure|null  $callback
-     * @return int
-     */
-    public function emailResetLink(CanResetPasswordContract $user, $token, Closure $callback = null)
-    {
-        // We will use the reminder view that was given to the broker to display the
-        // password reminder e-mail. We'll pass a "token" variable into the views
-        // so that it may be displayed for an user to click for password reset.
-        $view = $this->emailView;
-
-        return $this->mailer->send($view, compact('token', 'user'), function ($m) use ($user, $token, $callback) {
-            $m->to($user->getEmailForPasswordReset());
-
-            if (! is_null($callback)) {
-                call_user_func($callback, $m, $user, $token);
-            }
-        });
     }
 
     /**

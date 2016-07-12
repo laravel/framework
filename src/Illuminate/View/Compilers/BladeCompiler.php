@@ -252,7 +252,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $pattern = sprintf('/%s--(.*?)--%s/s', $this->contentTags[0], $this->contentTags[1]);
 
-        return preg_replace($pattern, '<?php /*$1*/ ?>', $value);
+        return preg_replace($pattern, '', $value);
     }
 
     /**
@@ -579,7 +579,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileForeach($expression)
     {
-        return "<?php foreach{$expression}: ?>";
+        preg_match('/\( *(.*) +as *([^\)]*)/', $expression, $matches);
+
+        $iteratee = trim($matches[1]);
+
+        $iteration = trim($matches[2]);
+
+        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getFirstLoop();';
+
+        return "<?php {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} ?>";
     }
 
     /**
@@ -614,7 +624,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.++$this->forelseCounter;
 
-        return "<?php {$empty} = true; foreach{$expression}: {$empty} = false; ?>";
+        preg_match('/\( *(.*) +as *([^\)]*)/', $expression, $matches);
+
+        $iteratee = trim($matches[1]);
+
+        $iteration = trim($matches[2]);
+
+        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getFirstLoop();';
+
+        return "<?php {$empty} = true; {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} {$empty} = false; ?>";
     }
 
     /**
@@ -693,7 +713,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $empty = '$__empty_'.$this->forelseCounter--;
 
-        return "<?php endforeach; if ({$empty}): ?>";
+        return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getFirstLoop(); if ({$empty}): ?>";
     }
 
     /**
@@ -748,7 +768,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileEndforeach($expression)
     {
-        return '<?php endforeach; ?>';
+        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getFirstLoop(); ?>';
     }
 
     /**

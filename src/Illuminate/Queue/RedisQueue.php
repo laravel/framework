@@ -102,22 +102,6 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
-     * Release a reserved job back onto the queue.
-     *
-     * @param  string  $queue
-     * @param  string  $payload
-     * @param  int  $delay
-     * @param  int  $attempts
-     * @return void
-     */
-    public function release($queue, $payload, $delay, $attempts)
-    {
-        $payload = $this->setMeta($payload, 'attempts', $attempts);
-
-        $this->getConnection()->zadd($this->getQueue($queue).':delayed', $this->getTime() + $delay, $payload);
-    }
-
-    /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
@@ -129,16 +113,30 @@ class RedisQueue extends Queue implements QueueContract
 
         $queue = $this->getQueue($queue);
 
+        $this->migrateExpiredJobs($queue.':delayed', $queue);
+
         if (! is_null($this->expire)) {
-            $this->migrateAllExpiredJobs($queue);
+            $this->migrateExpiredJobs($queue.':reserved', $queue);
         }
 
-        $job = $this->getConnection()->lpop($queue);
+        $script = <<<'LUA'
+local job = redis.call('lpop', KEYS[1])
+local reserved = false
+if(job ~= false) then
+    reserved = cjson.decode(job)
+    reserved['attempts'] = reserved['attempts'] + 1
+    reserved = cjson.encode(reserved)
+    redis.call('zadd', KEYS[2], KEYS[3], reserved)
+end
+return {job, reserved}
+LUA;
 
-        if (! is_null($job)) {
-            $this->getConnection()->zadd($queue.':reserved', $this->getTime() + $this->expire, $job);
+        list($job, $reserved) = $this->getConnection()->eval(
+            $script, 3, $queue, $queue.':reserved', $this->getTime() + $this->expire
+        );
 
-            return new RedisJob($this->container, $this, $job, $original);
+        if ($reserved) {
+            return new RedisJob($this->container, $this, $job, $reserved, $original);
         }
     }
 
@@ -155,16 +153,26 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
-     * Migrate all of the waiting jobs in the queue.
+     * Delete a reserved job from the reserved queue and release it.
      *
      * @param  string  $queue
+     * @param  string  $job
+     * @param  int  $delay
      * @return void
      */
-    protected function migrateAllExpiredJobs($queue)
+    public function deleteAndRelease($queue, $job, $delay)
     {
-        $this->migrateExpiredJobs($queue.':delayed', $queue);
+        $queue = $this->getQueue($queue);
 
-        $this->migrateExpiredJobs($queue.':reserved', $queue);
+        $script = <<<'LUA'
+redis.call('zrem', KEYS[2], KEYS[3])
+redis.call('zadd', KEYS[1], KEYS[4], KEYS[3])
+return true
+LUA;
+        $this->getConnection()->eval(
+            $script, 4, $queue.':delayed', $queue.':reserved',
+            $job, $this->getTime() + $delay
+        );
     }
 
     /**
@@ -176,66 +184,20 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function migrateExpiredJobs($from, $to)
     {
-        $options = ['cas' => true, 'watch' => $from, 'retry' => 10];
+        $redis = $this->getConnection();
 
-        $this->getConnection()->transaction($options, function ($transaction) use ($from, $to) {
-            // First we need to get all of jobs that have expired based on the current time
-            // so that we can push them onto the main queue. After we get them we simply
-            // remove them from this "delay" queues. All of this within a transaction.
-            $jobs = $this->getExpiredJobs(
-                $transaction, $from, $time = $this->getTime()
-            );
+        $script = <<<'LUA'
+local val = redis.call('zrangebyscore', KEYS[1], '-inf', KEYS[3])
+if(next(val) ~= nil) then
+    redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)
+    for i = 1, #val, 100 do
+        redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
+    end
+end
+return true
+LUA;
 
-            // If we actually found any jobs, we will remove them from the old queue and we
-            // will insert them onto the new (ready) "queue". This means they will stand
-            // ready to be processed by the queue worker whenever their turn comes up.
-            if (count($jobs) > 0) {
-                $this->removeExpiredJobs($transaction, $from, $time);
-
-                $this->pushExpiredJobsOntoNewQueue($transaction, $to, $jobs);
-            }
-        });
-    }
-
-    /**
-     * Get the expired jobs from a given queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $from
-     * @param  int  $time
-     * @return array
-     */
-    protected function getExpiredJobs($transaction, $from, $time)
-    {
-        return $transaction->zrangebyscore($from, '-inf', $time);
-    }
-
-    /**
-     * Remove the expired jobs from a given queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $from
-     * @param  int  $time
-     * @return void
-     */
-    protected function removeExpiredJobs($transaction, $from, $time)
-    {
-        $transaction->multi();
-
-        $transaction->zremrangebyscore($from, '-inf', $time);
-    }
-
-    /**
-     * Push all of the given jobs onto another queue.
-     *
-     * @param  \Predis\Transaction\MultiExec  $transaction
-     * @param  string  $to
-     * @param  array  $jobs
-     * @return void
-     */
-    protected function pushExpiredJobsOntoNewQueue($transaction, $to, $jobs)
-    {
-        call_user_func_array([$transaction, 'rpush'], array_merge([$to], $jobs));
+        $redis->eval($script, 3, $from, $to, $this->getTime());
     }
 
     /**

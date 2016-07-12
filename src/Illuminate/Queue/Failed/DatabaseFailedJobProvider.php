@@ -65,7 +65,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      */
     public function all()
     {
-        return $this->getTable()->orderBy('id', 'desc')->get();
+        return $this->getTable()->orderBy('id', 'desc')->get()->all();
     }
 
     /**

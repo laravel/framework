@@ -22,7 +22,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->getKey();
         }
 
-        return Arr::first($this->items, function ($itemKey, $model) use ($key) {
+        return Arr::first($this->items, function ($model) use ($key) {
             return $model->getKey() == $key;
         }, $default);
     }
@@ -80,8 +80,8 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $key = $key instanceof Model ? $key->getKey() : $key;
 
-        return parent::contains(function ($k, $m) use ($key) {
-            return $m->getKey() == $key;
+        return parent::contains(function ($model) use ($key) {
+            return $model->getKey() == $key;
         });
     }
 
@@ -92,8 +92,8 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_map(function ($m) {
-            return $m->getKey();
+        return array_map(function ($model) {
+            return $model->getKey();
         }, $this->items);
     }
 
@@ -221,19 +221,6 @@ class Collection extends BaseCollection implements QueueableCollection
         return $this->each(function ($model) use ($attributes) {
             $model->makeVisible($attributes);
         });
-    }
-
-    /**
-     * Make the given, typically hidden, attributes visible across the entire collection.
-     *
-     * @param  array|string  $attributes
-     * @return $this
-     *
-     * @deprecated since version 5.2. Use the "makeVisible" method directly.
-     */
-    public function withHidden($attributes)
-    {
-        return $this->makeVisible($attributes);
     }
 
     /**

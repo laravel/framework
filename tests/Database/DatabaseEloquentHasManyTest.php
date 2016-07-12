@@ -14,7 +14,7 @@ class DatabaseEloquentHasManyTest extends PHPUnit_Framework_TestCase
     public function testCreateMethodProperlyCreatesNewModel()
     {
         $relation = $this->getRelation();
-        $created = $this->getMock('Illuminate\Database\Eloquent\Model', ['save', 'getKey', 'setAttribute']);
+        $created = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
         $created->expects($this->once())->method('save')->will($this->returnValue(true));
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);

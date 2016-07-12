@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Illuminate\Foundation\Application;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
@@ -13,10 +14,13 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
     public function testResetCommandCallsMigratorWithProperArguments()
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
-        $command->setLaravel(new AppDatabaseMigrationStub());
+        $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with(false);
+        $migrator->shouldReceive('reset')->once()->with([__DIR__.'/migrations'], false);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command);
@@ -25,10 +29,13 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
     public function testResetCommandCanBePretended()
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
-        $command->setLaravel(new AppDatabaseMigrationStub());
+        $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('reset')->once()->with(true);
+        $migrator->shouldReceive('reset')->once()->with([__DIR__.'/migrations'], true);
         $migrator->shouldReceive('getNotes')->andReturn([]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
@@ -40,8 +47,15 @@ class DatabaseMigrationResetCommandTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class AppDatabaseMigrationStub extends Illuminate\Foundation\Application
+class ApplicationDatabaseResetStub extends Application
 {
+    public function __construct(array $data = [])
+    {
+        foreach ($data as $abstract => $instance) {
+            $this->instance($abstract, $instance);
+        }
+    }
+
     public function environment()
     {
         return 'development';

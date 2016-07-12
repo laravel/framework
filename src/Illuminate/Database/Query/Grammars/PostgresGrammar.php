@@ -209,8 +209,10 @@ class PostgresGrammar extends Grammar
         // all out then implode them. This should give us "where" like syntax after
         // everything has been built and then we will join it to the real wheres.
         foreach ($query->joins as $join) {
-            foreach ($join->clauses as $clause) {
-                $joinWheres[] = $this->compileJoinConstraint($clause);
+            foreach ($join->wheres as $where) {
+                $method = "where{$where['type']}";
+
+                $joinWheres[] = $where['boolean'].' '.$this->$method($query, $where);
             }
         }
 

@@ -4,6 +4,20 @@ use Illuminate\Container\Container;
 
 class ContainerContainerTest extends PHPUnit_Framework_TestCase
 {
+    public function testContainerSingleton()
+    {
+        $container = Container::setInstance(new Container);
+
+        $this->assertSame($container, Container::getInstance());
+
+        Container::setInstance(null);
+
+        $container2 = Container::getInstance();
+
+        $this->assertInstanceOf(Container::class, $container2);
+        $this->assertNotSame($container, $container2);
+    }
+
     public function testClosureResolution()
     {
         $container = new Container;
@@ -54,7 +68,7 @@ class ContainerContainerTest extends PHPUnit_Framework_TestCase
     public function testParametersCanOverrideDependencies()
     {
         $container = new Container;
-        $stub = new ContainerDependentStub($mock = $this->getMock('IContainerContractStub'));
+        $stub = new ContainerDependentStub($mock = $this->createMock('IContainerContractStub'));
         $resolved = $container->make('ContainerNestedDependentStub', [$stub]);
         $this->assertInstanceOf('ContainerNestedDependentStub', $resolved);
         $this->assertEquals($mock, $resolved->inner->impl);

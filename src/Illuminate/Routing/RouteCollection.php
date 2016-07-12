@@ -228,7 +228,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function check(array $routes, $request, $includingMethod = true)
     {
-        return Arr::first($routes, function ($key, $value) use ($request, $includingMethod) {
+        return Arr::first($routes, function ($value) use ($request, $includingMethod) {
             return $value->matches($request, $includingMethod);
         });
     }

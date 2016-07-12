@@ -52,6 +52,58 @@ trait AuthorizesRequests
             return [$ability, $arguments];
         }
 
-        return [debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'], $ability];
+        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
+
+        return [$this->normalizeGuessedAbilityName($method), $ability];
+    }
+
+    /**
+     * Normalize the ability name that has been guessed from the method name.
+     *
+     * @param  string  $ability
+     * @return string
+     */
+    protected function normalizeGuessedAbilityName($ability)
+    {
+        $map = $this->resourceAbilityMap();
+
+        return isset($map[$ability]) ? $map[$ability] : $ability;
+    }
+
+    /**
+     * Authorize a resource action based on the incoming request.
+     *
+     * @param  string  $model
+     * @param  string|null  $parameter
+     * @param  array  $options
+     * @return void
+     */
+    public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
+    {
+        $parameter = $parameter ?: strtolower(class_basename($model));
+
+        foreach ($this->resourceAbilityMap() as $method => $ability) {
+            $modelName = in_array($method, ['index', 'create', 'store']) ? $model : $parameter;
+
+            $this->middleware("can:{$ability},{$modelName}", $options)->only($method);
+        }
+    }
+
+    /**
+     * Get the map of resource methods to ability names.
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return [
+            'index' => 'view',
+            'show' => 'view',
+            'create' => 'create',
+            'store' => 'create',
+            'edit' => 'update',
+            'update' => 'update',
+            'destroy' => 'delete',
+        ];
     }
 }

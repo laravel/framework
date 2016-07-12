@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use BadMethodCallException;
 use Illuminate\Console\Events\ArtisanStarting;
 
 abstract class ServiceProvider
@@ -47,13 +46,6 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    abstract public function register();
-
-    /**
      * Merge the given configuration with the existing configuration.
      *
      * @param  string  $path
@@ -93,6 +85,19 @@ abstract class ServiceProvider
     protected function loadTranslationsFrom($path, $namespace)
     {
         $this->app['translator']->addNamespace($namespace, $path);
+    }
+
+    /**
+     * Register a database migration path.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function loadMigrationsFrom($paths)
+    {
+        foreach ((array) $paths as $path) {
+            $this->app['migrator']->path($path);
+        }
     }
 
     /**
@@ -217,23 +222,5 @@ abstract class ServiceProvider
     public static function compiles()
     {
         return [];
-    }
-
-    /**
-     * Dynamically handle missing method calls.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     *
-     * @throws \BadMethodCallException
-     */
-    public function __call($method, $parameters)
-    {
-        if ($method == 'boot') {
-            return;
-        }
-
-        throw new BadMethodCallException("Call to undefined method [{$method}]");
     }
 }

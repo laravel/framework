@@ -25,7 +25,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.2.39';
+    const VERSION = '5.3.0-Dev';
 
     /**
      * The base path for the Laravel installation.
@@ -551,7 +551,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider = $this->resolveProviderClass($provider);
         }
 
-        $provider->register();
+        if (method_exists($provider, 'register')) {
+            $provider->register();
+        }
 
         // Once we have registered the service we will iterate through the options
         // and set each of them on the application so they will be available on
@@ -582,7 +584,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::first($this->serviceProviders, function ($key, $value) use ($name) {
+        return Arr::first($this->serviceProviders, function ($value) use ($name) {
             return $value instanceof $name;
         });
     }

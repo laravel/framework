@@ -66,6 +66,7 @@ class CacheTaggedCacheTest extends PHPUnit_Framework_TestCase
         $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
+
         $store->shouldReceive('forever')->with(sha1('foo|bar').':key1', 'key1:value');
 
         $redis->forever('key1', 'key1:value');
