@@ -2893,11 +2893,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function fromDateTime($value)
     {
-        $format = $this->getDateFormat();
+        $date = $this->asDateTime($value);
 
-        $value = $this->asDateTime($value);
-
-        return $value->format($format);
+        return $this->serializeDate($date);
     }
 
     /**
