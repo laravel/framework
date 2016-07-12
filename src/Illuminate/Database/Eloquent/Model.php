@@ -580,13 +580,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  mixed  $id
 	 * @param  array  $columns
+	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
 	 */
-	public static function findOrNew($id, $columns = array('*'))
+	public static function findOrNew($id, $columns = array('*'), array $attributes = array())
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		return new static($columns);
+		return new static($attributes);
 	}
 
 	/**
