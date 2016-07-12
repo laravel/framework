@@ -333,24 +333,40 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function fill(array $attributes)
 	{
-		$totallyGuarded = $this->totallyGuarded();
-
-		foreach ($this->fillableFromArray($attributes) as $key => $value)
-		{
-			$key = $this->removeTableFromKey($key);
-
-			// The developers may choose to place some attributes in the "fillable"
-			// array, which means only those attributes may be set through mass
-			// assignment to the model, and all others will just be ignored.
-			if ($this->isFillable($key))
-			{
-				$this->setAttribute($key, $value);
-			}
-			elseif ($totallyGuarded)
-			{
-				throw new MassAssignmentException($key);
-			}
-		}
+	        $totallyGuarded = $this->totallyGuarded();
+	
+	        $guardedAttributes = array();
+	
+	        foreach ($this->fillableFromArray($attributes) as $key => $value)
+	        {
+	            if($totallyGuarded)
+	            {
+	                throw new MassAssignmentException('All columns are guarded and not allowed for mass assignment.');
+	            }
+	            
+	            $key = $this->removeTableFromKey($key);
+	
+	            // The developers may choose to place some attributes in the "fillable"
+	            // array, which means only those attributes may be set through mass
+	            // assignment to the model, and all others will just be ignored.
+	            if ($this->isFillable($key))
+	            {
+	                $this->setAttribute($key, $value);
+	            }
+	            elseif ($totallyGuarded)
+	            {
+	                $guardedAttributes[] = $key;
+	            }
+	        }
+	
+	        //if any key is guarded but passed into function for mass assignment
+	        if (count($guardedAttributes) > 0)
+	        {
+	            $columns = implode(', ', $guardedAttributes);
+	            $message = $columns . ' column' . (count($guardedAttributes) > 1 ? 's are' : ' is') .
+	                        ' guarded and not allowed for mass assignment.';
+	            throw new MassAssignmentException($message);
+	        }
 
 		return $this;
 	}
