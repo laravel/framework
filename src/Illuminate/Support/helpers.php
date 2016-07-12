@@ -934,11 +934,12 @@ if ( ! function_exists('str_limit'))
 		 * @param  string  $value
 		 * @param  int     $limit
 		 * @param  string  $end
+		 * @param  boolean $preserveWords
 		 * @return string
 		 */
-		function str_limit($value, $limit = 100, $end = '...')
+		function str_limit($value, $limit = 100, $end = '...', $preserveWords = false)
 		{
-				return Illuminate\Support\Str::limit($value, $limit, $end);
+				return Illuminate\Support\Str::limit($value, $limit, $end, $preserveWords);
 		}
 }
 
