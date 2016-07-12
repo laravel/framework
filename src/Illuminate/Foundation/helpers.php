@@ -655,23 +655,34 @@ if ( ! function_exists('event'))
 if ( ! function_exists('elixir'))
 {
 	/**
-	* Get the path to a versioned Elixir file.
-	*
-	* @param  string  $file
-	* @return string
-	*/
-	function elixir($file)
+	 * Get the path to a versioned Elixir file.
+	 *
+	 * @param  string  $file
+	 * @param  string  $default
+	 * @return string
+	 */
+	function elixir($file, $default = null)
 	{
 		static $manifest = null;
+		static $manifest_exists = true;
 
-		if (is_null($manifest))
+		if (is_null($manifest) && $manifest_exists)
 		{
-			$manifest = json_decode(file_get_contents(public_path().'/build/rev-manifest.json'), true);
+
+			if ($manifest_exists = file_exists(public_path().'/build/rev-manifest.json'))
+			{
+				$manifest = json_decode(file_get_contents(public_path() . '/build/rev-manifest.json'), true);
+			}
+
 		}
 
 		if (isset($manifest[$file]))
 		{
 			return '/build/'.$manifest[$file];
+		}
+		elseif ($default !== null)
+		{
+			return $default;
 		}
 
 		throw new InvalidArgumentException("File {$file} not defined in asset manifest.");
