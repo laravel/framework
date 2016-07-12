@@ -58,13 +58,11 @@ class Hub implements HubContract {
 	 * Send an object through one of the available pipelines.
 	 *
 	 * @param  mixed  $object
-	 * @param  string|null  $pipeline
+	 * @param  string  $pipeline
 	 * @return mixed
 	 */
-	public function pipe($object, $pipeline = null)
+	public function pipe($object, $pipeline = 'default')
 	{
-		$pipeline = $pipeline ?: 'default';
-
 		return call_user_func(
 			$this->pipelines[$pipeline], new Pipeline($this->container), $object
 		);
