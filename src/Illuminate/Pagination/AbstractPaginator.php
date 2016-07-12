@@ -232,7 +232,7 @@ abstract class AbstractPaginator {
 	 */
 	public function firstItem()
 	{
-		return ($this->currentPage - 1) * $this->perPage + 1;
+		return $this->count() == 0 ? $this->count() : ($this->currentPage - 1) * $this->perPage + 1;
 	}
 
 	/**
@@ -242,7 +242,7 @@ abstract class AbstractPaginator {
 	 */
 	public function lastItem()
 	{
-		return $this->firstItem() + $this->count() - 1;
+		return ($this->currentPage - 1) * $this->perPage + $this->count();
 	}
 
 	/**
