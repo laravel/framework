@@ -121,6 +121,20 @@ class Builder {
 	public $unions;
 
 	/**
+	 * The maximum number of union records to return.
+	 *
+	 * @var int
+	 */
+	public $unionLimit;
+	
+	/**
+	 * The orderings for the union query.
+	 *
+	 * @var array
+	 */
+	public $unionOrders;
+
+	/**
 	 * Indicates whether row locking is being used.
 	 *
 	 * @var string|bool
@@ -988,7 +1002,14 @@ class Builder {
 	{
 		$direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
 
-		$this->orders[] = compact('column', 'direction');
+		if ($this->unions)
+		{
+			$this->unionOrders[] = compact('column', 'direction');
+		}
+		else
+		{
+			$this->orders[] = compact('column', 'direction');
+		}
 
 		return $this;
 	}
@@ -1065,7 +1086,16 @@ class Builder {
 	 */
 	public function limit($value)
 	{
-		if ($value > 0) $this->limit = $value;
+		if ($value <= 0) return $this;
+
+		if ($this->unions)
+		{
+			$this->unionLimit = $value;
+		}
+		else
+		{
+			$this->limit = $value;
+		}
 
 		return $this;
 	}
