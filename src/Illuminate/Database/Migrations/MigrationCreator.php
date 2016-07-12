@@ -41,18 +41,23 @@ class MigrationCreator {
 	 */
 	public function create($name, $path, $table = null, $create = false)
 	{
-		$path = $this->getPath($name, $path);
+		$migration = $this->getPath($name, $path);
 
 		// First we will get the stub file for the migration, which serves as a type
 		// of template for the migration. Once we have those we will populate the
 		// various place-holders, save the file, and run the post create event.
 		$stub = $this->getStub($table, $create);
 
-		$this->files->put($path, $this->populateStub($name, $stub, $table));
+	        if(!$this->files->exists($path))
+	        {
+	            $this->files->makeDirectory($path, 0755, true);
+	        }
+
+		$this->files->put($migration, $this->populateStub($name, $stub, $table));
 
 		$this->firePostCreateHooks();
 
-		return $path;
+		return $migration;
 	}
 
 	/**
