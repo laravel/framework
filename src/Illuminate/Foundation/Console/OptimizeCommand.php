@@ -80,7 +80,8 @@ class OptimizeCommand extends Command {
 	{
 		$this->registerClassPreloaderCommand();
 
-		$outputPath = $this->laravel['path.base'].'/bootstrap/compiled.php';
+		$outputPath = $this->input->getOption('compiled-path') ?:
+			$this->laravel['path.base'].'/bootstrap/compiled.php';
 
 		$this->callSilent('compile', array(
 			'--config' => implode(',', $this->getClassFiles()),
@@ -121,6 +122,8 @@ class OptimizeCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
+			array('compiled-path', null, InputOption::VALUE_OPTIONAL, 'The path to write compiled.php to.', null),
+
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
 
 			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
