@@ -562,10 +562,10 @@ class Guard {
 	/**
 	 * Create a new remember token for the user if one doesn't already exist.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\RememberableInterface   $user
 	 * @return void
 	 */
-	protected function createRememberTokenIfDoesntExist(UserInterface $user)
+	protected function createRememberTokenIfDoesntExist(RememberableInterface $user)
 	{
 		if (is_null($user->getRememberToken()))
 		{

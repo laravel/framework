@@ -1,6 +1,6 @@
 <?php namespace Illuminate\Auth;
 
-class GenericUser implements UserInterface {
+class GenericUser implements UserInterface, RememberableInterface {
 
 	/**
 	 * All of the user's attributes.

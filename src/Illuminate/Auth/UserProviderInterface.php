@@ -22,11 +22,11 @@ interface UserProviderInterface {
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\RememberableInterface   $user
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function updateRememberToken(UserInterface $user, $token);
+	public function updateRememberToken(RememberableInterface $user, $token);
 
 	/**
 	 * Retrieve a user by the given credentials.

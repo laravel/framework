@@ -53,20 +53,25 @@ class EloquentUserProvider implements UserProviderInterface {
 	{
 		$model = $this->createModel();
 
-		return $model->newQuery()
-                        ->where($model->getKeyName(), $identifier)
-                        ->where($model->getRememberTokenName(), $token)
-                        ->first();
+		$query = $model->newQuery()
+						->where($model->getKeyName(), $identifier);
+
+		if ($model instanceof RememberableInterface)
+		{
+			$query->where($model->getRememberTokenName(), $token);
+		}
+
+		return $query->first();
 	}
 
 	/**
 	 * Update the "remember me" token for the given user in storage.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\RememberableInterface   $user
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function updateRememberToken(UserInterface $user, $token)
+	public function updateRememberToken(RememberableInterface $user, $token)
 	{
 		$user->setAttribute($user->getRememberTokenName(), $token);
 
