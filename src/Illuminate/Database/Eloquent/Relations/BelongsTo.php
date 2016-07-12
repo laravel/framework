@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -95,6 +96,29 @@ class BelongsTo extends Relation {
 
 		return $query->where($this->getQualifiedForeignKey(), '=', new Expression($otherKey));
 	}
+
+
+
+	/**
+	 * Get the data for a relationship WHERE... IN constraint for faster processing of has().
+	 *
+	 * @param  \Closure|null  $callback
+	 * @param  \Illuminate\Database\Eloquent\Builder  $parent
+	 * @return array|null
+	 */
+	public function getWhereHasOneConstraints($callback, $parent) {
+		$parentKey = $this->wrap($this->getQualifiedForeignKey());
+		$selectKey = $this->wrap($this->query->getModel()->getTable().'.'.$this->otherKey);
+
+		if ($callback) call_user_func($callback, $this->query);
+		$this->query->select(new Expression($selectKey));
+
+		return array(
+			'sql' => new Expression($parentKey .' in (' . $this->query->toSql() . ')'),
+			'bindings' => $this->query->getBindings(),
+		);
+	}
+
 
 	/**
 	 * Add the constraints for a relationship count query on the same table.
