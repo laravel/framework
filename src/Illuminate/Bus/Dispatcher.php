@@ -163,8 +163,6 @@ class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResol
 		{
 			return $parameter->getDefaultValue();
 		}
-
-		MarshalException::whileMapping($command, $parameter);
 	}
 
 	/**
