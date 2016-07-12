@@ -183,6 +183,8 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 			$message = str_replace($replace, array($message, $messageKey), $format);
 		}
 
+		unset($message);
+
 		return $messages;
 	}
 
