@@ -728,6 +728,36 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testResourceWildcard()
+	{
+		$router = $this->getRouter();
+		$router->resource('foo', 'FooController', array('only' => array('show'), 'wildcard' => 'bar'));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('foo/{bar}', $routes[0]->getUri());
+		$this->assertEquals('foo.show', $routes[0]->getName());
+
+		$router = $this->getRouter();
+		$router->resource('/', 'FooController', array('only' => array('show'), 'wildcard' => 'bar'));
+		$routes = $router->getRoutes();
+		$routes = $routes->getRoutes();
+
+		$this->assertEquals('{bar}', $routes[0]->getUri());
+		$this->assertEquals('show', $routes[0]->getName());
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testResourceRoutingException()
+	{
+		$router = $this->getRouter();
+		$router->resource('/', 'FooController');
+	}
+
+
 	public function testResourceRouteNaming()
 	{
 		$router = $this->getRouter();
