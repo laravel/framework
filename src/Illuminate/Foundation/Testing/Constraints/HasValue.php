@@ -58,4 +58,17 @@ class HasValue extends FormFieldConstraint
             $this->selector, $this->value
         );
     }
+
+    /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return sprintf(
+            'the field [%s] does not contain the expected value [%s]',
+            $this->selector, $this->value
+        );
+    }
 }

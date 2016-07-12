@@ -101,6 +101,16 @@ abstract class PageConstraint extends PHPUnit_Framework_Constraint
     }
 
     /**
+     * Returns the reversed description of the failure.
+     *
+     * @return string
+     */
+    protected function getReverseFailureDescription()
+    {
+        return 'the page does not contain '.$this->toString();
+    }
+
+    /**
      * Get a string representation of the object.
      *
      * Placeholder method to avoid forcing definition of this method.
