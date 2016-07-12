@@ -802,6 +802,29 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testValidateDomain()
+	{
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => 'domain'));
+		$this->assertFalse($v->passes());
+		
+		$trans = $this->getRealTranslator();
+		$v = new Validator($trans, array('x' => 'aslsdlks'), array('x' => 'domain'));
+		$this->assertFalse($v->passes());
+		
+		$v = new Validator($trans, array('x' => 'sub.google.com'), array('x' => 'domain'));
+		$this->assertTrue($v->passes());
+		
+		$v = new Validator($trans, array('x' => 'google.me'), array('x' => 'domain'));
+		$this->assertTrue($v->passes());
+		
+		$v = new Validator($trans, array('x' => 'google.com'), array('x' => 'domain'));
+		$this->assertTrue($v->passes());
+		
+		$v = new Validator($trans, array('x' => 'google.com.ph'), array('x' => 'domain'));
+		$this->assertTrue($v->passes());
+	}
+
 	public function testValidateImage()
 	{
 		$trans = $this->getRealTranslator();

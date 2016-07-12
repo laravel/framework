@@ -1065,6 +1065,18 @@ class Validator implements MessageProviderInterface {
 	}
 
 	/**
+	* Validate that an attribute is a valid domain.
+	*
+	* @param  string  $attribute
+	* @param  mixed   $value
+	* @return bool
+	*/
+	protected function validateDomain($attribute,$value)
+	{
+		return preg_match('/^ (?: [a-z0-9] (?:[a-z0-9\-]* [a-z0-9])? \. )*[a-z0-9] (?:[a-z0-9\-]* [a-z0-9])?\. [a-z]{2,6} $/ix', $value);
+	}
+
+	/**
 	 * Validate the MIME type of a file is an image MIME type.
 	 *
 	 * @param  string  $attribute
