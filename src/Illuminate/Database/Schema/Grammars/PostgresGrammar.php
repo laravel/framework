@@ -474,6 +474,10 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
+        if ($column->useCurrent) {
+            return 'timestamp(0) without time zone default CURRENT_TIMESTAMP(0)';
+        }
+
 		return 'timestamp(0) without time zone';
 	}
 
@@ -485,6 +489,10 @@ class PostgresGrammar extends Grammar {
 	 */
 	protected function typeTimestampTz(Fluent $column)
 	{
+        if ($column->useCurrent) {
+            return 'timestamp(0) with time zone default CURRENT_TIMESTAMP(0)';
+        }
+
 		return 'timestamp(0) with time zone';
 	}
 

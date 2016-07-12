@@ -523,7 +523,13 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestamp(Fluent $column)
 	{
-		if ( ! $column->nullable) return 'timestamp default 0';
+		if ($column->useCurrent) {
+			return 'timestamp default CURRENT_TIMESTAMP';
+		}
+
+		if (! $column->nullable && $column->default === null) {
+			return 'timestamp default 0';
+		}
 
 		return 'timestamp';
 	}
@@ -536,7 +542,13 @@ class MySqlGrammar extends Grammar {
 	 */
 	protected function typeTimestampTz(Fluent $column)
 	{
-		if ( ! $column->nullable) return 'timestamp default 0';
+		if ($column->useCurrent) {
+			return 'timestamp default CURRENT_TIMESTAMP';
+		}
+
+		if (! $column->nullable && $column->default === null) {
+			return 'timestamp default 0';
+		}
 
 		return 'timestamp';
 	}
