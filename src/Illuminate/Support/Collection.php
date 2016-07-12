@@ -238,7 +238,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		if ( ! $this->useAsCallable($groupBy))
 		{
-			return $this->groupBy($this->valueRetriever($groupBy));
+			$groupBy = $this->valueRetriever($groupBy);
 		}
 
 		$results = [];
@@ -261,7 +261,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	{
 		if ( ! $this->useAsCallable($keyBy))
 		{
-			return $this->keyBy($this->valueRetriever($keyBy));
+			$keyBy = $this->valueRetriever($keyBy);
 		}
 
 		$results = [];
