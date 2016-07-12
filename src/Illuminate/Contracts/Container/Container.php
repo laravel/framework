@@ -49,6 +49,15 @@ interface Container {
 	public function bind($abstract, $concrete = null, $shared = false);
 
 	/**
+	 * Add a contextual binding to the container.
+	 *
+	 * @param  string  $concrete
+	 * @param  string  $abstract
+	 * @param  \Closure|string  $implementation
+	 */
+	public function addContextualBinding($concrete, $abstract, $implementation);
+
+	/**
 	 * Register a binding if it hasn't already been registered.
 	 *
 	 * @param  string  $abstract
