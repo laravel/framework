@@ -665,14 +665,21 @@ class Guard {
 	/**
 	 * Set the current user of the application.
 	 *
-	 * @param  \Illuminate\Auth\UserInterface  $user
+	 * @param  \Illuminate\Auth\UserInterface|null  $user
 	 * @return void
 	 */
-	public function setUser(UserInterface $user)
+	public function setUser(UserInterface $user = null)
 	{
-		$this->user = $user;
-
-		$this->loggedOut = false;
+		if (is_null($user))
+		{
+			$this->user = null;
+			$this->loggedOut = false;
+		}
+		else
+		{
+			$this->user = $user;
+			$this->loggedOut = false;
+		}
 	}
 
 	/**
