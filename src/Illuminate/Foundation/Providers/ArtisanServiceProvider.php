@@ -106,6 +106,10 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('artisan', function ($app) {
+            return new \Illuminate\Console\Application($app, $app['events'], $app->version());
+        });
+
         $this->registerCommands($this->commands);
 
         $this->registerCommands($this->devCommands);
