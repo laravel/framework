@@ -126,6 +126,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected $guarded = array('*');
 
 	/**
+	 * The attributes that should be enyrypted when being set and decrypted when being get.
+	 *
+	 * @var array
+	 */
+	protected $encrypt = array();
+
+	/**
 	 * The attributes that should be mutated to dates.
 	 *
 	 * @var array
@@ -2390,6 +2397,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	{
 		$attributes = $this->getArrayableAttributes();
 
+		// If an attribute is listed as to "encrypt", we'll decrypt it using Crypt facade.
+		foreach ($attributes as $key => $value)
+		{
+			if (in_array($key, $this->encrypt) && $value)
+			{
+				$attributes[$key] = \Crypt::decrypt($value);
+			}
+		}
+
 		// If an attribute is a date, we will cast it to a string after converting it
 		// to a DateTime / Carbon instance. This is so we will get some consistent
 		// formatting while accessing attributes vs. arraying / JSONing a model.
@@ -2583,6 +2599,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	protected function getAttributeValue($key)
 	{
 		$value = $this->getAttributeFromArray($key);
+
+		// If an attribute is listed as to "encrypt", we'll decrypt it using Crypt facade.
+		if (in_array($key, $this->encrypt))
+		{
+			$value = \Crypt::decrypt($value);
+		}
 
 		// If the attribute has a get mutator, we will call that then return what
 		// it returns as the value, which is useful for transforming values on
@@ -2790,6 +2812,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 		if ($this->isJsonCastable($key))
 		{
 			$value = json_encode($value);
+		}
+
+		// If an attribute is listed as to "encrypt", we'll encrypt it using Crypt facade.
+		if (in_array($key, $this->encrypt) && $value)
+		{
+			$value = \Crypt::encrypt($value);
 		}
 
 		$this->attributes[$key] = $value;
