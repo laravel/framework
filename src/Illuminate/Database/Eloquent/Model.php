@@ -606,6 +606,40 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Find a model by its primary key or create it.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function findOrCreate($id, $columns = array('*'))
+	{
+		if ( ! is_null($instance = static::find($id, $columns)))
+		{
+			return $instance;
+		}
+
+		return static::create($attributes);
+	}
+
+	/**
+	 * Find a model by its primary key or instantiate it.
+	 *
+	 * @param  mixed  $id
+	 * @param  array  $columns
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function findOrNew($id, $columns = array('*'))
+	{
+		if ( ! is_null($instance = static::find($id, $columns)))
+		{
+			return $instance;
+		}
+
+		return new static();
+	}
+
+	/**
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
