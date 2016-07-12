@@ -47,6 +47,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 * @var string
 	 */
 	protected $primaryKey = 'id';
+	
+	/**
+	 * The foreign key for the model.
+	 * 
+	 * @var string
+	 */
+	 protected $foreignKey;
 
 	/**
 	 * The number of models to return for pagination.
@@ -2075,7 +2082,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 	 */
 	public function getForeignKey()
 	{
-		return snake_case(class_basename($this)).'_id';
+		return is_null($this->foreignKey) ? snake_case(class_basename($this)).'_id' : $this->foreignKey;
+	}
+	
+	/**
+	 * set the foreign key of the model.
+	 * 
+	 * @param string $foreignKey
+	 */
+	public function setForeignKey($foreignKey)
+	{
+		$this->foreignKey = $foreignKey;
 	}
 
 	/**
