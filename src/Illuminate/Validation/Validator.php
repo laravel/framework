@@ -428,8 +428,8 @@ class Validator implements ValidatorContract {
 	protected function isValidatable($rule, $attribute, $value)
 	{
 		return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-               $this->passesOptionalCheck($attribute) &&
-               $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
+			   $this->passesOptionalCheck($attribute) &&
+			   $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
 	}
 
 	/**
