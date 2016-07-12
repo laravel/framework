@@ -3029,6 +3029,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 			{
 				$dirty[$key] = $value;
 			}
+			elseif (in_array($key, $this->getDates()) && ! is_null($value) && ! is_null($this->original[$key]))
+			{
+				if ($value === $this->original[$key]) continue;
+
+				$current = $this->asDateTime($value);
+
+				$original = $this->asDateTime($this->original[$key]);
+
+				if ($current->getTimestamp() !== $original->getTimestamp())
+				{
+					$dirty[$key] = $value;
+				}
+			}
 			elseif ($value !== $this->original[$key] &&
                                  ! $this->originalIsNumericallyEquivalent($key))
 			{
