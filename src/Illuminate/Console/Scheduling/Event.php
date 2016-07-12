@@ -83,6 +83,13 @@ class Event {
 	public $output = '/dev/null';
 
 	/**
+	 * The operation to use for the output.
+	 *
+	 * @var string
+	 */
+	public $outputOperation = '>';
+
+	/**
 	 * The array of callbacks to be run after the event is finished.
 	 *
 	 * @var array
@@ -175,11 +182,11 @@ class Event {
 	{
 		if ($this->withoutOverlapping)
 		{
-			$command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().') > '.$this->output.' 2>&1 &';
+			$command = '(touch '.$this->mutexPath().'; '.$this->command.'; rm '.$this->mutexPath().') '. $this->outputOperation .' '.$this->output.' 2>&1 &';
 		}
 		else
 		{
-			$command = $this->command.' > '.$this->output.' 2>&1 &';
+			$command = $this->command.' '. $this->outputOperation .' '.$this->output.' 2>&1 &';
 		}
 
 
@@ -605,6 +612,20 @@ class Event {
 	public function sendOutputTo($location)
 	{
 		$this->output = $location;
+
+		return $this;
+	}
+
+	/**
+	 * Append the output of the command to a given location.
+	 *
+	 * @param  string  $location
+	 * @return $this
+	 */
+	public function appendOutputTo($location)
+	{
+		$this->output = $location;
+		$this->outputOperation = '>>';
 
 		return $this;
 	}
