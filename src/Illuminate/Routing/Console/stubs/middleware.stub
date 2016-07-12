@@ -1,8 +1,9 @@
 <?php namespace {{namespace}};
 
 use Closure;
+use Illuminate\Contracts\Routing\Middleware;
 
-class {{class}} {
+class {{class}} implements Middleware {
 
 	/**
 	 * Handle an incoming request.
