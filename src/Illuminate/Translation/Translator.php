@@ -145,7 +145,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface {
 	 */
 	protected function sortReplacements(array $replace)
 	{
-		return (new Collection($replace))->sortBy(function($value, $key)
+		return (new Collection($replace))->sortBy(function($key)
 		{
 			return mb_strlen($key) * -1;
 		});
