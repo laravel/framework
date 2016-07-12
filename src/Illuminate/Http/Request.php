@@ -157,7 +157,9 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	{
 		foreach (func_get_args() as $pattern)
 		{
-			if (str_is($pattern, urldecode($this->path())))
+			$compareArray = array_map("urldecode", array($this->path(), $this->url()));
+			
+			if (in_array($pattern, $compareArray))
 			{
 				return true;
 			}
