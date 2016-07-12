@@ -744,7 +744,7 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function offsetGet($offset)
 	{
-		return $this->input($offset);
+		return array_get($this->all(), $offset, null);
 	}
 
 	/**
@@ -778,11 +778,11 @@ class Request extends SymfonyRequest implements ArrayAccess {
 	 */
 	public function __get($key)
 	{
-		$input = $this->input();
+		$all = $this->all();
 
-		if (array_key_exists($key, $input))
+		if (array_key_exists($key, $all))
 		{
-			return $this->input($key);
+			return array_get($this->all(), $key, null);
 		}
 		elseif ( ! is_null($this->route()))
 		{
