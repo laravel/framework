@@ -122,6 +122,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 			$table->string('migration');
 
 			$table->integer('batch');
+
+			$table->primary('migration');
 		});
 	}
 
