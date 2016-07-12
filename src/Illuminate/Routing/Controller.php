@@ -40,11 +40,12 @@ abstract class Controller {
 	 *
 	 * @param  string  $middleware
 	 * @param  array   $options
+	 * @param  array   $data
 	 * @return void
 	 */
-	public function middleware($middleware, array $options = array())
+	public function middleware($middleware, array $options = [], array $data = [])
 	{
-		$this->middleware[$middleware] = $options;
+		$this->middleware[$middleware] = array_merge($options, [ 'data' => $data ]);
 	}
 
 	/**

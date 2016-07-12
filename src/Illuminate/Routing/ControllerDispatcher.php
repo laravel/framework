@@ -125,7 +125,7 @@ class ControllerDispatcher {
 		{
 			if ( ! $this->methodExcludedByOptions($method, $options))
 			{
-				$results[] = array_get($middleware, $name, $name);
+				$results[array_get($middleware, $name, $name)] = $options['data'];
 			}
 		}
 
