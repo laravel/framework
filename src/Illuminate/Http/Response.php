@@ -57,7 +57,7 @@ class Response extends BaseResponse {
 	{
 		if ($content instanceof Jsonable) return $content->toJson();
 
-		return json_encode($content);
+		return json_encode($content, JSON_PRETTY_PRINT);
 	}
 
 	/**

@@ -21,7 +21,7 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase {
 
 		$response = new Illuminate\Http\Response();
 		$response->setContent(array('foo' => 'bar'));
-		$this->assertEquals('{"foo":"bar"}', $response->getContent());
+		$this->assertEquals("{\n    \"foo\": \"bar\"\n}", $response->getContent());
 		$this->assertEquals('application/json', $response->headers->get('Content-Type'));
 	}
 
