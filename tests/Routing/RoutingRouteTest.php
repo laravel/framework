@@ -728,6 +728,16 @@ class RoutingRouteTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testResourceRoutingException()
+	{
+		$router = $this->getRouter();
+		$router->resource('/', 'FooController');
+	}
+
+
 	public function testResourceRouteNaming()
 	{
 		$router = $this->getRouter();
