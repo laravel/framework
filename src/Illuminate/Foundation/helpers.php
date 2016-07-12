@@ -624,7 +624,7 @@ if ( ! function_exists('env'))
 
 			case 'null':
 			case '(null)':
-				return;
+				return null;
 		}
 
 		if (Str::startsWith($value, '"') && Str::endsWith($value, '"'))
