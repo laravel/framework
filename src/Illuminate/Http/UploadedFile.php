@@ -2,7 +2,9 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
@@ -52,6 +54,40 @@ class UploadedFile extends SymfonyUploadedFile
         }
 
         return $path.md5_file($this->path()).'.'.$this->extension();
+    }
+
+    /**
+     * Store the uploaded file on a filesystem disk.
+     *
+     * @param  string  $path
+     * @param  string|null  $disk
+     * @return string|false
+     */
+    public function store($path, $disk = null)
+    {
+        return $this->storeAs($path, $this->hashName(), $disk);
+    }
+
+    /**
+     * Store the uploaded file on a filesystem disk.
+     *
+     * @param  string  $path
+     * @param  string|null  $disk
+     * @return string|false
+     */
+    public function storeAs($path, $name, $disk = null)
+    {
+        $factory = Container::getInstance()->make(FilesystemFactory::class);
+
+        $stream = fopen($this->path(), 'r+');
+
+        $result = $factory->disk($disk)->put($path = trim($path.'/'.$name, '/'), $stream);
+
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+
+        return $result ? $path : false;
     }
 
     /**
