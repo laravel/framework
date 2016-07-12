@@ -56,9 +56,15 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase {
 	{
 		$form1 = $this->formBuilder->label('foo', 'Foobar');
 		$form2 = $this->formBuilder->label('foo', 'Foobar', array('class' => 'control-label'));
+		$form3 = $this->formBuilder->label('foo', 'Foobar <em>emphasis</em>');
+		$form4 = $this->formBuilder->label('foo', 'Foobar <em>emphasis</em>', null, false);
+		$form5 = $this->formBuilder->label('foo', 'Foobar <em>emphasis</em>', array('class' => 'control-label'), false);
 
 		$this->assertEquals('<label for="foo">Foobar</label>', $form1);
 		$this->assertEquals('<label for="foo" class="control-label">Foobar</label>', $form2);
+		$this->assertEquals('<label for="foo">Foobar &lt;em&gt;emphasis&lt;/em&gt;</label>', $form3);
+		$this->assertEquals('<label for="foo">Foobar <em>emphasis</em></label>', $form4);
+		$this->assertEquals('<label for="foo" class="control-label">Foobar <em>emphasis</em></label>', $form5);
 	}
 
 
