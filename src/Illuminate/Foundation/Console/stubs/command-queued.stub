@@ -1,7 +1,6 @@
 <?php namespace {{namespace}};
 
 use {{rootNamespace}}Commands\Command;
-
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
