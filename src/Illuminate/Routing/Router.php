@@ -248,7 +248,7 @@ class Router implements RegistrarContract {
 		}
 
 		$routable = (new ControllerInspector)
-							->getRoutable($prepended, $uri);
+							->getRoutable($prepended, $uri, array_keys($this->binders));
 
 		// When a controller is routed using this method, we use Reflection to parse
 		// out all of the routable methods for the controller, then register each
