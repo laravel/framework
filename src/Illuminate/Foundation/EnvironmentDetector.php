@@ -39,6 +39,13 @@ class EnvironmentDetector {
 			return call_user_func($environments);
 		}
 
+		// If you are using php server, we are thinking this is your local machine, 
+		// if this is not true, we have a bad news for you.
+		if(php_sapi_name() == 'cli-server')
+		{
+			return 'local';
+		}
+
 		foreach ($environments as $environment => $hosts)
 		{
 			// To determine the current environment, we'll simply iterate through the possible
