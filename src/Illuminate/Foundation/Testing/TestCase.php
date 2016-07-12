@@ -13,7 +13,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
 	 */
-	abstract public function createApplication();
+	abstract public static function createApplication();
 
 	/**
 	 * Setup the test environment.
