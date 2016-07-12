@@ -43,6 +43,13 @@ class BelongsToMany extends Relation {
 	protected $pivotColumns = array();
 
 	/**
+	 * Pivot Columns to be set when creating a new link
+	 *
+	 * @var array
+	 */
+	protected $pivotFilters = array();
+
+	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -99,6 +106,64 @@ class BelongsToMany extends Relation {
 	public function orWherePivot($column, $operator = null, $value = null)
 	{
 		return $this->wherePivot($column, $operator, $value, 'or');
+	}
+
+
+	/**
+	 * Create a new filter to set when creating a link
+	 *
+	 * @param closure|array|string $column
+	 * @param closure|string|null $value
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function setFilter($column, $value = null)
+	{
+		if (is_array($column)){
+			$this->pivotFilters = array_merge($this->pivotFilters,$column);
+		} elseif (is_callable($column)) {
+			$this->pivotFilters[] = $column;
+		} else {
+			$this->pivotFilters[ $column ] = $value;
+		}
+		return $this;
+	}
+
+	/**
+	 * Run any closures and return an array of column=>value
+	 *
+	 * @return array
+	 */
+	protected function generateFilters()
+	{
+		$filters = array();
+		foreach ($this->pivotFilters as $column => $value)
+		{
+			if (is_callable($value)) {
+				$result = call_user_func($value, $this);
+				if (is_array($result)) {
+					$filters = array_merge($filters, $result);
+				} else {
+					$filters[$column] = $result;
+				}
+			} else {
+				$filters[$column] = $value;
+			}
+		}
+		return $filters;
+	}
+
+	/**
+	 * @param string $column
+	 * @param string|null $value
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function filter($column, $value = null)
+	{
+		$this->setFilter($column, $value);
+		$this->wherePivot($column, $value);
+		$this->withPivot(array($column));
+
+		return $this;
 	}
 
 	/**
@@ -487,6 +552,8 @@ class BelongsToMany extends Relation {
 	public function save(Model $model, array $joining = array(), $touch = true)
 	{
 		$model->save(array('touch' => false));
+
+		$joining = array_merge($joining, $this->generateFilters());
 
 		$this->attach($model->getKey(), $joining, $touch);
 
