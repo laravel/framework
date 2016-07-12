@@ -3038,6 +3038,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if the model matches the model passed in.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
+     */
+    public function is(Model $model)
+    {
+        return $this->getKey() === $model->getKey() && $this->getTable() === $model->getTable();
+    }
+
+    /**
      * Get all of the current attributes on the model.
      *
      * @return array

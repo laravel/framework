@@ -1349,6 +1349,31 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
         $this->assertSame($scopes, $model->scopesCalled);
     }
 
+    public function testIsWithTheSameModelInstance()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = new EloquentModelStub(['id' => 1]);
+        $result = $firstInstance->is($secondInstance);
+        $this->assertTrue($result);
+    }
+
+    public function testIsWithAnotherModelInstance()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = new EloquentModelStub(['id' => 2]);
+        $result = $firstInstance->is($secondInstance);
+        $this->assertFalse($result);
+    }
+
+    public function testIsWIthAnotherModel()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance->setTable('foo');
+        $result = $firstInstance->is($secondInstance);
+        $this->assertFalse($result);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
