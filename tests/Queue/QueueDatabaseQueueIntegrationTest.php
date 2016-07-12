@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use \Illuminate\Queue\DatabaseQueue;
 use Carbon\Carbon;
 use Illuminate\Container\Container;
+use \Symfony\Bridge\PhpUnit\ClockMock;
 
 class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -46,6 +47,31 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $this->queue->setContainer($this->container);
 
         $this->createSchema();
+
+        ClockMock::register(DatabaseQueue::class);
+
+        ClockMock::withClockMock(true);
+    }
+
+    /**
+     * Gets a mock queue instance.
+     *
+     * @param callable $callback
+     * @return PHPUnit_Framework_MockObject_MockBuilder
+     */
+    public function getMockQueue($callback = null)
+    {
+        $builder = $this->getMockBuilder(DatabaseQueue::class)->setConstructorArgs([$this->connection(), $this->table]);
+
+        if (is_callable($callback)) {
+            $callback($builder);
+        }
+
+        $queue = $builder->getMock();
+
+        $queue->setContainer($this->container);
+
+        return $queue;
     }
 
     /**
@@ -95,6 +121,8 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->schema()->drop('jobs');
+
+        ClockMock::withClockMock(false);
     }
 
     /**
@@ -208,5 +236,87 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
         $popped_job = $this->queue->pop($mock_queue_name);
 
         $this->assertNull($popped_job);
+    }
+
+    /**
+     * Test that pop returns null when there are no jobs in a queue.
+     */
+    public function testPopWhenQueueIsEmpty()
+    {
+        $mock_queue_name = 'mock_queue_name';
+
+        $popped_job = $this->queue->pop($mock_queue_name);
+
+        $this->assertNull($popped_job);
+    }
+
+    /**
+     * Test that when a worker is attempts to reserve an already reserved job, no update is performed.
+     */
+    public function testReservedJobDoesNotGetReservedAgain()
+    {
+        $job = [
+            'id' => 1,
+            'queue' => 'mock_queue_name',
+            'payload' => 'mock_payload',
+            'attempts' => 0,
+            'reserved_at' => null,
+            'available_at' => Carbon::now()->subDay()->getTimestamp(),
+            'created_at' => Carbon::now()->getTimestamp(),
+        ];
+
+
+        $reserved_job = [
+            'id' => $job['id'],
+            'queue' => $job['queue'],
+            'payload' => $job['payload'],
+            'attempts' => $job['attempts'],
+            'reserved_at' =>  Carbon::now()->addDay()->getTimestamp(),
+            'available_at' => $job['available_at'],
+            'created_at' => $job['created_at'],
+        ];
+
+        $mock_queue = $this->getMockQueue(function (PHPUnit_Framework_MockObject_MockBuilder $builder) {
+            $builder->setMethods(['getNextAvailableJob']);
+        });
+
+        $mock_queue
+            ->expects($this->exactly(2))
+            ->method('getNextAvailableJob')
+            ->withAnyParameters()
+            ->willReturnOnConsecutiveCalls((object) $job);
+
+        $this->connection()->table('jobs')->insert($reserved_job);
+
+        $popped_job = $mock_queue->pop($job['queue']);
+
+        $this->assertNull($popped_job);
+    }
+
+    /**
+     * Tests that an exception is thrown if the pop method fails to reserve a job an excessive number of times.
+     *
+     * @group time-sensitive
+     * @expectedException Illuminate\Queue\ExcessiveBlockException
+     */
+    public function testExceptionIsThrownWhenPopAttemptsBecomeExcessive()
+    {
+        $mock_queue = $this->getMockQueue(function (PHPUnit_Framework_MockObject_MockBuilder $builder) {
+            $builder->setMethods(['getNextAvailableJob', 'markJobAsReserved']);
+        });
+
+        $mock_queue
+            ->expects($this->atLeastOnce())
+            ->method('getNextAvailableJob')
+            ->withAnyParameters()
+            ->willReturn('mock_job');
+
+        $mock_queue
+            ->expects($this->atLeastOnce())
+            ->method('markJobAsReserved')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mock_queue->pop('mock_queue');
     }
 }

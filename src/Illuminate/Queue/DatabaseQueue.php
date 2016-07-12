@@ -154,45 +154,66 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
+     * @throws ExcessiveBlockException
      */
     public function pop($queue = null)
     {
         $queue = $this->getQueue($queue);
 
-        $this->database->beginTransaction();
+        do {
+            $times_blocked = ! isset($times_blocked) ? 0 : $times_blocked + 1;
 
-        if ($job = $this->getNextAvailableJob($queue)) {
-            $job = $this->markJobAsReserved($job);
+            if (isset($job)) {
+                // If a worker has been blocked excessively, we will throw an exception to notify developers.
+                // The higher the number of attempts, the less efficient the process; either the driver should be
+                // transitioned to one that can handle a higher number of workers on a single queue, or the queue
+                // should be divided (if possible) into sub queues with less workers.
+                if ($times_blocked >= 10) {
+                    throw new ExcessiveBlockException();
+                }
 
-            $this->database->commit();
+                // If the process has previously been blocked, then we will sleep for a random amount of time before
+                // continuing; this way, we will re-start any simultaneously blocked processes at different times.
+                usleep(rand(500000, 3000000));
+            }
 
-            return new DatabaseJob(
-                $this->container, $this, $job, $queue
-            );
-        }
+            $job = $this->getNextAvailableJob($queue);
 
-        $this->database->commit();
+            $job = is_null($job) ? null : $this->markJobAsReserved($job);
+        } while (! is_null($job) && $job === false);
+
+        return is_null($job) ? null : $this->makeJob($queue, $job);
+    }
+
+    /**
+     * Creates a new job instance.
+     *
+     * @param string $queue
+     * @param \stdClass $attributes
+     * @return DatabaseJob
+     */
+    protected function makeJob($queue, $attributes)
+    {
+        return new DatabaseJob($this->container, $this, $attributes, $queue);
     }
 
     /**
      * Get the next available job for the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null  $queue
      * @return \StdClass|null
      */
     protected function getNextAvailableJob($queue)
     {
-        $job = $this->database->table($this->table)
-                    ->lockForUpdate()
-                    ->where('queue', $this->getQueue($queue))
-                    ->where(function ($query) {
-                        $this->isAvailable($query);
-                        $this->isReservedButExpired($query);
-                    })
-                    ->orderBy('id', 'asc')
-                    ->first();
-
-        return $job ? (object) $job : null;
+        return $this->database
+            ->table($this->table)
+            ->where('queue', $this->getQueue($queue))
+            ->where(function ($query) {
+                $this->isAvailable($query);
+                $this->isReservedButExpired($query);
+            })
+            ->orderBy('id', 'asc')
+            ->first();
     }
 
     /**
@@ -225,22 +246,25 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
-     * Mark the given job ID as reserved.
+     * Mark the given job as reserved.
      *
      * @param \stdClass $job
-     * @return \stdClass
+     * @return \stdClass|false
      */
     protected function markJobAsReserved($job)
     {
-        $job->attempts = $job->attempts + 1;
-        $job->reserved_at = $this->getTime();
+        $num_updates = $this->database
+            ->table($this->table)
+            ->where('id', $job->id)
+            ->where('attempts', $job->attempts)
+            ->where('reserved_at', $job->reserved_at)
+            ->where('available_at', $job->available_at)
+            ->update([
+                'reserved_at' => $job->reserved_at = $this->getTime(),
+                'attempts' => ++$job->attempts,
+            ]);
 
-        $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->reserved_at,
-            'attempts' => $job->attempts,
-        ]);
-
-        return $job;
+        return $num_updates === 1 ? $job : false;
     }
 
     /**
