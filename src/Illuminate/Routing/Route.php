@@ -289,7 +289,7 @@ class Route
         }
 
         if (is_string($middleware)) {
-            $middleware = [$middleware];
+            $middleware = func_get_args();
         }
 
         $this->action['middleware'] = array_merge(
