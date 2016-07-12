@@ -8,6 +8,21 @@ abstract class Migration {
 	 * @var string
 	 */
 	protected $connection;
+	
+	/**
+	 * The schema builder for migrations.
+	 * 
+	 * @var Illuminate\Database\Schema\Builder
+	 */
+	 protected $builder;
+
+	/**
+	 * Construct an instance of Migration.
+	 */
+	function __construct()
+	{
+		$this->builder = app('db')->connection($this->connection)->getSchemaBuilder();
+	}
 
 	/**
 	 * Get the migration connection name.
@@ -18,5 +33,15 @@ abstract class Migration {
 	{
 		return $this->connection;
 	}
+	
+	/**
+	 * Get the schema builder.
+	 * 
+	 * @return Illuminate\Database\Schema\Builder
+	 */
+	 public function builder()
+	 {
+	 	return $this->builder;
+	 }
 
 }
