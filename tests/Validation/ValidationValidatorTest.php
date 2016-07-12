@@ -1376,7 +1376,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testValidateEach()
+	public function testEach()
 	{
 		$trans = $this->getRealTranslator();
 		$data = ['foo' => [5, 10, 15]];
@@ -1390,7 +1390,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
-	public function testValidateEachWithNonIndexedArray()
+	public function testEachWithNonIndexedArray()
 	{
 		$trans = $this->getRealTranslator();
 		$data = ['foobar' => [
@@ -1408,7 +1408,7 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($v->passes());
 	}
 
-	public function testValidateEachWithNonArrayWithArrayRule()
+	public function testEachWithNonArrayWithArrayRule()
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'Array']);
@@ -1420,11 +1420,33 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
-	public function testValidateEachWithNonArrayWithoutArrayRule()
+	public function testEachWithNonArrayWithoutArrayRule()
 	{
 		$trans = $this->getRealTranslator();
 		$v = new Validator($trans, ['foo' => 'string'], ['foo' => 'numeric']);
 		$v->each('foo', ['min:7|max:13']);
+		$this->assertFalse($v->passes());
+	}
+
+
+	public function testValidateEach()
+	{
+		$v = new Validator(
+			$this->getRealTranslator(),
+			['children' => ['string', 'string1']],
+			['children' => ['array', ['each', 'required']]]
+		);
+		$this->assertTrue($v->passes());
+	}
+
+
+	public function testValidateEachMultDimensional()
+	{
+		$v = new Validator(
+			$this->getRealTranslator(),
+			['children' => [['name' => '']]],
+			['children' => ['array', ['each', 'name' => 'required']]]
+		);
 		$this->assertFalse($v->passes());
 	}
 
