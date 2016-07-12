@@ -48,6 +48,20 @@ abstract class Controller {
 	}
 
 	/**
+	 * Remove middleware on the controller.
+	 *
+	 * @param  string  $middleware
+	 * @return void
+	 */
+	public function removeMiddleware($middleware)
+	{
+		if(isset($this->middleware[$middleware]))
+		{
+			unset($this->middleware[$middleware]);
+		}
+	}
+
+	/**
 	 * Register a "before" filter on the controller.
 	 *
 	 * @param  \Closure|string  $filter
