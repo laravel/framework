@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Support\Facades\Facade;
 
 trait ApplicationTrait {
 
@@ -54,7 +55,13 @@ trait ApplicationTrait {
 	{
 		$request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
 
-		return $this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
+		$this->response = $this->app->make('Illuminate\Contracts\Http\Kernel')->handle($request);
+
+		// Clear the resolved request instance, otherwise subsequent invocations of call()
+		// in the same test will reuse the first request instance
+		Facade::clearResolvedInstances();
+
+		return $this->response;
 	}
 
 	/**
