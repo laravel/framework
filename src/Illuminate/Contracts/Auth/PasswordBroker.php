@@ -73,4 +73,12 @@ interface PasswordBroker {
 	 */
 	public function validateNewPassword(array $credentials);
 
+    /**
+     * Validate reset password token.
+     *
+     * @param  string  $token
+     * @return bool
+     */
+    public function validateToken($token);
+
 }
