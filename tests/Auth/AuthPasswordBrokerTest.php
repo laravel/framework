@@ -153,6 +153,26 @@ class AuthPasswordBrokerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('user' => $user, 'password' => 'password'), $_SERVER['__password.reset.test']);
 	}
 
+	public function testEmailViewIsUpdatedOnRequest()
+	{
+		unset($_SERVER['__password.reset.test']);
+		$broker = $this->getBroker($mocks = $this->getMocks());
+		$broker->setEmailView('resetLinkAlterView');
+		$callback = function($message, $user) { $_SERVER['__password.reset.test'] = true; };
+		$user = m::mock('Illuminate\Contracts\Auth\CanResetPassword');
+		$mocks['mailer']->shouldReceive('send')->once()->with('resetLinkAlterView', array('token' => 'token', 'user' => $user), m::type('Closure'))->andReturnUsing(function($view, $data, $callback)
+		{
+			return $callback;
+		});
+		$user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
+		$message = m::mock('StdClass');
+		$message->shouldReceive('to')->once()->with('email');
+		$result = $broker->emailResetLink($user, 'token', $callback);
+		call_user_func($result, $message);
+
+		$this->assertTrue($_SERVER['__password.reset.test']);		
+	}
+
 
 	protected function getBroker($mocks)
 	{
