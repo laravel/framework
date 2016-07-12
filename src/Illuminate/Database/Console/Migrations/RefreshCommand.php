@@ -44,7 +44,7 @@ class RefreshCommand extends Command
 
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
-        // only rollback and remigrate the latest four migrations instead of all.
+        // only rollback and remigrate the last four migrations instead of all.
         $step = Arr::get(
             $this->getOptions(), $this->input->getOption('step'), 0
         );
