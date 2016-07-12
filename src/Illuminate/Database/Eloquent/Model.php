@@ -723,12 +723,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Define a polymorphic, inverse one-to-one or many relationship.
 	 *
+	 * @param  string  $related
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo
 	 */
-	public function morphTo($name = null, $type = null, $id = null)
+	public function morphTo($related = null, $name = null, $type = null, $id = null)
 	{
 		// If no name is provided, we will use the backtrace to get the function name
 		// since that is most likely the name of the polymorphic interface. We can
@@ -757,7 +758,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// we will pass in the appropriate values so that it behaves as expected.
 		else
 		{
-			$instance = new $class;
+			$instance = ($related) ? new $related : new $class;
 
 			return new MorphTo(
 				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
