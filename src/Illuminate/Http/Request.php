@@ -307,7 +307,11 @@ class Request extends SymfonyRequest implements ArrayAccess {
 
 		foreach ($keys as $key)
 		{
-			array_set($results, $key, array_get($input, $key));
+			$value = array_get($input, $key);
+			
+			if( ! is_null($value)){
+				array_set($results, $key, $value);
+			}
 		}
 
 		return $results;
