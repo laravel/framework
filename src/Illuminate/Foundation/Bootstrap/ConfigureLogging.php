@@ -63,7 +63,7 @@ class ConfigureLogging {
 	 */
 	protected function configureSingleHandler(Application $app, Writer $log)
 	{
-		$log->useFiles($app->storagePath().'/logs/laravel.log');
+		$log->useFiles($app->logPath());
 	}
 
 	/**
@@ -76,8 +76,8 @@ class ConfigureLogging {
 	protected function configureDailyHandler(Application $app, Writer $log)
 	{
 		$log->useDailyFiles(
-			$app->storagePath().'/logs/laravel.log',
-			$app->make('config')->get('app.log_max_files', 5)
+			$app->logPath(),
+			$app->make('config')->get('log.max_files', 5)
 		);
 	}
 

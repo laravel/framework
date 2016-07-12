@@ -329,6 +329,24 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 	}
 
 	/**
+	 * Get the path to the log file.
+	 * If the path is defined without a leading slash, it will be
+	 * resolved relative to the storage path.
+	 *
+	 * @return string
+	 */
+	public function logPath()
+	{
+		$path = $this['config']->get('log.path', 'logs/laravel.log');
+
+		if(substr($path, 0, 1) != DIRECTORY_SEPARATOR) {
+			$path = $this->storagePath().DIRECTORY_SEPARATOR.$path;
+		}
+
+		return $path;
+	}
+
+	/**
 	 * Get the path to the public / web directory.
 	 *
 	 * @return string
