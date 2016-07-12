@@ -304,16 +304,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 	 */
 	public function register($provider, $options = array(), $force = false)
 	{
-		if ($registered = $this->getRegistered($provider) && ! $force)
-                                     return $registered;
+		if ($registered = $this->getRegistered($provider) && ! $force) return $registered;
 
 		// If the given "provider" is a string, we will resolve it, passing in the
 		// application instance automatically for the developer. This is simply
 		// a more convenient way of specifying your service provider classes.
-		if (is_string($provider))
-		{
-			$provider = $this->resolveProviderClass($provider);
-		}
+		if (is_string($provider)) $provider = $this->resolveProviderClass($provider);
 
 		$provider->register();
 
