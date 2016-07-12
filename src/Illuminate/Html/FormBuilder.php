@@ -646,6 +646,9 @@ class FormBuilder {
 
 		$posted = $this->getValueAttribute($name);
 
+		// If posted value is a string other than "0" cast to an array
+		if (is_string($posted) && (bool)$posted) $posted = array($posted);
+
 		return is_array($posted) ? in_array($value, $posted) : (bool) $posted;
 	}
 
