@@ -4,12 +4,12 @@ php:
   - 5.5.9
   - 5.5
   - 5.6
-  - 7.0
   - hhvm
 
 env:
   global:
     - setup=basic
+    - coverage=false
 
 matrix:
   include:
@@ -17,6 +17,8 @@ matrix:
       env: setup=lowest
     - php: 5.5.9
       env: setup=stable
+    - php: 7.0
+      env: coverage=true
 
 sudo: false
 
@@ -28,4 +30,9 @@ install:
   - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable; fi
   - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable; fi
 
-script: vendor/bin/phpunit
+script:
+  - if [[ $coverage = 'false' ]]; then vendor/bin/phpunit; fi
+  - if [[ $coverage = 'true' ]]; then vendor/bin/phpunit --verbose --coverage-text --coverage-clover=coverage.xml; fi
+
+after_success:
+  - if [[ $coverage != 'true' ]]; then codecov; fi
