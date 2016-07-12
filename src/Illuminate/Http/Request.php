@@ -338,6 +338,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Retrieve an input item from the request.
+     * Overridden to support all of Illuminate's input sources.
+     *
+     * @param  string  $key
+     * @param  string|array|null  $default
+     * @return string|array
+     */
+    public function get($key, $default = null)
+    {
+        return $this->input($key, $default);
+    }
+
+    /**
      * Get a subset of the items from the input data.
      *
      * @param  array|mixed  $keys
@@ -824,25 +837,25 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Create an Illuminate request from a Symfony instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Request  $baseRequest
      * @return \Illuminate\Http\Request
      */
-    public static function createFromBase(SymfonyRequest $request)
+    public static function createFromBase(SymfonyRequest $baseRequest)
     {
-        if ($request instanceof static) {
-            return $request;
+        if ($baseRequest instanceof static) {
+            return $baseRequest;
         }
 
-        $content = $request->content;
+        $request = (new static);
 
-        $request = (new static)->duplicate(
+        $request->content = $baseRequest->content;
 
-            $request->query->all(), $request->request->all(), $request->attributes->all(),
+        $request = $request->duplicate(
 
-            $request->cookies->all(), $request->files->all(), $request->server->all()
+            $baseRequest->query->all(), $baseRequest->request->all(), $baseRequest->attributes->all(),
+
+            $baseRequest->cookies->all(), $baseRequest->files->all(), $baseRequest->server->all()
         );
-
-        $request->content = $content;
 
         $request->request = $request->getInputSource();
 
