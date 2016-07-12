@@ -685,6 +685,47 @@ class Builder {
 	}
 
 	/**
+	 * Add a relationship count condition to the query by given model.
+	 * 
+	 * @param  string  $relation
+	 * @param  Model   $model
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function hasIn($relationName, Model $model, $boolean = 'and')
+	{
+		$relation = $this->getHasRelationQuery($relationName);
+
+		// Let us check if provided Model belongs to the given relation
+		// because developer may have used incorrect Model what could
+		// result giving completely mistaken results of this query.
+		if (($accepted = get_class($relation->getRelated())) !== $given = get_class($model))
+		{
+			throw new \InvalidArgumentException('Relation "{$relationName}" accepts only "{$accepted}" model. '
+				. 'Instance of "{$given}" given.');
+		}
+
+		$query = $relation->getRelationCountQuery($model->newQuery(), $this);
+
+		$query->where($model->getQualifiedKeyName(), '=', $model->getKey());
+
+		return $this->addHasWhere($query, $relation, '>=', 1, $boolean);
+	}
+
+	/**
+	 * Add a relationship count condition to the query by given model with an "or".
+	 * 
+	 * @param  string  $relation
+	 * @param  Model   $model
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function orHasIn($relation, Model $model)
+	{
+		return $this->hasIn($relation, $model, 'or');
+	}
+
+	/**
 	 * Add the "has" condition where clause to the query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
@@ -910,6 +951,17 @@ class Builder {
 	 */
 	public function __call($method, $parameters)
 	{
+		if (
+			starts_with($method, 'hasIn') 
+				&& $relation = camel_case(substr($method, 5))
+				&& $boolean = 'and'
+			|| starts_with($method, 'orHasIn') 
+				&& $relation = camel_case(substr($method, 7))
+				&& $boolean = 'or'
+		)
+		{
+			return $this->hasIn($relation, $model = $parameters[0], $boolean);
+		}
 		if (method_exists($this->model, $scope = 'scope'.ucfirst($method)))
 		{
 			return $this->callScope($scope, $parameters);
