@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class MiddlewareMakeCommand extends GeneratorCommand {
 
@@ -32,7 +33,17 @@ class MiddlewareMakeCommand extends GeneratorCommand {
 	 */
 	protected function getStub()
 	{
-		return __DIR__.'/stubs/middleware.stub';
+		if ($this->option('terminable'))
+		{
+			return __DIR__.'/stubs/middleware-terminable.stub';
+		}
+
+		if ($this->option('after'))
+		{
+			return __DIR__.'/stubs/middleware-after.stub';
+		}
+
+		return __DIR__.'/stubs/middleware-before.stub';
 	}
 
 	/**
@@ -44,6 +55,20 @@ class MiddlewareMakeCommand extends GeneratorCommand {
 	protected function getDefaultNamespace($rootNamespace)
 	{
 		return $rootNamespace.'\Http\Middleware';
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return array(
+			array('after', null, InputOption::VALUE_NONE, 'Indicates that the after middleware should be generated.'),
+
+			array('terminable', null, InputOption::VALUE_NONE, 'Indicates that the terminable middleware should be generated.'),
+		);
 	}
 
 }
