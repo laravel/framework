@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Support\Str;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -554,7 +555,7 @@ class Guard {
 	 */
 	protected function refreshRememberToken(UserInterface $user)
 	{
-		$user->setRememberToken($token = str_random(60));
+		$user->setRememberToken($token = Str::random(60));
 
 		$this->provider->updateRememberToken($user, $token);
 	}
