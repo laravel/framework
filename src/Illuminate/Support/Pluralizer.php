@@ -13,6 +13,7 @@ class Pluralizer
      */
     public static $uncountable = [
         'audio',
+        'accommodation',
         'bison',
         'chassis',
         'compensation',
@@ -26,6 +27,7 @@ class Pluralizer
         'information',
         'knowledge',
         'love',
+        'luck',
         'rain',
         'money',
         'moose',
@@ -39,6 +41,8 @@ class Pluralizer
         'species',
         'swine',
         'traffic',
+        'travel',
+        'work',
     ];
 
     /**
