@@ -2371,9 +2371,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->attributes as $key => $value)
 		{
-			if ( ! array_key_exists($key, $this->original) or $value !== $this->original[$key])
-			{
+			if ( ! array_key_exists($key, $this->original)) {
 				$dirty[$key] = $value;
+			}
+			else if ($value !== $this->original[$key]) {
+				// two equivilent numerical fields shouldn't match as 'dirty', e.g. 1 and "1"
+				if (!is_numeric($value) || !is_numeric($this->original[$key]) || strcmp((string) $value, (string) $this->original[$key]) != 0) {
+					$dirty[$key] = $value;
+				}
 			}
 		}
 
