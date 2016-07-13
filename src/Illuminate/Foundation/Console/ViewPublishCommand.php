@@ -97,7 +97,7 @@ class ViewPublishCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the view files.', null),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the source view files.', null),
 		);
 	}
 
