@@ -701,7 +701,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relations = func_get_args();
         }
 
-        $query = $this->newQuery();
+        $without = array_diff($this->with, $relations);
+
+        if (empty($without)) {
+            $query = $this->newQuery()->with($relations);
+        } else {
+            $query = $this->newQuery()->with($relations)->without($this->with);
+        }
 
         $query->eagerLoadRelations([$this]);
 
