@@ -389,18 +389,14 @@ class Builder {
 	public function withTrashed()
 	{
 		$column = $this->model->getQualifiedDeletedAtColumn();
-
-		foreach ((array) $this->query->wheres as $key => $where)
+		$self   = $this;
+		
+		$this->query->wheres = array_values(array_filter($this->query->wheres, function($where) use ($column, $self)
 		{
 			// If the where clause is a soft delete date constraint, we will remove it from
 			// the query and reset the keys on the wheres. This allows this developer to
 			// include deleted model in a relationship result set that is lazy loaded.
-			if ($this->isSoftDeleteConstraint($where, $column))
-			{
-				unset($this->query->wheres[$key]);
-
-				$this->query->wheres = array_values($this->query->wheres);
-			}
+			return !$self->isSoftDeleteConstraint($where, $column);
 		}
 
 		return $this;
