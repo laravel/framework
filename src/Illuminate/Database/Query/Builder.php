@@ -210,7 +210,16 @@ class Builder {
 	 */
 	public function from($table)
 	{
-		$this->from = $table;
+		if (func_num_args() == 1)
+		{
+			$this->from = $table;
+		}
+		else if (func_get_arg(1) instanceof Builder)
+		{
+			$query = func_get_arg(1);
+			$this->from = $this->getConnection()->raw(sprintf('(%s) as `%s`', $query->toSql(), $table));
+			$this->mergeBindings($query);
+		}
 
 		return $this;
 	}

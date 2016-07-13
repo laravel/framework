@@ -225,7 +225,9 @@ class Connection implements ConnectionInterface {
 
 		$query = new Query\Builder($this, $this->getQueryGrammar(), $processor);
 
-		return $query->from($table);
+		return func_num_args() == 1
+			? $query->from($table)
+			: call_user_func_array(array($query, 'from'), func_get_args());
 	}
 
 	/**
