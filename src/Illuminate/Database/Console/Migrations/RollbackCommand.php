@@ -51,7 +51,9 @@ class RollbackCommand extends Command {
 
 		$pretend = $this->input->getOption('pretend');
 
-		$this->migrator->rollback($pretend);
+		$name = $this->input->getOption('name');
+
+		$this->migrator->rollback($pretend, $name);
 
 		// Once the migrator has run we will grab the note output and send it out to
 		// the console screen, since the migrator itself functions without having
@@ -73,6 +75,8 @@ class RollbackCommand extends Command {
 			array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
 
 			array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),
+
+			array('name', null, InputOption::VALUE_OPTIONAL, 'Comma separated list of migrations files to roleback from this batch.', null),
 		);
 	}
 
