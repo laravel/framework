@@ -87,6 +87,8 @@ trait AuthenticatesUsers
      */
     protected function sendLoginResponse(Request $request)
     {
+        $request->session()->regenerate();
+
         $this->clearLoginAttempts($request);
 
         return $this->authenticated($request, $this->guard()->user())
@@ -133,11 +135,16 @@ trait AuthenticatesUsers
     /**
      * Log the user out of the application.
      *
+     * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function logout()
+    public function logout(Request $request)
     {
         $this->guard()->logout();
+
+        $request->session()->flush();
+
+        $request->session()->regenerate();
 
         return redirect('/');
     }
