@@ -252,6 +252,14 @@ class Handler {
 				$response = $this->formatException($e);
 			}
 
+			// If the handler returns an Exception object, it is safe to say we intentionally 
+			// want to throw an exception from the handler itself. Let's throw it now so that 
+			// it can be caught.
+			if ($response instanceof \Exception)
+			{
+				throw $response;
+			}
+
 			// If this handler returns a "non-null" response, we will return it so it will
 			// get sent back to the browsers. Once the handler returns a valid response
 			// we will cease iterating through them and calling these other handlers.
