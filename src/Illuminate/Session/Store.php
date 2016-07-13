@@ -234,7 +234,7 @@ class Store implements SessionInterface
 
         $this->setExists(false);
 
-        $this->id = $this->generateSessionId();
+        $this->setId($this->generateSessionId());
 
         return true;
     }
