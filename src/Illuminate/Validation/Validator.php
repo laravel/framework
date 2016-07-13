@@ -2556,7 +2556,7 @@ class Validator implements ValidatorContract
      * @param  string|array  $rules
      * @return bool
      */
-    protected function hasRule($attribute, $rules)
+    public function hasRule($attribute, $rules)
     {
         return ! is_null($this->getRule($attribute, $rules));
     }
