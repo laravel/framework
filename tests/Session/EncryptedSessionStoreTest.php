@@ -22,7 +22,7 @@ class EncryptedSessionStoreTest extends PHPUnit_Framework_TestCase
             '_token' => $session->token(),
             'foo' => 'bar',
             'baz' => 'boom',
-            'flash' => [
+            '_flash' => [
                 'new' => [],
                 'old' => ['baz'],
             ],
