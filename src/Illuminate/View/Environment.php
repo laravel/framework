@@ -103,7 +103,7 @@ class Environment {
 	}
 
 	/**
-	 * Get a evaluated view contents for the given view.
+	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param  string  $view
 	 * @param  array   $data
@@ -133,7 +133,7 @@ class Environment {
 	}
 
 	/**
-	 * Get a evaluated view contents for a named view.
+	 * Get the evaluated view contents for a named view.
 	 *
 	 * @param string $view
 	 * @param mixed $data
