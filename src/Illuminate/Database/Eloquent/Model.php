@@ -463,9 +463,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$model = new static($attributes);
 
-		$model->save();
-
-		return $model;
+		return $model->save() ? $model : false;
 	}
 
 	/**
