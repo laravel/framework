@@ -1315,6 +1315,35 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection();
         $this->assertNull($collection->median());
     }
+
+    public function testModeOnNullCollection()
+    {
+        $collection = new Collection();
+        $this->assertNull($collection->mode());
+    }
+
+    public function testMode()
+    {
+        $collection = new Collection([1, 2, 3, 4, 4, 5]);
+        $this->assertEquals(new Collection([4]), $collection->mode());
+    }
+
+    public function testModeValueByKey()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 1],
+            (object) ['foo' => 1],
+            (object) ['foo' => 2],
+            (object) ['foo' => 4],
+        ]);
+        $this->assertEquals(new Collection([1]), $collection->mode('foo'));
+    }
+
+    public function testWithMultipleModeValues()
+    {
+        $collection = new Collection([1, 2, 2, 1]);
+        $this->assertEquals(new Collection([1, 2]), $collection->mode());
+    }
 }
 
 class TestAccessorEloquentTestStub
