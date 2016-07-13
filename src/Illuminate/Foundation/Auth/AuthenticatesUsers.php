@@ -144,7 +144,7 @@ trait AuthenticatesUsers
 
         $request->session()->flush();
 
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
 
         return redirect('/');
     }
