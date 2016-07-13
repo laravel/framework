@@ -1282,6 +1282,39 @@ class SupportCollectionTest extends PHPUnit_Framework_TestCase
             return $collection->sum();
         }));
     }
+
+    public function testMedianValueWithArrayCollection()
+    {
+        $collection = new Collection([1, 2, 2, 4]);
+
+        $this->assertEquals(2, $collection->median());
+    }
+
+    public function testMedianValueByKey()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 1],
+            (object) ['foo' => 2],
+            (object) ['foo' => 2],
+            (object) ['foo' => 4],
+        ]);
+        $this->assertEquals(2, $collection->median('foo'));
+    }
+
+    public function testEvenMedianCollection()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 0],
+            (object) ['foo' => 3],
+        ]);
+        $this->assertEquals(1.5, $collection->median('foo'));
+    }
+
+    public function testMedianOnEmptyCollectionReturnsNull()
+    {
+        $collection = new Collection();
+        $this->assertNull($collection->median());
+    }
 }
 
 class TestAccessorEloquentTestStub
