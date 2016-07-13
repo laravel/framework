@@ -106,11 +106,14 @@ class Filesystem {
 	 * Delete the file at a given path.
 	 *
 	 * @param  string|array  $paths
-	 * @return bool
+	 * @return bool|void
 	 */
 	public function delete($paths)
 	{
-		$paths = is_array($paths) ? $paths : func_get_args();
+		if( ! is_array($paths))
+		{
+			return @unlink($paths);
+		}
 
 		$success = true;
 
