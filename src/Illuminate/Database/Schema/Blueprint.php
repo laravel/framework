@@ -628,7 +628,7 @@ class Blueprint {
 	 */
 	public function softDeletes()
 	{
-		$this->timestamp('deleted_at')->nullable();
+		$this->timestamp('deleted_at')->nullable()->index();
 	}
 
 	/**
