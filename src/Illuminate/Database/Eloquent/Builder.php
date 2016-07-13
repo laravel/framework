@@ -317,7 +317,7 @@ class Builder {
 	{
 		if ( ! $this->model->usesTimestamps()) return $values;
 
-		$column = $this->model->getUpdatedAtColumn();
+		$column = $this->model->getQualifiedUpdatedAtColumn();
 
 		return array_add($values, $column, $this->model->freshTimestampString());
 	}
@@ -346,7 +346,7 @@ class Builder {
 	 */
 	protected function softDelete()
 	{
-		$column = $this->model->getDeletedAtColumn();
+		$column = $this->model->getQualifiedDeletedAtColumn();
 
 		return $this->update(array($column => $this->model->freshTimestampString()));
 	}
@@ -370,7 +370,7 @@ class Builder {
 	{
 		if ($this->model->isSoftDeleting())
 		{
-			$column = $this->model->getDeletedAtColumn();
+			$column = $this->model->getQualifiedDeletedAtColumn();
 
 			return $this->update(array($column => null));
 		}
